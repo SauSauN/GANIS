@@ -141,3 +141,13 @@
     @apply font-sans;
   }
 }
+
+/* ============================================================
+   GANIS — BARRE DE TITRE Tauri
+   ============================================================
+   Le drag de la fenêtre est géré nativement par Tauri via
+   l'attribut `data-tauri-drag-region` (voir TitleBar.tsx).
+   Aucune propriété CSS n'est nécessaire — surtout pas
+   `-webkit-app-region` qui est spécifique à Electron et
+   interfère avec le comportement de Tauri v2.
+   ============================================================ */

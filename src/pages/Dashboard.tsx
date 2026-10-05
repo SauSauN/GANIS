@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { FolderOpen, Plus, Star } from "lucide-react";
-import { TitleBar } from "@/components/layout/TitleBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,9 +28,7 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-background">
-      <TitleBar />
-
+    <div className="flex min-h-0 flex-1 flex-col bg-background">
       <main className="mx-auto w-full max-w-5xl flex-1 overflow-y-auto px-6 py-8">
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
