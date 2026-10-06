@@ -11,14 +11,28 @@ export default function Login() {
   const { login, loading, error, clearError } = useAuthStore();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [localError, setLocalError] = useState<string | null>(null);
 
   useEffect(() => clearError(), [clearError]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!username.trim() || !password) return;
-    if (await login(username.trim(), password)) navigate("/dashboard", { replace: true });
+    setLocalError(null);
+
+    if (!username.trim()) {
+      setLocalError("Le nom d'utilisateur est requis.");
+      return;
+    }
+    if (!password) {
+      setLocalError("Le mot de passe est requis.");
+      return;
+    }
+
+    const ok = await login(username.trim(), password);
+    if (ok) navigate("/dashboard", { replace: true });
   }
+
+  const shownError = localError ?? error;
 
   return (
     <main className="flex flex-1 items-center justify-center bg-background px-4 py-6">
@@ -41,12 +55,7 @@ export default function Login() {
                 onChange={(e) => setPassword(e.target.value)} />
             </div>
 
-            {error && <p role="alert" className="text-sm text-destructive">{error}</p>}
-            {import.meta.env.DEV && (
-              <p className="text-xs text-muted-foreground">
-                Formulaire seul pour l'instant : l'authentification est branchée à la Phase 3.
-              </p>
-            )}
+            {shownError && <p role="alert" className="text-sm text-destructive">{shownError}</p>}
           </CardContent>
 
           <CardFooter className="mt-4 flex-col gap-3">

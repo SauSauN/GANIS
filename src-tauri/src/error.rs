@@ -109,6 +109,12 @@ impl From<serde_json::Error> for AppError {
     }
 }
 
+impl From<sqlx::Error> for AppError {
+    fn from(e: sqlx::Error) -> Self {
+        AppError::database(e)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

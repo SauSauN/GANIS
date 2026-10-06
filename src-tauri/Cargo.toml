@@ -51,6 +51,14 @@ tracing = "0.1.44"
 tracing-subscriber = "0.3.23"
 tracing-appender = "0.2.5"
 
+# --- Sécurité (Phase 3) ---
+# Argon2id pour le hachage des mots de passe (recommandation OWASP).
+argon2 = "0.5"
+# Génération de sel cryptographiquement sûr.
+rand = "0.8"
+# Hachage SHA-256 pour les tokens de session.
+sha2 = "0.10"
+
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
 [profile.release]
 codegen-units = 1
