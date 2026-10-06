@@ -1,13 +1,42 @@
+// ============================================================================
+// GANIS — Types partagés entre le frontend et le backend Rust.
+// ============================================================================
+// Ces types doivent rester synchronisés avec les structs Rust exposés
+// via #[derive(Serialize)] dans src-tauri/src/models/.
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// Utilisateurs & authentification
+// ----------------------------------------------------------------------------
+
 export type Role = "admin" | "developer" | "user";
 
+/**
+ * Utilisateur tel qu'exposé par le backend (correspond à `UserPublic` en Rust).
+ * Le hash et le sel du mot de passe ne sont jamais transmis à l'interface.
+ */
 export interface User {
   id: string;
   username: string;
   email?: string | null;
   role: Role;
+  createdAt: string; // RFC 3339, UTC
+  updatedAt: string; // RFC 3339, UTC
 }
 
-export type ProjectType = "manga" | "novel" | "film" | "series" | "game" | "rpg" | "custom";
+// ----------------------------------------------------------------------------
+// Projets narratifs
+// ----------------------------------------------------------------------------
+
+export type ProjectType =
+  | "manga"
+  | "novel"
+  | "film"
+  | "series"
+  | "game"
+  | "rpg"
+  | "custom";
+
 export type ProjectStatus = "preparing" | "in_progress" | "paused" | "done";
 
 export interface Project {
@@ -19,8 +48,12 @@ export interface Project {
   isFavorite: boolean;
   isArchived: boolean;
   createdAt: string; // RFC 3339, UTC
-  updatedAt: string;
+  updatedAt: string; // RFC 3339, UTC
 }
+
+// ----------------------------------------------------------------------------
+// Informations sur l'application
+// ----------------------------------------------------------------------------
 
 export interface AppInfo {
   name: string;
@@ -28,6 +61,14 @@ export interface AppInfo {
   offline: boolean;
 }
 
+// ----------------------------------------------------------------------------
+// Gestion des erreurs
+// ----------------------------------------------------------------------------
+
+/**
+ * Codes d'erreur renvoyés par Rust (voir `error.rs`, enum `ErrorCode`).
+ * Toute valeur hors de cette liste doit être traitée comme `INTERNAL`.
+ */
 export type ErrorCode =
   | "INTERNAL"
   | "VALIDATION"
@@ -38,11 +79,15 @@ export type ErrorCode =
   | "DATABASE"
   | "IO";
 
-/** Forme exacte de l'erreur renvoyée par Rust (error.rs). */
+/** Forme exacte de l'erreur renvoyée par Rust (voir `error.rs`). */
 export interface ApiErrorPayload {
   code: ErrorCode;
   message: string;
 }
+
+// ----------------------------------------------------------------------------
+// Libellés pour l'interface
+// ----------------------------------------------------------------------------
 
 export const PROJECT_TYPE_LABELS: Record<ProjectType, string> = {
   manga: "Manga",
@@ -59,4 +104,10 @@ export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
   in_progress: "En cours",
   paused: "En pause",
   done: "Terminé",
+};
+
+export const ROLE_LABELS: Record<Role, string> = {
+  admin: "Administrateur",
+  developer: "Développeur",
+  user: "Utilisateur",
 };
