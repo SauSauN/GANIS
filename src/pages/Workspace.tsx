@@ -4,7 +4,6 @@ import { FileText } from "lucide-react";
 import { ActivityBar, type ActivityId } from "@/components/layout/ActivityBar";
 import { SideBar } from "@/components/layout/SideBar";
 import { StatusBar } from "@/components/layout/StatusBar";
-import { TitleBar } from "@/components/layout/TitleBar";
 import { useProjectStore } from "@/stores/projectStore";
 
 export default function Workspace() {
@@ -25,9 +24,7 @@ export default function Workspace() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-background">
-      <TitleBar projectName={project.name} />
-
+    <div className="flex min-h-0 flex-1 flex-col bg-background">
       <div className="flex min-h-0 flex-1">
         <ActivityBar active={view} panelOpen={panelOpen} onSelect={select} />
         {panelOpen && <SideBar view={view} projectName={project.name} />}
@@ -41,7 +38,7 @@ export default function Workspace() {
             </div>
           </div>
 
-          <div className="flex flex-1 flex-col items-center justify-center gap-2 p-8 text-center">
+          <div className="flex flex-1 flex-col items-center justify-center gap-2 overflow-y-auto p-8 text-center">
             <h2 className="text-xl font-semibold">{project.name}</h2>
             <p className="max-w-md text-sm text-muted-foreground">
               Choisissez un élément dans l'explorateur pour l'ouvrir. L'éditeur et les fiches arrivent

@@ -3,27 +3,37 @@
   "productName": "ganis",
   "version": "0.1.0",
   "identifier": "ganis",
+
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
     "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
+
   "app": {
     "windows": [
       {
-        "title": "ganis",
+        "label": "main",
+        "title": "GANIS",
         "width": 800,
-        "height": 600
+        "height": 600,
+        "decorations": false,
+        "resizable": true,
+        "maximizable": true,
+        "minimizable": true
       }
     ],
+
     "security": {
       "csp": null
     }
   },
+
   "bundle": {
     "active": true,
     "targets": "all",
+
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",

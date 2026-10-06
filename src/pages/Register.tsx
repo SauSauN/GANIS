@@ -41,7 +41,7 @@ export default function Register() {
   const shownError = localError ?? error;
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-4">
+    <main className="flex flex-1 items-center justify-center bg-background px-4 py-6">
       <Card className="w-full max-w-sm">
         <form onSubmit={onSubmit}>
           <CardHeader>

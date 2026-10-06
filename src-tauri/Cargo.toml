@@ -1,7 +1,7 @@
 [package]
 name = "ganis"
 version = "0.1.0"
-description = "A Tauri App"
+description = "GANIS — Studio de conception narrative"
 authors = ["you"]
 edition = "2021"
 
@@ -18,17 +18,38 @@ crate-type = ["staticlib", "cdylib", "rlib"]
 tauri-build = { version = "2", features = [] }
 
 [dependencies]
+# --- Tauri ---
 tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
+
+# --- Sérialisation ---
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tauri-plugin-sql = { version = "2.5.0", features = ["sqlite"] }
+
+# --- Base de données (Phase 2) ---
+# sqlx gère SQLite, les migrations embarquées et les requêtes async.
+# ATTENTION : la feature "macros" est indispensable pour la macro
+# sqlx::migrate! utilisée dans db/migrations.rs.
+sqlx = { version = "0.8", default-features = false, features = [
+    "runtime-tokio",
+    "sqlite",
+    "migrate",
+    "macros",
+    "chrono",
+] }
+
+# --- Runtime async (Phase 2) ---
+# Nécessaire pour `tokio::sync::Mutex` dans state.rs.
+tokio = { version = "1", features = ["sync"] }
+
+# --- Utilitaires ---
 chrono = "0.4.45"
+uuid = { version = "1.27.0", features = ["v4"] }
+
+# --- Journalisation ---
 tracing = "0.1.44"
 tracing-subscriber = "0.3.23"
 tracing-appender = "0.2.5"
-uuid = { version = "1.27.0", features = ["v4"] }
-
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
 [profile.release]
