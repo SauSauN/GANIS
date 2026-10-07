@@ -1,8 +1,10 @@
-import { useState } from "react";
+import type { MouseEvent } from "react";
 import { useMatch, useNavigate } from "react-router-dom";
-import { Feather, LogOut, Moon, Sun } from "lucide-react";
+import { Feather, Moon, Settings, Sun } from "lucide-react";
+import { UserMenu } from "@/components/layout/UserMenu";
 import { WindowControls } from "@/components/layout/WindowControls";
-import { applyTheme, type Theme } from "@/lib/theme";
+import { applyTheme, useResolvedTheme, type Theme } from "@/lib/theme";
+import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { useProjectStore } from "@/stores/projectStore";
 
@@ -12,45 +14,58 @@ const iconButton =
   "flex h-7 w-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground";
 
 /**
- * Barre de titre unique de l'application (remplace la barre native de Windows).
- * Seules les zones explicitement marquées `data-tauri-drag-region` permettent
- * de déplacer la fenêtre. Les boutons bloquent la propagation pour rester cliquables.
+ * Barre de titre unique de l'application.
+ *
+ * Remplace la barre native de Windows.
+ *
+ * Seule la zone explicitement marquée
+ * `data-tauri-drag-region` permet de déplacer la fenêtre.
+ *
+ * Les zones interactives empêchent la propagation de `mousedown`
+ * afin que les boutons restent cliquables.
  */
 export function TitleBar() {
   const navigate = useNavigate();
+
   const user = useAuthStore((s) => s.user);
-  const logout = useAuthStore((s) => s.logout);
+
+  const onSettingsPage = useMatch("/settings") !== null;
 
   const match = useMatch("/workspace/:projectId");
   const projectId = match?.params.projectId;
+
   const projectName = useProjectStore((s) =>
-    s.projects.find((p) => p.id === projectId)?.name
+    s.projects.find((project) => project.id === projectId)?.name,
   );
 
-  const [theme, setTheme] = useState<Theme>(
-    document.documentElement.classList.contains("dark") ? "dark" : "light"
-  );
+  const theme = useResolvedTheme();
 
+  /**
+   * Change le thème clair/sombre.
+   */
   function toggleTheme() {
     const next: Theme = theme === "dark" ? "light" : "dark";
+
     applyTheme(next);
-    setTheme(next);
   }
 
-  async function onLogout() {
-    await logout();
-    navigate("/", { replace: true });
-  }
-
-  // Empêche le clic de démarrer un drag de la fenêtre.
-  const stopDrag = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  /**
+   * Empêche le clic de démarrer le déplacement de la fenêtre.
+   */
+  const stopDrag = (event: MouseEvent) => {
+    event.stopPropagation();
   };
 
   return (
     <header className="flex h-9 shrink-0 select-none items-center border-b border-border bg-card pl-2 text-sm">
-      {/* Logo + navigation : interactif, pas de drag */}
-      <div className="flex items-center gap-1" onMouseDown={stopDrag}>
+      {/* ------------------------------------------------------------------ */}
+      {/* Logo + navigation                                                   */}
+      {/* ------------------------------------------------------------------ */}
+
+      <div
+        className="flex items-center gap-1"
+        onMouseDown={stopDrag}
+      >
         <button
           type="button"
           title="Accueil"
@@ -59,27 +74,36 @@ export function TitleBar() {
           className="flex h-7 items-center gap-2 rounded px-2 font-semibold hover:bg-secondary"
         >
           <Feather className="h-4 w-4 text-primary" />
-          <span className="hidden sm:inline">GANIS</span>
+
+          <span className="hidden sm:inline">
+            GANIS
+          </span>
         </button>
 
         {user && (
-          <nav className="hidden items-center md:flex" aria-label="Menus">
-            {MENUS.map((m) => (
+          <nav
+            className="hidden items-center md:flex"
+            aria-label="Menus"
+          >
+            {MENUS.map((menu) => (
               <button
-                key={m}
+                key={menu}
                 type="button"
                 disabled
                 title="Disponible prochainement"
                 className="h-7 rounded px-2 text-muted-foreground enabled:hover:bg-secondary"
               >
-                {m}
+                {menu}
               </button>
             ))}
           </nav>
         )}
       </div>
 
-      {/* Zone centrale : seule zone draggable */}
+      {/* ------------------------------------------------------------------ */}
+      {/* Zone centrale draggable                                             */}
+      {/* ------------------------------------------------------------------ */}
+
       <div
         data-tauri-drag-region
         className="flex h-full min-w-0 flex-1 items-center justify-center px-3"
@@ -89,8 +113,14 @@ export function TitleBar() {
         </span>
       </div>
 
-      {/* Actions utilisateur : interactif, pas de drag */}
-      <div className="flex items-center gap-1 pr-2" onMouseDown={stopDrag}>
+      {/* ------------------------------------------------------------------ */}
+      {/* Actions utilisateur                                                 */}
+      {/* ------------------------------------------------------------------ */}
+
+      <div
+        className="flex items-center gap-1 pr-2"
+        onMouseDown={stopDrag}
+      >
         <button
           type="button"
           onClick={toggleTheme}
@@ -98,28 +128,35 @@ export function TitleBar() {
           title="Changer de thème"
           className={iconButton}
         >
-          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          {theme === "dark" ? (
+            <Sun className="h-4 w-4" />
+          ) : (
+            <Moon className="h-4 w-4" />
+          )}
         </button>
 
+        {/* Paramètres généraux (compte, apparence) */}
         {user && (
-          <>
-            <span className="pointer-events-none hidden px-1 text-xs text-muted-foreground sm:inline">
-              {user.username}
-            </span>
-            <button
-              type="button"
-              onClick={onLogout}
-              aria-label="Se déconnecter"
-              title="Se déconnecter"
-              className={iconButton}
-            >
-              <LogOut className="h-4 w-4" />
-            </button>
-          </>
+          <button
+            type="button"
+            onClick={() => navigate("/settings")}
+            aria-label="Paramètres généraux"
+            title="Paramètres généraux"
+            aria-current={onSettingsPage ? "page" : undefined}
+            className={cn(iconButton, onSettingsPage && "bg-secondary text-foreground")}
+          >
+            <Settings className="h-4 w-4" />
+          </button>
         )}
+
+        {/* Menu du compte : paramètres, administration, déconnexion */}
+        <UserMenu />
       </div>
 
-      {/* Contrôles de fenêtre (Min / Max / Close) */}
+      {/* ------------------------------------------------------------------ */}
+      {/* Contrôles de fenêtre                                                */}
+      {/* ------------------------------------------------------------------ */}
+
       <WindowControls />
     </header>
   );

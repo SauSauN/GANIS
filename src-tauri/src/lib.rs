@@ -11,7 +11,6 @@ mod db;
 mod models;
 mod state;
 
-// Modules de services et de commandes.
 mod services;
 mod commands;
 
@@ -28,7 +27,7 @@ struct AppInfo {
     offline: bool,
 }
 
-/// Commande de test du pont Rust <-> interface.
+/// Commande de test du pont Rust vers l'interface.
 #[tauri::command]
 fn app_info() -> AppResult<AppInfo> {
     Ok(AppInfo {
@@ -89,7 +88,20 @@ pub fn run() {
             commands::auth::register,
             commands::auth::login,
             commands::auth::logout,
-            commands::auth::list_users,
+            commands::users::list_users,
+            commands::users::create_user,
+            commands::users::update_user_role,
+            commands::users::delete_user,
+            commands::users::update_profile,
+            commands::users::change_password,
+            commands::projects::create_project,
+            commands::projects::list_projects,
+            commands::projects::get_project,
+            commands::projects::open_project,
+            commands::projects::update_project,
+            commands::projects::duplicate_project,
+            commands::projects::delete_project,
+            commands::diagnostics::get_diagnostics,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -49,6 +49,8 @@ export interface Project {
   isArchived: boolean;
   createdAt: string; // RFC 3339, UTC
   updatedAt: string; // RFC 3339, UTC
+  /** Dernière ouverture du projet ; `null` s'il n'a jamais été ouvert. */
+  lastOpenedAt?: string | null; // RFC 3339, UTC
 }
 
 // ----------------------------------------------------------------------------
@@ -59,6 +61,32 @@ export interface AppInfo {
   name: string;
   version: string;
   offline: boolean;
+}
+
+/**
+ * Rapport de diagnostic (correspond à `Diagnostics` en Rust).
+ * Réservé aux rôles administrateur et développeur.
+ */
+export interface Diagnostics {
+  appVersion: string;
+  os: string;
+  arch: string;
+  generatedAt: string; // RFC 3339, UTC
+  database: {
+    sqliteVersion: string;
+    sizeBytes: number;
+    /** "ok" si la base est saine, sinon le message de SQLite. */
+    integrity: string;
+    foreignKeyViolations: number;
+    appliedMigrations: number;
+  };
+  counts: {
+    users: number;
+    admins: number;
+    developers: number;
+    activeSessions: number;
+    projects: number;
+  };
 }
 
 // ----------------------------------------------------------------------------

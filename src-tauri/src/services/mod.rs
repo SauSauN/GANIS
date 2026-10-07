@@ -1,8 +1,10 @@
-//! Module de services métier.
+//! Module des services métier.
 //!
-//! Contient la logique applicative qui n'est pas directement liée à l'interface
-//! ou aux commandes Tauri. Les services sont utilisés par les commandes.
+//! Les services contiennent la logique applicative utilisée par
+//! les commandes Tauri.
 
 pub mod auth_service;
+pub mod diagnostics_service;
+pub mod project_service;
 pub mod session_service;
 pub mod user_service;

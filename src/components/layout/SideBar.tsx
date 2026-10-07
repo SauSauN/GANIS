@@ -1,6 +1,11 @@
 import { BookOpen, ChevronRight, Clapperboard, FileText, MapPin, StickyNote, Users, type LucideIcon } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import type { ActivityId } from "@/components/layout/ActivityBar";
+import {
+  PROJECT_SETTINGS_SECTIONS,
+  type ProjectSettingsId,
+} from "@/components/project-settings/sections";
+import { cn } from "@/lib/utils";
 
 const SECTIONS: { label: string; icon: LucideIcon }[] = [
   { label: "Synopsis", icon: FileText },
@@ -11,7 +16,15 @@ const SECTIONS: { label: string; icon: LucideIcon }[] = [
   { label: "Notes", icon: StickyNote },
 ];
 
-export function SideBar({ view, projectName }: { view: ActivityId; projectName: string }) {
+interface SideBarProps {
+  view: ActivityId;
+  projectName: string;
+  /** Section des paramètres du projet actuellement ouverte au centre. */
+  settingsSection: ProjectSettingsId | null;
+  onSelectSettingsSection: (id: ProjectSettingsId) => void;
+}
+
+export function SideBar({ view, projectName, settingsSection, onSelectSettingsSection }: SideBarProps) {
   return (
     <aside className="flex w-64 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
       {view === "explorer" && (
@@ -47,10 +60,30 @@ export function SideBar({ view, projectName }: { view: ActivityId; projectName: 
       )}
 
       {view === "settings" && (
-        <div className="space-y-2 p-4">
-          <p className="text-xs text-muted-foreground">Paramètres</p>
-          <p className="text-sm text-muted-foreground">Les préférences seront disponibles prochainement.</p>
-        </div>
+        <>
+          <div className="px-4 py-3">
+            <p className="text-xs text-muted-foreground">Paramètres du projet</p>
+            <p className="truncate text-sm font-semibold">{projectName}</p>
+          </div>
+          <ul className="px-2">
+            {PROJECT_SETTINGS_SECTIONS.map(({ id, label, icon: Icon }) => (
+              <li key={id}>
+                <button
+                  type="button"
+                  aria-current={settingsSection === id ? "page" : undefined}
+                  onClick={() => onSelectSettingsSection(id)}
+                  className={cn(
+                    "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent",
+                    settingsSection === id && "bg-sidebar-accent font-medium",
+                  )}
+                >
+                  <Icon className="h-4 w-4 text-primary" />
+                  <span className="flex-1 text-left">{label}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
       )}
     </aside>
   );

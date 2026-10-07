@@ -42,18 +42,20 @@ pub async fn has_any_user(state: State<'_, AppState>) -> AppResult<bool> {
     crate::db::app_db::has_any_user(&state.app_db).await
 }
 
-/// Crée le premier compte administrateur (uniquement si aucun utilisateur n'existe).
+/// Crée le premier compte administrateur
+/// uniquement si aucun utilisateur n'existe.
 #[tauri::command]
 pub async fn setup_admin(
     state: State<'_, AppState>,
     input: RegisterInput,
 ) -> AppResult<UserPublic> {
-    // Vérifie qu'aucun utilisateur n'existe
+    // Vérifie qu'aucun utilisateur n'existe.
     if crate::db::app_db::has_any_user(&state.app_db).await? {
         return Err(crate::error::AppError::conflict(
             "Un compte administrateur existe déjà.",
         ));
     }
+
     auth_service::register_user(
         &state.app_db,
         &input.username,
@@ -61,14 +63,6 @@ pub async fn setup_admin(
         input.email.as_deref(),
     )
     .await
-}
-
-/// Liste tous les utilisateurs (réservé aux administrateurs).
-#[tauri::command]
-pub async fn list_users(state: State<'_, AppState>) -> AppResult<Vec<UserPublic>> {
-    state.require_admin().await?;
-    let users = crate::services::user_service::list_all(&state.app_db).await?;
-    Ok(users.into_iter().map(UserPublic::from).collect())
 }
 
 // ----------------------------------------------------------------------------

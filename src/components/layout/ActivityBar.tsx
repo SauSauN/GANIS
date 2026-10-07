@@ -40,7 +40,7 @@ export function ActivityBar({ active, panelOpen, onSelect }: Props) {
   return (
     <aside className="flex w-12 shrink-0 flex-col justify-between border-r border-sidebar-border bg-sidebar">
       <div>{TOP.map((t) => item(t.id, t.label, t.icon))}</div>
-      <div>{item("settings", "Paramètres", Settings)}</div>
+      <div>{item("settings", "Paramètres du projet", Settings)}</div>
     </aside>
   );
 }
