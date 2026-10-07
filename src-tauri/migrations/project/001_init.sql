@@ -6,9 +6,6 @@
 -- portabilité. Les identifiants sont des UUID v4 stockés en texte.
 -- ============================================================================
 
-PRAGMA foreign_keys = ON;
-PRAGMA journal_mode = WAL;
-
 -- ----------------------------------------------------------------------------
 -- Table : characters (Personnages)
 -- ----------------------------------------------------------------------------

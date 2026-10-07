@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/stores/authStore";
+import { validateEmail, validatePassword, validateUsername } from "@/lib/validators";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -17,11 +18,20 @@ export default function Register() {
 
   useEffect(() => clearError(), [clearError]);
 
-  // Contrôles minimaux : les règles complètes (robustesse, unicité) arrivent en Phase 3.
   function validate(): string | null {
-    if (username.trim().length < 3) return "Le nom d'utilisateur doit contenir au moins 3 caractères.";
-    if (password.length < 8) return "Le mot de passe doit contenir au moins 8 caractères.";
-    if (password !== confirm) return "Les deux mots de passe ne correspondent pas.";
+    const usernameError = validateUsername(username);
+    if (usernameError) return usernameError;
+
+    const passwordError = validatePassword(password);
+    if (passwordError) return passwordError;
+
+    if (password !== confirm) {
+      return "Les deux mots de passe ne correspondent pas.";
+    }
+
+    const emailError = validateEmail(email);
+    if (emailError) return emailError;
+
     return null;
   }
 
@@ -30,6 +40,7 @@ export default function Register() {
     const problem = validate();
     setLocalError(problem);
     if (problem) return;
+
     const ok = await register({
       username: username.trim(),
       password,
@@ -72,11 +83,6 @@ export default function Register() {
             </div>
 
             {shownError && <p role="alert" className="text-sm text-destructive">{shownError}</p>}
-            {import.meta.env.DEV && (
-              <p className="text-xs text-muted-foreground">
-                Formulaire seul pour l'instant : l'inscription est branchée à la Phase 3.
-              </p>
-            )}
           </CardContent>
 
           <CardFooter className="mt-4 flex-col gap-3">

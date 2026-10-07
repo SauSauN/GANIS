@@ -8,4 +8,6 @@ pub mod migrations;
 pub mod project_db;
 
 pub use app_db::init_app_db;
+
+#[allow(unused_imports)]
 pub use project_db::init_project_db;

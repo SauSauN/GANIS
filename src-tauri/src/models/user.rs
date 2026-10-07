@@ -5,13 +5,17 @@ use serde::{Deserialize, Serialize};
 /// Rôle d'un utilisateur dans l'application.
 ///
 /// Le rôle détermine les privilèges et les actions autorisées.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
 #[serde(rename_all = "lowercase")]
+#[sqlx(type_name = "TEXT")]
+#[sqlx(rename_all = "lowercase")]
 pub enum Role {
     /// Administrateur : gestion des comptes, paramètres généraux.
     Admin,
+
     /// Développeur : accès aux outils de diagnostic et de test.
     Developer,
+
     /// Utilisateur standard : création et gestion de ses projets.
     User,
 }
@@ -46,17 +50,23 @@ impl Role {
 ///
 /// Le hash et le sel du mot de passe ne sont **jamais** sérialisés
 /// vers l'interface (`#[serde(skip_serializing)]`).
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct User {
     pub id: String,
     pub username: String,
     pub email: Option<String>,
     pub role: Role,
+
     #[serde(skip_serializing)]
     pub password_hash: String,
+
     #[serde(skip_serializing)]
     pub password_salt: String,
+
+    #[sqlx(rename = "created_at")]
     pub created_at: String,
+
+    #[sqlx(rename = "updated_at")]
     pub updated_at: String,
 }
 

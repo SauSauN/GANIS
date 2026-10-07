@@ -12,14 +12,33 @@ interface AuthState {
   user: User | null;
   loading: boolean;
   error: string | null;
-  login: (username: string, password: string) => Promise<boolean>;
-  register: (input: { username: string; password: string; email?: string }) => Promise<boolean>;
+
+  login: (
+    username: string,
+    password: string,
+  ) => Promise<boolean>;
+
+  register: (input: {
+    username: string;
+    password: string;
+    email?: string;
+  }) => Promise<boolean>;
+
   logout: () => Promise<void>;
+
   clearError: () => void;
-  devLogin: () => void; // développement uniquement, à supprimer en Phase 3
+
+  /**
+   * Connexion de développement uniquement.
+   * Cette fonction ne doit pas être utilisée en production.
+   */
+  devLogin: () => void;
 }
 
-const messageOf = (e: unknown) => (e instanceof ApiError ? e.message : "Une erreur inattendue est survenue.");
+const messageOf = (e: unknown): string =>
+  e instanceof ApiError
+    ? e.message
+    : "Une erreur inattendue est survenue.";
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
@@ -27,25 +46,53 @@ export const useAuthStore = create<AuthState>((set) => ({
   error: null,
 
   login: async (username, password) => {
-    set({ loading: true, error: null });
+    set({
+      loading: true,
+      error: null,
+    });
+
     try {
-      const user = await api.login({ username, password });
-      set({ user, loading: false });
+      const user = await api.login({
+        username,
+        password,
+      });
+
+      set({
+        user,
+        loading: false,
+      });
+
       return true;
     } catch (e) {
-      set({ loading: false, error: messageOf(e) });
+      set({
+        loading: false,
+        error: messageOf(e),
+      });
+
       return false;
     }
   },
 
   register: async (input) => {
-    set({ loading: true, error: null });
+    set({
+      loading: true,
+      error: null,
+    });
+
     try {
       await api.register(input);
-      set({ loading: false });
+
+      set({
+        loading: false,
+      });
+
       return true;
     } catch (e) {
-      set({ loading: false, error: messageOf(e) });
+      set({
+        loading: false,
+        error: messageOf(e),
+      });
+
       return false;
     }
   },
@@ -54,17 +101,45 @@ export const useAuthStore = create<AuthState>((set) => ({
     try {
       await api.logout();
     } catch {
-      /* on déconnecte l'interface dans tous les cas */
+      /*
+       * Même si le backend échoue pendant la déconnexion,
+       * l'interface est réinitialisée localement.
+       */
     }
+
     useProjectStore.getState().reset();
-    set({ user: null, error: null });
+
+    set({
+      user: null,
+      error: null,
+    });
   },
 
-  clearError: () => set({ error: null }),
+  clearError: () => {
+    set({
+      error: null,
+    });
+  },
 
   devLogin: () => {
-    if (!import.meta.env.DEV) return;
+    if (!import.meta.env.DEV) {
+      return;
+    }
+
+    const now = new Date().toISOString();
+
     useProjectStore.getState().seedDemo();
-    set({ user: { id: "dev-user", username: "demo", email: null, role: "user" }, error: null });
+
+    set({
+      user: {
+        id: "dev-user",
+        username: "demo",
+        email: null,
+        role: "user",
+        createdAt: now,
+        updatedAt: now,
+      },
+      error: null,
+    });
   },
 }));
