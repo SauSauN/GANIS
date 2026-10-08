@@ -116,3 +116,67 @@ export function setRailExpanded(expanded: boolean) {
 export function useRailExpanded(): boolean {
   return useSyncExternalStore(subscribeTo(RAIL_EVENT), getRailExpanded);
 }
+
+// ----------------------------------------------------------------------------
+// Largeur du panneau du milieu de l'espace de travail
+// ----------------------------------------------------------------------------
+
+/** Largeur minimale (px) du panneau ouvert. */
+export const PANEL_MIN_WIDTH = 200;
+
+/** Largeur maximale (px) du panneau. */
+export const PANEL_MAX_WIDTH = 480;
+
+/** Largeur par défaut (px), rétablie par un double-clic sur le bord. */
+export const PANEL_DEFAULT_WIDTH = 256;
+
+/**
+ * Tiré en dessous de cette largeur (px), le panneau se replie, puis se
+ * ferme au relâchement du bouton.
+ */
+export const PANEL_CLOSE_THRESHOLD = 120;
+
+const PANEL_WIDTH_KEY = "ganis-panel-width";
+const PANEL_WIDTH_EVENT = "ganis:panel-width-change";
+
+/** Ramène une largeur dans les bornes autorisées. */
+export function clampPanelWidth(width: number): number {
+  return Math.round(
+    Math.min(Math.max(width, PANEL_MIN_WIDTH), PANEL_MAX_WIDTH),
+  );
+}
+
+/** Largeur enregistrée du panneau du milieu. */
+export function getPanelWidth(): number {
+  try {
+    const saved = localStorage.getItem(PANEL_WIDTH_KEY);
+
+    if (saved !== null) {
+      const width = Number(saved);
+
+      if (Number.isFinite(width)) {
+        return clampPanelWidth(width);
+      }
+    }
+  } catch {
+    /* stockage indisponible : largeur par défaut */
+  }
+
+  return PANEL_DEFAULT_WIDTH;
+}
+
+/** Enregistre la largeur du panneau du milieu. */
+export function setPanelWidth(width: number) {
+  try {
+    localStorage.setItem(PANEL_WIDTH_KEY, String(clampPanelWidth(width)));
+  } catch {
+    /* ignoré */
+  }
+
+  window.dispatchEvent(new Event(PANEL_WIDTH_EVENT));
+}
+
+/** Largeur du panneau du milieu, mise à jour dès qu'elle change. */
+export function usePanelWidth(): number {
+  return useSyncExternalStore(subscribeTo(PANEL_WIDTH_EVENT), getPanelWidth);
+}

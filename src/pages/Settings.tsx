@@ -87,11 +87,6 @@ export default function Settings() {
 
           <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Application</span>
-                <span>/</span>
-                <span>Paramètres généraux</span>
-              </div>
 
               <h1 className="text-3xl font-semibold tracking-tight">
                 {meta.label}

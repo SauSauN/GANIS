@@ -67,6 +67,9 @@ function ReadonlyTagList({
  * Toute modification du synopsis se fait dans SynopsisEditView.
  * Cette vue est uniquement destinée à présenter les informations
  * narratives principales du projet sur l'accueil.
+ *
+ * La carte a une couleur de fond unique (`bg-card`), en-tête compris,
+ * et le même contour que les autres blocs de la page.
  */
 function SynopsisReadonly({ projectId }: { projectId: string }) {
   // Seul le synopsis de CE projet est affiché, jamais celui d'un autre.
@@ -88,10 +91,12 @@ function SynopsisReadonly({ projectId }: { projectId: string }) {
 
   return (
     <section className="mb-8">
-      <Card className="overflow-hidden">
-        <CardHeader className="border-b bg-muted/20 px-6 py-5">
+      {/* gap-0 / py-0 : pas de bande vide au-dessus de l'en-tête.
+          ring-0 + border : même contour que les autres blocs. */}
+      <Card className="gap-0 border py-0 shadow-sm ring-0">
+        <CardHeader className="border-b px-6 py-5">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg border bg-background">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg border">
               <FileText className="h-4 w-4 text-muted-foreground" />
             </div>
 
@@ -122,7 +127,7 @@ function SynopsisReadonly({ projectId }: { projectId: string }) {
           )}
 
           {!loading && !error && !hasAnyContent && (
-            <div className="rounded-lg border border-dashed bg-muted/20 p-6 text-center">
+            <div className="rounded-lg border border-dashed p-6 text-center">
               <FileText className="mx-auto mb-3 h-8 w-8 text-muted-foreground/60" />
 
               <p className="text-sm font-medium">
@@ -198,10 +203,6 @@ export function WorkspaceHome({ project }: { project: Project }) {
             ================================================================ */}
 
         <header className="mb-8">
-          <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-            <FolderOpen className="h-4 w-4 shrink-0" />
-            <span>Projet</span>
-          </div>
 
           <div className="flex flex-col gap-4">
             <div>

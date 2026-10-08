@@ -299,11 +299,6 @@ export function SynopsisEditView({
             ================================================================ */}
 
         <header className="mb-8">
-          <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Projet</span>
-            <span>/</span>
-            <span>Synopsis</span>
-          </div>
 
           <h1 className="text-3xl font-semibold tracking-tight">
             {feature.label}
@@ -341,10 +336,14 @@ export function SynopsisEditView({
 
         {/* ================================================================
             SYNOPSIS
+
+            Couleur de fond unique (`bg-card`), en-tête compris :
+            gap-0 / py-0 évitent la bande vide au-dessus de l'en-tête,
+            ring-0 + border donnent le même contour que les autres blocs.
             ================================================================ */}
 
-        <Card className="mb-8 overflow-hidden">
-          <CardHeader className="border-b bg-muted/20 px-6 py-5">
+        <Card className="mb-8 gap-0 border py-0 shadow-sm ring-0">
+          <CardHeader className="border-b px-6 py-5">
             <CardTitle className="text-base">
               Synopsis
             </CardTitle>
@@ -362,7 +361,8 @@ export function SynopsisEditView({
             <div className="space-y-2">
               <Label>Contenu</Label>
 
-              <div className="rounded-lg border border-input bg-background p-4 focus-within:ring-2 focus-within:ring-ring">
+              {/* Fond transparent : l'éditeur prend la couleur de la carte. */}
+              <div className="rounded-lg border border-input bg-transparent p-4 focus-within:ring-2 focus-within:ring-ring">
                 <EditorContent editor={editor} />
               </div>
             </div>

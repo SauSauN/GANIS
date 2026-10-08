@@ -91,6 +91,72 @@ export function closeTab(layout: TabLayout, id: string): TabLayout {
 }
 
 /**
+ * Portée d'une fermeture demandée depuis le menu d'un onglet :
+ * - `this`   : cet onglet ;
+ * - `others` : tous les autres ;
+ * - `left`   : ceux à sa gauche ;
+ * - `right`  : ceux à sa droite ;
+ * - `all`    : tous.
+ */
+export type CloseScope = "this" | "others" | "left" | "right" | "all";
+
+/**
+ * Onglets qu'une fermeture fermerait réellement, relativement à l'onglet
+ * `id`. Les onglets épinglés ne sont jamais concernés : il faut d'abord
+ * les désépingler.
+ */
+export function tabsToClose(
+  layout: TabLayout,
+  id: string,
+  scope: CloseScope,
+): string[] {
+  const index = layout.tabs.indexOf(id);
+
+  if (index < 0) {
+    return [];
+  }
+
+  let candidates: string[];
+
+  switch (scope) {
+    case "this":
+      candidates = [id];
+      break;
+    case "others":
+      candidates = layout.tabs.filter((tab) => tab !== id);
+      break;
+    case "left":
+      candidates = layout.tabs.slice(0, index);
+      break;
+    case "right":
+      candidates = layout.tabs.slice(index + 1);
+      break;
+    case "all":
+      candidates = layout.tabs;
+      break;
+  }
+
+  const pinned = new Set(layout.pinned);
+
+  return candidates.filter((tab) => !pinned.has(tab));
+}
+
+/** Ferme plusieurs onglets d'un coup (les épinglés sont ignorés). */
+export function closeTabs(layout: TabLayout, ids: string[]): TabLayout {
+  const pinned = new Set(layout.pinned);
+  const closing = new Set(ids.filter((id) => !pinned.has(id)));
+
+  if (![...closing].some((id) => layout.tabs.includes(id))) {
+    return layout;
+  }
+
+  return normalize({
+    ...layout,
+    tabs: layout.tabs.filter((tab) => !closing.has(tab)),
+  });
+}
+
+/**
  * Épingle un onglet libre (il rejoint la fin du groupe des épinglés)
  * ou désépingle un onglet épinglé (il retrouve la tête des onglets libres).
  */

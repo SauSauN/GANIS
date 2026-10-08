@@ -23,12 +23,14 @@ import {
 } from "@/lib/preferences";
 import {
   addTab,
-  closeTab as closeTabInLayout,
+  closeTabs as closeTabsInLayout,
   initialLayout,
   moveTab as moveTabInLayout,
   savePinnedTabs,
   shiftTab as shiftTabInLayout,
+  tabsToClose,
   togglePin as togglePinInLayout,
+  type CloseScope,
   type TabLayout,
 } from "@/lib/tabLayout";
 import { useProjectStore } from "@/stores/projectStore";
@@ -261,16 +263,24 @@ export default function Workspace() {
   }
 
   /**
-   * Ferme un onglet.
+   * Ferme un ou plusieurs onglets, relativement à l'onglet `tabId`
+   * (voir `CloseScope` : cet onglet, les autres, ceux à gauche, à droite,
+   * ou tous).
    *
-   * On ne ferme PAS le projet : seul l'onglet est fermé.
-   * Un onglet épinglé ne se ferme pas : il faut d'abord le désépingler.
-   * Si c'était l'onglet actif, on passe à son voisin ;
-   * s'il n'en reste aucun, la zone centrale est vide.
+   * On ne ferme PAS le projet : seuls les onglets sont fermés.
+   * Les onglets épinglés restent toujours ouverts : il faut d'abord
+   * les désépingler.
+   *
+   * Si l'onglet actif est fermé :
+   * - l'onglet `tabId` devient actif s'il est resté ouvert
+   *   (« fermer les autres », « à gauche », « à droite ») ;
+   * - sinon on passe au voisin le plus proche encore ouvert
+   *   (d'abord à droite, puis à gauche) ;
+   * - s'il n'en reste aucun, la zone centrale est vide.
    */
-  function closeTab(tabId: string) {
-    const index = layout.tabs.indexOf(tabId);
-    const next = closeTabInLayout(layout, tabId);
+  function closeTabs(tabId: string, scope: CloseScope) {
+    const closing = tabsToClose(layout, tabId, scope);
+    const next = closeTabsInLayout(layout, closing);
 
     if (next === layout) {
       return;
@@ -278,11 +288,29 @@ export default function Workspace() {
 
     setLayout(next);
 
-    if (activeTab === tabId) {
-      activate(
-        next.tabs[Math.min(index, next.tabs.length - 1)] ?? null,
-      );
+    if (!activeTab || !closing.includes(activeTab)) {
+      return;
     }
+
+    if (next.tabs.includes(tabId)) {
+      activate(tabId);
+      return;
+    }
+
+    const index = layout.tabs.indexOf(activeTab);
+    const isOpen = (id: string) => next.tabs.includes(id);
+
+    const after = layout.tabs.slice(index + 1).find(isOpen);
+    const before = layout.tabs.slice(0, index).reverse().find(isOpen);
+
+    activate(after ?? before ?? null);
+  }
+
+  /**
+   * Ferme un seul onglet (croix de l'onglet).
+   */
+  function closeTab(tabId: string) {
+    closeTabs(tabId, "this");
   }
 
   /**
@@ -357,6 +385,11 @@ export default function Workspace() {
 
         {/* =========================================================
             PANNEAU DU MILIEU (fonctionnalités du module)
+
+            Redimensionnable par son bord droit. Tiré vers la gauche
+            au-delà de sa largeur minimale, il se ferme ; un clic sur
+            un module de la barre de gauche le rouvre à sa largeur
+            précédente.
             ========================================================= */}
         {panelOpen && (
           <SideBar
@@ -364,6 +397,7 @@ export default function Workspace() {
             projectName={project.name}
             activeTab={activeTab}
             onOpenFeature={openFeature}
+            onClose={() => setPanelOpen(false)}
           />
         )}
 
@@ -373,12 +407,17 @@ export default function Workspace() {
         <main className="flex min-w-0 flex-1 flex-col">
           {/* =======================================================
               ONGLETS (épinglables et déplaçables)
+
+              Clic droit (ou appui à deux doigts sur le pavé tactile)
+              sur un onglet : menu pour l'épingler ou fermer cet
+              onglet, les autres, ceux à gauche, à droite, ou tous.
               ======================================================= */}
           <WorkspaceTabs
             tabs={tabInfos}
             activeTab={activeTab}
             onSelect={activate}
             onClose={closeTab}
+            onCloseTabs={closeTabs}
             onTogglePin={togglePin}
             onMove={moveTab}
             onShift={shiftTab}

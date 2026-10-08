@@ -97,6 +97,7 @@ export function ActivityBar({
       )}
     >
       <div>
+        {/* Pas de séparation sous ce bouton : il s'enchaîne directement avec les modules. */}
         <button
           type="button"
           title={expanded ? "Réduire la barre" : "Développer la barre"}
@@ -106,7 +107,7 @@ export function ActivityBar({
           aria-expanded={expanded}
           onClick={onToggleExpanded}
           className={cn(
-            "flex h-11 w-full items-center gap-3 border-b border-sidebar-border border-l-2 border-l-transparent text-sm text-muted-foreground transition-colors hover:text-foreground",
+            "flex h-11 w-full items-center gap-3 border-l-2 border-transparent text-sm text-muted-foreground transition-colors hover:text-foreground",
             expanded ? "px-3.5" : "justify-center",
           )}
         >

@@ -30,6 +30,7 @@ import {
   PROJECT_SETTINGS_SECTIONS,
   type ProjectSettingsId,
 } from "@/components/project-settings/sections";
+import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/projectStore";
 import {
   PROJECT_STATUS_LABELS,
@@ -52,6 +53,16 @@ const MAX_DESCRIPTION_LENGTH = 5000;
 
 const fieldClass =
   "w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
+
+/**
+ * Cartes à couleur de fond unique (`bg-card`), en-tête et pied compris.
+ *
+ * - gap-0 / py-0 : pas de bande vide au-dessus de l'en-tête ni sous le pied ;
+ * - ring-0 + border : même contour que les blocs de l'accueil du projet.
+ */
+const cardClass = "gap-0 border py-0 shadow-sm ring-0";
+const cardHeaderClass = "border-b px-6 py-5";
+const cardFooterClass = "border-t bg-transparent px-6 py-4";
 
 interface Feedback {
   kind: "success" | "error";
@@ -112,11 +123,6 @@ export function ProjectSettingsPanel({
             ================================================================ */}
 
         <header className="mb-8">
-          <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Projet</span>
-            <span>/</span>
-            <span>Paramètres</span>
-          </div>
 
           <h1 className="text-3xl font-semibold tracking-tight">
             {meta.label}
@@ -237,9 +243,9 @@ function InfoSection({ project }: { project: Project }) {
   }
 
   return (
-    <Card>
+    <Card className={cardClass}>
       <form onSubmit={handleSubmit}>
-        <CardHeader className="border-b bg-muted/20">
+        <CardHeader className={cardHeaderClass}>
           <CardTitle>Informations du projet</CardTitle>
 
           <CardDescription>
@@ -303,7 +309,7 @@ function InfoSection({ project }: { project: Project }) {
           <FeedbackMessage feedback={feedback} />
         </CardContent>
 
-        <CardFooter className="border-t bg-muted/10 px-6 py-4">
+        <CardFooter className={cardFooterClass}>
           <Button
             type="submit"
             disabled={saving || unchanged}
@@ -359,8 +365,8 @@ function StatusSection({ project }: { project: Project }) {
   return (
     <div className="space-y-8">
       {/* Statut */}
-      <Card>
-        <CardHeader className="border-b bg-muted/20">
+      <Card className={cardClass}>
+        <CardHeader className={cardHeaderClass}>
           <CardTitle>Statut</CardTitle>
 
           <CardDescription>
@@ -398,8 +404,8 @@ function StatusSection({ project }: { project: Project }) {
       </Card>
 
       {/* Organisation */}
-      <Card>
-        <CardHeader className="border-b bg-muted/20">
+      <Card className={cardClass}>
+        <CardHeader className={cardHeaderClass}>
           <CardTitle>Organisation</CardTitle>
 
           <CardDescription>
@@ -545,8 +551,8 @@ function DangerSection({ project }: { project: Project }) {
   return (
     <div className="space-y-8">
       {/* Duplication */}
-      <Card>
-        <CardHeader className="border-b bg-muted/20">
+      <Card className={cardClass}>
+        <CardHeader className={cardHeaderClass}>
           <CardTitle>Dupliquer le projet</CardTitle>
 
           <CardDescription>
@@ -575,9 +581,11 @@ function DangerSection({ project }: { project: Project }) {
         </CardContent>
       </Card>
 
-      {/* Suppression */}
-      <Card className="border-destructive/40">
-        <CardHeader className="border-b border-destructive/20 bg-destructive/5">
+      {/* Suppression : même fond unique, signalée par la bordure et le titre rouges. */}
+      <Card className={cn(cardClass, "border-destructive/40")}>
+        <CardHeader
+          className={cn(cardHeaderClass, "border-destructive/20")}
+        >
           <CardTitle className="text-destructive">
             Supprimer le projet
           </CardTitle>
