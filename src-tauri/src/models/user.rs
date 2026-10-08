@@ -5,12 +5,21 @@ use serde::{Deserialize, Serialize};
 /// Rôle d'un utilisateur dans l'application.
 ///
 /// Le rôle détermine les privilèges et les actions autorisées.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, sqlx::Type)]
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Serialize,
+    Deserialize,
+    sqlx::Type,
+)]
 #[serde(rename_all = "lowercase")]
 #[sqlx(type_name = "TEXT")]
 #[sqlx(rename_all = "lowercase")]
 pub enum Role {
-    /// Administrateur : gestion des comptes, paramètres généraux.
+    /// Administrateur : gestion des comptes et paramètres généraux.
     Admin,
 
     /// Développeur : accès aux outils de diagnostic et de test.
@@ -27,7 +36,8 @@ impl Default for Role {
 }
 
 impl Role {
-    /// Retourne la représentation textuelle du rôle (pour la base de données).
+    /// Retourne la représentation textuelle du rôle
+    /// utilisée par la base de données.
     pub fn as_str(&self) -> &'static str {
         match self {
             Role::Admin => "admin",
@@ -36,7 +46,9 @@ impl Role {
         }
     }
 
-    /// Convertit une chaîne en rôle, avec fallback sur `User`.
+    /// Convertit une chaîne en rôle.
+    ///
+    /// Toute valeur inconnue est considérée comme `User`.
     pub fn from_str(s: &str) -> Self {
         match s.to_lowercase().as_str() {
             "admin" => Role::Admin,
@@ -48,8 +60,8 @@ impl Role {
 
 /// Représente un utilisateur dans la base de données de l'application.
 ///
-/// Le hash et le sel du mot de passe ne sont **jamais** sérialisés
-/// vers l'interface (`#[serde(skip_serializing)]`).
+/// `password_hash` et `password_salt` ne sont jamais sérialisés
+/// vers le frontend.
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct User {
     pub id: String,
@@ -63,33 +75,50 @@ pub struct User {
     #[serde(skip_serializing)]
     pub password_salt: String,
 
+    /// Nom SQL : `created_at`
+    ///
+    /// Nom JSON/frontend : `createdAt`
+    #[serde(rename = "createdAt")]
     #[sqlx(rename = "created_at")]
     pub created_at: String,
 
+    /// Nom SQL : `updated_at`
+    ///
+    /// Nom JSON/frontend : `updatedAt`
+    #[serde(rename = "updatedAt")]
     #[sqlx(rename = "updated_at")]
     pub updated_at: String,
 }
 
-/// Version allégée d'un utilisateur, exposée à l'interface.
+/// Version publique d'un utilisateur.
+///
+/// Cette structure est utilisée lorsque le backend doit explicitement
+/// exposer uniquement les informations publiques d'un utilisateur.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct UserPublic {
     pub id: String,
     pub username: String,
     pub email: Option<String>,
     pub role: Role,
+
+    /// Nom JSON/frontend : `createdAt`.
+    #[serde(rename = "createdAt")]
     pub created_at: String,
+
+    /// Nom JSON/frontend : `updatedAt`.
+    #[serde(rename = "updatedAt")]
     pub updated_at: String,
 }
 
 impl From<User> for UserPublic {
-    fn from(u: User) -> Self {
+    fn from(user: User) -> Self {
         Self {
-            id: u.id,
-            username: u.username,
-            email: u.email,
-            role: u.role,
-            created_at: u.created_at,
-            updated_at: u.updated_at,
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            created_at: user.created_at,
+            updated_at: user.updated_at,
         }
     }
 }

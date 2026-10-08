@@ -4,3 +4,7 @@
 //! enregistrées dans `lib.rs`.
 
 pub mod auth;
+pub mod diagnostics;
+pub mod projects;
+pub mod synopsis;
+pub mod users;

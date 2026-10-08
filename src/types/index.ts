@@ -49,6 +49,32 @@ export interface Project {
   isArchived: boolean;
   createdAt: string; // RFC 3339, UTC
   updatedAt: string; // RFC 3339, UTC
+  /** Dernière ouverture du projet ; `null` s'il n'a jamais été ouvert. */
+  lastOpenedAt?: string | null; // RFC 3339, UTC
+}
+
+// ----------------------------------------------------------------------------
+// Synopsis
+// ----------------------------------------------------------------------------
+
+/**
+ * Synopsis d'un projet narratif.
+ *
+ * Un projet n'a qu'un seul synopsis, stocké dans la base de données
+ * propre au projet. Il contient :
+ *   - le contenu textuel du synopsis (éditeur riche, HTML) ;
+ *   - les genres associés (ex. "Fantasy", "Aventure") ;
+ *   - les sous-genres associés (ex. "Dark Fantasy") ;
+ *   - les tons associés (ex. "Sombre", "Épique").
+ */
+export interface Synopsis {
+  id: string;
+  content: string;
+  genres: string[];
+  subgenres: string[];
+  tone: string[];
+  createdAt: string; // RFC 3339, UTC
+  updatedAt: string; // RFC 3339, UTC
 }
 
 // ----------------------------------------------------------------------------
@@ -59,6 +85,32 @@ export interface AppInfo {
   name: string;
   version: string;
   offline: boolean;
+}
+
+/**
+ * Rapport de diagnostic (correspond à `Diagnostics` en Rust).
+ * Réservé aux rôles administrateur et développeur.
+ */
+export interface Diagnostics {
+  appVersion: string;
+  os: string;
+  arch: string;
+  generatedAt: string; // RFC 3339, UTC
+  database: {
+    sqliteVersion: string;
+    sizeBytes: number;
+    /** "ok" si la base est saine, sinon le message de SQLite. */
+    integrity: string;
+    foreignKeyViolations: number;
+    appliedMigrations: number;
+  };
+  counts: {
+    users: number;
+    admins: number;
+    developers: number;
+    activeSessions: number;
+    projects: number;
+  };
 }
 
 // ----------------------------------------------------------------------------

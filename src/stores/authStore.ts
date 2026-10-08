@@ -8,6 +8,7 @@ import type { User } from "@/types";
  * La session réelle et les droits sont gérés par Rust (Phase 3).
  * Aucun mot de passe ni jeton n'est conservé dans ce store.
  */
+
 interface AuthState {
   user: User | null;
   loading: boolean;
@@ -27,6 +28,11 @@ interface AuthState {
   logout: () => Promise<void>;
 
   clearError: () => void;
+
+  /**
+   * Remplace l'utilisateur affiché (après une modification du profil).
+   */
+  setUser: (user: User) => void;
 
   /**
    * Connexion de développement uniquement.
@@ -118,6 +124,12 @@ export const useAuthStore = create<AuthState>((set) => ({
   clearError: () => {
     set({
       error: null,
+    });
+  },
+
+  setUser: (user) => {
+    set({
+      user,
     });
   },
 

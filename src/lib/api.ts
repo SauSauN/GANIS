@@ -2,13 +2,17 @@ import { invoke } from "@tauri-apps/api/core";
 import type {
   ApiErrorPayload,
   AppInfo,
+  Diagnostics,
   ErrorCode,
   Project,
+  Role,
+  Synopsis,
   User,
 } from "@/types";
 
 /**
  * Erreur normalisée renvoyée par le pont Rust.
+ *
  * Utilise les codes de `ErrorCode` définis dans `types/index.ts`
  * et correspondant aux codes du backend Rust.
  */
@@ -60,11 +64,6 @@ function isApiErrorPayload(value: unknown): value is ApiErrorPayload {
 
 /**
  * Essaie de convertir une chaîne en payload d'erreur API.
- *
- * Tauri peut transmettre certaines erreurs sous forme de chaîne JSON,
- * par exemple :
- *
- * {"code":"DATABASE","message":"Une erreur est survenue."}
  */
 function parseErrorString(value: string): ApiError | null {
   const trimmed = value.trim();
@@ -80,7 +79,7 @@ function parseErrorString(value: string): ApiError | null {
       return new ApiError(parsed.code, parsed.message);
     }
   } catch {
-    // La chaîne n'est pas du JSON : on la traite plus bas.
+    // La chaîne n'est pas du JSON.
   }
 
   return null;
@@ -88,16 +87,6 @@ function parseErrorString(value: string): ApiError | null {
 
 /**
  * Normalise toute erreur remontée par Tauri en `ApiError`.
- *
- * Les formats pris en charge sont :
- * - une instance de `ApiError` ;
- * - un objet `{ code, message }` ;
- * - une chaîne contenant un objet JSON `{ code, message }` ;
- * - une Error JavaScript classique ;
- * - une chaîne d'erreur simple.
- *
- * Une erreur réellement inconnue est journalisée et remplacée
- * par un message générique.
  */
 function normalize(e: unknown): ApiError {
   if (e instanceof ApiError) {
@@ -152,17 +141,14 @@ async function call<T>(
 }
 
 /**
- * Vrai quand l'application tourne dans Tauri.
+ * Vrai lorsque l'application tourne dans Tauri.
  * Faux lorsque le frontend est exécuté dans un navigateur classique.
  */
 export const isTauri = () =>
   typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
 
 /**
- * Seul point d'accès de l'interface au noyau Rust.
- *
- * Les commandes non encore implémentées côté Rust sont conservées
- * ici afin de garder l'API frontend centralisée.
+ * Point d'accès unique de l'interface au noyau Rust.
  */
 export const api = {
   // -------------------------------------------------------------------------
@@ -177,26 +163,49 @@ export const api = {
 
   /**
    * Crée le premier compte administrateur.
-   *
-   * Le backend vérifie qu'aucun utilisateur n'existe déjà.
    */
-  setupAdmin: (
-    input: {
-      username: string;
-      password: string;
-      email?: string;
-    },
-  ) => call<User>("setup_admin", { input }),
+  setupAdmin: (input: {
+    username: string;
+    password: string;
+    email?: string;
+  }) => call<User>("setup_admin", { input }),
 
   /**
    * Liste les comptes utilisateurs locaux.
    *
-   * Cette commande est réservée au rôle administrateur côté backend.
+   * La protection administrateur est effectuée côté Rust.
    */
   listUsers: () => call<User[]>("list_users"),
 
   /**
-   * Indique si au moins un compte utilisateur existe déjà.
+   * Modifie le rôle d'un utilisateur.
+   *
+   * La vérification des droits administrateur est effectuée
+   * côté backend Rust.
+   */
+  updateUserRole: (userId: string, role: User["role"]) =>
+    call<User>("update_user_role", {
+      userId,
+      role,
+    }),
+
+  /**
+   * Crée un compte avec un rôle précis (administrateur uniquement).
+   */
+  createUser: (input: {
+    username: string;
+    password: string;
+    email?: string;
+    role: Role;
+  }) => call<User>("create_user", { input }),
+
+  /**
+   * Supprime un compte local, avec ses projets (administrateur uniquement).
+   */
+  deleteUser: (userId: string) => call<void>("delete_user", { userId }),
+
+  /**
+   * Indique si au moins un compte utilisateur existe.
    */
   hasAnyUser: () => call<boolean>("has_any_user"),
 
@@ -207,23 +216,19 @@ export const api = {
   /**
    * Crée un nouveau compte utilisateur local.
    */
-  register: (
-    input: {
-      username: string;
-      password: string;
-      email?: string;
-    },
-  ) => call<User>("register", { input }),
+  register: (input: {
+    username: string;
+    password: string;
+    email?: string;
+  }) => call<User>("register", { input }),
 
   /**
    * Authentifie un utilisateur existant.
    */
-  login: (
-    input: {
-      username: string;
-      password: string;
-    },
-  ) => call<User>("login", { input }),
+  login: (input: {
+    username: string;
+    password: string;
+  }) => call<User>("login", { input }),
 
   /**
    * Ferme la session locale courante.
@@ -231,11 +236,119 @@ export const api = {
   logout: () => call<void>("logout"),
 
   // -------------------------------------------------------------------------
+  // Phase 4 — Profil et diagnostics
+  // -------------------------------------------------------------------------
+
+  /**
+   * Met à jour l'adresse e-mail du compte connecté.
+   * Une valeur vide supprime l'adresse.
+   */
+  updateProfile: (input: { email?: string }) =>
+    call<User>("update_profile", { input }),
+
+  /**
+   * Change le mot de passe du compte connecté.
+   */
+  changePassword: (input: {
+    currentPassword: string;
+    newPassword: string;
+  }) => call<void>("change_password", { input }),
+
+  /**
+   * Rapport de diagnostic (administrateur ou développeur).
+   */
+  getDiagnostics: () => call<Diagnostics>("get_diagnostics"),
+
+  // -------------------------------------------------------------------------
   // Phase 4 — Projets
   // -------------------------------------------------------------------------
+
+  /**
+   * Crée un nouveau projet.
+   *
+   * `projectType` est volontairement en camelCase côté frontend.
+   */
+  createProject: (input: {
+    name: string;
+    description: string;
+    projectType: Project["type"];
+  }) => call<Project>("create_project", { input }),
 
   /**
    * Liste les projets accessibles à l'utilisateur courant.
    */
   listProjects: () => call<Project[]>("list_projects"),
+
+  /**
+   * Récupère un projet précis.
+   */
+  getProject: (projectId: string) =>
+    call<Project>("get_project", { projectId }),
+
+  /**
+   * Ouvre un projet : enregistre la date d'ouverture et retourne le projet.
+   */
+  openProject: (projectId: string) =>
+    call<Project>("open_project", { projectId }),
+
+  /**
+   * Met à jour un projet existant.
+   *
+   * Les champs sont optionnels afin de permettre des mises à jour
+   * partielles depuis l'interface.
+   */
+  updateProject: (
+    projectId: string,
+    input: {
+      name?: string;
+      description?: string;
+      projectType?: Project["type"];
+      status?: Project["status"];
+      isFavorite?: boolean;
+      isArchived?: boolean;
+    },
+  ) =>
+    call<Project>("update_project", {
+      projectId,
+      input,
+    }),
+
+  /**
+   * Duplique un projet (métadonnées uniquement).
+   */
+  duplicateProject: (projectId: string) =>
+    call<Project>("duplicate_project", { projectId }),
+
+  /**
+   * Supprime définitivement un projet.
+   */
+  deleteProject: (projectId: string) =>
+    call<void>("delete_project", { projectId }),
+
+  // -------------------------------------------------------------------------
+  // Synopsis
+  // -------------------------------------------------------------------------
+
+  /**
+   * Récupère le synopsis d'un projet.
+   */
+  getSynopsis: (projectId: string) =>
+    call<Synopsis>("get_synopsis", { projectId }),
+
+  /**
+   * Met à jour le synopsis d'un projet.
+   */
+  updateSynopsis: (
+    projectId: string,
+    input: {
+      content: string;
+      genres: string[];
+      subgenres: string[];
+      tone: string[];
+    },
+  ) =>
+    call<Synopsis>("update_synopsis", {
+      projectId,
+      input,
+    }),
 };

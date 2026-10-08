@@ -1,53 +1,437 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
-import { FileText } from "lucide-react";
-import { ActivityBar, type ActivityId } from "@/components/layout/ActivityBar";
+import { FileText, type LucideIcon } from "lucide-react";
+
+import { ActivityBar } from "@/components/layout/ActivityBar";
 import { SideBar } from "@/components/layout/SideBar";
 import { StatusBar } from "@/components/layout/StatusBar";
+import {
+  HOME_TAB,
+  findFeature,
+  type ModuleId,
+} from "@/components/workspace/modules";
+import {
+  WorkspaceTabs,
+  type TabInfo,
+} from "@/components/workspace/WorkspaceTabs";
+import { WorkspaceView } from "@/components/workspace/WorkspaceView";
+
+import { cn } from "@/lib/utils";
+import {
+  setRailExpanded,
+  useRailExpanded,
+} from "@/lib/preferences";
+import {
+  addTab,
+  closeTab as closeTabInLayout,
+  initialLayout,
+  moveTab as moveTabInLayout,
+  savePinnedTabs,
+  shiftTab as shiftTabInLayout,
+  togglePin as togglePinInLayout,
+  type TabLayout,
+} from "@/lib/tabLayout";
 import { useProjectStore } from "@/stores/projectStore";
 
+/**
+ * Libellé et icône d'un onglet.
+ */
+function tabMeta(
+  tabId: string,
+): { label: string; icon: LucideIcon } | null {
+  if (tabId === HOME_TAB) {
+    return { label: "Accueil du projet", icon: FileText };
+  }
+
+  const found = findFeature(tabId);
+
+  return found
+    ? { label: found.feature.label, icon: found.feature.icon }
+    : null;
+}
+
 export default function Workspace() {
-  const { projectId } = useParams<{ projectId: string }>();
-  const project = useProjectStore((s) => s.projects.find((p) => p.id === projectId));
-  const [view, setView] = useState<ActivityId>("explorer");
-  const [panelOpen, setPanelOpen] = useState(true);
+  const { projectId } = useParams<{
+    projectId: string;
+  }>();
 
-  if (!project) return <Navigate to="/dashboard" replace />;
+  /**
+   * Projet actuellement ouvert.
+   */
+  const project = useProjectStore((state) =>
+    state.projects.find(
+      (item) => item.id === projectId,
+    ),
+  );
 
-  // Cliquer sur l'icône déjà active masque le panneau latéral (comme VS Code)
-  function select(id: ActivityId) {
-    if (id === view && panelOpen) setPanelOpen(false);
-    else {
-      setView(id);
-      setPanelOpen(true);
+  /**
+   * Charge le projet depuis Rust si nécessaire.
+   */
+  const openProject = useProjectStore(
+    (state) => state.openProject,
+  );
+
+  /**
+   * Réinitialise le projet courant lorsqu'on quitte le workspace.
+   */
+  const closeProject = useProjectStore(
+    (state) => state.closeProject,
+  );
+
+  /**
+   * Barre de gauche : icônes + noms (vrai) ou icônes seules (faux).
+   * Le choix est mémorisé sur l'appareil.
+   */
+  const railExpanded = useRailExpanded();
+
+  /**
+   * Module sélectionné dans la barre de gauche.
+   *
+   * Au départ, c'est le module qui contient l'onglet ouvert à l'arrivée
+   * (l'accueil du projet, donc « Détails ») : la barre de gauche et la
+   * zone centrale restent ainsi toujours cohérentes.
+   */
+  const [activeModule, setActiveModule] = useState<ModuleId>(
+    () => findFeature(HOME_TAB)?.module.id ?? "details",
+  );
+
+  /**
+   * État d'ouverture du panneau du milieu.
+   */
+  const [panelOpen, setPanelOpen] =
+    useState(true);
+
+  /**
+   * Indique qu'un projet demandé n'a pas pu être chargé.
+   */
+  const [missing, setMissing] = useState(false);
+
+  /**
+   * Onglets ouverts dans la zone centrale : leur ordre et ceux qui
+   * sont épinglés (toujours regroupés au début).
+   *
+   * Chaque onglet est identifié par l'identifiant d'une
+   * fonctionnalité (voir `modules.ts`), ou par `home`.
+   * Les onglets épinglés sont mémorisés par projet et retrouvés
+   * à la prochaine ouverture.
+   */
+  const [layout, setLayout] = useState<TabLayout>(() =>
+    initialLayout(
+      projectId ?? "",
+      HOME_TAB,
+      (id) => tabMeta(id) !== null,
+    ),
+  );
+
+  /**
+   * Onglet actuellement actif.
+   *
+   * null = aucun onglet ouvert.
+   */
+  const [activeTab, setActiveTab] =
+    useState<string | null>(HOME_TAB);
+
+  /**
+   * Devient vrai dès que le projet a été vu dans le store.
+   *
+   * Si le projet disparaît ensuite du store, cela signifie
+   * généralement qu'il a été supprimé : on retourne alors
+   * au tableau de bord.
+   */
+  const seenRef = useRef(false);
+
+  if (project) {
+    seenRef.current = true;
+  }
+
+  /**
+   * Charge le projet depuis Rust s'il n'est pas encore
+   * présent dans le store.
+   *
+   * Rust vérifie que le projet appartient bien au compte connecté.
+   */
+  useEffect(() => {
+    if (!projectId || project || seenRef.current) {
+      return;
+    }
+
+    let cancelled = false;
+
+    openProject(projectId).catch(() => {
+      if (!cancelled) {
+        setMissing(true);
+      }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [projectId, project, openProject]);
+
+  /**
+   * Mémorise les onglets épinglés de ce projet.
+   */
+  useEffect(() => {
+    if (projectId) {
+      savePinnedTabs(projectId, layout.pinned);
+    }
+  }, [projectId, layout.pinned]);
+
+  /**
+   * Le projet courant est réinitialisé lorsqu'on quitte
+   * l'espace de travail.
+   */
+  useEffect(() => {
+    return () => {
+      closeProject();
+    };
+  }, [closeProject]);
+
+  /**
+   * Si le projet est inexistant ou a été supprimé,
+   * retour au tableau de bord.
+   */
+  if (
+    !projectId ||
+    missing ||
+    (!project && seenRef.current)
+  ) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  /**
+   * Affichage pendant le chargement du projet.
+   */
+  if (!project) {
+    return (
+      <div className="flex min-h-0 flex-1 items-center justify-center bg-background">
+        <p className="text-sm text-muted-foreground">
+          Chargement du projet…
+        </p>
+      </div>
+    );
+  }
+
+  /**
+   * Sélection d'un module dans la barre de gauche.
+   */
+  function selectModule(id: ModuleId) {
+    /**
+     * Si on clique une seconde fois sur le même module
+     * alors que le panneau est ouvert, on le ferme.
+     */
+    if (id === activeModule && panelOpen) {
+      setPanelOpen(false);
+      return;
+    }
+
+    setActiveModule(id);
+    setPanelOpen(true);
+  }
+
+  /**
+   * Active un onglet et synchronise la barre de gauche : le module qui le
+   * contient est sélectionné et son panneau affiche l'élément correspondant.
+   *
+   * Tous les changements d'onglet actif passent par ici (clic sur un onglet,
+   * ouverture d'une fonctionnalité, fermeture de l'onglet actif), pour que
+   * la gauche et la zone centrale ne se désynchronisent jamais.
+   *
+   * Le panneau du milieu n'est pas rouvert s'il a été fermé : le module
+   * reste alors repéré dans la barre (voir `linked`).
+   */
+  function activate(tabId: string | null) {
+    setActiveTab(tabId);
+
+    const owner = tabId ? findFeature(tabId)?.module.id : undefined;
+
+    if (owner) {
+      setActiveModule(owner);
     }
   }
+
+  /**
+   * Ouvre une fonctionnalité dans un onglet de la zone centrale
+   * (ou revient sur son onglet s'il est déjà ouvert).
+   */
+  function openFeature(featureId: string) {
+    setLayout((current) => addTab(current, featureId));
+
+    activate(featureId);
+  }
+
+  /**
+   * Ferme un onglet.
+   *
+   * On ne ferme PAS le projet : seul l'onglet est fermé.
+   * Un onglet épinglé ne se ferme pas : il faut d'abord le désépingler.
+   * Si c'était l'onglet actif, on passe à son voisin ;
+   * s'il n'en reste aucun, la zone centrale est vide.
+   */
+  function closeTab(tabId: string) {
+    const index = layout.tabs.indexOf(tabId);
+    const next = closeTabInLayout(layout, tabId);
+
+    if (next === layout) {
+      return;
+    }
+
+    setLayout(next);
+
+    if (activeTab === tabId) {
+      activate(
+        next.tabs[Math.min(index, next.tabs.length - 1)] ?? null,
+      );
+    }
+  }
+
+  /**
+   * Épingle ou désépingle un onglet.
+   */
+  function togglePin(tabId: string) {
+    setLayout((current) => togglePinInLayout(current, tabId));
+  }
+
+  /**
+   * Glisser-déposer : `activeId` est déposé sur `overId`.
+   */
+  function moveTab(activeId: string, overId: string) {
+    setLayout((current) => moveTabInLayout(current, activeId, overId));
+  }
+
+  /**
+   * Déplacement au clavier (Alt + flèches).
+   */
+  function shiftTab(tabId: string, delta: -1 | 1) {
+    setLayout((current) => shiftTabInLayout(current, tabId, delta));
+  }
+
+  /**
+   * Onglets tels qu'affichés dans la barre (ceux dont l'identifiant
+   * n'est plus connu sont ignorés).
+   */
+  const tabInfos: TabInfo[] = layout.tabs.flatMap((id) => {
+    const meta = tabMeta(id);
+
+    return meta
+      ? [
+          {
+            id,
+            label: meta.label,
+            icon: meta.icon,
+            pinned: layout.pinned.includes(id),
+          },
+        ]
+      : [];
+  });
+
+  /**
+   * Module qui contient l'onglet actif (repéré dans la barre de gauche).
+   */
+  const linkedModule = activeTab
+    ? (findFeature(activeTab)?.module.id ?? null)
+    : null;
+
+  /**
+   * Ordre de rendu du contenu : indépendant de l'ordre des onglets,
+   * pour que déplacer un onglet ne déplace jamais son contenu dans la page.
+   */
+  const contentIds = [...layout.tabs].sort();
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-background">
       <div className="flex min-h-0 flex-1">
-        <ActivityBar active={view} panelOpen={panelOpen} onSelect={select} />
-        {panelOpen && <SideBar view={view} projectName={project.name} />}
+        {/* =========================================================
+            BARRE DE GAUCHE (modules)
+            ========================================================= */}
+        <ActivityBar
+          active={activeModule}
+          linked={linkedModule}
+          panelOpen={panelOpen}
+          expanded={railExpanded}
+          onToggleExpanded={() =>
+            setRailExpanded(!railExpanded)
+          }
+          onSelect={selectModule}
+        />
 
+        {/* =========================================================
+            PANNEAU DU MILIEU (fonctionnalités du module)
+            ========================================================= */}
+        {panelOpen && (
+          <SideBar
+            module={activeModule}
+            projectName={project.name}
+            activeTab={activeTab}
+            onOpenFeature={openFeature}
+          />
+        )}
+
+        {/* =========================================================
+            ZONE CENTRALE
+            ========================================================= */}
         <main className="flex min-w-0 flex-1 flex-col">
-          {/* Barre d'onglets (un seul onglet factice pour l'instant) */}
-          <div className="flex h-9 shrink-0 items-end border-b border-border bg-card">
-            <div className="flex items-center gap-2 border-t-2 border-primary bg-background px-4 py-1.5 text-sm">
-              <FileText className="h-3.5 w-3.5 text-primary" />
-              Accueil du projet
-            </div>
-          </div>
+          {/* =======================================================
+              ONGLETS (épinglables et déplaçables)
+              ======================================================= */}
+          <WorkspaceTabs
+            tabs={tabInfos}
+            activeTab={activeTab}
+            onSelect={activate}
+            onClose={closeTab}
+            onTogglePin={togglePin}
+            onMove={moveTab}
+            onShift={shiftTab}
+          />
 
-          <div className="flex flex-1 flex-col items-center justify-center gap-2 overflow-y-auto p-8 text-center">
-            <h2 className="text-xl font-semibold">{project.name}</h2>
-            <p className="max-w-md text-sm text-muted-foreground">
-              Choisissez un élément dans l'explorateur pour l'ouvrir. L'éditeur et les fiches arrivent
-              dans les prochaines phases.
-            </p>
-          </div>
+          {/* =======================================================
+              CONTENU DES ONGLETS
+
+              Tous les onglets ouverts restent montés (seul l'actif
+              est visible) : un formulaire en cours de saisie n'est
+              pas perdu quand on change d'onglet.
+              ======================================================= */}
+          {layout.tabs.length > 0 ? (
+            contentIds.map((tabId) => (
+              <div
+                key={tabId}
+                className={cn(
+                  "flex min-h-0 flex-1 flex-col",
+                  activeTab !== tabId && "hidden",
+                )}
+              >
+                <WorkspaceView
+                  tabId={tabId}
+                  project={project}
+                  onOpenFeature={openFeature}
+                />
+              </div>
+            ))
+          ) : (
+            /* -----------------------------------------------------
+               AUCUN ONGLET OUVERT
+               ----------------------------------------------------- */
+            <div className="flex flex-1 items-center justify-center">
+              <div className="flex flex-col items-center gap-2 text-center">
+                <FileText className="h-8 w-8 text-muted-foreground/50" />
+
+                <p className="text-sm text-muted-foreground">
+                  Aucun onglet ouvert
+                </p>
+
+                <p className="text-xs text-muted-foreground">
+                  Choisissez une fonctionnalité dans la
+                  barre de gauche pour l'ouvrir.
+                </p>
+              </div>
+            </div>
+          )}
         </main>
       </div>
 
+      {/* =========================================================
+          STATUS BAR
+          ========================================================= */}
       <StatusBar />
     </div>
   );
