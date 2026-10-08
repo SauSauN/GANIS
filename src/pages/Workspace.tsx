@@ -230,13 +230,34 @@ export default function Workspace() {
   }
 
   /**
+   * Active un onglet et synchronise la barre de gauche : le module qui le
+   * contient est sélectionné et son panneau affiche l'élément correspondant.
+   *
+   * Tous les changements d'onglet actif passent par ici (clic sur un onglet,
+   * ouverture d'une fonctionnalité, fermeture de l'onglet actif), pour que
+   * la gauche et la zone centrale ne se désynchronisent jamais.
+   *
+   * Le panneau du milieu n'est pas rouvert s'il a été fermé : le module
+   * reste alors repéré dans la barre (voir `linked`).
+   */
+  function activate(tabId: string | null) {
+    setActiveTab(tabId);
+
+    const owner = tabId ? findFeature(tabId)?.module.id : undefined;
+
+    if (owner) {
+      setActiveModule(owner);
+    }
+  }
+
+  /**
    * Ouvre une fonctionnalité dans un onglet de la zone centrale
    * (ou revient sur son onglet s'il est déjà ouvert).
    */
   function openFeature(featureId: string) {
     setLayout((current) => addTab(current, featureId));
 
-    setActiveTab(featureId);
+    activate(featureId);
   }
 
   /**
@@ -258,7 +279,7 @@ export default function Workspace() {
     setLayout(next);
 
     if (activeTab === tabId) {
-      setActiveTab(
+      activate(
         next.tabs[Math.min(index, next.tabs.length - 1)] ?? null,
       );
     }
@@ -305,6 +326,13 @@ export default function Workspace() {
   });
 
   /**
+   * Module qui contient l'onglet actif (repéré dans la barre de gauche).
+   */
+  const linkedModule = activeTab
+    ? (findFeature(activeTab)?.module.id ?? null)
+    : null;
+
+  /**
    * Ordre de rendu du contenu : indépendant de l'ordre des onglets,
    * pour que déplacer un onglet ne déplace jamais son contenu dans la page.
    */
@@ -318,6 +346,7 @@ export default function Workspace() {
             ========================================================= */}
         <ActivityBar
           active={activeModule}
+          linked={linkedModule}
           panelOpen={panelOpen}
           expanded={railExpanded}
           onToggleExpanded={() =>
@@ -348,7 +377,7 @@ export default function Workspace() {
           <WorkspaceTabs
             tabs={tabInfos}
             activeTab={activeTab}
-            onSelect={setActiveTab}
+            onSelect={activate}
             onClose={closeTab}
             onTogglePin={togglePin}
             onMove={moveTab}

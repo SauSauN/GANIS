@@ -10,6 +10,12 @@ import { cn } from "@/lib/utils";
 interface ActivityBarProps {
   /** Module actuellement sélectionné. */
   active: ModuleId;
+  /**
+   * Module qui contient l'onglet ouvert dans la zone centrale (`null` s'il
+   * n'y en a pas). Il reste repéré dans la barre même quand le panneau du
+   * milieu est fermé, ou quand on parcourt un autre module.
+   */
+  linked?: ModuleId | null;
   /** Vrai si le panneau du milieu est ouvert. */
   panelOpen: boolean;
   /** Vrai : icônes + noms. Faux : icônes seules. */
@@ -24,9 +30,15 @@ interface ActivityBarProps {
  * Le premier bouton la développe (icônes + noms) ou la réduit
  * (icônes seules). Viennent ensuite les modules de base, puis les
  * paramètres du projet tout en bas.
+ *
+ * Deux repères distincts :
+ * - le module « sélectionné » est celui dont le panneau est affiché ;
+ * - le module « lié » est celui qui contient l'onglet ouvert (point
+ *   coloré), pour toujours savoir à quoi correspond l'onglet actif.
  */
 export function ActivityBar({
   active,
+  linked = null,
   panelOpen,
   expanded,
   onToggleExpanded,
@@ -34,27 +46,44 @@ export function ActivityBar({
 }: ActivityBarProps) {
   const renderModule = (module: WorkspaceModule) => {
     const selected = panelOpen && active === module.id;
+    const isLinked = linked === module.id;
     const Icon = module.icon;
 
     return (
       <button
         key={module.id}
         type="button"
-        title={module.label}
+        title={
+          isLinked
+            ? `${module.label} — contient l'onglet ouvert`
+            : module.label
+        }
         aria-label={module.label}
         aria-pressed={selected}
+        aria-current={isLinked ? "true" : undefined}
+        data-linked={isLinked ? "true" : undefined}
         onClick={() => onSelect(module.id)}
         className={cn(
-          "flex h-11 w-full items-center gap-3 border-l-2 text-sm transition-colors",
+          "relative flex h-11 w-full items-center gap-3 border-l-2 text-sm transition-colors",
           expanded ? "px-3.5" : "justify-center",
           selected
             ? "border-primary bg-sidebar-accent text-foreground"
-            : "border-transparent text-muted-foreground hover:text-foreground",
+            : isLinked
+              ? "border-primary/50 text-foreground"
+              : "border-transparent text-muted-foreground hover:text-foreground",
         )}
       >
         <Icon className="h-5 w-5 shrink-0" />
 
         {expanded && <span className="truncate">{module.label}</span>}
+
+        {/* Point : ce module contient l'onglet ouvert, mais son panneau n'est pas affiché. */}
+        {isLinked && !selected && (
+          <span
+            aria-hidden="true"
+            className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-primary"
+          />
+        )}
       </button>
     );
   };
