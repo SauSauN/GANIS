@@ -4,6 +4,7 @@
 use serde::ser::SerializeStruct;
 use serde::{Serialize, Serializer};
 use std::fmt;
+use std::time::Duration;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
@@ -59,8 +60,39 @@ impl AppError {
         Self::new(ErrorCode::Conflict, message)
     }
 
+    /// Aucune session ouverte : la commande exige d'être connecté.
     pub fn unauthorized() -> Self {
         Self::new(ErrorCode::Unauthorized, "Authentification requise.")
+    }
+
+    /// Connexion refusée.
+    ///
+    /// Le même message est utilisé que le nom d'utilisateur soit inconnu ou
+    /// que le mot de passe soit faux, pour ne pas révéler quels comptes existent.
+    pub fn invalid_credentials() -> Self {
+        Self::new(
+            ErrorCode::Unauthorized,
+            "Nom d'utilisateur ou mot de passe incorrect.",
+        )
+    }
+
+    /// Trop de tentatives de connexion : l'utilisateur doit patienter.
+    pub fn too_many_attempts(retry_after: Duration) -> Self {
+        // Arrondi à la seconde supérieure, au moins une seconde.
+        let seconds = (retry_after.as_secs()
+            + u64::from(retry_after.subsec_nanos() > 0))
+        .max(1);
+
+        let wait = if seconds < 60 {
+            format!("{seconds} s")
+        } else {
+            format!("{} min", seconds.div_ceil(60))
+        };
+
+        Self::new(
+            ErrorCode::Forbidden,
+            format!("Trop de tentatives de connexion. Réessayez dans {wait}."),
+        )
     }
 
     pub fn forbidden() -> Self {
@@ -125,5 +157,17 @@ mod tests {
         let json = serde_json::to_string(&err).unwrap();
         assert!(json.contains("INTERNAL"));
         assert!(!json.contains("secret"));
+    }
+
+    #[test]
+    fn too_many_attempts_rounds_up() {
+        let err = AppError::too_many_attempts(Duration::from_millis(29_100));
+        assert!(err.message.contains("30 s"));
+
+        let err = AppError::too_many_attempts(Duration::from_secs(61));
+        assert!(err.message.contains("2 min"));
+
+        let err = AppError::too_many_attempts(Duration::ZERO);
+        assert!(err.message.contains("1 s"));
     }
 }
