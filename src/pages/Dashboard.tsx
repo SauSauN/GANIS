@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Archive,
+  ChevronDown,
+  ChevronRight,
   Clock,
   FolderOpen,
   Plus,
@@ -46,6 +48,8 @@ const RECENT_LIMIT = 3;
  * Affiche ses projets, permet de les créer, modifier, dupliquer,
  * archiver et supprimer, et met en avant les projets récemment ouverts
  * et les favoris.
+ *
+ * La liste des projets peut être repliée (clic sur son titre).
  */
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -66,6 +70,12 @@ export default function Dashboard() {
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
+
+  /**
+   * Liste des projets dépliée (vrai) ou repliée (faux).
+   */
+  const [listOpen, setListOpen] = useState(true);
+
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Project | null>(null);
   const [deleting, setDeleting] = useState<Project | null>(null);
@@ -118,7 +128,15 @@ export default function Dashboard() {
     [projects],
   );
 
-  const showRecent = filter === "all" && search.trim() === "" && recent.length > 0;
+  const searching = search.trim() !== "";
+
+  const showRecent = filter === "all" && !searching && recent.length > 0;
+
+  /**
+   * Pendant une recherche, la liste est toujours affichée :
+   * un résultat ne doit jamais rester caché derrière une section repliée.
+   */
+  const listVisible = listOpen || searching;
 
   /** Exécute une action sur un projet en gérant l'état et les erreurs. */
   async function run(project: Project, task: () => Promise<unknown>) {
@@ -263,148 +281,196 @@ export default function Dashboard() {
     },
   ];
 
-  const emptyTitle =
-    search.trim() !== ""
-      ? "Aucun projet ne correspond"
-      : filter === "favorites"
-        ? "Aucun projet favori"
-        : filter === "archived"
-          ? "Aucun projet archivé"
-          : "Aucun projet pour l'instant";
+  const listTitle = searching
+    ? "Résultats de recherche"
+    : filter === "favorites"
+      ? "Favoris"
+      : filter === "archived"
+        ? "Projets archivés"
+        : "Tous les projets";
 
-  const emptyDescription =
-    search.trim() !== ""
-      ? "Essayez un autre terme de recherche."
-      : filter === "favorites"
-        ? "Cliquez sur l'étoile d'un projet pour le retrouver ici."
-        : filter === "archived"
-          ? "Les projets que vous archivez apparaissent ici."
-          : "Créez votre premier projet pour commencer à écrire.";
+  const emptyTitle = searching
+    ? "Aucun projet ne correspond"
+    : filter === "favorites"
+      ? "Aucun projet favori"
+      : filter === "archived"
+        ? "Aucun projet archivé"
+        : "Aucun projet pour l'instant";
+
+  const emptyDescription = searching
+    ? "Essayez un autre terme de recherche."
+    : filter === "favorites"
+      ? "Cliquez sur l'étoile d'un projet pour le retrouver ici."
+      : filter === "archived"
+        ? "Les projets que vous archivez apparaissent ici."
+        : "Créez votre premier projet pour commencer à écrire.";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-background">
-      <main className="mx-auto w-full max-w-6xl flex-1 overflow-y-auto px-6 py-8">
-        {/* En-tête */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Bonjour, {user?.username ?? "créateur"}
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Bienvenue dans votre studio de conception narrative.
-            </p>
-          </div>
-
-          <Button onClick={openCreateDialog}>
-            <Plus className="mr-2 h-4 w-4" />
-            Nouveau projet
-          </Button>
-        </div>
-
-        {/* Recherche */}
-        <div className="relative mt-6">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            className="pl-9"
-            placeholder="Rechercher un projet…"
-            aria-label="Rechercher un projet"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-        </div>
-
-        {/* Erreurs */}
-        {(error || actionError) && (
-          <div
-            role="alert"
-            className="mt-6 rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-          >
-            {actionError ?? error}
-          </div>
-        )}
-
-        {/* Filtres avec compteurs */}
-        <div className="mt-6 grid gap-4 sm:grid-cols-3">
-          {filters.map(({ id, label, count, icon: Icon }) => (
-            <button
-              key={id}
-              type="button"
-              aria-pressed={filter === id}
-              onClick={() => setFilter(id)}
-              className="text-left"
-            >
-              <Card
-                className={cn(
-                  "transition-colors hover:bg-accent/50",
-                  filter === id && "ring-2 ring-primary",
-                )}
-              >
-                <CardHeader className="flex flex-row items-center justify-between pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {label}
-                  </CardTitle>
-                  <Icon className="h-4 w-4 text-muted-foreground" />
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">{count}</div>
-                </CardContent>
-              </Card>
-            </button>
-          ))}
-        </div>
-
-        {/* Récemment ouverts */}
-        {showRecent && (
-          <section className="mt-8">
-            <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
-              <Clock className="h-4 w-4 text-muted-foreground" />
-              Récemment ouverts
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {recent.map(renderCard)}
+      {/*
+        Le conteneur qui défile occupe toute la largeur : la barre de
+        défilement se place ainsi tout à droite de la fenêtre. Le contenu,
+        lui, reste centré dans une colonne de largeur limitée.
+      */}
+      <main className="min-h-0 flex-1 overflow-y-auto">
+        <div className="mx-auto w-full max-w-6xl px-6 py-8">
+          {/* En-tête */}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 className="text-2xl font-semibold tracking-tight">
+                Bonjour, {user?.username ?? "créateur"}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                Bienvenue dans votre studio de conception narrative.
+              </p>
             </div>
-          </section>
-        )}
 
-        {/* Liste des projets */}
-        <section className="mt-8">
-          <h2 className="mb-4 text-lg font-semibold">
-            {search.trim() !== ""
-              ? "Résultats de recherche"
-              : filter === "favorites"
-                ? "Favoris"
-                : filter === "archived"
-                  ? "Projets archivés"
-                  : "Tous les projets"}
-          </h2>
+            <Button onClick={openCreateDialog}>
+              <Plus className="mr-2 h-4 w-4" />
+              Nouveau projet
+            </Button>
+          </div>
 
-          {loading && projects.length === 0 ? (
-            <p className="text-sm text-muted-foreground">
-              Chargement des projets…
-            </p>
-          ) : visible.length === 0 ? (
-            <Card>
-              <CardHeader>
-                <CardTitle>{emptyTitle}</CardTitle>
-                <CardDescription>{emptyDescription}</CardDescription>
-              </CardHeader>
-              {filter === "all" &&
-                search.trim() === "" &&
-                projects.length === 0 && (
-                  <CardContent>
-                    <Button onClick={openCreateDialog}>
-                      <Plus className="mr-2 h-4 w-4" />
-                      Créer mon premier projet
-                    </Button>
-                  </CardContent>
-                )}
-            </Card>
-          ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {visible.map(renderCard)}
+          {/* Recherche */}
+          <div className="relative mt-6">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              className="pl-9"
+              placeholder="Rechercher un projet…"
+              aria-label="Rechercher un projet"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
+
+          {/* Erreurs */}
+          {(error || actionError) && (
+            <div
+              role="alert"
+              className="mt-6 rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+            >
+              {actionError ?? error}
             </div>
           )}
-        </section>
+
+          {/* Filtres avec compteurs */}
+          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+            {filters.map(({ id, label, count, icon: Icon }) => (
+              <button
+                key={id}
+                type="button"
+                aria-pressed={filter === id}
+                onClick={() => {
+                  setFilter(id);
+                  // Choisir un filtre déplie la liste pour en montrer le résultat.
+                  setListOpen(true);
+                }}
+                className="text-left"
+              >
+                <Card
+                  className={cn(
+                    "transition-colors hover:bg-accent/50",
+                    filter === id && "ring-2 ring-primary",
+                  )}
+                >
+                  <CardHeader className="flex flex-row items-center justify-between pb-2">
+                    <CardTitle className="text-sm font-medium">
+                      {label}
+                    </CardTitle>
+                    <Icon className="h-4 w-4 text-muted-foreground" />
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{count}</div>
+                  </CardContent>
+                </Card>
+              </button>
+            ))}
+          </div>
+
+          {/* Récemment ouverts */}
+          {showRecent && (
+            <section className="mt-8">
+              <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
+                <Clock className="h-4 w-4 text-muted-foreground" />
+                Récemment ouverts
+              </h2>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {recent.map(renderCard)}
+              </div>
+            </section>
+          )}
+
+          {/* Liste des projets (repliable) */}
+          <section className="mt-8">
+            <h2 className="mb-4 text-lg font-semibold">
+              {searching ? (
+                // Pendant une recherche, la liste reste ouverte : pas de bouton.
+                <span className="flex items-center gap-2">
+                  {listTitle}
+                  <span className="text-sm font-normal text-muted-foreground">
+                    ({visible.length})
+                  </span>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  aria-expanded={listOpen}
+                  aria-controls={listOpen ? "projects-list" : undefined}
+                  title={
+                    listOpen
+                      ? "Fermer la liste des projets"
+                      : "Afficher la liste des projets"
+                  }
+                  onClick={() => setListOpen((open) => !open)}
+                  className="flex items-center gap-2 rounded-md text-left transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  {listOpen ? (
+                    <ChevronDown className="h-5 w-5 shrink-0" />
+                  ) : (
+                    <ChevronRight className="h-5 w-5 shrink-0" />
+                  )}
+
+                  {listTitle}
+
+                  <span className="text-sm font-normal text-muted-foreground">
+                    ({visible.length})
+                  </span>
+                </button>
+              )}
+            </h2>
+
+            {listVisible && (
+              <div id="projects-list">
+                {loading && projects.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">
+                    Chargement des projets…
+                  </p>
+                ) : visible.length === 0 ? (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>{emptyTitle}</CardTitle>
+                      <CardDescription>{emptyDescription}</CardDescription>
+                    </CardHeader>
+                    {filter === "all" &&
+                      !searching &&
+                      projects.length === 0 && (
+                        <CardContent>
+                          <Button onClick={openCreateDialog}>
+                            <Plus className="mr-2 h-4 w-4" />
+                            Créer mon premier projet
+                          </Button>
+                        </CardContent>
+                      )}
+                  </Card>
+                ) : (
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {visible.map(renderCard)}
+                  </div>
+                )}
+              </div>
+            )}
+          </section>
+        </div>
       </main>
 
       {/* Création / modification */}

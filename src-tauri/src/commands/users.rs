@@ -2,7 +2,7 @@
 
 use crate::error::{AppError, AppResult};
 use crate::models::user::{Role, UserPublic};
-use crate::services::{auth_service, user_service};
+use crate::services::{auth_service, project_service, project_storage, user_service};
 use crate::state::AppState;
 use serde::Deserialize;
 use tauri::State;
@@ -102,7 +102,8 @@ pub async fn update_user_role(
     Ok(UserPublic::from(updated_user))
 }
 
-/// Supprime un compte local, avec ses sessions et ses projets.
+/// Supprime un compte local, avec ses sessions, ses projets et les
+/// données de ces projets.
 ///
 /// Réservé aux administrateurs. Un administrateur ne peut pas supprimer
 /// son propre compte, ni le dernier compte administrateur.
@@ -119,7 +120,18 @@ pub async fn delete_user(
         ));
     }
 
-    user_service::delete_by_id(&state.app_db, &user_id).await
+    // Les projets sont relevés avant la suppression : une fois le compte
+    // supprimé, la base de l'application ne les connaît plus.
+    let projects =
+        project_service::list_projects_for_user(&state.app_db, &user_id).await?;
+
+    user_service::delete_by_id(&state.app_db, &user_id).await?;
+
+    for project in projects {
+        project_storage::delete_storage(&state, &project.id).await;
+    }
+
+    Ok(())
 }
 
 /// Met à jour l'adresse e-mail de l'utilisateur connecté.

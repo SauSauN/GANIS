@@ -6,6 +6,7 @@ import type {
   ErrorCode,
   Project,
   Role,
+  Synopsis,
   User,
 } from "@/types";
 
@@ -323,4 +324,31 @@ export const api = {
    */
   deleteProject: (projectId: string) =>
     call<void>("delete_project", { projectId }),
+
+  // -------------------------------------------------------------------------
+  // Synopsis
+  // -------------------------------------------------------------------------
+
+  /**
+   * Récupère le synopsis d'un projet.
+   */
+  getSynopsis: (projectId: string) =>
+    call<Synopsis>("get_synopsis", { projectId }),
+
+  /**
+   * Met à jour le synopsis d'un projet.
+   */
+  updateSynopsis: (
+    projectId: string,
+    input: {
+      content: string;
+      genres: string[];
+      subgenres: string[];
+      tone: string[];
+    },
+  ) =>
+    call<Synopsis>("update_synopsis", {
+      projectId,
+      input,
+    }),
 };

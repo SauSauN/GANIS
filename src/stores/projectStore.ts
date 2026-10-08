@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
+import { useSynopsisStore } from "@/stores/synopsisStore";
 import type {
   Project,
   ProjectStatus,
@@ -397,12 +398,19 @@ export const useProjectStore =
       },
 
       closeProject: () => {
+        // Le synopsis appartient au projet qu'on quitte.
+        useSynopsisStore.getState().reset();
+
         set({
           currentProjectId: null,
         });
       },
 
       reset: () => {
+        // Appelé à la déconnexion : aucune donnée du compte précédent
+        // ne doit rester en mémoire.
+        useSynopsisStore.getState().reset();
+
         set(initial);
       },
 

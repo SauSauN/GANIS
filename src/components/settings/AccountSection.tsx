@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { CalendarDays, Mail, ShieldCheck, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,7 +25,9 @@ const errorMessage = (e: unknown, fallback: string) =>
   e instanceof Error ? e.message : fallback;
 
 function FeedbackMessage({ feedback }: { feedback: Feedback | null }) {
-  if (!feedback) return null;
+  if (!feedback) {
+    return null;
+  }
 
   return (
     <p
@@ -37,6 +40,29 @@ function FeedbackMessage({ feedback }: { feedback: Feedback | null }) {
     >
       {feedback.text}
     </p>
+  );
+}
+
+/** Une information du compte, avec son icône (même présentation que l'accueil du projet). */
+function InfoCell({
+  icon: Icon,
+  label,
+  children,
+}: {
+  icon: typeof UserIcon;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex items-start gap-3 bg-card p-5">
+      <Icon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+
+      <div className="min-w-0">
+        <p className="text-xs text-muted-foreground">{label}</p>
+
+        <div className="mt-1 break-words text-sm font-medium">{children}</div>
+      </div>
+    </div>
   );
 }
 
@@ -147,71 +173,83 @@ export function AccountSection() {
   }
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
+    <div className="space-y-8">
+      {/* ==================================================================
+          INFORMATIONS DU COMPTE
+          ================================================================== */}
+
+      <Card className="overflow-hidden">
+        <CardHeader className="border-b bg-muted/20 px-6 py-5">
           <CardTitle>Informations du compte</CardTitle>
+
           <CardDescription>
-            Ces informations sont stockées localement.
+            Ces informations sont stockées localement, sur cet appareil.
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-3 text-sm">
-          <div>
-            <span className="font-medium">Nom d'utilisateur</span>
-            <p className="text-muted-foreground">{user.username}</p>
-          </div>
+        <CardContent className="p-0">
+          <div className="grid gap-px bg-border sm:grid-cols-2">
+            <InfoCell icon={UserIcon} label="Nom d'utilisateur">
+              {user.username}
+            </InfoCell>
 
-          <div>
-            <span className="font-medium">Adresse e-mail</span>
-            <p className="text-muted-foreground">
-              {user.email ?? "Non renseignée"}
-            </p>
-          </div>
+            <InfoCell icon={Mail} label="Adresse e-mail">
+              {user.email ?? (
+                <span className="font-normal text-muted-foreground">
+                  Non renseignée
+                </span>
+              )}
+            </InfoCell>
 
-          <div>
-            <span className="font-medium">Rôle</span>
-            <p className="text-muted-foreground">
-              {ROLE_LABELS[user.role] ?? user.role}
-            </p>
-          </div>
+            <InfoCell icon={ShieldCheck} label="Rôle">
+              <span className="inline-flex items-center rounded-md border bg-muted/40 px-2.5 py-1 text-xs font-medium">
+                {ROLE_LABELS[user.role] ?? user.role}
+              </span>
+            </InfoCell>
 
-          <div>
-            <span className="font-medium">Compte créé le</span>
-            <p className="text-muted-foreground">
+            <InfoCell icon={CalendarDays} label="Compte créé le">
               {new Date(user.createdAt).toLocaleDateString("fr-FR", {
                 day: "numeric",
                 month: "long",
                 year: "numeric",
               })}
-            </p>
+            </InfoCell>
           </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <form onSubmit={handleEmailSubmit}>
-          <CardHeader>
+      {/* ==================================================================
+          ADRESSE E-MAIL
+          ================================================================== */}
+
+      <Card className="overflow-hidden">
+        <form onSubmit={handleEmailSubmit} noValidate>
+          <CardHeader className="border-b bg-muted/20 px-6 py-5">
             <CardTitle>Adresse e-mail</CardTitle>
+
             <CardDescription>
-              Facultative, utilisée uniquement comme contact local.
-              Laissez le champ vide pour la supprimer.
+              Facultative, utilisée uniquement comme contact local. Laissez
+              le champ vide pour la supprimer.
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="mt-4 space-y-2">
-            <Label htmlFor="profile-email">Adresse e-mail</Label>
-            <Input
-              id="profile-email"
-              type="email"
-              autoComplete="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+          <CardContent className="space-y-6 px-6 py-6">
+            <div className="max-w-md space-y-2">
+              <Label htmlFor="profile-email">Adresse e-mail</Label>
+
+              <Input
+                id="profile-email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+
             <FeedbackMessage feedback={emailFeedback} />
           </CardContent>
 
-          <CardFooter className="mt-4">
+          <CardFooter className="border-t bg-muted/10 px-6 py-4">
             <Button type="submit" disabled={emailSaving}>
               {emailSaving ? "Enregistrement…" : "Enregistrer"}
             </Button>
@@ -219,20 +257,24 @@ export function AccountSection() {
         </form>
       </Card>
 
-      <Card>
+      {/* ==================================================================
+          MOT DE PASSE
+          ================================================================== */}
+
+      <Card className="overflow-hidden">
         <form onSubmit={handlePasswordSubmit}>
-          <CardHeader>
+          <CardHeader className="border-b bg-muted/20 px-6 py-5">
             <CardTitle>Mot de passe</CardTitle>
+
             <CardDescription>
               Au moins 8 caractères, avec une lettre et un chiffre.
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="mt-4 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="current-password">
-                Mot de passe actuel
-              </Label>
+          <CardContent className="space-y-6 px-6 py-6">
+            <div className="max-w-md space-y-2">
+              <Label htmlFor="current-password">Mot de passe actuel</Label>
+
               <Input
                 id="current-password"
                 type="password"
@@ -242,38 +284,40 @@ export function AccountSection() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="new-password">Nouveau mot de passe</Label>
-              <Input
-                id="new-password"
-                type="password"
-                autoComplete="new-password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-              />
-            </div>
+            <div className="grid max-w-2xl gap-6 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="new-password">Nouveau mot de passe</Label>
 
-            <div className="space-y-2">
-              <Label htmlFor="confirm-password">
-                Confirmer le nouveau mot de passe
-              </Label>
-              <Input
-                id="confirm-password"
-                type="password"
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
+                <Input
+                  id="new-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirm-password">
+                  Confirmer le nouveau mot de passe
+                </Label>
+
+                <Input
+                  id="confirm-password"
+                  type="password"
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+              </div>
             </div>
 
             <FeedbackMessage feedback={passwordFeedback} />
           </CardContent>
 
-          <CardFooter className="mt-4">
+          <CardFooter className="border-t bg-muted/10 px-6 py-4">
             <Button type="submit" disabled={passwordSaving}>
-              {passwordSaving
-                ? "Modification…"
-                : "Changer le mot de passe"}
+              {passwordSaving ? "Modification…" : "Changer le mot de passe"}
             </Button>
           </CardFooter>
         </form>

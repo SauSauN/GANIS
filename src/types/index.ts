@@ -54,6 +54,30 @@ export interface Project {
 }
 
 // ----------------------------------------------------------------------------
+// Synopsis
+// ----------------------------------------------------------------------------
+
+/**
+ * Synopsis d'un projet narratif.
+ *
+ * Un projet n'a qu'un seul synopsis, stocké dans la base de données
+ * propre au projet. Il contient :
+ *   - le contenu textuel du synopsis (éditeur riche, HTML) ;
+ *   - les genres associés (ex. "Fantasy", "Aventure") ;
+ *   - les sous-genres associés (ex. "Dark Fantasy") ;
+ *   - les tons associés (ex. "Sombre", "Épique").
+ */
+export interface Synopsis {
+  id: string;
+  content: string;
+  genres: string[];
+  subgenres: string[];
+  tone: string[];
+  createdAt: string; // RFC 3339, UTC
+  updatedAt: string; // RFC 3339, UTC
+}
+
+// ----------------------------------------------------------------------------
 // Informations sur l'application
 // ----------------------------------------------------------------------------
 

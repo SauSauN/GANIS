@@ -6,6 +6,7 @@ import {
   Star,
   Trash2,
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -60,8 +61,14 @@ interface Feedback {
 const errorMessage = (e: unknown, fallback: string) =>
   e instanceof Error ? e.message : fallback;
 
-function FeedbackMessage({ feedback }: { feedback: Feedback | null }) {
-  if (!feedback) return null;
+function FeedbackMessage({
+  feedback,
+}: {
+  feedback: Feedback | null;
+}) {
+  if (!feedback) {
+    return null;
+  }
 
   return (
     <p
@@ -83,34 +90,63 @@ interface ProjectSettingsPanelProps {
 }
 
 /**
- * Contenu d'une section des paramètres du projet, affiché dans la zone
- * centrale de l'espace de travail.
+ * Contenu d'une section des paramètres du projet.
+ *
+ * Utilise la même structure et les mêmes dimensions que
+ * WorkspaceHome et les autres vues principales du workspace.
  */
 export function ProjectSettingsPanel({
   project,
   section,
 }: ProjectSettingsPanelProps) {
   const meta =
-    PROJECT_SETTINGS_SECTIONS.find((item) => item.id === section) ??
-    PROJECT_SETTINGS_SECTIONS[0];
+    PROJECT_SETTINGS_SECTIONS.find(
+      (item) => item.id === section,
+    ) ?? PROJECT_SETTINGS_SECTIONS[0];
 
   return (
-    <div className="flex-1 overflow-y-auto p-8">
-      <div className="mx-auto max-w-2xl space-y-6">
-        <div>
-          <h2 className="text-xl font-semibold">{meta.label}</h2>
-          <p className="text-sm text-muted-foreground">
+    <main className="flex min-h-0 flex-1 overflow-y-auto">
+      <div className="mx-auto w-full max-w-5xl px-6 py-8 pb-24 lg:px-10">
+        {/* ================================================================
+            EN-TÊTE
+            ================================================================ */}
+
+        <header className="mb-8">
+          <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
+            <span>Projet</span>
+            <span>/</span>
+            <span>Paramètres</span>
+          </div>
+
+          <h1 className="text-3xl font-semibold tracking-tight">
+            {meta.label}
+          </h1>
+
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
             {meta.description}
           </p>
-        </div>
+        </header>
+
+        {/* ================================================================
+            CONTENU
+            ================================================================ */}
 
         {section === "info" && (
-          <InfoSection key={project.id} project={project} />
+          <InfoSection
+            key={project.id}
+            project={project}
+          />
         )}
-        {section === "status" && <StatusSection project={project} />}
-        {section === "danger" && <DangerSection project={project} />}
+
+        {section === "status" && (
+          <StatusSection project={project} />
+        )}
+
+        {section === "danger" && (
+          <DangerSection project={project} />
+        )}
       </div>
-    </div>
+    </main>
   );
 }
 
@@ -119,13 +155,20 @@ export function ProjectSettingsPanel({
 // ----------------------------------------------------------------------------
 
 function InfoSection({ project }: { project: Project }) {
-  const updateProject = useProjectStore((state) => state.updateProject);
+  const updateProject = useProjectStore(
+    (state) => state.updateProject,
+  );
 
   const [name, setName] = useState(project.name);
-  const [description, setDescription] = useState(project.description);
-  const [projectType, setProjectType] = useState<ProjectType>(project.type);
+  const [description, setDescription] = useState(
+    project.description,
+  );
+  const [projectType, setProjectType] =
+    useState<ProjectType>(project.type);
+
   const [saving, setSaving] = useState(false);
-  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [feedback, setFeedback] =
+    useState<Feedback | null>(null);
 
   const unchanged =
     name.trim() === project.name &&
@@ -140,7 +183,10 @@ function InfoSection({ project }: { project: Project }) {
     const trimmedDescription = description.trim();
 
     if (!trimmedName) {
-      setFeedback({ kind: "error", text: "Le nom du projet est requis." });
+      setFeedback({
+        kind: "error",
+        text: "Le nom du projet est requis.",
+      });
       return;
     }
 
@@ -172,11 +218,18 @@ function InfoSection({ project }: { project: Project }) {
 
       setName(trimmedName);
       setDescription(trimmedDescription);
-      setFeedback({ kind: "success", text: "Modifications enregistrées." });
+
+      setFeedback({
+        kind: "success",
+        text: "Modifications enregistrées.",
+      });
     } catch (e) {
       setFeedback({
         kind: "error",
-        text: errorMessage(e, "Impossible d'enregistrer les modifications."),
+        text: errorMessage(
+          e,
+          "Impossible d'enregistrer les modifications.",
+        ),
       });
     } finally {
       setSaving(false);
@@ -186,16 +239,21 @@ function InfoSection({ project }: { project: Project }) {
   return (
     <Card>
       <form onSubmit={handleSubmit}>
-        <CardHeader>
+        <CardHeader className="border-b bg-muted/20">
           <CardTitle>Informations du projet</CardTitle>
+
           <CardDescription>
             Ces informations apparaissent sur le tableau de bord.
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="mt-4 space-y-4">
+        <CardContent className="space-y-6 px-6 py-6">
+          {/* Nom */}
           <div className="space-y-2">
-            <Label htmlFor="settings-project-name">Nom du projet</Label>
+            <Label htmlFor="settings-project-name">
+              Nom du projet
+            </Label>
+
             <Input
               id="settings-project-name"
               value={name}
@@ -203,26 +261,34 @@ function InfoSection({ project }: { project: Project }) {
             />
           </div>
 
+          {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="settings-project-description">
               Description
             </Label>
+
             <textarea
               id="settings-project-description"
-              rows={4}
+              rows={5}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className={`${fieldClass} resize-none py-2`}
+              className={`${fieldClass} resize-y py-2 leading-6`}
             />
           </div>
 
+          {/* Type */}
           <div className="space-y-2">
-            <Label htmlFor="settings-project-type">Type de création</Label>
+            <Label htmlFor="settings-project-type">
+              Type de création
+            </Label>
+
             <select
               id="settings-project-type"
               value={projectType}
               onChange={(e) =>
-                setProjectType(e.target.value as ProjectType)
+                setProjectType(
+                  e.target.value as ProjectType,
+                )
               }
               className={`${fieldClass} h-9`}
             >
@@ -237,9 +303,14 @@ function InfoSection({ project }: { project: Project }) {
           <FeedbackMessage feedback={feedback} />
         </CardContent>
 
-        <CardFooter className="mt-4">
-          <Button type="submit" disabled={saving || unchanged}>
-            {saving ? "Enregistrement…" : "Enregistrer"}
+        <CardFooter className="border-t bg-muted/10 px-6 py-4">
+          <Button
+            type="submit"
+            disabled={saving || unchanged}
+          >
+            {saving
+              ? "Enregistrement…"
+              : "Enregistrer"}
           </Button>
         </CardFooter>
       </form>
@@ -252,10 +323,13 @@ function InfoSection({ project }: { project: Project }) {
 // ----------------------------------------------------------------------------
 
 function StatusSection({ project }: { project: Project }) {
-  const updateProject = useProjectStore((state) => state.updateProject);
+  const updateProject = useProjectStore(
+    (state) => state.updateProject,
+  );
 
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] =
+    useState<string | null>(null);
 
   async function apply(changes: {
     status?: ProjectStatus;
@@ -266,37 +340,53 @@ function StatusSection({ project }: { project: Project }) {
     setError(null);
 
     try {
-      await updateProject({ id: project.id, ...changes });
+      await updateProject({
+        id: project.id,
+        ...changes,
+      });
     } catch (e) {
-      setError(errorMessage(e, "Impossible de modifier le projet."));
+      setError(
+        errorMessage(
+          e,
+          "Impossible de modifier le projet.",
+        ),
+      );
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Statut */}
       <Card>
-        <CardHeader>
+        <CardHeader className="border-b bg-muted/20">
           <CardTitle>Statut</CardTitle>
+
           <CardDescription>
             Où en est ce projet ? Le changement est enregistré
             immédiatement.
           </CardDescription>
         </CardHeader>
 
-        <CardContent>
-          <Label htmlFor="settings-project-status" className="sr-only">
+        <CardContent className="px-6 py-6">
+          <Label
+            htmlFor="settings-project-status"
+            className="sr-only"
+          >
             Statut du projet
           </Label>
+
           <select
             id="settings-project-status"
             value={project.status}
             disabled={busy}
             onChange={(e) =>
-              void apply({ status: e.target.value as ProjectStatus })
+              void apply({
+                status: e.target.value as ProjectStatus,
+              })
             }
-            className={`${fieldClass} h-9 max-w-xs`}
+            className={`${fieldClass} h-10 max-w-sm`}
           >
             {PROJECT_STATUSES.map((value) => (
               <option key={value} value={value}>
@@ -307,22 +397,29 @@ function StatusSection({ project }: { project: Project }) {
         </CardContent>
       </Card>
 
+      {/* Organisation */}
       <Card>
-        <CardHeader>
+        <CardHeader className="border-b bg-muted/20">
           <CardTitle>Organisation</CardTitle>
+
           <CardDescription>
-            Les favoris sont mis en avant sur le tableau de bord. Un
-            projet archivé n'apparaît plus dans la liste principale.
+            Les favoris sont mis en avant sur le tableau de
+            bord. Un projet archivé n'apparaît plus dans la
+            liste principale.
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="flex flex-wrap gap-2">
+        <CardContent className="flex flex-wrap gap-3 px-6 py-6">
           <Button
             type="button"
             variant="outline"
             disabled={busy}
             aria-pressed={project.isFavorite}
-            onClick={() => void apply({ isFavorite: !project.isFavorite })}
+            onClick={() =>
+              void apply({
+                isFavorite: !project.isFavorite,
+              })
+            }
           >
             <Star
               className={
@@ -331,6 +428,7 @@ function StatusSection({ project }: { project: Project }) {
                   : "mr-2 h-4 w-4"
               }
             />
+
             {project.isFavorite
               ? "Retirer des favoris"
               : "Ajouter aux favoris"}
@@ -340,20 +438,30 @@ function StatusSection({ project }: { project: Project }) {
             type="button"
             variant="outline"
             disabled={busy}
-            onClick={() => void apply({ isArchived: !project.isArchived })}
+            onClick={() =>
+              void apply({
+                isArchived: !project.isArchived,
+              })
+            }
           >
             {project.isArchived ? (
               <ArchiveRestore className="mr-2 h-4 w-4" />
             ) : (
               <Archive className="mr-2 h-4 w-4" />
             )}
-            {project.isArchived ? "Désarchiver" : "Archiver le projet"}
+
+            {project.isArchived
+              ? "Désarchiver"
+              : "Archiver le projet"}
           </Button>
         </CardContent>
       </Card>
 
       {error && (
-        <p role="alert" className="text-sm text-destructive">
+        <p
+          role="alert"
+          className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
+        >
           {error}
         </p>
       )}
@@ -369,15 +477,25 @@ function DangerSection({ project }: { project: Project }) {
   const duplicateProject = useProjectStore(
     (state) => state.duplicateProject,
   );
-  const deleteProject = useProjectStore((state) => state.deleteProject);
 
-  const [duplicating, setDuplicating] = useState(false);
+  const deleteProject = useProjectStore(
+    (state) => state.deleteProject,
+  );
+
+  const [duplicating, setDuplicating] =
+    useState(false);
+
   const [duplicateFeedback, setDuplicateFeedback] =
     useState<Feedback | null>(null);
 
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [deleting, setDeleting] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] =
+    useState(false);
+
+  const [deleting, setDeleting] =
+    useState(false);
+
+  const [deleteError, setDeleteError] =
+    useState<string | null>(null);
 
   async function handleDuplicate() {
     setDuplicating(true);
@@ -393,7 +511,10 @@ function DangerSection({ project }: { project: Project }) {
     } catch (e) {
       setDuplicateFeedback({
         kind: "error",
-        text: errorMessage(e, "Impossible de dupliquer le projet."),
+        text: errorMessage(
+          e,
+          "Impossible de dupliquer le projet.",
+        ),
       });
     } finally {
       setDuplicating(false);
@@ -406,27 +527,35 @@ function DangerSection({ project }: { project: Project }) {
 
     try {
       // Une fois le projet retiré du store, l'espace de travail
-      // redirige tout seul vers le tableau de bord.
+      // redirige automatiquement vers le tableau de bord.
       await deleteProject(project.id);
     } catch (e) {
-      setDeleteError(errorMessage(e, "Impossible de supprimer le projet."));
+      setDeleteError(
+        errorMessage(
+          e,
+          "Impossible de supprimer le projet.",
+        ),
+      );
+
       setConfirmOpen(false);
       setDeleting(false);
     }
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      {/* Duplication */}
       <Card>
-        <CardHeader>
+        <CardHeader className="border-b bg-muted/20">
           <CardTitle>Dupliquer le projet</CardTitle>
+
           <CardDescription>
-            Crée une copie avec le même nom (suivi de « (copie) »), la
-            même description et le même type.
+            Crée une copie avec le même nom (suivi de « (copie) »),
+            la même description et le même type.
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-3 px-6 py-6">
           <Button
             type="button"
             variant="outline"
@@ -434,24 +563,32 @@ function DangerSection({ project }: { project: Project }) {
             onClick={() => void handleDuplicate()}
           >
             <Copy className="mr-2 h-4 w-4" />
-            {duplicating ? "Duplication…" : "Dupliquer"}
+
+            {duplicating
+              ? "Duplication…"
+              : "Dupliquer"}
           </Button>
 
-          <FeedbackMessage feedback={duplicateFeedback} />
+          <FeedbackMessage
+            feedback={duplicateFeedback}
+          />
         </CardContent>
       </Card>
 
+      {/* Suppression */}
       <Card className="border-destructive/40">
-        <CardHeader>
+        <CardHeader className="border-b border-destructive/20 bg-destructive/5">
           <CardTitle className="text-destructive">
             Supprimer le projet
           </CardTitle>
+
           <CardDescription>
-            La suppression est définitive et ne peut pas être annulée.
+            La suppression est définitive et ne peut pas être
+            annulée.
           </CardDescription>
         </CardHeader>
 
-        <CardContent className="space-y-2">
+        <CardContent className="space-y-3 px-6 py-6">
           <Button
             type="button"
             variant="destructive"
@@ -462,25 +599,34 @@ function DangerSection({ project }: { project: Project }) {
           </Button>
 
           {deleteError && (
-            <p role="alert" className="text-sm text-destructive">
+            <p
+              role="alert"
+              className="text-sm text-destructive"
+            >
               {deleteError}
             </p>
           )}
         </CardContent>
       </Card>
 
+      {/* Confirmation */}
       <Dialog
         open={confirmOpen}
         onOpenChange={(open) => {
-          if (!deleting) setConfirmOpen(open);
+          if (!deleting) {
+            setConfirmOpen(open);
+          }
         }}
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Supprimer ce projet ?</DialogTitle>
+            <DialogTitle>
+              Supprimer ce projet ?
+            </DialogTitle>
+
             <DialogDescription>
-              Le projet « {project.name} » sera supprimé définitivement.
-              Cette action est irréversible.
+              Le projet « {project.name} » sera supprimé
+              définitivement. Cette action est irréversible.
             </DialogDescription>
           </DialogHeader>
 
@@ -493,13 +639,16 @@ function DangerSection({ project }: { project: Project }) {
             >
               Annuler
             </Button>
+
             <Button
               type="button"
               variant="destructive"
               onClick={() => void handleDelete()}
               disabled={deleting}
             >
-              {deleting ? "Suppression…" : "Supprimer"}
+              {deleting
+                ? "Suppression…"
+                : "Supprimer"}
             </Button>
           </DialogFooter>
         </DialogContent>

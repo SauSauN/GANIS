@@ -1,52 +1,56 @@
 import { useEffect, useRef, useState } from "react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
-import { format } from "date-fns";
-import { fr } from "date-fns/locale";
-import { ArrowLeft, FileText, X } from "lucide-react";
+import { Navigate, useParams } from "react-router-dom";
+import { FileText, type LucideIcon } from "lucide-react";
 
-import {
-  ActivityBar,
-  type ActivityId,
-} from "@/components/layout/ActivityBar";
+import { ActivityBar } from "@/components/layout/ActivityBar";
 import { SideBar } from "@/components/layout/SideBar";
 import { StatusBar } from "@/components/layout/StatusBar";
-import { ProjectSettingsPanel } from "@/components/project-settings/ProjectSettingsPanel";
-
 import {
-  PROJECT_SETTINGS_SECTIONS,
-  type ProjectSettingsId,
-} from "@/components/project-settings/sections";
+  HOME_TAB,
+  findFeature,
+  type ModuleId,
+} from "@/components/workspace/modules";
+import {
+  WorkspaceTabs,
+  type TabInfo,
+} from "@/components/workspace/WorkspaceTabs";
+import { WorkspaceView } from "@/components/workspace/WorkspaceView";
 
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import {
+  setRailExpanded,
+  useRailExpanded,
+} from "@/lib/preferences";
+import {
+  addTab,
+  closeTab as closeTabInLayout,
+  initialLayout,
+  moveTab as moveTabInLayout,
+  savePinnedTabs,
+  shiftTab as shiftTabInLayout,
+  togglePin as togglePinInLayout,
+  type TabLayout,
+} from "@/lib/tabLayout";
 import { useProjectStore } from "@/stores/projectStore";
 
-import {
-  PROJECT_STATUS_LABELS,
-  PROJECT_TYPE_LABELS,
-} from "@/types";
-
 /**
- * Onglets disponibles dans la zone centrale.
- *
- * null = aucun onglet ouvert.
+ * Libellé et icône d'un onglet.
  */
-type TabId = "home" | "settings" | null;
+function tabMeta(
+  tabId: string,
+): { label: string; icon: LucideIcon } | null {
+  if (tabId === HOME_TAB) {
+    return { label: "Accueil du projet", icon: FileText };
+  }
 
-/**
- * Style commun des onglets.
- */
-const tabClass = (active: boolean) =>
-  cn(
-    "flex items-center gap-2 border-t-2 px-4 py-1.5 text-sm",
-    active
-      ? "border-primary bg-background"
-      : "border-transparent text-muted-foreground hover:text-foreground",
-  );
+  const found = findFeature(tabId);
+
+  return found
+    ? { label: found.feature.label, icon: found.feature.icon }
+    : null;
+}
 
 export default function Workspace() {
-  const navigate = useNavigate();
-
   const { projectId } = useParams<{
     projectId: string;
   }>();
@@ -75,13 +79,24 @@ export default function Workspace() {
   );
 
   /**
-   * Vue actuellement sélectionnée dans l'ActivityBar.
+   * Barre de gauche : icônes + noms (vrai) ou icônes seules (faux).
+   * Le choix est mémorisé sur l'appareil.
    */
-  const [view, setView] =
-    useState<ActivityId>("explorer");
+  const railExpanded = useRailExpanded();
 
   /**
-   * État d'ouverture de la sidebar.
+   * Module sélectionné dans la barre de gauche.
+   *
+   * Au départ, c'est le module qui contient l'onglet ouvert à l'arrivée
+   * (l'accueil du projet, donc « Détails ») : la barre de gauche et la
+   * zone centrale restent ainsi toujours cohérentes.
+   */
+  const [activeModule, setActiveModule] = useState<ModuleId>(
+    () => findFeature(HOME_TAB)?.module.id ?? "details",
+  );
+
+  /**
+   * État d'ouverture du panneau du milieu.
    */
   const [panelOpen, setPanelOpen] =
     useState(true);
@@ -92,12 +107,21 @@ export default function Workspace() {
   const [missing, setMissing] = useState(false);
 
   /**
-   * Section des paramètres actuellement ouverte.
+   * Onglets ouverts dans la zone centrale : leur ordre et ceux qui
+   * sont épinglés (toujours regroupés au début).
    *
-   * null = aucune section de paramètres ouverte.
+   * Chaque onglet est identifié par l'identifiant d'une
+   * fonctionnalité (voir `modules.ts`), ou par `home`.
+   * Les onglets épinglés sont mémorisés par projet et retrouvés
+   * à la prochaine ouverture.
    */
-  const [openSection, setOpenSection] =
-    useState<ProjectSettingsId | null>(null);
+  const [layout, setLayout] = useState<TabLayout>(() =>
+    initialLayout(
+      projectId ?? "",
+      HOME_TAB,
+      (id) => tabMeta(id) !== null,
+    ),
+  );
 
   /**
    * Onglet actuellement actif.
@@ -105,7 +129,7 @@ export default function Workspace() {
    * null = aucun onglet ouvert.
    */
   const [activeTab, setActiveTab] =
-    useState<TabId>("home");
+    useState<string | null>(HOME_TAB);
 
   /**
    * Devient vrai dès que le projet a été vu dans le store.
@@ -145,6 +169,15 @@ export default function Workspace() {
   }, [projectId, project, openProject]);
 
   /**
+   * Mémorise les onglets épinglés de ce projet.
+   */
+  useEffect(() => {
+    if (projectId) {
+      savePinnedTabs(projectId, layout.pinned);
+    }
+  }, [projectId, layout.pinned]);
+
+  /**
    * Le projet courant est réinitialisé lorsqu'on quitte
    * l'espace de travail.
    */
@@ -180,90 +213,128 @@ export default function Workspace() {
   }
 
   /**
-   * Informations de la section de paramètres actuellement ouverte.
+   * Sélection d'un module dans la barre de gauche.
    */
-  const openSectionMeta =
-    PROJECT_SETTINGS_SECTIONS.find(
-      (section) => section.id === openSection,
-    );
-
-  /**
-   * Sélection d'une vue dans l'ActivityBar.
-   */
-  function select(id: ActivityId) {
+  function selectModule(id: ModuleId) {
     /**
-     * Si on clique une seconde fois sur la même icône
+     * Si on clique une seconde fois sur le même module
      * alors que le panneau est ouvert, on le ferme.
      */
-    if (id === view && panelOpen) {
+    if (id === activeModule && panelOpen) {
       setPanelOpen(false);
       return;
     }
 
-    setView(id);
+    setActiveModule(id);
     setPanelOpen(true);
   }
 
   /**
-   * Ouvre une section des paramètres dans un onglet.
+   * Ouvre une fonctionnalité dans un onglet de la zone centrale
+   * (ou revient sur son onglet s'il est déjà ouvert).
    */
-  function selectSettingsSection(
-    id: ProjectSettingsId,
-  ) {
-    setOpenSection(id);
-    setActiveTab("settings");
+  function openFeature(featureId: string) {
+    setLayout((current) => addTab(current, featureId));
+
+    setActiveTab(featureId);
   }
 
   /**
-   * Ferme l'onglet des paramètres.
+   * Ferme un onglet.
    *
-   * On ne ferme PAS le projet.
-   * On ferme uniquement la vue correspondante.
+   * On ne ferme PAS le projet : seul l'onglet est fermé.
+   * Un onglet épinglé ne se ferme pas : il faut d'abord le désépingler.
+   * Si c'était l'onglet actif, on passe à son voisin ;
+   * s'il n'en reste aucun, la zone centrale est vide.
    */
-  function closeSettingsTab() {
-    setOpenSection(null);
+  function closeTab(tabId: string) {
+    const index = layout.tabs.indexOf(tabId);
+    const next = closeTabInLayout(layout, tabId);
 
-    /**
-     * Si l'utilisateur ferme l'onglet actif,
-     * on retourne à l'accueil du projet si celui-ci
-     * est toujours ouvert.
-     */
-    setActiveTab("home");
+    if (next === layout) {
+      return;
+    }
+
+    setLayout(next);
+
+    if (activeTab === tabId) {
+      setActiveTab(
+        next.tabs[Math.min(index, next.tabs.length - 1)] ?? null,
+      );
+    }
   }
 
   /**
-   * Ferme l'onglet "Accueil du projet".
-   *
-   * Le projet reste ouvert.
-   * Seul l'onglet central est fermé.
+   * Épingle ou désépingle un onglet.
    */
-  function closeHomeTab() {
-    setActiveTab(null);
+  function togglePin(tabId: string) {
+    setLayout((current) => togglePinInLayout(current, tabId));
   }
+
+  /**
+   * Glisser-déposer : `activeId` est déposé sur `overId`.
+   */
+  function moveTab(activeId: string, overId: string) {
+    setLayout((current) => moveTabInLayout(current, activeId, overId));
+  }
+
+  /**
+   * Déplacement au clavier (Alt + flèches).
+   */
+  function shiftTab(tabId: string, delta: -1 | 1) {
+    setLayout((current) => shiftTabInLayout(current, tabId, delta));
+  }
+
+  /**
+   * Onglets tels qu'affichés dans la barre (ceux dont l'identifiant
+   * n'est plus connu sont ignorés).
+   */
+  const tabInfos: TabInfo[] = layout.tabs.flatMap((id) => {
+    const meta = tabMeta(id);
+
+    return meta
+      ? [
+          {
+            id,
+            label: meta.label,
+            icon: meta.icon,
+            pinned: layout.pinned.includes(id),
+          },
+        ]
+      : [];
+  });
+
+  /**
+   * Ordre de rendu du contenu : indépendant de l'ordre des onglets,
+   * pour que déplacer un onglet ne déplace jamais son contenu dans la page.
+   */
+  const contentIds = [...layout.tabs].sort();
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-background">
       <div className="flex min-h-0 flex-1">
         {/* =========================================================
-            ACTIVITY BAR
+            BARRE DE GAUCHE (modules)
             ========================================================= */}
         <ActivityBar
-          active={view}
+          active={activeModule}
           panelOpen={panelOpen}
-          onSelect={select}
+          expanded={railExpanded}
+          onToggleExpanded={() =>
+            setRailExpanded(!railExpanded)
+          }
+          onSelect={selectModule}
         />
 
         {/* =========================================================
-            SIDEBAR
+            PANNEAU DU MILIEU (fonctionnalités du module)
             ========================================================= */}
         {panelOpen && (
           <SideBar
-            view={view}
+            module={activeModule}
             projectName={project.name}
-            settingsSection={openSection}
-            onSelectSettingsSection={
-              selectSettingsSection
-            }
+            activeTab={activeTab}
+            onOpenFeature={openFeature}
           />
         )}
 
@@ -272,169 +343,41 @@ export default function Workspace() {
             ========================================================= */}
         <main className="flex min-w-0 flex-1 flex-col">
           {/* =======================================================
-              ONGLET DE LA ZONE CENTRALE
+              ONGLETS (épinglables et déplaçables)
               ======================================================= */}
-          <div
-            role="tablist"
-            aria-label="Onglets du projet"
-            className="flex h-9 shrink-0 items-end border-b border-border bg-card"
-          >
-            {/* =====================================================
-                ONGLET ACCUEIL DU PROJET
-                ===================================================== */}
-            {activeTab === "home" && (
-              <div
-                className={cn(
-                  tabClass(true),
-                  "gap-1 pr-2",
-                )}
-              >
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={true}
-                  onClick={() =>
-                    setActiveTab("home")
-                  }
-                  className="flex items-center gap-2"
-                >
-                  <FileText className="h-3.5 w-3.5 text-primary" />
-
-                  Accueil du projet
-                </button>
-
-                {/* Bouton de fermeture */}
-                <button
-                  type="button"
-                  aria-label="Fermer l'onglet Accueil du projet"
-                  title="Fermer l'onglet"
-                  onClick={closeHomeTab}
-                  className="flex h-5 w-5 items-center justify-center rounded hover:bg-secondary"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
-            )}
-
-            {/* =====================================================
-                ONGLET PARAMÈTRES
-                ===================================================== */}
-            {openSectionMeta && (
-              <div
-                className={cn(
-                  tabClass(
-                    activeTab === "settings",
-                  ),
-                  "gap-1 pr-2",
-                )}
-              >
-                <button
-                  type="button"
-                  role="tab"
-                  aria-selected={
-                    activeTab === "settings"
-                  }
-                  onClick={() =>
-                    setActiveTab("settings")
-                  }
-                  className="flex items-center gap-2"
-                >
-                  <openSectionMeta.icon className="h-3.5 w-3.5 text-primary" />
-
-                  {openSectionMeta.label}
-                </button>
-
-                {/* Bouton de fermeture */}
-                <button
-                  type="button"
-                  aria-label={`Fermer l'onglet ${openSectionMeta.label}`}
-                  title="Fermer l'onglet"
-                  onClick={closeSettingsTab}
-                  className="flex h-5 w-5 items-center justify-center rounded hover:bg-secondary"
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </div>
-            )}
-          </div>
+          <WorkspaceTabs
+            tabs={tabInfos}
+            activeTab={activeTab}
+            onSelect={setActiveTab}
+            onClose={closeTab}
+            onTogglePin={togglePin}
+            onMove={moveTab}
+            onShift={shiftTab}
+          />
 
           {/* =======================================================
-              CONTENU DE L'ONGLET ACTIF
+              CONTENU DES ONGLETS
+
+              Tous les onglets ouverts restent montés (seul l'actif
+              est visible) : un formulaire en cours de saisie n'est
+              pas perdu quand on change d'onglet.
               ======================================================= */}
-
-          {/* -------------------------------------------------------
-              PARAMÈTRES
-              ------------------------------------------------------- */}
-          {activeTab === "settings" &&
-          openSection ? (
-            <ProjectSettingsPanel
-              project={project}
-              section={openSection}
-            />
-          ) : activeTab === "home" ? (
-            /* -----------------------------------------------------
-               ACCUEIL DU PROJET
-               ----------------------------------------------------- */
-            <div className="flex flex-1 flex-col items-center justify-center gap-3 overflow-y-auto p-8 text-center">
-              <h2 className="text-xl font-semibold">
-                {project.name}
-              </h2>
-
-              <p className="text-xs text-muted-foreground">
-                {PROJECT_TYPE_LABELS[
-                  project.type
-                ]}{" "}
-                ·{" "}
-                {PROJECT_STATUS_LABELS[
-                  project.status
-                ]}
-                {project.isArchived
-                  ? " · Archivé"
-                  : ""}
-              </p>
-
-              {project.description && (
-                <p className="max-w-md whitespace-pre-line text-sm text-muted-foreground">
-                  {project.description}
-                </p>
-              )}
-
-              <p className="text-xs text-muted-foreground">
-                Créé le{" "}
-                {format(
-                  new Date(project.createdAt),
-                  "d MMMM yyyy",
-                  {
-                    locale: fr,
-                  },
-                )}{" "}
-                · Modifié le{" "}
-                {format(
-                  new Date(project.updatedAt),
-                  "d MMMM yyyy",
-                  {
-                    locale: fr,
-                  },
+          {layout.tabs.length > 0 ? (
+            contentIds.map((tabId) => (
+              <div
+                key={tabId}
+                className={cn(
+                  "flex min-h-0 flex-1 flex-col",
+                  activeTab !== tabId && "hidden",
                 )}
-              </p>
-
-              <p className="max-w-md text-sm text-muted-foreground">
-                Choisissez un élément dans
-                l'explorateur pour l'ouvrir. Les
-                réglages du projet sont accessibles
-                avec l'engrenage en bas à gauche.
-              </p>
-
-              <Button
-                variant="outline"
-                onClick={() =>
-                  navigate("/dashboard")
-                }
               >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Retour au tableau de bord
-              </Button>
-            </div>
+                <WorkspaceView
+                  tabId={tabId}
+                  project={project}
+                  onOpenFeature={openFeature}
+                />
+              </div>
+            ))
           ) : (
             /* -----------------------------------------------------
                AUCUN ONGLET OUVERT
@@ -448,8 +391,8 @@ export default function Workspace() {
                 </p>
 
                 <p className="text-xs text-muted-foreground">
-                  Choisissez un élément dans
-                  l'explorateur pour l'ouvrir.
+                  Choisissez une fonctionnalité dans la
+                  barre de gauche pour l'ouvrir.
                 </p>
               </div>
             </div>

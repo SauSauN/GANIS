@@ -73,7 +73,7 @@ pub fn run() {
             // -----------------------------------------------------------------
             // 3. État partagé
             // -----------------------------------------------------------------
-            let state = AppState::new(app_db);
+            let state = AppState::new(app_db, data_dir);
 
             app.manage(state);
 
@@ -101,6 +101,8 @@ pub fn run() {
             commands::projects::update_project,
             commands::projects::duplicate_project,
             commands::projects::delete_project,
+            commands::synopsis::get_synopsis,
+            commands::synopsis::update_synopsis,
             commands::diagnostics::get_diagnostics,
         ])
         .run(tauri::generate_context!())

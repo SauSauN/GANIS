@@ -1,10 +1,12 @@
 //! État partagé de l'application, géré par Tauri.
 //!
-//! Contient la connexion à la base de données de l'application
-//! et la session utilisateur active.
+//! Contient la connexion à la base de données de l'application,
+//! les connexions aux bases des projets et la session utilisateur active.
 
 use crate::models::user::{Role, User};
 use sqlx::SqlitePool;
+use std::collections::HashMap;
+use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
@@ -14,6 +16,17 @@ pub struct AppState {
     /// Connexion à la base de données de l'application.
     pub app_db: SqlitePool,
 
+    /// Dossier de données de l'application.
+    ///
+    /// Les bases des projets y sont rangées dans `projets/<id>/`.
+    pub data_dir: PathBuf,
+
+    /// Connexions ouvertes aux bases des projets, par identifiant de projet.
+    ///
+    /// Une seule connexion par projet, partagée entre toutes les commandes.
+    /// Ce cache est géré uniquement par `services::project_storage`.
+    pub project_pools: Mutex<HashMap<String, SqlitePool>>,
+
     /// Session utilisateur active.
     ///
     /// `None` lorsqu'aucun utilisateur n'est connecté.
@@ -22,9 +35,11 @@ pub struct AppState {
 
 impl AppState {
     /// Crée un nouvel état d'application.
-    pub fn new(app_db: SqlitePool) -> Self {
+    pub fn new(app_db: SqlitePool, data_dir: PathBuf) -> Self {
         Self {
             app_db,
+            data_dir,
+            project_pools: Mutex::new(HashMap::new()),
             current_user: Mutex::new(None),
         }
     }
