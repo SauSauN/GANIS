@@ -150,7 +150,7 @@ pub async fn update_role(
 ) -> AppResult<User> {
     let target = find_by_id(pool, id)
         .await?
-        .ok_or_else(|| AppError::not_found("Utilisateur non trouvé."))?;
+        .ok_or_else(|| AppError::not_found("Utilisateur non trouvé.").with_key("user.notFound"))?;
 
     if target.role == Role::Admin
         && role != Role::Admin
@@ -158,7 +158,7 @@ pub async fn update_role(
     {
         return Err(AppError::validation(
             "Impossible de retirer le rôle du dernier administrateur.",
-        ));
+        ).with_key("user.lastAdminRole"));
     }
 
     let result = sqlx::query(
@@ -178,7 +178,7 @@ pub async fn update_role(
     })?;
 
     if result.rows_affected() == 0 {
-        return Err(AppError::not_found("Utilisateur non trouvé."));
+        return Err(AppError::not_found("Utilisateur non trouvé.").with_key("user.notFound"));
     }
 
     find_by_id(pool, id)
@@ -209,7 +209,7 @@ pub async fn update_email(
     })?;
 
     if result.rows_affected() == 0 {
-        return Err(AppError::not_found("Utilisateur non trouvé."));
+        return Err(AppError::not_found("Utilisateur non trouvé.").with_key("user.notFound"));
     }
 
     find_by_id(pool, id)
@@ -243,7 +243,7 @@ pub async fn update_password(
     })?;
 
     if result.rows_affected() == 0 {
-        return Err(AppError::not_found("Utilisateur non trouvé."));
+        return Err(AppError::not_found("Utilisateur non trouvé.").with_key("user.notFound"));
     }
 
     Ok(())
@@ -256,12 +256,12 @@ pub async fn update_password(
 pub async fn delete_by_id(pool: &SqlitePool, id: &str) -> AppResult<()> {
     let target = find_by_id(pool, id)
         .await?
-        .ok_or_else(|| AppError::not_found("Utilisateur non trouvé."))?;
+        .ok_or_else(|| AppError::not_found("Utilisateur non trouvé.").with_key("user.notFound"))?;
 
     if target.role == Role::Admin && count_admins(pool).await? <= 1 {
         return Err(AppError::validation(
             "Impossible de supprimer le dernier administrateur.",
-        ));
+        ).with_key("user.lastAdminDelete"));
     }
 
     sqlx::query("DELETE FROM users WHERE id = ?")

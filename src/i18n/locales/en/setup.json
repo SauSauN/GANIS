@@ -1,0 +1,23 @@
+{
+  "title": "Welcome to GANIS",
+  "description": "Create the administrator account to get started. It will be used to manage the other accounts on this computer. Everything is stored locally, with no Internet connection.",
+  "username": {
+    "label": "Username",
+    "placeholder": "administrator",
+    "hint": "3 to 50 characters: letters, digits, “_” and “-”."
+  },
+  "email": {
+    "label": "Email address (optional)",
+    "placeholder": "you@example.com"
+  },
+  "password": {
+    "label": "Password",
+    "hint": "At least 8 characters, with one letter and one digit."
+  },
+  "confirm": "Confirm password",
+  "submit": "Create administrator account",
+  "submitting": "Creating…",
+  "errors": {
+    "failed": "An error occurred during setup."
+  }
+}

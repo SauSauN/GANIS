@@ -134,7 +134,12 @@ export type ErrorCode =
 /** Forme exacte de l'erreur renvoyée par Rust (voir `error.rs`). */
 export interface ApiErrorPayload {
   code: ErrorCode;
+  /** Message français, toujours présent (secours et journal). */
   message: string;
+  /** Clé de traduction (`errors.json`), quand Rust en fournit une. */
+  key?: string;
+  /** Valeurs à insérer dans le message traduit. */
+  params?: Record<string, string | number>;
 }
 
 // ----------------------------------------------------------------------------

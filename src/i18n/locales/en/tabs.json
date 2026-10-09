@@ -1,0 +1,29 @@
+{
+  "listLabel": "Project tabs",
+  "tab": {
+    "pin": "Pin",
+    "unpin": "Unpin",
+    "pinNamed": "Pin tab {{name}}",
+    "unpinNamed": "Unpin tab {{name}}",
+    "close": "Close tab",
+    "closeNamed": "Close tab {{name}}"
+  },
+  "nav": {
+    "left_one": "Show hidden tab on the left ({{count}} hidden)",
+    "left_other": "Show hidden tab on the left ({{count}} hidden)",
+    "right_one": "Show hidden tab on the right ({{count}} hidden)",
+    "right_other": "Show hidden tab on the right ({{count}} hidden)"
+  },
+  "menu": {
+    "label": "Actions for tab {{name}}",
+    "pin": "Pin tab",
+    "unpin": "Unpin tab",
+    "close": "Close this tab",
+    "closePinned": "Unpin the tab first to close it",
+    "closeOthers": "Close other tabs",
+    "closeLeft": "Close tabs to the left",
+    "closeRight": "Close tabs to the right",
+    "closeAll": "Close all tabs",
+    "pinnedNote": "Pinned tabs stay open."
+  }
+}

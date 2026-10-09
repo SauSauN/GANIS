@@ -1,0 +1,14 @@
+{
+  "title": "Sign in",
+  "subtitle": "Access your personal workspace.",
+  "username": "Username",
+  "password": "Password",
+  "submit": "Sign in",
+  "submitting": "Signing in…",
+  "noAccount": "Don't have an account yet?",
+  "createAccount": "Create an account",
+  "errors": {
+    "usernameRequired": "Username is required.",
+    "passwordRequired": "Password is required."
+  }
+}

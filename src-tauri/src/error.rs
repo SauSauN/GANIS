@@ -1,9 +1,14 @@
 //! Type d'erreur commun renvoyé à l'interface.
-//! Seuls `code` et `message` sortent de Rust ; `detail` ne va que dans le journal.
+//!
+//! Sortent de Rust : `code`, `message` (français), et si possible `key` +
+//! `params`. L'interface traduit `key` dans la langue choisie
+//! (`locales/<langue>/errors.json`) ; `message` sert de secours et au journal.
+//! `detail` ne va que dans le journal.
 
 use serde::ser::SerializeStruct;
 use serde::{Serialize, Serializer};
 use std::fmt;
+use std::time::Duration;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "SCREAMING_SNAKE_CASE")]
@@ -23,6 +28,10 @@ pub struct AppError {
     pub code: ErrorCode,
     /// Message affichable à l'utilisateur (aucune donnée sensible).
     pub message: String,
+    /// Clé de traduction lue par l'interface (ex. `auth.invalidCredentials`).
+    pub key: Option<&'static str>,
+    /// Valeurs à insérer dans le message traduit (ex. `count` → 30).
+    pub params: Vec<(&'static str, serde_json::Value)>,
     /// Détail technique : journalisé, jamais envoyé à l'interface.
     detail: Option<String>,
 }
@@ -31,7 +40,25 @@ pub type AppResult<T> = Result<T, AppError>;
 
 impl AppError {
     pub fn new(code: ErrorCode, message: impl Into<String>) -> Self {
-        Self { code, message: message.into(), detail: None }
+        Self {
+            code,
+            message: message.into(),
+            key: None,
+            params: Vec::new(),
+            detail: None,
+        }
+    }
+
+    /// Associe une clé de traduction (voir `errors.json` côté interface).
+    pub fn with_key(mut self, key: &'static str) -> Self {
+        self.key = Some(key);
+        self
+    }
+
+    /// Ajoute une valeur à insérer dans le message traduit (`{{name}}`).
+    pub fn with_param(mut self, name: &'static str, value: impl Into<serde_json::Value>) -> Self {
+        self.params.push((name, value.into()));
+        self
     }
 
     pub fn with_detail(mut self, detail: impl fmt::Display) -> Self {
@@ -44,7 +71,9 @@ impl AppError {
     }
 
     pub fn internal(detail: impl fmt::Display) -> Self {
-        Self::new(ErrorCode::Internal, "Une erreur interne est survenue.").with_detail(detail)
+        Self::new(ErrorCode::Internal, "Une erreur interne est survenue.")
+            .with_key("internal")
+            .with_detail(detail)
     }
 
     pub fn validation(message: impl Into<String>) -> Self {
@@ -59,20 +88,60 @@ impl AppError {
         Self::new(ErrorCode::Conflict, message)
     }
 
+    /// Aucune session ouverte : la commande exige d'être connecté.
     pub fn unauthorized() -> Self {
-        Self::new(ErrorCode::Unauthorized, "Authentification requise.")
+        Self::new(ErrorCode::Unauthorized, "Authentification requise.").with_key("unauthorized")
+    }
+
+    /// Connexion refusée.
+    ///
+    /// Le même message est utilisé que le nom d'utilisateur soit inconnu ou
+    /// que le mot de passe soit faux, pour ne pas révéler quels comptes existent.
+    pub fn invalid_credentials() -> Self {
+        Self::new(
+            ErrorCode::Unauthorized,
+            "Nom d'utilisateur ou mot de passe incorrect.",
+        )
+        .with_key("auth.invalidCredentials")
+    }
+
+    /// Trop de tentatives de connexion : l'utilisateur doit patienter.
+    pub fn too_many_attempts(retry_after: Duration) -> Self {
+        // Arrondi à la seconde supérieure, au moins une seconde.
+        let seconds = (retry_after.as_secs()
+            + u64::from(retry_after.subsec_nanos() > 0))
+        .max(1);
+
+        let (wait, key, count) = if seconds < 60 {
+            (format!("{seconds} s"), "auth.tooManyAttemptsSeconds", seconds)
+        } else {
+            let minutes = seconds.div_ceil(60);
+            (format!("{minutes} min"), "auth.tooManyAttemptsMinutes", minutes)
+        };
+
+        Self::new(
+            ErrorCode::Forbidden,
+            format!("Trop de tentatives de connexion. Réessayez dans {wait}."),
+        )
+        .with_key(key)
+        .with_param("count", count)
     }
 
     pub fn forbidden() -> Self {
         Self::new(ErrorCode::Forbidden, "Vous n'avez pas les droits nécessaires.")
+            .with_key("forbidden")
     }
 
     pub fn database(detail: impl fmt::Display) -> Self {
-        Self::new(ErrorCode::Database, "Erreur d'accès aux données.").with_detail(detail)
+        Self::new(ErrorCode::Database, "Erreur d'accès aux données.")
+            .with_key("database")
+            .with_detail(detail)
     }
 
     pub fn io(detail: impl fmt::Display) -> Self {
-        Self::new(ErrorCode::Io, "Erreur de lecture ou d'écriture.").with_detail(detail)
+        Self::new(ErrorCode::Io, "Erreur de lecture ou d'écriture.")
+            .with_key("io")
+            .with_detail(detail)
     }
 }
 
@@ -90,9 +159,27 @@ impl Serialize for AppError {
         if let Some(detail) = &self.detail {
             tracing::error!(code = ?self.code, detail = %detail, "{}", self.message);
         }
-        let mut s = serializer.serialize_struct("AppError", 2)?;
+        let mut s = serializer.serialize_struct("AppError", 4)?;
         s.serialize_field("code", &self.code)?;
         s.serialize_field("message", &self.message)?;
+
+        // `key` et `params` ne sont envoyés que s'ils existent.
+        match self.key {
+            Some(key) => s.serialize_field("key", key)?,
+            None => s.skip_field("key")?,
+        }
+
+        if self.params.is_empty() {
+            s.skip_field("params")?;
+        } else {
+            let params: serde_json::Map<String, serde_json::Value> = self
+                .params
+                .iter()
+                .map(|(name, value)| ((*name).to_owned(), value.clone()))
+                .collect();
+            s.serialize_field("params", &params)?;
+        }
+
         s.end()
     }
 }
@@ -125,5 +212,39 @@ mod tests {
         let json = serde_json::to_string(&err).unwrap();
         assert!(json.contains("INTERNAL"));
         assert!(!json.contains("secret"));
+    }
+
+    #[test]
+    fn too_many_attempts_rounds_up() {
+        let err = AppError::too_many_attempts(Duration::from_millis(29_100));
+        assert!(err.message.contains("30 s"));
+
+        let err = AppError::too_many_attempts(Duration::from_secs(61));
+        assert!(err.message.contains("2 min"));
+
+        let err = AppError::too_many_attempts(Duration::ZERO);
+        assert!(err.message.contains("1 s"));
+    }
+
+    #[test]
+    fn serialization_includes_key_and_params() {
+        let err = AppError::too_many_attempts(Duration::from_secs(30));
+        let json: serde_json::Value = serde_json::to_value(&err).unwrap();
+        assert_eq!(json["key"], "auth.tooManyAttemptsSeconds");
+        assert_eq!(json["params"]["count"], 30);
+
+        let err = AppError::too_many_attempts(Duration::from_secs(61));
+        let json: serde_json::Value = serde_json::to_value(&err).unwrap();
+        assert_eq!(json["key"], "auth.tooManyAttemptsMinutes");
+        assert_eq!(json["params"]["count"], 2);
+    }
+
+    #[test]
+    fn serialization_omits_missing_key() {
+        let err = AppError::validation("Message libre.");
+        let json: serde_json::Value = serde_json::to_value(&err).unwrap();
+        assert!(json.get("key").is_none());
+        assert!(json.get("params").is_none());
+        assert_eq!(json["message"], "Message libre.");
     }
 }

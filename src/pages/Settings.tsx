@@ -1,9 +1,8 @@
+import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
-  Activity,
   ArrowLeft,
   Palette,
-  ShieldCheck,
   User as UserIcon,
   type LucideIcon,
 } from "lucide-react";
@@ -11,42 +10,23 @@ import { StatusBar } from "@/components/layout/StatusBar";
 import { AccountSection } from "@/components/settings/AccountSection";
 import { AppearanceSection } from "@/components/settings/AppearanceSection";
 import { Button } from "@/components/ui/button";
+import { clampPanelWidth, usePanelWidth } from "@/lib/preferences";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 
 type SectionId = "account" | "appearance";
 
-interface SectionMeta {
-  id: SectionId;
-  label: string;
-  description: string;
-  icon: LucideIcon;
-}
-
-const SECTIONS: SectionMeta[] = [
-  {
-    id: "account",
-    label: "Compte",
-    description:
-      "Vos informations, votre adresse e-mail et votre mot de passe.",
-    icon: UserIcon,
-  },
-  {
-    id: "appearance",
-    label: "Apparence",
-    description:
-      "Thème et taille du texte de GANIS, valables pour tous vos projets.",
-    icon: Palette,
-  },
+/** Sections, dans l'ordre du menu (libellés dans `settings.json`). */
+const SECTIONS: { id: SectionId; icon: LucideIcon }[] = [
+  { id: "account", icon: UserIcon },
+  { id: "appearance", icon: Palette },
 ];
 
-/** Style d'une entrée du menu, identique à celui des listes de l'espace de travail. */
+/** Entrée du menu : même style que le panneau latéral de l'espace de travail. */
 const navItemClass = (selected: boolean) =>
   cn(
-    "flex shrink-0 items-center gap-2 whitespace-nowrap rounded-md px-2 py-1.5 text-left text-sm transition-colors md:w-full",
-    selected
-      ? "bg-accent font-medium text-foreground"
-      : "text-muted-foreground hover:bg-accent/60 hover:text-foreground",
+    "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent",
+    selected && "bg-sidebar-accent font-medium",
   );
 
 function isSectionId(value: string | null): value is SectionId {
@@ -56,120 +36,92 @@ function isSectionId(value: string | null): value is SectionId {
 /**
  * Page des paramètres généraux.
  *
- * Même structure que les vues de l'espace de travail : fil d'Ariane,
- * grand titre, description, puis cartes. Le conteneur qui défile occupe
- * toute la largeur de la fenêtre (la barre de défilement se place donc
- * tout à droite) ; seule la colonne de contenu est centrée.
+ * Reprend la direction artistique de l'espace de travail, sans en être
+ * une vue : pas de barre d'activité ni d'onglets.
+ * - à gauche, un panneau identique au panneau des fonctionnalités
+ *   (`bg-sidebar`, même largeur que celle choisie dans l'espace de travail) ;
+ * - au centre, la même mise en page que les paramètres du projet :
+ *   grand titre, description, puis cartes.
  *
  * La section affichée est pilotée par l'adresse (`?section=appearance`),
  * ce qui permet d'y accéder directement depuis un autre écran.
  */
 export default function Settings() {
   const navigate = useNavigate();
+  const { t } = useTranslation("settings");
   const [params, setParams] = useSearchParams();
   const user = useAuthStore((state) => state.user);
+  const panelWidth = clampPanelWidth(usePanelWidth());
 
   const requested = params.get("section");
   const section: SectionId = isSectionId(requested) ? requested : "account";
 
-  const meta = SECTIONS.find((item) => item.id === section) ?? SECTIONS[0];
-
-  const canDiagnose = user?.role === "admin" || user?.role === "developer";
-  const isAdmin = user?.role === "admin";
-
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-background">
-      <main className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-5xl px-6 py-8 pb-24 lg:px-10">
-          {/* ================================================================
-              EN-TÊTE
-              ================================================================ */}
+      <div className="flex min-h-0 flex-1">
+        {/* =========================================================
+            PANNEAU DE GAUCHE (sections)
+            ========================================================= */}
+        <aside
+          aria-label={t("nav.label")}
+          style={{ width: panelWidth }}
+          className="flex shrink-0 flex-col overflow-y-auto border-r border-sidebar-border bg-sidebar text-sidebar-foreground"
+        >
+          <div className="px-4 py-3">
+            <p className="text-xs text-muted-foreground">{t("nav.title")}</p>
+            <p className="truncate text-sm font-semibold">
+              {user?.username}
+            </p>
+          </div>
 
-          <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0">
-              <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-                <span>Application</span>
-                <span>/</span>
-                <span>Paramètres généraux</span>
-              </div>
-
-              <h1 className="text-3xl font-semibold tracking-tight">
-                {meta.label}
-              </h1>
-
-              <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
-                {meta.description}
-              </p>
-            </div>
-
-            <Button variant="outline" onClick={() => navigate(-1)}>
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour
-            </Button>
-          </header>
-
-          {/* ================================================================
-              MENU + CONTENU
-              ================================================================ */}
-
-          <div className="grid gap-8 md:grid-cols-[14rem_minmax(0,1fr)]">
-            <nav
-              aria-label="Sections des paramètres"
-              className="flex gap-1 overflow-x-auto md:sticky md:top-8 md:flex-col md:self-start md:overflow-visible"
-            >
-              {SECTIONS.map(({ id, label, icon: Icon }) => (
+          <ul className="px-2">
+            {SECTIONS.map(({ id, icon: Icon }) => (
+              <li key={id}>
                 <button
-                  key={id}
                   type="button"
                   aria-current={section === id ? "page" : undefined}
-                  onClick={() =>
-                    setParams({ section: id }, { replace: true })
-                  }
+                  onClick={() => setParams({ section: id }, { replace: true })}
                   className={navItemClass(section === id)}
                 >
                   <Icon className="h-4 w-4 shrink-0 text-primary" />
-                  {label}
+                  <span className="flex-1 truncate text-left">
+                    {t(`sections.${id}.label`)}
+                  </span>
                 </button>
-              ))}
+              </li>
+            ))}
+          </ul>
+        </aside>
 
-              {(isAdmin || canDiagnose) && (
-                <>
-                  <p className="hidden px-2 pb-1 pt-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground md:block">
-                    Outils
-                  </p>
+        {/* =========================================================
+            ZONE CENTRALE
+            ========================================================= */}
+        <main className="flex min-h-0 min-w-0 flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-5xl px-6 py-8 pb-24 lg:px-10">
+            <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
+              <div className="min-w-0">
+                <h1 className="text-3xl font-semibold tracking-tight">
+                  {t(`sections.${section}.label`)}
+                </h1>
 
-                  {isAdmin && (
-                    <button
-                      type="button"
-                      onClick={() => navigate("/admin")}
-                      className={navItemClass(false)}
-                    >
-                      <ShieldCheck className="h-4 w-4 shrink-0 text-primary" />
-                      Administration
-                    </button>
-                  )}
+                <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+                  {t(`sections.${section}.description`)}
+                </p>
+              </div>
 
-                  {canDiagnose && (
-                    <button
-                      type="button"
-                      onClick={() => navigate("/diagnostics")}
-                      className={navItemClass(false)}
-                    >
-                      <Activity className="h-4 w-4 shrink-0 text-primary" />
-                      Diagnostics
-                    </button>
-                  )}
-                </>
-              )}
-            </nav>
+              <Button variant="outline" onClick={() => navigate(-1)}>
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                {t("back")}
+              </Button>
+            </header>
 
             <section aria-live="polite" className="min-w-0">
               {section === "account" && <AccountSection />}
               {section === "appearance" && <AppearanceSection />}
             </section>
           </div>
-        </div>
-      </main>
+        </main>
+      </div>
 
       <StatusBar />
     </div>

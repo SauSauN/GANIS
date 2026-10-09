@@ -26,13 +26,13 @@ fn validate_name(name: &str) -> AppResult<()> {
     if name.is_empty() {
         return Err(AppError::validation(
             "Le nom du projet ne peut pas être vide.",
-        ));
+        ).with_key("project.nameEmpty"));
     }
 
     if name.chars().count() > MAX_NAME_CHARS {
         return Err(AppError::validation(
             "Le nom du projet ne peut pas dépasser 200 caractères.",
-        ));
+        ).with_key("project.nameTooLong"));
     }
 
     Ok(())
@@ -42,14 +42,14 @@ fn validate_description(description: &str) -> AppResult<()> {
     if description.chars().count() > MAX_DESCRIPTION_CHARS {
         return Err(AppError::validation(
             "La description du projet ne peut pas dépasser 5000 caractères.",
-        ));
+        ).with_key("project.descriptionTooLong"));
     }
 
     Ok(())
 }
 
 fn project_not_found() -> AppError {
-    AppError::not_found("Projet non trouvé ou non autorisé.")
+    AppError::not_found("Projet non trouvé ou non autorisé.").with_key("project.notFound")
 }
 
 /// Crée un nouveau projet appartenant à l'utilisateur indiqué.

@@ -1,9 +1,11 @@
 //! État partagé de l'application, géré par Tauri.
 //!
 //! Contient la connexion à la base de données de l'application,
-//! les connexions aux bases des projets et la session utilisateur active.
+//! les connexions aux bases des projets, la session utilisateur active
+//! et le compteur des tentatives de connexion.
 
 use crate::models::user::{Role, User};
+use crate::services::login_throttle::LoginThrottle;
 use sqlx::SqlitePool;
 use std::collections::HashMap;
 use std::path::PathBuf;
@@ -31,6 +33,9 @@ pub struct AppState {
     ///
     /// `None` lorsqu'aucun utilisateur n'est connecté.
     pub current_user: Mutex<Option<User>>,
+
+    /// Échecs de connexion récents, par nom d'utilisateur (§8.4).
+    pub login_throttle: LoginThrottle,
 }
 
 impl AppState {
@@ -41,6 +46,7 @@ impl AppState {
             data_dir,
             project_pools: Mutex::new(HashMap::new()),
             current_user: Mutex::new(None),
+            login_throttle: LoginThrottle::new(),
         }
     }
 

@@ -88,10 +88,10 @@ pub fn run() {
             commands::auth::register,
             commands::auth::login,
             commands::auth::logout,
-            commands::users::list_users,
-            commands::users::create_user,
-            commands::users::update_user_role,
-            commands::users::delete_user,
+            //commands::users::list_users,
+            //commands::users::create_user,
+            //commands::users::update_user_role,
+            //commands::users::delete_user,
             commands::users::update_profile,
             commands::users::change_password,
             commands::projects::create_project,
@@ -103,7 +103,7 @@ pub fn run() {
             commands::projects::delete_project,
             commands::synopsis::get_synopsis,
             commands::synopsis::update_synopsis,
-            commands::diagnostics::get_diagnostics,
+            //commands::diagnostics::get_diagnostics,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

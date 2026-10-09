@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,6 +26,8 @@ export interface ProjectFormValues {
   status: ProjectStatus;
 }
 
+// Les libellés français de `@/types` ne servent plus qu'à lister les valeurs ;
+// le texte affiché vient de `projects.json` (types.* et statuses.*).
 const PROJECT_TYPES = Object.keys(
   PROJECT_TYPE_LABELS,
 ) as ProjectType[];
@@ -35,6 +38,17 @@ const PROJECT_STATUSES = Object.keys(
 
 const MAX_NAME_LENGTH = 200;
 const MAX_DESCRIPTION_LENGTH = 5000;
+
+/**
+ * Erreur affichée sous le formulaire.
+ *
+ * On garde une clé (pas le texte) : le message suit la langue si elle
+ * change pendant qu'il est affiché. `text` ne sert qu'aux erreurs
+ * renvoyées par Rust (encore en français).
+ */
+type FormError =
+  | { key: "nameRequired" | "nameTooLong" | "descriptionTooLong" | "failed" }
+  | { text: string };
 
 const fieldClass =
   "w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring";
@@ -81,6 +95,7 @@ function ProjectForm({
   onSubmit,
   onClose,
 }: ProjectFormProps) {
+  const { t } = useTranslation(["projects", "common"]);
   const isEdit = project !== null;
 
   const [name, setName] = useState(project?.name ?? "");
@@ -94,7 +109,7 @@ function ProjectForm({
     project?.status ?? "preparing",
   );
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<FormError | null>(null);
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
@@ -104,21 +119,17 @@ function ProjectForm({
     const trimmedDescription = description.trim();
 
     if (!trimmedName) {
-      setError("Le nom du projet est requis.");
+      setError({ key: "nameRequired" });
       return;
     }
 
     if (trimmedName.length > MAX_NAME_LENGTH) {
-      setError(
-        `Le nom ne peut pas dépasser ${MAX_NAME_LENGTH} caractères.`,
-      );
+      setError({ key: "nameTooLong" });
       return;
     }
 
     if (trimmedDescription.length > MAX_DESCRIPTION_LENGTH) {
-      setError(
-        `La description ne peut pas dépasser ${MAX_DESCRIPTION_LENGTH} caractères.`,
-      );
+      setError({ key: "descriptionTooLong" });
       return;
     }
 
@@ -133,61 +144,66 @@ function ProjectForm({
       });
       onClose();
     } catch (e) {
-      setError(
-        e instanceof Error
-          ? e.message
-          : "L'opération a échoué.",
-      );
+      setError(e instanceof Error ? { text: e.message } : { key: "failed" });
     } finally {
       setSubmitting(false);
     }
   }
+
+  const errorMessage = !error
+    ? null
+    : "text" in error
+      ? error.text
+      : t(`form.errors.${error.key}`, {
+          max:
+            error.key === "descriptionTooLong"
+              ? MAX_DESCRIPTION_LENGTH
+              : MAX_NAME_LENGTH,
+        });
 
   return (
     <DialogContent>
       <form onSubmit={handleSubmit}>
         <DialogHeader>
           <DialogTitle>
-            {isEdit
-              ? "Modifier le projet"
-              : "Créer un nouveau projet"}
+            {isEdit ? t("form.editTitle") : t("form.createTitle")}
           </DialogTitle>
           <DialogDescription>
             {isEdit
-              ? "Mettez à jour les informations du projet."
-              : "Donnez un nom à votre projet et choisissez son type."}
+              ? t("form.editDescription")
+              : t("form.createDescription")}
           </DialogDescription>
         </DialogHeader>
 
         <div className="mt-4 space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="project-name">Nom du projet</Label>
+            <Label htmlFor="project-name">{t("form.name.label")}</Label>
             <Input
               id="project-name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Mon univers"
+              placeholder={t("form.name.placeholder")}
               autoFocus
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="project-description">
-              Description (facultatif)
+              {t("form.description.label")}
             </Label>
             <textarea
               id="project-description"
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Un court résumé de votre projet"
+              placeholder={t("form.description.placeholder")}
               className={`${fieldClass} resize-none py-2`}
             />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="project-type">
-              Type de création
+              {t("form.type")}
             </Label>
             <select
               id="project-type"
@@ -199,7 +215,7 @@ function ProjectForm({
             >
               {PROJECT_TYPES.map((type) => (
                 <option key={type} value={type}>
-                  {PROJECT_TYPE_LABELS[type]}
+                  {t(`types.${type}`)}
                 </option>
               ))}
             </select>
@@ -207,7 +223,7 @@ function ProjectForm({
 
           {isEdit && (
             <div className="space-y-2">
-              <Label htmlFor="project-status">Statut</Label>
+              <Label htmlFor="project-status">{t("form.status")}</Label>
               <select
                 id="project-status"
                 value={status}
@@ -218,19 +234,19 @@ function ProjectForm({
               >
                 {PROJECT_STATUSES.map((value) => (
                   <option key={value} value={value}>
-                    {PROJECT_STATUS_LABELS[value]}
+                    {t(`statuses.${value}`)}
                   </option>
                 ))}
               </select>
             </div>
           )}
 
-          {error && (
+          {errorMessage && (
             <p
               role="alert"
               className="text-sm text-destructive"
             >
-              {error}
+              {errorMessage}
             </p>
           )}
         </div>
@@ -242,14 +258,14 @@ function ProjectForm({
             onClick={onClose}
             disabled={submitting}
           >
-            Annuler
+            {t("common:actions.cancel")}
           </Button>
           <Button type="submit" disabled={submitting}>
             {submitting
-              ? "Enregistrement…"
+              ? t("common:actions.saving")
               : isEdit
-                ? "Enregistrer"
-                : "Créer le projet"}
+                ? t("common:actions.save")
+                : t("form.create")}
           </Button>
         </DialogFooter>
       </form>

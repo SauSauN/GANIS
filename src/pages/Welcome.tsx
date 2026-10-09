@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Feather } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -8,6 +9,7 @@ import { useAuthStore } from "@/stores/authStore";
 
 export default function Welcome() {
   const navigate = useNavigate();
+  const { t } = useTranslation("welcome");
 
   const user = useAuthStore((s) => s.user);
   const login = useAuthStore((s) => s.login);
@@ -33,7 +35,8 @@ export default function Welcome() {
   };
 
   return (
-    <main className="flex flex-1 items-center justify-center bg-background px-8 py-10">
+    <main className="relative flex flex-1 items-center justify-center bg-background px-8 py-10">
+
       <div className="flex w-full max-w-5xl items-center justify-between gap-16">
 
         {/* Présentation GANIS */}
@@ -47,12 +50,11 @@ export default function Welcome() {
           </h1>
 
           <p className="mt-3 text-xl text-muted-foreground">
-            Studio de conception narrative
+            {t("tagline")}
           </p>
 
           <p className="mt-6 max-w-lg text-sm leading-6 text-muted-foreground">
-            Organisez vos univers, vos personnages et vos récits
-            dans un espace de travail modulaire, directement sur votre ordinateur.
+            {t("intro")}
           </p>
 
           <div className="mt-8 flex items-center gap-3">
@@ -60,7 +62,7 @@ export default function Welcome() {
               variant="outline"
               onClick={() => navigate("/register")}
             >
-              Créer un compte
+              {t("actions.createAccount")}
             </Button>
 
             {import.meta.env.DEV && (
@@ -72,7 +74,7 @@ export default function Welcome() {
                   navigate("/dashboard");
                 }}
               >
-                Mode démo
+                {t("actions.demo")}
               </Button>
             )}
           </div>
@@ -84,11 +86,11 @@ export default function Welcome() {
 
             <div className="mb-6">
               <h2 className="text-xl font-semibold">
-                Connexion
+                {t("login.title")}
               </h2>
 
               <p className="mt-1 text-sm text-muted-foreground">
-                Connectez-vous à votre espace GANIS.
+                {t("login.subtitle")}
               </p>
             </div>
 
@@ -96,14 +98,14 @@ export default function Welcome() {
 
               <div className="space-y-2">
                 <Label htmlFor="username">
-                  Nom d'utilisateur
+                  {t("login.username")}
                 </Label>
 
                 <Input
                   id="username"
                   type="text"
                   autoComplete="username"
-                  placeholder="Nom d'utilisateur"
+                  placeholder={t("login.username")}
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   required
@@ -112,14 +114,14 @@ export default function Welcome() {
 
               <div className="space-y-2">
                 <Label htmlFor="password">
-                  Mot de passe
+                  {t("login.password")}
                 </Label>
 
                 <Input
                   id="password"
                   type="password"
                   autoComplete="current-password"
-                  placeholder="Mot de passe"
+                  placeholder={t("login.password")}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -140,19 +142,19 @@ export default function Welcome() {
                 className="w-full"
                 disabled={loading}
               >
-                {loading ? "Connexion…" : "Se connecter"}
+                {loading ? t("login.submitting") : t("login.submit")}
               </Button>
             </form>
 
             <div className="mt-6 border-t pt-5 text-center">
               <p className="text-sm text-muted-foreground">
-                Pas encore de compte ?{" "}
+                {t("noAccount")}{" "}
                 <button
                   type="button"
                   onClick={() => navigate("/register")}
                   className="font-medium text-foreground underline-offset-4 hover:underline"
                 >
-                  Créer un compte
+                  {t("actions.createAccount")}
                 </button>
               </p>
             </div>

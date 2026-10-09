@@ -1,0 +1,22 @@
+{
+  "language": {
+    "label": "Interface language"
+  },
+  "actions": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "saving": "Saving…",
+    "retry": "Retry"
+  },
+  "startup": "Starting GANIS…",
+  "validation": {
+    "usernameTooShort": "Username must be at least 3 characters long.",
+    "usernameTooLong": "Username must not exceed 50 characters.",
+    "usernameInvalidChars": "Username can only contain letters, digits, hyphens and underscores.",
+    "passwordTooShort": "Password must be at least 8 characters long.",
+    "passwordTooLong": "Password must not exceed 128 characters.",
+    "passwordNeedsLetterAndDigit": "Password must contain at least one letter and one digit.",
+    "passwordMismatch": "The two passwords do not match.",
+    "emailInvalid": "This email address is not valid."
+  }
+}

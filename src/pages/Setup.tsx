@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Feather } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,119 +13,168 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
+import {
+  checkEmail,
+  checkPassword,
+  checkUsername,
+  type ValidationIssue,
+} from "@/lib/validators";
+import { useAuthStore } from "@/stores/authStore";
+import { useSetupStore } from "@/stores/setupStore";
 
 /**
- * Page de configuration initiale de GANIS.
+ * Erreur affichée sous le formulaire.
  *
- * Affichée au premier lancement lorsqu'aucun compte n'existe encore.
- * Permet de créer le premier compte utilisateur, avec le rôle 'admin'.
+ * On garde le code du problème (pas le texte) : le message suit la langue
+ * si elle change pendant qu'il est affiché. `text` ne sert qu'aux erreurs
+ * renvoyées par Rust (encore en français).
+ */
+type SetupError =
+  | { issue: ValidationIssue }
+  | { key: "failed" }
+  | { text: string };
+
+/**
+ * Assistant de configuration initiale (§37.9).
+ *
+ * Affiché au premier lancement, lorsqu'aucun compte n'existe encore
+ * (voir `SetupGate`). Crée le compte administrateur, puis connecte
+ * directement l'utilisateur.
+ *
+ * La protection réelle est côté Rust : `setup_admin` échoue dès qu'un
+ * compte existe, même si deux demandes arrivent en même temps.
  */
 export default function Setup() {
   const navigate = useNavigate();
+  const { t } = useTranslation(["setup", "common"]);
+
+  const login = useAuthStore((state) => state.login);
+  const markDone = useSetupStore((state) => state.markDone);
+  const checkSetup = useSetupStore((state) => state.check);
+
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<SetupError | null>(null);
   const [loading, setLoading] = useState(false);
 
-  function validate(): string | null {
-    if (username.trim().length < 3) {
-      return "Le nom d'utilisateur doit contenir au moins 3 caractères.";
-    }
-    if (password.length < 8) {
-      return "Le mot de passe doit contenir au moins 8 caractères.";
-    }
-    if (password !== confirm) {
-      return "Les deux mots de passe ne correspondent pas.";
-    }
-    return null;
+  function validate(): ValidationIssue | null {
+    return (
+      checkUsername(username) ??
+      checkPassword(password) ??
+      (password !== confirm ? "passwordMismatch" : null) ??
+      checkEmail(email)
+    );
   }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
 
-    const problem = validate();
-    if (problem) {
-      setError(problem);
+    const issue = validate();
+
+    if (issue) {
+      setError({ issue });
       return;
     }
 
     setLoading(true);
+
     try {
       await api.setupAdmin({
         username: username.trim(),
         password,
         email: email.trim() || undefined,
       });
-      navigate("/login", { replace: true });
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Une erreur est survenue lors de la configuration.",
-      );
-    } finally {
+      // La configuration a peut-être été faite entre-temps :
+      // on revérifie, ce qui redirige si besoin.
+      if (err instanceof ApiError && err.code === "CONFLICT") {
+        void checkSetup();
+      }
+
+      setError(err instanceof Error ? { text: err.message } : { key: "failed" });
       setLoading(false);
+      return;
     }
+
+    markDone();
+
+    const loggedIn = await login(username.trim(), password);
+
+    navigate(loggedIn ? "/dashboard" : "/", { replace: true });
   }
+
+  const errorMessage = !error
+    ? null
+    : "issue" in error
+      ? t(`common:validation.${error.issue}`)
+      : "key" in error
+        ? t("errors.failed")
+        : error.text;
 
   return (
     <main className="flex flex-1 items-center justify-center bg-background px-4 py-6">
       <Card className="w-full max-w-md">
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} noValidate>
           <CardHeader>
             <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
               <Feather className="h-6 w-6" />
             </div>
-            <CardTitle>Configuration initiale</CardTitle>
-            <CardDescription>
-              Créez le compte administrateur pour commencer à utiliser GANIS.
-              Ce compte restera enregistré localement sur cet appareil.
-            </CardDescription>
+
+            <CardTitle>{t("title")}</CardTitle>
+
+            <CardDescription>{t("description")}</CardDescription>
           </CardHeader>
 
           <CardContent className="mt-4 space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Nom d'utilisateur</Label>
+              <Label htmlFor="setup-username">{t("username.label")}</Label>
               <Input
-                id="username"
+                id="setup-username"
                 autoComplete="username"
+                autoFocus
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="administrateur"
+                placeholder={t("username.placeholder")}
               />
+              <p className="text-xs text-muted-foreground">
+                {t("username.hint")}
+              </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Adresse e-mail (facultatif)</Label>
+              <Label htmlFor="setup-email">{t("email.label")}</Label>
               <Input
-                id="email"
+                id="setup-email"
                 type="email"
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="vous@exemple.com"
+                placeholder={t("email.placeholder")}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
+              <Label htmlFor="setup-password">{t("password.label")}</Label>
               <Input
-                id="password"
+                id="setup-password"
                 type="password"
                 autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <p className="text-xs text-muted-foreground">
+                {t("password.hint")}
+              </p>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirm">Confirmer le mot de passe</Label>
+              <Label htmlFor="setup-confirm">{t("confirm")}</Label>
               <Input
-                id="confirm"
+                id="setup-confirm"
                 type="password"
                 autoComplete="new-password"
                 value={confirm}
@@ -132,16 +182,16 @@ export default function Setup() {
               />
             </div>
 
-            {error && (
+            {errorMessage && (
               <p role="alert" className="text-sm text-destructive">
-                {error}
+                {errorMessage}
               </p>
             )}
           </CardContent>
 
           <CardFooter className="mt-4">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Création…" : "Créer le compte administrateur"}
+              {loading ? t("submitting") : t("submit")}
             </Button>
           </CardFooter>
         </form>

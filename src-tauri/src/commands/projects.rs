@@ -87,7 +87,7 @@ pub async fn get_project(
 
     project_service::find_by_id_for_user(&state.app_db, &project_id, &user.id)
         .await?
-        .ok_or_else(|| AppError::not_found("Projet non trouvé."))
+        .ok_or_else(|| AppError::not_found("Projet non trouvé.").with_key("project.notFound"))
 }
 
 /// Ouvre un projet : vérifie que ses données sont accessibles, enregistre

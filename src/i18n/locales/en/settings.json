@@ -1,0 +1,99 @@
+{
+  "back": "Back",
+  "nav": {
+    "label": "Settings sections",
+    "title": "General settings"
+  },
+  "sections": {
+    "account": {
+      "label": "Account",
+      "description": "Your details, email address and password."
+    },
+    "appearance": {
+      "label": "Appearance",
+      "description": "GANIS theme and text size, applied to all your projects."
+    }
+  },
+  "account": {
+    "info": {
+      "title": "Account details",
+      "description": "This information is stored locally, on this device.",
+      "username": "Username",
+      "email": "Email address",
+      "emailEmpty": "Not set",
+      "role": "Role",
+      "createdAt": "Account created on"
+    },
+    "roles": {
+      "admin": "Administrator",
+      "developer": "Developer",
+      "user": "User"
+    },
+    "email": {
+      "title": "Email address",
+      "description": "Optional, used only as a local contact. Leave the field empty to remove it.",
+      "label": "Email address",
+      "updated": "Email address updated.",
+      "removed": "Email address removed.",
+      "failed": "Unable to change the email address."
+    },
+    "password": {
+      "title": "Password",
+      "description": "At least 8 characters, with one letter and one digit.",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Confirm new password",
+      "submit": "Change password",
+      "submitting": "Changing…",
+      "currentRequired": "Current password is required.",
+      "changed": "Password changed.",
+      "failed": "Unable to change the password."
+    }
+  },
+  "appearance": {
+    "theme": {
+      "title": "Theme",
+      "description": "Choose the look of the interface.",
+      "options": {
+        "light": {
+          "label": "Light",
+          "description": "Light background, comfortable during the day."
+        },
+        "dark": {
+          "label": "Dark",
+          "description": "Dark background, easy on the eyes at night."
+        },
+        "system": {
+          "label": "System",
+          "description": "Automatically follows your computer's theme."
+        }
+      }
+    },
+    "textSize": {
+      "title": "Text size",
+      "description": "Makes the whole interface larger or smaller.",
+      "options": {
+        "small": {
+          "label": "Small",
+          "description": "More content on screen."
+        },
+        "normal": {
+          "label": "Normal",
+          "description": "The recommended setting."
+        },
+        "large": {
+          "label": "Large",
+          "description": "More comfortable to read."
+        }
+      }
+    },
+    "preview": {
+      "title": "Preview",
+      "text": "Inspiration comes while writing: every project starts with a first sentence."
+    },
+    "note": {
+      "title": "Saved on this device",
+      "text": "These preferences never change the content of your projects."
+    }
+  }
+}

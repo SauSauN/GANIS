@@ -1,0 +1,57 @@
+{
+  "greeting": "Bonjour, {{name}}",
+  "defaultName": "créateur",
+  "subtitle": "Bienvenue dans votre studio de conception narrative.",
+  "newProject": "Nouveau projet",
+  "search": {
+    "placeholder": "Rechercher un projet…",
+    "label": "Rechercher un projet"
+  },
+  "filters": {
+    "all": "Projets actifs",
+    "favorites": "Favoris",
+    "archived": "Archivés"
+  },
+  "recent": "Récemment ouverts",
+  "list": {
+    "title": {
+      "search": "Résultats de recherche",
+      "all": "Tous les projets",
+      "favorites": "Favoris",
+      "archived": "Projets archivés"
+    },
+    "collapse": "Fermer la liste des projets",
+    "expand": "Afficher la liste des projets",
+    "loading": "Chargement des projets…"
+  },
+  "empty": {
+    "search": {
+      "title": "Aucun projet ne correspond",
+      "description": "Essayez un autre terme de recherche."
+    },
+    "all": {
+      "title": "Aucun projet pour l'instant",
+      "description": "Créez votre premier projet pour commencer à écrire."
+    },
+    "favorites": {
+      "title": "Aucun projet favori",
+      "description": "Cliquez sur l'étoile d'un projet pour le retrouver ici."
+    },
+    "archived": {
+      "title": "Aucun projet archivé",
+      "description": "Les projets que vous archivez apparaissent ici."
+    },
+    "createFirst": "Créer mon premier projet"
+  },
+  "errors": {
+    "actionFailed": "L'opération a échoué.",
+    "openFailed": "Impossible d'ouvrir le projet.",
+    "deleteFailed": "Suppression du projet impossible."
+  },
+  "delete": {
+    "title": "Supprimer ce projet ?",
+    "description": "Le projet « {{name}} » sera supprimé définitivement. Cette action est irréversible.",
+    "confirm": "Supprimer",
+    "deleting": "Suppression…"
+  }
+}

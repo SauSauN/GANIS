@@ -1,6 +1,7 @@
 import type { KeyboardEvent, MouseEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
-import { fr } from "date-fns/locale";
+import { enUS, fr } from "date-fns/locale";
 import {
   Archive,
   ArchiveRestore,
@@ -19,11 +20,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import {
-  PROJECT_STATUS_LABELS,
-  PROJECT_TYPE_LABELS,
-  type Project,
-} from "@/types";
+import type { Project } from "@/types";
+
+/** Format des dates de date-fns pour chaque langue de l'interface. */
+const DATE_LOCALES = { fr, en: enUS } as const;
 
 interface ProjectCardProps {
   project: Project;
@@ -52,6 +52,19 @@ export function ProjectCard({
   onDuplicate,
   onDelete,
 }: ProjectCardProps) {
+  const { t, i18n } = useTranslation("projects");
+
+  const dateLocale =
+    i18n.resolvedLanguage === "en" ? DATE_LOCALES.en : DATE_LOCALES.fr;
+
+  const favoriteLabel = project.isFavorite
+    ? t("card.removeFavorite")
+    : t("card.addFavorite");
+
+  const archiveLabel = project.isArchived
+    ? t("card.unarchive")
+    : t("card.archive");
+
   function action(handler: (project: Project) => void) {
     return (event: MouseEvent) => {
       event.stopPropagation();
@@ -74,7 +87,7 @@ export function ProjectCard({
     <Card
       role="button"
       tabIndex={0}
-      aria-label={`Ouvrir le projet ${project.name}`}
+      aria-label={t("card.open", { name: project.name })}
       onClick={() => onOpen(project)}
       onKeyDown={onKeyDown}
       className={cn(
@@ -94,16 +107,8 @@ export function ProjectCard({
               type="button"
               variant="ghost"
               size="icon-sm"
-              title={
-                project.isFavorite
-                  ? "Retirer des favoris"
-                  : "Ajouter aux favoris"
-              }
-              aria-label={
-                project.isFavorite
-                  ? "Retirer des favoris"
-                  : "Ajouter aux favoris"
-              }
+              title={favoriteLabel}
+              aria-label={favoriteLabel}
               aria-pressed={project.isFavorite}
               onClick={action(onToggleFavorite)}
             >
@@ -120,8 +125,8 @@ export function ProjectCard({
               type="button"
               variant="ghost"
               size="icon-sm"
-              title="Modifier le projet"
-              aria-label="Modifier le projet"
+              title={t("card.edit")}
+              aria-label={t("card.edit")}
               onClick={action(onEdit)}
             >
               <Pencil className="h-4 w-4" />
@@ -131,8 +136,8 @@ export function ProjectCard({
               type="button"
               variant="ghost"
               size="icon-sm"
-              title="Dupliquer le projet"
-              aria-label="Dupliquer le projet"
+              title={t("card.duplicate")}
+              aria-label={t("card.duplicate")}
               onClick={action(onDuplicate)}
             >
               <Copy className="h-4 w-4" />
@@ -142,16 +147,8 @@ export function ProjectCard({
               type="button"
               variant="ghost"
               size="icon-sm"
-              title={
-                project.isArchived
-                  ? "Désarchiver le projet"
-                  : "Archiver le projet"
-              }
-              aria-label={
-                project.isArchived
-                  ? "Désarchiver le projet"
-                  : "Archiver le projet"
-              }
+              title={archiveLabel}
+              aria-label={archiveLabel}
               onClick={action(onToggleArchive)}
             >
               {project.isArchived ? (
@@ -165,8 +162,8 @@ export function ProjectCard({
               type="button"
               variant="ghost"
               size="icon-sm"
-              title="Supprimer le projet"
-              aria-label="Supprimer le projet"
+              title={t("card.delete")}
+              aria-label={t("card.delete")}
               onClick={action(onDelete)}
             >
               <Trash2 className="h-4 w-4 text-destructive" />
@@ -179,22 +176,23 @@ export function ProjectCard({
         </CardTitle>
 
         <CardDescription className="line-clamp-2">
-          {project.description || "Aucune description."}
+          {project.description || t("card.noDescription")}
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-1 text-xs text-muted-foreground">
         <div className="flex items-center justify-between">
-          <span>{PROJECT_TYPE_LABELS[project.type]}</span>
-          <span>{PROJECT_STATUS_LABELS[project.status]}</span>
+          <span>{t(`types.${project.type}`)}</span>
+          <span>{t(`statuses.${project.status}`)}</span>
         </div>
 
         <p>
-          Modifié le{" "}
-          {format(new Date(project.updatedAt), "d MMM yyyy", {
-            locale: fr,
+          {t("card.updatedAt", {
+            date: format(new Date(project.updatedAt), "d MMM yyyy", {
+              locale: dateLocale,
+            }),
           })}
-          {project.isArchived ? " · Archivé" : ""}
+          {project.isArchived ? ` · ${t("card.archived")}` : ""}
         </p>
       </CardContent>
     </Card>

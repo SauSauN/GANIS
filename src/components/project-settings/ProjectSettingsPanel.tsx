@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Archive,
   ArchiveRestore,
@@ -30,6 +31,7 @@ import {
   PROJECT_SETTINGS_SECTIONS,
   type ProjectSettingsId,
 } from "@/components/project-settings/sections";
+import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/projectStore";
 import {
   PROJECT_STATUS_LABELS,
@@ -39,6 +41,8 @@ import {
   type ProjectType,
 } from "@/types";
 
+// Les libellés français de `@/types` ne servent plus qu'à lister les valeurs ;
+// le texte affiché vient de `projects.json` (types.* et statuses.*).
 const PROJECT_TYPES = Object.keys(
   PROJECT_TYPE_LABELS,
 ) as ProjectType[];
@@ -53,22 +57,68 @@ const MAX_DESCRIPTION_LENGTH = 5000;
 const fieldClass =
   "w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
 
-interface Feedback {
-  kind: "success" | "error";
-  text: string;
-}
+/**
+ * Cartes à couleur de fond unique (`bg-card`), en-tête et pied compris.
+ *
+ * - gap-0 / py-0 : pas de bande vide au-dessus de l'en-tête ni sous le pied ;
+ * - ring-0 + border : même contour que les blocs de l'accueil du projet.
+ */
+const cardClass = "gap-0 border py-0 shadow-sm ring-0";
+const cardHeaderClass = "border-b px-6 py-5";
+const cardFooterClass = "border-t bg-transparent px-6 py-4";
 
-const errorMessage = (e: unknown, fallback: string) =>
-  e instanceof Error ? e.message : fallback;
+/** Messages de ce panneau (clés de `projectSettings.json`). */
+type PanelMessage =
+  | "info.saved"
+  | "info.saveFailed"
+  | "status.failed"
+  | "danger.duplicateFailed"
+  | "danger.deleteFailed";
+
+/**
+ * Retour affiché sous un formulaire.
+ *
+ * On garde une clé de traduction plutôt qu'un texte : le message suit la
+ * langue si elle change pendant qu'il est affiché. `text` ne sert qu'aux
+ * erreurs renvoyées par Rust (encore en français).
+ */
+type Feedback =
+  | { kind: "success" | "error"; key: PanelMessage }
+  | {
+      kind: "error";
+      formKey: "nameRequired" | "nameTooLong" | "descriptionTooLong";
+    }
+  | { kind: "success"; copied: string }
+  | { kind: "error"; text: string };
+
+/** Erreur de Rust si elle a un message, sinon le message de secours traduit. */
+const failure = (e: unknown, key: PanelMessage): Feedback =>
+  e instanceof Error ? { kind: "error", text: e.message } : { kind: "error", key };
 
 function FeedbackMessage({
   feedback,
 }: {
   feedback: Feedback | null;
 }) {
+  const { t } = useTranslation(["projectSettings", "projects"]);
+
   if (!feedback) {
     return null;
   }
+
+  const text =
+    "key" in feedback
+      ? t(feedback.key)
+      : "formKey" in feedback
+        ? t(`projects:form.errors.${feedback.formKey}`, {
+            max:
+              feedback.formKey === "descriptionTooLong"
+                ? MAX_DESCRIPTION_LENGTH
+                : MAX_NAME_LENGTH,
+          })
+        : "copied" in feedback
+          ? t("danger.duplicated", { name: feedback.copied })
+          : feedback.text;
 
   return (
     <p
@@ -79,7 +129,7 @@ function FeedbackMessage({
           : "text-sm text-success"
       }
     >
-      {feedback.text}
+      {text}
     </p>
   );
 }
@@ -99,6 +149,10 @@ export function ProjectSettingsPanel({
   project,
   section,
 }: ProjectSettingsPanelProps) {
+  // Abonne le panneau aux changements de langue : le titre et la
+  // description de la section (lus via `meta`) sont alors relus.
+  useTranslation("projectSettings");
+
   const meta =
     PROJECT_SETTINGS_SECTIONS.find(
       (item) => item.id === section,
@@ -112,11 +166,6 @@ export function ProjectSettingsPanel({
             ================================================================ */}
 
         <header className="mb-8">
-          <div className="mb-3 flex items-center gap-2 text-sm text-muted-foreground">
-            <span>Projet</span>
-            <span>/</span>
-            <span>Paramètres</span>
-          </div>
 
           <h1 className="text-3xl font-semibold tracking-tight">
             {meta.label}
@@ -155,6 +204,7 @@ export function ProjectSettingsPanel({
 // ----------------------------------------------------------------------------
 
 function InfoSection({ project }: { project: Project }) {
+  const { t } = useTranslation(["projectSettings", "projects", "common"]);
   const updateProject = useProjectStore(
     (state) => state.updateProject,
   );
@@ -183,26 +233,17 @@ function InfoSection({ project }: { project: Project }) {
     const trimmedDescription = description.trim();
 
     if (!trimmedName) {
-      setFeedback({
-        kind: "error",
-        text: "Le nom du projet est requis.",
-      });
+      setFeedback({ kind: "error", formKey: "nameRequired" });
       return;
     }
 
     if (trimmedName.length > MAX_NAME_LENGTH) {
-      setFeedback({
-        kind: "error",
-        text: `Le nom ne peut pas dépasser ${MAX_NAME_LENGTH} caractères.`,
-      });
+      setFeedback({ kind: "error", formKey: "nameTooLong" });
       return;
     }
 
     if (trimmedDescription.length > MAX_DESCRIPTION_LENGTH) {
-      setFeedback({
-        kind: "error",
-        text: `La description ne peut pas dépasser ${MAX_DESCRIPTION_LENGTH} caractères.`,
-      });
+      setFeedback({ kind: "error", formKey: "descriptionTooLong" });
       return;
     }
 
@@ -219,39 +260,28 @@ function InfoSection({ project }: { project: Project }) {
       setName(trimmedName);
       setDescription(trimmedDescription);
 
-      setFeedback({
-        kind: "success",
-        text: "Modifications enregistrées.",
-      });
+      setFeedback({ kind: "success", key: "info.saved" });
     } catch (e) {
-      setFeedback({
-        kind: "error",
-        text: errorMessage(
-          e,
-          "Impossible d'enregistrer les modifications.",
-        ),
-      });
+      setFeedback(failure(e, "info.saveFailed"));
     } finally {
       setSaving(false);
     }
   }
 
   return (
-    <Card>
+    <Card className={cardClass}>
       <form onSubmit={handleSubmit}>
-        <CardHeader className="border-b bg-muted/20">
-          <CardTitle>Informations du projet</CardTitle>
+        <CardHeader className={cardHeaderClass}>
+          <CardTitle>{t("info.title")}</CardTitle>
 
-          <CardDescription>
-            Ces informations apparaissent sur le tableau de bord.
-          </CardDescription>
+          <CardDescription>{t("info.description")}</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6 px-6 py-6">
           {/* Nom */}
           <div className="space-y-2">
             <Label htmlFor="settings-project-name">
-              Nom du projet
+              {t("projects:form.name.label")}
             </Label>
 
             <Input
@@ -264,7 +294,7 @@ function InfoSection({ project }: { project: Project }) {
           {/* Description */}
           <div className="space-y-2">
             <Label htmlFor="settings-project-description">
-              Description
+              {t("info.descriptionField")}
             </Label>
 
             <textarea
@@ -279,7 +309,7 @@ function InfoSection({ project }: { project: Project }) {
           {/* Type */}
           <div className="space-y-2">
             <Label htmlFor="settings-project-type">
-              Type de création
+              {t("projects:form.type")}
             </Label>
 
             <select
@@ -294,7 +324,7 @@ function InfoSection({ project }: { project: Project }) {
             >
               {PROJECT_TYPES.map((type) => (
                 <option key={type} value={type}>
-                  {PROJECT_TYPE_LABELS[type]}
+                  {t(`projects:types.${type}`)}
                 </option>
               ))}
             </select>
@@ -303,14 +333,14 @@ function InfoSection({ project }: { project: Project }) {
           <FeedbackMessage feedback={feedback} />
         </CardContent>
 
-        <CardFooter className="border-t bg-muted/10 px-6 py-4">
+        <CardFooter className={cardFooterClass}>
           <Button
             type="submit"
             disabled={saving || unchanged}
           >
             {saving
-              ? "Enregistrement…"
-              : "Enregistrer"}
+              ? t("common:actions.saving")
+              : t("common:actions.save")}
           </Button>
         </CardFooter>
       </form>
@@ -323,13 +353,14 @@ function InfoSection({ project }: { project: Project }) {
 // ----------------------------------------------------------------------------
 
 function StatusSection({ project }: { project: Project }) {
+  const { t } = useTranslation(["projectSettings", "projects"]);
   const updateProject = useProjectStore(
     (state) => state.updateProject,
   );
 
   const [busy, setBusy] = useState(false);
   const [error, setError] =
-    useState<string | null>(null);
+    useState<Feedback | null>(null);
 
   async function apply(changes: {
     status?: ProjectStatus;
@@ -345,12 +376,7 @@ function StatusSection({ project }: { project: Project }) {
         ...changes,
       });
     } catch (e) {
-      setError(
-        errorMessage(
-          e,
-          "Impossible de modifier le projet.",
-        ),
-      );
+      setError(failure(e, "status.failed"));
     } finally {
       setBusy(false);
     }
@@ -359,14 +385,11 @@ function StatusSection({ project }: { project: Project }) {
   return (
     <div className="space-y-8">
       {/* Statut */}
-      <Card>
-        <CardHeader className="border-b bg-muted/20">
-          <CardTitle>Statut</CardTitle>
+      <Card className={cardClass}>
+        <CardHeader className={cardHeaderClass}>
+          <CardTitle>{t("status.title")}</CardTitle>
 
-          <CardDescription>
-            Où en est ce projet ? Le changement est enregistré
-            immédiatement.
-          </CardDescription>
+          <CardDescription>{t("status.description")}</CardDescription>
         </CardHeader>
 
         <CardContent className="px-6 py-6">
@@ -374,7 +397,7 @@ function StatusSection({ project }: { project: Project }) {
             htmlFor="settings-project-status"
             className="sr-only"
           >
-            Statut du projet
+            {t("status.label")}
           </Label>
 
           <select
@@ -390,7 +413,7 @@ function StatusSection({ project }: { project: Project }) {
           >
             {PROJECT_STATUSES.map((value) => (
               <option key={value} value={value}>
-                {PROJECT_STATUS_LABELS[value]}
+                {t(`projects:statuses.${value}`)}
               </option>
             ))}
           </select>
@@ -398,15 +421,11 @@ function StatusSection({ project }: { project: Project }) {
       </Card>
 
       {/* Organisation */}
-      <Card>
-        <CardHeader className="border-b bg-muted/20">
-          <CardTitle>Organisation</CardTitle>
+      <Card className={cardClass}>
+        <CardHeader className={cardHeaderClass}>
+          <CardTitle>{t("organization.title")}</CardTitle>
 
-          <CardDescription>
-            Les favoris sont mis en avant sur le tableau de
-            bord. Un projet archivé n'apparaît plus dans la
-            liste principale.
-          </CardDescription>
+          <CardDescription>{t("organization.description")}</CardDescription>
         </CardHeader>
 
         <CardContent className="flex flex-wrap gap-3 px-6 py-6">
@@ -430,8 +449,8 @@ function StatusSection({ project }: { project: Project }) {
             />
 
             {project.isFavorite
-              ? "Retirer des favoris"
-              : "Ajouter aux favoris"}
+              ? t("projects:card.removeFavorite")
+              : t("projects:card.addFavorite")}
           </Button>
 
           <Button
@@ -451,19 +470,16 @@ function StatusSection({ project }: { project: Project }) {
             )}
 
             {project.isArchived
-              ? "Désarchiver"
-              : "Archiver le projet"}
+              ? t("organization.unarchive")
+              : t("projects:card.archive")}
           </Button>
         </CardContent>
       </Card>
 
       {error && (
-        <p
-          role="alert"
-          className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
-        >
-          {error}
-        </p>
+        <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
+          <FeedbackMessage feedback={error} />
+        </div>
       )}
     </div>
   );
@@ -474,6 +490,7 @@ function StatusSection({ project }: { project: Project }) {
 // ----------------------------------------------------------------------------
 
 function DangerSection({ project }: { project: Project }) {
+  const { t } = useTranslation(["projectSettings", "dashboard", "common"]);
   const duplicateProject = useProjectStore(
     (state) => state.duplicateProject,
   );
@@ -495,7 +512,7 @@ function DangerSection({ project }: { project: Project }) {
     useState(false);
 
   const [deleteError, setDeleteError] =
-    useState<string | null>(null);
+    useState<Feedback | null>(null);
 
   async function handleDuplicate() {
     setDuplicating(true);
@@ -504,18 +521,9 @@ function DangerSection({ project }: { project: Project }) {
     try {
       const copy = await duplicateProject(project.id);
 
-      setDuplicateFeedback({
-        kind: "success",
-        text: `La copie « ${copy.name} » a été créée. Retrouvez-la sur le tableau de bord.`,
-      });
+      setDuplicateFeedback({ kind: "success", copied: copy.name });
     } catch (e) {
-      setDuplicateFeedback({
-        kind: "error",
-        text: errorMessage(
-          e,
-          "Impossible de dupliquer le projet.",
-        ),
-      });
+      setDuplicateFeedback(failure(e, "danger.duplicateFailed"));
     } finally {
       setDuplicating(false);
     }
@@ -530,12 +538,7 @@ function DangerSection({ project }: { project: Project }) {
       // redirige automatiquement vers le tableau de bord.
       await deleteProject(project.id);
     } catch (e) {
-      setDeleteError(
-        errorMessage(
-          e,
-          "Impossible de supprimer le projet.",
-        ),
-      );
+      setDeleteError(failure(e, "danger.deleteFailed"));
 
       setConfirmOpen(false);
       setDeleting(false);
@@ -545,14 +548,11 @@ function DangerSection({ project }: { project: Project }) {
   return (
     <div className="space-y-8">
       {/* Duplication */}
-      <Card>
-        <CardHeader className="border-b bg-muted/20">
-          <CardTitle>Dupliquer le projet</CardTitle>
+      <Card className={cardClass}>
+        <CardHeader className={cardHeaderClass}>
+          <CardTitle>{t("danger.duplicateTitle")}</CardTitle>
 
-          <CardDescription>
-            Crée une copie avec le même nom (suivi de « (copie) »),
-            la même description et le même type.
-          </CardDescription>
+          <CardDescription>{t("danger.duplicateDescription")}</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-3 px-6 py-6">
@@ -565,8 +565,8 @@ function DangerSection({ project }: { project: Project }) {
             <Copy className="mr-2 h-4 w-4" />
 
             {duplicating
-              ? "Duplication…"
-              : "Dupliquer"}
+              ? t("danger.duplicating")
+              : t("danger.duplicate")}
           </Button>
 
           <FeedbackMessage
@@ -575,17 +575,16 @@ function DangerSection({ project }: { project: Project }) {
         </CardContent>
       </Card>
 
-      {/* Suppression */}
-      <Card className="border-destructive/40">
-        <CardHeader className="border-b border-destructive/20 bg-destructive/5">
+      {/* Suppression : même fond unique, signalée par la bordure et le titre rouges. */}
+      <Card className={cn(cardClass, "border-destructive/40")}>
+        <CardHeader
+          className={cn(cardHeaderClass, "border-destructive/20")}
+        >
           <CardTitle className="text-destructive">
-            Supprimer le projet
+            {t("danger.deleteTitle")}
           </CardTitle>
 
-          <CardDescription>
-            La suppression est définitive et ne peut pas être
-            annulée.
-          </CardDescription>
+          <CardDescription>{t("danger.deleteDescription")}</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-3 px-6 py-6">
@@ -595,17 +594,10 @@ function DangerSection({ project }: { project: Project }) {
             onClick={() => setConfirmOpen(true)}
           >
             <Trash2 className="mr-2 h-4 w-4" />
-            Supprimer le projet
+            {t("danger.deleteTitle")}
           </Button>
 
-          {deleteError && (
-            <p
-              role="alert"
-              className="text-sm text-destructive"
-            >
-              {deleteError}
-            </p>
-          )}
+          <FeedbackMessage feedback={deleteError} />
         </CardContent>
       </Card>
 
@@ -620,13 +612,10 @@ function DangerSection({ project }: { project: Project }) {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              Supprimer ce projet ?
-            </DialogTitle>
+            <DialogTitle>{t("dashboard:delete.title")}</DialogTitle>
 
             <DialogDescription>
-              Le projet « {project.name} » sera supprimé
-              définitivement. Cette action est irréversible.
+              {t("dashboard:delete.description", { name: project.name })}
             </DialogDescription>
           </DialogHeader>
 
@@ -637,7 +626,7 @@ function DangerSection({ project }: { project: Project }) {
               onClick={() => setConfirmOpen(false)}
               disabled={deleting}
             >
-              Annuler
+              {t("common:actions.cancel")}
             </Button>
 
             <Button
@@ -647,8 +636,8 @@ function DangerSection({ project }: { project: Project }) {
               disabled={deleting}
             >
               {deleting
-                ? "Suppression…"
-                : "Supprimer"}
+                ? t("dashboard:delete.deleting")
+                : t("dashboard:delete.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>

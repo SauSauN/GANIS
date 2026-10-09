@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import {
   Archive,
@@ -53,6 +54,7 @@ const RECENT_LIMIT = 3;
  */
 export default function Dashboard() {
   const navigate = useNavigate();
+  const { t } = useTranslation(["dashboard", "common"]);
 
   const user = useAuthStore((state) => state.user);
 
@@ -147,7 +149,7 @@ export default function Dashboard() {
       await task();
     } catch (e) {
       setActionError(
-        e instanceof Error ? e.message : "L'opération a échoué.",
+        e instanceof Error ? e.message : t("errors.actionFailed"),
       );
     } finally {
       setBusyId(null);
@@ -164,7 +166,7 @@ export default function Dashboard() {
       setActionError(
         e instanceof Error
           ? e.message
-          : "Impossible d'ouvrir le projet.",
+          : t("errors.openFailed"),
       );
     }
   }
@@ -215,7 +217,7 @@ export default function Dashboard() {
       setActionError(
         e instanceof Error
           ? e.message
-          : "Suppression du projet impossible.",
+          : t("errors.deleteFailed"),
       );
       setDeleting(null);
     } finally {
@@ -263,47 +265,30 @@ export default function Dashboard() {
   }[] = [
     {
       id: "all",
-      label: "Projets actifs",
+      label: t("filters.all"),
       count: counts.active,
       icon: FolderOpen,
     },
     {
       id: "favorites",
-      label: "Favoris",
+      label: t("filters.favorites"),
       count: counts.favorites,
       icon: Star,
     },
     {
       id: "archived",
-      label: "Archivés",
+      label: t("filters.archived"),
       count: counts.archived,
       icon: Archive,
     },
   ];
 
-  const listTitle = searching
-    ? "Résultats de recherche"
-    : filter === "favorites"
-      ? "Favoris"
-      : filter === "archived"
-        ? "Projets archivés"
-        : "Tous les projets";
+  /** Ce que montre la liste : une recherche prime sur le filtre choisi. */
+  const listMode = searching ? "search" : filter;
 
-  const emptyTitle = searching
-    ? "Aucun projet ne correspond"
-    : filter === "favorites"
-      ? "Aucun projet favori"
-      : filter === "archived"
-        ? "Aucun projet archivé"
-        : "Aucun projet pour l'instant";
-
-  const emptyDescription = searching
-    ? "Essayez un autre terme de recherche."
-    : filter === "favorites"
-      ? "Cliquez sur l'étoile d'un projet pour le retrouver ici."
-      : filter === "archived"
-        ? "Les projets que vous archivez apparaissent ici."
-        : "Créez votre premier projet pour commencer à écrire.";
+  const listTitle = t(`list.title.${listMode}`);
+  const emptyTitle = t(`empty.${listMode}.title`);
+  const emptyDescription = t(`empty.${listMode}.description`);
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-background">
@@ -318,16 +303,18 @@ export default function Dashboard() {
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight">
-                Bonjour, {user?.username ?? "créateur"}
+                {t("greeting", {
+                  name: user?.username ?? t("defaultName"),
+                })}
               </h1>
               <p className="text-sm text-muted-foreground">
-                Bienvenue dans votre studio de conception narrative.
+                {t("subtitle")}
               </p>
             </div>
 
             <Button onClick={openCreateDialog}>
               <Plus className="mr-2 h-4 w-4" />
-              Nouveau projet
+              {t("newProject")}
             </Button>
           </div>
 
@@ -336,8 +323,8 @@ export default function Dashboard() {
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="pl-9"
-              placeholder="Rechercher un projet…"
-              aria-label="Rechercher un projet"
+              placeholder={t("search.placeholder")}
+              aria-label={t("search.label")}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -392,7 +379,7 @@ export default function Dashboard() {
             <section className="mt-8">
               <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold">
                 <Clock className="h-4 w-4 text-muted-foreground" />
-                Récemment ouverts
+                {t("recent")}
               </h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {recent.map(renderCard)}
@@ -417,9 +404,7 @@ export default function Dashboard() {
                   aria-expanded={listOpen}
                   aria-controls={listOpen ? "projects-list" : undefined}
                   title={
-                    listOpen
-                      ? "Fermer la liste des projets"
-                      : "Afficher la liste des projets"
+                    listOpen ? t("list.collapse") : t("list.expand")
                   }
                   onClick={() => setListOpen((open) => !open)}
                   className="flex items-center gap-2 rounded-md text-left transition-colors hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -443,7 +428,7 @@ export default function Dashboard() {
               <div id="projects-list">
                 {loading && projects.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
-                    Chargement des projets…
+                    {t("list.loading")}
                   </p>
                 ) : visible.length === 0 ? (
                   <Card>
@@ -457,7 +442,7 @@ export default function Dashboard() {
                         <CardContent>
                           <Button onClick={openCreateDialog}>
                             <Plus className="mr-2 h-4 w-4" />
-                            Créer mon premier projet
+                            {t("empty.createFirst")}
                           </Button>
                         </CardContent>
                       )}
@@ -490,10 +475,9 @@ export default function Dashboard() {
       >
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Supprimer ce projet ?</DialogTitle>
+            <DialogTitle>{t("delete.title")}</DialogTitle>
             <DialogDescription>
-              Le projet « {deleting?.name} » sera supprimé définitivement.
-              Cette action est irréversible.
+              {t("delete.description", { name: deleting?.name ?? "" })}
             </DialogDescription>
           </DialogHeader>
 
@@ -504,7 +488,7 @@ export default function Dashboard() {
               onClick={() => setDeleting(null)}
               disabled={deletingBusy}
             >
-              Annuler
+              {t("common:actions.cancel")}
             </Button>
             <Button
               type="button"
@@ -512,7 +496,7 @@ export default function Dashboard() {
               onClick={() => void handleConfirmDelete()}
               disabled={deletingBusy}
             >
-              {deletingBusy ? "Suppression…" : "Supprimer"}
+              {deletingBusy ? t("delete.deleting") : t("delete.confirm")}
             </Button>
           </DialogFooter>
         </DialogContent>

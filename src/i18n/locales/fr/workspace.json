@@ -1,0 +1,8 @@
+{
+  "homeTab": "Accueil du projet",
+  "loading": "Chargement du projet…",
+  "empty": {
+    "title": "Aucun onglet ouvert",
+    "description": "Choisissez une fonctionnalité dans la barre de gauche pour l'ouvrir."
+  }
+}

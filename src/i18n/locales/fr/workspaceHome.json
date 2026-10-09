@@ -1,0 +1,22 @@
+{
+  "synopsis": {
+    "title": "Synopsis",
+    "subtitle": "Présentation narrative du projet",
+    "loading": "Chargement du synopsis…",
+    "emptyTitle": "Aucun synopsis n'a encore été rédigé",
+    "emptyHint": "Ouvrez « {{module}} » puis « {{feature}} » dans la barre de gauche pour commencer.",
+    "genres": "Genres",
+    "subgenres": "Sous-genres",
+    "tone": "Ton"
+  },
+  "description": "Description",
+  "info": {
+    "title": "Informations du projet",
+    "createdAt": "Créé le",
+    "updatedAt": "Dernière modification"
+  },
+  "help": {
+    "title": "Organiser votre projet",
+    "text": "Utilisez la barre de gauche pour organiser les personnages, lieux, chapitres, scènes et autres éléments de votre projet."
+  }
+}

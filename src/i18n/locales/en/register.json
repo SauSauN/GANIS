@@ -1,0 +1,12 @@
+{
+  "title": "Create an account",
+  "subtitle": "Your account is stored on this computer only.",
+  "username": "Username",
+  "email": "Email address (optional)",
+  "password": "Password",
+  "confirm": "Confirm password",
+  "submit": "Create account",
+  "submitting": "Creating…",
+  "hasAccount": "Already have an account?",
+  "signIn": "Sign in"
+}

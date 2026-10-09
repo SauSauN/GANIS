@@ -1,0 +1,45 @@
+{
+  "sections": {
+    "info": {
+      "label": "Informations",
+      "description": "Nom, description et type de création du projet."
+    },
+    "status": {
+      "label": "Statut et organisation",
+      "description": "Avancement du projet, favori et archivage."
+    },
+    "danger": {
+      "label": "Duplication et suppression",
+      "description": "Dupliquer ou supprimer définitivement le projet."
+    }
+  },
+  "info": {
+    "title": "Informations du projet",
+    "description": "Ces informations apparaissent sur le tableau de bord.",
+    "descriptionField": "Description",
+    "saved": "Modifications enregistrées.",
+    "saveFailed": "Impossible d'enregistrer les modifications."
+  },
+  "status": {
+    "title": "Statut",
+    "description": "Où en est ce projet ? Le changement est enregistré immédiatement.",
+    "label": "Statut du projet",
+    "failed": "Impossible de modifier le projet."
+  },
+  "organization": {
+    "title": "Organisation",
+    "description": "Les favoris sont mis en avant sur le tableau de bord. Un projet archivé n'apparaît plus dans la liste principale.",
+    "unarchive": "Désarchiver"
+  },
+  "danger": {
+    "duplicateTitle": "Dupliquer le projet",
+    "duplicateDescription": "Crée une copie avec le même nom (suivi de « (copie) »), la même description et le même type.",
+    "duplicate": "Dupliquer",
+    "duplicating": "Duplication…",
+    "duplicated": "La copie « {{name}} » a été créée. Retrouvez-la sur le tableau de bord.",
+    "duplicateFailed": "Impossible de dupliquer le projet.",
+    "deleteTitle": "Supprimer le projet",
+    "deleteDescription": "La suppression est définitive et ne peut pas être annulée.",
+    "deleteFailed": "Impossible de supprimer le projet."
+  }
+}

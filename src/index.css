@@ -92,6 +92,9 @@
     --sidebar-accent-foreground: #122056;
     --sidebar-border: #E0E2F4;
     --sidebar-ring: #5B65DC;
+
+    /* Barre de défilement (visible uniquement pendant un défilement) */
+    --scrollbar-thumb: color-mix(in oklab, var(--muted-foreground) 45%, transparent);
 }
 
 .dark {
@@ -128,6 +131,8 @@
     --sidebar-accent-foreground: #EEF0FF;
     --sidebar-border: #2A3157;
     --sidebar-ring: #7C85F2;
+
+    --scrollbar-thumb: color-mix(in oklab, var(--muted-foreground) 50%, transparent);
 }
 
 @layer base {
@@ -139,6 +144,52 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+/* ============================================================
+   GANIS — BARRES DE DÉFILEMENT
+   ============================================================
+   Invisibles au repos, colorées selon le thème pendant un
+   défilement. L'attribut `data-scrolling` est posé et retiré
+   par `src/lib/scrollbars.ts` sur l'élément qui défile.
+   L'espace de la barre reste réservé : le contenu ne bouge pas
+   quand elle apparaît.
+   ============================================================ */
+
+/* Moteurs récents (WebView2 sous Windows, Firefox) */
+@supports (scrollbar-color: auto) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  [data-scrolling] {
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+}
+
+/* Secours pour WebKit (macOS, Linux), sans `scrollbar-color` */
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    background-clip: content-box;
+    border: 2px solid transparent;
+    border-radius: 9999px;
+  }
+
+  [data-scrolling]::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
   }
 }
 

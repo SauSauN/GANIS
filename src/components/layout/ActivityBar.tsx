@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import {
   SETTINGS_MODULE,
@@ -44,6 +45,8 @@ export function ActivityBar({
   onToggleExpanded,
   onSelect,
 }: ActivityBarProps) {
+  const { t } = useTranslation("activitybar");
+
   const renderModule = (module: WorkspaceModule) => {
     const selected = panelOpen && active === module.id;
     const isLinked = linked === module.id;
@@ -55,7 +58,7 @@ export function ActivityBar({
         type="button"
         title={
           isLinked
-            ? `${module.label} — contient l'onglet ouvert`
+            ? t("linked", { module: module.label })
             : module.label
         }
         aria-label={module.label}
@@ -90,23 +93,24 @@ export function ActivityBar({
 
   return (
     <aside
-      aria-label="Modules du projet"
+      aria-label={t("label")}
       className={cn(
         "flex shrink-0 flex-col justify-between border-r border-sidebar-border bg-sidebar transition-[width] duration-150",
         expanded ? "w-48" : "w-12",
       )}
     >
       <div>
+        {/* Pas de séparation sous ce bouton : il s'enchaîne directement avec les modules. */}
         <button
           type="button"
-          title={expanded ? "Réduire la barre" : "Développer la barre"}
+          title={expanded ? t("collapse.title") : t("expand.title")}
           aria-label={
-            expanded ? "Réduire la barre latérale" : "Développer la barre latérale"
+            expanded ? t("collapse.label") : t("expand.label")
           }
           aria-expanded={expanded}
           onClick={onToggleExpanded}
           className={cn(
-            "flex h-11 w-full items-center gap-3 border-b border-sidebar-border border-l-2 border-l-transparent text-sm text-muted-foreground transition-colors hover:text-foreground",
+            "flex h-11 w-full items-center gap-3 border-l-2 border-transparent text-sm text-muted-foreground transition-colors hover:text-foreground",
             expanded ? "px-3.5" : "justify-center",
           )}
         >
@@ -116,7 +120,7 @@ export function ActivityBar({
             <PanelLeftOpen className="h-5 w-5 shrink-0" />
           )}
 
-          {expanded && <span className="truncate">Réduire</span>}
+          {expanded && <span className="truncate">{t("collapse.short")}</span>}
         </button>
 
         {WORKSPACE_MODULES.map(renderModule)}

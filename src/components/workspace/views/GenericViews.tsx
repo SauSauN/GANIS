@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,15 +32,17 @@ export function EmptyListView({
   createFeature,
   onOpenFeature,
 }: EmptyListViewProps) {
+  const { t } = useTranslation("views");
+
   return (
     <ViewShell title={feature.label} description={feature.description}>
       <Card>
         <CardHeader>
           <CardTitle>
-            {module.emptyMessage ?? "Aucun élément pour l'instant."}
+            {module.emptyMessage ?? t("emptyList.title")}
           </CardTitle>
           <CardDescription>
-            Les éléments créés apparaîtront ici.
+            {t("emptyList.description")}
           </CardDescription>
         </CardHeader>
 
@@ -58,13 +61,15 @@ export function EmptyListView({
 
 /** Vue d'une fonctionnalité dont l'interface n'est pas encore disponible. */
 export function ComingSoonView({ feature }: { feature: WorkspaceFeature }) {
+  const { t } = useTranslation("views");
+
   return (
     <ViewShell title={feature.label} description={feature.description}>
       <Card>
         <CardHeader>
-          <CardTitle>Bientôt disponible</CardTitle>
+          <CardTitle>{t("comingSoon.title")}</CardTitle>
           <CardDescription>
-            Cette fonctionnalité sera ajoutée dans une prochaine étape.
+            {t("comingSoon.description")}
           </CardDescription>
         </CardHeader>
       </Card>

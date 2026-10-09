@@ -85,12 +85,13 @@ fn parse_json_list(raw: &str, field: &str) -> AppResult<Vec<String>> {
 ///
 /// Les éléments sont débarrassés des espaces superflus, les doublons
 /// (sans tenir compte de la casse) sont retirés, et les limites de taille
-/// sont appliquées. `label` désigne la liste dans les messages d'erreur.
-fn clean_tags(list: &[String], label: &str) -> AppResult<Vec<String>> {
+/// sont appliquées. `label` désigne la liste dans les messages d'erreur ;
+/// `field` est son identifiant, envoyé à l'interface pour la traduction.
+fn clean_tags(list: &[String], label: &str, field: &'static str) -> AppResult<Vec<String>> {
     if list.len() > MAX_TAGS {
         return Err(AppError::validation(format!(
             "{label} : {MAX_TAGS} éléments au maximum."
-        )));
+        )).with_key("synopsis.tooManyTags").with_param("field", field).with_param("max", MAX_TAGS));
     }
 
     let mut cleaned: Vec<String> = Vec::with_capacity(list.len());
@@ -101,13 +102,13 @@ fn clean_tags(list: &[String], label: &str) -> AppResult<Vec<String>> {
         if tag.is_empty() {
             return Err(AppError::validation(format!(
                 "{label} : un élément est vide."
-            )));
+            )).with_key("synopsis.emptyTag").with_param("field", field));
         }
 
         if tag.chars().count() > MAX_TAG_CHARS {
             return Err(AppError::validation(format!(
                 "{label} : un élément dépasse {MAX_TAG_CHARS} caractères."
-            )));
+            )).with_key("synopsis.tagTooLong").with_param("field", field).with_param("max", MAX_TAG_CHARS));
         }
 
         let exists = cleaned
@@ -165,12 +166,12 @@ pub async fn update_synopsis(
     if content.chars().count() > MAX_CONTENT_CHARS {
         return Err(AppError::validation(format!(
             "Le contenu du synopsis est trop long ({MAX_CONTENT_CHARS} caractères au maximum)."
-        )));
+        )).with_key("synopsis.contentTooLong").with_param("max", MAX_CONTENT_CHARS));
     }
 
-    let genres = clean_tags(genres, "Genres")?;
-    let subgenres = clean_tags(subgenres, "Sous-genres")?;
-    let tone = clean_tags(tone, "Ton")?;
+    let genres = clean_tags(genres, "Genres", "genres")?;
+    let subgenres = clean_tags(subgenres, "Sous-genres", "subgenres")?;
+    let tone = clean_tags(tone, "Ton", "tone")?;
 
     let now = crate::utils::now_utc();
 
@@ -199,7 +200,7 @@ pub async fn update_synopsis(
     if result.rows_affected() == 0 {
         return Err(AppError::not_found(
             "Le synopsis du projet est introuvable.",
-        ));
+        ).with_key("synopsis.notFound"));
     }
 
     get_synopsis(pool).await

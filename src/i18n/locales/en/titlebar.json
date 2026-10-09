@@ -1,0 +1,20 @@
+{
+  "home": "Home",
+  "menusLabel": "Menus",
+  "menus": {
+    "file": "File",
+    "edit": "Edit",
+    "view": "View",
+    "project": "Project",
+    "help": "Help"
+  },
+  "comingSoon": "Coming soon",
+  "toggleTheme": "Toggle theme",
+  "settings": "General settings",
+  "window": {
+    "minimize": "Minimize",
+    "maximize": "Maximize",
+    "restore": "Restore",
+    "close": "Close"
+  }
+}

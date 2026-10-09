@@ -1,0 +1,9 @@
+{
+  "offline": "Offline",
+  "localProject": "Local project",
+  "save": {
+    "idle": "Ready",
+    "saving": "Saving…",
+    "error": "Saving failed"
+  }
+}

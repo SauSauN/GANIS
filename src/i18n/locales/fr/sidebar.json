@@ -1,0 +1,11 @@
+{
+  "label": "Fonctionnalités du module",
+  "search": {
+    "placeholder": "Rechercher dans le projet",
+    "unavailable": "La recherche sera disponible avec le contenu du projet."
+  },
+  "resize": {
+    "label": "Redimensionner le panneau des fonctionnalités",
+    "title": "Glisser pour redimensionner, vers la gauche pour fermer. Double-clic : largeur par défaut."
+  }
+}

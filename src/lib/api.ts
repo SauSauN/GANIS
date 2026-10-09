@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import i18n from "@/i18n";
 import type {
   ApiErrorPayload,
   AppInfo,
@@ -10,20 +11,88 @@ import type {
   User,
 } from "@/types";
 
+/** `t` sans typage des clés : les clés d'erreur viennent de Rust, à l'exécution. */
+const translate = i18n.t.bind(i18n) as unknown as (
+  key: string,
+  options?: Record<string, unknown>,
+) => string;
+
+/**
+ * Message d'une erreur Rust dans la langue de l'interface.
+ *
+ * 1. Rust a fourni une clé connue de `errors.json` → message traduit ;
+ * 2. sinon, en français → le message d'origine de Rust (le plus précis) ;
+ * 3. sinon → un message générique selon le code (`errors.codes.*`).
+ */
+export function translateApiError(error: ApiError): string {
+  if (error.key && i18n.exists(`errors:${error.key}`)) {
+    const params: Record<string, unknown> = { ...error.params };
+
+    // Nom de champ (ex. `genres`) : traduit lui aussi.
+    if (typeof params.field === "string") {
+      params.field = translate(`errors:fields.${params.field}`, {
+        defaultValue: params.field,
+      });
+    }
+
+    return translate(`errors:${error.key}`, params);
+  }
+
+  if (i18n.resolvedLanguage === "fr") {
+    return error.rawMessage;
+  }
+
+  return translate(`errors:codes.${error.code}`);
+}
+
 /**
  * Erreur normalisée renvoyée par le pont Rust.
  *
  * Utilise les codes de `ErrorCode` définis dans `types/index.ts`
  * et correspondant aux codes du backend Rust.
+ *
+ * `message` est traduit à chaque lecture (voir `translateApiError`) :
+ * tout le code existant qui affiche `e.message` obtient donc le texte
+ * dans la langue de l'interface, sans modification.
  */
 export class ApiError extends Error {
   code: ErrorCode;
+  /** Message d'origine, en français, tel que renvoyé par Rust. */
+  readonly rawMessage: string;
+  /** Clé de traduction fournie par Rust (`errors.json`). */
+  readonly key?: string;
+  /** Valeurs à insérer dans le message traduit. */
+  readonly params?: Record<string, string | number>;
 
-  constructor(code: ErrorCode, message: string) {
+  constructor(
+    code: ErrorCode,
+    message: string,
+    key?: string,
+    params?: Record<string, string | number>,
+  ) {
     super(message);
     this.name = "ApiError";
     this.code = code;
+    this.rawMessage = message;
+    this.key = key;
+    this.params = params;
+
+    Object.defineProperty(this, "message", {
+      get: () => translateApiError(this),
+      configurable: true,
+      enumerable: false,
+    });
   }
+}
+
+/** Construit une `ApiError` à partir de la réponse de Rust. */
+function fromPayload(payload: ApiErrorPayload): ApiError {
+  return new ApiError(
+    payload.code,
+    payload.message,
+    payload.key,
+    payload.params,
+  );
 }
 
 /**
@@ -76,7 +145,7 @@ function parseErrorString(value: string): ApiError | null {
     const parsed: unknown = JSON.parse(trimmed);
 
     if (isApiErrorPayload(parsed)) {
-      return new ApiError(parsed.code, parsed.message);
+      return fromPayload(parsed);
     }
   } catch {
     // La chaîne n'est pas du JSON.
@@ -94,7 +163,7 @@ function normalize(e: unknown): ApiError {
   }
 
   if (isApiErrorPayload(e)) {
-    return new ApiError(e.code, e.message);
+    return fromPayload(e);
   }
 
   if (typeof e === "string") {

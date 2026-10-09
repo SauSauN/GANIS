@@ -1,44 +1,45 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/stores/authStore";
-import { validateEmail, validatePassword, validateUsername } from "@/lib/validators";
+import {
+  checkEmail,
+  checkPassword,
+  checkUsername,
+  type ValidationIssue,
+} from "@/lib/validators";
 
 export default function Register() {
   const navigate = useNavigate();
+  const { t } = useTranslation(["register", "common"]);
   const { register, loading, error, clearError } = useAuthStore();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  const [localError, setLocalError] = useState<string | null>(null);
+  // On garde le code du problème (pas le texte) : le message suit la langue
+  // même si elle change pendant qu'il est affiché.
+  const [localIssue, setLocalIssue] = useState<ValidationIssue | null>(null);
 
   useEffect(() => clearError(), [clearError]);
 
-  function validate(): string | null {
-    const usernameError = validateUsername(username);
-    if (usernameError) return usernameError;
-
-    const passwordError = validatePassword(password);
-    if (passwordError) return passwordError;
-
-    if (password !== confirm) {
-      return "Les deux mots de passe ne correspondent pas.";
-    }
-
-    const emailError = validateEmail(email);
-    if (emailError) return emailError;
-
-    return null;
+  function validate(): ValidationIssue | null {
+    return (
+      checkUsername(username) ??
+      checkPassword(password) ??
+      (password !== confirm ? "passwordMismatch" : null) ??
+      checkEmail(email)
+    );
   }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     const problem = validate();
-    setLocalError(problem);
+    setLocalIssue(problem);
     if (problem) return;
 
     const ok = await register({
@@ -49,35 +50,39 @@ export default function Register() {
     if (ok) navigate("/login", { replace: true });
   }
 
-  const shownError = localError ?? error;
+  // Les erreurs renvoyées par Rust restent pour l'instant en français.
+  const shownError = localIssue
+    ? t(`common:validation.${localIssue}`)
+    : error;
 
   return (
-    <main className="flex flex-1 items-center justify-center bg-background px-4 py-6">
+    <main className="relative flex flex-1 items-center justify-center bg-background px-4 py-6">
+
       <Card className="w-full max-w-sm">
         <form onSubmit={onSubmit}>
           <CardHeader>
-            <CardTitle>Créer un compte</CardTitle>
-            <CardDescription>Le compte reste enregistré sur cet ordinateur.</CardDescription>
+            <CardTitle>{t("title")}</CardTitle>
+            <CardDescription>{t("subtitle")}</CardDescription>
           </CardHeader>
 
           <CardContent className="mt-4 space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Nom d'utilisateur</Label>
+              <Label htmlFor="username">{t("username")}</Label>
               <Input id="username" autoComplete="username" value={username}
                 onChange={(e) => setUsername(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Adresse e-mail (facultatif)</Label>
+              <Label htmlFor="email">{t("email")}</Label>
               <Input id="email" type="email" autoComplete="email" value={email}
                 onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
+              <Label htmlFor="password">{t("password")}</Label>
               <Input id="password" type="password" autoComplete="new-password" value={password}
                 onChange={(e) => setPassword(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm">Confirmer le mot de passe</Label>
+              <Label htmlFor="confirm">{t("confirm")}</Label>
               <Input id="confirm" type="password" autoComplete="new-password" value={confirm}
                 onChange={(e) => setConfirm(e.target.value)} />
             </div>
@@ -87,12 +92,12 @@ export default function Register() {
 
           <CardFooter className="mt-4 flex-col gap-3">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Création…" : "Créer le compte"}
+              {loading ? t("submitting") : t("submit")}
             </Button>
             <p className="text-sm text-muted-foreground">
-              Déjà un compte ?{" "}
+              {t("hasAccount")}{" "}
               <Link to="/login" className="text-primary underline-offset-4 hover:underline">
-                Se connecter
+                {t("signIn")}
               </Link>
             </p>
           </CardFooter>
