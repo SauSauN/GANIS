@@ -64,21 +64,33 @@ interface WorkspaceTabsProps {
 // Nombre d'onglets affichés
 // ----------------------------------------------------------------------------
 
-/** Onglets affichés au maximum quand la zone des onglets est large. */
+/** Capacité de base lorsque la barre est large. */
 export const MAX_TABS_LARGE = 5;
 
-/** Onglets affichés au maximum quand la zone des onglets est étroite. */
+/** Capacité de base lorsque la barre est étroite. */
 export const MAX_TABS_SMALL = 4;
 
 /** Largeur (px) à partir de laquelle la zone des onglets est considérée large. */
 export const LARGE_MIN_WIDTH = 1000;
 
 /**
- * Nombre maximal d'onglets affichés, selon la largeur réelle de la barre.
- * La largeur change avec la fenêtre, le panneau du milieu (ouvert ou
- * fermé) et la barre de gauche (développée ou réduite).
+ * Calcule le nombre maximal d'onglets affichables.
+ *
+ * La capacité de base est de 5 ou 4 onglets non épinglés selon la largeur.
+ * Les onglets épinglés s'ajoutent à cette capacité.
+ *
+ * Exemple :
+ * - Barre large, aucun onglet épinglé : 5 onglets.
+ * - Barre large, 2 onglets épinglés : 7 onglets.
+ * - Barre étroite, 2 onglets épinglés : 6 onglets.
+ *
+ * Les flèches de navigation restent nécessaires si le nombre total
+ * d'onglets dépasse cette capacité.
  */
-function useMaxVisibleTabs(ref: RefObject<HTMLElement | null>): number {
+function useMaxVisibleTabs(
+  ref: RefObject<HTMLElement | null>,
+  pinnedCount: number,
+): number {
   const [large, setLarge] = useState(true);
 
   useLayoutEffect(() => {
@@ -88,7 +100,9 @@ function useMaxVisibleTabs(ref: RefObject<HTMLElement | null>): number {
       return;
     }
 
-    const update = () => setLarge(element.clientWidth >= LARGE_MIN_WIDTH);
+    const update = () => {
+      setLarge(element.clientWidth >= LARGE_MIN_WIDTH);
+    };
 
     update();
 
@@ -97,13 +111,14 @@ function useMaxVisibleTabs(ref: RefObject<HTMLElement | null>): number {
     }
 
     const observer = new ResizeObserver(update);
-
     observer.observe(element);
 
     return () => observer.disconnect();
   }, [ref]);
 
-  return large ? MAX_TABS_LARGE : MAX_TABS_SMALL;
+  const baseCapacity = large ? MAX_TABS_LARGE : MAX_TABS_SMALL;
+
+  return baseCapacity + pinnedCount;
 }
 
 /** Ramène le premier onglet affiché dans les bornes possibles. */
@@ -201,7 +216,7 @@ function SortableTab({
 
   /**
    * Clic droit, appui à deux doigts sur le pavé tactile, touche Menu ou
-   * Maj + F10 : ouvre le menu de l'onglet (à la place du menu du navigateur).
+   * Maj + F10 : ouvre le menu de l'onglet.
    */
   function onContextMenu(event: ReactMouseEvent<HTMLDivElement>) {
     event.preventDefault();
@@ -238,10 +253,7 @@ function SortableTab({
         aria-selected={active}
         aria-haspopup="menu"
         aria-keyshortcuts="Alt+ArrowLeft Alt+ArrowRight Shift+F10"
-        // Un onglet épinglé n'affiche que son icône : le nom reste
-        // disponible pour les lecteurs d'écran.
         aria-label={tab.pinned ? tab.label : undefined}
-        // Infobulle : le nom complet, utile aussi quand il est tronqué.
         title={tab.label}
         onClick={() => onSelect(tab.id)}
         onKeyDown={onKeyDown}
@@ -268,7 +280,6 @@ function SortableTab({
         }}
         className={cn(
           "flex h-5 w-5 shrink-0 items-center justify-center rounded hover:bg-secondary",
-          // L'épingle d'un onglet libre n'apparaît qu'au survol ou au focus.
           !tab.pinned &&
             "opacity-0 focus-visible:opacity-100 group-focus-within:opacity-100 group-hover:opacity-100",
         )}
@@ -300,7 +311,7 @@ function SortableTab({
 
 interface NavButtonProps {
   direction: "left" | "right";
-  /** Nombre d'onglets masqués de ce côté (toujours au moins 1). */
+  /** Nombre d'onglets masqués de ce côté. */
   hidden: number;
   onClick: () => void;
 }
@@ -310,7 +321,7 @@ function NavButton({ direction, hidden, onClick }: NavButtonProps) {
   const { t } = useTranslation("tabs");
   const left = direction === "left";
   const Icon = left ? ChevronLeft : ChevronRight;
-  // Pluriel géré par i18next (`_one` / `_other` selon `count`).
+
   const label = left
     ? t("nav.left", { count: hidden })
     : t("nav.right", { count: hidden });
@@ -361,7 +372,13 @@ interface MenuItemProps {
   onSelect: () => void;
 }
 
-function MenuItem({ icon: Icon, label, title, disabled, onSelect }: MenuItemProps) {
+function MenuItem({
+  icon: Icon,
+  label,
+  title,
+  disabled,
+  onSelect,
+}: MenuItemProps) {
   return (
     <button
       type="button"
@@ -371,7 +388,6 @@ function MenuItem({ icon: Icon, label, title, disabled, onSelect }: MenuItemProp
       onClick={onSelect}
       className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm outline-none hover:bg-accent hover:text-accent-foreground focus-visible:bg-accent focus-visible:text-accent-foreground disabled:pointer-events-none disabled:opacity-40"
     >
-      {/* L'emplacement de l'icône est réservé pour aligner les libellés. */}
       <span className="flex h-4 w-4 shrink-0 items-center justify-center">
         {Icon && <Icon className="h-3.5 w-3.5" />}
       </span>
@@ -388,8 +404,7 @@ function MenuItem({ icon: Icon, label, title, disabled, onSelect }: MenuItemProp
  * - Se ferme au clic en dehors, avec Échap, au défilement, au
  *   redimensionnement ou quand la fenêtre perd le focus.
  * - Clavier : flèches haut / bas, Origine / Fin, Entrée pour choisir.
- * - Les actions sans effet sont grisées (par exemple « Fermer les onglets
- *   à droite » sur le dernier onglet).
+ * - Les actions sans effet sont grisées.
  */
 function TabContextMenu({
   tab,
@@ -472,7 +487,10 @@ function TabContextMenu({
       return;
     }
 
-    const current = items.indexOf(document.activeElement as HTMLButtonElement);
+    const current = items.indexOf(
+      document.activeElement as HTMLButtonElement,
+    );
+
     let next: number | null = null;
 
     switch (event.key) {
@@ -489,7 +507,6 @@ function TabContextMenu({
         next = items.length - 1;
         break;
       case "Tab":
-        // Le menu se ferme plutôt que de laisser le focus s'en échapper.
         event.preventDefault();
         onDismiss(true);
         return;
@@ -573,22 +590,15 @@ function TabContextMenu({
 /**
  * Barre d'onglets de l'espace de travail.
  *
- * - Pas de barre de défilement : au plus 5 onglets sont affichés quand la
- *   zone est large, 4 quand elle est étroite. Chaque clic sur une flèche
- *   décale la fenêtre d'un onglet : l'onglet révélé d'un côté masque celui
- *   de l'autre côté, sans jamais le fermer.
- * - Une flèche n'apparaît que s'il reste des onglets masqués de son côté :
- *   quand le premier onglet est visible, la flèche de gauche disparaît ;
- *   quand le dernier est visible, celle de droite disparaît.
- * - L'onglet actif est toujours ramené dans la partie visible.
- * - Glisser-déposer : on déplace un onglet parmi ceux affichés. Déposé parmi
- *   les épinglés il s'épingle, déposé parmi les autres il se désépingle.
- * - Épingle : garde l'onglet au début de la barre, sous forme d'icône,
- *   à l'abri d'une fermeture par erreur.
+ * - La capacité de base est de 5 onglets quand la barre est large et de 4
+ *   quand elle est étroite. Les onglets épinglés s'ajoutent à cette capacité.
+ * - Si tous les onglets ne tiennent pas, les flèches permettent de naviguer
+ *   sans fermer les onglets masqués.
+ * - L'onglet actif reste toujours ramené dans la partie visible.
+ * - Glisser-déposer : déplace un onglet parmi ceux affichés.
+ * - Les onglets épinglés restent au début et s'affichent sous forme d'icônes.
  * - Clavier : Alt + flèche gauche ou droite déplace l'onglet sélectionné.
- * - Clic droit (ou appui à deux doigts sur le pavé tactile) : menu pour
- *   épingler l'onglet ou fermer cet onglet, les autres, ceux à gauche,
- *   à droite, ou tous. Les onglets épinglés restent toujours ouverts.
+ * - Clic droit : menu pour épingler ou fermer les onglets.
  */
 export function WorkspaceTabs({
   tabs,
@@ -609,9 +619,14 @@ export function WorkspaceTabs({
   );
 
   const barRef = useRef<HTMLDivElement>(null);
-  const maxVisible = useMaxVisibleTabs(barRef);
 
-  /** Position du premier onglet affiché (ramenée dans les bornes au rendu). */
+  // Nombre d'onglets épinglés : ils augmentent la capacité de la barre.
+  const pinnedCount = tabs.filter((tab) => tab.pinned).length;
+
+  // Capacité totale = capacité de base + nombre d'onglets épinglés.
+  const maxVisible = useMaxVisibleTabs(barRef, pinnedCount);
+
+  /** Position du premier onglet affiché. */
   const [start, setStart] = useState(0);
 
   const count = tabs.length;
@@ -624,18 +639,18 @@ export function WorkspaceTabs({
     ? tabs.findIndex((tab) => tab.id === activeTab)
     : -1;
 
-  // L'onglet actif reste toujours visible : à son ouverture, quand il change,
-  // quand il est déplacé, ou quand la place disponible diminue.
+  // L'onglet actif reste visible quand il change ou quand la capacité évolue.
   useLayoutEffect(() => {
     if (activeIndex >= 0) {
       setStart((current) =>
         revealIndex(current, activeIndex, count, maxVisible),
       );
+    } else {
+      setStart((current) => clampStart(current, count, maxVisible));
     }
   }, [activeIndex, count, maxVisible]);
 
-  // Après un déplacement, React replace les éléments dans le DOM, ce qui
-  // fait perdre le focus : on le rend à l'élément qui l'avait.
+  // Après un déplacement, on rend le focus à l'élément qui l'avait.
   const pendingFocus = useRef<string | null>(null);
 
   useEffect(() => {
@@ -695,14 +710,16 @@ export function WorkspaceTabs({
       tabs: tabs.map((tab) => tab.id),
       pinned: tabs.filter((tab) => tab.pinned).map((tab) => tab.id),
     };
-    const count = (scope: CloseScope) => tabsToClose(layout, id, scope).length;
+
+    const getCount = (scope: CloseScope) =>
+      tabsToClose(layout, id, scope).length;
 
     return {
-      this: count("this"),
-      others: count("others"),
-      left: count("left"),
-      right: count("right"),
-      all: count("all"),
+      this: getCount("this"),
+      others: getCount("others"),
+      left: getCount("left"),
+      right: getCount("right"),
+      all: getCount("all"),
     };
   }
 
@@ -747,12 +764,16 @@ export function WorkspaceTabs({
                   key={tab.id}
                   tab={tab}
                   active={activeTab === tab.id}
-                  lastPinned={index === lastPinnedIndex && index < count - 1}
+                  lastPinned={
+                    index === lastPinnedIndex && index < count - 1
+                  }
                   onSelect={onSelect}
                   onClose={onClose}
                   onTogglePin={onTogglePin}
                   onShift={handleShift}
-                  onOpenMenu={(id, x, y) => setMenu({ tabId: id, x, y })}
+                  onOpenMenu={(id, x, y) =>
+                    setMenu({ tabId: id, x, y })
+                  }
                   keepFocus={(elementId) => {
                     pendingFocus.current = elementId;
                   }}
