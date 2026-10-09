@@ -1,5 +1,7 @@
 {
   "label": "User menu",
   "settings": "General settings",
-  "logout": "Sign out"
+  "logout": "Sign out",
+  "packages": "Packages",
+  "language": "Language"
 }

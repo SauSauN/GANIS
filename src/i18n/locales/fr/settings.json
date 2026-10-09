@@ -12,6 +12,14 @@
     "appearance": {
       "label": "Apparence",
       "description": "Thème et taille du texte de GANIS, valables pour tous vos projets."
+    },
+    "developer": {
+      "label": "Développeur",
+      "description": "Créez vos propres packages. Pour commencer : des thèmes, utilisables directement sur cet appareil."
+    },
+    "saving": {
+      "label": "Enregistrement",
+      "description": "Enregistrement automatique ou manuel de vos modifications, sur cet appareil."
     }
   },
   "account": {
@@ -94,6 +102,93 @@
     "note": {
       "title": "Enregistré sur cet appareil",
       "text": "Ces préférences ne modifient jamais le contenu de vos projets."
+    },
+    "colorTheme": {
+      "title": "Thème de couleurs",
+      "description": "Palette utilisée en mode clair et en mode sombre.",
+      "manage": "Gérer les packages"
+    }
+  },
+  "developer": {
+    "become": {
+      "title": "Devenir développeur",
+      "description": "Le mode développeur ajoute des outils de création à votre compte.",
+      "perks": {
+        "create": "Créez des plugins de thème : couleurs claires et sombres, arrondis, aperçu en direct.",
+        "direct": "Vos créations s'utilisent immédiatement, sans téléchargement ni installation.",
+        "share": "Plus tard : publiez et partagez vos packages avec la communauté."
+      },
+      "note": "Vos projets et vos préférences ne changent pas.",
+      "action": "Devenir développeur",
+      "confirmTitle": "Activer le mode développeur ?",
+      "confirmText": "Votre compte « {{username}} » obtiendra le rôle Développeur et l'accès aux outils de création de packages.",
+      "confirm": "Activer",
+      "cancel": "Annuler",
+      "activating": "Activation…",
+      "done": "Mode développeur activé.",
+      "failed": "Impossible d'activer le mode développeur."
+    },
+    "active": {
+      "title": "Mode développeur activé",
+      "description": "Votre compte a accès aux outils de création de packages.",
+      "roleAdmin": "En tant qu'administrateur, vous disposez déjà de tous les outils de développement."
+    },
+    "tools": {
+      "title": "Créer un plugin",
+      "description": "Choisissez le type de package à créer.",
+      "theme": {
+        "title": "Plugin de thème",
+        "description": "Couleurs des modes clair et sombre, arrondis. Utilisable directement.",
+        "action": "Créer un thème"
+      },
+      "soon": "Bientôt",
+      "others": {
+        "iconPack": "Pack d'icônes",
+        "list": "Listes (genres, tons…)",
+        "template": "Modèles de fiches",
+        "plugin": "Extensions avec code"
+      }
+    },
+    "mine": {
+      "title": "Mes créations",
+      "description_other": "{{count}} thèmes créés.",
+      "none": "Aucun thème créé pour l'instant.",
+      "open": "Gérer dans Packages",
+      "description_one": "{{count}} thème créé."
+    },
+    "leave": {
+      "title": "Quitter le mode développeur",
+      "description": "Votre compte redevient un compte utilisateur.",
+      "details": "Les outils de création et vos thèmes ne seront plus affichés. Vos thèmes ne sont pas supprimés : ils réapparaîtront si vous réactivez le mode développeur.",
+      "action": "Quitter le mode développeur",
+      "confirmTitle": "Quitter le mode développeur ?",
+      "confirmText": "Les outils de création seront masqués. Si l'un de vos thèmes est utilisé, GANIS reviendra au thème par défaut. Vous pourrez réactiver le mode développeur à tout moment.",
+      "confirm": "Quitter",
+      "cancel": "Annuler",
+      "leaving": "Désactivation…",
+      "failed": "Impossible de quitter le mode développeur."
+    }
+  },
+  "saving": {
+    "autoSave": {
+      "title": "Enregistrement automatique",
+      "description": "Choisissez si GANIS enregistre vos modifications tout seul ou si vous enregistrez vous-même.",
+      "toggle": "Enregistrer automatiquement",
+      "on_one": "Activé : enregistrement {{count}} seconde après votre dernière modification.",
+      "on_other": "Activé : enregistrement {{count}} secondes après votre dernière modification.",
+      "off": "Désactivé : vous enregistrez avec le bouton « Enregistrer »."
+    },
+    "delay": {
+      "title": "Délai avant l'enregistrement",
+      "description": "Temps sans nouvelle modification avant que GANIS enregistre.",
+      "option_one": "{{count}} seconde",
+      "option_other": "{{count}} secondes"
+    },
+    "note": {
+      "title": "Repérer ce qui n'est pas enregistré",
+      "tabExample": "Synopsis",
+      "dot": "Un point à la place de la croix signale un onglet non enregistré.",
+      "ask": "Avant de fermer un tel onglet, de quitter la page ou de fermer GANIS, une question vous propose d'enregistrer, de ne pas enregistrer ou d'annuler."
     }
   }
 }

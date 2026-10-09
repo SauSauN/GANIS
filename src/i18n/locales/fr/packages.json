@@ -1,0 +1,210 @@
+{
+  "title": "Packages",
+  "description": "Personnalisez GANIS. Les thèmes système et ceux que vous créez s'utilisent directement, sans téléchargement.",
+  "back": "Retour",
+  "nav": {
+    "label": "Vues des packages",
+    "title": "Gestionnaire de packages",
+    "soon": "Bientôt"
+  },
+  "views": {
+    "installed": {
+      "label": "Installés",
+      "description": "Thèmes disponibles sur cet appareil : prêts à l'emploi, sans téléchargement."
+    },
+    "discover": {
+      "label": "Découvrir",
+      "description": "Le catalogue des packages partagés par la communauté."
+    },
+    "import": {
+      "label": "Importer",
+      "description": "Installer un package depuis un fichier .ganixpkg, sans connexion."
+    }
+  },
+  "categories": {
+    "theme": "Thème"
+  },
+  "search": {
+    "label": "Rechercher un thème",
+    "placeholder": "Rechercher un thème…",
+    "empty": "Aucun thème ne correspond à « {{query}} »."
+  },
+  "groups": {
+    "system": {
+      "title": "Thèmes système",
+      "description": "Fournis avec GANIS, toujours disponibles."
+    },
+    "mine": {
+      "title": "Mes créations",
+      "description": "Les thèmes que vous avez créés. Visibles uniquement par vous."
+    }
+  },
+  "badges": {
+    "system": "Système",
+    "mine": "Créé par vous",
+    "active": "Utilisé",
+    "version": "v{{version}}"
+  },
+  "card": {
+    "by": "par {{author}}",
+    "light": "Clair",
+    "dark": "Sombre",
+    "use": "Utiliser",
+    "inUse": "Utilisé",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "previewLabel": "Aperçu des couleurs de {{name}}"
+  },
+  "builtin": {
+    "ganis.classique": {
+      "name": "GANIS Classique",
+      "description": "L'identité d'origine : indigo profond et lavande."
+    },
+    "ganis.parchemin": {
+      "name": "Parchemin",
+      "description": "Papier chaud et encre sépia, pour écrire au calme."
+    },
+    "ganis.foret": {
+      "name": "Forêt",
+      "description": "Verts apaisants et coins arrondis."
+    },
+    "ganis.crepuscule": {
+      "name": "Crépuscule",
+      "description": "Rose et prune, une ambiance de fin de journée."
+    },
+    "ganis.contraste": {
+      "name": "Contraste élevé",
+      "description": "Lisibilité maximale, contours nets."
+    }
+  },
+  "mine": {
+    "emptyTitle": "Aucun thème créé pour l'instant",
+    "emptyDeveloper": "Créez votre premier thème : il sera utilisable tout de suite.",
+    "create": "Créer un thème",
+    "loadFailed": "Impossible de charger vos thèmes.",
+    "retry": "Réessayer"
+  },
+  "actions": {
+    "create": "Créer un thème",
+    "used": "Thème « {{name}} » appliqué.",
+    "deleted": "Thème « {{name}} » supprimé."
+  },
+  "delete": {
+    "title": "Supprimer ce thème ?",
+    "description": "« {{name}} » sera supprimé définitivement. S'il est utilisé, GANIS reviendra au thème par défaut.",
+    "confirm": "Supprimer",
+    "cancel": "Annuler",
+    "failed": "Impossible de supprimer le thème."
+  },
+  "discover": {
+    "title": "Le partage arrive bientôt",
+    "text": "Vous pourrez bientôt parcourir et télécharger les thèmes partagés par d'autres créateurs. En attendant, les thèmes système et vos créations sont déjà disponibles, sans téléchargement.",
+    "toInstalled": "Voir les thèmes installés"
+  },
+  "import": {
+    "title": "Import de fichiers .ganixpkg",
+    "text": "Bientôt, vous pourrez glisser ici un fichier .ganixpkg pour installer un package sans connexion. GANIS vérifiera son contenu avant toute installation.",
+    "drop": "Glisser-déposer un fichier .ganixpkg",
+    "unavailable": "Pas encore disponible"
+  },
+  "developer": {
+    "title": "Espace développeur"
+  },
+  "editor": {
+    "createTitle": "Nouveau thème",
+    "editTitle": "Modifier le thème",
+    "description": "Choisissez les couleurs des modes clair et sombre. L'aperçu se met à jour en direct ; le thème est utilisable dès l'enregistrement.",
+    "back": "Retour aux packages",
+    "identity": {
+      "title": "Informations",
+      "description": "Comment ce thème apparaîtra dans la liste des packages.",
+      "name": "Nom du thème",
+      "namePlaceholder": "Ex. Nuit étoilée",
+      "summary": "Description",
+      "summaryPlaceholder": "Ce qui rend ce thème unique (facultatif)",
+      "counter": "{{count}} / {{max}}",
+      "packageId": "Identifiant : {{id}}",
+      "version": "Version {{version}}"
+    },
+    "start": {
+      "label": "Partir de",
+      "hint": "Remplace toutes les couleurs par celles du thème choisi."
+    },
+    "colors": {
+      "title": "Couleurs",
+      "description": "Chaque mode a sa propre palette. Format : #RRGGBB.",
+      "modeLabel": "Mode à modifier",
+      "light": "Clair",
+      "dark": "Sombre",
+      "copyFrom": "Copier depuis le mode {{mode}}",
+      "invalid": "Couleur invalide (format : #RRGGBB).",
+      "groups": {
+        "surfaces": "Surfaces",
+        "text": "Texte",
+        "accent": "Accent",
+        "states": "États"
+      },
+      "keys": {
+        "background": "Fond",
+        "foreground": "Texte principal",
+        "card": "Cartes et menus",
+        "sidebar": "Panneau latéral",
+        "primary": "Couleur d'accent",
+        "primaryForeground": "Texte sur l'accent",
+        "secondary": "Surface secondaire",
+        "mutedForeground": "Texte secondaire",
+        "border": "Bordures",
+        "destructive": "Danger",
+        "success": "Succès",
+        "warning": "Avertissement"
+      }
+    },
+    "shape": {
+      "title": "Forme",
+      "description": "Arrondi des boutons, champs et cartes.",
+      "radius": "Arrondi des coins",
+      "value": "{{value}} rem"
+    },
+    "contrast": {
+      "title": "Lisibilité",
+      "text": "Texte principal sur le fond",
+      "accent": "Texte sur l'accent",
+      "ratio": "{{ratio}} : 1",
+      "good": "Bonne lisibilité",
+      "low": "Contraste faible (4,5 : 1 recommandé)"
+    },
+    "preview": {
+      "title": "Aperçu en direct",
+      "label": "Aperçu du thème en mode {{mode}}",
+      "project": "Mon roman",
+      "nav": {
+        "details": "Détails",
+        "characters": "Personnages",
+        "locations": "Lieux",
+        "chapters": "Chapitres"
+      },
+      "heading": "Chapitre 1 — L'éveil",
+      "text": "Les premières lueurs filtraient à travers les volets quand Elena ouvrit les yeux.",
+      "field": "Titre de la scène",
+      "fieldValue": "La forêt d'argent",
+      "primary": "Enregistrer",
+      "secondary": "Annuler",
+      "danger": "Supprimer",
+      "saved": "Enregistré",
+      "draft": "Brouillon"
+    },
+    "save": "Enregistrer",
+    "saveAndUse": "Enregistrer et utiliser",
+    "saving": "Enregistrement…",
+    "cancel": "Annuler",
+    "created": "Thème créé.",
+    "updated": "Thème enregistré.",
+    "failed": "Impossible d'enregistrer le thème.",
+    "fixErrors": "Corrigez les champs signalés avant d'enregistrer.",
+    "nameRequired": "Le nom du thème est requis.",
+    "notFound": "Ce thème est introuvable ou ne vous appartient pas.",
+    "forbiddenTitle": "Réservé aux développeurs",
+    "forbiddenText": "La création de thèmes est disponible en mode développeur. Activez-le dans les paramètres généraux.",
+    "toDeveloper": "Ouvrir le mode développeur"
+  }
+}

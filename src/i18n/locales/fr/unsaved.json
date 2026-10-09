@@ -1,0 +1,29 @@
+{
+  "title": {
+    "one": "Enregistrer les modifications de « {{name}} » ?",
+    "many": "Enregistrer les modifications de {{count}} éléments ?"
+  },
+  "description": {
+    "closeTabs": "Vos modifications seront perdues si vous fermez sans les enregistrer.",
+    "leave": "Vos modifications seront perdues si vous quittez cette page sans les enregistrer.",
+    "quit": "Vos modifications seront perdues si vous fermez GANIS sans les enregistrer."
+  },
+  "save": {
+    "closeTabs": "Enregistrer",
+    "leave": "Enregistrer et continuer",
+    "quit": "Enregistrer et quitter"
+  },
+  "discard": {
+    "closeTabs": "Ne pas enregistrer",
+    "leave": "Ne pas enregistrer",
+    "quit": "Quitter sans enregistrer"
+  },
+  "cancel": "Annuler",
+  "saving": "Enregistrement…",
+  "failed_one": "« {{names}} » n'a pas pu être enregistré. Corrigez l'erreur affichée puis réessayez.",
+  "failed_other": "Ces éléments n'ont pas pu être enregistrés : {{names}}. Corrigez les erreurs affichées puis réessayez.",
+  "tab": {
+    "unsaved": "Modifications non enregistrées",
+    "unsavedNamed": "{{name}} (non enregistré)"
+  }
+}

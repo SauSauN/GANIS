@@ -16,5 +16,6 @@
     "maximize": "Maximize",
     "restore": "Restore",
     "close": "Close"
-  }
+  },
+  "packages": "Packages"
 }

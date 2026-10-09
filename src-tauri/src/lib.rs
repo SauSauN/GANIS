@@ -103,6 +103,12 @@ pub fn run() {
             commands::projects::delete_project,
             commands::synopsis::get_synopsis,
             commands::synopsis::update_synopsis,
+            commands::packages::become_developer,
+            commands::packages::leave_developer_mode,
+            commands::packages::list_my_packages,
+            commands::packages::create_theme_package,
+            commands::packages::update_theme_package,
+            commands::packages::delete_package,
             //commands::diagnostics::get_diagnostics,
         ])
         .run(tauri::generate_context!())

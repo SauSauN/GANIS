@@ -56,6 +56,16 @@
     "invalidRole": "Le rôle demandé n'est pas valide.",
     "deleteSelf": "Vous ne pouvez pas supprimer votre propre compte.",
     "lastAdminRole": "Impossible de retirer le rôle du dernier administrateur.",
-    "lastAdminDelete": "Impossible de supprimer le dernier administrateur."
+    "lastAdminDelete": "Impossible de supprimer le dernier administrateur.",
+    "adminKeepsDeveloper": "Un administrateur conserve toujours les outils de développement."
+  },
+  "package": {
+    "notFound": "Package introuvable.",
+    "nameEmpty": "Le nom du thème ne peut pas être vide.",
+    "nameTooLong": "Le nom du thème ne peut pas dépasser {{max}} caractères.",
+    "descriptionTooLong": "La description ne peut pas dépasser {{max}} caractères.",
+    "invalidColor": "La couleur « {{name}} » n'est pas valide (format attendu : #RRGGBB).",
+    "invalidRadius": "L'arrondi doit être compris entre 0 et {{max}} rem.",
+    "idUnavailable": "Impossible de trouver un identifiant libre pour ce package."
   }
 }

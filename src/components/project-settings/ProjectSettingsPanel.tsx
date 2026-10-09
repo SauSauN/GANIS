@@ -32,6 +32,7 @@ import {
   type ProjectSettingsId,
 } from "@/components/project-settings/sections";
 import { cn } from "@/lib/utils";
+import { useUnsavedChanges } from "@/lib/unsavedChanges";
 import { useProjectStore } from "@/stores/projectStore";
 import {
   PROJECT_STATUS_LABELS,
@@ -225,8 +226,16 @@ function InfoSection({ project }: { project: Project }) {
     description.trim() === project.description &&
     projectType === project.type;
 
-  async function handleSubmit(event: FormEvent) {
+  function handleSubmit(event: FormEvent) {
     event.preventDefault();
+    void save();
+  }
+
+  /**
+   * Enregistre ; renvoie `false` si les champs sont invalides ou si
+   * l'enregistrement échoue (le message s'affiche sous le formulaire).
+   */
+  async function save(): Promise<boolean> {
     setFeedback(null);
 
     const trimmedName = name.trim();
@@ -234,17 +243,17 @@ function InfoSection({ project }: { project: Project }) {
 
     if (!trimmedName) {
       setFeedback({ kind: "error", formKey: "nameRequired" });
-      return;
+      return false;
     }
 
     if (trimmedName.length > MAX_NAME_LENGTH) {
       setFeedback({ kind: "error", formKey: "nameTooLong" });
-      return;
+      return false;
     }
 
     if (trimmedDescription.length > MAX_DESCRIPTION_LENGTH) {
       setFeedback({ kind: "error", formKey: "descriptionTooLong" });
-      return;
+      return false;
     }
 
     setSaving(true);
@@ -261,12 +270,21 @@ function InfoSection({ project }: { project: Project }) {
       setDescription(trimmedDescription);
 
       setFeedback({ kind: "success", key: "info.saved" });
+      return true;
     } catch (e) {
       setFeedback(failure(e, "info.saveFailed"));
+      return false;
     } finally {
       setSaving(false);
     }
   }
+
+  // Point sur l'onglet, question à la fermeture, enregistrement automatique.
+  useUnsavedChanges({
+    dirty: !unchanged,
+    save,
+    revision: `${name}\u0000${description}\u0000${projectType}`,
+  });
 
   return (
     <Card className={cardClass}>

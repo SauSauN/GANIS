@@ -1,5 +1,8 @@
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
+import { findBuiltinTheme, getActiveColorThemeId, resetColorTheme } from "@/lib/colorTheme";
+import { canDevelop } from "@/lib/roles";
+import { usePackageStore } from "@/stores/packageStore";
 import { useProjectStore } from "@/stores/projectStore";
 import type { User } from "@/types";
 
@@ -41,6 +44,31 @@ interface AuthState {
   devLogin: () => void;
 }
 
+/**
+ * Aligne les thèmes sur le rôle du compte affiché.
+ *
+ * - Développeur : ses créations sont (re)chargées ; le thème actif est
+ *   vérifié au passage (`packageStore.load`).
+ * - Utilisateur : il ne voit que les thèmes système. Un thème créé (par lui
+ *   avant de quitter le mode développeur, ou par un autre compte de cet
+ *   appareil) n'est plus appliqué : retour au thème par défaut.
+ */
+function syncThemesWithRole(user: User | null) {
+  const packages = usePackageStore.getState();
+
+  packages.reset();
+
+  if (!user) {
+    return;
+  }
+
+  if (canDevelop(user)) {
+    void packages.load();
+  } else if (!findBuiltinTheme(getActiveColorThemeId())) {
+    resetColorTheme();
+  }
+}
+
 const messageOf = (e: unknown): string =>
   e instanceof ApiError
     ? e.message
@@ -67,6 +95,8 @@ export const useAuthStore = create<AuthState>((set) => ({
         user,
         loading: false,
       });
+
+      syncThemesWithRole(user);
 
       return true;
     } catch (e) {
@@ -114,6 +144,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
 
     useProjectStore.getState().reset();
+    usePackageStore.getState().reset();
 
     set({
       user: null,
@@ -128,9 +159,16 @@ export const useAuthStore = create<AuthState>((set) => ({
   },
 
   setUser: (user) => {
+    const previous = useAuthStore.getState().user;
+
     set({
       user,
     });
+
+    // Changement de rôle (devenir / quitter développeur).
+    if (previous?.role !== user.role) {
+      syncThemesWithRole(user);
+    }
   },
 
   devLogin: () => {

@@ -56,6 +56,16 @@
     "invalidRole": "The requested role is not valid.",
     "deleteSelf": "You cannot delete your own account.",
     "lastAdminRole": "Cannot remove the role of the last administrator.",
-    "lastAdminDelete": "Cannot delete the last administrator."
+    "lastAdminDelete": "Cannot delete the last administrator.",
+    "adminKeepsDeveloper": "An administrator always keeps the development tools."
+  },
+  "package": {
+    "notFound": "Package not found.",
+    "nameEmpty": "The theme name can't be empty.",
+    "nameTooLong": "The theme name can't exceed {{max}} characters.",
+    "descriptionTooLong": "The description can't exceed {{max}} characters.",
+    "invalidColor": "The “{{name}}” color isn't valid (expected format: #RRGGBB).",
+    "invalidRadius": "The corner radius must be between 0 and {{max}} rem.",
+    "idUnavailable": "Couldn't find a free identifier for this package."
   }
 }
