@@ -35,7 +35,7 @@ const LEGACY_DIR: &str = "ganis_projects";
 /// sortir du dossier des projets (`..`, séparateurs, etc.).
 pub fn project_dir(state: &AppState, project_id: &str) -> AppResult<PathBuf> {
     let id = Uuid::parse_str(project_id)
-        .map_err(|_| AppError::not_found("Projet non trouvé."))?;
+        .map_err(|_| AppError::not_found("Projet non trouvé.").with_key("project.notFound"))?;
 
     Ok(state
         .data_dir
@@ -123,7 +123,7 @@ pub async fn pool_for_user(
         project_service::find_by_id_for_user(&state.app_db, project_id, owner_id)
             .await?
             .ok_or_else(|| {
-                AppError::not_found("Projet non trouvé ou non autorisé.")
+                AppError::not_found("Projet non trouvé ou non autorisé.").with_key("project.notFound")
             })?;
 
     // 2. Une seule ouverture à la fois : le verrou protège à la fois le
@@ -162,7 +162,7 @@ async fn open_storage(
     if is_db_ready(state, project_id).await? {
         return Err(AppError::not_found(
             "Les données de ce projet sont introuvables.",
-        )
+        ).with_key("project.dataMissing")
         .with_detail("project.db absent alors que db_ready = 1"));
     }
 

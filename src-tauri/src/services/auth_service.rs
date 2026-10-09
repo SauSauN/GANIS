@@ -90,7 +90,7 @@ pub fn validate_username(username: &str) -> AppResult<()> {
     if !(USERNAME_MIN_CHARS..=USERNAME_MAX_CHARS).contains(&length) {
         return Err(AppError::validation(
             "Le nom d'utilisateur doit contenir entre 3 et 50 caractères.",
-        ));
+        ).with_key("auth.usernameLength"));
     }
 
     if !username
@@ -99,7 +99,7 @@ pub fn validate_username(username: &str) -> AppResult<()> {
     {
         return Err(AppError::validation(
             "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres, « _ » et « - ».",
-        ));
+        ).with_key("auth.usernameChars"));
     }
 
     Ok(())
@@ -115,13 +115,13 @@ pub fn validate_new_password(password: &str) -> AppResult<()> {
     if length < PASSWORD_MIN_CHARS {
         return Err(AppError::validation(
             "Le mot de passe doit contenir au moins 8 caractères.",
-        ));
+        ).with_key("auth.passwordTooShort"));
     }
 
     if length > PASSWORD_MAX_CHARS {
         return Err(AppError::validation(
             "Le mot de passe ne peut pas dépasser 128 caractères.",
-        ));
+        ).with_key("auth.passwordTooLong"));
     }
 
     let has_letter = password.chars().any(|c| c.is_alphabetic());
@@ -130,7 +130,7 @@ pub fn validate_new_password(password: &str) -> AppResult<()> {
     if !has_letter || !has_digit {
         return Err(AppError::validation(
             "Le mot de passe doit contenir au moins une lettre et un chiffre.",
-        ));
+        ).with_key("auth.passwordLetterDigit"));
     }
 
     Ok(())
@@ -166,7 +166,7 @@ pub fn normalize_email(email: Option<&str>) -> AppResult<Option<String>> {
             .unwrap_or(false);
 
     if !looks_valid {
-        return Err(AppError::validation("L'adresse e-mail n'est pas valide."));
+        return Err(AppError::validation("L'adresse e-mail n'est pas valide.").with_key("auth.emailInvalid"));
     }
 
     Ok(Some(trimmed.to_lowercase()))
@@ -210,21 +210,21 @@ impl Precondition {
 }
 
 fn already_configured() -> AppError {
-    AppError::conflict("La configuration initiale a déjà été effectuée.")
+    AppError::conflict("La configuration initiale a déjà été effectuée.").with_key("auth.setupDone")
 }
 
 fn setup_not_done() -> AppError {
     AppError::validation(
         "La configuration initiale de GANIS n'est pas terminée : créez d'abord le compte administrateur.",
-    )
+    ).with_key("auth.setupRequired")
 }
 
 fn username_taken() -> AppError {
-    AppError::conflict("Ce nom d'utilisateur est déjà utilisé.")
+    AppError::conflict("Ce nom d'utilisateur est déjà utilisé.").with_key("auth.usernameTaken")
 }
 
 fn email_taken() -> AppError {
-    AppError::conflict("Cette adresse e-mail est déjà utilisée.")
+    AppError::conflict("Cette adresse e-mail est déjà utilisée.").with_key("auth.emailTaken")
 }
 
 /// Convertit une erreur d'insertion en erreur lisible.
@@ -393,7 +393,7 @@ pub async fn change_password(
     if !verify_password(current_password, &user.password_hash)? {
         return Err(AppError::validation(
             "Le mot de passe actuel est incorrect.",
-        ));
+        ).with_key("auth.currentPasswordWrong"));
     }
 
     validate_new_password(new_password)?;
@@ -401,7 +401,7 @@ pub async fn change_password(
     if new_password == current_password {
         return Err(AppError::validation(
             "Le nouveau mot de passe doit être différent de l'ancien.",
-        ));
+        ).with_key("auth.passwordUnchanged"));
     }
 
     let (password_hash, password_salt) = hash_password(new_password)?;

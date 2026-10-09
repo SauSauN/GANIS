@@ -1,13 +1,35 @@
 import { Info, ListChecks, TriangleAlert, type LucideIcon } from "lucide-react";
 
+import i18n from "@/i18n";
+
 /** Sections des paramètres d'un projet. */
 export type ProjectSettingsId = "info" | "status" | "danger";
 
 export interface ProjectSettingsSection {
   id: ProjectSettingsId;
-  label: string;
-  description: string;
+  /** Libellé dans la langue courante (lu à chaque rendu). */
+  readonly label: string;
+  /** Description dans la langue courante (lue à chaque rendu). */
+  readonly description: string;
   icon: LucideIcon;
+}
+
+/**
+ * Crée une section dont le libellé et la description sont traduits
+ * au moment où on les lit (`projectSettings.json`, `sections.<id>`) :
+ * ils suivent donc la langue choisie, même après un changement.
+ */
+function section(id: ProjectSettingsId, icon: LucideIcon): ProjectSettingsSection {
+  return {
+    id,
+    icon,
+    get label() {
+      return i18n.t(`projectSettings:sections.${id}.label`);
+    },
+    get description() {
+      return i18n.t(`projectSettings:sections.${id}.description`);
+    },
+  };
 }
 
 /**
@@ -15,22 +37,7 @@ export interface ProjectSettingsSection {
  * Chaque entrée s'ouvre dans la zone centrale.
  */
 export const PROJECT_SETTINGS_SECTIONS: ProjectSettingsSection[] = [
-  {
-    id: "info",
-    label: "Informations",
-    description: "Nom, description et type de création du projet.",
-    icon: Info,
-  },
-  {
-    id: "status",
-    label: "Statut et organisation",
-    description: "Avancement du projet, favori et archivage.",
-    icon: ListChecks,
-  },
-  {
-    id: "danger",
-    label: "Duplication et suppression",
-    description: "Dupliquer ou supprimer définitivement le projet.",
-    icon: TriangleAlert,
-  },
+  section("info", Info),
+  section("status", ListChecks),
+  section("danger", TriangleAlert),
 ];

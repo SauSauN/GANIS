@@ -1,0 +1,45 @@
+{
+  "sections": {
+    "info": {
+      "label": "Information",
+      "description": "Project name, description and type of work."
+    },
+    "status": {
+      "label": "Status and organization",
+      "description": "Project progress, favorite and archiving."
+    },
+    "danger": {
+      "label": "Duplicate and delete",
+      "description": "Duplicate or permanently delete the project."
+    }
+  },
+  "info": {
+    "title": "Project information",
+    "description": "This information appears on the dashboard.",
+    "descriptionField": "Description",
+    "saved": "Changes saved.",
+    "saveFailed": "Unable to save the changes."
+  },
+  "status": {
+    "title": "Status",
+    "description": "Where is this project at? The change is saved immediately.",
+    "label": "Project status",
+    "failed": "Unable to update the project."
+  },
+  "organization": {
+    "title": "Organization",
+    "description": "Favorites are highlighted on the dashboard. An archived project no longer appears in the main list.",
+    "unarchive": "Unarchive"
+  },
+  "danger": {
+    "duplicateTitle": "Duplicate project",
+    "duplicateDescription": "Creates a copy with the same name (followed by “(copie)”), the same description and the same type.",
+    "duplicate": "Duplicate",
+    "duplicating": "Duplicating…",
+    "duplicated": "The copy “{{name}}” has been created. You'll find it on the dashboard.",
+    "duplicateFailed": "Unable to duplicate the project.",
+    "deleteTitle": "Delete project",
+    "deleteDescription": "Deletion is permanent and cannot be undone.",
+    "deleteFailed": "Unable to delete the project."
+  }
+}

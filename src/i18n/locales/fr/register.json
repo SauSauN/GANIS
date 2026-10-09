@@ -1,0 +1,12 @@
+{
+  "title": "Créer un compte",
+  "subtitle": "Le compte reste enregistré sur cet ordinateur.",
+  "username": "Nom d'utilisateur",
+  "email": "Adresse e-mail (facultatif)",
+  "password": "Mot de passe",
+  "confirm": "Confirmer le mot de passe",
+  "submit": "Créer le compte",
+  "submitting": "Création…",
+  "hasAccount": "Déjà un compte ?",
+  "signIn": "Se connecter"
+}

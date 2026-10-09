@@ -1,0 +1,61 @@
+{
+  "codes": {
+    "INTERNAL": "Une erreur interne est survenue.",
+    "VALIDATION": "Les données saisies ne sont pas valides.",
+    "NOT_FOUND": "Élément introuvable.",
+    "UNAUTHORIZED": "Authentification requise.",
+    "FORBIDDEN": "Vous n'avez pas les droits nécessaires.",
+    "CONFLICT": "Cet élément existe déjà.",
+    "DATABASE": "Erreur d'accès aux données.",
+    "IO": "Erreur de lecture ou d'écriture."
+  },
+  "internal": "Une erreur interne est survenue.",
+  "unauthorized": "Authentification requise.",
+  "forbidden": "Vous n'avez pas les droits nécessaires.",
+  "database": "Erreur d'accès aux données.",
+  "io": "Erreur de lecture ou d'écriture.",
+  "fields": {
+    "genres": "Genres",
+    "subgenres": "Sous-genres",
+    "tone": "Ton"
+  },
+  "auth": {
+    "invalidCredentials": "Nom d'utilisateur ou mot de passe incorrect.",
+    "tooManyAttemptsSeconds": "Trop de tentatives de connexion. Réessayez dans {{count}} s.",
+    "tooManyAttemptsMinutes": "Trop de tentatives de connexion. Réessayez dans {{count}} min.",
+    "usernameLength": "Le nom d'utilisateur doit contenir entre 3 et 50 caractères.",
+    "usernameChars": "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres, « _ » et « - ».",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères.",
+    "passwordTooLong": "Le mot de passe ne peut pas dépasser 128 caractères.",
+    "passwordLetterDigit": "Le mot de passe doit contenir au moins une lettre et un chiffre.",
+    "emailInvalid": "L'adresse e-mail n'est pas valide.",
+    "setupDone": "La configuration initiale a déjà été effectuée.",
+    "setupRequired": "La configuration initiale de GANIS n'est pas terminée : créez d'abord le compte administrateur.",
+    "usernameTaken": "Ce nom d'utilisateur est déjà utilisé.",
+    "emailTaken": "Cette adresse e-mail est déjà utilisée.",
+    "currentPasswordWrong": "Le mot de passe actuel est incorrect.",
+    "passwordUnchanged": "Le nouveau mot de passe doit être différent de l'ancien."
+  },
+  "project": {
+    "notFound": "Projet non trouvé.",
+    "nameEmpty": "Le nom du projet ne peut pas être vide.",
+    "nameTooLong": "Le nom du projet ne peut pas dépasser 200 caractères.",
+    "descriptionTooLong": "La description du projet ne peut pas dépasser 5000 caractères.",
+    "dataMissing": "Les données de ce projet sont introuvables."
+  },
+  "synopsis": {
+    "tooManyTags": "{{field}} : {{max}} éléments au maximum.",
+    "emptyTag": "{{field}} : un élément est vide.",
+    "tagTooLong": "{{field}} : un élément dépasse {{max}} caractères.",
+    "contentTooLong": "Le contenu du synopsis est trop long ({{max}} caractères au maximum).",
+    "notFound": "Le synopsis du projet est introuvable."
+  },
+  "user": {
+    "notFound": "Utilisateur non trouvé.",
+    "ownRole": "Vous ne pouvez pas modifier votre propre rôle.",
+    "invalidRole": "Le rôle demandé n'est pas valide.",
+    "deleteSelf": "Vous ne pouvez pas supprimer votre propre compte.",
+    "lastAdminRole": "Impossible de retirer le rôle du dernier administrateur.",
+    "lastAdminDelete": "Impossible de supprimer le dernier administrateur."
+  }
+}

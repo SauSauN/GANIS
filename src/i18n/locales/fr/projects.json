@@ -1,0 +1,53 @@
+{
+  "types": {
+    "manga": "Manga",
+    "novel": "Roman",
+    "film": "Film",
+    "series": "Série",
+    "game": "Jeu vidéo",
+    "rpg": "Jeu de rôle",
+    "custom": "Personnalisé"
+  },
+  "statuses": {
+    "preparing": "En préparation",
+    "in_progress": "En cours",
+    "paused": "En pause",
+    "done": "Terminé"
+  },
+  "form": {
+    "createTitle": "Créer un nouveau projet",
+    "editTitle": "Modifier le projet",
+    "createDescription": "Donnez un nom à votre projet et choisissez son type.",
+    "editDescription": "Mettez à jour les informations du projet.",
+    "name": {
+      "label": "Nom du projet",
+      "placeholder": "Mon univers"
+    },
+    "description": {
+      "label": "Description (facultatif)",
+      "placeholder": "Un court résumé de votre projet"
+    },
+    "type": "Type de création",
+    "status": "Statut",
+    "create": "Créer le projet",
+    "errors": {
+      "nameRequired": "Le nom du projet est requis.",
+      "nameTooLong": "Le nom ne peut pas dépasser {{max}} caractères.",
+      "descriptionTooLong": "La description ne peut pas dépasser {{max}} caractères.",
+      "failed": "L'opération a échoué."
+    }
+  },
+  "card": {
+    "open": "Ouvrir le projet {{name}}",
+    "addFavorite": "Ajouter aux favoris",
+    "removeFavorite": "Retirer des favoris",
+    "edit": "Modifier le projet",
+    "duplicate": "Dupliquer le projet",
+    "archive": "Archiver le projet",
+    "unarchive": "Désarchiver le projet",
+    "delete": "Supprimer le projet",
+    "noDescription": "Aucune description.",
+    "updatedAt": "Modifié le {{date}}",
+    "archived": "Archivé"
+  }
+}

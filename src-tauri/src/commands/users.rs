@@ -80,7 +80,7 @@ pub async fn update_user_role(
     if administrator.id == user_id {
         return Err(AppError::validation(
             "Vous ne pouvez pas modifier votre propre rôle.",
-        ));
+        ).with_key("user.ownRole"));
     }
 
     let normalized_role = role.trim().to_lowercase();
@@ -92,7 +92,7 @@ pub async fn update_user_role(
         _ => {
             return Err(AppError::validation(
                 "Le rôle demandé n'est pas valide.",
-            ))
+            ).with_key("user.invalidRole"))
         }
     };
 
@@ -117,7 +117,7 @@ pub async fn delete_user(
     if administrator.id == user_id {
         return Err(AppError::validation(
             "Vous ne pouvez pas supprimer votre propre compte.",
-        ));
+        ).with_key("user.deleteSelf"));
     }
 
     // Les projets sont relevés avant la suppression : une fois le compte
@@ -153,7 +153,7 @@ pub async fn update_profile(
             if owner.id != current.id {
                 return Err(AppError::conflict(
                     "Cette adresse e-mail est déjà utilisée.",
-                ));
+                ).with_key("auth.emailTaken"));
             }
         }
     }

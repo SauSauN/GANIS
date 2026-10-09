@@ -1,0 +1,51 @@
+{
+  "roles": {
+    "main": "Personnage principal",
+    "secondary": "Personnage secondaire",
+    "antagonist": "Antagoniste",
+    "extra": "Figurant"
+  },
+  "create": {
+    "preview": "Aperçu de l'interface de création. L'enregistrement des personnages sera activé avec la base de données du projet.",
+    "identity": {
+      "title": "Identité",
+      "description": "Comment s'appelle le personnage et quel rôle joue-t-il ?",
+      "name": "Nom",
+      "namePlaceholder": "Nom du personnage",
+      "nickname": "Surnom",
+      "nicknamePlaceholder": "Surnom ou alias (facultatif)",
+      "role": "Rôle dans l'intrigue"
+    },
+    "description": {
+      "title": "Description",
+      "description": "Ce qui se voit et ce qui se devine du personnage.",
+      "appearance": "Apparence physique",
+      "appearancePlaceholder": "Taille, silhouette, traits marquants, style vestimentaire…",
+      "personality": "Personnalité",
+      "personalityPlaceholder": "Caractère, qualités, défauts, manies…"
+    },
+    "background": {
+      "title": "Parcours et motivations",
+      "description": "D'où vient le personnage et ce qui le fait avancer.",
+      "history": "Histoire personnelle",
+      "historyPlaceholder": "Passé, famille, événements fondateurs…",
+      "motivations": "Motivations",
+      "motivationsPlaceholder": "Ce qui le pousse à agir…",
+      "goals": "Objectifs et conflits",
+      "goalsPlaceholder": "Ce qu'il cherche à obtenir, ce qui s'y oppose…"
+    },
+    "notes": {
+      "title": "Notes privées",
+      "description": "Remarques libres, visibles uniquement dans ce projet.",
+      "label": "Notes",
+      "placeholder": "Idées, références, questions ouvertes…"
+    },
+    "save": "Enregistrer le personnage",
+    "saveUnavailable": "L'enregistrement sera disponible avec la base de données du projet",
+    "reset": "Réinitialiser",
+    "errors": {
+      "nameRequired": "Le nom du personnage est requis.",
+      "nameTooLong": "Le nom ne peut pas dépasser {{max}} caractères."
+    }
+  }
+}

@@ -1,6 +1,8 @@
 import type { MouseEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { useMatch, useNavigate } from "react-router-dom";
 import { Feather, Moon, Settings, Sun } from "lucide-react";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { WindowControls } from "@/components/layout/WindowControls";
 import { applyTheme, useResolvedTheme, type Theme } from "@/lib/theme";
@@ -8,7 +10,8 @@ import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { useProjectStore } from "@/stores/projectStore";
 
-const MENUS = ["Fichier", "Édition", "Affichage", "Projet", "Aide"];
+/** Menus de l'application (libellés dans `titlebar.json`). */
+const MENUS = ["file", "edit", "view", "project", "help"] as const;
 
 const iconButton =
   "flex h-7 w-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground";
@@ -26,6 +29,7 @@ const iconButton =
  */
 export function TitleBar() {
   const navigate = useNavigate();
+  const { t } = useTranslation("titlebar");
 
   const user = useAuthStore((s) => s.user);
 
@@ -68,8 +72,8 @@ export function TitleBar() {
       >
         <button
           type="button"
-          title="Accueil"
-          aria-label="Accueil"
+          title={t("home")}
+          aria-label={t("home")}
           onClick={() => navigate(user ? "/dashboard" : "/")}
           className="flex h-7 items-center gap-2 rounded px-2 font-semibold hover:bg-secondary"
         >
@@ -83,17 +87,17 @@ export function TitleBar() {
         {user && (
           <nav
             className="hidden items-center md:flex"
-            aria-label="Menus"
+            aria-label={t("menusLabel")}
           >
             {MENUS.map((menu) => (
               <button
                 key={menu}
                 type="button"
                 disabled
-                title="Disponible prochainement"
+                title={t("comingSoon")}
                 className="h-7 rounded px-2 text-muted-foreground enabled:hover:bg-secondary"
               >
-                {menu}
+                {t(`menus.${menu}`)}
               </button>
             ))}
           </nav>
@@ -121,11 +125,14 @@ export function TitleBar() {
         className="flex items-center gap-1 pr-2"
         onMouseDown={stopDrag}
       >
+        {/* Langue de l'interface (seul emplacement du sélecteur) */}
+        <LanguageSwitcher className="mr-1" />
+
         <button
           type="button"
           onClick={toggleTheme}
-          aria-label="Changer de thème"
-          title="Changer de thème"
+          aria-label={t("toggleTheme")}
+          title={t("toggleTheme")}
           className={iconButton}
         >
           {theme === "dark" ? (
@@ -140,8 +147,8 @@ export function TitleBar() {
           <button
             type="button"
             onClick={() => navigate("/settings")}
-            aria-label="Paramètres généraux"
-            title="Paramètres généraux"
+            aria-label={t("settings")}
+            title={t("settings")}
             aria-current={onSettingsPage ? "page" : undefined}
             className={cn(iconButton, onSettingsPage && "bg-secondary text-foreground")}
           >

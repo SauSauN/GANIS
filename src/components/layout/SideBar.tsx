@@ -5,6 +5,7 @@ import {
   type KeyboardEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import {
   getModule,
@@ -65,6 +66,7 @@ export function SideBar({
   onOpenFeature,
   onClose,
 }: SideBarProps) {
+  const { t } = useTranslation("sidebar");
   const module = getModule(moduleId);
   const savedWidth = usePanelWidth();
 
@@ -167,7 +169,7 @@ export function SideBar({
   return (
     <div className="relative flex shrink-0" style={{ width }}>
       <aside
-        aria-label="Fonctionnalités du module"
+        aria-label={t("label")}
         aria-hidden={collapsing || undefined}
         className={cn(
           "flex min-w-0 flex-1 flex-col overflow-hidden bg-sidebar text-sidebar-foreground",
@@ -181,9 +183,9 @@ export function SideBar({
 
         {module.id === "search" ? (
           <div className="space-y-2 px-4">
-            <Input disabled placeholder="Rechercher dans le projet" />
+            <Input disabled placeholder={t("search.placeholder")} />
             <p className="text-xs text-muted-foreground">
-              La recherche sera disponible avec le contenu du projet.
+              {t("search.unavailable")}
             </p>
           </div>
         ) : (
@@ -212,12 +214,12 @@ export function SideBar({
       <div
         role="separator"
         aria-orientation="vertical"
-        aria-label="Redimensionner le panneau des fonctionnalités"
+        aria-label={t("resize.label")}
         aria-valuemin={PANEL_MIN_WIDTH}
         aria-valuemax={PANEL_MAX_WIDTH}
         aria-valuenow={width}
         tabIndex={0}
-        title="Glisser pour redimensionner, vers la gauche pour fermer. Double-clic : largeur par défaut."
+        title={t("resize.title")}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}

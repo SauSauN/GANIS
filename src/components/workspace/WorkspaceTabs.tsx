@@ -8,6 +8,7 @@ import {
   type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
+import { useTranslation } from "react-i18next";
 import {
   DndContext,
   PointerSensor,
@@ -169,6 +170,7 @@ function SortableTab({
   onOpenMenu,
   keepFocus,
 }: SortableTabProps) {
+  const { t } = useTranslation("tabs");
   const { setNodeRef, transform, transition, isDragging, listeners } =
     useSortable({ id: tab.id });
 
@@ -256,10 +258,10 @@ function SortableTab({
         type="button"
         aria-label={
           tab.pinned
-            ? `Désépingler l'onglet ${tab.label}`
-            : `Épingler l'onglet ${tab.label}`
+            ? t("tab.unpinNamed", { name: tab.label })
+            : t("tab.pinNamed", { name: tab.label })
         }
-        title={tab.pinned ? "Désépingler" : "Épingler"}
+        title={tab.pinned ? t("tab.unpin") : t("tab.pin")}
         onClick={() => {
           keepFocus(pinButtonId);
           onTogglePin(tab.id);
@@ -280,8 +282,8 @@ function SortableTab({
       {!tab.pinned && (
         <button
           type="button"
-          aria-label={`Fermer l'onglet ${tab.label}`}
-          title="Fermer l'onglet"
+          aria-label={t("tab.closeNamed", { name: tab.label })}
+          title={t("tab.close")}
           onClick={() => onClose(tab.id)}
           className="flex h-5 w-5 shrink-0 items-center justify-center rounded hover:bg-secondary"
         >
@@ -305,12 +307,13 @@ interface NavButtonProps {
 
 /** Flèche affichée uniquement quand des onglets sont masqués de son côté. */
 function NavButton({ direction, hidden, onClick }: NavButtonProps) {
+  const { t } = useTranslation("tabs");
   const left = direction === "left";
   const Icon = left ? ChevronLeft : ChevronRight;
-  const side = left ? "à gauche" : "à droite";
-  const label = `Afficher l'onglet masqué ${side} (${hidden} masqué${
-    hidden > 1 ? "s" : ""
-  })`;
+  // Pluriel géré par i18next (`_one` / `_other` selon `count`).
+  const label = left
+    ? t("nav.left", { count: hidden })
+    : t("nav.right", { count: hidden });
 
   return (
     <button
@@ -397,6 +400,7 @@ function TabContextMenu({
   onCloseTabs,
   onDismiss,
 }: TabContextMenuProps) {
+  const { t } = useTranslation("tabs");
   const ref = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState({ left: x, top: y });
 
@@ -506,7 +510,7 @@ function TabContextMenu({
     <div
       ref={ref}
       role="menu"
-      aria-label={`Actions de l'onglet ${tab.label}`}
+      aria-label={t("menu.label", { name: tab.label })}
       onKeyDown={onMenuKeyDown}
       onContextMenu={(event) => event.preventDefault()}
       style={{ left: position.left, top: position.top }}
@@ -514,7 +518,7 @@ function TabContextMenu({
     >
       <MenuItem
         icon={tab.pinned ? PinOff : Pin}
-        label={tab.pinned ? "Désépingler l'onglet" : "Épingler l'onglet"}
+        label={tab.pinned ? t("menu.unpin") : t("menu.pin")}
         onSelect={() => run(onTogglePin)}
       />
 
@@ -522,32 +526,32 @@ function TabContextMenu({
 
       <MenuItem
         icon={X}
-        label="Fermer cet onglet"
-        title={tab.pinned ? "Désépinglez d'abord l'onglet pour le fermer" : undefined}
+        label={t("menu.close")}
+        title={tab.pinned ? t("menu.closePinned") : undefined}
         disabled={counts.this === 0}
         onSelect={() => run(() => onCloseTabs("this"))}
       />
 
       <MenuItem
-        label="Fermer les autres onglets"
+        label={t("menu.closeOthers")}
         disabled={counts.others === 0}
         onSelect={() => run(() => onCloseTabs("others"))}
       />
 
       <MenuItem
-        label="Fermer les onglets à gauche"
+        label={t("menu.closeLeft")}
         disabled={counts.left === 0}
         onSelect={() => run(() => onCloseTabs("left"))}
       />
 
       <MenuItem
-        label="Fermer les onglets à droite"
+        label={t("menu.closeRight")}
         disabled={counts.right === 0}
         onSelect={() => run(() => onCloseTabs("right"))}
       />
 
       <MenuItem
-        label="Fermer tous les onglets"
+        label={t("menu.closeAll")}
         disabled={counts.all === 0}
         onSelect={() => run(() => onCloseTabs("all"))}
       />
@@ -555,7 +559,7 @@ function TabContextMenu({
       <div role="separator" className="-mx-1 my-1 h-px bg-border" />
 
       <p className="px-2 py-1 text-xs text-muted-foreground">
-        Les onglets épinglés restent ouverts.
+        {t("menu.pinnedNote")}
       </p>
     </div>,
     document.body,
@@ -596,6 +600,8 @@ export function WorkspaceTabs({
   onMove,
   onShift,
 }: WorkspaceTabsProps) {
+  const { t } = useTranslation("tabs");
+
   // Le glisser ne démarre qu'après quelques pixels : un simple clic
   // continue de sélectionner l'onglet.
   const sensors = useSensors(
@@ -730,7 +736,7 @@ export function WorkspaceTabs({
         >
           <div
             role="tablist"
-            aria-label="Onglets du projet"
+            aria-label={t("listLabel")}
             className="flex min-w-0 flex-1 items-end overflow-hidden"
           >
             {visible.map((tab, offset) => {

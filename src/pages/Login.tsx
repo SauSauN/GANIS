@@ -1,4 +1,5 @@
 import { useEffect, useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,25 +7,30 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuthStore } from "@/stores/authStore";
 
+type LoginIssue = "usernameRequired" | "passwordRequired";
+
 export default function Login() {
   const navigate = useNavigate();
+  const { t } = useTranslation("login");
   const { login, loading, error, clearError } = useAuthStore();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [localError, setLocalError] = useState<string | null>(null);
+  // On garde le code du problème (pas le texte) : le message suit la langue
+  // même si elle change pendant qu'il est affiché.
+  const [localIssue, setLocalIssue] = useState<LoginIssue | null>(null);
 
   useEffect(() => clearError(), [clearError]);
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    setLocalError(null);
+    setLocalIssue(null);
 
     if (!username.trim()) {
-      setLocalError("Le nom d'utilisateur est requis.");
+      setLocalIssue("usernameRequired");
       return;
     }
     if (!password) {
-      setLocalError("Le mot de passe est requis.");
+      setLocalIssue("passwordRequired");
       return;
     }
 
@@ -32,25 +38,27 @@ export default function Login() {
     if (ok) navigate("/dashboard", { replace: true });
   }
 
-  const shownError = localError ?? error;
+  // Les erreurs renvoyées par Rust restent pour l'instant en français.
+  const shownError = localIssue ? t(`errors.${localIssue}`) : error;
 
   return (
-    <main className="flex flex-1 items-center justify-center bg-background px-4 py-6">
+    <main className="relative flex flex-1 items-center justify-center bg-background px-4 py-6">
+
       <Card className="w-full max-w-sm">
         <form onSubmit={onSubmit}>
           <CardHeader>
-            <CardTitle>Connexion</CardTitle>
-            <CardDescription>Accédez à votre espace personnel.</CardDescription>
+            <CardTitle>{t("title")}</CardTitle>
+            <CardDescription>{t("subtitle")}</CardDescription>
           </CardHeader>
 
           <CardContent className="mt-4 space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="username">Nom d'utilisateur</Label>
+              <Label htmlFor="username">{t("username")}</Label>
               <Input id="username" autoComplete="username" value={username}
                 onChange={(e) => setUsername(e.target.value)} />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Mot de passe</Label>
+              <Label htmlFor="password">{t("password")}</Label>
               <Input id="password" type="password" autoComplete="current-password" value={password}
                 onChange={(e) => setPassword(e.target.value)} />
             </div>
@@ -60,12 +68,12 @@ export default function Login() {
 
           <CardFooter className="mt-4 flex-col gap-3">
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Connexion…" : "Se connecter"}
+              {loading ? t("submitting") : t("submit")}
             </Button>
             <p className="text-sm text-muted-foreground">
-              Pas encore de compte ?{" "}
+              {t("noAccount")}{" "}
               <Link to="/register" className="text-primary underline-offset-4 hover:underline">
-                Créer un compte
+                {t("createAccount")}
               </Link>
             </p>
           </CardFooter>

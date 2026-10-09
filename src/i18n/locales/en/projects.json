@@ -1,0 +1,53 @@
+{
+  "types": {
+    "manga": "Manga",
+    "novel": "Novel",
+    "film": "Film",
+    "series": "Series",
+    "game": "Video game",
+    "rpg": "Role-playing game",
+    "custom": "Custom"
+  },
+  "statuses": {
+    "preparing": "In preparation",
+    "in_progress": "In progress",
+    "paused": "Paused",
+    "done": "Done"
+  },
+  "form": {
+    "createTitle": "Create a new project",
+    "editTitle": "Edit project",
+    "createDescription": "Give your project a name and choose its type.",
+    "editDescription": "Update the project's information.",
+    "name": {
+      "label": "Project name",
+      "placeholder": "My world"
+    },
+    "description": {
+      "label": "Description (optional)",
+      "placeholder": "A short summary of your project"
+    },
+    "type": "Type of work",
+    "status": "Status",
+    "create": "Create project",
+    "errors": {
+      "nameRequired": "Project name is required.",
+      "nameTooLong": "The name cannot exceed {{max}} characters.",
+      "descriptionTooLong": "The description cannot exceed {{max}} characters.",
+      "failed": "The operation failed."
+    }
+  },
+  "card": {
+    "open": "Open project {{name}}",
+    "addFavorite": "Add to favorites",
+    "removeFavorite": "Remove from favorites",
+    "edit": "Edit project",
+    "duplicate": "Duplicate project",
+    "archive": "Archive project",
+    "unarchive": "Unarchive project",
+    "delete": "Delete project",
+    "noDescription": "No description.",
+    "updatedAt": "Updated {{date}}",
+    "archived": "Archived"
+  }
+}

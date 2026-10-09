@@ -1,0 +1,99 @@
+{
+  "back": "Retour",
+  "nav": {
+    "label": "Sections des paramètres",
+    "title": "Paramètres généraux"
+  },
+  "sections": {
+    "account": {
+      "label": "Compte",
+      "description": "Vos informations, votre adresse e-mail et votre mot de passe."
+    },
+    "appearance": {
+      "label": "Apparence",
+      "description": "Thème et taille du texte de GANIS, valables pour tous vos projets."
+    }
+  },
+  "account": {
+    "info": {
+      "title": "Informations du compte",
+      "description": "Ces informations sont stockées localement, sur cet appareil.",
+      "username": "Nom d'utilisateur",
+      "email": "Adresse e-mail",
+      "emailEmpty": "Non renseignée",
+      "role": "Rôle",
+      "createdAt": "Compte créé le"
+    },
+    "roles": {
+      "admin": "Administrateur",
+      "developer": "Développeur",
+      "user": "Utilisateur"
+    },
+    "email": {
+      "title": "Adresse e-mail",
+      "description": "Facultative, utilisée uniquement comme contact local. Laissez le champ vide pour la supprimer.",
+      "label": "Adresse e-mail",
+      "updated": "Adresse e-mail mise à jour.",
+      "removed": "Adresse e-mail supprimée.",
+      "failed": "Impossible de modifier l'adresse e-mail."
+    },
+    "password": {
+      "title": "Mot de passe",
+      "description": "Au moins 8 caractères, avec une lettre et un chiffre.",
+      "current": "Mot de passe actuel",
+      "new": "Nouveau mot de passe",
+      "confirm": "Confirmer le nouveau mot de passe",
+      "submit": "Changer le mot de passe",
+      "submitting": "Modification…",
+      "currentRequired": "Le mot de passe actuel est requis.",
+      "changed": "Mot de passe modifié.",
+      "failed": "Impossible de modifier le mot de passe."
+    }
+  },
+  "appearance": {
+    "theme": {
+      "title": "Thème",
+      "description": "Choisissez l'ambiance de l'interface.",
+      "options": {
+        "light": {
+          "label": "Clair",
+          "description": "Fond clair, agréable en pleine journée."
+        },
+        "dark": {
+          "label": "Sombre",
+          "description": "Fond sombre, reposant le soir."
+        },
+        "system": {
+          "label": "Système",
+          "description": "Suit automatiquement le thème de votre ordinateur."
+        }
+      }
+    },
+    "textSize": {
+      "title": "Taille du texte",
+      "description": "Agrandit ou réduit toute l'interface.",
+      "options": {
+        "small": {
+          "label": "Petite",
+          "description": "Plus de contenu à l'écran."
+        },
+        "normal": {
+          "label": "Normale",
+          "description": "Le réglage recommandé."
+        },
+        "large": {
+          "label": "Grande",
+          "description": "Plus confortable à lire."
+        }
+      }
+    },
+    "preview": {
+      "title": "Aperçu",
+      "text": "L'inspiration vient en écrivant : chaque projet commence par une première phrase."
+    },
+    "note": {
+      "title": "Enregistré sur cet appareil",
+      "text": "Ces préférences ne modifient jamais le contenu de vos projets."
+    }
+  }
+}

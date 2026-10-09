@@ -1,6 +1,8 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { HashRouter } from "react-router-dom";
+// Initialise la traduction avant le premier rendu (langue enregistrée).
+import "@/i18n";
 import App from "./App";
 import { initTextSize } from "@/lib/preferences";
 import { initAutoHideScrollbars } from "@/lib/scrollbars";

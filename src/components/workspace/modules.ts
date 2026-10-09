@@ -16,6 +16,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/sections";
+import i18n from "@/i18n";
 
 /**
  * Registre des modules de l'espace de travail.
@@ -24,6 +25,12 @@ import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/section
  * s'affichent dans le panneau du milieu ; chacune s'ouvre dans un onglet
  * de la zone centrale. La barre de gauche, le panneau latéral et les
  * onglets lisent tous ce registre : ajouter une fonctionnalité se fait ici.
+ *
+ * Les textes sont dans `modules.json` (fr / en). Ils sont exposés par des
+ * accesseurs (`get label()`…) : relus à chaque rendu, ils suivent la langue
+ * choisie, même après un changement. Pour ajouter une fonctionnalité :
+ * son identifiant dans `FeatureId`, ses textes dans les deux `modules.json`,
+ * puis son entrée ci-dessous.
  */
 
 export type ModuleId =
@@ -39,18 +46,18 @@ export type ModuleId =
 export interface WorkspaceFeature {
   /** Identifiant unique, utilisé comme identifiant d'onglet. */
   id: string;
-  label: string;
-  description: string;
+  readonly label: string;
+  readonly description: string;
   icon: LucideIcon;
 }
 
 export interface WorkspaceModule {
   id: ModuleId;
-  label: string;
+  readonly label: string;
   icon: LucideIcon;
   features: WorkspaceFeature[];
   /** Message affiché dans la liste lorsqu'elle est vide. */
-  emptyMessage?: string;
+  readonly emptyMessage?: string;
 }
 
 /** Identifiant de l'onglet d'accueil du projet. */
@@ -59,152 +66,121 @@ export const HOME_TAB = "home";
 /** Préfixe des onglets de paramètres du projet. */
 export const SETTINGS_PREFIX = "settings:";
 
+// ----------------------------------------------------------------------------
+// Textes traduits
+// ----------------------------------------------------------------------------
+
+/** Fonctionnalités dont les textes sont dans `modules.json` (`features.*`). */
+type FeatureId =
+  | typeof HOME_TAB
+  | "synopsis.edit"
+  | "characters.create"
+  | "characters.list"
+  | "characters.relations"
+  | "locations.create"
+  | "locations.list"
+  | "chapters.create"
+  | "chapters.list"
+  | "scenes.create"
+  | "scenes.list"
+  | "notes.create"
+  | "notes.list";
+
+/** Modules qui ont une liste (et donc un message de liste vide). */
+type ListModuleId = "characters" | "locations" | "chapters" | "scenes" | "notes";
+
+/** Fonctionnalité dont le libellé et la description suivent la langue. */
+function defineFeature(id: FeatureId, icon: LucideIcon): WorkspaceFeature {
+  return {
+    id,
+    icon,
+    get label() {
+      return i18n.t(`modules:features.${id}.label`);
+    },
+    get description() {
+      return i18n.t(`modules:features.${id}.description`);
+    },
+  };
+}
+
+/** Module dont le libellé suit la langue. */
+function defineModule(
+  id: Exclude<ModuleId, "settings">,
+  icon: LucideIcon,
+  features: WorkspaceFeature[],
+): WorkspaceModule {
+  return {
+    id,
+    icon,
+    features,
+    get label() {
+      return i18n.t(`modules:modules.${id}.label`);
+    },
+  };
+}
+
+/** Module avec une liste : ajoute le message affiché quand elle est vide. */
+function defineListModule(
+  id: ListModuleId,
+  icon: LucideIcon,
+  features: WorkspaceFeature[],
+): WorkspaceModule {
+  return Object.defineProperty(defineModule(id, icon, features), "emptyMessage", {
+    enumerable: true,
+    get: () => i18n.t(`modules:modules.${id}.empty`),
+  });
+}
+
+// ----------------------------------------------------------------------------
+// Registre
+// ----------------------------------------------------------------------------
+
 /** Modules affichés en haut de la barre de gauche. */
 export const WORKSPACE_MODULES: WorkspaceModule[] = [
-  {
-    id: "details",
-    label: "Détails",
-    icon: FileText,
-    features: [
-      {
-        id: HOME_TAB,
-        label: "Accueil du projet",
-        description:
-          "Résumé, genres, ton et informations générales de votre histoire.",
-        icon: Info,
-      },
-      {
-        id: "synopsis.edit",
-        label: "Synopsis du projet",
-        description:
-          "Résumé, genres, ton et informations générales de votre histoire.",
-        icon: PenLine,
-      },
-    ],
-  },
-  {
-    id: "characters",
-    label: "Personnages",
-    icon: Users,
-    emptyMessage: "Aucun personnage pour l'instant.",
-    features: [
-      {
-        id: "characters.create",
-        label: "Créer un personnage",
-        description: "Identité, description, parcours et motivations.",
-        icon: UserPlus,
-      },
-      {
-        id: "characters.list",
-        label: "Liste des personnages",
-        description: "Tous les personnages du projet.",
-        icon: List,
-      },
-      {
-        id: "characters.relations",
-        label: "Relations entre personnages",
-        description: "Liens familiaux, amicaux, rivalités et alliances.",
-        icon: Network,
-      },
-    ],
-  },
-  {
-    id: "locations",
-    label: "Lieux",
-    icon: MapPin,
-    emptyMessage: "Aucun lieu pour l'instant.",
-    features: [
-      {
-        id: "locations.create",
-        label: "Créer un lieu",
-        description: "Description, histoire et caractéristiques du lieu.",
-        icon: Plus,
-      },
-      {
-        id: "locations.list",
-        label: "Liste des lieux",
-        description: "Tous les lieux de votre univers.",
-        icon: List,
-      },
-    ],
-  },
-  {
-    id: "chapters",
-    label: "Chapitres",
-    icon: BookOpen,
-    emptyMessage: "Aucun chapitre pour l'instant.",
-    features: [
-      {
-        id: "chapters.create",
-        label: "Créer un chapitre",
-        description: "Titre, synopsis et place dans le récit.",
-        icon: Plus,
-      },
-      {
-        id: "chapters.list",
-        label: "Plan des chapitres",
-        description: "Les chapitres dans l'ordre du récit.",
-        icon: List,
-      },
-    ],
-  },
-  {
-    id: "scenes",
-    label: "Scènes",
-    icon: Clapperboard,
-    emptyMessage: "Aucune scène pour l'instant.",
-    features: [
-      {
-        id: "scenes.create",
-        label: "Créer une scène",
-        description: "Chapitre, lieu, personnages et contenu de la scène.",
-        icon: Plus,
-      },
-      {
-        id: "scenes.list",
-        label: "Liste des scènes",
-        description: "Toutes les scènes du projet.",
-        icon: List,
-      },
-    ],
-  },
-  {
-    id: "notes",
-    label: "Notes",
-    icon: StickyNote,
-    emptyMessage: "Aucune note pour l'instant.",
-    features: [
-      {
-        id: "notes.create",
-        label: "Créer une note",
-        description: "Idées, références et documentation libre.",
-        icon: Plus,
-      },
-      {
-        id: "notes.list",
-        label: "Liste des notes",
-        description: "Toutes vos notes de projet.",
-        icon: List,
-      },
-    ],
-  },
-  {
-    id: "search",
-    label: "Recherche",
-    icon: Search,
-    features: [],
-  },
+  defineModule("details", FileText, [
+    defineFeature(HOME_TAB, Info),
+    defineFeature("synopsis.edit", PenLine),
+  ]),
+  defineListModule("characters", Users, [
+    defineFeature("characters.create", UserPlus),
+    defineFeature("characters.list", List),
+    defineFeature("characters.relations", Network),
+  ]),
+  defineListModule("locations", MapPin, [
+    defineFeature("locations.create", Plus),
+    defineFeature("locations.list", List),
+  ]),
+  defineListModule("chapters", BookOpen, [
+    defineFeature("chapters.create", Plus),
+    defineFeature("chapters.list", List),
+  ]),
+  defineListModule("scenes", Clapperboard, [
+    defineFeature("scenes.create", Plus),
+    defineFeature("scenes.list", List),
+  ]),
+  defineListModule("notes", StickyNote, [
+    defineFeature("notes.create", Plus),
+    defineFeature("notes.list", List),
+  ]),
+  defineModule("search", Search, []),
 ];
 
 /** Paramètres du projet : module affiché en bas de la barre de gauche. */
 export const SETTINGS_MODULE: WorkspaceModule = {
   id: "settings",
-  label: "Paramètres du projet",
   icon: Settings,
+  get label() {
+    return i18n.t("modules:modules.settings.label");
+  },
+  // Accesseurs (get) : le libellé est relu à chaque rendu et suit la langue.
   features: PROJECT_SETTINGS_SECTIONS.map((section) => ({
     id: `${SETTINGS_PREFIX}${section.id}`,
-    label: section.label,
-    description: section.description,
+    get label() {
+      return section.label;
+    },
+    get description() {
+      return section.description;
+    },
     icon: section.icon,
   })),
 };

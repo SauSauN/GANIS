@@ -11,8 +11,6 @@ import Setup from "@/pages/Setup";
 import Dashboard from "@/pages/Dashboard";
 import Workspace from "@/pages/Workspace";
 import Settings from "@/pages/Settings";
-import Admin from "@/pages/Admin";
-import Diagnostics from "@/pages/Diagnostics";
 
 export default function App() {
   return (
@@ -87,26 +85,6 @@ export default function App() {
                 path="/profile"
                 element={<Navigate to="/settings" replace />}
               />
-
-              {/* Administration : rôle administrateur uniquement */}
-              <Route element={<ProtectedRoute roles={["admin"]} />}>
-                <Route
-                  path="/admin"
-                  element={<Admin />}
-                />
-              </Route>
-
-              {/* Diagnostics : rôles administrateur et développeur */}
-              <Route
-                element={
-                  <ProtectedRoute roles={["admin", "developer"]} />
-                }
-              >
-                <Route
-                  path="/diagnostics"
-                  element={<Diagnostics />}
-                />
-              </Route>
             </Route>
 
             {/* ============================================================ */}

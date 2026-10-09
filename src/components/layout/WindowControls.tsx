@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { isTauri } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -8,6 +9,7 @@ const base =
 
 /** Boutons Réduire / Agrandir-Restaurer / Fermer, style Windows. */
 export function WindowControls() {
+  const { t } = useTranslation("titlebar");
   const [maximized, setMaximized] = useState(false);
 
   useEffect(() => {
@@ -52,12 +54,14 @@ export function WindowControls() {
     e.stopPropagation();
   };
 
+  const maximizeLabel = maximized ? t("window.restore") : t("window.maximize");
+
   return (
     <div className="flex h-full items-stretch">
       <button
         type="button"
-        aria-label="Réduire"
-        title="Réduire"
+        aria-label={t("window.minimize")}
+        title={t("window.minimize")}
         onMouseDown={stopDrag}
         onClick={run((w) => w.minimize())}
         className={cn(base, "hover:bg-secondary")}
@@ -69,8 +73,8 @@ export function WindowControls() {
 
       <button
         type="button"
-        aria-label={maximized ? "Restaurer" : "Agrandir"}
-        title={maximized ? "Restaurer" : "Agrandir"}
+        aria-label={maximizeLabel}
+        title={maximizeLabel}
         onMouseDown={stopDrag}
         onClick={run((w) => w.toggleMaximize())}
         className={cn(base, "hover:bg-secondary")}
@@ -89,8 +93,8 @@ export function WindowControls() {
 
       <button
         type="button"
-        aria-label="Fermer"
-        title="Fermer"
+        aria-label={t("window.close")}
+        title={t("window.close")}
         onMouseDown={stopDrag}
         onClick={run((w) => w.close())}
         className={cn(base, "hover:bg-[#E81123] hover:text-white")}

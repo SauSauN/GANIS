@@ -1,17 +1,13 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Check, HardDrive, WifiOff } from "lucide-react";
 import { api } from "@/lib/api";
 import type { AppInfo } from "@/types";
 
 export type SaveState = "idle" | "saving" | "error";
 
-const SAVE_LABEL: Record<SaveState, string> = {
-  idle: "Prêt",
-  saving: "Enregistrement…",
-  error: "Échec de l'enregistrement",
-};
-
 export function StatusBar({ saveState = "idle" }: { saveState?: SaveState }) {
+  const { t } = useTranslation("statusbar");
   const [info, setInfo] = useState<AppInfo | null>(null);
 
   useEffect(() => {
@@ -23,16 +19,16 @@ export function StatusBar({ saveState = "idle" }: { saveState?: SaveState }) {
     <footer className="flex h-6 shrink-0 items-center justify-between border-t border-border bg-card px-3 text-xs text-muted-foreground">
       <div className="flex items-center gap-4">
         <span className="flex items-center gap-1">
-          <WifiOff className="h-3 w-3" /> Hors ligne
+          <WifiOff className="h-3 w-3" /> {t("offline")}
         </span>
         <span className="flex items-center gap-1">
-          <HardDrive className="h-3 w-3" /> Projet local
+          <HardDrive className="h-3 w-3" /> {t("localProject")}
         </span>
       </div>
       <div className="flex items-center gap-4">
         <span className={saveState === "error" ? "text-destructive" : "flex items-center gap-1"}>
           {saveState === "idle" && <Check className="h-3 w-3 text-success" />}
-          {SAVE_LABEL[saveState]}
+          {t(`save.${saveState}`)}
         </span>
         {info && <span>v{info.version}</span>}
       </div>

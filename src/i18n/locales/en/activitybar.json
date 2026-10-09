@@ -1,0 +1,13 @@
+{
+  "label": "Project modules",
+  "linked": "{{module}} — contains the open tab",
+  "collapse": {
+    "short": "Collapse",
+    "title": "Collapse the bar",
+    "label": "Collapse the sidebar"
+  },
+  "expand": {
+    "title": "Expand the bar",
+    "label": "Expand the sidebar"
+  }
+}

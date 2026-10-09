@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigate, useParams } from "react-router-dom";
 import { FileText, type LucideIcon } from "lucide-react";
 
@@ -16,6 +17,7 @@ import {
 } from "@/components/workspace/WorkspaceTabs";
 import { WorkspaceView } from "@/components/workspace/WorkspaceView";
 
+import i18n from "@/i18n";
 import { cn } from "@/lib/utils";
 import {
   setRailExpanded,
@@ -37,12 +39,15 @@ import { useProjectStore } from "@/stores/projectStore";
 
 /**
  * Libellé et icône d'un onglet.
+ *
+ * Appelée pendant le rendu : le libellé suit donc la langue courante
+ * (le composant se re-rend au changement de langue via `useTranslation`).
  */
 function tabMeta(
   tabId: string,
 ): { label: string; icon: LucideIcon } | null {
   if (tabId === HOME_TAB) {
-    return { label: "Accueil du projet", icon: FileText };
+    return { label: i18n.t("workspace:homeTab"), icon: FileText };
   }
 
   const found = findFeature(tabId);
@@ -53,6 +58,8 @@ function tabMeta(
 }
 
 export default function Workspace() {
+  const { t } = useTranslation("workspace");
+
   const { projectId } = useParams<{
     projectId: string;
   }>();
@@ -208,7 +215,7 @@ export default function Workspace() {
     return (
       <div className="flex min-h-0 flex-1 items-center justify-center bg-background">
         <p className="text-sm text-muted-foreground">
-          Chargement du projet…
+          {t("loading")}
         </p>
       </div>
     );
@@ -455,12 +462,11 @@ export default function Workspace() {
                 <FileText className="h-8 w-8 text-muted-foreground/50" />
 
                 <p className="text-sm text-muted-foreground">
-                  Aucun onglet ouvert
+                  {t("empty.title")}
                 </p>
 
                 <p className="text-xs text-muted-foreground">
-                  Choisissez une fonctionnalité dans la
-                  barre de gauche pour l'ouvrir.
+                  {t("empty.description")}
                 </p>
               </div>
             </div>

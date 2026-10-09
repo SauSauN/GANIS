@@ -1,4 +1,6 @@
+import { useTranslation } from "react-i18next";
 import { Check, Info, Monitor, Moon, Sun, type LucideIcon } from "lucide-react";
+import { cardClass, cardHeaderClass } from "@/components/settings/styles";
 import {
   Card,
   CardContent,
@@ -8,7 +10,6 @@ import {
 } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import {
-  TEXT_SIZE_LABELS,
   TEXT_SIZES,
   setTextSize,
   useTextSize,
@@ -20,39 +21,18 @@ import {
   type ThemeMode,
 } from "@/lib/theme";
 
-const THEME_OPTIONS: {
-  id: ThemeMode;
-  label: string;
-  description: string;
-  icon: LucideIcon;
-}[] = [
-  {
-    id: "light",
-    label: "Clair",
-    description: "Fond clair, agréable en pleine journée.",
-    icon: Sun,
-  },
-  {
-    id: "dark",
-    label: "Sombre",
-    description: "Fond sombre, reposant le soir.",
-    icon: Moon,
-  },
-  {
-    id: "system",
-    label: "Système",
-    description: "Suit automatiquement le thème de votre ordinateur.",
-    icon: Monitor,
-  },
+/** Thèmes proposés (libellés dans `settings.json`). */
+const THEME_OPTIONS: { id: ThemeMode; icon: LucideIcon }[] = [
+  { id: "light", icon: Sun },
+  { id: "dark", icon: Moon },
+  { id: "system", icon: Monitor },
 ];
 
-const TEXT_SIZE_DETAILS: Record<
-  TextSize,
-  { description: string; sample: string }
-> = {
-  small: { description: "Plus de contenu à l'écran.", sample: "text-sm" },
-  normal: { description: "Le réglage recommandé.", sample: "text-base" },
-  large: { description: "Plus confortable à lire.", sample: "text-xl" },
+/** Taille de l'aperçu « Aa » de chaque choix. */
+const TEXT_SIZE_SAMPLE: Record<TextSize, string> = {
+  small: "text-sm",
+  normal: "text-base",
+  large: "text-xl",
 };
 
 /** Style commun des choix : une tuile qui se met en évidence quand elle est choisie. */
@@ -71,6 +51,7 @@ const tileClass = (selected: boolean) =>
  * cet appareil. Ils n'affectent jamais les données des projets.
  */
 export function AppearanceSection() {
+  const { t } = useTranslation("settings");
   const themeMode = useThemeMode();
   const textSize = useTextSize();
 
@@ -80,23 +61,23 @@ export function AppearanceSection() {
           THÈME
           ================================================================== */}
 
-      <Card className="overflow-hidden">
-        <CardHeader className="border-b bg-muted/20 px-6 py-5">
-          <CardTitle>Thème</CardTitle>
+      <Card className={cardClass}>
+        <CardHeader className={cardHeaderClass}>
+          <CardTitle>{t("appearance.theme.title")}</CardTitle>
 
-          <CardDescription>
-            Choisissez l'ambiance de l'interface.
-          </CardDescription>
+          <CardDescription>{t("appearance.theme.description")}</CardDescription>
         </CardHeader>
 
         <CardContent className="px-6 py-6">
           <div
             role="radiogroup"
-            aria-label="Thème"
+            aria-label={t("appearance.theme.title")}
             className="grid gap-3 sm:grid-cols-3"
           >
-            {THEME_OPTIONS.map(({ id, label, description, icon: Icon }) => {
+            {THEME_OPTIONS.map(({ id, icon: Icon }) => {
               const selected = themeMode === id;
+              const label = t(`appearance.theme.options.${id}.label`);
+              const description = t(`appearance.theme.options.${id}.description`);
 
               return (
                 <button
@@ -138,24 +119,22 @@ export function AppearanceSection() {
           TAILLE DU TEXTE
           ================================================================== */}
 
-      <Card className="overflow-hidden">
-        <CardHeader className="border-b bg-muted/20 px-6 py-5">
-          <CardTitle>Taille du texte</CardTitle>
+      <Card className={cardClass}>
+        <CardHeader className={cardHeaderClass}>
+          <CardTitle>{t("appearance.textSize.title")}</CardTitle>
 
-          <CardDescription>
-            Agrandit ou réduit toute l'interface.
-          </CardDescription>
+          <CardDescription>{t("appearance.textSize.description")}</CardDescription>
         </CardHeader>
 
         <CardContent className="space-y-6 px-6 py-6">
           <div
             role="radiogroup"
-            aria-label="Taille du texte"
+            aria-label={t("appearance.textSize.title")}
             className="grid gap-3 sm:grid-cols-3"
           >
             {TEXT_SIZES.map((size) => {
               const selected = textSize === size;
-              const details = TEXT_SIZE_DETAILS[size];
+              const label = t(`appearance.textSize.options.${size}.label`);
 
               return (
                 <button
@@ -163,7 +142,7 @@ export function AppearanceSection() {
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  aria-label={TEXT_SIZE_LABELS[size]}
+                  aria-label={label}
                   aria-describedby={`text-size-${size}-description`}
                   onClick={() => setTextSize(size)}
                   className={tileClass(selected)}
@@ -172,7 +151,7 @@ export function AppearanceSection() {
                     <span
                       className={cn(
                         "flex h-9 min-w-9 items-center justify-center rounded-lg border bg-background px-2 font-semibold",
-                        details.sample,
+                        TEXT_SIZE_SAMPLE[size],
                       )}
                     >
                       Aa
@@ -182,15 +161,13 @@ export function AppearanceSection() {
                   </span>
 
                   <span>
-                    <span className="block text-sm font-medium">
-                      {TEXT_SIZE_LABELS[size]}
-                    </span>
+                    <span className="block text-sm font-medium">{label}</span>
 
                     <span
                       id={`text-size-${size}-description`}
                       className="mt-1 block text-xs leading-5 text-muted-foreground"
                     >
-                      {details.description}
+                      {t(`appearance.textSize.options.${size}.description`)}
                     </span>
                   </span>
                 </button>
@@ -200,12 +177,11 @@ export function AppearanceSection() {
 
           <div className="rounded-lg border bg-muted/40 p-4">
             <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Aperçu
+              {t("appearance.preview.title")}
             </p>
 
             <p className="text-sm leading-7">
-              L'inspiration vient en écrivant : chaque projet commence par une
-              première phrase.
+              {t("appearance.preview.text")}
             </p>
           </div>
         </CardContent>
@@ -223,11 +199,11 @@ export function AppearanceSection() {
 
           <div>
             <h2 className="text-sm font-semibold">
-              Enregistré sur cet appareil
+              {t("appearance.note.title")}
             </h2>
 
             <p className="mt-1 text-sm leading-6 text-muted-foreground">
-              Ces préférences ne modifient jamais le contenu de vos projets.
+              {t("appearance.note.text")}
             </p>
           </div>
         </div>

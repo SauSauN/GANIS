@@ -1,5 +1,11 @@
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { CalendarDays, Mail, ShieldCheck, User as UserIcon } from "lucide-react";
+import {
+  cardClass,
+  cardFooterClass,
+  cardHeaderClass,
+} from "@/components/settings/styles";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,22 +18,51 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
-import { validateEmail, validatePassword } from "@/lib/validators";
+import {
+  checkEmail,
+  checkPassword,
+  type ValidationIssue,
+} from "@/lib/validators";
 import { useAuthStore } from "@/stores/authStore";
-import { ROLE_LABELS } from "@/types";
 
-interface Feedback {
-  kind: "success" | "error";
-  text: string;
-}
+/** Messages propres à cette section (clés de `settings.json`). */
+type AccountMessage =
+  | "account.email.updated"
+  | "account.email.removed"
+  | "account.email.failed"
+  | "account.password.currentRequired"
+  | "account.password.changed"
+  | "account.password.failed";
 
-const errorMessage = (e: unknown, fallback: string) =>
-  e instanceof Error ? e.message : fallback;
+/**
+ * Retour affiché sous un formulaire.
+ *
+ * On garde une clé de traduction plutôt qu'un texte : le message suit la
+ * langue si elle change pendant qu'il est affiché. `text` ne sert qu'aux
+ * erreurs renvoyées par Rust (encore en français).
+ */
+type Feedback =
+  | { kind: "success" | "error"; key: AccountMessage }
+  | { kind: "error"; issue: ValidationIssue }
+  | { kind: "error"; text: string };
+
+/** Erreur de Rust si elle a un message, sinon le message de secours traduit. */
+const failure = (e: unknown, key: AccountMessage): Feedback =>
+  e instanceof Error ? { kind: "error", text: e.message } : { kind: "error", key };
 
 function FeedbackMessage({ feedback }: { feedback: Feedback | null }) {
+  const { t } = useTranslation(["settings", "common"]);
+
   if (!feedback) {
     return null;
   }
+
+  const message =
+    "key" in feedback
+      ? t(feedback.key)
+      : "issue" in feedback
+        ? t(`common:validation.${feedback.issue}`)
+        : feedback.text;
 
   return (
     <p
@@ -38,12 +73,12 @@ function FeedbackMessage({ feedback }: { feedback: Feedback | null }) {
           : "text-sm text-success"
       }
     >
-      {feedback.text}
+      {message}
     </p>
   );
 }
 
-/** Une information du compte, avec son icône (même présentation que l'accueil du projet). */
+/** Une information du compte, avec son icône : posée directement sur la carte, sans cadre. */
 function InfoCell({
   icon: Icon,
   label,
@@ -51,10 +86,10 @@ function InfoCell({
 }: {
   icon: typeof UserIcon;
   label: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
-    <div className="flex items-start gap-3 bg-card p-5">
+    <div className="flex items-start gap-3">
       <Icon className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
 
       <div className="min-w-0">
@@ -71,6 +106,7 @@ function InfoCell({
  * et changement de mot de passe.
  */
 export function AccountSection() {
+  const { t, i18n } = useTranslation(["settings", "common"]);
   const user = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
 
@@ -93,10 +129,10 @@ export function AccountSection() {
     event.preventDefault();
     setEmailFeedback(null);
 
-    const problem = validateEmail(email);
+    const issue = checkEmail(email);
 
-    if (problem) {
-      setEmailFeedback({ kind: "error", text: problem });
+    if (issue) {
+      setEmailFeedback({ kind: "error", issue });
       return;
     }
 
@@ -109,15 +145,10 @@ export function AccountSection() {
       setEmail(updated.email ?? "");
       setEmailFeedback({
         kind: "success",
-        text: updated.email
-          ? "Adresse e-mail mise à jour."
-          : "Adresse e-mail supprimée.",
+        key: updated.email ? "account.email.updated" : "account.email.removed",
       });
     } catch (e) {
-      setEmailFeedback({
-        kind: "error",
-        text: errorMessage(e, "Impossible de modifier l'adresse e-mail."),
-      });
+      setEmailFeedback(failure(e, "account.email.failed"));
     } finally {
       setEmailSaving(false);
     }
@@ -130,23 +161,17 @@ export function AccountSection() {
     if (!currentPassword) {
       setPasswordFeedback({
         kind: "error",
-        text: "Le mot de passe actuel est requis.",
+        key: "account.password.currentRequired",
       });
       return;
     }
 
-    const problem = validatePassword(newPassword);
+    const issue =
+      checkPassword(newPassword) ??
+      (newPassword !== confirmPassword ? "passwordMismatch" : null);
 
-    if (problem) {
-      setPasswordFeedback({ kind: "error", text: problem });
-      return;
-    }
-
-    if (newPassword !== confirmPassword) {
-      setPasswordFeedback({
-        kind: "error",
-        text: "Les deux mots de passe ne correspondent pas.",
-      });
+    if (issue) {
+      setPasswordFeedback({ kind: "error", issue });
       return;
     }
 
@@ -158,19 +183,19 @@ export function AccountSection() {
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
-      setPasswordFeedback({
-        kind: "success",
-        text: "Mot de passe modifié.",
-      });
+      setPasswordFeedback({ kind: "success", key: "account.password.changed" });
     } catch (e) {
-      setPasswordFeedback({
-        kind: "error",
-        text: errorMessage(e, "Impossible de modifier le mot de passe."),
-      });
+      setPasswordFeedback(failure(e, "account.password.failed"));
     } finally {
       setPasswordSaving(false);
     }
   }
+
+  // Date au format de la langue choisie (« 8 octobre 2026 » / « October 8, 2026 »).
+  const createdAt = new Date(user.createdAt).toLocaleDateString(
+    i18n.resolvedLanguage,
+    { day: "numeric", month: "long", year: "numeric" },
+  );
 
   return (
     <div className="space-y-8">
@@ -178,41 +203,35 @@ export function AccountSection() {
           INFORMATIONS DU COMPTE
           ================================================================== */}
 
-      <Card className="overflow-hidden">
-        <CardHeader className="border-b bg-muted/20 px-6 py-5">
-          <CardTitle>Informations du compte</CardTitle>
+      <Card className={cardClass}>
+        <CardHeader className={cardHeaderClass}>
+          <CardTitle>{t("account.info.title")}</CardTitle>
 
-          <CardDescription>
-            Ces informations sont stockées localement, sur cet appareil.
-          </CardDescription>
+          <CardDescription>{t("account.info.description")}</CardDescription>
         </CardHeader>
 
-        <CardContent className="p-0">
-          <div className="grid gap-px bg-border sm:grid-cols-2">
-            <InfoCell icon={UserIcon} label="Nom d'utilisateur">
+        <CardContent className="px-6 py-6">
+          <div className="grid gap-x-8 gap-y-6 sm:grid-cols-2">
+            <InfoCell icon={UserIcon} label={t("account.info.username")}>
               {user.username}
             </InfoCell>
 
-            <InfoCell icon={Mail} label="Adresse e-mail">
+            <InfoCell icon={Mail} label={t("account.info.email")}>
               {user.email ?? (
                 <span className="font-normal text-muted-foreground">
-                  Non renseignée
+                  {t("account.info.emailEmpty")}
                 </span>
               )}
             </InfoCell>
 
-            <InfoCell icon={ShieldCheck} label="Rôle">
+            <InfoCell icon={ShieldCheck} label={t("account.info.role")}>
               <span className="inline-flex items-center rounded-md border bg-muted/40 px-2.5 py-1 text-xs font-medium">
-                {ROLE_LABELS[user.role] ?? user.role}
+                {t(`account.roles.${user.role}`, { defaultValue: user.role })}
               </span>
             </InfoCell>
 
-            <InfoCell icon={CalendarDays} label="Compte créé le">
-              {new Date(user.createdAt).toLocaleDateString("fr-FR", {
-                day: "numeric",
-                month: "long",
-                year: "numeric",
-              })}
+            <InfoCell icon={CalendarDays} label={t("account.info.createdAt")}>
+              {createdAt}
             </InfoCell>
           </div>
         </CardContent>
@@ -222,20 +241,17 @@ export function AccountSection() {
           ADRESSE E-MAIL
           ================================================================== */}
 
-      <Card className="overflow-hidden">
+      <Card className={cardClass}>
         <form onSubmit={handleEmailSubmit} noValidate>
-          <CardHeader className="border-b bg-muted/20 px-6 py-5">
-            <CardTitle>Adresse e-mail</CardTitle>
+          <CardHeader className={cardHeaderClass}>
+            <CardTitle>{t("account.email.title")}</CardTitle>
 
-            <CardDescription>
-              Facultative, utilisée uniquement comme contact local. Laissez
-              le champ vide pour la supprimer.
-            </CardDescription>
+            <CardDescription>{t("account.email.description")}</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6 px-6 py-6">
             <div className="max-w-md space-y-2">
-              <Label htmlFor="profile-email">Adresse e-mail</Label>
+              <Label htmlFor="profile-email">{t("account.email.label")}</Label>
 
               <Input
                 id="profile-email"
@@ -249,9 +265,9 @@ export function AccountSection() {
             <FeedbackMessage feedback={emailFeedback} />
           </CardContent>
 
-          <CardFooter className="border-t bg-muted/10 px-6 py-4">
+          <CardFooter className={cardFooterClass}>
             <Button type="submit" disabled={emailSaving}>
-              {emailSaving ? "Enregistrement…" : "Enregistrer"}
+              {emailSaving ? t("common:actions.saving") : t("common:actions.save")}
             </Button>
           </CardFooter>
         </form>
@@ -261,19 +277,19 @@ export function AccountSection() {
           MOT DE PASSE
           ================================================================== */}
 
-      <Card className="overflow-hidden">
+      <Card className={cardClass}>
         <form onSubmit={handlePasswordSubmit}>
-          <CardHeader className="border-b bg-muted/20 px-6 py-5">
-            <CardTitle>Mot de passe</CardTitle>
+          <CardHeader className={cardHeaderClass}>
+            <CardTitle>{t("account.password.title")}</CardTitle>
 
-            <CardDescription>
-              Au moins 8 caractères, avec une lettre et un chiffre.
-            </CardDescription>
+            <CardDescription>{t("account.password.description")}</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-6 px-6 py-6">
             <div className="max-w-md space-y-2">
-              <Label htmlFor="current-password">Mot de passe actuel</Label>
+              <Label htmlFor="current-password">
+                {t("account.password.current")}
+              </Label>
 
               <Input
                 id="current-password"
@@ -286,7 +302,7 @@ export function AccountSection() {
 
             <div className="grid max-w-2xl gap-6 sm:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="new-password">Nouveau mot de passe</Label>
+                <Label htmlFor="new-password">{t("account.password.new")}</Label>
 
                 <Input
                   id="new-password"
@@ -299,7 +315,7 @@ export function AccountSection() {
 
               <div className="space-y-2">
                 <Label htmlFor="confirm-password">
-                  Confirmer le nouveau mot de passe
+                  {t("account.password.confirm")}
                 </Label>
 
                 <Input
@@ -315,9 +331,11 @@ export function AccountSection() {
             <FeedbackMessage feedback={passwordFeedback} />
           </CardContent>
 
-          <CardFooter className="border-t bg-muted/10 px-6 py-4">
+          <CardFooter className={cardFooterClass}>
             <Button type="submit" disabled={passwordSaving}>
-              {passwordSaving ? "Modification…" : "Changer le mot de passe"}
+              {passwordSaving
+                ? t("account.password.submitting")
+                : t("account.password.submit")}
             </Button>
           </CardFooter>
         </form>

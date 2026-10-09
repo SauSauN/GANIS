@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { Navigate, useLocation } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ const SETUP_PATH = "/setup";
  * - configuration faite → /setup redirige vers l'accueil.
  */
 export function SetupGate({ children }: { children: ReactNode }) {
+  const { t } = useTranslation("common");
   const needsSetup = useSetupStore((state) => state.needsSetup);
   const error = useSetupStore((state) => state.error);
   const check = useSetupStore((state) => state.check);
@@ -32,7 +34,7 @@ export function SetupGate({ children }: { children: ReactNode }) {
         </p>
 
         <Button variant="outline" onClick={() => void check()}>
-          Réessayer
+          {t("actions.retry")}
         </Button>
       </main>
     );
@@ -43,7 +45,7 @@ export function SetupGate({ children }: { children: ReactNode }) {
       <main className="flex flex-1 items-center justify-center bg-background">
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
           <Loader2 className="h-4 w-4 animate-spin" />
-          Démarrage de GANIS…
+          {t("startup")}
         </p>
       </main>
     );

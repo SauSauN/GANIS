@@ -1,0 +1,57 @@
+{
+  "greeting": "Hello, {{name}}",
+  "defaultName": "creator",
+  "subtitle": "Welcome to your narrative design studio.",
+  "newProject": "New project",
+  "search": {
+    "placeholder": "Search projects…",
+    "label": "Search projects"
+  },
+  "filters": {
+    "all": "Active projects",
+    "favorites": "Favorites",
+    "archived": "Archived"
+  },
+  "recent": "Recently opened",
+  "list": {
+    "title": {
+      "search": "Search results",
+      "all": "All projects",
+      "favorites": "Favorites",
+      "archived": "Archived projects"
+    },
+    "collapse": "Hide the project list",
+    "expand": "Show the project list",
+    "loading": "Loading projects…"
+  },
+  "empty": {
+    "search": {
+      "title": "No matching projects",
+      "description": "Try a different search term."
+    },
+    "all": {
+      "title": "No projects yet",
+      "description": "Create your first project to start writing."
+    },
+    "favorites": {
+      "title": "No favorite projects",
+      "description": "Click a project's star to find it here."
+    },
+    "archived": {
+      "title": "No archived projects",
+      "description": "Projects you archive will appear here."
+    },
+    "createFirst": "Create my first project"
+  },
+  "errors": {
+    "actionFailed": "The operation failed.",
+    "openFailed": "Unable to open the project.",
+    "deleteFailed": "Unable to delete the project."
+  },
+  "delete": {
+    "title": "Delete this project?",
+    "description": "The project “{{name}}” will be permanently deleted. This action cannot be undone.",
+    "confirm": "Delete",
+    "deleting": "Deleting…"
+  }
+}

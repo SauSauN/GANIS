@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,12 +16,11 @@ import type { WorkspaceFeature } from "@/components/workspace/modules";
 
 const MAX_NAME_LENGTH = 200;
 
-const ROLES = [
-  { value: "main", label: "Personnage principal" },
-  { value: "secondary", label: "Personnage secondaire" },
-  { value: "antagonist", label: "Antagoniste" },
-  { value: "extra", label: "Figurant" },
-] as const;
+/** Rôles proposés (libellés dans `characters.json`, `roles.*`). */
+const ROLES = ["main", "secondary", "antagonist", "extra"] as const;
+
+/** Erreur du champ « Nom » : on garde une clé, le message suit la langue. */
+type NameError = "nameRequired" | "nameTooLong";
 
 interface CharacterDraft {
   name: string;
@@ -81,8 +81,9 @@ function AreaField({ id, label, placeholder, value, onChange }: AreaFieldProps) 
  * Le brouillon est conservé tant que l'onglet reste ouvert.
  */
 export function CharacterCreateView({ feature }: { feature: WorkspaceFeature }) {
+  const { t } = useTranslation("characters");
   const [draft, setDraft] = useState<CharacterDraft>(EMPTY_DRAFT);
-  const [nameError, setNameError] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<NameError | null>(null);
 
   function update<K extends keyof CharacterDraft>(
     field: K,
@@ -99,14 +100,12 @@ export function CharacterCreateView({ feature }: { feature: WorkspaceFeature }) 
     const name = draft.name.trim();
 
     if (!name) {
-      setNameError("Le nom du personnage est requis.");
+      setNameError("nameRequired");
       return false;
     }
 
     if (name.length > MAX_NAME_LENGTH) {
-      setNameError(
-        `Le nom ne peut pas dépasser ${MAX_NAME_LENGTH} caractères.`,
-      );
+      setNameError("nameTooLong");
       return false;
     }
 
@@ -131,49 +130,46 @@ export function CharacterCreateView({ feature }: { feature: WorkspaceFeature }) 
       >
         <Info className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
         <p>
-          Aperçu de l'interface de création. L'enregistrement des
-          personnages sera activé avec la base de données du projet.
+          {t("create.preview")}
         </p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
         <Card>
           <CardHeader>
-            <CardTitle>Identité</CardTitle>
-            <CardDescription>
-              Comment s'appelle le personnage et quel rôle joue-t-il ?
-            </CardDescription>
+            <CardTitle>{t("create.identity.title")}</CardTitle>
+            <CardDescription>{t("create.identity.description")}</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="character-name">Nom</Label>
+              <Label htmlFor="character-name">{t("create.identity.name")}</Label>
               <Input
                 id="character-name"
                 value={draft.name}
                 aria-invalid={nameError !== null}
                 onChange={(e) => update("name", e.target.value)}
-                placeholder="Nom du personnage"
+                placeholder={t("create.identity.namePlaceholder")}
               />
               {nameError && (
                 <p role="alert" className="text-sm text-destructive">
-                  {nameError}
+                  {t(`create.errors.${nameError}`, { max: MAX_NAME_LENGTH })}
                 </p>
               )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="character-nickname">Surnom</Label>
+              <Label htmlFor="character-nickname">{t("create.identity.nickname")}</Label>
               <Input
                 id="character-nickname"
                 value={draft.nickname}
                 onChange={(e) => update("nickname", e.target.value)}
-                placeholder="Surnom ou alias (facultatif)"
+                placeholder={t("create.identity.nicknamePlaceholder")}
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="character-role">Rôle dans l'intrigue</Label>
+              <Label htmlFor="character-role">{t("create.identity.role")}</Label>
               <select
                 id="character-role"
                 value={draft.role}
@@ -181,8 +177,8 @@ export function CharacterCreateView({ feature }: { feature: WorkspaceFeature }) 
                 className={`${fieldClass} h-9`}
               >
                 {ROLES.map((role) => (
-                  <option key={role.value} value={role.value}>
-                    {role.label}
+                  <option key={role} value={role}>
+                    {t(`roles.${role}`)}
                   </option>
                 ))}
               </select>
@@ -192,24 +188,22 @@ export function CharacterCreateView({ feature }: { feature: WorkspaceFeature }) 
 
         <Card>
           <CardHeader>
-            <CardTitle>Description</CardTitle>
-            <CardDescription>
-              Ce qui se voit et ce qui se devine du personnage.
-            </CardDescription>
+            <CardTitle>{t("create.description.title")}</CardTitle>
+            <CardDescription>{t("create.description.description")}</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
             <AreaField
               id="character-appearance"
-              label="Apparence physique"
-              placeholder="Taille, silhouette, traits marquants, style vestimentaire…"
+              label={t("create.description.appearance")}
+              placeholder={t("create.description.appearancePlaceholder")}
               value={draft.appearance}
               onChange={(value) => update("appearance", value)}
             />
             <AreaField
               id="character-personality"
-              label="Personnalité"
-              placeholder="Caractère, qualités, défauts, manies…"
+              label={t("create.description.personality")}
+              placeholder={t("create.description.personalityPlaceholder")}
               value={draft.personality}
               onChange={(value) => update("personality", value)}
             />
@@ -218,31 +212,29 @@ export function CharacterCreateView({ feature }: { feature: WorkspaceFeature }) 
 
         <Card>
           <CardHeader>
-            <CardTitle>Parcours et motivations</CardTitle>
-            <CardDescription>
-              D'où vient le personnage et ce qui le fait avancer.
-            </CardDescription>
+            <CardTitle>{t("create.background.title")}</CardTitle>
+            <CardDescription>{t("create.background.description")}</CardDescription>
           </CardHeader>
 
           <CardContent className="space-y-4">
             <AreaField
               id="character-background"
-              label="Histoire personnelle"
-              placeholder="Passé, famille, événements fondateurs…"
+              label={t("create.background.history")}
+              placeholder={t("create.background.historyPlaceholder")}
               value={draft.background}
               onChange={(value) => update("background", value)}
             />
             <AreaField
               id="character-motivations"
-              label="Motivations"
-              placeholder="Ce qui le pousse à agir…"
+              label={t("create.background.motivations")}
+              placeholder={t("create.background.motivationsPlaceholder")}
               value={draft.motivations}
               onChange={(value) => update("motivations", value)}
             />
             <AreaField
               id="character-goals"
-              label="Objectifs et conflits"
-              placeholder="Ce qu'il cherche à obtenir, ce qui s'y oppose…"
+              label={t("create.background.goals")}
+              placeholder={t("create.background.goalsPlaceholder")}
               value={draft.goals}
               onChange={(value) => update("goals", value)}
             />
@@ -251,17 +243,15 @@ export function CharacterCreateView({ feature }: { feature: WorkspaceFeature }) 
 
         <Card>
           <CardHeader>
-            <CardTitle>Notes privées</CardTitle>
-            <CardDescription>
-              Remarques libres, visibles uniquement dans ce projet.
-            </CardDescription>
+            <CardTitle>{t("create.notes.title")}</CardTitle>
+            <CardDescription>{t("create.notes.description")}</CardDescription>
           </CardHeader>
 
           <CardContent>
             <AreaField
               id="character-notes"
-              label="Notes"
-              placeholder="Idées, références, questions ouvertes…"
+              label={t("create.notes.label")}
+              placeholder={t("create.notes.placeholder")}
               value={draft.notes}
               onChange={(value) => update("notes", value)}
             />
@@ -272,13 +262,13 @@ export function CharacterCreateView({ feature }: { feature: WorkspaceFeature }) 
           <Button
             type="submit"
             disabled
-            title="L'enregistrement sera disponible avec la base de données du projet"
+            title={t("create.saveUnavailable")}
           >
-            Enregistrer le personnage
+            {t("create.save")}
           </Button>
 
           <Button type="button" variant="outline" onClick={handleReset}>
-            Réinitialiser
+            {t("create.reset")}
           </Button>
         </div>
       </form>

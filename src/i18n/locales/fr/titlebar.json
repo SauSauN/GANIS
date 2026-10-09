@@ -1,0 +1,20 @@
+{
+  "home": "Accueil",
+  "menusLabel": "Menus",
+  "menus": {
+    "file": "Fichier",
+    "edit": "Édition",
+    "view": "Affichage",
+    "project": "Projet",
+    "help": "Aide"
+  },
+  "comingSoon": "Disponible prochainement",
+  "toggleTheme": "Changer de thème",
+  "settings": "Paramètres généraux",
+  "window": {
+    "minimize": "Réduire",
+    "maximize": "Agrandir",
+    "restore": "Restaurer",
+    "close": "Fermer"
+  }
+}

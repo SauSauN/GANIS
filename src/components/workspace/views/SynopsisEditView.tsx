@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import { Plus, RefreshCw, Save, X } from "lucide-react";
@@ -54,6 +55,7 @@ function TagList({
   disabled,
   onChange,
 }: TagListProps) {
+  const { t } = useTranslation(["synopsis", "common"]);
   const [draft, setDraft] = useState("");
 
   const full = values.length >= MAX_TAGS;
@@ -103,8 +105,8 @@ function TagList({
 
               <button
                 type="button"
-                aria-label={`Supprimer ${tag}`}
-                title="Supprimer"
+                aria-label={t("tags.removeNamed", { tag })}
+                title={t("tags.remove")}
                 disabled={disabled}
                 onClick={() => removeTag(tag)}
                 className="flex h-4 w-4 items-center justify-center rounded hover:bg-secondary disabled:cursor-not-allowed disabled:opacity-50"
@@ -123,7 +125,7 @@ function TagList({
           disabled={disabled || full}
           maxLength={MAX_TAG_LENGTH}
           placeholder={
-            full ? `${MAX_TAGS} éléments au maximum` : placeholder
+            full ? t("tags.full", { max: MAX_TAGS }) : placeholder
           }
           onChange={(event) => setDraft(event.target.value)}
           onKeyDown={handleKeyDown}
@@ -136,7 +138,7 @@ function TagList({
           disabled={disabled || full || !draft.trim()}
         >
           <Plus className="mr-1 h-4 w-4" />
-          Ajouter
+          {t("tags.add")}
         </Button>
       </div>
     </div>
@@ -161,6 +163,7 @@ export function SynopsisEditView({
   projectId,
   feature,
 }: SynopsisEditViewProps) {
+  const { t } = useTranslation(["synopsis", "common"]);
   const { synopsis, loading, saving, error } =
     useProjectSynopsis(projectId);
 
@@ -328,7 +331,7 @@ export function SynopsisEditView({
                 onClick={() => void fetchSynopsis(projectId)}
               >
                 <RefreshCw className="mr-2 h-4 w-4" />
-                Réessayer
+                {t("retry")}
               </Button>
             )}
           </div>
@@ -345,11 +348,11 @@ export function SynopsisEditView({
         <Card className="mb-8 gap-0 border py-0 shadow-sm ring-0">
           <CardHeader className="border-b px-6 py-5">
             <CardTitle className="text-base">
-              Synopsis
+              {t("card.title")}
             </CardTitle>
 
             <CardDescription>
-              Contenu, genres, sous-genres et ton de votre histoire.
+              {t("card.description")}
             </CardDescription>
           </CardHeader>
 
@@ -359,7 +362,7 @@ export function SynopsisEditView({
                 ------------------------------------------------------------ */}
 
             <div className="space-y-2">
-              <Label>Contenu</Label>
+              <Label>{t("content")}</Label>
 
               {/* Fond transparent : l'éditeur prend la couleur de la carte. */}
               <div className="rounded-lg border border-input bg-transparent p-4 focus-within:ring-2 focus-within:ring-ring">
@@ -374,8 +377,8 @@ export function SynopsisEditView({
             <div className="border-t pt-6">
               <TagList
                 id="synopsis-genres"
-                label="Genres"
-                placeholder="Ex. Fantasy, Aventure, Science-fiction…"
+                label={t("genres.label")}
+                placeholder={t("genres.placeholder")}
                 values={genres}
                 disabled={loading || !synopsis}
                 onChange={setGenres}
@@ -389,8 +392,8 @@ export function SynopsisEditView({
             <div className="border-t pt-6">
               <TagList
                 id="synopsis-subgenres"
-                label="Sous-genres"
-                placeholder="Ex. Dark Fantasy, Cyberpunk, Space Opera…"
+                label={t("subgenres.label")}
+                placeholder={t("subgenres.placeholder")}
                 values={subgenres}
                 disabled={loading || !synopsis}
                 onChange={setSubgenres}
@@ -404,8 +407,8 @@ export function SynopsisEditView({
             <div className="border-t pt-6">
               <TagList
                 id="synopsis-tone"
-                label="Ton"
-                placeholder="Ex. Sombre, Épique, Humoristique, Mélancolique…"
+                label={t("tone.label")}
+                placeholder={t("tone.placeholder")}
                 values={tone}
                 disabled={loading || !synopsis}
                 onChange={setTone}
@@ -426,8 +429,8 @@ export function SynopsisEditView({
             <Save className="mr-2 h-4 w-4" />
 
             {saving
-              ? "Enregistrement…"
-              : "Enregistrer"}
+              ? t("common:actions.saving")
+              : t("common:actions.save")}
           </Button>
 
           {saveStatus === "saved" && (
@@ -435,7 +438,7 @@ export function SynopsisEditView({
               role="status"
               className="text-sm text-success"
             >
-              Synopsis enregistré.
+              {t("saved")}
             </p>
           )}
 
@@ -444,7 +447,7 @@ export function SynopsisEditView({
               role="alert"
               className="text-sm text-destructive"
             >
-              Échec de l'enregistrement.
+              {t("saveFailed")}
             </p>
           )}
         </div>

@@ -1,0 +1,13 @@
+{
+  "label": "Modules du projet",
+  "linked": "{{module}} — contient l'onglet ouvert",
+  "collapse": {
+    "short": "Réduire",
+    "title": "Réduire la barre",
+    "label": "Réduire la barre latérale"
+  },
+  "expand": {
+    "title": "Développer la barre",
+    "label": "Développer la barre latérale"
+  }
+}
