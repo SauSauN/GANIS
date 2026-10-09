@@ -12,6 +12,14 @@
     "appearance": {
       "label": "Appearance",
       "description": "GANIS theme and text size, applied to all your projects."
+    },
+    "developer": {
+      "label": "Developer",
+      "description": "Create your own packages. To start with: themes, usable right away on this device."
+    },
+    "saving": {
+      "label": "Saving",
+      "description": "Automatic or manual saving of your changes, on this device."
     }
   },
   "account": {
@@ -94,6 +102,93 @@
     "note": {
       "title": "Saved on this device",
       "text": "These preferences never change the content of your projects."
+    },
+    "colorTheme": {
+      "title": "Color theme",
+      "description": "Palette used in both light and dark modes.",
+      "manage": "Manage packages"
+    }
+  },
+  "developer": {
+    "become": {
+      "title": "Become a developer",
+      "description": "Developer mode adds creation tools to your account.",
+      "perks": {
+        "create": "Create theme plugins: light and dark colors, corner radius, live preview.",
+        "direct": "Your creations work right away, with no download or installation.",
+        "share": "Later: publish and share your packages with the community."
+      },
+      "note": "Your projects and preferences stay the same.",
+      "action": "Become a developer",
+      "confirmTitle": "Turn on developer mode?",
+      "confirmText": "Your account “{{username}}” will get the Developer role and access to package creation tools.",
+      "confirm": "Turn on",
+      "cancel": "Cancel",
+      "activating": "Turning on…",
+      "done": "Developer mode is on.",
+      "failed": "Couldn't turn on developer mode."
+    },
+    "active": {
+      "title": "Developer mode is on",
+      "description": "Your account has access to package creation tools.",
+      "roleAdmin": "As an administrator, you already have every development tool."
+    },
+    "tools": {
+      "title": "Create a plugin",
+      "description": "Choose the type of package to create.",
+      "theme": {
+        "title": "Theme plugin",
+        "description": "Light and dark mode colors, corner radius. Usable right away.",
+        "action": "Create a theme"
+      },
+      "soon": "Soon",
+      "others": {
+        "iconPack": "Icon pack",
+        "list": "Lists (genres, tones…)",
+        "template": "Sheet templates",
+        "plugin": "Extensions with code"
+      }
+    },
+    "mine": {
+      "title": "My creations",
+      "description_other": "{{count}} themes created.",
+      "none": "No themes created yet.",
+      "open": "Manage in Packages",
+      "description_one": "{{count}} theme created."
+    },
+    "leave": {
+      "title": "Leave developer mode",
+      "description": "Your account goes back to being a regular user account.",
+      "details": "Creation tools and your themes will no longer be shown. Your themes aren't deleted: they'll come back if you turn developer mode on again.",
+      "action": "Leave developer mode",
+      "confirmTitle": "Leave developer mode?",
+      "confirmText": "Creation tools will be hidden. If one of your themes is in use, GANIS will switch back to the default theme. You can turn developer mode back on at any time.",
+      "confirm": "Leave",
+      "cancel": "Cancel",
+      "leaving": "Turning off…",
+      "failed": "Couldn't leave developer mode."
+    }
+  },
+  "saving": {
+    "autoSave": {
+      "title": "Auto save",
+      "description": "Choose whether GANIS saves your changes on its own or you save them yourself.",
+      "toggle": "Save automatically",
+      "on_one": "On: saves {{count}} second after your last change.",
+      "on_other": "On: saves {{count}} seconds after your last change.",
+      "off": "Off: you save with the “Save” button."
+    },
+    "delay": {
+      "title": "Delay before saving",
+      "description": "Time without a new change before GANIS saves.",
+      "option_one": "{{count}} second",
+      "option_other": "{{count}} seconds"
+    },
+    "note": {
+      "title": "Spotting unsaved work",
+      "tabExample": "Synopsis",
+      "dot": "A dot instead of the close button marks an unsaved tab.",
+      "ask": "Before closing such a tab, leaving the page or closing GANIS, you're asked whether to save, not save, or cancel."
     }
   }
 }

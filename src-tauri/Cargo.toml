@@ -59,6 +59,10 @@ rand = "0.8"
 # Hachage SHA-256 pour les tokens de session.
 sha2 = "0.10"
 
+[dev-dependencies]
+# Tests asynchrones des services (base SQLite en mémoire).
+tokio = { version = "1", features = ["sync", "macros", "rt"] }
+
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
 [profile.release]
 codegen-units = 1

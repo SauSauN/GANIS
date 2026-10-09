@@ -1,5 +1,8 @@
 import { useTranslation } from "react-i18next";
-import { Check, Info, Monitor, Moon, Sun, type LucideIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Blocks, Check, Info, Monitor, Moon, Sun, type LucideIcon } from "lucide-react";
+import { ThemeSwatch } from "@/components/packages/ThemeSwatch";
+import { useInstalledThemes } from "@/components/packages/useInstalledThemes";
 import { cardClass, cardHeaderClass } from "@/components/settings/styles";
 import {
   Card,
@@ -8,6 +11,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { setActiveColorTheme, useActiveColorThemeId } from "@/lib/colorTheme";
 import { cn } from "@/lib/utils";
 import {
   TEXT_SIZES,
@@ -17,6 +22,7 @@ import {
 } from "@/lib/preferences";
 import {
   setThemeMode,
+  useResolvedTheme,
   useThemeMode,
   type ThemeMode,
 } from "@/lib/theme";
@@ -116,6 +122,12 @@ export function AppearanceSection() {
       </Card>
 
       {/* ==================================================================
+          THÈME DE COULEURS (packages de type thème)
+          ================================================================== */}
+
+      <ColorThemeCard />
+
+      {/* ==================================================================
           TAILLE DU TEXTE
           ================================================================== */}
 
@@ -209,5 +221,63 @@ export function AppearanceSection() {
         </div>
       </section>
     </div>
+  );
+}
+
+/**
+ * Choix du thème de couleurs parmi les thèmes installés : thèmes système et
+ * thèmes créés par l'utilisateur, utilisables directement.
+ * L'aperçu suit le mode affiché (clair ou sombre).
+ */
+function ColorThemeCard() {
+  const { t } = useTranslation("settings");
+  const navigate = useNavigate();
+  const resolved = useResolvedTheme();
+  const activeId = useActiveColorThemeId();
+  const { system, mine } = useInstalledThemes();
+
+  return (
+    <Card className={cardClass}>
+      <CardHeader className={cardHeaderClass}>
+        <CardTitle>{t("appearance.colorTheme.title")}</CardTitle>
+
+        <CardDescription>{t("appearance.colorTheme.description")}</CardDescription>
+      </CardHeader>
+
+      <CardContent className="space-y-4 px-6 py-6">
+        <div
+          role="radiogroup"
+          aria-label={t("appearance.colorTheme.title")}
+          className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3"
+        >
+          {[...system, ...mine].map((item) => {
+            const selected = activeId === item.id;
+
+            return (
+              <button
+                key={item.id}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                onClick={() => setActiveColorTheme(item.id, item.theme)}
+                className={cn(tileClass(selected), "gap-2 p-3")}
+              >
+                <ThemeSwatch palette={item.theme[resolved]} className="h-14 w-full" />
+
+                <span className="flex w-full items-center justify-between gap-2">
+                  <span className="truncate text-sm font-medium">{item.name}</span>
+                  {selected && <Check className="h-4 w-4 shrink-0 text-primary" />}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <Button variant="outline" size="sm" onClick={() => navigate("/packages")}>
+          <Blocks />
+          {t("appearance.colorTheme.manage")}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

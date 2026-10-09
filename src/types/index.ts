@@ -78,6 +78,56 @@ export interface Synopsis {
 }
 
 // ----------------------------------------------------------------------------
+// Packages (§20) — pour l'instant, uniquement les thèmes
+// ----------------------------------------------------------------------------
+
+/** Type technique d'un package (correspond à `PackageType` en Rust). */
+export type PackageType = "theme";
+
+/**
+ * Couleurs modifiables d'un thème, pour un mode (clair ou sombre).
+ * Chaque valeur est une couleur `#RRGGBB` (vérifiée par Rust).
+ * Les autres variables de l'interface en sont dérivées (`lib/colorTheme.ts`).
+ */
+export interface ThemePalette {
+  background: string;
+  foreground: string;
+  card: string;
+  sidebar: string;
+  primary: string;
+  primaryForeground: string;
+  secondary: string;
+  mutedForeground: string;
+  border: string;
+  destructive: string;
+  success: string;
+  warning: string;
+}
+
+/** Données d'un package de type `theme` (correspond à `ThemeData`). */
+export interface ThemeData {
+  light: ThemePalette;
+  dark: ThemePalette;
+  /** Arrondi des coins, en rem (0 à 1,5). */
+  radius: number;
+}
+
+/** Package créé par l'utilisateur connecté (correspond à `UserPackage`). */
+export interface UserPackage {
+  id: string;
+  /** Identifiant public, de la forme `auteur.nom`. */
+  packageId: string;
+  type: PackageType;
+  name: string;
+  description: string;
+  version: string;
+  author: string;
+  theme: ThemeData;
+  createdAt: string; // RFC 3339, UTC
+  updatedAt: string; // RFC 3339, UTC
+}
+
+// ----------------------------------------------------------------------------
 // Informations sur l'application
 // ----------------------------------------------------------------------------
 

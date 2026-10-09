@@ -4,6 +4,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { FileText, type LucideIcon } from "lucide-react";
 
 import { ActivityBar } from "@/components/layout/ActivityBar";
+import { UnsavedChangesDialog } from "@/components/layout/UnsavedChangesDialog";
 import { SideBar } from "@/components/layout/SideBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import {
@@ -35,6 +36,12 @@ import {
   type CloseScope,
   type TabLayout,
 } from "@/lib/tabLayout";
+import {
+  UnsavedTabContext,
+  discardEntries,
+  saveEntries,
+  useUnsavedStore,
+} from "@/lib/unsavedChanges";
 import { useProjectStore } from "@/stores/projectStore";
 
 /**
@@ -57,8 +64,16 @@ function tabMeta(
     : null;
 }
 
+/** Fermeture d'onglets en attente de la réponse « Enregistrer ? ». */
+interface PendingClose {
+  tabId: string;
+  scope: CloseScope;
+  /** Onglets concernés qui ont des modifications non enregistrées. */
+  unsaved: string[];
+}
+
 export default function Workspace() {
-  const { t } = useTranslation("workspace");
+  const { t } = useTranslation(["workspace", "unsaved"]);
 
   const { projectId } = useParams<{
     projectId: string;
@@ -148,6 +163,23 @@ export default function Workspace() {
    * au tableau de bord.
    */
   const seenRef = useRef(false);
+
+  /** Onglets avec des modifications non enregistrées (point ● sur l'onglet). */
+  const unsavedEntries = useUnsavedStore((state) => state.entries);
+
+  /** Question « Enregistrer ? » affichée avant de fermer des onglets. */
+  const [pendingClose, setPendingClose] = useState<PendingClose | null>(null);
+  const [closeBusy, setCloseBusy] = useState(false);
+  const [closeError, setCloseError] = useState<string | null>(null);
+
+  /**
+   * Dernière disposition et dernier onglet actif : une fermeture qui suit un
+   * enregistrement (asynchrone) doit partir de l'état à jour.
+   */
+  const layoutRef = useRef(layout);
+  layoutRef.current = layout;
+  const activeTabRef = useRef(activeTab);
+  activeTabRef.current = activeTab;
 
   if (project) {
     seenRef.current = true;
@@ -286,6 +318,25 @@ export default function Workspace() {
    * - s'il n'en reste aucun, la zone centrale est vide.
    */
   function closeTabs(tabId: string, scope: CloseScope) {
+    const closing = tabsToClose(layoutRef.current, tabId, scope);
+    const unsaved = closing.filter(
+      (id) => id in useUnsavedStore.getState().entries,
+    );
+
+    // Modifications non enregistrées : on demande d'abord quoi en faire.
+    if (unsaved.length > 0) {
+      setCloseError(null);
+      setPendingClose({ tabId, scope, unsaved });
+      return;
+    }
+
+    closeTabsNow(tabId, scope);
+  }
+
+  /** Ferme réellement les onglets (aucune question). */
+  function closeTabsNow(tabId: string, scope: CloseScope) {
+    const layout = layoutRef.current;
+    const activeTab = activeTabRef.current;
     const closing = tabsToClose(layout, tabId, scope);
     const next = closeTabsInLayout(layout, closing);
 
@@ -293,6 +344,7 @@ export default function Workspace() {
       return;
     }
 
+    layoutRef.current = next;
     setLayout(next);
 
     if (!activeTab || !closing.includes(activeTab)) {
@@ -311,6 +363,41 @@ export default function Workspace() {
     const before = layout.tabs.slice(0, index).reverse().find(isOpen);
 
     activate(after ?? before ?? null);
+  }
+
+  /** « Enregistrer » : enregistre puis ferme ; en cas d'échec, montre l'onglet fautif. */
+  async function saveAndClose() {
+    if (!pendingClose) {
+      return;
+    }
+
+    setCloseBusy(true);
+    setCloseError(null);
+
+    const failed = await saveEntries(pendingClose.unsaved);
+
+    setCloseBusy(false);
+
+    if (failed.length === 0) {
+      setPendingClose(null);
+      closeTabsNow(pendingClose.tabId, pendingClose.scope);
+      return;
+    }
+
+    // L'erreur s'affiche dans l'onglet : on le montre et on n'en ferme aucun.
+    setPendingClose(null);
+    activate(failed[0]);
+  }
+
+  /** « Ne pas enregistrer » : les modifications sont abandonnées. */
+  function discardAndClose() {
+    if (!pendingClose) {
+      return;
+    }
+
+    discardEntries(pendingClose.unsaved);
+    setPendingClose(null);
+    closeTabsNow(pendingClose.tabId, pendingClose.scope);
   }
 
   /**
@@ -355,6 +442,7 @@ export default function Workspace() {
             label: meta.label,
             icon: meta.icon,
             pinned: layout.pinned.includes(id),
+            dirty: id in unsavedEntries,
           },
         ]
       : [];
@@ -446,11 +534,17 @@ export default function Workspace() {
                   activeTab !== tabId && "hidden",
                 )}
               >
-                <WorkspaceView
-                  tabId={tabId}
-                  project={project}
-                  onOpenFeature={openFeature}
-                />
+                {/* L'onglet est connu des écrans qui signalent leurs
+                    modifications non enregistrées. */}
+                <UnsavedTabContext.Provider
+                  value={{ id: tabId, label: tabMeta(tabId)?.label ?? tabId }}
+                >
+                  <WorkspaceView
+                    tabId={tabId}
+                    project={project}
+                    onOpenFeature={openFeature}
+                  />
+                </UnsavedTabContext.Provider>
               </div>
             ))
           ) : (
@@ -473,6 +567,22 @@ export default function Workspace() {
           )}
         </main>
       </div>
+
+      {/* =========================================================
+          « ENREGISTRER LES MODIFICATIONS ? » (fermeture d'onglets)
+          ========================================================= */}
+      <UnsavedChangesDialog
+        open={pendingClose !== null}
+        reason="closeTabs"
+        items={(pendingClose?.unsaved ?? []).map(
+          (id) => tabMeta(id)?.label ?? id,
+        )}
+        busy={closeBusy}
+        error={closeError}
+        onSave={() => void saveAndClose()}
+        onDiscard={discardAndClose}
+        onCancel={() => setPendingClose(null)}
+      />
 
       {/* =========================================================
           STATUS BAR

@@ -1,0 +1,210 @@
+{
+  "title": "Packages",
+  "description": "Customize GANIS. System themes and the ones you create work right away, with no download.",
+  "back": "Back",
+  "nav": {
+    "label": "Package views",
+    "title": "Package manager",
+    "soon": "Soon"
+  },
+  "views": {
+    "installed": {
+      "label": "Installed",
+      "description": "Themes available on this device: ready to use, no download needed."
+    },
+    "discover": {
+      "label": "Discover",
+      "description": "The catalog of packages shared by the community."
+    },
+    "import": {
+      "label": "Import",
+      "description": "Install a package from a .ganixpkg file, offline."
+    }
+  },
+  "categories": {
+    "theme": "Theme"
+  },
+  "search": {
+    "label": "Search themes",
+    "placeholder": "Search themes…",
+    "empty": "No theme matches “{{query}}”."
+  },
+  "groups": {
+    "system": {
+      "title": "System themes",
+      "description": "Shipped with GANIS, always available."
+    },
+    "mine": {
+      "title": "My creations",
+      "description": "Themes you created. Only visible to you."
+    }
+  },
+  "badges": {
+    "system": "System",
+    "mine": "Created by you",
+    "active": "In use",
+    "version": "v{{version}}"
+  },
+  "card": {
+    "by": "by {{author}}",
+    "light": "Light",
+    "dark": "Dark",
+    "use": "Use",
+    "inUse": "In use",
+    "edit": "Edit",
+    "delete": "Delete",
+    "previewLabel": "Color preview of {{name}}"
+  },
+  "builtin": {
+    "ganis.classique": {
+      "name": "GANIS Classic",
+      "description": "The original identity: deep indigo and lavender."
+    },
+    "ganis.parchemin": {
+      "name": "Parchment",
+      "description": "Warm paper and sepia ink, for quiet writing."
+    },
+    "ganis.foret": {
+      "name": "Forest",
+      "description": "Soothing greens and rounded corners."
+    },
+    "ganis.crepuscule": {
+      "name": "Twilight",
+      "description": "Rose and plum, an end-of-day mood."
+    },
+    "ganis.contraste": {
+      "name": "High contrast",
+      "description": "Maximum legibility, crisp outlines."
+    }
+  },
+  "mine": {
+    "emptyTitle": "No themes created yet",
+    "emptyDeveloper": "Create your first theme: you can use it right away.",
+    "create": "Create a theme",
+    "loadFailed": "Couldn't load your themes.",
+    "retry": "Try again"
+  },
+  "actions": {
+    "create": "Create a theme",
+    "used": "Theme “{{name}}” applied.",
+    "deleted": "Theme “{{name}}” deleted."
+  },
+  "delete": {
+    "title": "Delete this theme?",
+    "description": "“{{name}}” will be permanently deleted. If it's in use, GANIS will switch back to the default theme.",
+    "confirm": "Delete",
+    "cancel": "Cancel",
+    "failed": "Couldn't delete the theme."
+  },
+  "discover": {
+    "title": "Sharing is coming soon",
+    "text": "Soon you'll be able to browse and download themes shared by other creators. Meanwhile, system themes and your own creations are already available, no download needed.",
+    "toInstalled": "See installed themes"
+  },
+  "import": {
+    "title": "Importing .ganixpkg files",
+    "text": "Soon you'll be able to drop a .ganixpkg file here to install a package offline. GANIS will check its content before installing anything.",
+    "drop": "Drag and drop a .ganixpkg file",
+    "unavailable": "Not available yet"
+  },
+  "developer": {
+    "title": "Developer area"
+  },
+  "editor": {
+    "createTitle": "New theme",
+    "editTitle": "Edit theme",
+    "description": "Pick colors for light and dark modes. The preview updates live; the theme is usable as soon as it's saved.",
+    "back": "Back to packages",
+    "identity": {
+      "title": "Details",
+      "description": "How this theme will appear in the package list.",
+      "name": "Theme name",
+      "namePlaceholder": "e.g. Starry night",
+      "summary": "Description",
+      "summaryPlaceholder": "What makes this theme unique (optional)",
+      "counter": "{{count}} / {{max}}",
+      "packageId": "Identifier: {{id}}",
+      "version": "Version {{version}}"
+    },
+    "start": {
+      "label": "Start from",
+      "hint": "Replaces every color with those of the chosen theme."
+    },
+    "colors": {
+      "title": "Colors",
+      "description": "Each mode has its own palette. Format: #RRGGBB.",
+      "modeLabel": "Mode to edit",
+      "light": "Light",
+      "dark": "Dark",
+      "copyFrom": "Copy from {{mode}} mode",
+      "invalid": "Invalid color (format: #RRGGBB).",
+      "groups": {
+        "surfaces": "Surfaces",
+        "text": "Text",
+        "accent": "Accent",
+        "states": "States"
+      },
+      "keys": {
+        "background": "Background",
+        "foreground": "Main text",
+        "card": "Cards and menus",
+        "sidebar": "Side panel",
+        "primary": "Accent color",
+        "primaryForeground": "Text on accent",
+        "secondary": "Secondary surface",
+        "mutedForeground": "Secondary text",
+        "border": "Borders",
+        "destructive": "Danger",
+        "success": "Success",
+        "warning": "Warning"
+      }
+    },
+    "shape": {
+      "title": "Shape",
+      "description": "Roundness of buttons, fields and cards.",
+      "radius": "Corner radius",
+      "value": "{{value}} rem"
+    },
+    "contrast": {
+      "title": "Legibility",
+      "text": "Main text on background",
+      "accent": "Text on accent",
+      "ratio": "{{ratio}}:1",
+      "good": "Good legibility",
+      "low": "Low contrast (4.5:1 recommended)"
+    },
+    "preview": {
+      "title": "Live preview",
+      "label": "Theme preview in {{mode}} mode",
+      "project": "My novel",
+      "nav": {
+        "details": "Details",
+        "characters": "Characters",
+        "locations": "Locations",
+        "chapters": "Chapters"
+      },
+      "heading": "Chapter 1 — Awakening",
+      "text": "The first light was filtering through the shutters when Elena opened her eyes.",
+      "field": "Scene title",
+      "fieldValue": "The silver forest",
+      "primary": "Save",
+      "secondary": "Cancel",
+      "danger": "Delete",
+      "saved": "Saved",
+      "draft": "Draft"
+    },
+    "save": "Save",
+    "saveAndUse": "Save and use",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "created": "Theme created.",
+    "updated": "Theme saved.",
+    "failed": "Couldn't save the theme.",
+    "fixErrors": "Fix the highlighted fields before saving.",
+    "nameRequired": "The theme name is required.",
+    "notFound": "This theme can't be found or doesn't belong to you.",
+    "forbiddenTitle": "Developers only",
+    "forbiddenText": "Creating themes is available in developer mode. Turn it on in the general settings.",
+    "toDeveloper": "Open developer mode"
+  }
+}

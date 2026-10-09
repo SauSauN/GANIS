@@ -3,6 +3,7 @@
 //! Ce module centralise les exports des différents modèles utilisés
 //! par l'application (utilisateurs, sessions, projets, etc.).
 
+pub mod package;
 pub mod project;
 pub mod session;
 pub mod user;

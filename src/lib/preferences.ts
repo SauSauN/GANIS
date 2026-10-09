@@ -180,3 +180,83 @@ export function setPanelWidth(width: number) {
 export function usePanelWidth(): number {
   return useSyncExternalStore(subscribeTo(PANEL_WIDTH_EVENT), getPanelWidth);
 }
+
+// ----------------------------------------------------------------------------
+// Enregistrement automatique
+// ----------------------------------------------------------------------------
+
+/** Délais proposés (secondes) entre la dernière modification et l'enregistrement. */
+export const AUTO_SAVE_DELAYS = [1, 3, 10, 30] as const;
+
+export type AutoSaveDelay = (typeof AUTO_SAVE_DELAYS)[number];
+
+export interface AutoSaveSettings {
+  /** Désactivé par défaut : l'utilisateur enregistre lui-même. */
+  enabled: boolean;
+  delay: AutoSaveDelay;
+}
+
+const AUTO_SAVE_KEY = "ganis-auto-save";
+const AUTO_SAVE_EVENT = "ganis:auto-save-change";
+const DEFAULT_AUTO_SAVE: AutoSaveSettings = { enabled: false, delay: 3 };
+
+function isAutoSaveDelay(value: unknown): value is AutoSaveDelay {
+  return AUTO_SAVE_DELAYS.includes(value as AutoSaveDelay);
+}
+
+// Même objet tant que la valeur enregistrée ne change pas
+// (exigé par `useSyncExternalStore`).
+let autoSaveRaw: string | null | undefined;
+let autoSaveCache: AutoSaveSettings = DEFAULT_AUTO_SAVE;
+
+export function getAutoSave(): AutoSaveSettings {
+  let raw: string | null = null;
+
+  try {
+    raw = localStorage.getItem(AUTO_SAVE_KEY);
+  } catch {
+    /* stockage indisponible : réglage par défaut */
+  }
+
+  if (raw === autoSaveRaw) {
+    return autoSaveCache;
+  }
+
+  autoSaveRaw = raw;
+  autoSaveCache = DEFAULT_AUTO_SAVE;
+
+  try {
+    const parsed: unknown = raw ? JSON.parse(raw) : null;
+
+    if (typeof parsed === "object" && parsed !== null) {
+      const { enabled, delay } = parsed as Record<string, unknown>;
+
+      autoSaveCache = {
+        enabled: enabled === true,
+        delay: isAutoSaveDelay(delay) ? delay : DEFAULT_AUTO_SAVE.delay,
+      };
+    }
+  } catch {
+    /* valeur illisible : réglage par défaut */
+  }
+
+  return autoSaveCache;
+}
+
+/** Enregistre le réglage d'enregistrement automatique. */
+export function setAutoSave(changes: Partial<AutoSaveSettings>) {
+  const next = { ...getAutoSave(), ...changes };
+
+  try {
+    localStorage.setItem(AUTO_SAVE_KEY, JSON.stringify(next));
+  } catch {
+    /* ignoré */
+  }
+
+  window.dispatchEvent(new Event(AUTO_SAVE_EVENT));
+}
+
+/** Réglage d'enregistrement automatique, mis à jour dès qu'il change. */
+export function useAutoSave(): AutoSaveSettings {
+  return useSyncExternalStore(subscribeTo(AUTO_SAVE_EVENT), getAutoSave);
+}

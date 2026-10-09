@@ -26,6 +26,7 @@ import { CSS } from "@dnd-kit/utilities";
 import {
   ChevronLeft,
   ChevronRight,
+  Circle,
   Pin,
   PinOff,
   X,
@@ -40,6 +41,8 @@ export interface TabInfo {
   label: string;
   icon: LucideIcon;
   pinned: boolean;
+  /** Modifications non enregistrées : un point ● remplace la croix. */
+  dirty: boolean;
 }
 
 interface WorkspaceTabsProps {
@@ -185,7 +188,7 @@ function SortableTab({
   onOpenMenu,
   keepFocus,
 }: SortableTabProps) {
-  const { t } = useTranslation("tabs");
+  const { t } = useTranslation(["tabs", "unsaved"]);
   const { setNodeRef, transform, transition, isDragging, listeners } =
     useSortable({ id: tab.id });
 
@@ -253,8 +256,14 @@ function SortableTab({
         aria-selected={active}
         aria-haspopup="menu"
         aria-keyshortcuts="Alt+ArrowLeft Alt+ArrowRight Shift+F10"
-        aria-label={tab.pinned ? tab.label : undefined}
-        title={tab.label}
+        aria-label={
+          tab.dirty
+            ? t("unsaved:tab.unsavedNamed", { name: tab.label })
+            : tab.pinned
+              ? tab.label
+              : undefined
+        }
+        title={tab.dirty ? `${tab.label} — ${t("unsaved:tab.unsaved")}` : tab.label}
         onClick={() => onSelect(tab.id)}
         onKeyDown={onKeyDown}
         {...listeners}
@@ -284,8 +293,20 @@ function SortableTab({
             "opacity-0 focus-visible:opacity-100 group-focus-within:opacity-100 group-hover:opacity-100",
         )}
       >
+        {/* Épinglé et non enregistré : le point remplace l'épingle,
+            qui réapparaît au survol. */}
+        {tab.pinned && tab.dirty && (
+          <Circle
+            aria-hidden="true"
+            className="h-2 w-2 fill-current text-foreground group-focus-within:hidden group-hover:hidden"
+          />
+        )}
         <Pin
-          className={cn("h-3 w-3", tab.pinned && "fill-current text-primary")}
+          className={cn(
+            "h-3 w-3",
+            tab.pinned && "fill-current text-primary",
+            tab.pinned && tab.dirty && "hidden group-focus-within:block group-hover:block",
+          )}
         />
       </button>
 
@@ -294,11 +315,27 @@ function SortableTab({
         <button
           type="button"
           aria-label={t("tab.closeNamed", { name: tab.label })}
-          title={t("tab.close")}
+          title={
+            tab.dirty
+              ? `${t("unsaved:tab.unsaved")} — ${t("tab.close")}`
+              : t("tab.close")
+          }
           onClick={() => onClose(tab.id)}
           className="flex h-5 w-5 shrink-0 items-center justify-center rounded hover:bg-secondary"
         >
-          <X className="h-3 w-3" />
+          {/* Comme VS Code : un point tant que ce n'est pas enregistré,
+              la croix au survol pour pouvoir fermer quand même. */}
+          {tab.dirty ? (
+            <>
+              <Circle
+                aria-hidden="true"
+                className="h-2 w-2 fill-current text-foreground group-focus-within:hidden group-hover:hidden"
+              />
+              <X className="hidden h-3 w-3 group-focus-within:block group-hover:block" />
+            </>
+          ) : (
+            <X className="h-3 w-3" />
+          )}
         </button>
       )}
     </div>

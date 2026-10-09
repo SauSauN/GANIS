@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { SetupGate } from "@/components/layout/SetupGate";
 import { TitleBar } from "@/components/layout/TitleBar";
+import { UnsavedChangesGuard } from "@/components/layout/UnsavedChangesGuard";
 
 import Welcome from "@/pages/Welcome";
 import Login from "@/pages/Login";
@@ -11,6 +12,8 @@ import Setup from "@/pages/Setup";
 import Dashboard from "@/pages/Dashboard";
 import Workspace from "@/pages/Workspace";
 import Settings from "@/pages/Settings";
+import Packages from "@/pages/Packages";
+import ThemeEditor from "@/pages/ThemeEditor";
 
 export default function App() {
   return (
@@ -20,6 +23,9 @@ export default function App() {
       {/* ------------------------------------------------------------------ */}
 
       <TitleBar />
+
+      {/* Modifications non enregistrées : question avant de quitter */}
+      <UnsavedChangesGuard />
 
       {/* ------------------------------------------------------------------ */}
       {/* Contenu principal                                                    */}
@@ -78,6 +84,23 @@ export default function App() {
               <Route
                 path="/settings"
                 element={<Settings />}
+              />
+
+              {/* Packages : thèmes système et créations de l'utilisateur */}
+              <Route
+                path="/packages"
+                element={<Packages />}
+              />
+
+              {/* Éditeur de thème (mode développeur, vérifié par Rust) */}
+              <Route
+                path="/packages/themes/new"
+                element={<ThemeEditor />}
+              />
+
+              <Route
+                path="/packages/themes/:packageId"
+                element={<ThemeEditor />}
               />
 
               {/* Ancienne adresse du profil : redirigée vers les paramètres */}

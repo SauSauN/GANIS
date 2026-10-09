@@ -6,6 +6,7 @@
 pub mod auth_service;
 pub mod diagnostics_service;
 pub mod login_throttle;
+pub mod package_service;
 pub mod project_service;
 pub mod project_storage;
 pub mod session_service;

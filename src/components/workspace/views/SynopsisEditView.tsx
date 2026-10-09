@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useUnsavedChanges } from "@/lib/unsavedChanges";
 import { useTranslation } from "react-i18next";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
@@ -24,6 +25,17 @@ const MAX_TAGS = 20;
 const MAX_TAG_LENGTH = 50;
 
 type SaveStatus = "idle" | "saved" | "error";
+
+/** Dernière version enregistrée (ou chargée) : sert à repérer les modifications. */
+interface Baseline {
+  content: string;
+  genres: string[];
+  subgenres: string[];
+  tone: string[];
+}
+
+const sameList = (a: string[], b: string[]) =>
+  a.length === b.length && a.every((item, index) => item === b[index]);
 
 interface SynopsisEditViewProps {
   projectId: string;
@@ -179,6 +191,15 @@ export function SynopsisEditView({
   const [saveStatus, setSaveStatus] =
     useState<SaveStatus>("idle");
 
+  /** Texte actuel de l'éditeur (HTML), mis à jour à chaque frappe. */
+  const [contentHtml, setContentHtml] = useState("");
+
+  /** Version de référence ; `null` tant que le synopsis n'est pas chargé. */
+  const [baseline, setBaseline] = useState<Baseline | null>(null);
+
+  /** Enregistrement en cours : un second appel attend le premier. */
+  const inFlight = useRef<Promise<boolean> | null>(null);
+
   /**
    * Projet pour lequel l'éditeur a déjà été rempli.
    */
@@ -197,6 +218,7 @@ export function SynopsisEditView({
       }),
     ],
     content: "",
+    onUpdate: ({ editor: current }) => setContentHtml(current.getHTML()),
     editorProps: {
       attributes: {
         class:
@@ -234,6 +256,16 @@ export function SynopsisEditView({
     setTone(synopsis.tone);
     editor.commands.setContent(synopsis.content || "");
 
+    // Référence : le texte tel que l'éditeur le restitue (HTML normalisé).
+    const html = editor.getHTML();
+    setContentHtml(html);
+    setBaseline({
+      content: html,
+      genres: synopsis.genres,
+      subgenres: synopsis.subgenres,
+      tone: synopsis.tone,
+    });
+
     hydratedFor.current = projectId;
   }, [synopsis, editor, projectId]);
 
@@ -253,16 +285,32 @@ export function SynopsisEditView({
   // Enregistrement
   // -------------------------------------------------------------------------
 
-  async function handleSave() {
+  /**
+   * Enregistre ; renvoie `false` en cas d'échec. Utilisé par le bouton,
+   * l'enregistrement automatique et la question « Enregistrer ? ».
+   */
+  function handleSave(): Promise<boolean> {
+    if (!inFlight.current) {
+      inFlight.current = doSave().finally(() => {
+        inFlight.current = null;
+      });
+    }
+
+    return inFlight.current;
+  }
+
+  async function doSave(): Promise<boolean> {
     if (!editor || !synopsis) {
-      return;
+      return false;
     }
 
     setSaveStatus("idle");
 
+    const content = editor.getHTML();
+
     try {
       const saved = await updateSynopsis(projectId, {
-        content: editor.getHTML(),
+        content,
         genres,
         subgenres,
         tone,
@@ -274,6 +322,14 @@ export function SynopsisEditView({
       setSubgenres(saved.subgenres);
       setTone(saved.tone);
 
+      // Ce qui a été tapé pendant l'enregistrement reste « non enregistré ».
+      setBaseline({
+        content,
+        genres: saved.genres,
+        subgenres: saved.subgenres,
+        tone: saved.tone,
+      });
+
       setSaveStatus("saved");
 
       if (statusTimer.current !== null) {
@@ -283,10 +339,33 @@ export function SynopsisEditView({
       statusTimer.current = window.setTimeout(() => {
         setSaveStatus("idle");
       }, 3000);
+
+      return true;
     } catch {
       setSaveStatus("error");
+      return false;
     }
   }
+
+  // -------------------------------------------------------------------------
+  // Modifications non enregistrées (point sur l'onglet, question à la
+  // fermeture, enregistrement automatique)
+  // -------------------------------------------------------------------------
+
+  const dirty =
+    baseline !== null &&
+    (contentHtml !== baseline.content ||
+      !sameList(genres, baseline.genres) ||
+      !sameList(subgenres, baseline.subgenres) ||
+      !sameList(tone, baseline.tone));
+
+  useUnsavedChanges({
+    dirty,
+    save: handleSave,
+    // Texte stable (et non un tableau recréé à chaque rendu) : le délai
+    // ne repart qu'à une vraie modification.
+    revision: JSON.stringify([contentHtml, genres, subgenres, tone]),
+  });
 
   // -------------------------------------------------------------------------
   // Affichage

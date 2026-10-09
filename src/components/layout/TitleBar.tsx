@@ -1,9 +1,10 @@
 import type { MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { useMatch, useNavigate } from "react-router-dom";
-import { Moon, Settings, Sun } from "lucide-react";
+import { useMatch } from "react-router-dom";
+import { Blocks, Moon, Settings, Sun } from "lucide-react";
 import ganisLogo from "@/assets/ganis-logo.png";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { useGuardedNavigate } from "@/components/layout/UnsavedChangesGuard";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { WindowControls } from "@/components/layout/WindowControls";
 import { applyTheme, useResolvedTheme, type Theme } from "@/lib/theme";
@@ -29,12 +30,14 @@ const iconButton =
  * afin que les boutons restent cliquables.
  */
 export function TitleBar() {
-  const navigate = useNavigate();
+  // Demande d'abord quoi faire des modifications non enregistrées.
+  const navigate = useGuardedNavigate();
   const { t } = useTranslation("titlebar");
 
   const user = useAuthStore((s) => s.user);
 
   const onSettingsPage = useMatch("/settings") !== null;
+  const onPackagesPage = useMatch("/packages/*") !== null;
 
   const match = useMatch("/workspace/:projectId");
   const projectId = match?.params.projectId;
@@ -131,8 +134,10 @@ export function TitleBar() {
         className="flex items-center gap-1 pr-2"
         onMouseDown={stopDrag}
       >
-        {/* Langue de l'interface (seul emplacement du sélecteur) */}
-        <LanguageSwitcher className="mr-1" />
+        {/* Langue de l'interface avant connexion (accueil, connexion,
+            inscription, configuration). Une fois connecté, elle se change
+            dans le menu du compte. */}
+        {!user && <LanguageSwitcher className="mr-1" />}
 
         <button
           type="button"
@@ -147,6 +152,20 @@ export function TitleBar() {
             <Moon className="h-4 w-4" />
           )}
         </button>
+
+        {/* Packages (thèmes) */}
+        {user && (
+          <button
+            type="button"
+            onClick={() => navigate("/packages")}
+            aria-label={t("packages")}
+            title={t("packages")}
+            aria-current={onPackagesPage ? "page" : undefined}
+            className={cn(iconButton, onPackagesPage && "bg-secondary text-foreground")}
+          >
+            <Blocks className="h-4 w-4" />
+          </button>
+        )}
 
         {/* Paramètres généraux (compte, apparence) */}
         {user && (

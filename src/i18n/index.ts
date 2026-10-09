@@ -8,6 +8,7 @@ import enDashboard from "./locales/en/dashboard.json";
 import enErrors from "./locales/en/errors.json";
 import enLogin from "./locales/en/login.json";
 import enModules from "./locales/en/modules.json";
+import enPackages from "./locales/en/packages.json";
 import enProjectSettings from "./locales/en/projectSettings.json";
 import enProjects from "./locales/en/projects.json";
 import enRegister from "./locales/en/register.json";
@@ -18,6 +19,7 @@ import enStatusbar from "./locales/en/statusbar.json";
 import enSynopsis from "./locales/en/synopsis.json";
 import enTabs from "./locales/en/tabs.json";
 import enTitlebar from "./locales/en/titlebar.json";
+import enUnsaved from "./locales/en/unsaved.json";
 import enUsermenu from "./locales/en/usermenu.json";
 import enViews from "./locales/en/views.json";
 import enWelcome from "./locales/en/welcome.json";
@@ -30,6 +32,7 @@ import frDashboard from "./locales/fr/dashboard.json";
 import frErrors from "./locales/fr/errors.json";
 import frLogin from "./locales/fr/login.json";
 import frModules from "./locales/fr/modules.json";
+import frPackages from "./locales/fr/packages.json";
 import frProjectSettings from "./locales/fr/projectSettings.json";
 import frProjects from "./locales/fr/projects.json";
 import frRegister from "./locales/fr/register.json";
@@ -40,6 +43,7 @@ import frStatusbar from "./locales/fr/statusbar.json";
 import frSynopsis from "./locales/fr/synopsis.json";
 import frTabs from "./locales/fr/tabs.json";
 import frTitlebar from "./locales/fr/titlebar.json";
+import frUnsaved from "./locales/fr/unsaved.json";
 import frUsermenu from "./locales/fr/usermenu.json";
 import frViews from "./locales/fr/views.json";
 import frWelcome from "./locales/fr/welcome.json";
@@ -95,6 +99,7 @@ export const resources = {
     errors: frErrors,
     login: frLogin,
     modules: frModules,
+    packages: frPackages,
     projectSettings: frProjectSettings,
     projects: frProjects,
     register: frRegister,
@@ -105,6 +110,7 @@ export const resources = {
     synopsis: frSynopsis,
     tabs: frTabs,
     titlebar: frTitlebar,
+    unsaved: frUnsaved,
     usermenu: frUsermenu,
     views: frViews,
     welcome: frWelcome,
@@ -119,6 +125,7 @@ export const resources = {
     errors: enErrors,
     login: enLogin,
     modules: enModules,
+    packages: enPackages,
     projectSettings: enProjectSettings,
     projects: enProjects,
     register: enRegister,
@@ -129,6 +136,7 @@ export const resources = {
     synopsis: enSynopsis,
     tabs: enTabs,
     titlebar: enTitlebar,
+    unsaved: enUnsaved,
     usermenu: enUsermenu,
     views: enViews,
     welcome: enWelcome,
@@ -192,6 +200,7 @@ void i18n.use(initReactI18next).init({
     "errors",
     "login",
     "modules",
+    "packages",
     "projectSettings",
     "projects",
     "register",
@@ -202,6 +211,7 @@ void i18n.use(initReactI18next).init({
     "synopsis",
     "tabs",
     "titlebar",
+    "unsaved",
     "usermenu",
     "views",
     "welcome",
