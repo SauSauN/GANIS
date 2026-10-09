@@ -1,0 +1,45 @@
+{
+  "modules": {
+    "details": { "label": "Détails" },
+    "characters": { "label": "Personnages", "empty": "Aucun personnage pour l'instant." },
+    "locations": { "label": "Lieux", "empty": "Aucun lieu pour l'instant." },
+    "chapters": { "label": "Chapitres", "empty": "Aucun chapitre pour l'instant." },
+    "scenes": { "label": "Scènes", "empty": "Aucune scène pour l'instant." },
+    "notes": { "label": "Notes", "empty": "Aucune note pour l'instant." },
+    "search": { "label": "Recherche" },
+    "settings": { "label": "Paramètres du projet" }
+  },
+  "features": {
+    "home": {
+      "label": "Accueil du projet",
+      "description": "Résumé, genres, ton et informations générales de votre histoire."
+    },
+    "synopsis": {
+      "edit": {
+        "label": "Synopsis du projet",
+        "description": "Résumé, genres, ton et informations générales de votre histoire."
+      }
+    },
+    "characters": {
+      "create": { "label": "Créer un personnage", "description": "Identité, description, parcours et motivations." },
+      "list": { "label": "Liste des personnages", "description": "Tous les personnages du projet." },
+      "relations": { "label": "Relations entre personnages", "description": "Liens familiaux, amicaux, rivalités et alliances." }
+    },
+    "locations": {
+      "create": { "label": "Créer un lieu", "description": "Description, histoire et caractéristiques du lieu." },
+      "list": { "label": "Liste des lieux", "description": "Tous les lieux de votre univers." }
+    },
+    "chapters": {
+      "create": { "label": "Créer un chapitre", "description": "Titre, synopsis et place dans le récit." },
+      "list": { "label": "Plan des chapitres", "description": "Les chapitres dans l'ordre du récit." }
+    },
+    "scenes": {
+      "create": { "label": "Créer une scène", "description": "Chapitre, lieu, personnages et contenu de la scène." },
+      "list": { "label": "Liste des scènes", "description": "Toutes les scènes du projet." }
+    },
+    "notes": {
+      "create": { "label": "Créer une note", "description": "Idées, références et documentation libre." },
+      "list": { "label": "Liste des notes", "description": "Toutes vos notes de projet." }
+    }
+  }
+}

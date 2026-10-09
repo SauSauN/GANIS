@@ -1,0 +1,22 @@
+{
+  "synopsis": {
+    "title": "Synopsis",
+    "subtitle": "Narrative overview of the project",
+    "loading": "Loading synopsis…",
+    "emptyTitle": "No synopsis has been written yet",
+    "emptyHint": "Open “{{module}}” then “{{feature}}” in the left bar to get started.",
+    "genres": "Genres",
+    "subgenres": "Subgenres",
+    "tone": "Tone"
+  },
+  "description": "Description",
+  "info": {
+    "title": "Project information",
+    "createdAt": "Created on",
+    "updatedAt": "Last modified"
+  },
+  "help": {
+    "title": "Organize your project",
+    "text": "Use the left bar to organize the characters, locations, chapters, scenes and other elements of your project."
+  }
+}

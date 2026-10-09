@@ -1,0 +1,29 @@
+{
+  "listLabel": "Onglets du projet",
+  "tab": {
+    "pin": "Épingler",
+    "unpin": "Désépingler",
+    "pinNamed": "Épingler l'onglet {{name}}",
+    "unpinNamed": "Désépingler l'onglet {{name}}",
+    "close": "Fermer l'onglet",
+    "closeNamed": "Fermer l'onglet {{name}}"
+  },
+  "nav": {
+    "left_one": "Afficher l'onglet masqué à gauche ({{count}} masqué)",
+    "left_other": "Afficher l'onglet masqué à gauche ({{count}} masqués)",
+    "right_one": "Afficher l'onglet masqué à droite ({{count}} masqué)",
+    "right_other": "Afficher l'onglet masqué à droite ({{count}} masqués)"
+  },
+  "menu": {
+    "label": "Actions de l'onglet {{name}}",
+    "pin": "Épingler l'onglet",
+    "unpin": "Désépingler l'onglet",
+    "close": "Fermer cet onglet",
+    "closePinned": "Désépinglez d'abord l'onglet pour le fermer",
+    "closeOthers": "Fermer les autres onglets",
+    "closeLeft": "Fermer les onglets à gauche",
+    "closeRight": "Fermer les onglets à droite",
+    "closeAll": "Fermer tous les onglets",
+    "pinnedNote": "Les onglets épinglés restent ouverts."
+  }
+}

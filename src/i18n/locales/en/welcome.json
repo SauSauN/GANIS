@@ -1,0 +1,17 @@
+{
+  "tagline": "Narrative design studio",
+  "intro": "Organize your worlds, characters and stories in a modular workspace, right on your computer.",
+  "actions": {
+    "createAccount": "Create an account",
+    "demo": "Demo mode"
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Sign in to your GANIS workspace.",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…"
+  },
+  "noAccount": "Don't have an account yet?"
+}

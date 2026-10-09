@@ -1,51 +1,103 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import { invoke } from "@tauri-apps/api/core";
-import "./App.css";
+import { Navigate, Route, Routes } from "react-router-dom";
 
-function App() {
-  const [greetMsg, setGreetMsg] = useState("");
-  const [name, setName] = useState("");
+import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
+import { SetupGate } from "@/components/layout/SetupGate";
+import { TitleBar } from "@/components/layout/TitleBar";
 
-  async function greet() {
-    // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
-    setGreetMsg(await invoke("greet", { name }));
-  }
+import Welcome from "@/pages/Welcome";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import Setup from "@/pages/Setup";
+import Dashboard from "@/pages/Dashboard";
+import Workspace from "@/pages/Workspace";
+import Settings from "@/pages/Settings";
 
+export default function App() {
   return (
-    <main className="container">
-      <h1>Welcome to Tauri + React</h1>
+    <div className="flex h-screen flex-col overflow-hidden bg-background">
+      {/* ------------------------------------------------------------------ */}
+      {/* Barre de titre                                                       */}
+      {/* ------------------------------------------------------------------ */}
 
-      <div className="row">
-        <a href="https://vite.dev" target="_blank">
-          <img src="/vite.svg" className="logo vite" alt="Vite logo" />
-        </a>
-        <a href="https://tauri.app" target="_blank">
-          <img src="/tauri.svg" className="logo tauri" alt="Tauri logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <TitleBar />
+
+      {/* ------------------------------------------------------------------ */}
+      {/* Contenu principal                                                    */}
+      {/* ------------------------------------------------------------------ */}
+
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+        {/* Impose la configuration initiale tant qu'aucun compte n'existe */}
+        <SetupGate>
+          <Routes>
+            {/* ============================================================ */}
+            {/* Configuration initiale (premier lancement)                    */}
+            {/* ============================================================ */}
+
+            <Route
+              path="/setup"
+              element={<Setup />}
+            />
+
+            {/* ============================================================ */}
+            {/* Routes publiques                                              */}
+            {/* ============================================================ */}
+
+            <Route
+              path="/"
+              element={<Welcome />}
+            />
+
+            <Route
+              path="/login"
+              element={<Login />}
+            />
+
+            <Route
+              path="/register"
+              element={<Register />}
+            />
+
+            {/* ============================================================ */}
+            {/* Routes privées                                                */}
+            {/* ============================================================ */}
+
+            <Route element={<ProtectedRoute />}>
+              {/* Tableau de bord */}
+              <Route
+                path="/dashboard"
+                element={<Dashboard />}
+              />
+
+              {/* Espace de travail d'un projet */}
+              <Route
+                path="/workspace/:projectId"
+                element={<Workspace />}
+              />
+
+              {/* Paramètres (compte, apparence) */}
+              <Route
+                path="/settings"
+                element={<Settings />}
+              />
+
+              {/* Ancienne adresse du profil : redirigée vers les paramètres */}
+              <Route
+                path="/profile"
+                element={<Navigate to="/settings" replace />}
+              />
+            </Route>
+
+            {/* ============================================================ */}
+            {/* Route inconnue                                                */}
+            {/* ============================================================ */}
+
+            <Route
+              path="*"
+              element={<Navigate to="/" replace />}
+            />
+          </Routes>
+        </SetupGate>
       </div>
-      <p>Click on the Tauri, Vite, and React logos to learn more.</p>
-
-      <form
-        className="row"
-        onSubmit={(e) => {
-          e.preventDefault();
-          greet();
-        }}
-      >
-        <input
-          id="greet-input"
-          onChange={(e) => setName(e.currentTarget.value)}
-          placeholder="Enter a name..."
-        />
-        <button type="submit">Greet</button>
-      </form>
-      <p>{greetMsg}</p>
-    </main>
+    </div>
   );
 }
-
-export default App;

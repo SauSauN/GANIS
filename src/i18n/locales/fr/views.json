@@ -1,0 +1,10 @@
+{
+  "emptyList": {
+    "title": "Aucun élément pour l'instant.",
+    "description": "Les éléments créés apparaîtront ici."
+  },
+  "comingSoon": {
+    "title": "Bientôt disponible",
+    "description": "Cette fonctionnalité sera ajoutée dans une prochaine étape."
+  }
+}

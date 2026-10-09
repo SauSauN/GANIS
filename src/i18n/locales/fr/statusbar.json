@@ -1,0 +1,9 @@
+{
+  "offline": "Hors ligne",
+  "localProject": "Projet local",
+  "save": {
+    "idle": "Prêt",
+    "saving": "Enregistrement…",
+    "error": "Échec de l'enregistrement"
+  }
+}

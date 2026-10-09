@@ -1,4 +1,14 @@
+# ============================================================================
+# GANIS — .gitignore racine
+# ============================================================================
+# Couvre : Node/Vite (frontend), Playwright (tests E2E), bases SQLite locales,
+#          artefacts d'IDE et d'OS.
+# Le côté Rust est couvert par src-tauri/.gitignore (/target/, /gen/schemas).
+# ============================================================================
+
+# ----------------------------------------------------------------------------
 # Logs
+# ----------------------------------------------------------------------------
 logs
 *.log
 npm-debug.log*
@@ -7,12 +17,28 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# ----------------------------------------------------------------------------
+# Dépendances & builds frontend
+# ----------------------------------------------------------------------------
 node_modules
 dist
 dist-ssr
 *.local
 
-# Editor directories and files
+# ----------------------------------------------------------------------------
+# Bases de données locales (dev)
+# ----------------------------------------------------------------------------
+# SQLite crée des fichiers -wal et -shm à côté de la base principale.
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# ----------------------------------------------------------------------------
+# Éditeurs & OS
+# ----------------------------------------------------------------------------
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -23,9 +49,28 @@ dist-ssr
 *.sln
 *.sw?
 
+# ----------------------------------------------------------------------------
 # Playwright
+# ----------------------------------------------------------------------------
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# ----------------------------------------------------------------------------
+# Tauri (artefacts de build générés à la racine si présents)
+# ----------------------------------------------------------------------------
+# Le binaire compilé et les bundles finaux.
+# (Le dossier src-tauri/target/ est couvert par src-tauri/.gitignore.)
+/src-tauri/target/
+/src-tauri/gen/schemas/
+
+# ----------------------------------------------------------------------------
+# Divers
+# ----------------------------------------------------------------------------
+# Fichiers temporaires de sauvegarde / export
+*.tmp
+*.bak
+# Archives de projet GANIS : NE PAS ignorer les .ganix (format d'échange officiel)
+# !*.ganix

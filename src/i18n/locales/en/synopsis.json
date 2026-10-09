@@ -1,0 +1,28 @@
+{
+  "card": {
+    "title": "Synopsis",
+    "description": "Content, genres, subgenres and tone of your story."
+  },
+  "content": "Content",
+  "genres": {
+    "label": "Genres",
+    "placeholder": "E.g. Fantasy, Adventure, Science fiction…"
+  },
+  "subgenres": {
+    "label": "Subgenres",
+    "placeholder": "E.g. Dark Fantasy, Cyberpunk, Space Opera…"
+  },
+  "tone": {
+    "label": "Tone",
+    "placeholder": "E.g. Dark, Epic, Humorous, Melancholic…"
+  },
+  "tags": {
+    "add": "Add",
+    "remove": "Remove",
+    "removeNamed": "Remove {{tag}}",
+    "full": "{{max}} items maximum"
+  },
+  "retry": "Retry",
+  "saved": "Synopsis saved.",
+  "saveFailed": "Saving failed."
+}

@@ -25,6 +25,8 @@
     --color-input: var(--input);
     --color-border: var(--border);
     --color-destructive: var(--destructive);
+    --color-success: var(--success);
+    --color-warning: var(--warning);
     --color-accent-foreground: var(--accent-foreground);
     --color-accent: var(--accent);
     --color-muted-foreground: var(--muted-foreground);
@@ -48,83 +50,155 @@
     --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/*
+ * Palette GANIS.
+ * - foreground  = "Primary / navigation / texte fort"
+ * - primary     = "Accent / actions / sélection" (boutons, liens actifs)
+ * - secondary / muted / accent = "Surface secondaire / hover"
+ * Les valeurs marquées (dérivé) ne figurent pas dans ta table : ajustables.
+ */
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
-    --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
+    --background: #FAFAFD;
+    --foreground: #122056;
+    --card: #FFFFFF;
+    --card-foreground: #122056;
+    --popover: #FFFFFF;
+    --popover-foreground: #122056;
+    --primary: #5B65DC;
+    --primary-foreground: #FFFFFF;
+    --secondary: #EEEFFD;
+    --secondary-foreground: #122056;
+    --muted: #EEEFFD;
+    --muted-foreground: #5D6590;   /* dérivé */
+    --accent: #EEEFFD;
+    --accent-foreground: #122056;
+    --destructive: #F87171;
+    --success: #34D399;
+    --warning: #FBBF24;
+    --border: #E0E2F4;             /* dérivé */
+    --input: #E0E2F4;              /* dérivé */
+    --ring: #5B65DC;
+    --chart-1: #5B65DC;
+    --chart-2: #7C85F2;
+    --chart-3: #34D399;
+    --chart-4: #FBBF24;
+    --chart-5: #F87171;
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    --sidebar: #FFFFFF;
+    --sidebar-foreground: #122056;
+    --sidebar-primary: #5B65DC;
+    --sidebar-primary-foreground: #FFFFFF;
+    --sidebar-accent: #EEEFFD;
+    --sidebar-accent-foreground: #122056;
+    --sidebar-border: #E0E2F4;
+    --sidebar-ring: #5B65DC;
+
+    /* Barre de défilement (visible uniquement pendant un défilement) */
+    --scrollbar-thumb: color-mix(in oklab, var(--muted-foreground) 45%, transparent);
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
-    --destructive: oklch(0.704 0.191 22.216);
-    --border: oklch(1 0 0 / 10%);
-    --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+    --background: #0D1020;
+    --foreground: #EEF0FF;
+    --card: #151A30;
+    --card-foreground: #EEF0FF;
+    --popover: #151A30;
+    --popover-foreground: #EEF0FF;
+    --primary: #7C85F2;
+    --primary-foreground: #0D1020;
+    --secondary: #242A4A;
+    --secondary-foreground: #EEF0FF;
+    --muted: #242A4A;
+    --muted-foreground: #9AA3D6;   /* dérivé */
+    --accent: #242A4A;
+    --accent-foreground: #EEF0FF;
+    --destructive: #DC2626;
+    --success: #059669;
+    --warning: #D97706;
+    --border: #2A3157;             /* dérivé */
+    --input: #2A3157;              /* dérivé */
+    --ring: #7C85F2;
+    --chart-1: #7C85F2;
+    --chart-2: #5B65DC;
+    --chart-3: #059669;
+    --chart-4: #D97706;
+    --chart-5: #DC2626;
+    --sidebar: #151A30;
+    --sidebar-foreground: #EEF0FF;
+    --sidebar-primary: #7C85F2;
+    --sidebar-primary-foreground: #0D1020;
+    --sidebar-accent: #242A4A;
+    --sidebar-accent-foreground: #EEF0FF;
+    --sidebar-border: #2A3157;
+    --sidebar-ring: #7C85F2;
+
+    --scrollbar-thumb: color-mix(in oklab, var(--muted-foreground) 50%, transparent);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
-    }
+  }
   body {
     @apply bg-background text-foreground;
-    }
+  }
   html {
     @apply font-sans;
-    }
+  }
 }
+
+/* ============================================================
+   GANIS — BARRES DE DÉFILEMENT
+   ============================================================
+   Invisibles au repos, colorées selon le thème pendant un
+   défilement. L'attribut `data-scrolling` est posé et retiré
+   par `src/lib/scrollbars.ts` sur l'élément qui défile.
+   L'espace de la barre reste réservé : le contenu ne bouge pas
+   quand elle apparaît.
+   ============================================================ */
+
+/* Moteurs récents (WebView2 sous Windows, Firefox) */
+@supports (scrollbar-color: auto) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  [data-scrolling] {
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+  }
+}
+
+/* Secours pour WebKit (macOS, Linux), sans `scrollbar-color` */
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track,
+  ::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    background-clip: content-box;
+    border: 2px solid transparent;
+    border-radius: 9999px;
+  }
+
+  [data-scrolling]::-webkit-scrollbar-thumb {
+    background-color: var(--scrollbar-thumb);
+  }
+}
+
+/* ============================================================
+   GANIS — BARRE DE TITRE Tauri
+   ============================================================
+   Le drag de la fenêtre est géré nativement par Tauri via
+   l'attribut `data-tauri-drag-region` (voir TitleBar.tsx).
+   Aucune propriété CSS n'est nécessaire — surtout pas
+   `-webkit-app-region` qui est spécifique à Electron et
+   interfère avec le comportement de Tauri v2.
+   ============================================================ */

@@ -1,0 +1,51 @@
+{
+  "roles": {
+    "main": "Main character",
+    "secondary": "Secondary character",
+    "antagonist": "Antagonist",
+    "extra": "Extra"
+  },
+  "create": {
+    "preview": "Preview of the creation form. Saving characters will be enabled with the project database.",
+    "identity": {
+      "title": "Identity",
+      "description": "What is the character's name and what role do they play?",
+      "name": "Name",
+      "namePlaceholder": "Character name",
+      "nickname": "Nickname",
+      "nicknamePlaceholder": "Nickname or alias (optional)",
+      "role": "Role in the plot"
+    },
+    "description": {
+      "title": "Description",
+      "description": "What can be seen and what can be sensed about the character.",
+      "appearance": "Physical appearance",
+      "appearancePlaceholder": "Height, build, distinctive features, clothing style…",
+      "personality": "Personality",
+      "personalityPlaceholder": "Temperament, strengths, flaws, quirks…"
+    },
+    "background": {
+      "title": "Background and motivations",
+      "description": "Where the character comes from and what drives them.",
+      "history": "Personal history",
+      "historyPlaceholder": "Past, family, defining events…",
+      "motivations": "Motivations",
+      "motivationsPlaceholder": "What drives them to act…",
+      "goals": "Goals and conflicts",
+      "goalsPlaceholder": "What they want to achieve, what stands in their way…"
+    },
+    "notes": {
+      "title": "Private notes",
+      "description": "Free-form remarks, visible only in this project.",
+      "label": "Notes",
+      "placeholder": "Ideas, references, open questions…"
+    },
+    "save": "Save character",
+    "saveUnavailable": "Saving will be available with the project database",
+    "reset": "Reset",
+    "errors": {
+      "nameRequired": "Character name is required.",
+      "nameTooLong": "The name cannot exceed {{max}} characters."
+    }
+  }
+}

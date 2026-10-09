@@ -1,0 +1,11 @@
+{
+  "label": "Module features",
+  "search": {
+    "placeholder": "Search the project",
+    "unavailable": "Search will be available once the project has content."
+  },
+  "resize": {
+    "label": "Resize the features panel",
+    "title": "Drag to resize, drag left to close. Double-click: default width."
+  }
+}
