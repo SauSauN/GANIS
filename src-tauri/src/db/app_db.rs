@@ -27,7 +27,12 @@ pub async fn init_app_db(data_dir: &Path) -> AppResult<SqlitePool> {
         .map_err(|e| AppError::database(e).with_detail("URL de base de données invalide"))?
         .create_if_missing(true)
         .foreign_keys(true)
-        .journal_mode(sqlx::sqlite::SqliteJournalMode::Wal);
+        .journal_mode(sqlx::sqlite::SqliteJournalMode::Wal)
+        // Les données supprimées ou remplacées sont effacées du fichier
+        // (mises à zéro), pas seulement marquées comme libres : quand un
+        // e-mail ou un nom de projet passe en version chiffrée, l'ancienne
+        // valeur en clair ne reste pas lisible dans l'espace libéré.
+        .pragma("secure_delete", "ON");
 
     let pool = SqlitePoolOptions::new()
         .max_connections(5)

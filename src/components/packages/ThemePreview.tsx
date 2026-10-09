@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { BookOpen, FileText, MapPin, Users } from "lucide-react";
+import { ListTree, FileText, MapPin, Users } from "lucide-react";
 import { themeStyle } from "@/components/packages/ThemeSwatch";
 import type { ThemePalette } from "@/types";
 
@@ -27,7 +27,7 @@ export function ThemePreview({
     { key: "details", icon: FileText },
     { key: "characters", icon: Users },
     { key: "locations", icon: MapPin },
-    { key: "chapters", icon: BookOpen },
+    { key: "structure", icon: ListTree },
   ] as const;
 
   return (

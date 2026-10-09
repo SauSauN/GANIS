@@ -7,5 +7,6 @@ pub mod auth;
 pub mod diagnostics;
 pub mod packages;
 pub mod projects;
+pub mod structure;
 pub mod synopsis;
 pub mod users;

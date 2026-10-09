@@ -66,7 +66,18 @@ impl Role {
 pub struct User {
     pub id: String,
     pub username: String,
+    /// E-mail en clair.
+    ///
+    /// En base, cette colonne reste vide pour les comptes chiffrés : l'adresse
+    /// est dans `email_sealed`. Dans la session (`AppState`), elle contient
+    /// l'adresse déchiffrée.
     pub email: Option<String>,
+
+    /// E-mail chiffré avec la clé du compte (jamais envoyé à l'interface).
+    #[serde(skip)]
+    #[sqlx(default)]
+    pub email_sealed: Option<String>,
+
     pub role: Role,
 
     #[serde(skip_serializing)]

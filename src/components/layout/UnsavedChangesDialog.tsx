@@ -1,5 +1,4 @@
 import { useTranslation } from "react-i18next";
-import { Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -8,67 +7,76 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import type { UnsavedQueueQuestion } from "@/components/layout/useUnsavedQueue";
 
 interface UnsavedChangesDialogProps {
-  open: boolean;
   /** Ce qui déclenche la question : fermer des onglets, quitter la page ou GANIS. */
   reason: "closeTabs" | "leave" | "quit";
-  /** Noms des éléments non enregistrés. */
-  items: string[];
+  /** Élément demandé (`null` : fenêtre fermée). */
+  question: UnsavedQueueQuestion | null;
   busy: boolean;
-  /** Message d'échec d'un enregistrement, le cas échéant. */
-  error: string | null;
+  /** Vrai si l'enregistrement de cet élément vient d'échouer. */
+  failed: boolean;
   onSave: () => void;
   onDiscard: () => void;
   onCancel: () => void;
 }
 
 /**
- * « Voulez-vous enregistrer vos modifications ? »
+ * « Voulez-vous enregistrer les modifications de … ? »
  *
- * Trois choix, comme dans les éditeurs de texte :
- * - Enregistrer (puis continuer) ;
- * - Ne pas enregistrer (les modifications sont perdues) ;
- * - Annuler (rien ne se passe, on revient à l'écran).
+ * Toujours pour **un seul** élément à la fois (voir `useUnsavedQueue`) :
+ * le choix ne vaut que pour lui. S'il en reste d'autres, la question est
+ * reposée pour chacun.
+ *
+ * - Enregistrer (puis élément suivant) ;
+ * - Ne pas enregistrer (ses modifications sont perdues, puis élément suivant) ;
+ * - Annuler (on s'arrête là : les éléments suivants ne sont pas touchés).
  */
 export function UnsavedChangesDialog({
-  open,
   reason,
-  items,
+  question,
   busy,
-  error,
+  failed,
   onSave,
   onDiscard,
   onCancel,
 }: UnsavedChangesDialogProps) {
   const { t } = useTranslation("unsaved");
-  const single = items.length === 1;
+
+  if (!question) {
+    return null;
+  }
+
+  const remaining = question.total - question.current;
+
+  // Libellés de fin (« Enregistrer et quitter ») seulement pour le dernier
+  // élément : avant, on passe simplement au suivant.
+  const step = question.hasNext ? "closeTabs" : reason;
 
   return (
-    <Dialog open={open} onOpenChange={(next) => !next && !busy && onCancel()}>
+    <Dialog open onOpenChange={(next) => !next && !busy && onCancel()}>
       <DialogHeader>
-        <DialogTitle>
-          {single
-            ? t("title.one", { name: items[0] })
-            : t("title.many", { count: items.length })}
-        </DialogTitle>
+        {question.total > 1 && (
+          <p className="text-xs font-medium text-muted-foreground">
+            {t("progress", { current: question.current, total: question.total })}
+          </p>
+        )}
+
+        <DialogTitle>{t("title.one", { name: question.label })}</DialogTitle>
+
         <DialogDescription>{t(`description.${reason}`)}</DialogDescription>
       </DialogHeader>
 
-      {!single && (
-        <ul className="mt-4 space-y-1.5 rounded-lg border bg-muted/30 p-3">
-          {items.map((name) => (
-            <li key={name} className="flex items-center gap-2 text-sm">
-              <Circle className="h-2 w-2 shrink-0 fill-current text-primary" aria-hidden />
-              {name}
-            </li>
-          ))}
-        </ul>
+      {remaining > 0 && (
+        <p className="mt-3 text-sm text-muted-foreground">
+          {t("remaining", { count: remaining })}
+        </p>
       )}
 
-      {error && (
+      {failed && (
         <p role="alert" className="mt-4 text-sm text-destructive">
-          {error}
+          {t("saveFailed", { name: question.label })}
         </p>
       )}
 
@@ -77,10 +85,10 @@ export function UnsavedChangesDialog({
           {t("cancel")}
         </Button>
         <Button variant="outline" onClick={onDiscard} disabled={busy}>
-          {t(`discard.${reason}`)}
+          {t(`discard.${step}`)}
         </Button>
         <Button onClick={onSave} disabled={busy}>
-          {busy ? t("saving") : t(`save.${reason}`, { count: items.length })}
+          {busy ? t("saving") : t(`save.${step}`)}
         </Button>
       </DialogFooter>
     </Dialog>

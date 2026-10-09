@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { CalendarDays, Mail, ShieldCheck, User as UserIcon } from "lucide-react";
+import { RecoveryKeyPanel } from "@/components/auth/RecoveryKeyPanel";
 import {
   cardClass,
   cardFooterClass,
@@ -23,6 +24,7 @@ import {
   checkPassword,
   type ValidationIssue,
 } from "@/lib/validators";
+import { RECOVERY_KEY_ENABLED } from "@/lib/recoveryKey";
 import { useAuthStore } from "@/stores/authStore";
 
 /** Messages propres à cette section (clés de `settings.json`). */
@@ -32,7 +34,10 @@ type AccountMessage =
   | "account.email.failed"
   | "account.password.currentRequired"
   | "account.password.changed"
-  | "account.password.failed";
+  | "account.password.failed"
+  | "account.recovery.currentRequired"
+  | "account.recovery.failed"
+  | "account.recovery.done";
 
 /**
  * Retour affiché sous un formulaire.
@@ -102,8 +107,103 @@ function InfoCell({
 }
 
 /**
- * Section « Compte » : informations du compte, adresse e-mail
- * et changement de mot de passe.
+ * Clé de récupération : en créer une nouvelle (l'ancienne cesse de
+ * fonctionner). La nouvelle clé est affichée une seule fois, à la place
+ * du formulaire, jusqu'à ce que l'utilisateur confirme l'avoir notée.
+ */
+function RecoveryKeyCard({ username }: { username: string }) {
+  const { t } = useTranslation(["settings", "common"]);
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [newKey, setNewKey] = useState<string | null>(null);
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setFeedback(null);
+
+    if (!currentPassword) {
+      setFeedback({ kind: "error", key: "account.recovery.currentRequired" });
+      return;
+    }
+
+    setSaving(true);
+
+    try {
+      const key = await api.regenerateRecoveryKey({ currentPassword });
+
+      setCurrentPassword("");
+      setNewKey(key);
+    } catch (e) {
+      setFeedback(failure(e, "account.recovery.failed"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (newKey) {
+    return (
+      <Card className={cardClass}>
+        <CardContent className="px-6 py-6">
+          <div className="max-w-xl">
+            <RecoveryKeyPanel
+              recoveryKey={newKey}
+              username={username}
+              context="regenerated"
+              onConfirmed={() => {
+                setNewKey(null);
+                setFeedback({ kind: "success", key: "account.recovery.done" });
+              }}
+            />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  return (
+    <Card className={cardClass}>
+      <form onSubmit={handleSubmit}>
+        <CardHeader className={cardHeaderClass}>
+          <CardTitle>{t("account.recovery.title")}</CardTitle>
+
+          <CardDescription>{t("account.recovery.description")}</CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-6 px-6 py-6">
+          <div className="max-w-md space-y-2">
+            <Label htmlFor="recovery-current-password">
+              {t("account.recovery.current")}
+            </Label>
+
+            <Input
+              id="recovery-current-password"
+              type="password"
+              autoComplete="current-password"
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+            />
+          </div>
+
+          <FeedbackMessage feedback={feedback} />
+        </CardContent>
+
+        <CardFooter className={cardFooterClass}>
+          <Button type="submit" variant="outline" disabled={saving}>
+            {saving
+              ? t("account.recovery.submitting")
+              : t("account.recovery.submit")}
+          </Button>
+        </CardFooter>
+      </form>
+    </Card>
+  );
+}
+
+/**
+ * Section « Compte » : informations du compte, adresse e-mail,
+ * changement de mot de passe et clé de récupération.
  */
 export function AccountSection() {
   const { t, i18n } = useTranslation(["settings", "common"]);
@@ -340,6 +440,13 @@ export function AccountSection() {
           </CardFooter>
         </form>
       </Card>
+
+      {/* ==================================================================
+          CLÉ DE RÉCUPÉRATION
+          ================================================================== */}
+
+      {/* Désactivée pour l'instant : voir RECOVERY_KEY_ENABLED. */}
+      {RECOVERY_KEY_ENABLED && <RecoveryKeyCard username={user.username} />}
     </div>
   );
 }

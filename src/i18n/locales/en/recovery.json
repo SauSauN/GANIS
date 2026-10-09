@@ -1,0 +1,49 @@
+{
+  "panel": {
+    "title": {
+      "created": "Your recovery key",
+      "migrated": "Your data is now encrypted",
+      "regenerated": "Your new recovery key"
+    },
+    "intro": {
+      "created": "Your projects are encrypted: only you can read them. If you forget your password, this key lets you choose a new one without losing anything.",
+      "migrated": "This version of GANIS encrypts your projects: only you can read them. If you forget your password, this key lets you choose a new one without losing anything.",
+      "regenerated": "This key replaces the previous one. It lets you choose a new password if you forget yours, without losing anything."
+    },
+    "keyLabel": "Recovery key",
+    "copy": "Copy",
+    "copied": "Copied",
+    "save": "Save to a file",
+    "saved": "File saved",
+    "saveDialogTitle": "Save the recovery key",
+    "copyFailed": "The key could not be copied. Write it down by hand.",
+    "saveFailed": "The file could not be saved. Copy the key or write it down by hand.",
+    "warningTitle": "It will never be shown again.",
+    "warning": "Write it on paper or keep the file away from this computer. Without your password or this key, your projects will be lost for good: nobody can recover them, not even an administrator.",
+    "oldKeyRevoked": "The previous key no longer works.",
+    "check": "To confirm you wrote it down, type group no. {{number}}",
+    "continue": "I wrote down my key, continue"
+  },
+  "forgot": {
+    "title": "Forgot password",
+    "subtitle": "Enter your recovery key to choose a new password. Your projects will be kept.",
+    "username": "Username",
+    "recoveryKey": "Recovery key",
+    "recoveryKeyHint": "6 groups of 6 characters. Capitals, spaces and dashes are optional.",
+    "newPassword": "New password",
+    "confirm": "Confirm new password",
+    "submit": "Change password",
+    "submitting": "Checking…",
+    "back": "Back to sign in",
+    "noKey": "Without your recovery key, your projects cannot be recovered.",
+    "success": {
+      "title": "Password changed",
+      "description": "You can now sign in with your new password. Your projects are intact, and your recovery key is still valid.",
+      "login": "Sign in"
+    },
+    "errors": {
+      "usernameRequired": "Username is required.",
+      "keyFormat": "The recovery key must contain 6 groups of 6 characters (letters and digits)."
+    }
+  }
+}

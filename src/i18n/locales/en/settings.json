@@ -47,7 +47,7 @@
     },
     "password": {
       "title": "Password",
-      "description": "At least 8 characters, with one letter and one digit.",
+      "description": "At least 8 characters, with a letter and a digit. Your projects stay accessible with the new password.",
       "current": "Current password",
       "new": "New password",
       "confirm": "Confirm new password",
@@ -56,6 +56,16 @@
       "currentRequired": "Current password is required.",
       "changed": "Password changed.",
       "failed": "Unable to change the password."
+    },
+    "recovery": {
+      "title": "Recovery key",
+      "description": "It lets you choose a new password if you forget yours, without losing your projects. If you lost it, or someone else may have seen it, create a new one: the old one will stop working.",
+      "current": "Current password",
+      "submit": "Create a new key",
+      "submitting": "Creating…",
+      "currentRequired": "Current password is required.",
+      "failed": "Could not create a new key.",
+      "done": "New recovery key saved."
     }
   },
   "appearance": {

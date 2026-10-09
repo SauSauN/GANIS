@@ -67,5 +67,18 @@
     "invalidColor": "La couleur « {{name}} » n'est pas valide (format attendu : #RRGGBB).",
     "invalidRadius": "L'arrondi doit être compris entre 0 et {{max}} rem.",
     "idUnavailable": "Impossible de trouver un identifiant libre pour ce package."
+  },
+  "recovery": {
+    "invalid": "Nom d'utilisateur ou clé de récupération incorrect.",
+    "invalidFormat": "La clé de récupération doit contenir 6 groupes de 6 caractères (lettres et chiffres)."
+  },
+  "structure": {
+    "notFound": "Élément du découpage introuvable.",
+    "titleEmpty": "Le titre ne peut pas être vide.",
+    "titleTooLong": "Le titre ne peut pas dépasser {{max}} caractères.",
+    "summaryTooLong": "Le résumé ne peut pas dépasser {{max}} caractères.",
+    "invalidLevel": "Niveau de découpage invalide.",
+    "invalidParent": "Un élément ne peut contenir que des éléments de niveau inférieur.",
+    "invalidTemplate": "Modèle de découpage inconnu."
   }
 }

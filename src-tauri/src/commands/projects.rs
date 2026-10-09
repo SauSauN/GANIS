@@ -4,9 +4,12 @@
 //! est toujours pris dans l'état Rust, jamais fourni par l'interface : un
 //! compte ne peut donc agir que sur ses propres projets.
 //!
-//! Les données de chaque projet (base SQLite) sont gérées par
+//! Les données de chaque projet (base SQLite chiffrée) sont gérées par
 //! `services::project_storage` : créées avec le projet, copiées à la
 //! duplication, supprimées avec lui.
+//!
+//! La clé du compte, ouverte à la connexion, est nécessaire pour lire le
+//! nom et la description des projets et pour ouvrir leurs bases.
 
 use crate::error::{AppError, AppResult};
 use crate::models::project::{Project, ProjectStatus, ProjectType};
@@ -47,18 +50,21 @@ pub async fn create_project(
     state: State<'_, AppState>,
     input: CreateProjectInput,
 ) -> AppResult<Project> {
-    let user = state.require_user().await?;
+    let (user, account_key) = state.require_session().await?;
 
-    let project = project_service::create_project(
+    let (project, project_key) = project_service::create_project(
         &state.app_db,
         &user.id,
+        &account_key,
         &input.name,
         &input.description,
         input.project_type,
     )
     .await?;
 
-    if let Err(error) = project_storage::create_storage(&state, &project.id).await {
+    if let Err(error) =
+        project_storage::create_storage(&state, &project.id, &project_key).await
+    {
         let _ = project_service::delete_project(&state.app_db, &project.id, &user.id).await;
 
         return Err(error);
@@ -72,9 +78,9 @@ pub async fn create_project(
 pub async fn list_projects(
     state: State<'_, AppState>,
 ) -> AppResult<Vec<Project>> {
-    let user = state.require_user().await?;
+    let (user, account_key) = state.require_session().await?;
 
-    project_service::list_projects_for_user(&state.app_db, &user.id).await
+    project_service::list_projects_for_user(&state.app_db, &user.id, &account_key).await
 }
 
 /// Récupère un projet appartenant à l'utilisateur courant.
@@ -83,9 +89,9 @@ pub async fn get_project(
     state: State<'_, AppState>,
     project_id: String,
 ) -> AppResult<Project> {
-    let user = state.require_user().await?;
+    let (user, account_key) = state.require_session().await?;
 
-    project_service::find_by_id_for_user(&state.app_db, &project_id, &user.id)
+    project_service::find_by_id_for_user(&state.app_db, &project_id, &user.id, &account_key)
         .await?
         .ok_or_else(|| AppError::not_found("Projet non trouvé.").with_key("project.notFound"))
 }
@@ -100,11 +106,11 @@ pub async fn open_project(
     state: State<'_, AppState>,
     project_id: String,
 ) -> AppResult<Project> {
-    let user = state.require_user().await?;
+    let (user, account_key) = state.require_session().await?;
 
     project_storage::pool_for_user(&state, &project_id, &user.id).await?;
 
-    project_service::mark_opened(&state.app_db, &project_id, &user.id).await
+    project_service::mark_opened(&state.app_db, &project_id, &user.id, &account_key).await
 }
 
 /// Met à jour un projet appartenant à l'utilisateur courant.
@@ -116,12 +122,13 @@ pub async fn update_project(
     project_id: String,
     input: UpdateProjectInput,
 ) -> AppResult<Project> {
-    let user = state.require_user().await?;
+    let (user, account_key) = state.require_session().await?;
 
     project_service::update_project(
         &state.app_db,
         &project_id,
         &user.id,
+        &account_key,
         input.name.as_deref(),
         input.description.as_deref(),
         input.project_type,
@@ -141,15 +148,20 @@ pub async fn duplicate_project(
     state: State<'_, AppState>,
     project_id: String,
 ) -> AppResult<Project> {
-    let user = state.require_user().await?;
+    let (user, account_key) = state.require_session().await?;
 
-    let copy =
-        project_service::duplicate_project(&state.app_db, &project_id, &user.id)
+    let (copy, copy_key) =
+        project_service::duplicate_project(&state.app_db, &project_id, &user.id, &account_key)
             .await?;
 
-    if let Err(error) =
-        project_storage::duplicate_storage(&state, &project_id, &copy.id, &user.id)
-            .await
+    if let Err(error) = project_storage::duplicate_storage(
+        &state,
+        &project_id,
+        &copy.id,
+        &user.id,
+        &copy_key,
+    )
+    .await
     {
         let _ = project_service::delete_project(&state.app_db, &copy.id, &user.id).await;
 

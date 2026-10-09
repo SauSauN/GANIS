@@ -1,8 +1,8 @@
 {
   "title": {
-    "one": "Save changes to “{{name}}”?",
-    "many": "Save changes to {{count}} items?"
+    "one": "Save changes to “{{name}}”?"
   },
+  "progress": "Item {{current}} of {{total}}",
   "description": {
     "closeTabs": "Your changes will be lost if you close without saving.",
     "leave": "Your changes will be lost if you leave this page without saving.",
@@ -20,8 +20,9 @@
   },
   "cancel": "Cancel",
   "saving": "Saving…",
-  "failed_one": "“{{names}}” couldn't be saved. Fix the error shown and try again.",
-  "failed_other": "These items couldn't be saved: {{names}}. Fix the errors shown and try again.",
+  "remaining_one": "You'll then choose for the next item.",
+  "remaining_other": "You'll then choose for each of the next {{count}} items.",
+  "saveFailed": "“{{name}}” couldn't be saved. Cancel to fix the error shown, or continue without saving it.",
   "tab": {
     "unsaved": "Unsaved changes",
     "unsavedNamed": "{{name}} (unsaved)"

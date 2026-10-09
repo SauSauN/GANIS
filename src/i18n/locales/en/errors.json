@@ -67,5 +67,18 @@
     "invalidColor": "The “{{name}}” color isn't valid (expected format: #RRGGBB).",
     "invalidRadius": "The corner radius must be between 0 and {{max}} rem.",
     "idUnavailable": "Couldn't find a free identifier for this package."
+  },
+  "recovery": {
+    "invalid": "Incorrect username or recovery key.",
+    "invalidFormat": "The recovery key must contain 6 groups of 6 characters (letters and digits)."
+  },
+  "structure": {
+    "notFound": "Structure item not found.",
+    "titleEmpty": "The title cannot be empty.",
+    "titleTooLong": "The title cannot exceed {{max}} characters.",
+    "summaryTooLong": "The summary cannot exceed {{max}} characters.",
+    "invalidLevel": "Invalid structure level.",
+    "invalidParent": "An item can only contain items of a lower level.",
+    "invalidTemplate": "Unknown structure template."
   }
 }

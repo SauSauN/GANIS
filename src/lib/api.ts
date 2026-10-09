@@ -1,12 +1,16 @@
 import { invoke } from "@tauri-apps/api/core";
 import i18n from "@/i18n";
 import type {
+  AccountCreated,
   ApiErrorPayload,
   AppInfo,
   Diagnostics,
   ErrorCode,
+  LoginResult,
   Project,
   Role,
+  Structure,
+  StructureNode,
   Synopsis,
   ThemeData,
   User,
@@ -234,12 +238,13 @@ export const api = {
 
   /**
    * Crée le premier compte administrateur.
+   * Retourne aussi sa clé de récupération, à montrer une seule fois.
    */
   setupAdmin: (input: {
     username: string;
     password: string;
     email?: string;
-  }) => call<User>("setup_admin", { input }),
+  }) => call<AccountCreated>("setup_admin", { input }),
 
   /**
    * Liste les comptes utilisateurs locaux.
@@ -286,20 +291,53 @@ export const api = {
 
   /**
    * Crée un nouveau compte utilisateur local.
+   * Retourne aussi sa clé de récupération, à montrer une seule fois.
    */
   register: (input: {
     username: string;
     password: string;
     email?: string;
-  }) => call<User>("register", { input }),
+  }) => call<AccountCreated>("register", { input }),
 
   /**
-   * Authentifie un utilisateur existant.
+   * Authentifie un utilisateur existant et ouvre la clé de son compte.
    */
   login: (input: {
     username: string;
     password: string;
-  }) => call<User>("login", { input }),
+  }) => call<LoginResult>("login", { input }),
+
+  // -------------------------------------------------------------------------
+  // Clé de récupération
+  // -------------------------------------------------------------------------
+
+  /**
+   * Mot de passe oublié : choisit un nouveau mot de passe grâce à la clé
+   * de récupération. Les projets sont conservés.
+   */
+  recoverAccount: (input: {
+    username: string;
+    recoveryKey: string;
+    newPassword: string;
+  }) => call<void>("recover_account", { input }),
+
+  /**
+   * Remplace la clé de récupération du compte connecté et retourne la
+   * nouvelle. L'ancienne cesse aussitôt de fonctionner.
+   */
+  regenerateRecoveryKey: (input: { currentPassword: string }) =>
+    call<string>("regenerate_recovery_key", { input }),
+
+  /**
+   * Enregistre la clé de récupération dans un fichier texte (fenêtre
+   * « Enregistrer sous » ouverte par Rust). `false` si l'utilisateur annule.
+   */
+  saveRecoveryKeyFile: (input: {
+    recoveryKey: string;
+    username: string;
+    language: string;
+    dialogTitle: string;
+  }) => call<boolean>("save_recovery_key_file", { input }),
 
   /**
    * Ferme la session locale courante.
@@ -422,6 +460,43 @@ export const api = {
       projectId,
       input,
     }),
+
+  // -------------------------------------------------------------------------
+  // Découpage du récit
+  // -------------------------------------------------------------------------
+
+  /** Découpage complet du projet (modèle et éléments). */
+  getStructure: (projectId: string) =>
+    call<Structure>("get_structure", { projectId }),
+
+  /** Choisit le modèle de découpage (`null` : il suit le type du projet). */
+  setStructureTemplate: (projectId: string, template: string | null) =>
+    call<void>("set_structure_template", { projectId, template }),
+
+  /** Ajoute un élément à la fin de son parent (ou de la racine). */
+  createStructureNode: (
+    projectId: string,
+    input: { parentId: string | null; level: number; title: string },
+  ) => call<StructureNode>("create_structure_node", { projectId, input }),
+
+  /** Modifie le titre et/ou le résumé d'un élément. */
+  updateStructureNode: (
+    projectId: string,
+    nodeId: string,
+    input: { title?: string; summary?: string },
+  ) =>
+    call<StructureNode>("update_structure_node", { projectId, nodeId, input }),
+
+  /** Monte ou descend un élément parmi ceux de même parent. */
+  moveStructureNode: (
+    projectId: string,
+    nodeId: string,
+    direction: "up" | "down",
+  ) => call<void>("move_structure_node", { projectId, nodeId, direction }),
+
+  /** Supprime un élément et tout ce qu'il contient. */
+  deleteStructureNode: (projectId: string, nodeId: string) =>
+    call<void>("delete_structure_node", { projectId, nodeId }),
 
   // -------------------------------------------------------------------------
   // Packages et mode développeur

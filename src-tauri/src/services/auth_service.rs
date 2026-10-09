@@ -1,6 +1,12 @@
 //! Service d'authentification.
 //!
-//! Création des comptes, connexion, déconnexion et changement de mot de passe.
+//! Création des comptes, connexion, déconnexion, changement de mot de passe
+//! et récupération d'un compte avec sa clé de récupération.
+//!
+//! Chaque compte a une clé de compte qui chiffre ses données (voir
+//! `security`). Elle est créée avec le compte, ouverte à chaque connexion
+//! par le mot de passe, et peut aussi être ouverte par la clé de
+//! récupération si le mot de passe est oublié.
 //!
 //! Toutes les règles de validation sont appliquées ici, côté Rust. L'interface
 //! les vérifie aussi, mais uniquement pour le confort de l'utilisateur.
@@ -16,8 +22,11 @@
 
 use crate::db::app_db;
 use crate::error::{AppError, AppResult};
-use crate::models::user::{Role, UserPublic};
-use crate::services::{session_service, user_service};
+use crate::models::user::{Role, User, UserPublic};
+use crate::security::crypto::SecretKey;
+use crate::security::recovery_key::RecoveryKey;
+use crate::services::keyring_service::{self, NewKeyring, NewSlot, SlotKind};
+use crate::services::{project_storage, session_service, user_service};
 use crate::state::AppState;
 use crate::utils::{new_id, now_utc};
 use argon2::password_hash::{
@@ -246,7 +255,20 @@ fn map_insert_error(error: sqlx::Error) -> AppError {
         .with_detail(format!("Échec de l'insertion de l'utilisateur : {error}"))
 }
 
+/// Compte créé, avec sa clé de récupération éventuelle, à montrer une seule
+/// fois (voir `keyring_service::RECOVERY_KEY_ON_SIGNUP`).
+pub struct CreatedAccount {
+    pub user: UserPublic,
+    pub recovery_key: Option<RecoveryKey>,
+}
+
 /// Valide les données et crée le compte si `precondition` est remplie.
+///
+/// Avec `keyring`, le trousseau du compte (clé de compte, verrous mot de
+/// passe et clé de récupération) est créé dans la même transaction que le
+/// compte, et l'e-mail est chiffré. Sans trousseau (compte créé par un
+/// administrateur), il sera créé à la première connexion de l'utilisateur :
+/// l'administrateur ne voit donc jamais sa clé de récupération.
 async fn create_account(
     pool: &SqlitePool,
     username: &str,
@@ -254,7 +276,8 @@ async fn create_account(
     email: Option<&str>,
     role: Role,
     precondition: Precondition,
-) -> AppResult<UserPublic> {
+    keyring: bool,
+) -> AppResult<(UserPublic, Option<RecoveryKey>)> {
     let username = username.trim();
 
     validate_username(username)?;
@@ -262,27 +285,48 @@ async fn create_account(
 
     let email = normalize_email(email)?;
 
-    // Vérifications préalables, pour un message clair.
+    // Vérification préalable, pour un message clair.
+    //
+    // L'unicité des adresses e-mail n'est plus vérifiée : elles sont
+    // chiffrées, chaque compte avec sa propre clé, donc impossibles à
+    // comparer. Un serveur de récupération pourra la garantir plus tard.
     if user_service::find_by_username(pool, username).await?.is_some() {
         return Err(username_taken());
     }
 
-    if let Some(address) = email.as_deref() {
-        if user_service::find_by_email(pool, address).await?.is_some() {
-            return Err(email_taken());
-        }
-    }
-
-    let (password_hash, password_salt) = hash_password(password)?;
     let id = new_id();
     let now = now_utc();
+
+    // Calculs coûteux (Argon2) avant la transaction.
+    let (password_hash, password_salt) = hash_password(password)?;
+
+    let new_keyring: Option<NewKeyring> = if keyring {
+        Some(keyring_service::build_keyring(
+            &id,
+            password,
+            keyring_service::RECOVERY_KEY_ON_SIGNUP,
+        )?)
+    } else {
+        None
+    };
+
+    let (plain_email, sealed_email) = match (&new_keyring, email.as_deref()) {
+        (Some(k), Some(address)) => (
+            None,
+            Some(user_service::seal_email(&k.account_key, &id, address)?),
+        ),
+        (Some(_), None) => (None, None),
+        (None, address) => (address.map(str::to_owned), None),
+    };
+
+    let mut tx = pool.begin().await?;
 
     // INSERT … SELECT … WHERE : la condition et l'insertion forment une
     // seule instruction SQLite, donc une seule opération atomique.
     let sql = format!(
         "INSERT INTO users \
-            (id, username, email, password_hash, password_salt, role, created_at, updated_at) \
-         SELECT ?, ?, ?, ?, ?, ?, ?, ? \
+            (id, username, email, email_sealed, password_hash, password_salt, role, created_at, updated_at) \
+         SELECT ?, ?, ?, ?, ?, ?, ?, ?, ? \
          WHERE {}",
         precondition.sql()
     );
@@ -290,13 +334,14 @@ async fn create_account(
     let result = sqlx::query(&sql)
         .bind(&id)
         .bind(username)
-        .bind(email.as_deref())
+        .bind(plain_email.as_deref())
+        .bind(sealed_email.as_deref())
         .bind(&password_hash)
         .bind(&password_salt)
         .bind(role.as_str())
         .bind(&now)
         .bind(&now)
-        .execute(pool)
+        .execute(&mut *tx)
         .await
         .map_err(map_insert_error)?;
 
@@ -304,12 +349,30 @@ async fn create_account(
         return Err(precondition.failure());
     }
 
+    if let Some(k) = &new_keyring {
+        for slot in &k.slots {
+            keyring_service::insert_slot(&mut tx, &id, slot).await?;
+        }
+    }
+
+    tx.commit().await?;
+
     tracing::info!(role = role.as_str(), "Compte utilisateur créé");
 
-    user_service::find_by_id(pool, &id)
+    let stored = user_service::find_by_id(pool, &id)
         .await?
-        .map(UserPublic::from)
-        .ok_or_else(|| AppError::internal("Utilisateur non trouvé après création"))
+        .ok_or_else(|| AppError::internal("Utilisateur non trouvé après création"))?;
+
+    let mut user = UserPublic::from(stored);
+    user.email = email;
+
+    Ok((user, new_keyring.and_then(|k| k.recovery_key)))
+}
+
+fn with_recovery_key(
+    (user, recovery_key): (UserPublic, Option<RecoveryKey>),
+) -> AppResult<CreatedAccount> {
+    Ok(CreatedAccount { user, recovery_key })
 }
 
 /// Crée le premier compte administrateur (configuration initiale, §37.9).
@@ -321,20 +384,23 @@ pub async fn setup_first_admin(
     username: &str,
     password: &str,
     email: Option<&str>,
-) -> AppResult<UserPublic> {
+) -> AppResult<CreatedAccount> {
     if app_db::has_any_user(pool).await? {
         return Err(already_configured());
     }
 
-    create_account(
-        pool,
-        username,
-        password,
-        email,
-        Role::Admin,
-        Precondition::NoUserYet,
+    with_recovery_key(
+        create_account(
+            pool,
+            username,
+            password,
+            email,
+            Role::Admin,
+            Precondition::NoUserYet,
+            true,
+        )
+        .await?,
     )
-    .await
 }
 
 /// Inscription publique : crée toujours un compte « Utilisateur ».
@@ -346,25 +412,30 @@ pub async fn register_user(
     username: &str,
     password: &str,
     email: Option<&str>,
-) -> AppResult<UserPublic> {
+) -> AppResult<CreatedAccount> {
     if user_service::count_admins(pool).await? == 0 {
         return Err(setup_not_done());
     }
 
-    create_account(
-        pool,
-        username,
-        password,
-        email,
-        Role::User,
-        Precondition::AdminExists,
+    with_recovery_key(
+        create_account(
+            pool,
+            username,
+            password,
+            email,
+            Role::User,
+            Precondition::AdminExists,
+            true,
+        )
+        .await?,
     )
-    .await
 }
 
 /// Crée un compte avec un rôle précis.
 ///
 /// Réservé aux administrateurs : la commande appelante vérifie ce droit.
+/// Le trousseau du compte sera créé à la première connexion de
+/// l'utilisateur, qui recevra alors lui-même sa clé de récupération.
 pub async fn create_user_with_role(
     pool: &SqlitePool,
     username: &str,
@@ -372,28 +443,39 @@ pub async fn create_user_with_role(
     email: Option<&str>,
     role: Role,
 ) -> AppResult<UserPublic> {
-    create_account(pool, username, password, email, role, Precondition::None).await
+    create_account(pool, username, password, email, role, Precondition::None, false)
+        .await
+        .map(|(user, _)| user)
 }
 
 // ----------------------------------------------------------------------------
 // Mot de passe
 // ----------------------------------------------------------------------------
 
-/// Change le mot de passe d'un utilisateur après vérification de l'ancien.
+fn current_password_wrong() -> AppError {
+    AppError::validation("Le mot de passe actuel est incorrect.")
+        .with_key("auth.currentPasswordWrong")
+}
+
+/// Change le mot de passe de l'utilisateur connecté après vérification de
+/// l'ancien.
+///
+/// Seul le verrou « mot de passe » est remplacé : la clé du compte, et
+/// donc tous les projets, restent les mêmes. Le hash et le verrou sont
+/// changés dans une même transaction.
 pub async fn change_password(
-    pool: &SqlitePool,
-    user_id: &str,
+    state: &AppState,
     current_password: &str,
     new_password: &str,
 ) -> AppResult<()> {
-    let user = user_service::find_by_id(pool, user_id)
+    let (session_user, account_key) = state.require_session().await?;
+
+    let user = user_service::find_by_id(&state.app_db, &session_user.id)
         .await?
         .ok_or_else(AppError::unauthorized)?;
 
     if !verify_password(current_password, &user.password_hash)? {
-        return Err(AppError::validation(
-            "Le mot de passe actuel est incorrect.",
-        ).with_key("auth.currentPasswordWrong"));
+        return Err(current_password_wrong());
     }
 
     validate_new_password(new_password)?;
@@ -404,25 +486,66 @@ pub async fn change_password(
         ).with_key("auth.passwordUnchanged"));
     }
 
-    let (password_hash, password_salt) = hash_password(new_password)?;
+    set_password(&state.app_db, &user.id, new_password, &account_key).await?;
 
-    user_service::update_password(pool, user_id, &password_hash, &password_salt).await
+    tracing::info!("Mot de passe modifié");
+
+    Ok(())
+}
+
+/// Remplace le mot de passe d'un compte : hash de connexion et verrou de
+/// la clé du compte, dans une même transaction.
+async fn set_password(
+    pool: &SqlitePool,
+    user_id: &str,
+    new_password: &str,
+    account_key: &SecretKey,
+) -> AppResult<()> {
+    let (password_hash, password_salt) = hash_password(new_password)?;
+    let slot = NewSlot::seal(
+        user_id,
+        SlotKind::Password,
+        new_password.as_bytes(),
+        account_key,
+    )?;
+
+    let mut tx = pool.begin().await?;
+
+    user_service::update_password(&mut tx, user_id, &password_hash, &password_salt).await?;
+    keyring_service::replace_slot(&mut tx, user_id, &slot).await?;
+
+    tx.commit().await?;
+
+    Ok(())
 }
 
 // ----------------------------------------------------------------------------
 // Connexion / déconnexion
 // ----------------------------------------------------------------------------
 
-/// Tente de connecter un utilisateur et crée une session.
+/// Résultat d'une connexion réussie.
+pub struct LoginOutcome {
+    pub user: UserPublic,
+    /// Présente uniquement si le compte vient d'être chiffré à cette
+    /// connexion (compte créé avant le chiffrement, ou par un
+    /// administrateur) et que les clés de récupération sont activées
+    /// (`RECOVERY_KEY_ON_SIGNUP`) : elle doit être montrée une seule fois.
+    pub recovery_key: Option<RecoveryKey>,
+}
+
+/// Tente de connecter un utilisateur, ouvre la clé de son compte et crée
+/// une session.
 ///
 /// - Les tentatives sont limitées par nom d'utilisateur (§8.4).
 /// - Nom inconnu et mot de passe faux donnent le même message et prennent
 ///   le même temps, pour ne pas révéler quels comptes existent.
+/// - Un compte sans trousseau (antérieur au chiffrement) reçoit le sien
+///   maintenant, et ses projets sont chiffrés.
 pub async fn login_user(
     state: &AppState,
     username: &str,
     password: &str,
-) -> AppResult<UserPublic> {
+) -> AppResult<LoginOutcome> {
     let username = username.trim();
 
     state.login_throttle.check(username)?;
@@ -453,32 +576,219 @@ pub async fn login_user(
 
     state.login_throttle.record_success(username);
 
+    // Clé du compte : ouverte par le mot de passe, ou créée si le compte
+    // n'a pas encore de trousseau.
+    let (account_key, recovery_key) =
+        match keyring_service::unlock(&state.app_db, &user.id, SlotKind::Password, password.as_bytes())
+            .await?
+        {
+            Some(Some(key)) => (key, None),
+            Some(None) => {
+                // Le mot de passe est juste mais n'ouvre pas le verrou : les
+                // deux ne sont plus en accord. Cela ne peut venir que d'une
+                // modification extérieure de la base.
+                return Err(AppError::internal(
+                    "Verrou du compte en désaccord avec le mot de passe",
+                ));
+            }
+            None => {
+                create_missing_keyring(&state.app_db, &user, password).await?
+            }
+        };
+
+    let user = user_service::reveal(user, &account_key)?;
+
     // Crée une session en base pour tracer la connexion.
     // Le jeton n'est pas encore exposé à l'interface : il servira à
     // renforcer la vérification de session côté Rust.
     let _token = session_service::create_session(&state.app_db, &user.id).await?;
 
     // C'est cet état qui est consulté par `require_user`,
-    // `require_admin` et `require_developer` dans state.rs.
-    state.set_current_user(Some(user.clone())).await;
+    // `require_admin`, `require_developer` et `require_session` (state.rs).
+    state.open_session(user.clone(), account_key.clone()).await;
+
+    // Projets antérieurs au chiffrement : chiffrés maintenant. Un échec
+    // n'empêche pas la connexion ; le projet sera chiffré à son ouverture.
+    project_storage::encrypt_legacy_projects(state, &user.id, &account_key).await;
 
     tracing::info!("Connexion réussie");
 
-    Ok(user.into())
+    Ok(LoginOutcome {
+        user: user.into(),
+        recovery_key,
+    })
+}
+
+/// Crée le trousseau d'un compte qui n'en a pas encore, et chiffre son
+/// adresse e-mail.
+///
+/// Les verrous sont insérés sans remplacement : si deux connexions
+/// simultanées s'y essaient, la seconde échoue au lieu d'écraser une clé
+/// de compte peut-être déjà utilisée.
+async fn create_missing_keyring(
+    pool: &SqlitePool,
+    user: &User,
+    password: &str,
+) -> AppResult<(SecretKey, Option<RecoveryKey>)> {
+    let keyring = keyring_service::build_keyring(
+        &user.id,
+        password,
+        keyring_service::RECOVERY_KEY_ON_SIGNUP,
+    )?;
+
+    let sealed_email = match user.email.as_deref() {
+        Some(address) => Some(user_service::seal_email(&keyring.account_key, &user.id, address)?),
+        None => user.email_sealed.clone(),
+    };
+
+    let mut tx = pool.begin().await?;
+
+    for slot in &keyring.slots {
+        keyring_service::insert_slot(&mut tx, &user.id, slot).await?;
+    }
+
+    sqlx::query("UPDATE users SET email = NULL, email_sealed = ? WHERE id = ?")
+        .bind(sealed_email.as_deref())
+        .bind(&user.id)
+        .execute(&mut *tx)
+        .await?;
+
+    tx.commit().await?;
+
+    tracing::info!("Trousseau du compte créé");
+
+    Ok((keyring.account_key, keyring.recovery_key))
 }
 
 /// Déconnecte l'utilisateur actuel.
 ///
-/// Supprime toutes les sessions de l'utilisateur de la base de données
-/// et réinitialise l'état partagé.
+/// Supprime toutes les sessions de l'utilisateur de la base de données,
+/// efface la clé du compte de la mémoire et ferme ses projets.
 pub async fn logout_user(state: &AppState) -> AppResult<()> {
     if let Some(user) = state.current_user().await {
         session_service::delete_user_sessions(&state.app_db, &user.id).await?;
     }
 
-    state.set_current_user(None).await;
+    state.close_session().await;
 
     Ok(())
+}
+
+// ----------------------------------------------------------------------------
+// Clé de récupération
+// ----------------------------------------------------------------------------
+
+fn invalid_recovery() -> AppError {
+    AppError::new(
+        crate::error::ErrorCode::Unauthorized,
+        "Nom d'utilisateur ou clé de récupération incorrect.",
+    )
+    .with_key("recovery.invalid")
+}
+
+/// Mot de passe oublié : la clé de récupération ouvre la clé du compte, et
+/// un nouveau mot de passe la referme. Tous les projets sont conservés.
+///
+/// Mêmes protections que la connexion : tentatives limitées, même message
+/// et même temps de réponse que le compte existe ou non. Les sessions du
+/// compte sont fermées.
+pub async fn recover_account(
+    state: &AppState,
+    username: &str,
+    recovery_key: &str,
+    new_password: &str,
+) -> AppResult<()> {
+    let username = username.trim();
+
+    state.recovery_throttle.check(username)?;
+
+    // Vérifications sans coût, qui ne révèlent rien sur le compte.
+    validate_new_password(new_password)?;
+    let recovery_key = RecoveryKey::parse(recovery_key)?;
+
+    let candidate = user_service::find_by_username(&state.app_db, username).await?;
+
+    let unlocked = match &candidate {
+        Some(user) => {
+            match keyring_service::unlock(
+                &state.app_db,
+                &user.id,
+                SlotKind::Recovery,
+                recovery_key.secret_bytes(),
+            )
+            .await?
+            {
+                Some(result) => result,
+                None => {
+                    // Compte sans trousseau : aucune clé de récupération
+                    // n'existe. Même coût qu'un vrai essai.
+                    keyring_service::burn_equivalent_work(recovery_key.secret_bytes());
+                    None
+                }
+            }
+        }
+        None => {
+            keyring_service::burn_equivalent_work(recovery_key.secret_bytes());
+            None
+        }
+    };
+
+    let (Some(user), Some(account_key)) = (candidate, unlocked) else {
+        state.recovery_throttle.record_failure(username);
+        tracing::warn!("Échec de récupération de compte");
+
+        return Err(invalid_recovery());
+    };
+
+    state.recovery_throttle.record_success(username);
+    state.login_throttle.record_success(username);
+
+    set_password(&state.app_db, &user.id, new_password, &account_key).await?;
+
+    // Toute session ouverte de ce compte est fermée.
+    session_service::delete_user_sessions(&state.app_db, &user.id).await?;
+
+    if state.current_user().await.is_some_and(|current| current.id == user.id) {
+        state.close_session().await;
+    }
+
+    tracing::info!("Compte récupéré avec la clé de récupération");
+
+    Ok(())
+}
+
+/// Crée la clé de récupération du compte connecté, ou la remplace (ancienne
+/// perdue ou exposée). L'ancienne cesse aussitôt de fonctionner.
+///
+/// Le mot de passe actuel est demandé, comme pour toute opération sensible.
+pub async fn regenerate_recovery_key(
+    state: &AppState,
+    current_password: &str,
+) -> AppResult<RecoveryKey> {
+    let (session_user, account_key) = state.require_session().await?;
+
+    let user = user_service::find_by_id(&state.app_db, &session_user.id)
+        .await?
+        .ok_or_else(AppError::unauthorized)?;
+
+    if !verify_password(current_password, &user.password_hash)? {
+        return Err(current_password_wrong());
+    }
+
+    let recovery_key = RecoveryKey::generate();
+    let slot = NewSlot::seal(
+        &user.id,
+        SlotKind::Recovery,
+        recovery_key.secret_bytes(),
+        &account_key,
+    )?;
+
+    let mut conn = state.app_db.acquire().await?;
+    keyring_service::replace_slot(&mut conn, &user.id, &slot).await?;
+
+    tracing::info!("Nouvelle clé de récupération créée");
+
+    Ok(recovery_key)
 }
 
 #[cfg(test)]

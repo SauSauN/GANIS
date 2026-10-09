@@ -5,6 +5,7 @@ import ganisLogo from "@/assets/ganis-logo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RECOVERY_KEY_ENABLED } from "@/lib/recoveryKey";
 import { useAuthStore } from "@/stores/authStore";
 
 export default function Welcome() {
@@ -120,9 +121,21 @@ export default function Welcome() {
 
               {/* Mot de passe */}
               <div className="space-y-2">
-                <Label htmlFor="password">
-                  {t("login.password")}
-                </Label>
+                <div className="flex items-baseline justify-between gap-2">
+                  <Label htmlFor="password">
+                    {t("login.password")}
+                  </Label>
+
+                  {RECOVERY_KEY_ENABLED && (
+                    <button
+                      type="button"
+                      onClick={() => navigate("/recover")}
+                      className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                    >
+                      {t("login.forgotPassword")}
+                    </button>
+                  )}
+                </div>
 
                 <Input
                   id="password"

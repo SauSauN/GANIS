@@ -10,6 +10,7 @@ import {
   ComingSoonView,
   EmptyListView,
 } from "@/components/workspace/views/GenericViews";
+import { StructurePlanView } from "@/components/workspace/views/StructurePlanView";
 import { SynopsisEditView } from "@/components/workspace/views/SynopsisEditView";
 import { WorkspaceHome } from "@/components/workspace/WorkspaceHome";
 import type { Project } from "@/types";
@@ -58,6 +59,13 @@ export function WorkspaceView({
   // ---------------------------------------------------------------------------
   if (tabId === "synopsis.edit") {
     return <SynopsisEditView projectId={project.id} feature={feature} />;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Découpage du récit
+  // ---------------------------------------------------------------------------
+  if (tabId === "structure.plan") {
+    return <StructurePlanView project={project} feature={feature} />;
   }
 
   // ---------------------------------------------------------------------------

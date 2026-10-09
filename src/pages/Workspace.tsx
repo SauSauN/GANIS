@@ -5,6 +5,7 @@ import { FileText, type LucideIcon } from "lucide-react";
 
 import { ActivityBar } from "@/components/layout/ActivityBar";
 import { UnsavedChangesDialog } from "@/components/layout/UnsavedChangesDialog";
+import { useUnsavedQueue } from "@/components/layout/useUnsavedQueue";
 import { SideBar } from "@/components/layout/SideBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import {
@@ -38,8 +39,6 @@ import {
 } from "@/lib/tabLayout";
 import {
   UnsavedTabContext,
-  discardEntries,
-  saveEntries,
   useUnsavedStore,
 } from "@/lib/unsavedChanges";
 import { useProjectStore } from "@/stores/projectStore";
@@ -62,14 +61,6 @@ function tabMeta(
   return found
     ? { label: found.feature.label, icon: found.feature.icon }
     : null;
-}
-
-/** Fermeture d'onglets en attente de la réponse « Enregistrer ? ». */
-interface PendingClose {
-  tabId: string;
-  scope: CloseScope;
-  /** Onglets concernés qui ont des modifications non enregistrées. */
-  unsaved: string[];
 }
 
 export default function Workspace() {
@@ -167,10 +158,11 @@ export default function Workspace() {
   /** Onglets avec des modifications non enregistrées (point ● sur l'onglet). */
   const unsavedEntries = useUnsavedStore((state) => state.entries);
 
-  /** Question « Enregistrer ? » affichée avant de fermer des onglets. */
-  const [pendingClose, setPendingClose] = useState<PendingClose | null>(null);
-  const [closeBusy, setCloseBusy] = useState(false);
-  const [closeError, setCloseError] = useState<string | null>(null);
+  /**
+   * Question « Enregistrer ? » avant de fermer des onglets modifiés,
+   * posée pour chaque onglet, l'un après l'autre.
+   */
+  const closeQueue = useUnsavedQueue();
 
   /**
    * Dernière disposition et dernier onglet actif : une fermeture qui suit un
@@ -282,6 +274,9 @@ export default function Workspace() {
    * reste alors repéré dans la barre (voir `linked`).
    */
   function activate(tabId: string | null) {
+    // Mis à jour tout de suite : une fermeture enchaînée (questions
+    // successives) doit voir le nouvel onglet actif sans attendre le rendu.
+    activeTabRef.current = tabId;
     setActiveTab(tabId);
 
     const owner = tabId ? findFeature(tabId)?.module.id : undefined;
@@ -319,25 +314,37 @@ export default function Workspace() {
    */
   function closeTabs(tabId: string, scope: CloseScope) {
     const closing = tabsToClose(layoutRef.current, tabId, scope);
-    const unsaved = closing.filter(
-      (id) => id in useUnsavedStore.getState().entries,
-    );
+    const isUnsaved = (id: string) => id in useUnsavedStore.getState().entries;
 
-    // Modifications non enregistrées : on demande d'abord quoi en faire.
-    if (unsaved.length > 0) {
-      setCloseError(null);
-      setPendingClose({ tabId, scope, unsaved });
+    const unsaved = closing.filter(isUnsaved);
+    const clean = closing.filter((id) => !isUnsaved(id));
+
+    // Les onglets sans modification se ferment tout de suite.
+    closeTabIds(clean, tabId);
+
+    if (unsaved.length === 0) {
       return;
     }
 
-    closeTabsNow(tabId, scope);
+    // Les onglets modifiés : un par un. Chaque onglet est affiché, la
+    // question est posée pour lui seul, puis il est fermé (s'il est
+    // enregistré ou abandonné) avant de passer au suivant. « Annuler »
+    // laisse ouverts celui-ci et les suivants.
+    closeQueue.start(unsaved, {
+      onShow: (id) => activate(id),
+      onResolved: (id) => closeTabIds([id], tabId),
+    });
   }
 
-  /** Ferme réellement les onglets (aucune question). */
-  function closeTabsNow(tabId: string, scope: CloseScope) {
+  /**
+   * Ferme réellement ces onglets (aucune question).
+   *
+   * Si l'onglet actif en fait partie, `anchor` devient actif s'il est
+   * resté ouvert, sinon le voisin le plus proche.
+   */
+  function closeTabIds(closing: string[], anchor: string) {
     const layout = layoutRef.current;
     const activeTab = activeTabRef.current;
-    const closing = tabsToClose(layout, tabId, scope);
     const next = closeTabsInLayout(layout, closing);
 
     if (next === layout) {
@@ -351,8 +358,8 @@ export default function Workspace() {
       return;
     }
 
-    if (next.tabs.includes(tabId)) {
-      activate(tabId);
+    if (next.tabs.includes(anchor)) {
+      activate(anchor);
       return;
     }
 
@@ -363,41 +370,6 @@ export default function Workspace() {
     const before = layout.tabs.slice(0, index).reverse().find(isOpen);
 
     activate(after ?? before ?? null);
-  }
-
-  /** « Enregistrer » : enregistre puis ferme ; en cas d'échec, montre l'onglet fautif. */
-  async function saveAndClose() {
-    if (!pendingClose) {
-      return;
-    }
-
-    setCloseBusy(true);
-    setCloseError(null);
-
-    const failed = await saveEntries(pendingClose.unsaved);
-
-    setCloseBusy(false);
-
-    if (failed.length === 0) {
-      setPendingClose(null);
-      closeTabsNow(pendingClose.tabId, pendingClose.scope);
-      return;
-    }
-
-    // L'erreur s'affiche dans l'onglet : on le montre et on n'en ferme aucun.
-    setPendingClose(null);
-    activate(failed[0]);
-  }
-
-  /** « Ne pas enregistrer » : les modifications sont abandonnées. */
-  function discardAndClose() {
-    if (!pendingClose) {
-      return;
-    }
-
-    discardEntries(pendingClose.unsaved);
-    setPendingClose(null);
-    closeTabsNow(pendingClose.tabId, pendingClose.scope);
   }
 
   /**
@@ -572,16 +544,13 @@ export default function Workspace() {
           « ENREGISTRER LES MODIFICATIONS ? » (fermeture d'onglets)
           ========================================================= */}
       <UnsavedChangesDialog
-        open={pendingClose !== null}
         reason="closeTabs"
-        items={(pendingClose?.unsaved ?? []).map(
-          (id) => tabMeta(id)?.label ?? id,
-        )}
-        busy={closeBusy}
-        error={closeError}
-        onSave={() => void saveAndClose()}
-        onDiscard={discardAndClose}
-        onCancel={() => setPendingClose(null)}
+        question={closeQueue.question}
+        busy={closeQueue.busy}
+        failed={closeQueue.failed}
+        onSave={closeQueue.save}
+        onDiscard={closeQueue.discard}
+        onCancel={closeQueue.cancel}
       />
 
       {/* =========================================================

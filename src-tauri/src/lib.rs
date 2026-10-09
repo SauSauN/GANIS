@@ -9,6 +9,7 @@ mod utils;
 
 mod db;
 mod models;
+mod security;
 mod state;
 
 mod services;
@@ -41,6 +42,7 @@ fn app_info() -> AppResult<AppInfo> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             // -----------------------------------------------------------------
             // 1. Journalisation
@@ -88,6 +90,9 @@ pub fn run() {
             commands::auth::register,
             commands::auth::login,
             commands::auth::logout,
+            commands::auth::recover_account,
+            commands::auth::regenerate_recovery_key,
+            commands::auth::save_recovery_key_file,
             //commands::users::list_users,
             //commands::users::create_user,
             //commands::users::update_user_role,
@@ -103,6 +108,12 @@ pub fn run() {
             commands::projects::delete_project,
             commands::synopsis::get_synopsis,
             commands::synopsis::update_synopsis,
+            commands::structure::get_structure,
+            commands::structure::set_structure_template,
+            commands::structure::create_structure_node,
+            commands::structure::update_structure_node,
+            commands::structure::move_structure_node,
+            commands::structure::delete_structure_node,
             commands::packages::become_developer,
             commands::packages::leave_developer_mode,
             commands::packages::list_my_packages,

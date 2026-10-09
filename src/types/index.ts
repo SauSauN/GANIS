@@ -24,6 +24,30 @@ export interface User {
   updatedAt: string; // RFC 3339, UTC
 }
 
+/**
+ * Compte créé (inscription, configuration initiale).
+ *
+ * `recoveryKey` n'est transmise qu'à cet instant : elle n'est stockée nulle
+ * part en clair et ne pourra plus jamais être relue. Elle vaut `null` tant
+ * que les clés de récupération sont désactivées (`RECOVERY_KEY_ENABLED`).
+ */
+export interface AccountCreated {
+  user: User;
+  recoveryKey: string | null;
+}
+
+/**
+ * Connexion réussie.
+ *
+ * `recoveryKey` n'est présente que si le compte vient d'être chiffré à
+ * cette connexion (compte créé avant le chiffrement) : elle doit être
+ * montrée une seule fois.
+ */
+export interface LoginResult {
+  user: User;
+  recoveryKey: string | null;
+}
+
 // ----------------------------------------------------------------------------
 // Projets narratifs
 // ----------------------------------------------------------------------------
@@ -75,6 +99,47 @@ export interface Synopsis {
   tone: string[];
   createdAt: string; // RFC 3339, UTC
   updatedAt: string; // RFC 3339, UTC
+}
+
+// ----------------------------------------------------------------------------
+// Découpage du récit
+// ----------------------------------------------------------------------------
+
+/**
+ * Modèle de découpage : il donne un nom à chacun des trois niveaux
+ * (ex. roman : Partie › Chapitre › Scène). Voir `lib/structure.ts`.
+ */
+export type StructureTemplateId =
+  | "novel"
+  | "manga"
+  | "film"
+  | "series"
+  | "game"
+  | "rpg"
+  | "generic";
+
+/** Élément du découpage (correspond à `StructureNode` en Rust). */
+export interface StructureNode {
+  id: string;
+  /** `null` : élément à la racine. */
+  parentId: string | null;
+  /** Niveau : 0, 1 ou 2. Son nom dépend du modèle. */
+  level: number;
+  title: string;
+  summary: string;
+  /** Ordre parmi les éléments de même parent. */
+  position: number;
+  createdAt: string; // RFC 3339, UTC
+  updatedAt: string; // RFC 3339, UTC
+}
+
+/** Découpage complet d'un projet. */
+export interface Structure {
+  template: StructureTemplateId;
+  /** Faux : le modèle suit le type du projet. */
+  templateChosen: boolean;
+  /** Tous les éléments, triés par parent puis par position. */
+  nodes: StructureNode[];
 }
 
 // ----------------------------------------------------------------------------
