@@ -1,7 +1,8 @@
 import type { MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useMatch, useNavigate } from "react-router-dom";
-import { Feather, Moon, Settings, Sun } from "lucide-react";
+import { Moon, Settings, Sun } from "lucide-react";
+import ganisLogo from "@/assets/ganis-logo.png";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { WindowControls } from "@/components/layout/WindowControls";
@@ -77,7 +78,12 @@ export function TitleBar() {
           onClick={() => navigate(user ? "/dashboard" : "/")}
           className="flex h-7 items-center gap-2 rounded px-2 font-semibold hover:bg-secondary"
         >
-          <Feather className="h-4 w-4 text-primary" />
+          <img
+            src={ganisLogo}
+            alt=""
+            aria-hidden="true"
+            className="h-6 w-6 shrink-0 object-contain"
+          />
 
           <span className="hidden sm:inline">
             GANIS

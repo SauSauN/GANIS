@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Feather } from "lucide-react";
+import ganisLogo from "@/assets/ganis-logo.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,27 +36,34 @@ export default function Welcome() {
 
   return (
     <main className="relative flex flex-1 items-center justify-center bg-background px-8 py-10">
-
       <div className="flex w-full max-w-5xl items-center justify-between gap-16">
-
         {/* Présentation GANIS */}
         <section className="flex flex-1 flex-col">
-          <div className="mb-7 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground">
-            <Feather className="h-7 w-7" />
+          {/* Logo à gauche du titre et du slogan */}
+          <div className="mb-7 flex items-center gap-5">
+            <img
+              src={ganisLogo}
+              alt="Logo GANIS"
+              className="h-32 w-32 shrink-0 object-contain"
+            />
+
+            <div className="min-w-0">
+              <h1 className="text-5xl font-semibold tracking-tight">
+                GANIS
+              </h1>
+
+              <p className="mt-3 text-xl text-muted-foreground">
+                {t("tagline")}
+              </p>
+            </div>
           </div>
 
-          <h1 className="text-5xl font-semibold tracking-tight">
-            GANIS
-          </h1>
-
-          <p className="mt-3 text-xl text-muted-foreground">
-            {t("tagline")}
-          </p>
-
+          {/* Description de l'application */}
           <p className="mt-6 max-w-lg text-sm leading-6 text-muted-foreground">
             {t("intro")}
           </p>
 
+          {/* Actions */}
           <div className="mt-8 flex items-center gap-3">
             <Button
               variant="outline"
@@ -83,7 +90,6 @@ export default function Welcome() {
         {/* Panneau de connexion */}
         <section className="w-full max-w-sm">
           <div className="rounded-3xl border bg-card p-7 shadow-sm">
-
             <div className="mb-6">
               <h2 className="text-xl font-semibold">
                 {t("login.title")}
@@ -95,7 +101,7 @@ export default function Welcome() {
             </div>
 
             <form onSubmit={handleLogin} className="space-y-5">
-
+              {/* Identifiant */}
               <div className="space-y-2">
                 <Label htmlFor="username">
                   {t("login.username")}
@@ -112,6 +118,7 @@ export default function Welcome() {
                 />
               </div>
 
+              {/* Mot de passe */}
               <div className="space-y-2">
                 <Label htmlFor="password">
                   {t("login.password")}
@@ -128,6 +135,7 @@ export default function Welcome() {
                 />
               </div>
 
+              {/* Erreur de connexion */}
               {error && (
                 <p
                   role="alert"
@@ -137,15 +145,19 @@ export default function Welcome() {
                 </p>
               )}
 
+              {/* Bouton de connexion */}
               <Button
                 type="submit"
                 className="w-full"
                 disabled={loading}
               >
-                {loading ? t("login.submitting") : t("login.submit")}
+                {loading
+                  ? t("login.submitting")
+                  : t("login.submit")}
               </Button>
             </form>
 
+            {/* Création de compte */}
             <div className="mt-6 border-t pt-5 text-center">
               <p className="text-sm text-muted-foreground">
                 {t("noAccount")}{" "}
@@ -158,10 +170,8 @@ export default function Welcome() {
                 </button>
               </p>
             </div>
-
           </div>
         </section>
-
       </div>
     </main>
   );
