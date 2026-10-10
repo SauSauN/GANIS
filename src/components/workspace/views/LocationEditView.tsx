@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2, MapPinOff, Plus, Save, Trash2 } from "lucide-react";
+import { Loader2, MapPinOff, Network, Plus, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,6 +17,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { LocationGallery } from "@/components/locations/LocationGallery";
+import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import { PlaceLinksCard } from "@/components/locations/PlaceLinksCard";
 import { LocationSheet } from "@/components/locations/LocationSheet";
 import { LocationThumb, TypeBadge } from "@/components/locations/LocationVisuals";
@@ -73,6 +74,8 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
   const setPortrait = useLocationStore((state) => state.setPortrait);
   const removePortrait = useLocationStore((state) => state.removePortrait);
   const setCreatePreset = useLocationStore((state) => state.setCreatePreset);
+
+  const [childrenOpen, setChildrenOpen] = useCollapsible("ganis.locationSheet.children.collapsed");
 
   const base = useMemo(() => (location ? draftFromLocation(location) : null), [location]);
 
@@ -238,18 +241,26 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
   const parent = location.parentId ? locations.find((item) => item.id === location.parentId) : undefined;
 
   const childrenCard = (
-    <Card className={cardClass}>
-      <CardHeader className={headerWithAction}>
-        <span className="min-w-0">
-          <CardTitle>{t("sections.children.title")}</CardTitle>
-          <CardDescription>{t("sections.children.description", { name: location.name })}</CardDescription>
-        </span>
-        <Button type="button" size="sm" variant="outline" onClick={addInside} disabled={deleting}>
+    <CollapsibleCard
+      open={childrenOpen}
+      onOpenChange={setChildrenOpen}
+      icon={Network}
+      title={t("sections.children.title")}
+      description={t("sections.children.description", { name: location.name })}
+      count={children.length}
+      actions={
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={addInside}
+          disabled={deleting}
+        >
           <Plus />
-          {t("sections.children.add")}
+          <span className="hidden sm:inline">{t("sections.children.add")}</span>
         </Button>
-      </CardHeader>
-      <CardContent className={cardContentClass}>
+      }
+    >
         {children.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("sections.children.empty")}</p>
         ) : (
@@ -276,8 +287,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
             ))}
           </ul>
         )}
-      </CardContent>
-    </Card>
+    </CollapsibleCard>
   );
 
   return (
@@ -417,5 +427,3 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
   );
 }
 
-/** En-tête de carte avec un bouton à droite. */
-const headerWithAction = `${cardHeaderClass} flex flex-row items-center justify-between gap-4`;

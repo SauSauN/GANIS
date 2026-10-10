@@ -1,4 +1,4 @@
-import { useId, useState, type ReactNode } from "react";
+import { useEffect, useId, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import {
   BookOpen,
@@ -10,13 +10,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogDescription,
@@ -38,10 +32,10 @@ import {
   typeIcon,
 } from "@/components/locations/locationStyle";
 import type { LocationLabels } from "@/components/locations/useLocationLabels";
+import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import {
   cardClass,
   cardContentClass,
-  cardHeaderClass,
 } from "@/components/workspace/views/PageShell";
 import {
   IDENTITY_FIELDS,
@@ -116,41 +110,62 @@ function Field({
   );
 }
 
-/** Carte de section : icône, titre, description, champs sur deux colonnes. */
+/** Section repliable : icône, titre, description, champs sur deux colonnes. */
 function Section({
-  icon: Icon,
+  sectionKey,
+  icon,
   title,
   description,
   tint,
+  forceOpen,
   children,
 }: {
+  /** Identifiant mémorisé de l'état replié (commun à toutes les fiches). */
+  sectionKey: string;
   icon: LucideIcon;
   title: string;
   description: string;
   tint?: React.CSSProperties;
+  /** Déplie la section (ex. erreur à montrer). */
+  forceOpen?: boolean;
   children: ReactNode;
 }) {
+  const [open, setOpen] = useCollapsible(`ganis.locationSheet.${sectionKey}.collapsed`);
+
+  useEffect(() => {
+    if (forceOpen) setOpen(true);
+  }, [forceOpen, setOpen]);
+
   return (
-    <Card className={cardClass}>
-      <CardHeader className={cn(cardHeaderClass, "flex flex-row items-center gap-4")}>
-        <span
-          className={cn(
-            "flex size-10 shrink-0 items-center justify-center rounded-lg",
-            !tint && "bg-primary/10 text-primary",
-          )}
-          style={tint}
-        >
-          <Icon className="size-5" aria-hidden="true" />
-        </span>
-        <span className="min-w-0">
-          <CardTitle>{title}</CardTitle>
-          <CardDescription>{description}</CardDescription>
-        </span>
-      </CardHeader>
-      <CardContent className={cn(cardContentClass, "grid gap-x-4 gap-y-5 sm:grid-cols-2")}>
-        {children}
-      </CardContent>
-    </Card>
+    <CollapsibleCard
+      open={open}
+      onOpenChange={setOpen}
+      icon={icon}
+      title={title}
+      description={description}
+      tint={tint}
+      contentClassName={cn(cardContentClass, "grid gap-x-4 gap-y-5 sm:grid-cols-2")}
+    >
+      {children}
+    </CollapsibleCard>
+  );
+}
+
+/** Galerie du lieu, repliable comme les autres sections. */
+function GallerySection({ children }: { children: ReactNode }) {
+  const { t } = useTranslation("locations");
+  const [open, setOpen] = useCollapsible("ganis.locationSheet.gallery.collapsed");
+
+  return (
+    <CollapsibleCard
+      open={open}
+      onOpenChange={setOpen}
+      icon={Images}
+      title={t("sections.gallery.title")}
+      description={t("sections.gallery.description")}
+    >
+      {children}
+    </CollapsibleCard>
   );
 }
 
@@ -291,6 +306,8 @@ export function LocationSheet({
           ================================================================ */}
       <div className="min-w-0 space-y-8">
         <Section
+          sectionKey="identity"
+          forceOpen={Boolean(nameError)}
           icon={Fingerprint}
           title={t("sections.identity.title")}
           description={t("sections.identity.description")}
@@ -369,6 +386,7 @@ export function LocationSheet({
 
         {category && ownFields.length > 0 && (
           <Section
+            sectionKey="category"
             icon={CategoryIcon}
             title={labels.category(category)}
             description={t("sections.category.description")}
@@ -380,6 +398,7 @@ export function LocationSheet({
 
         {specificFields.length > 0 && (
           <Section
+            sectionKey="type"
             icon={TypeIcon}
             title={t("sections.type.title", { type: labels.type(draft.type) })}
             description={t("sections.type.description")}
@@ -390,6 +409,7 @@ export function LocationSheet({
         )}
 
         <Section
+          sectionKey="story"
           icon={BookOpen}
           title={t("sections.story.title")}
           description={t("sections.story.description")}
@@ -397,18 +417,7 @@ export function LocationSheet({
           {STORY_FIELDS.map((key) => renderField(fieldByKey(key)))}
         </Section>
 
-        <Card className={cardClass}>
-          <CardHeader className={cn(cardHeaderClass, "flex flex-row items-center gap-4")}>
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Images className="size-5" aria-hidden="true" />
-            </span>
-            <span className="min-w-0">
-              <CardTitle>{t("sections.gallery.title")}</CardTitle>
-              <CardDescription>{t("sections.gallery.description")}</CardDescription>
-            </span>
-          </CardHeader>
-          <CardContent className={cardContentClass}>{gallery}</CardContent>
-        </Card>
+        <GallerySection>{gallery}</GallerySection>
 
         {hidden.length > 0 && (
           <div className="flex gap-3 rounded-lg border border-dashed bg-muted/30 px-4 py-3 text-sm">

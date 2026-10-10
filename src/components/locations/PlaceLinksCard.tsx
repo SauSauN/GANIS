@@ -2,22 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link2, MapPinned, Pencil, Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { CharacterAvatar } from "@/components/characters/CharacterAvatar";
 import { LocationThumb, TypeBadge } from "@/components/locations/LocationVisuals";
 import { PlaceLinkDialog } from "@/components/locations/PlaceLinkDialog";
 import { useLocationLabels } from "@/components/locations/useLocationLabels";
-import {
-  cardClass,
-  cardContentClass,
-  cardHeaderClass,
-} from "@/components/workspace/views/PageShell";
+import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
+import { cardContentClass } from "@/components/workspace/views/PageShell";
 import { api } from "@/lib/api";
 import { characterTabId, fullName } from "@/lib/characters";
 import { locationTabId } from "@/lib/locations";
@@ -84,6 +74,7 @@ export function PlaceLinksCard({ projectId, side, id, onOpenFeature }: PlaceLink
     null,
   );
 
+  const [open, setOpen] = useCollapsible(`ganis.placeLinks.${side}.collapsed`);
   const mine = linksOf(links, side, id);
 
   /** Mentions venues des champs : [libellé, élément, onglet]. */
@@ -144,31 +135,29 @@ export function PlaceLinksCard({ projectId, side, id, onOpenFeature }: PlaceLink
   const Icon = side === "character" ? MapPinned : Users;
 
   return (
-    <Card className={cardClass}>
-      <CardHeader className={`${cardHeaderClass} flex flex-row items-center gap-4`}>
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-          <Icon className="size-5" aria-hidden="true" />
-        </span>
-        <span className="min-w-0 flex-1">
-          <CardTitle>
-            {side === "character" ? t("links.characterTitle") : t("links.locationTitle")}
-            {mine.length + mentionCount > 0 && (
-              <span className="ml-2 text-sm font-normal text-muted-foreground tabular-nums">
-                {mine.length + mentionCount}
-              </span>
-            )}
-          </CardTitle>
-          <CardDescription>
-            {side === "character" ? t("links.characterDescription") : t("links.locationDescription")}
-          </CardDescription>
-        </span>
-        <Button type="button" size="sm" variant="outline" onClick={openNew}>
+    <CollapsibleCard
+      open={open}
+      onOpenChange={setOpen}
+      icon={Icon}
+      title={side === "character" ? t("links.characterTitle") : t("links.locationTitle")}
+      description={side === "character" ? t("links.characterDescription") : t("links.locationDescription")}
+      count={mine.length + mentionCount}
+      contentClassName={`${cardContentClass} space-y-5`}
+      actions={
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          onClick={() => {
+            setOpen(true);
+            openNew();
+          }}
+        >
           <Plus />
-          {t("links.add")}
+          <span className="hidden sm:inline">{t("links.add")}</span>
         </Button>
-      </CardHeader>
-
-      <CardContent className={`${cardContentClass} space-y-5`}>
+      }
+    >
         {mine.length === 0 && mentionCount === 0 && (
           <p className="text-sm text-muted-foreground">{t("links.empty")}</p>
         )}
@@ -270,8 +259,6 @@ export function PlaceLinksCard({ projectId, side, id, onOpenFeature }: PlaceLink
             <p className="text-xs text-muted-foreground">{t("links.mentionsHint")}</p>
           </div>
         )}
-      </CardContent>
-
       {dialog && (
         <PlaceLinkDialog
           projectId={projectId}
@@ -281,6 +268,6 @@ export function PlaceLinksCard({ projectId, side, id, onOpenFeature }: PlaceLink
           onClose={() => setDialog(null)}
         />
       )}
-    </Card>
+    </CollapsibleCard>
   );
 }
