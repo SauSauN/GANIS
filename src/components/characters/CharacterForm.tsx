@@ -411,19 +411,6 @@ export function CharacterSheet({
             </span>
           </div>
 
-          {palette.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-1" aria-label={label("colorPalette")}>
-              {palette.map((color, index) => (
-                <span
-                  key={`${color}-${index}`}
-                  className="size-5 rounded-full border shadow-sm"
-                  style={{ backgroundColor: color }}
-                  title={color}
-                />
-              ))}
-            </div>
-          )}
-
           <div className="w-full space-y-3 border-t pt-4 text-left">
             <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
               {t("profile.progress")}

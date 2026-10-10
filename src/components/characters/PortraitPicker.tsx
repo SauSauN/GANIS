@@ -1,7 +1,6 @@
 import { useRef, useState, type DragEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { ImagePlus, Loader2, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { AvatarFace, type AvatarSize } from "@/components/characters/CharacterAvatar";
 import { PORTRAIT_ACCEPT } from "@/lib/portraitImage";
 import { cn } from "@/lib/utils";
@@ -68,22 +67,34 @@ export function PortraitPicker({
     pickFirst(event.dataTransfer.files);
   }
 
+  // Un seul élément qui change d'état : sans image, un clic en ajoute une ;
+  // avec une image, un clic la retire. Le survol montre l'action. On peut
+  // aussi déposer une image (elle remplace l'actuelle).
+  const actionLabel = url ? t("portrait.remove") : t("portrait.add");
+  const ActionIcon = url ? Trash2 : ImagePlus;
+
   return (
     <div className="flex shrink-0 flex-col items-center gap-2">
-      <div
+      <button
+        type="button"
+        disabled={locked}
+        onClick={() => (url ? onRemove() : inputRef.current?.click())}
         onDragOver={onDragOver}
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
-        title={t("portrait.drop")}
+        aria-label={actionLabel}
+        title={dragOver ? t("portrait.drop") : actionLabel}
         className={cn(
-          "relative rounded-full transition-shadow",
+          "group relative rounded-full transition-shadow focus-visible:outline-none",
+          "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           ring && "p-1",
           dragOver && "ring-4 ring-primary ring-offset-2 ring-offset-background",
+          !locked && "cursor-pointer",
         )}
         style={ring ? { background: ring } : undefined}
       >
         {/* Fin liseré de la couleur de la carte entre l'anneau et la photo. */}
-        <span className={cn("block rounded-full", ring && "bg-card p-1")}>
+        <span className={cn("relative block rounded-full", ring && "bg-card p-1")}>
           <AvatarFace
             colorKey={colorKey}
             name={name}
@@ -91,6 +102,24 @@ export function PortraitPicker({
             size={size}
             className={ring ? "ring-0" : undefined}
           />
+
+          {/* Action au survol (ou au focus clavier), sur la photo elle-même. */}
+          {!locked && (
+            <span
+              className={cn(
+                "absolute inset-0 flex flex-col items-center justify-center gap-1 overflow-hidden rounded-full text-xs font-medium text-white opacity-0 transition-opacity",
+                "group-hover:opacity-100 group-focus-visible:opacity-100",
+                dragOver && "opacity-100",
+                "bg-black/60 backdrop-blur-[2px]",
+              )}
+              aria-hidden="true"
+            >
+              <ActionIcon className="size-5" />
+              <span className="px-2 text-center leading-tight">
+                {dragOver ? t("portrait.drop") : actionLabel}
+              </span>
+            </span>
+          )}
         </span>
 
         {busy && (
@@ -98,7 +127,7 @@ export function PortraitPicker({
             <Loader2 className="size-6 animate-spin text-primary" aria-label={t("portrait.saving")} />
           </span>
         )}
-      </div>
+      </button>
 
       <input
         ref={inputRef}
@@ -115,33 +144,6 @@ export function PortraitPicker({
           event.target.value = "";
         }}
       />
-
-      <div className="flex flex-wrap justify-center gap-1">
-        <Button
-          type="button"
-          size="sm"
-          variant="ghost"
-          disabled={locked}
-          onClick={() => inputRef.current?.click()}
-        >
-          <ImagePlus />
-          {url ? t("portrait.change") : t("portrait.add")}
-        </Button>
-
-        {url && (
-          <Button
-            type="button"
-            size="sm"
-            variant="ghost"
-            disabled={locked}
-            onClick={onRemove}
-            aria-label={t("portrait.remove")}
-            title={t("portrait.remove")}
-          >
-            <Trash2 />
-          </Button>
-        )}
-      </div>
 
       {error && (
         <p role="alert" className="text-center text-xs text-destructive">

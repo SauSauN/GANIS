@@ -1,7 +1,6 @@
 import { useRef, useState, type DragEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { ImagePlus, Loader2, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
   categoryBackdrop,
   categoryTint,
@@ -114,8 +113,8 @@ interface BannerPickerProps {
 
 /**
  * Image principale d'un lieu, en bandeau. Sans image : l'icône du type sur
- * la teinte de sa catégorie. On choisit une image avec le bouton, ou en la
- * déposant sur le bandeau.
+ * la teinte de sa catégorie. Le bandeau est lui-même le bouton : il ajoute
+ * une image, ou retire celle qui est affichée.
  */
 export function BannerPicker({
   url,
@@ -155,17 +154,23 @@ export function BannerPicker({
     pickFirst(event.dataTransfer.files);
   }
 
+  // Un seul élément qui change d'état : sans image, un clic en ajoute une ;
+  // avec une image, un clic la retire. Le survol montre l'action. On peut
+  // aussi déposer une image (elle remplace l'actuelle).
+  const actionLabel = url ? t("image.remove") : t("image.choose");
+  const ActionIcon = url ? Trash2 : ImagePlus;
+
   return (
     <div className="w-full space-y-2">
       <button
         type="button"
         disabled={locked}
-        onClick={() => inputRef.current?.click()}
+        onClick={() => (url ? onRemove() : inputRef.current?.click())}
         onDragOver={onDragOver}
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
-        title={t("image.hint")}
-        aria-label={url ? t("image.change") : t("image.choose")}
+        title={dragOver ? t("image.drop") : actionLabel}
+        aria-label={actionLabel}
         className={cn(
           "group relative flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-lg text-white transition-shadow",
           "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
@@ -176,13 +181,28 @@ export function BannerPicker({
         {url ? (
           <img src={url} alt="" className="size-full object-cover" />
         ) : (
-          <Icon className="size-12 opacity-90 drop-shadow" aria-hidden="true" />
+          <Icon
+            className={cn(
+              "size-12 opacity-90 drop-shadow transition-opacity",
+              !locked && "group-hover:opacity-0 group-focus-visible:opacity-0",
+            )}
+            aria-hidden="true"
+          />
         )}
 
+        {/* Action au survol (ou au focus clavier), sur l'image elle-même. */}
         {!locked && (
-          <span className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-1.5 bg-black/45 py-1.5 text-xs font-medium opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100">
-            <ImagePlus className="size-3.5" aria-hidden="true" />
-            {dragOver ? t("image.drop") : url ? t("image.change") : t("image.choose")}
+          <span
+            className={cn(
+              "absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-sm font-medium opacity-0 transition-opacity",
+              "group-hover:opacity-100 group-focus-visible:opacity-100",
+              dragOver && "opacity-100",
+              url ? "bg-black/55" : "bg-black/20",
+            )}
+            aria-hidden="true"
+          >
+            <ActionIcon className="size-6" />
+            {dragOver ? t("image.drop") : actionLabel}
           </span>
         )}
 
@@ -205,20 +225,6 @@ export function BannerPicker({
           event.target.value = "";
         }}
       />
-
-      {url && (
-        <Button
-          type="button"
-          size="xs"
-          variant="ghost"
-          disabled={locked}
-          onClick={onRemove}
-          className="mx-auto flex text-muted-foreground"
-        >
-          <Trash2 />
-          {t("image.remove")}
-        </Button>
-      )}
 
       {error && (
         <p role="alert" className="text-center text-xs text-destructive">
