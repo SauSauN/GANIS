@@ -1,9 +1,8 @@
 import {
-  BookOpen,
-  Clapperboard,
   FileText,
   Info,
   List,
+  ListTree,
   MapPin,
   Network,
   PenLine,
@@ -12,11 +11,14 @@ import {
   Settings,
   StickyNote,
   UserPlus,
+  UserRound,
   Users,
   type LucideIcon,
 } from "lucide-react";
 import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/sections";
 import i18n from "@/i18n";
+import { characterIdOfTab, fullName } from "@/lib/characters";
+import { useCharacterStore } from "@/stores/characterStore";
 
 /**
  * Registre des modules de l'espace de travail.
@@ -37,8 +39,7 @@ export type ModuleId =
   | "details"
   | "characters"
   | "locations"
-  | "chapters"
-  | "scenes"
+  | "structure"
   | "notes"
   | "search"
   | "settings";
@@ -79,15 +80,12 @@ type FeatureId =
   | "characters.relations"
   | "locations.create"
   | "locations.list"
-  | "chapters.create"
-  | "chapters.list"
-  | "scenes.create"
-  | "scenes.list"
+  | "structure.plan"
   | "notes.create"
   | "notes.list";
 
 /** Modules qui ont une liste (et donc un message de liste vide). */
-type ListModuleId = "characters" | "locations" | "chapters" | "scenes" | "notes";
+type ListModuleId = "characters" | "locations" | "notes";
 
 /** Fonctionnalité dont le libellé et la description suivent la langue. */
 function defineFeature(id: FeatureId, icon: LucideIcon): WorkspaceFeature {
@@ -150,13 +148,10 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
     defineFeature("locations.create", Plus),
     defineFeature("locations.list", List),
   ]),
-  defineListModule("chapters", BookOpen, [
-    defineFeature("chapters.create", Plus),
-    defineFeature("chapters.list", List),
-  ]),
-  defineListModule("scenes", Clapperboard, [
-    defineFeature("scenes.create", Plus),
-    defineFeature("scenes.list", List),
+  // Découpage du récit : ses niveaux (parties, chapitres, scènes ; actes,
+  // séquences… ) dépendent du type de projet. Voir `lib/structure.ts`.
+  defineModule("structure", ListTree, [
+    defineFeature("structure.plan", ListTree),
   ]),
   defineListModule("notes", StickyNote, [
     defineFeature("notes.create", Plus),
@@ -195,10 +190,40 @@ export function getModule(id: ModuleId): WorkspaceModule {
   return ALL_MODULES.find((module) => module.id === id) ?? ALL_MODULES[0];
 }
 
+/**
+ * Fiche d'un personnage (onglet `character:<id>`) : fonctionnalité du module
+ * Personnages, dont le libellé est le nom du personnage.
+ */
+function characterFeature(tabId: string, characterId: string): WorkspaceFeature {
+  return {
+    id: tabId,
+    icon: UserRound,
+    get label() {
+      const character = useCharacterStore
+        .getState()
+        .characters.find((item) => item.id === characterId);
+
+      return (character && fullName(character)) || i18n.t("characters:tab.fallback");
+    },
+    get description() {
+      return i18n.t("modules:features.characters.list.description");
+    },
+  };
+}
+
 /** Retrouve une fonctionnalité (et son module) par son identifiant. */
 export function findFeature(
   featureId: string,
 ): { module: WorkspaceModule; feature: WorkspaceFeature } | undefined {
+  const characterId = characterIdOfTab(featureId);
+
+  if (characterId) {
+    return {
+      module: getModule("characters"),
+      feature: characterFeature(featureId, characterId),
+    };
+  }
+
   for (const module of ALL_MODULES) {
     const feature = module.features.find((item) => item.id === featureId);
 

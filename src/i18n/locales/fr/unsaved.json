@@ -1,8 +1,8 @@
 {
   "title": {
-    "one": "Enregistrer les modifications de « {{name}} » ?",
-    "many": "Enregistrer les modifications de {{count}} éléments ?"
+    "one": "Enregistrer les modifications de « {{name}} » ?"
   },
+  "progress": "Élément {{current}} sur {{total}}",
   "description": {
     "closeTabs": "Vos modifications seront perdues si vous fermez sans les enregistrer.",
     "leave": "Vos modifications seront perdues si vous quittez cette page sans les enregistrer.",
@@ -20,8 +20,9 @@
   },
   "cancel": "Annuler",
   "saving": "Enregistrement…",
-  "failed_one": "« {{names}} » n'a pas pu être enregistré. Corrigez l'erreur affichée puis réessayez.",
-  "failed_other": "Ces éléments n'ont pas pu être enregistrés : {{names}}. Corrigez les erreurs affichées puis réessayez.",
+  "remaining_one": "Vous choisirez ensuite pour l'élément suivant.",
+  "remaining_other": "Vous choisirez ensuite pour chacun des {{count}} éléments suivants.",
+  "saveFailed": "« {{name}} » n'a pas pu être enregistré. Annulez pour corriger l'erreur affichée, ou continuez sans l'enregistrer.",
   "tab": {
     "unsaved": "Modifications non enregistrées",
     "unsavedNamed": "{{name}} (non enregistré)"

@@ -53,7 +53,9 @@
     "inUse": "In use",
     "edit": "Edit",
     "delete": "Delete",
-    "previewLabel": "Color preview of {{name}}"
+    "previewLabel": "Color preview of {{name}}",
+    "customize": "Customize",
+    "relations": "Relationships"
   },
   "builtin": {
     "ganis.classique": {
@@ -159,6 +161,11 @@
         "warning": "Warning"
       }
     },
+    "relations": {
+      "title": "Relationship colors",
+      "description": "Color of each type of relationship between characters (graph, lists, sheets), the same in light and dark mode.",
+      "reset": "Default colors"
+    },
     "shape": {
       "title": "Shape",
       "description": "Roundness of buttons, fields and cards.",
@@ -181,7 +188,7 @@
         "details": "Details",
         "characters": "Characters",
         "locations": "Locations",
-        "chapters": "Chapters"
+        "structure": "Structure"
       },
       "heading": "Chapter 1 — Awakening",
       "text": "The first light was filtering through the shutters when Elena opened her eyes.",
@@ -205,6 +212,10 @@
     "notFound": "This theme can't be found or doesn't belong to you.",
     "forbiddenTitle": "Developers only",
     "forbiddenText": "Creating themes is available in developer mode. Turn it on in the general settings.",
-    "toDeveloper": "Open developer mode"
+    "toDeveloper": "Open developer mode",
+    "section": {
+      "collapse": "Collapse",
+      "expand": "Expand"
+    }
   }
 }

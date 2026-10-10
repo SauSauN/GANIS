@@ -24,6 +24,30 @@ export interface User {
   updatedAt: string; // RFC 3339, UTC
 }
 
+/**
+ * Compte créé (inscription, configuration initiale).
+ *
+ * `recoveryKey` n'est transmise qu'à cet instant : elle n'est stockée nulle
+ * part en clair et ne pourra plus jamais être relue. Elle vaut `null` tant
+ * que les clés de récupération sont désactivées (`RECOVERY_KEY_ENABLED`).
+ */
+export interface AccountCreated {
+  user: User;
+  recoveryKey: string | null;
+}
+
+/**
+ * Connexion réussie.
+ *
+ * `recoveryKey` n'est présente que si le compte vient d'être chiffré à
+ * cette connexion (compte créé avant le chiffrement) : elle doit être
+ * montrée une seule fois.
+ */
+export interface LoginResult {
+  user: User;
+  recoveryKey: string | null;
+}
+
 // ----------------------------------------------------------------------------
 // Projets narratifs
 // ----------------------------------------------------------------------------
@@ -78,6 +102,162 @@ export interface Synopsis {
 }
 
 // ----------------------------------------------------------------------------
+// Découpage du récit
+// ----------------------------------------------------------------------------
+
+/**
+ * Modèle de découpage : il donne un nom à chacun des trois niveaux
+ * (ex. roman : Partie › Chapitre › Scène). Voir `lib/structure.ts`.
+ */
+export type StructureTemplateId =
+  | "novel"
+  | "manga"
+  | "film"
+  | "series"
+  | "game"
+  | "rpg"
+  | "generic";
+
+/** Élément du découpage (correspond à `StructureNode` en Rust). */
+export interface StructureNode {
+  id: string;
+  /** `null` : élément à la racine. */
+  parentId: string | null;
+  /** Niveau : 0, 1 ou 2. Son nom dépend du modèle. */
+  level: number;
+  title: string;
+  summary: string;
+  /** Ordre parmi les éléments de même parent. */
+  position: number;
+  createdAt: string; // RFC 3339, UTC
+  updatedAt: string; // RFC 3339, UTC
+}
+
+/** Découpage complet d'un projet. */
+export interface Structure {
+  template: StructureTemplateId;
+  /** Faux : le modèle suit le type du projet. */
+  templateChosen: boolean;
+  /** Tous les éléments, triés par parent puis par position. */
+  nodes: StructureNode[];
+}
+
+// ----------------------------------------------------------------------------
+// Personnages
+// ----------------------------------------------------------------------------
+
+/**
+ * Niveau de détail des fiches de personnage, réglé pour tout le projet.
+ * Les niveaux sont cumulatifs : chacun ajoute des champs au précédent
+ * (voir `lib/characters.ts`).
+ */
+export type CharacterDetailLevel = "basic" | "intermediate" | "advanced";
+
+/** Listes personnalisables d'un projet (valeurs de rôle, statut…). */
+export type CharacterListKey = "gender" | "status" | "role" | "build";
+
+/** Personnage (correspond à `Character` en Rust ; les images sont à part). */
+export interface Character {
+  id: string;
+  firstName: string;
+  lastName: string;
+  /** Valeur de la liste « rôle » (code par défaut ou valeur personnalisée). */
+  role: string;
+  /** Valeur de la liste « statut ». */
+  status: string;
+  /** Champs remplis de la fiche, par clé (voir `characterFields.json`). */
+  fields: Record<string, string>;
+  /** Date de l'image principale ; `null` : pas d'image (initiales). */
+  portraitUpdatedAt: string | null;
+  /** Nombre d'images de la galerie de références. */
+  galleryCount: number;
+  createdAt: string; // RFC 3339, UTC
+  updatedAt: string; // RFC 3339, UTC
+}
+
+/** Contenu d'une fiche, envoyé pour créer ou modifier un personnage. */
+export interface CharacterInput {
+  firstName: string;
+  lastName: string;
+  role: string;
+  status: string;
+  fields: Record<string, string>;
+}
+
+/** Réglages des personnages d'un projet. */
+export interface CharacterSettings {
+  /** Niveau de détail de toutes les fiches ; `null` : pas encore choisi. */
+  detailLevel: CharacterDetailLevel | null;
+  /** Listes personnalisées ; une liste absente : valeurs par défaut. */
+  lists: Partial<Record<CharacterListKey, string[]>>;
+}
+
+/** Image de la galerie, sans son contenu. */
+export interface GalleryImage {
+  id: string;
+  createdAt: string;
+}
+
+/** Image d'un personnage, encodée en base64. */
+export interface CharacterPortrait {
+  mime: string;
+  data: string;
+  updatedAt: string;
+}
+
+// ----------------------------------------------------------------------------
+// Relations entre personnages
+// ----------------------------------------------------------------------------
+
+/** Type de relation (couleur et nom dans `lib/relations.ts`). */
+export type RelationType =
+  | "family"
+  | "love"
+  | "friendship"
+  | "alliance"
+  | "professional"
+  | "mentor"
+  | "political"
+  | "rivalry"
+  | "enmity"
+  | "betrayal"
+  | "secret"
+  | "other";
+
+export type RelationSentiment = "positive" | "neutral" | "negative";
+
+/** Relation entre deux personnages (correspond à `Relation` en Rust). */
+export interface Relation {
+  id: string;
+  sourceId: string;
+  targetId: string;
+  type: RelationType;
+  /** Nom libre (« Frère aîné »…), éventuellement vide. */
+  label: string;
+  description: string;
+  /** Vrai : à sens unique (de `sourceId` vers `targetId`). */
+  directed: boolean;
+  /** 1 (faible) à 5 (très forte). */
+  intensity: number;
+  sentiment: RelationSentiment;
+  /** Élément du découpage où la relation commence (`null` : dès le début). */
+  sinceNode: string | null;
+  /** Élément du découpage où elle finit (`null` : jusqu'à la fin). */
+  untilNode: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type RelationInput = Omit<Relation, "id" | "createdAt" | "updatedAt">;
+
+/** Position d'un personnage dans la disposition libre du graphe. */
+export interface GraphPosition {
+  characterId: string;
+  x: number;
+  y: number;
+}
+
+// ----------------------------------------------------------------------------
 // Packages (§20) — pour l'instant, uniquement les thèmes
 // ----------------------------------------------------------------------------
 
@@ -110,6 +290,11 @@ export interface ThemeData {
   dark: ThemePalette;
   /** Arrondi des coins, en rem (0 à 1,5). */
   radius: number;
+  /**
+   * Couleurs des types de relation (`#RRGGBB`), les mêmes en mode clair et
+   * sombre. Facultatives : un type absent garde sa couleur par défaut.
+   */
+  relations?: Partial<Record<RelationType, string>>;
 }
 
 /** Package créé par l'utilisateur connecté (correspond à `UserPackage`). */

@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
 import { findBuiltinTheme, getActiveColorThemeId, resetColorTheme } from "@/lib/colorTheme";
 import { canDevelop } from "@/lib/roles";
+import { clearOpenTabs } from "@/lib/tabLayout";
 import { usePackageStore } from "@/stores/packageStore";
 import { useProjectStore } from "@/stores/projectStore";
 import type { User } from "@/types";
@@ -17,16 +18,32 @@ interface AuthState {
   loading: boolean;
   error: string | null;
 
+  /**
+   * Clé de récupération à montrer une seule fois, après une connexion qui
+   * vient de chiffrer un compte créé avant le chiffrement.
+   *
+   * Gardée uniquement en mémoire, le temps de l'afficher.
+   */
+  pendingRecoveryKey: string | null;
+
+  /** Oublie la clé de récupération une fois notée par l'utilisateur. */
+  clearPendingRecoveryKey: () => void;
+
   login: (
     username: string,
     password: string,
   ) => Promise<boolean>;
 
+  /**
+   * Crée un compte. Retourne `null` en cas d'échec ; sinon la clé de
+   * récupération du compte (à montrer une seule fois), qui vaut `null`
+   * tant que les clés de récupération sont désactivées.
+   */
   register: (input: {
     username: string;
     password: string;
     email?: string;
-  }) => Promise<boolean>;
+  }) => Promise<{ recoveryKey: string | null } | null>;
 
   logout: () => Promise<void>;
 
@@ -78,6 +95,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   loading: false,
   error: null,
+  pendingRecoveryKey: null,
+
+  clearPendingRecoveryKey: () => {
+    set({ pendingRecoveryKey: null });
+  },
 
   login: async (username, password) => {
     set({
@@ -86,7 +108,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
 
     try {
-      const user = await api.login({
+      const { user, recoveryKey } = await api.login({
         username,
         password,
       });
@@ -94,6 +116,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({
         user,
         loading: false,
+        pendingRecoveryKey: recoveryKey,
       });
 
       syncThemesWithRole(user);
@@ -116,20 +139,20 @@ export const useAuthStore = create<AuthState>((set) => ({
     });
 
     try {
-      await api.register(input);
+      const { recoveryKey } = await api.register(input);
 
       set({
         loading: false,
       });
 
-      return true;
+      return { recoveryKey };
     } catch (e) {
       set({
         loading: false,
         error: messageOf(e),
       });
 
-      return false;
+      return null;
     }
   },
 
@@ -145,10 +168,13 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     useProjectStore.getState().reset();
     usePackageStore.getState().reset();
+    // Les onglets ouverts sont oubliés (les épinglés restent).
+    clearOpenTabs();
 
     set({
       user: null,
       error: null,
+      pendingRecoveryKey: null,
     });
   },
 

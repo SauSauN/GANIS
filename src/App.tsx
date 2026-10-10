@@ -8,6 +8,7 @@ import { UnsavedChangesGuard } from "@/components/layout/UnsavedChangesGuard";
 import Welcome from "@/pages/Welcome";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
+import Recover from "@/pages/Recover";
 import Setup from "@/pages/Setup";
 import Dashboard from "@/pages/Dashboard";
 import Workspace from "@/pages/Workspace";
@@ -61,6 +62,12 @@ export default function App() {
             <Route
               path="/register"
               element={<Register />}
+            />
+
+            {/* Mot de passe oublié : clé de récupération */}
+            <Route
+              path="/recover"
+              element={<Recover />}
             />
 
             {/* ============================================================ */}

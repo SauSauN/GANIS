@@ -1,13 +1,29 @@
 {
   "modules": {
-    "details": { "label": "Details" },
-    "characters": { "label": "Characters", "empty": "No characters yet." },
-    "locations": { "label": "Locations", "empty": "No locations yet." },
-    "chapters": { "label": "Chapters", "empty": "No chapters yet." },
-    "scenes": { "label": "Scenes", "empty": "No scenes yet." },
-    "notes": { "label": "Notes", "empty": "No notes yet." },
-    "search": { "label": "Search" },
-    "settings": { "label": "Project settings" }
+    "details": {
+      "label": "Details"
+    },
+    "characters": {
+      "label": "Characters",
+      "empty": "No characters yet."
+    },
+    "locations": {
+      "label": "Locations",
+      "empty": "No locations yet."
+    },
+    "structure": {
+      "label": "Structure"
+    },
+    "notes": {
+      "label": "Notes",
+      "empty": "No notes yet."
+    },
+    "search": {
+      "label": "Search"
+    },
+    "settings": {
+      "label": "Project settings"
+    }
   },
   "features": {
     "home": {
@@ -21,25 +37,44 @@
       }
     },
     "characters": {
-      "create": { "label": "Create a character", "description": "Identity, description, background and motivations." },
-      "list": { "label": "Character list", "description": "All the characters in the project." },
-      "relations": { "label": "Character relationships", "description": "Family ties, friendships, rivalries and alliances." }
+      "create": {
+        "label": "Create a character",
+        "description": "Identity, appearance and personality, in three levels of detail."
+      },
+      "list": {
+        "label": "Character list",
+        "description": "All the characters in the project."
+      },
+      "relations": {
+        "label": "Character relationships",
+        "description": "Family ties, friendships, rivalries and alliances."
+      }
     },
     "locations": {
-      "create": { "label": "Create a location", "description": "Description, history and features of the location." },
-      "list": { "label": "Location list", "description": "All the locations in your world." }
+      "create": {
+        "label": "Create a location",
+        "description": "Description, history and features of the location."
+      },
+      "list": {
+        "label": "Location list",
+        "description": "All the locations in your world."
+      }
     },
-    "chapters": {
-      "create": { "label": "Create a chapter", "description": "Title, synopsis and place in the story." },
-      "list": { "label": "Chapter outline", "description": "The chapters in story order." }
-    },
-    "scenes": {
-      "create": { "label": "Create a scene", "description": "Chapter, location, characters and content of the scene." },
-      "list": { "label": "Scene list", "description": "All the scenes in the project." }
+    "structure": {
+      "plan": {
+        "label": "Story outline",
+        "description": "How your story is divided, adapted to the project type."
+      }
     },
     "notes": {
-      "create": { "label": "Create a note", "description": "Ideas, references and free-form documentation." },
-      "list": { "label": "Note list", "description": "All your project notes." }
+      "create": {
+        "label": "Create a note",
+        "description": "Ideas, references and free-form documentation."
+      },
+      "list": {
+        "label": "Note list",
+        "description": "All your project notes."
+      }
     }
   }
 }

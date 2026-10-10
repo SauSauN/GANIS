@@ -11,11 +11,14 @@ import enModules from "./locales/en/modules.json";
 import enPackages from "./locales/en/packages.json";
 import enProjectSettings from "./locales/en/projectSettings.json";
 import enProjects from "./locales/en/projects.json";
+import enRecovery from "./locales/en/recovery.json";
+import enRelations from "./locales/en/relations.json";
 import enRegister from "./locales/en/register.json";
 import enSettings from "./locales/en/settings.json";
 import enSetup from "./locales/en/setup.json";
 import enSidebar from "./locales/en/sidebar.json";
 import enStatusbar from "./locales/en/statusbar.json";
+import enStructure from "./locales/en/structure.json";
 import enSynopsis from "./locales/en/synopsis.json";
 import enTabs from "./locales/en/tabs.json";
 import enTitlebar from "./locales/en/titlebar.json";
@@ -35,11 +38,14 @@ import frModules from "./locales/fr/modules.json";
 import frPackages from "./locales/fr/packages.json";
 import frProjectSettings from "./locales/fr/projectSettings.json";
 import frProjects from "./locales/fr/projects.json";
+import frRecovery from "./locales/fr/recovery.json";
+import frRelations from "./locales/fr/relations.json";
 import frRegister from "./locales/fr/register.json";
 import frSettings from "./locales/fr/settings.json";
 import frSetup from "./locales/fr/setup.json";
 import frSidebar from "./locales/fr/sidebar.json";
 import frStatusbar from "./locales/fr/statusbar.json";
+import frStructure from "./locales/fr/structure.json";
 import frSynopsis from "./locales/fr/synopsis.json";
 import frTabs from "./locales/fr/tabs.json";
 import frTitlebar from "./locales/fr/titlebar.json";
@@ -102,11 +108,14 @@ export const resources = {
     packages: frPackages,
     projectSettings: frProjectSettings,
     projects: frProjects,
+    recovery: frRecovery,
+    relations: frRelations,
     register: frRegister,
     settings: frSettings,
     setup: frSetup,
     sidebar: frSidebar,
     statusbar: frStatusbar,
+    structure: frStructure,
     synopsis: frSynopsis,
     tabs: frTabs,
     titlebar: frTitlebar,
@@ -128,11 +137,14 @@ export const resources = {
     packages: enPackages,
     projectSettings: enProjectSettings,
     projects: enProjects,
+    recovery: enRecovery,
+    relations: enRelations,
     register: enRegister,
     settings: enSettings,
     setup: enSetup,
     sidebar: enSidebar,
     statusbar: enStatusbar,
+    structure: enStructure,
     synopsis: enSynopsis,
     tabs: enTabs,
     titlebar: enTitlebar,
@@ -203,11 +215,14 @@ void i18n.use(initReactI18next).init({
     "packages",
     "projectSettings",
     "projects",
+    "recovery",
+    "relations",
     "register",
     "settings",
     "setup",
     "sidebar",
     "statusbar",
+    "structure",
     "synopsis",
     "tabs",
     "titlebar",

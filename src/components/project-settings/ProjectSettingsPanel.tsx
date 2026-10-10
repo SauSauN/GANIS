@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { CharacterSettingsSection } from "@/components/characters/CharacterSettingsSection";
 import {
   PROJECT_SETTINGS_SECTIONS,
   type ProjectSettingsId,
@@ -190,6 +191,10 @@ export function ProjectSettingsPanel({
 
         {section === "status" && (
           <StatusSection project={project} />
+        )}
+
+        {section === "characters" && (
+          <CharacterSettingsSection projectId={project.id} />
         )}
 
         {section === "danger" && (

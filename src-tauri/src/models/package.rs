@@ -4,6 +4,7 @@
 //! purement déclaratif (des couleurs, aucun code).
 
 use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 /// Type technique d'un package (§20.2).
 ///
@@ -78,6 +79,11 @@ pub struct ThemeData {
     pub dark: ThemePalette,
     /// Arrondi des coins, en rem (0 à 1,5).
     pub radius: f64,
+    /// Couleurs des types de relation entre personnages (`family` →
+    /// `#RRGGBB`…), les mêmes en mode clair et sombre. Facultatives : un type
+    /// absent garde sa couleur par défaut. Les thèmes plus anciens n'en ont pas.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub relations: Option<BTreeMap<String, String>>,
 }
 
 /// Ligne de la table `packages`.

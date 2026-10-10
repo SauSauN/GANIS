@@ -1,0 +1,207 @@
+{
+  "templates": {
+    "novel": {
+      "name": "Novel",
+      "levels": {
+        "0": {
+          "one": "Part",
+          "other": "Parts",
+          "add": "Add a part",
+          "new": "Part"
+        },
+        "1": {
+          "one": "Chapter",
+          "other": "Chapters",
+          "add": "Add a chapter",
+          "new": "Chapter"
+        },
+        "2": {
+          "one": "Scene",
+          "other": "Scenes",
+          "add": "Add a scene",
+          "new": "Scene"
+        }
+      }
+    },
+    "manga": {
+      "name": "Manga / comics",
+      "levels": {
+        "0": {
+          "one": "Volume",
+          "other": "Volumes",
+          "add": "Add a volume",
+          "new": "Volume"
+        },
+        "1": {
+          "one": "Chapter",
+          "other": "Chapters",
+          "add": "Add a chapter",
+          "new": "Chapter"
+        },
+        "2": {
+          "one": "Page",
+          "other": "Pages",
+          "add": "Add a page",
+          "new": "Page"
+        }
+      }
+    },
+    "film": {
+      "name": "Film",
+      "levels": {
+        "0": {
+          "one": "Act",
+          "other": "Acts",
+          "add": "Add an act",
+          "new": "Act"
+        },
+        "1": {
+          "one": "Sequence",
+          "other": "Sequences",
+          "add": "Add a sequence",
+          "new": "Sequence"
+        },
+        "2": {
+          "one": "Scene",
+          "other": "Scenes",
+          "add": "Add a scene",
+          "new": "Scene"
+        }
+      }
+    },
+    "series": {
+      "name": "Series",
+      "levels": {
+        "0": {
+          "one": "Season",
+          "other": "Seasons",
+          "add": "Add a season",
+          "new": "Season"
+        },
+        "1": {
+          "one": "Episode",
+          "other": "Episodes",
+          "add": "Add an episode",
+          "new": "Episode"
+        },
+        "2": {
+          "one": "Scene",
+          "other": "Scenes",
+          "add": "Add a scene",
+          "new": "Scene"
+        }
+      }
+    },
+    "game": {
+      "name": "Video game",
+      "levels": {
+        "0": {
+          "one": "Act",
+          "other": "Acts",
+          "add": "Add an act",
+          "new": "Act"
+        },
+        "1": {
+          "one": "Quest",
+          "other": "Quests",
+          "add": "Add a quest",
+          "new": "Quest"
+        },
+        "2": {
+          "one": "Mission",
+          "other": "Missions",
+          "add": "Add a mission",
+          "new": "Mission"
+        }
+      }
+    },
+    "rpg": {
+      "name": "Role-playing game",
+      "levels": {
+        "0": {
+          "one": "Scenario",
+          "other": "Scenarios",
+          "add": "Add a scenario",
+          "new": "Scenario"
+        },
+        "1": {
+          "one": "Session",
+          "other": "Sessions",
+          "add": "Add a session",
+          "new": "Session"
+        },
+        "2": {
+          "one": "Encounter",
+          "other": "Encounters",
+          "add": "Add an encounter",
+          "new": "Encounter"
+        }
+      }
+    },
+    "generic": {
+      "name": "Generic",
+      "levels": {
+        "0": {
+          "one": "Part",
+          "other": "Parts",
+          "add": "Add a part",
+          "new": "Part"
+        },
+        "1": {
+          "one": "Section",
+          "other": "Sections",
+          "add": "Add a section",
+          "new": "Section"
+        },
+        "2": {
+          "one": "Item",
+          "other": "Items",
+          "add": "Add an item",
+          "new": "Item"
+        }
+      }
+    }
+  },
+  "template": {
+    "label": "Structure template",
+    "auto": "Based on project type ({{name}})",
+    "hint": "Changing the template only renames the levels: nothing is lost."
+  },
+  "plan": {
+    "addAtRoot": "Add at the top level",
+    "empty": {
+      "title": "Your structure is empty",
+      "description": "Start with whichever level suits you: you can always add the others later."
+    },
+    "untitled": "Untitled",
+    "contains_one": "{{count}} item",
+    "contains_other": "{{count}} items",
+    "toggle": {
+      "expand": "Expand",
+      "collapse": "Collapse"
+    },
+    "actions": {
+      "edit": "Edit",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "delete": "Delete"
+    },
+    "edit": {
+      "title": "Title",
+      "summary": "Summary",
+      "summaryPlaceholder": "What happens here, in a few lines.",
+      "save": "Save",
+      "cancel": "Cancel"
+    },
+    "delete": {
+      "title": "Delete “{{title}}”?",
+      "description": "This cannot be undone.",
+      "withChildren_one": "The item it contains will also be deleted.",
+      "withChildren_other": "The {{count}} items it contains will also be deleted.",
+      "confirm": "Delete"
+    },
+    "loading": "Loading structure…",
+    "loadFailed": "Unable to load the structure.",
+    "retry": "Retry"
+  }
+}

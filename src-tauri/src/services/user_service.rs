@@ -2,7 +2,33 @@
 
 use crate::error::{AppError, AppResult};
 use crate::models::user::{Role, User};
+use crate::security::{aad, crypto, crypto::SecretKey};
 use sqlx::SqlitePool;
+
+// ----------------------------------------------------------------------------
+// E-mail chiffré
+// ----------------------------------------------------------------------------
+
+fn email_aad(user_id: &str) -> String {
+    aad::field("users", "email", user_id)
+}
+
+/// Chiffre l'adresse e-mail d'un compte avec la clé de ce compte.
+pub fn seal_email(key: &SecretKey, user_id: &str, email: &str) -> AppResult<String> {
+    crypto::seal_text(key, &email_aad(user_id), email)
+}
+
+/// Déchiffre l'adresse e-mail d'un utilisateur lu en base.
+///
+/// Un compte pas encore chiffré garde son adresse en clair : elle est
+/// alors conservée telle quelle.
+pub fn reveal(mut user: User, key: &SecretKey) -> AppResult<User> {
+    if let Some(sealed) = user.email_sealed.take() {
+        user.email = Some(crypto::open_text(key, &email_aad(&user.id), &sealed)?);
+    }
+
+    Ok(user)
+}
 
 /// Récupère un utilisateur par son identifiant.
 pub async fn find_by_id(pool: &SqlitePool, id: &str) -> AppResult<Option<User>> {
@@ -12,6 +38,7 @@ pub async fn find_by_id(pool: &SqlitePool, id: &str) -> AppResult<Option<User>> 
             id,
             username,
             email,
+            email_sealed,
             role,
             password_hash,
             password_salt,
@@ -43,6 +70,7 @@ pub async fn find_by_username(
             id,
             username,
             email,
+            email_sealed,
             role,
             password_hash,
             password_salt,
@@ -63,37 +91,6 @@ pub async fn find_by_username(
     Ok(user)
 }
 
-/// Récupère un utilisateur par son adresse e-mail.
-pub async fn find_by_email(
-    pool: &SqlitePool,
-    email: &str,
-) -> AppResult<Option<User>> {
-    let user = sqlx::query_as::<_, User>(
-        r#"
-        SELECT
-            id,
-            username,
-            email,
-            role,
-            password_hash,
-            password_salt,
-            created_at,
-            updated_at
-        FROM users
-        WHERE email = ?
-        "#,
-    )
-    .bind(email)
-    .fetch_optional(pool)
-    .await
-    .map_err(|e| {
-        AppError::database(e)
-            .with_detail("Échec de la recherche de l'utilisateur par e-mail")
-    })?;
-
-    Ok(user)
-}
-
 /// Liste tous les utilisateurs.
 ///
 /// Cette fonction est appelée uniquement par une commande qui vérifie
@@ -105,6 +102,7 @@ pub async fn list_all(pool: &SqlitePool) -> AppResult<Vec<User>> {
             id,
             username,
             email,
+            email_sealed,
             role,
             password_hash,
             password_salt,
@@ -186,20 +184,21 @@ pub async fn update_role(
         .ok_or_else(|| AppError::internal("Utilisateur introuvable après la mise à jour."))
 }
 
-/// Met à jour l'adresse e-mail d'un utilisateur (`None` la supprime).
+/// Met à jour l'adresse e-mail chiffrée d'un utilisateur (`None` la
+/// supprime). La colonne en clair est vidée.
 pub async fn update_email(
     pool: &SqlitePool,
     id: &str,
-    email: Option<&str>,
+    email_sealed: Option<&str>,
 ) -> AppResult<User> {
     let result = sqlx::query(
         r#"
         UPDATE users
-        SET email = ?, updated_at = ?
+        SET email = NULL, email_sealed = ?, updated_at = ?
         WHERE id = ?
         "#,
     )
-    .bind(email)
+    .bind(email_sealed)
     .bind(crate::utils::now_utc())
     .bind(id)
     .execute(pool)
@@ -218,8 +217,11 @@ pub async fn update_email(
 }
 
 /// Remplace le hash du mot de passe d'un utilisateur.
+///
+/// S'exécute sur la connexion fournie : l'appelant l'enchaîne, dans une
+/// même transaction, avec le remplacement du verrou « mot de passe ».
 pub async fn update_password(
-    pool: &SqlitePool,
+    conn: &mut sqlx::SqliteConnection,
     id: &str,
     password_hash: &str,
     password_salt: &str,
@@ -235,7 +237,7 @@ pub async fn update_password(
     .bind(password_salt)
     .bind(crate::utils::now_utc())
     .bind(id)
-    .execute(pool)
+    .execute(conn)
     .await
     .map_err(|e| {
         AppError::database(e)

@@ -47,7 +47,7 @@
     },
     "password": {
       "title": "Mot de passe",
-      "description": "Au moins 8 caractères, avec une lettre et un chiffre.",
+      "description": "Au moins 8 caractères, avec une lettre et un chiffre. Vos projets restent accessibles avec le nouveau mot de passe.",
       "current": "Mot de passe actuel",
       "new": "Nouveau mot de passe",
       "confirm": "Confirmer le nouveau mot de passe",
@@ -56,6 +56,16 @@
       "currentRequired": "Le mot de passe actuel est requis.",
       "changed": "Mot de passe modifié.",
       "failed": "Impossible de modifier le mot de passe."
+    },
+    "recovery": {
+      "title": "Clé de récupération",
+      "description": "Elle permet de choisir un nouveau mot de passe si vous oubliez le vôtre, sans perdre vos projets. Si vous l'avez perdue, ou si quelqu'un d'autre a pu la voir, créez-en une nouvelle : l'ancienne cessera de fonctionner.",
+      "current": "Mot de passe actuel",
+      "submit": "Créer une nouvelle clé",
+      "submitting": "Création…",
+      "currentRequired": "Le mot de passe actuel est requis.",
+      "failed": "Impossible de créer une nouvelle clé.",
+      "done": "Nouvelle clé de récupération enregistrée."
     }
   },
   "appearance": {

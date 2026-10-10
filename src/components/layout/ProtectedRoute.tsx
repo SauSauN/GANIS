@@ -8,10 +8,17 @@ import type { Role } from "@/types";
  */
 export function ProtectedRoute({ roles }: { roles?: Role[] }) {
   const user = useAuthStore((s) => s.user);
+  const pendingRecoveryKey = useAuthStore((s) => s.pendingRecoveryKey);
   const location = useLocation();
 
   if (!user) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  // Une clé de récupération attend d'être notée (compte tout juste
+  // chiffré) : elle est affichée par la page de connexion.
+  if (pendingRecoveryKey) {
+    return <Navigate to="/login" replace />;
   }
 
   if (roles && !roles.includes(user.role)) {

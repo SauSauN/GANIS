@@ -38,10 +38,10 @@ pub async fn become_developer(state: State<'_, AppState>) -> AppResult<UserPubli
         return Ok(UserPublic::from(current));
     }
 
-    let updated = user_service::update_role(&state.app_db, &current.id, Role::Developer).await?;
+    let stored = user_service::update_role(&state.app_db, &current.id, Role::Developer).await?;
 
     // Garde la session en mémoire synchronisée avec la base.
-    state.set_current_user(Some(updated.clone())).await;
+    let updated = state.refresh_current_user(stored).await?;
 
     tracing::info!(user = %updated.username, "Mode développeur activé");
 
@@ -69,9 +69,9 @@ pub async fn leave_developer_mode(state: State<'_, AppState>) -> AppResult<UserP
         Role::Developer => {}
     }
 
-    let updated = user_service::update_role(&state.app_db, &current.id, Role::User).await?;
+    let stored = user_service::update_role(&state.app_db, &current.id, Role::User).await?;
 
-    state.set_current_user(Some(updated.clone())).await;
+    let updated = state.refresh_current_user(stored).await?;
 
     tracing::info!(user = %updated.username, "Mode développeur désactivé");
 

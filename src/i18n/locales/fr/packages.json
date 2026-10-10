@@ -53,7 +53,9 @@
     "inUse": "Utilisé",
     "edit": "Modifier",
     "delete": "Supprimer",
-    "previewLabel": "Aperçu des couleurs de {{name}}"
+    "previewLabel": "Aperçu des couleurs de {{name}}",
+    "customize": "Personnaliser",
+    "relations": "Relations"
   },
   "builtin": {
     "ganis.classique": {
@@ -159,6 +161,11 @@
         "warning": "Avertissement"
       }
     },
+    "relations": {
+      "title": "Couleurs des relations",
+      "description": "Couleur de chaque type de relation entre personnages (graphe, listes, fiches), la même en mode clair et sombre.",
+      "reset": "Couleurs par défaut"
+    },
     "shape": {
       "title": "Forme",
       "description": "Arrondi des boutons, champs et cartes.",
@@ -181,7 +188,7 @@
         "details": "Détails",
         "characters": "Personnages",
         "locations": "Lieux",
-        "chapters": "Chapitres"
+        "structure": "Découpage"
       },
       "heading": "Chapitre 1 — L'éveil",
       "text": "Les premières lueurs filtraient à travers les volets quand Elena ouvrit les yeux.",
@@ -205,6 +212,10 @@
     "notFound": "Ce thème est introuvable ou ne vous appartient pas.",
     "forbiddenTitle": "Réservé aux développeurs",
     "forbiddenText": "La création de thèmes est disponible en mode développeur. Activez-le dans les paramètres généraux.",
-    "toDeveloper": "Ouvrir le mode développeur"
+    "toDeveloper": "Ouvrir le mode développeur",
+    "section": {
+      "collapse": "Fermer",
+      "expand": "Afficher"
+    }
   }
 }

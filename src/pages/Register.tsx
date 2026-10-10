@@ -1,10 +1,12 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
+import { RecoveryKeyPanel } from "@/components/auth/RecoveryKeyPanel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RECOVERY_KEY_ENABLED } from "@/lib/recoveryKey";
 import { useAuthStore } from "@/stores/authStore";
 import {
   checkEmail,
@@ -24,6 +26,8 @@ export default function Register() {
   // On garde le code du problème (pas le texte) : le message suit la langue
   // même si elle change pendant qu'il est affiché.
   const [localIssue, setLocalIssue] = useState<ValidationIssue | null>(null);
+  // Clé de récupération du compte créé, montrée une seule fois.
+  const [recoveryKey, setRecoveryKey] = useState<string | null>(null);
 
   useEffect(() => clearError(), [clearError]);
 
@@ -42,18 +46,47 @@ export default function Register() {
     setLocalIssue(problem);
     if (problem) return;
 
-    const ok = await register({
+    const created = await register({
       username: username.trim(),
       password,
       email: email.trim() || undefined,
     });
-    if (ok) navigate("/login", { replace: true });
+
+    if (!created) return;
+
+    // Le mot de passe n'a plus à rester en mémoire.
+    setPassword("");
+    setConfirm("");
+
+    // Clé de récupération (si activées) : montrée avant de continuer.
+    if (created.recoveryKey) {
+      setRecoveryKey(created.recoveryKey);
+    } else {
+      navigate("/login", { replace: true });
+    }
   }
 
   // Les erreurs renvoyées par Rust restent pour l'instant en français.
   const shownError = localIssue
     ? t(`common:validation.${localIssue}`)
     : error;
+
+  if (recoveryKey) {
+    return (
+      <main className="flex flex-1 items-center justify-center bg-background px-4 py-6">
+        <Card className="w-full max-w-lg">
+          <CardContent className="py-2">
+            <RecoveryKeyPanel
+              recoveryKey={recoveryKey}
+              username={username.trim()}
+              context="created"
+              onConfirmed={() => navigate("/login", { replace: true })}
+            />
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
 
   return (
     <main className="relative flex flex-1 items-center justify-center bg-background px-4 py-6">
@@ -80,6 +113,9 @@ export default function Register() {
               <Label htmlFor="password">{t("password")}</Label>
               <Input id="password" type="password" autoComplete="new-password" value={password}
                 onChange={(e) => setPassword(e.target.value)} />
+              {!RECOVERY_KEY_ENABLED && (
+                <p className="text-xs text-muted-foreground">{t("passwordWarning")}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm">{t("confirm")}</Label>

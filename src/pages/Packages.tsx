@@ -273,6 +273,11 @@ function InstalledView() {
       onEdit={
         theme.origin === "mine" ? () => navigate(`/packages/themes/${theme.id}`) : undefined
       }
+      onCustomize={
+        theme.origin === "system"
+          ? () => navigate(`/packages/themes/new?from=${encodeURIComponent(theme.id)}`)
+          : undefined
+      }
       onDelete={theme.origin === "mine" ? () => setToDelete(theme) : undefined}
     />
   );

@@ -1,0 +1,129 @@
+{
+  "types": {
+    "family": "Family",
+    "love": "Love",
+    "friendship": "Friendship",
+    "alliance": "Alliance",
+    "professional": "Work",
+    "mentor": "Mentor / student",
+    "political": "Political",
+    "rivalry": "Rivalry",
+    "enmity": "Enmity",
+    "betrayal": "Betrayal",
+    "secret": "Shared secret",
+    "other": "Other"
+  },
+  "sentiments": {
+    "positive": "Positive",
+    "neutral": "Neutral",
+    "negative": "Negative"
+  },
+  "intensity": {
+    "label": "Intensity",
+    "1": "Weak",
+    "2": "Moderate",
+    "3": "Medium",
+    "4": "Strong",
+    "5": "Very strong"
+  },
+  "form": {
+    "createTitle": "New relationship",
+    "editTitle": "Edit relationship",
+    "source": "Character",
+    "target": "Related to",
+    "choose": "Choose…",
+    "swap": "Swap the two characters",
+    "type": "Type",
+    "label": "Relationship name",
+    "labelPlaceholder": "E.g. Older brother, former fiancée, lifelong rival…",
+    "description": "Description",
+    "descriptionPlaceholder": "How this relationship began, what it involves, how it changes…",
+    "sentiment": "Tone",
+    "direction": "Direction",
+    "mutual": "Mutual",
+    "oneWay": "One-way",
+    "oneWayHint": "{{source}} → {{target}}",
+    "period": "Period in the story",
+    "since": "From",
+    "until": "Until",
+    "start": "The start of the story",
+    "end": "The end of the story",
+    "create": "Create relationship",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleteConfirm": "Permanently delete this relationship?",
+    "missingCharacters": "Choose both characters.",
+    "sameCharacter": "Choose two different characters.",
+    "moreDetails": "More details: intensity, tone, period, description"
+  },
+  "view": {
+    "newRelation": "New relationship",
+    "views": {
+      "graph": "Graph",
+      "matrix": "Matrix",
+      "list": "List"
+    },
+    "layouts": {
+      "force": "Network",
+      "circle": "Circle",
+      "groups": "By role",
+      "ego": "Centred",
+      "free": "Free"
+    },
+    "layoutHints": {
+      "force": "Related characters move closer together.",
+      "circle": "All characters in a circle.",
+      "groups": "Grouped by role in the story.",
+      "ego": "One character in the middle, their circle around them.",
+      "free": "Move characters around: their place is saved."
+    },
+    "center": "Centre",
+    "types": "Types",
+    "allTypes": "All types",
+    "search": "Search a character",
+    "showLabels": "Relationship names",
+    "showIsolated": "Characters without relationships",
+    "period": "Point in the story",
+    "wholeStory": "Whole story",
+    "resetLayout": "Reset layout",
+    "legend": "Legend",
+    "dragHint": "Drag a character's “+” onto another to link them.",
+    "count_one": "{{count}} relationship",
+    "count_other": "{{count}} relationships",
+    "loading": "Loading relationships…",
+    "retry": "Retry",
+    "noCharacters": "Create at least two characters to link them.",
+    "createCharacter": "Create a character",
+    "noRelations": "No relationships yet",
+    "noRelationsHint": "Create a first relationship, or drag from one character to another in the graph.",
+    "noMatch": "No relationship matches the filters.",
+    "details": {
+      "relations": "Relationships",
+      "openSheet": "Open profile",
+      "none": "No relationships",
+      "close": "Close"
+    },
+    "filters": "Filters",
+    "fullscreen": "Full screen",
+    "exitFullscreen": "Exit full screen (Esc)",
+    "resetFilters": "Reset filters"
+  },
+  "list": {
+    "characters": "Characters",
+    "type": "Type",
+    "name": "Name",
+    "period": "Period",
+    "intensity": "Intensity",
+    "edit": "Edit"
+  },
+  "matrix": {
+    "hint": "Each cell shows the relationships between the row's character and the column's. Click an empty cell to create one."
+  },
+  "sheet": {
+    "title": "Relationships",
+    "add": "Add a relationship",
+    "empty": "No relationships for this character.",
+    "graph": "View graph"
+  }
+}

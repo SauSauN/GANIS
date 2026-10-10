@@ -1,15 +1,10 @@
-import { useEffect, useState } from "react";
-import { useTranslation } from "react-i18next";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { UnsavedChangesDialog } from "@/components/layout/UnsavedChangesDialog";
+import { useUnsavedQueue } from "@/components/layout/useUnsavedQueue";
 import { isTauri } from "@/lib/api";
-import {
-  discardEntries,
-  saveEntries,
-  useUnsavedStore,
-  type LeaveKind,
-} from "@/lib/unsavedChanges";
+import { useUnsavedStore } from "@/lib/unsavedChanges";
 
 /** Ferme réellement la fenêtre, sans repasser par la question. */
 function closeWindow() {
@@ -22,7 +17,9 @@ function closeWindow() {
 
 /**
  * Garde globale : avant de quitter une page ou de fermer GANIS avec des
- * modifications non enregistrées, demande quoi en faire.
+ * modifications non enregistrées, demande quoi en faire, pour chaque
+ * élément l'un après l'autre (voir `useUnsavedQueue`). Une fois tous les
+ * éléments réglés, on quitte ; « Annuler » arrête tout et on reste.
  *
  * - Fermeture de la fenêtre (bouton ×, Alt+F4, barre des tâches) : la
  *   demande de fermeture de Tauri est interceptée.
@@ -33,14 +30,11 @@ function closeWindow() {
  * Montée une seule fois, dans `App`.
  */
 export function UnsavedChangesGuard() {
-  const { t } = useTranslation("unsaved");
-  const entries = useUnsavedStore((s) => s.entries);
   const pending = useUnsavedStore((s) => s.pending);
   const requestLeave = useUnsavedStore((s) => s.requestLeave);
   const clearPending = useUnsavedStore((s) => s.clearPending);
 
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const queue = useUnsavedQueue();
 
   // --- Fermeture de la fenêtre --------------------------------------------
   useEffect(() => {
@@ -90,67 +84,39 @@ export function UnsavedChangesGuard() {
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, []);
 
-  // Plus rien à enregistrer pendant que la question est affichée
-  // (enregistrement automatique) : on continue sans demander.
+  // Demande de sortie : la question est posée pour chaque élément non
+  // enregistré, l'un après l'autre. S'il n'y en a plus (enregistrement
+  // automatique entre-temps), on quitte sans rien demander.
   useEffect(() => {
-    if (pending && !busy && Object.keys(entries).length === 0) {
-      const { proceed } = pending;
-      clearPending();
-      proceed();
+    if (!pending) {
+      return;
     }
-  }, [pending, busy, entries, clearPending]);
+
+    const { proceed } = pending;
+
+    queue.start(Object.keys(useUnsavedStore.getState().entries), {
+      onFinished: () => {
+        clearPending();
+        proceed();
+      },
+      onCancelled: clearPending,
+    });
+    // Une seule file par demande de sortie.
+  }, [pending]);
 
   if (!pending) {
     return null;
   }
 
-  const ids = Object.keys(entries);
-  const labels = ids.map((id) => entries[id].label);
-
-  function finish() {
-    const { proceed } = pending!;
-    setError(null);
-    clearPending();
-    proceed();
-  }
-
-  async function handleSave() {
-    setBusy(true);
-    setError(null);
-
-    const failed = await saveEntries(ids);
-
-    setBusy(false);
-
-    if (failed.length === 0) {
-      finish();
-      return;
-    }
-
-    const names = failed.map((id) => entries[id]?.label ?? id).join(", ");
-    setError(t("failed", { count: failed.length, names }));
-  }
-
-  function handleDiscard() {
-    discardEntries(ids);
-    finish();
-  }
-
-  function handleCancel() {
-    setError(null);
-    clearPending();
-  }
-
   return (
     <UnsavedChangesDialog
-      open
-      reason={pending.kind satisfies LeaveKind}
-      items={labels}
-      busy={busy}
-      error={error}
-      onSave={() => void handleSave()}
-      onDiscard={handleDiscard}
-      onCancel={handleCancel}
+      reason={pending.kind}
+      question={queue.question}
+      busy={queue.busy}
+      failed={queue.failed}
+      onSave={queue.save}
+      onDiscard={queue.discard}
+      onCancel={queue.cancel}
     />
   );
 }

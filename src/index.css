@@ -145,6 +145,16 @@
   html {
     @apply font-sans;
   }
+  /*
+   * Application de bureau : seules les zones prévues défilent (contenu des
+   * pages, panneaux). La fenêtre elle-même ne défile jamais, même si un
+   * élément dépasse, et le défilement ne « rebondit » pas.
+   */
+  html,
+  body {
+    overflow: hidden;
+    overscroll-behavior: none;
+  }
 }
 
 /* ============================================================

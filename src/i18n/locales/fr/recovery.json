@@ -1,0 +1,49 @@
+{
+  "panel": {
+    "title": {
+      "created": "Votre clé de récupération",
+      "migrated": "Vos données sont maintenant chiffrées",
+      "regenerated": "Votre nouvelle clé de récupération"
+    },
+    "intro": {
+      "created": "Vos projets sont chiffrés : vous seul pouvez les lire. Si vous oubliez votre mot de passe, cette clé vous permettra d'en choisir un nouveau sans rien perdre.",
+      "migrated": "Cette version de GANIS chiffre vos projets : vous seul pouvez les lire. Si vous oubliez votre mot de passe, cette clé vous permettra d'en choisir un nouveau sans rien perdre.",
+      "regenerated": "Cette clé remplace la précédente. Elle vous permettra de choisir un nouveau mot de passe si vous oubliez le vôtre, sans rien perdre."
+    },
+    "keyLabel": "Clé de récupération",
+    "copy": "Copier",
+    "copied": "Copiée",
+    "save": "Enregistrer dans un fichier",
+    "saved": "Fichier enregistré",
+    "saveDialogTitle": "Enregistrer la clé de récupération",
+    "copyFailed": "Impossible de copier la clé. Notez-la à la main.",
+    "saveFailed": "Impossible d'enregistrer le fichier. Copiez la clé ou notez-la à la main.",
+    "warningTitle": "Elle ne sera plus jamais affichée.",
+    "warning": "Notez-la sur papier ou rangez le fichier hors de cet ordinateur. Sans votre mot de passe ni cette clé, vos projets seront définitivement perdus : personne ne pourra les récupérer, pas même un administrateur.",
+    "oldKeyRevoked": "L'ancienne clé ne fonctionne plus.",
+    "check": "Pour confirmer que vous l'avez notée, saisissez le groupe n° {{number}}",
+    "continue": "J'ai noté ma clé, continuer"
+  },
+  "forgot": {
+    "title": "Mot de passe oublié",
+    "subtitle": "Saisissez votre clé de récupération pour choisir un nouveau mot de passe. Vos projets seront conservés.",
+    "username": "Nom d'utilisateur",
+    "recoveryKey": "Clé de récupération",
+    "recoveryKeyHint": "6 groupes de 6 caractères. Majuscules, espaces et tirets facultatifs.",
+    "newPassword": "Nouveau mot de passe",
+    "confirm": "Confirmer le nouveau mot de passe",
+    "submit": "Changer le mot de passe",
+    "submitting": "Vérification…",
+    "back": "Retour à la connexion",
+    "noKey": "Sans votre clé de récupération, vos projets ne peuvent pas être récupérés.",
+    "success": {
+      "title": "Mot de passe changé",
+      "description": "Vous pouvez vous connecter avec votre nouveau mot de passe. Vos projets sont intacts, et votre clé de récupération reste valable.",
+      "login": "Se connecter"
+    },
+    "errors": {
+      "usernameRequired": "Le nom d'utilisateur est requis.",
+      "keyFormat": "La clé de récupération doit contenir 6 groupes de 6 caractères (lettres et chiffres)."
+    }
+  }
+}

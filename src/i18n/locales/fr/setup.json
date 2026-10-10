@@ -12,7 +12,8 @@
   },
   "password": {
     "label": "Mot de passe",
-    "hint": "Au moins 8 caractères, avec une lettre et un chiffre."
+    "hint": "Au moins 8 caractères, avec une lettre et un chiffre.",
+    "warning": "Retenez-le bien : sans lui, vos projets ne pourront pas être récupérés."
   },
   "confirm": "Confirmer le mot de passe",
   "submit": "Créer le compte administrateur",

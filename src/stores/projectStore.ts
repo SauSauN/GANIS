@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
+import { useCharacterStore } from "@/stores/characterStore";
+import { useRelationStore } from "@/stores/relationStore";
 import { useSynopsisStore } from "@/stores/synopsisStore";
 import type {
   Project,
@@ -398,8 +400,10 @@ export const useProjectStore =
       },
 
       closeProject: () => {
-        // Le synopsis appartient au projet qu'on quitte.
+        // Le synopsis et les personnages appartiennent au projet qu'on quitte.
         useSynopsisStore.getState().reset();
+        useCharacterStore.getState().reset();
+        useRelationStore.getState().reset();
 
         set({
           currentProjectId: null,
@@ -410,6 +414,8 @@ export const useProjectStore =
         // Appelé à la déconnexion : aucune donnée du compte précédent
         // ne doit rester en mémoire.
         useSynopsisStore.getState().reset();
+        useCharacterStore.getState().reset();
+        useRelationStore.getState().reset();
 
         set(initial);
       },

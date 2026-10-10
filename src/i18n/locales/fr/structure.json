@@ -1,0 +1,207 @@
+{
+  "templates": {
+    "novel": {
+      "name": "Roman",
+      "levels": {
+        "0": {
+          "one": "Partie",
+          "other": "Parties",
+          "add": "Ajouter une partie",
+          "new": "Partie"
+        },
+        "1": {
+          "one": "Chapitre",
+          "other": "Chapitres",
+          "add": "Ajouter un chapitre",
+          "new": "Chapitre"
+        },
+        "2": {
+          "one": "Scène",
+          "other": "Scènes",
+          "add": "Ajouter une scène",
+          "new": "Scène"
+        }
+      }
+    },
+    "manga": {
+      "name": "Manga / BD",
+      "levels": {
+        "0": {
+          "one": "Tome",
+          "other": "Tomes",
+          "add": "Ajouter un tome",
+          "new": "Tome"
+        },
+        "1": {
+          "one": "Chapitre",
+          "other": "Chapitres",
+          "add": "Ajouter un chapitre",
+          "new": "Chapitre"
+        },
+        "2": {
+          "one": "Page",
+          "other": "Pages",
+          "add": "Ajouter une page",
+          "new": "Page"
+        }
+      }
+    },
+    "film": {
+      "name": "Film",
+      "levels": {
+        "0": {
+          "one": "Acte",
+          "other": "Actes",
+          "add": "Ajouter un acte",
+          "new": "Acte"
+        },
+        "1": {
+          "one": "Séquence",
+          "other": "Séquences",
+          "add": "Ajouter une séquence",
+          "new": "Séquence"
+        },
+        "2": {
+          "one": "Scène",
+          "other": "Scènes",
+          "add": "Ajouter une scène",
+          "new": "Scène"
+        }
+      }
+    },
+    "series": {
+      "name": "Série",
+      "levels": {
+        "0": {
+          "one": "Saison",
+          "other": "Saisons",
+          "add": "Ajouter une saison",
+          "new": "Saison"
+        },
+        "1": {
+          "one": "Épisode",
+          "other": "Épisodes",
+          "add": "Ajouter un épisode",
+          "new": "Épisode"
+        },
+        "2": {
+          "one": "Scène",
+          "other": "Scènes",
+          "add": "Ajouter une scène",
+          "new": "Scène"
+        }
+      }
+    },
+    "game": {
+      "name": "Jeu vidéo",
+      "levels": {
+        "0": {
+          "one": "Acte",
+          "other": "Actes",
+          "add": "Ajouter un acte",
+          "new": "Acte"
+        },
+        "1": {
+          "one": "Quête",
+          "other": "Quêtes",
+          "add": "Ajouter une quête",
+          "new": "Quête"
+        },
+        "2": {
+          "one": "Mission",
+          "other": "Missions",
+          "add": "Ajouter une mission",
+          "new": "Mission"
+        }
+      }
+    },
+    "rpg": {
+      "name": "Jeu de rôle",
+      "levels": {
+        "0": {
+          "one": "Scénario",
+          "other": "Scénarios",
+          "add": "Ajouter un scénario",
+          "new": "Scénario"
+        },
+        "1": {
+          "one": "Session",
+          "other": "Sessions",
+          "add": "Ajouter une session",
+          "new": "Session"
+        },
+        "2": {
+          "one": "Rencontre",
+          "other": "Rencontres",
+          "add": "Ajouter une rencontre",
+          "new": "Rencontre"
+        }
+      }
+    },
+    "generic": {
+      "name": "Générique",
+      "levels": {
+        "0": {
+          "one": "Partie",
+          "other": "Parties",
+          "add": "Ajouter une partie",
+          "new": "Partie"
+        },
+        "1": {
+          "one": "Section",
+          "other": "Sections",
+          "add": "Ajouter une section",
+          "new": "Section"
+        },
+        "2": {
+          "one": "Élément",
+          "other": "Éléments",
+          "add": "Ajouter un élément",
+          "new": "Élément"
+        }
+      }
+    }
+  },
+  "template": {
+    "label": "Modèle de découpage",
+    "auto": "Selon le type du projet ({{name}})",
+    "hint": "Changer de modèle ne modifie que les noms des niveaux : aucun élément n'est perdu."
+  },
+  "plan": {
+    "addAtRoot": "Ajouter à la racine",
+    "empty": {
+      "title": "Votre découpage est vide",
+      "description": "Commencez par le niveau qui vous convient : vous pourrez toujours ajouter les autres ensuite."
+    },
+    "untitled": "Sans titre",
+    "contains_one": "{{count}} élément",
+    "contains_other": "{{count}} éléments",
+    "toggle": {
+      "expand": "Déplier",
+      "collapse": "Replier"
+    },
+    "actions": {
+      "edit": "Modifier",
+      "moveUp": "Monter",
+      "moveDown": "Descendre",
+      "delete": "Supprimer"
+    },
+    "edit": {
+      "title": "Titre",
+      "summary": "Résumé",
+      "summaryPlaceholder": "Ce qui s'y passe, en quelques lignes.",
+      "save": "Enregistrer",
+      "cancel": "Annuler"
+    },
+    "delete": {
+      "title": "Supprimer « {{title}} » ?",
+      "description": "Cette action est définitive.",
+      "withChildren_one": "L'élément qu'il contient sera aussi supprimé.",
+      "withChildren_other": "Les {{count}} éléments qu'il contient seront aussi supprimés.",
+      "confirm": "Supprimer"
+    },
+    "loading": "Chargement du découpage…",
+    "loadFailed": "Impossible de charger le découpage.",
+    "retry": "Réessayer"
+  }
+}

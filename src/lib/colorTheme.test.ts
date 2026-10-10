@@ -6,6 +6,7 @@ import {
   PALETTE_KEYS,
   contrastRatio,
   getActiveColorThemeId,
+  getThemeRelationColors,
   initColorTheme,
   isHexColor,
   isThemeData,
@@ -42,6 +43,12 @@ describe("validation", () => {
     expect(isThemeData({ ...sample, radius: 9 })).toBe(false);
     expect(isThemeData({ ...sample, dark: { ...sample.dark, primary: "url(x)" } })).toBe(false);
     expect(isThemeData(null)).toBe(false);
+  });
+
+  it("accepte des couleurs de relation facultatives, uniquement hexadécimales", () => {
+    expect(isThemeData({ ...sample, relations: { love: "#E11D48" } })).toBe(true);
+    expect(isThemeData({ ...sample, relations: { love: "red;}" } })).toBe(false);
+    expect(isThemeData({ ...sample, relations: ["#E11D48"] })).toBe(false);
   });
 
   it("les thèmes système sont valides et uniques", () => {
@@ -117,6 +124,22 @@ describe("thème actif", () => {
     initColorTheme();
     expect(getActiveColorThemeId()).toBe(DEFAULT_THEME_ID);
     expect(styleTag()).toBeNull();
+  });
+});
+
+describe("couleurs des relations", () => {
+  it("viennent du thème actif, sinon aucune surcharge", () => {
+    resetColorTheme();
+    expect(getThemeRelationColors()).toEqual({});
+
+    setActiveColorTheme("uuid-rel", { ...sample, relations: { love: "#112233" } });
+    const first = getThemeRelationColors();
+    expect(first).toEqual({ love: "#112233" });
+    // Même objet tant que rien ne change (useSyncExternalStore).
+    expect(getThemeRelationColors()).toBe(first);
+
+    resetColorTheme();
+    expect(getThemeRelationColors()).toEqual({});
   });
 });
 
