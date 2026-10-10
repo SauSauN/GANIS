@@ -15,6 +15,10 @@
     "characters": {
       "label": "Personnages",
       "description": "Niveau de détail des fiches et listes de valeurs proposées."
+    },
+    "locations": {
+      "label": "Lieux",
+      "description": "Types de lieux personnalisés et statuts."
     }
   },
   "info": {

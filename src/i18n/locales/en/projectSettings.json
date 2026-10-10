@@ -15,6 +15,10 @@
     "characters": {
       "label": "Characters",
       "description": "Profile detail level and the values offered in lists."
+    },
+    "locations": {
+      "label": "Locations",
+      "description": "Custom location types and statuses."
     }
   },
   "info": {

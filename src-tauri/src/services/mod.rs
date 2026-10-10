@@ -4,9 +4,11 @@
 //! les commandes Tauri.
 
 pub mod auth_service;
+pub mod character_location_service;
 pub mod character_service;
 pub mod diagnostics_service;
 pub mod keyring_service;
+pub mod location_service;
 pub mod login_throttle;
 pub mod package_service;
 pub mod project_service;

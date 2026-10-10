@@ -28,13 +28,14 @@ use crate::security::recovery_key::RecoveryKey;
 use crate::services::keyring_service::{self, NewKeyring, NewSlot, SlotKind};
 use crate::services::{project_storage, session_service, user_service};
 use crate::state::AppState;
-use crate::utils::{new_id, now_utc};
+use crate::utils::{new_id, now_utc, run_blocking};
 use argon2::password_hash::{
     rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString,
 };
 use argon2::Argon2;
 use sqlx::SqlitePool;
 use std::sync::OnceLock;
+use zeroize::Zeroizing;
 
 const USERNAME_MIN_CHARS: usize = 3;
 const USERNAME_MAX_CHARS: usize = 50;
@@ -69,6 +70,21 @@ fn verify_password(password: &str, hash: &str) -> AppResult<bool> {
     Ok(Argon2::default()
         .verify_password(password.as_bytes(), &parsed)
         .is_ok())
+}
+
+/// [`hash_password`] sur un fil dédié (Argon2 bloquerait le moteur async).
+async fn hash_password_off_thread(password: &str) -> AppResult<(String, String)> {
+    let password = Zeroizing::new(password.to_owned());
+
+    run_blocking(move || hash_password(&password)).await
+}
+
+/// [`verify_password`] sur un fil dédié (Argon2 bloquerait le moteur async).
+async fn verify_password_off_thread(password: &str, hash: &str) -> AppResult<bool> {
+    let password = Zeroizing::new(password.to_owned());
+    let hash = hash.to_owned();
+
+    run_blocking(move || verify_password(&password, &hash)).await
 }
 
 /// Hash factice, calculé une seule fois.
@@ -298,14 +314,17 @@ async fn create_account(
     let now = now_utc();
 
     // Calculs coûteux (Argon2) avant la transaction.
-    let (password_hash, password_salt) = hash_password(password)?;
+    let (password_hash, password_salt) = hash_password_off_thread(password).await?;
 
     let new_keyring: Option<NewKeyring> = if keyring {
-        Some(keyring_service::build_keyring(
-            &id,
-            password,
-            keyring_service::RECOVERY_KEY_ON_SIGNUP,
-        )?)
+        Some(
+            keyring_service::build_keyring_off_thread(
+                &id,
+                password,
+                keyring_service::RECOVERY_KEY_ON_SIGNUP,
+            )
+            .await?,
+        )
     } else {
         None
     };
@@ -474,7 +493,7 @@ pub async fn change_password(
         .await?
         .ok_or_else(AppError::unauthorized)?;
 
-    if !verify_password(current_password, &user.password_hash)? {
+    if !verify_password_off_thread(current_password, &user.password_hash).await? {
         return Err(current_password_wrong());
     }
 
@@ -501,13 +520,14 @@ async fn set_password(
     new_password: &str,
     account_key: &SecretKey,
 ) -> AppResult<()> {
-    let (password_hash, password_salt) = hash_password(new_password)?;
-    let slot = NewSlot::seal(
+    let (password_hash, password_salt) = hash_password_off_thread(new_password).await?;
+    let slot = NewSlot::seal_off_thread(
         user_id,
         SlotKind::Password,
         new_password.as_bytes(),
         account_key,
-    )?;
+    )
+    .await?;
 
     let mut tx = pool.begin().await?;
 
@@ -554,7 +574,7 @@ pub async fn login_user(
 
     let authenticated = match candidate {
         Some(user) => {
-            if verify_password(password, &user.password_hash)? {
+            if verify_password_off_thread(password, &user.password_hash).await? {
                 Some(user)
             } else {
                 None
@@ -562,7 +582,8 @@ pub async fn login_user(
         }
         None => {
             // Même coût de calcul qu'une vraie vérification.
-            let _ = verify_password(password, dummy_hash());
+            let password = Zeroizing::new(password.to_owned());
+            let _ = run_blocking(move || verify_password(&password, dummy_hash())).await;
             None
         }
     };
@@ -630,11 +651,12 @@ async fn create_missing_keyring(
     user: &User,
     password: &str,
 ) -> AppResult<(SecretKey, Option<RecoveryKey>)> {
-    let keyring = keyring_service::build_keyring(
+    let keyring = keyring_service::build_keyring_off_thread(
         &user.id,
         password,
         keyring_service::RECOVERY_KEY_ON_SIGNUP,
-    )?;
+    )
+    .await?;
 
     let sealed_email = match user.email.as_deref() {
         Some(address) => Some(user_service::seal_email(&keyring.account_key, &user.id, address)?),
@@ -722,13 +744,13 @@ pub async fn recover_account(
                 None => {
                     // Compte sans trousseau : aucune clé de récupération
                     // n'existe. Même coût qu'un vrai essai.
-                    keyring_service::burn_equivalent_work(recovery_key.secret_bytes());
+                    keyring_service::burn_equivalent_work(recovery_key.secret_bytes()).await;
                     None
                 }
             }
         }
         None => {
-            keyring_service::burn_equivalent_work(recovery_key.secret_bytes());
+            keyring_service::burn_equivalent_work(recovery_key.secret_bytes()).await;
             None
         }
     };
@@ -771,17 +793,18 @@ pub async fn regenerate_recovery_key(
         .await?
         .ok_or_else(AppError::unauthorized)?;
 
-    if !verify_password(current_password, &user.password_hash)? {
+    if !verify_password_off_thread(current_password, &user.password_hash).await? {
         return Err(current_password_wrong());
     }
 
     let recovery_key = RecoveryKey::generate();
-    let slot = NewSlot::seal(
+    let slot = NewSlot::seal_off_thread(
         &user.id,
         SlotKind::Recovery,
         recovery_key.secret_bytes(),
         &account_key,
-    )?;
+    )
+    .await?;
 
     let mut conn = state.app_db.acquire().await?;
     keyring_service::replace_slot(&mut conn, &user.id, &slot).await?;

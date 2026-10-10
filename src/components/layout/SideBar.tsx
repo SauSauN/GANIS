@@ -8,6 +8,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { SideBarCharacters } from "@/components/characters/SideBarCharacters";
+import { SideBarLocations } from "@/components/locations/SideBarLocations";
 import {
   getModule,
   type ModuleId,
@@ -215,6 +216,15 @@ export function SideBar({
         {/* Personnages du projet, sous les fonctionnalités du module. */}
         {module.id === "characters" && (
           <SideBarCharacters
+            projectId={projectId}
+            activeTab={activeTab}
+            onOpenFeature={onOpenFeature}
+          />
+        )}
+
+        {/* Lieux du projet, en arborescence. */}
+        {module.id === "locations" && (
+          <SideBarLocations
             projectId={projectId}
             activeTab={activeTab}
             onOpenFeature={onOpenFeature}

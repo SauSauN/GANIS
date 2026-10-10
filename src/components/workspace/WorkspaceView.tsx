@@ -8,6 +8,9 @@ import {
 import { CharacterCreateView } from "@/components/workspace/views/CharacterCreateView";
 import { CharacterEditView } from "@/components/workspace/views/CharacterEditView";
 import { CharacterListView } from "@/components/workspace/views/CharacterListView";
+import { LocationCreateView } from "@/components/workspace/views/LocationCreateView";
+import { LocationEditView } from "@/components/workspace/views/LocationEditView";
+import { LocationListView } from "@/components/workspace/views/LocationListView";
 import { RelationsView } from "@/components/workspace/views/RelationsView";
 import {
   ComingSoonView,
@@ -17,6 +20,7 @@ import { StructurePlanView } from "@/components/workspace/views/StructurePlanVie
 import { SynopsisEditView } from "@/components/workspace/views/SynopsisEditView";
 import { WorkspaceHome } from "@/components/workspace/WorkspaceHome";
 import { characterIdOfTab } from "@/lib/characters";
+import { locationIdOfTab } from "@/lib/locations";
 import type { Project } from "@/types";
 
 interface WorkspaceViewProps {
@@ -113,6 +117,30 @@ export function WorkspaceView({
         onOpenFeature={onOpenFeature}
       />
     );
+  }
+
+  // ---------------------------------------------------------------------------
+  // Lieux
+  // ---------------------------------------------------------------------------
+  const locationId = locationIdOfTab(tabId);
+
+  if (locationId) {
+    return (
+      <LocationEditView
+        projectId={project.id}
+        locationId={locationId}
+        onClose={() => onCloseTab(tabId)}
+        onOpenFeature={onOpenFeature}
+      />
+    );
+  }
+
+  if (tabId === "locations.create") {
+    return <LocationCreateView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "locations.list") {
+    return <LocationListView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
   // ---------------------------------------------------------------------------

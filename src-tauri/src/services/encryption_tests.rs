@@ -510,3 +510,26 @@ async fn account_without_recovery_key_cannot_be_recovered() {
     // Le mot de passe d'origine fonctionne toujours.
     assert_eq!(login(&env, "bob", "motdepasse2").await, None);
 }
+#[tokio::test]
+async fn an_unreadable_project_does_not_hide_the_others() {
+    let env = env().await;
+    register_alice(&env).await;
+    login(&env, "alice", "motdepasse1").await;
+    let damaged = create_project_with_text(&env, "Abîmé", "Texte").await;
+    create_project_with_text(&env, "Intact", "Texte").await;
+
+    // Nom chiffré altéré : il ne se déchiffre plus.
+    sqlx::query("UPDATE projects SET name_sealed = 'v1.AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA.AAAA' WHERE id = ?")
+        .bind(&damaged)
+        .execute(&env.state.app_db)
+        .await
+        .unwrap();
+
+    let (user, key) = env.state.require_session().await.unwrap();
+    let projects = project_service::list_projects_for_user(&env.state.app_db, &user.id, &key)
+        .await
+        .unwrap();
+
+    assert_eq!(projects.len(), 1);
+    assert_eq!(projects[0].name, "Intact");
+}

@@ -1,6 +1,8 @@
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
 import { useCharacterStore } from "@/stores/characterStore";
+import { useLocationStore } from "@/stores/locationStore";
+import { usePlaceLinkStore } from "@/stores/placeLinkStore";
 import { useRelationStore } from "@/stores/relationStore";
 import { useSynopsisStore } from "@/stores/synopsisStore";
 import type {
@@ -400,10 +402,12 @@ export const useProjectStore =
       },
 
       closeProject: () => {
-        // Le synopsis et les personnages appartiennent au projet qu'on quitte.
+        // Le synopsis, les personnages et les lieux appartiennent au projet qu'on quitte.
         useSynopsisStore.getState().reset();
         useCharacterStore.getState().reset();
         useRelationStore.getState().reset();
+        useLocationStore.getState().reset();
+        usePlaceLinkStore.getState().reset();
 
         set({
           currentProjectId: null,
@@ -416,6 +420,8 @@ export const useProjectStore =
         useSynopsisStore.getState().reset();
         useCharacterStore.getState().reset();
         useRelationStore.getState().reset();
+        useLocationStore.getState().reset();
+        usePlaceLinkStore.getState().reset();
 
         set(initial);
       },

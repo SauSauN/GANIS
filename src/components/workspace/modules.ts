@@ -4,6 +4,7 @@ import {
   List,
   ListTree,
   MapPin,
+  MapPinned,
   Network,
   PenLine,
   Plus,
@@ -18,7 +19,9 @@ import {
 import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/sections";
 import i18n from "@/i18n";
 import { characterIdOfTab, fullName } from "@/lib/characters";
+import { locationIdOfTab } from "@/lib/locations";
 import { useCharacterStore } from "@/stores/characterStore";
+import { useLocationStore } from "@/stores/locationStore";
 
 /**
  * Registre des modules de l'espace de travail.
@@ -211,6 +214,27 @@ function characterFeature(tabId: string, characterId: string): WorkspaceFeature 
   };
 }
 
+/**
+ * Fiche d'un lieu (onglet `location:<id>`) : fonctionnalité du module Lieux,
+ * dont le libellé est le nom du lieu.
+ */
+function locationFeature(tabId: string, locationId: string): WorkspaceFeature {
+  return {
+    id: tabId,
+    icon: MapPinned,
+    get label() {
+      const location = useLocationStore
+        .getState()
+        .locations.find((item) => item.id === locationId);
+
+      return location?.name || i18n.t("locations:tab.fallback");
+    },
+    get description() {
+      return i18n.t("modules:features.locations.list.description");
+    },
+  };
+}
+
 /** Retrouve une fonctionnalité (et son module) par son identifiant. */
 export function findFeature(
   featureId: string,
@@ -221,6 +245,15 @@ export function findFeature(
     return {
       module: getModule("characters"),
       feature: characterFeature(featureId, characterId),
+    };
+  }
+
+  const locationId = locationIdOfTab(featureId);
+
+  if (locationId) {
+    return {
+      module: getModule("locations"),
+      feature: locationFeature(featureId, locationId),
     };
   }
 

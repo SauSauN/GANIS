@@ -152,5 +152,32 @@
     "invalidIntensity": "L'intensité va de 1 à 5.",
     "labelTooLong": "Le nom de la relation ne peut pas dépasser {{max}} caractères.",
     "descriptionTooLong": "La description ne peut pas dépasser {{max}} caractères."
+  },
+  "location": {
+    "notFound": "Lieu introuvable.",
+    "imageNotFound": "Image introuvable.",
+    "fieldTooLong": "Un champ dépasse {{max}} caractères.",
+    "invalidValue": "Valeur invalide.",
+    "tooManyTags": "{{max}} étiquettes au maximum.",
+    "nameRequired": "Indiquez le nom du lieu.",
+    "nameTooLong": "Le nom ne peut pas dépasser {{max}} caractères.",
+    "invalidType": "Type de lieu inconnu.",
+    "parentNotFound": "Le lieu parent est introuvable.",
+    "parentCycle": "Un lieu ne peut pas être placé dans lui-même ni dans un lieu qu'il contient.",
+    "unknownField": "Champ de fiche inconnu.",
+    "typeNameRequired": "Indiquez le nom du type.",
+    "invalidCategory": "Catégorie inconnue.",
+    "typeDuplicate": "Le type « {{name}} » existe déjà.",
+    "typeInUse": "Le type « {{name}} » est encore utilisé par {{count}} lieu(x) : changez d'abord leur type.",
+    "tooManyTypes": "{{max}} types personnalisés au maximum.",
+    "invalidList": "Liste inconnue.",
+    "listTooLong": "Une liste ne peut pas contenir plus de {{max}} valeurs.",
+    "galleryFull": "La galerie est pleine ({{max}} images au maximum)."
+  },
+  "placeLink": {
+    "notFound": "Lien introuvable.",
+    "invalidType": "Nature de lien inconnue.",
+    "labelTooLong": "La précision ne peut pas dépasser {{max}} caractères.",
+    "descriptionTooLong": "La description ne peut pas dépasser {{max}} caractères."
   }
 }

@@ -1,9 +1,9 @@
-import { Info, ListChecks, TriangleAlert, Users, type LucideIcon } from "lucide-react";
+import { Info, ListChecks, MapPin, TriangleAlert, Users, type LucideIcon } from "lucide-react";
 
 import i18n from "@/i18n";
 
 /** Sections des paramètres d'un projet. */
-export type ProjectSettingsId = "info" | "status" | "characters" | "danger";
+export type ProjectSettingsId = "info" | "status" | "characters" | "locations" | "danger";
 
 export interface ProjectSettingsSection {
   id: ProjectSettingsId;
@@ -40,5 +40,6 @@ export const PROJECT_SETTINGS_SECTIONS: ProjectSettingsSection[] = [
   section("info", Info),
   section("status", ListChecks),
   section("characters", Users),
+  section("locations", MapPin),
   section("danger", TriangleAlert),
 ];

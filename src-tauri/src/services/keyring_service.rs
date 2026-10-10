@@ -15,7 +15,8 @@ use crate::error::{AppError, AppResult};
 use crate::security::crypto::{self, KdfParams, SecretKey};
 use crate::security::recovery_key::RecoveryKey;
 use crate::security::aad;
-use crate::utils::{new_id, now_utc};
+use crate::utils::{new_id, now_utc, run_blocking};
+use zeroize::Zeroizing;
 use sqlx::{SqliteConnection, SqlitePool};
 
 /// Type de verrou.
@@ -64,6 +65,21 @@ impl NewSlot {
             params,
             wrapped_key,
         })
+    }
+
+    /// Comme [`NewSlot::seal`], mais le calcul Argon2id est fait sur un fil
+    /// dédié pour ne pas bloquer les autres commandes.
+    pub async fn seal_off_thread(
+        user_id: &str,
+        kind: SlotKind,
+        secret: &[u8],
+        account_key: &SecretKey,
+    ) -> AppResult<Self> {
+        let user_id = user_id.to_owned();
+        let secret = Zeroizing::new(secret.to_vec());
+        let account_key = account_key.clone();
+
+        run_blocking(move || Self::seal(&user_id, kind, &secret, &account_key)).await
     }
 }
 
@@ -119,6 +135,19 @@ pub fn build_keyring(user_id: &str, password: &str, with_recovery: bool) -> AppR
         recovery_key,
         slots,
     })
+}
+
+/// Comme [`build_keyring`], mais les calculs Argon2id sont faits sur un fil
+/// dédié pour ne pas bloquer les autres commandes.
+pub async fn build_keyring_off_thread(
+    user_id: &str,
+    password: &str,
+    with_recovery: bool,
+) -> AppResult<NewKeyring> {
+    let user_id = user_id.to_owned();
+    let password = Zeroizing::new(password.to_owned());
+
+    run_blocking(move || build_keyring(&user_id, &password, with_recovery)).await
 }
 
 const INSERT_SLOT: &str = r#"
@@ -219,31 +248,60 @@ pub async fn unlock(
         return Ok(None);
     };
 
-    let to_u32 = |value: i64| {
-        u32::try_from(value).map_err(|_| AppError::internal("Paramètre de dérivation invalide"))
+    let params = checked_params(&row)?;
+
+    // Dérivation (Argon2id) sur un fil dédié : elle dure plusieurs centaines
+    // de millisecondes et bloquerait sinon le moteur async.
+    let secret = Zeroizing::new(secret.to_vec());
+    let aad = aad::key_slot(user_id, kind.as_str());
+
+    run_blocking(move || {
+        let kek = crypto::derive_key(&secret, &row.kdf_salt, params)?;
+
+        Ok(Some(crypto::unwrap_key(&kek, &aad, &row.wrapped_key)?))
+    })
+    .await
+}
+
+/// Plafonds des paramètres de dérivation lus dans `app.db`.
+///
+/// Les valeurs enregistrées sont celles de `KdfParams::CURRENT` (64 Mio,
+/// 3 passes, 1 fil). Une base modifiée à la main ne doit pas pouvoir
+/// imposer un calcul démesuré (mémoire saturée, connexion bloquée).
+const KDF_MAX_MEMORY_KIB: u32 = 1024 * 1024; // 1 Gio
+const KDF_MAX_ITERATIONS: u32 = 16;
+const KDF_MAX_PARALLELISM: u32 = 16;
+
+/// Lit et vérifie les paramètres de dérivation d'un verrou.
+fn checked_params(row: &SlotRow) -> AppResult<KdfParams> {
+    let read = |value: i64, max: u32| {
+        u32::try_from(value)
+            .ok()
+            .filter(|value| (1..=max).contains(value))
+            .ok_or_else(|| {
+                AppError::internal("Paramètre de dérivation invalide")
+                    .with_detail(format!("Valeur hors limites dans user_key_slots : {value}"))
+            })
     };
 
-    let params = KdfParams {
-        memory_kib: to_u32(row.kdf_memory_kib)?,
-        iterations: to_u32(row.kdf_iterations)?,
-        parallelism: to_u32(row.kdf_parallelism)?,
-    };
-
-    let kek = crypto::derive_key(secret, &row.kdf_salt, params)?;
-
-    Ok(Some(crypto::unwrap_key(
-        &kek,
-        &aad::key_slot(user_id, kind.as_str()),
-        &row.wrapped_key,
-    )?))
+    Ok(KdfParams {
+        memory_kib: read(row.kdf_memory_kib, KDF_MAX_MEMORY_KIB)?,
+        iterations: read(row.kdf_iterations, KDF_MAX_ITERATIONS)?,
+        parallelism: read(row.kdf_parallelism, KDF_MAX_PARALLELISM)?,
+    })
 }
 
 /// Calcul Argon2 factice, au même coût qu'une vraie ouverture de verrou.
 ///
 /// Utilisé quand le compte est inconnu, pour que le temps de réponse ne
 /// révèle pas quels comptes existent.
-pub fn burn_equivalent_work(secret: &[u8]) {
-    let _ = crypto::derive_key(secret, &crypto::generate_salt(), KdfParams::CURRENT);
+pub async fn burn_equivalent_work(secret: &[u8]) {
+    let secret = Zeroizing::new(secret.to_vec());
+
+    let _ = run_blocking(move || {
+        crypto::derive_key(&secret, &crypto::generate_salt(), KdfParams::CURRENT)
+    })
+    .await;
 }
 
 #[cfg(test)]
@@ -366,6 +424,34 @@ mod tests {
             .unwrap()
             .unwrap();
         assert_eq!(key.as_bytes(), keyring.account_key.as_bytes());
+    }
+
+    #[tokio::test]
+    async fn absurd_kdf_parameters_are_refused() {
+        let pool = pool_with_user("u1").await;
+        let keyring = build_keyring("u1", "motdepasse1", false).unwrap();
+        save_all(&pool, "u1", &keyring).await;
+
+        for (column, value) in [
+            ("kdf_memory_kib", i64::from(u32::MAX)),
+            ("kdf_iterations", 1_000_000),
+            ("kdf_parallelism", 0),
+            ("kdf_memory_kib", -1),
+        ] {
+            let mut conn = pool.acquire().await.unwrap();
+            replace_slot(&mut conn, "u1", &keyring.slots[0]).await.unwrap();
+            sqlx::query(&format!("UPDATE user_key_slots SET {column} = ?"))
+                .bind(value)
+                .execute(&mut *conn)
+                .await
+                .unwrap();
+            drop(conn);
+
+            assert!(
+                unlock(&pool, "u1", SlotKind::Password, b"motdepasse1").await.is_err(),
+                "{column} = {value} aurait dû être refusé"
+            );
+        }
     }
 
     #[tokio::test]

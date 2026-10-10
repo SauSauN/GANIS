@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PortraitPicker } from "@/components/characters/PortraitPicker";
+import { PlaceField } from "@/components/locations/PlaceField";
 import {
   ChoiceField,
   ColorsField,
@@ -230,6 +231,18 @@ export function CharacterSheet({
                   projectId={projectId}
                   value={value}
                   onChange={change}
+                  disabled={disabled}
+                />
+              );
+            case "place":
+              return (
+                <PlaceField
+                  id={id}
+                  projectId={projectId}
+                  value={value}
+                  onChange={change}
+                  placeholder={placeholder}
+                  maxLength={field.maxLength}
                   disabled={disabled}
                 />
               );

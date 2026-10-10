@@ -152,5 +152,32 @@
     "invalidIntensity": "Intensity ranges from 1 to 5.",
     "labelTooLong": "The relationship name cannot exceed {{max}} characters.",
     "descriptionTooLong": "The description cannot exceed {{max}} characters."
+  },
+  "location": {
+    "notFound": "Location not found.",
+    "imageNotFound": "Image not found.",
+    "fieldTooLong": "A field exceeds {{max}} characters.",
+    "invalidValue": "Invalid value.",
+    "tooManyTags": "{{max}} tags at most.",
+    "nameRequired": "Enter the location's name.",
+    "nameTooLong": "The name cannot exceed {{max}} characters.",
+    "invalidType": "Unknown location type.",
+    "parentNotFound": "The parent location was not found.",
+    "parentCycle": "A location cannot be placed inside itself or inside a place it contains.",
+    "unknownField": "Unknown sheet field.",
+    "typeNameRequired": "Enter the type's name.",
+    "invalidCategory": "Unknown category.",
+    "typeDuplicate": "The type “{{name}}” already exists.",
+    "typeInUse": "The type “{{name}}” is still used by {{count}} location(s): change their type first.",
+    "tooManyTypes": "{{max}} custom types at most.",
+    "invalidList": "Unknown list.",
+    "listTooLong": "A list cannot hold more than {{max}} values.",
+    "galleryFull": "The gallery is full ({{max}} images at most)."
+  },
+  "placeLink": {
+    "notFound": "Link not found.",
+    "invalidType": "Unknown kind of link.",
+    "labelTooLong": "The detail cannot exceed {{max}} characters.",
+    "descriptionTooLong": "The description cannot exceed {{max}} characters."
   }
 }

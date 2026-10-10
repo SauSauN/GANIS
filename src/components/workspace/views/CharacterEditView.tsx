@@ -19,6 +19,7 @@ import {
 import { CharacterSheet } from "@/components/characters/CharacterForm";
 import { CharacterGallery } from "@/components/characters/fields/GalleryField";
 import { CharacterRelationsCard } from "@/components/relations/CharacterRelationsCard";
+import { PlaceLinksCard } from "@/components/locations/PlaceLinksCard";
 import {
   PageShell,
   cardClass,
@@ -279,6 +280,12 @@ export function CharacterEditView({
               projectId={projectId}
               characterId={character.id}
               onOpenGraph={() => onOpenFeature("characters.relations")}
+            />
+            <PlaceLinksCard
+              projectId={projectId}
+              side="character"
+              id={character.id}
+              onOpenFeature={onOpenFeature}
             />
             <div className="flex min-h-10 flex-wrap items-center gap-4">
               <Button type="submit" disabled={!dirty || saving}>

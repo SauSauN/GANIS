@@ -206,6 +206,85 @@ export interface CharacterPortrait {
 }
 
 // ----------------------------------------------------------------------------
+// Lieux
+// ----------------------------------------------------------------------------
+
+/** Lieu (correspond à `Location` en Rust ; les images sont à part). */
+export interface Location {
+  id: string;
+  name: string;
+  /** Type par défaut (`city`, `forest`…) ou ajouté par l'auteur (`custom-…`). */
+  type: string;
+  /** Lieu qui contient celui-ci ; `null` : tout en haut. */
+  parentId: string | null;
+  /** Valeur de la liste « statut » (code par défaut ou valeur personnalisée). */
+  status: string;
+  /** Champs remplis de la fiche, par clé (voir `locationCatalog.json`). */
+  fields: Record<string, string>;
+  /** Date de l'image principale ; `null` : pas d'image. */
+  portraitUpdatedAt: string | null;
+  galleryCount: number;
+  createdAt: string; // RFC 3339, UTC
+  updatedAt: string; // RFC 3339, UTC
+}
+
+/** Contenu d'une fiche, envoyé pour créer ou modifier un lieu. */
+export interface LocationInput {
+  name: string;
+  type: string;
+  parentId: string | null;
+  status: string;
+  fields: Record<string, string>;
+}
+
+/** Type de lieu ajouté par l'auteur. */
+export interface CustomLocationType {
+  id: string;
+  name: string;
+  category: string;
+}
+
+/** Réglages des lieux du projet. */
+export interface LocationSettings {
+  customTypes: CustomLocationType[];
+  /** Listes personnalisées (absente : valeurs par défaut). */
+  lists: Partial<Record<"status", string[]>>;
+}
+
+/** Lien entre un personnage et un lieu (visible sur les deux fiches). */
+export interface CharacterLocation {
+  id: string;
+  characterId: string;
+  locationId: string;
+  /** Nature du lien : `born`, `lives`, `rules`… (voir `lib/placeLinks.ts`). */
+  type: string;
+  label: string;
+  description: string;
+  /** Élément du plan où le lien commence / finit (`null` : début / fin). */
+  sinceNode: string | null;
+  untilNode: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CharacterLocationInput {
+  characterId: string;
+  locationId: string;
+  type: string;
+  label: string;
+  description: string;
+  sinceNode: string | null;
+  untilNode: string | null;
+}
+
+/** Image de la galerie d'un lieu, sans son contenu. */
+export interface LocationImage {
+  id: string;
+  caption: string | null;
+  createdAt: string;
+}
+
+// ----------------------------------------------------------------------------
 // Relations entre personnages
 // ----------------------------------------------------------------------------
 

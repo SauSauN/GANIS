@@ -53,11 +53,11 @@
     "locations": {
       "create": {
         "label": "Créer un lieu",
-        "description": "Description, histoire et caractéristiques du lieu."
+        "description": "Ville, royaume, forêt… une fiche adaptée à chaque type de lieu."
       },
       "list": {
         "label": "Liste des lieux",
-        "description": "Tous les lieux de votre univers."
+        "description": "Tous les lieux de votre univers, rangés les uns dans les autres."
       }
     },
     "structure": {

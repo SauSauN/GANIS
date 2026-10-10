@@ -78,7 +78,7 @@ export function isDefaultValue(key: CharacterListKey, value: string): boolean {
 // Champs
 // ----------------------------------------------------------------------------
 
-export type FieldKind = "text" | "longText" | "date" | "choice" | "reference" | "tags" | "colors";
+export type FieldKind = "text" | "longText" | "date" | "choice" | "reference" | "place" | "tags" | "colors";
 
 export interface CharacterField {
   key: string;

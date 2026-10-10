@@ -2,6 +2,8 @@ import { useEffect } from "react";
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
 import { fullName } from "@/lib/characters";
+import { useLocationStore } from "@/stores/locationStore";
+import { usePlaceLinkStore } from "@/stores/placeLinkStore";
 import { useRelationStore } from "@/stores/relationStore";
 import type {
   Character,
@@ -184,8 +186,15 @@ export const useCharacterStore = create<CharacterState>((set, get) => {
     deleteCharacter: async (projectId, id) => {
       await api.deleteCharacter(projectId, id);
 
-      // Rust a supprimé ses relations avec lui.
+      // Rust a supprimé ses relations et ses liens avec des lieux, et vidé
+      // les champs de lieux qui le désignaient (« Dirigeant ») : relus.
       useRelationStore.getState().forgetCharacter(projectId, id);
+      usePlaceLinkStore.getState().forget(projectId, "character", id);
+
+      const locations = useLocationStore.getState();
+      if (locations.projectId === projectId && locations.loaded) {
+        void locations.fetchLocations(projectId);
+      }
 
       if (get().projectId !== projectId) return;
 

@@ -53,11 +53,11 @@
     "locations": {
       "create": {
         "label": "Create a location",
-        "description": "Description, history and features of the location."
+        "description": "City, kingdom, forest… a sheet tailored to each type of place."
       },
       "list": {
         "label": "Location list",
-        "description": "All the locations in your world."
+        "description": "Every place in your world, nested inside one another."
       }
     },
     "structure": {

@@ -6,6 +6,7 @@ import enCharacters from "./locales/en/characters.json";
 import enCommon from "./locales/en/common.json";
 import enDashboard from "./locales/en/dashboard.json";
 import enErrors from "./locales/en/errors.json";
+import enLocations from "./locales/en/locations.json";
 import enLogin from "./locales/en/login.json";
 import enModules from "./locales/en/modules.json";
 import enPackages from "./locales/en/packages.json";
@@ -33,6 +34,7 @@ import frCharacters from "./locales/fr/characters.json";
 import frCommon from "./locales/fr/common.json";
 import frDashboard from "./locales/fr/dashboard.json";
 import frErrors from "./locales/fr/errors.json";
+import frLocations from "./locales/fr/locations.json";
 import frLogin from "./locales/fr/login.json";
 import frModules from "./locales/fr/modules.json";
 import frPackages from "./locales/fr/packages.json";
@@ -100,6 +102,7 @@ export const resources = {
   fr: {
     activitybar: frActivitybar,
     characters: frCharacters,
+    locations: frLocations,
     common: frCommon,
     dashboard: frDashboard,
     errors: frErrors,
@@ -129,6 +132,7 @@ export const resources = {
   en: {
     activitybar: enActivitybar,
     characters: enCharacters,
+    locations: enLocations,
     common: enCommon,
     dashboard: enDashboard,
     errors: enErrors,

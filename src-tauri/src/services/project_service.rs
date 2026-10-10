@@ -295,11 +295,28 @@ pub async fn list_projects_for_user(
     owner_id: &str,
     account_key: &SecretKey,
 ) -> AppResult<Vec<Project>> {
-    list_stored_for_user(pool, owner_id)
-        .await?
-        .into_iter()
-        .map(|project| reveal(project, account_key))
-        .collect()
+    let stored = list_stored_for_user(pool, owner_id).await?;
+    let mut projects = Vec::with_capacity(stored.len());
+
+    // Un projet dont le nom ou la description ne se déchiffre plus (ligne
+    // abîmée) est écarté de la liste au lieu de faire échouer tout le
+    // tableau de bord. Il n'est ni modifié ni supprimé : l'erreur est
+    // journalisée pour pouvoir le réparer.
+    for project in stored {
+        let id = project.id.clone();
+
+        match reveal(project, account_key) {
+            Ok(project) => projects.push(project),
+            Err(error) => tracing::error!(
+                project = %id,
+                error = %error,
+                detail = error.detail().unwrap_or_default(),
+                "Projet illisible écarté de la liste"
+            ),
+        }
+    }
+
+    Ok(projects)
 }
 
 /// Identifiants des projets d'un utilisateur (sans rien déchiffrer).
