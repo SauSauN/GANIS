@@ -29,7 +29,9 @@ import {
   addTab,
   closeTabs as closeTabsInLayout,
   initialLayout,
+  loadOpenTabs,
   moveTab as moveTabInLayout,
+  saveOpenTabs,
   savePinnedTabs,
   shiftTab as shiftTabInLayout,
   tabsToClose,
@@ -39,8 +41,10 @@ import {
 } from "@/lib/tabLayout";
 import {
   UnsavedTabContext,
+  discardEntries,
   useUnsavedStore,
 } from "@/lib/unsavedChanges";
+import { useCharacterStore } from "@/stores/characterStore";
 import { useProjectStore } from "@/stores/projectStore";
 
 /**
@@ -100,6 +104,15 @@ export default function Workspace() {
   const railExpanded = useRailExpanded();
 
   /**
+   * Onglet actif à l'arrivée : celui qu'on avait quitté plus tôt dans la
+   * session (retour du tableau de bord, des paramètres…), sinon l'accueil.
+   */
+  const [startTab] = useState<string | null>(() => {
+    const session = loadOpenTabs(projectId ?? "", (id) => tabMeta(id) !== null);
+    return session ? session.active : HOME_TAB;
+  });
+
+  /**
    * Module sélectionné dans la barre de gauche.
    *
    * Au départ, c'est le module qui contient l'onglet ouvert à l'arrivée
@@ -107,7 +120,7 @@ export default function Workspace() {
    * zone centrale restent ainsi toujours cohérentes.
    */
   const [activeModule, setActiveModule] = useState<ModuleId>(
-    () => findFeature(HOME_TAB)?.module.id ?? "details",
+    () => findFeature(startTab ?? HOME_TAB)?.module.id ?? "details",
   );
 
   /**
@@ -143,8 +156,11 @@ export default function Workspace() {
    *
    * null = aucun onglet ouvert.
    */
-  const [activeTab, setActiveTab] =
-    useState<string | null>(HOME_TAB);
+  const [activeTab, setActiveTab] = useState<string | null>(() =>
+    startTab && layout.tabs.includes(startTab)
+      ? startTab
+      : (layout.tabs[0] ?? null),
+  );
 
   /**
    * Devient vrai dès que le projet a été vu dans le store.
@@ -154,6 +170,13 @@ export default function Workspace() {
    * au tableau de bord.
    */
   const seenRef = useRef(false);
+
+  /**
+   * Personnages chargés : le libellé d'un onglet de fiche est le nom du
+   * personnage (voir `findFeature`). S'abonner ici renomme l'onglet dès
+   * que le personnage est renommé.
+   */
+  useCharacterStore((state) => state.characters);
 
   /** Onglets avec des modifications non enregistrées (point ● sur l'onglet). */
   const unsavedEntries = useUnsavedStore((state) => state.entries);
@@ -209,6 +232,16 @@ export default function Workspace() {
       savePinnedTabs(projectId, layout.pinned);
     }
   }, [projectId, layout.pinned]);
+
+  /**
+   * Mémorise les onglets ouverts et l'onglet actif jusqu'à la déconnexion :
+   * en revenant dans le projet, on les retrouve tels quels.
+   */
+  useEffect(() => {
+    if (projectId) {
+      saveOpenTabs(projectId, { tabs: layout.tabs, active: activeTab });
+    }
+  }, [projectId, layout.tabs, activeTab]);
 
   /**
    * Le projet courant est réinitialisé lorsqu'on quitte
@@ -373,6 +406,15 @@ export default function Workspace() {
   }
 
   /**
+   * Ferme un onglet sans poser de question : ses modifications éventuelles
+   * sont abandonnées (ex. le personnage de la fiche vient d'être supprimé).
+   */
+  function forceCloseTab(tabId: string) {
+    discardEntries([tabId]);
+    closeTabIds([tabId], tabId);
+  }
+
+  /**
    * Ferme un seul onglet (croix de l'onglet).
    */
   function closeTab(tabId: string) {
@@ -461,6 +503,7 @@ export default function Workspace() {
         {panelOpen && (
           <SideBar
             module={activeModule}
+            projectId={project.id}
             projectName={project.name}
             activeTab={activeTab}
             onOpenFeature={openFeature}
@@ -471,7 +514,10 @@ export default function Workspace() {
         {/* =========================================================
             ZONE CENTRALE
             ========================================================= */}
-        <main className="flex min-w-0 flex-1 flex-col">
+        {/* `workspace-drawer-host` : les panneaux latéraux (relation…)
+            s'ouvrent dans cette zone, à la hauteur de la barre de gauche,
+            sans recouvrir la barre de titre ni la barre d'état. */}
+        <main id="workspace-drawer-host" className="relative flex min-w-0 flex-1 flex-col">
           {/* =======================================================
               ONGLETS (épinglables et déplaçables)
 
@@ -515,6 +561,7 @@ export default function Workspace() {
                     tabId={tabId}
                     project={project}
                     onOpenFeature={openFeature}
+                    onCloseTab={forceCloseTab}
                   />
                 </UnsavedTabContext.Provider>
               </div>

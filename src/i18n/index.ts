@@ -12,6 +12,7 @@ import enPackages from "./locales/en/packages.json";
 import enProjectSettings from "./locales/en/projectSettings.json";
 import enProjects from "./locales/en/projects.json";
 import enRecovery from "./locales/en/recovery.json";
+import enRelations from "./locales/en/relations.json";
 import enRegister from "./locales/en/register.json";
 import enSettings from "./locales/en/settings.json";
 import enSetup from "./locales/en/setup.json";
@@ -38,6 +39,7 @@ import frPackages from "./locales/fr/packages.json";
 import frProjectSettings from "./locales/fr/projectSettings.json";
 import frProjects from "./locales/fr/projects.json";
 import frRecovery from "./locales/fr/recovery.json";
+import frRelations from "./locales/fr/relations.json";
 import frRegister from "./locales/fr/register.json";
 import frSettings from "./locales/fr/settings.json";
 import frSetup from "./locales/fr/setup.json";
@@ -107,6 +109,7 @@ export const resources = {
     projectSettings: frProjectSettings,
     projects: frProjects,
     recovery: frRecovery,
+    relations: frRelations,
     register: frRegister,
     settings: frSettings,
     setup: frSetup,
@@ -135,6 +138,7 @@ export const resources = {
     projectSettings: enProjectSettings,
     projects: enProjects,
     recovery: enRecovery,
+    relations: enRelations,
     register: enRegister,
     settings: enSettings,
     setup: enSetup,
@@ -212,6 +216,7 @@ void i18n.use(initReactI18next).init({
     "projectSettings",
     "projects",
     "recovery",
+    "relations",
     "register",
     "settings",
     "setup",

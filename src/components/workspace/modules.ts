@@ -11,11 +11,14 @@ import {
   Settings,
   StickyNote,
   UserPlus,
+  UserRound,
   Users,
   type LucideIcon,
 } from "lucide-react";
 import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/sections";
 import i18n from "@/i18n";
+import { characterIdOfTab, fullName } from "@/lib/characters";
+import { useCharacterStore } from "@/stores/characterStore";
 
 /**
  * Registre des modules de l'espace de travail.
@@ -187,10 +190,40 @@ export function getModule(id: ModuleId): WorkspaceModule {
   return ALL_MODULES.find((module) => module.id === id) ?? ALL_MODULES[0];
 }
 
+/**
+ * Fiche d'un personnage (onglet `character:<id>`) : fonctionnalité du module
+ * Personnages, dont le libellé est le nom du personnage.
+ */
+function characterFeature(tabId: string, characterId: string): WorkspaceFeature {
+  return {
+    id: tabId,
+    icon: UserRound,
+    get label() {
+      const character = useCharacterStore
+        .getState()
+        .characters.find((item) => item.id === characterId);
+
+      return (character && fullName(character)) || i18n.t("characters:tab.fallback");
+    },
+    get description() {
+      return i18n.t("modules:features.characters.list.description");
+    },
+  };
+}
+
 /** Retrouve une fonctionnalité (et son module) par son identifiant. */
 export function findFeature(
   featureId: string,
 ): { module: WorkspaceModule; feature: WorkspaceFeature } | undefined {
+  const characterId = characterIdOfTab(featureId);
+
+  if (characterId) {
+    return {
+      module: getModule("characters"),
+      feature: characterFeature(featureId, characterId),
+    };
+  }
+
   for (const module of ALL_MODULES) {
     const feature = module.features.find((item) => item.id === featureId);
 

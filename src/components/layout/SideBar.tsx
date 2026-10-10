@@ -7,6 +7,7 @@ import {
 } from "react";
 import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
+import { SideBarCharacters } from "@/components/characters/SideBarCharacters";
 import {
   getModule,
   type ModuleId,
@@ -25,6 +26,7 @@ import { cn } from "@/lib/utils";
 interface SideBarProps {
   /** Module dont on affiche les fonctionnalités. */
   module: ModuleId;
+  projectId: string;
   projectName: string;
   /** Onglet actuellement actif dans la zone centrale. */
   activeTab: string | null;
@@ -61,6 +63,7 @@ function resetBodyStyle() {
  */
 export function SideBar({
   module: moduleId,
+  projectId,
   projectName,
   activeTab,
   onOpenFeature,
@@ -207,6 +210,15 @@ export function SideBar({
               </li>
             ))}
           </ul>
+        )}
+
+        {/* Personnages du projet, sous les fonctionnalités du module. */}
+        {module.id === "characters" && (
+          <SideBarCharacters
+            projectId={projectId}
+            activeTab={activeTab}
+            onOpenFeature={onOpenFeature}
+          />
         )}
       </aside>
 

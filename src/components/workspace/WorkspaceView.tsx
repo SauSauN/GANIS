@@ -6,6 +6,9 @@ import {
   findFeature,
 } from "@/components/workspace/modules";
 import { CharacterCreateView } from "@/components/workspace/views/CharacterCreateView";
+import { CharacterEditView } from "@/components/workspace/views/CharacterEditView";
+import { CharacterListView } from "@/components/workspace/views/CharacterListView";
+import { RelationsView } from "@/components/workspace/views/RelationsView";
 import {
   ComingSoonView,
   EmptyListView,
@@ -13,6 +16,7 @@ import {
 import { StructurePlanView } from "@/components/workspace/views/StructurePlanView";
 import { SynopsisEditView } from "@/components/workspace/views/SynopsisEditView";
 import { WorkspaceHome } from "@/components/workspace/WorkspaceHome";
+import { characterIdOfTab } from "@/lib/characters";
 import type { Project } from "@/types";
 
 interface WorkspaceViewProps {
@@ -20,6 +24,8 @@ interface WorkspaceViewProps {
   tabId: string;
   project: Project;
   onOpenFeature: (featureId: string) => void;
+  /** Ferme cet onglet sans question (ex. personnage supprimé). */
+  onCloseTab: (tabId: string) => void;
 }
 
 /**
@@ -32,6 +38,7 @@ export function WorkspaceView({
   tabId,
   project,
   onOpenFeature,
+  onCloseTab,
 }: WorkspaceViewProps) {
   if (tabId === HOME_TAB) {
     return <WorkspaceHome project={project} />;
@@ -71,8 +78,41 @@ export function WorkspaceView({
   // ---------------------------------------------------------------------------
   // Personnages
   // ---------------------------------------------------------------------------
+  const characterId = characterIdOfTab(tabId);
+
+  if (characterId) {
+    return (
+      <CharacterEditView
+        projectId={project.id}
+        characterId={characterId}
+        onClose={() => onCloseTab(tabId)}
+        onOpenFeature={onOpenFeature}
+      />
+    );
+  }
+
   if (tabId === "characters.create") {
-    return <CharacterCreateView feature={feature} />;
+    return (
+      <CharacterCreateView
+        projectId={project.id}
+        feature={feature}
+        onOpenFeature={onOpenFeature}
+      />
+    );
+  }
+
+  if (tabId === "characters.relations") {
+    return <RelationsView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "characters.list") {
+    return (
+      <CharacterListView
+        projectId={project.id}
+        feature={feature}
+        onOpenFeature={onOpenFeature}
+      />
+    );
   }
 
   // ---------------------------------------------------------------------------

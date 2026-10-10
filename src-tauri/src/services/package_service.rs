@@ -12,6 +12,7 @@
 use crate::error::{AppError, AppResult};
 use crate::models::package::{PackageRow, PackageType, ThemeData, UserPackage};
 use crate::models::user::User;
+use crate::services::relation_service;
 use crate::utils::{new_id, now_utc};
 use sqlx::SqlitePool;
 
@@ -101,6 +102,29 @@ pub fn normalize_theme(
         ] {
             *value = value.trim().to_ascii_uppercase();
         }
+    }
+
+    // Couleurs des relations : types connus et couleurs hexadécimales
+    // uniquement (rien d'autre n'atteint la feuille de style).
+    if let Some(relations) = theme.relations.take() {
+        let mut checked = std::collections::BTreeMap::new();
+
+        for (kind, value) in relations {
+            let value = value.trim().to_ascii_uppercase();
+
+            if !relation_service::TYPES.contains(&kind.as_str()) || !is_hex_color(&value) {
+                return Err(AppError::validation(format!(
+                    "La couleur de relation « {kind} » n'est pas valide (format attendu : #RRGGBB)."
+                ))
+                .with_key("package.invalidColor")
+                .with_param("name", format!("relations.{kind}")));
+            }
+
+            checked.insert(kind, value);
+        }
+
+        // Aucune couleur : le champ disparaît (thème identique aux anciens).
+        theme.relations = (!checked.is_empty()).then_some(checked);
     }
 
     if !theme.radius.is_finite() || !(0.0..=RADIUS_MAX).contains(&theme.radius) {
@@ -409,7 +433,36 @@ mod tests {
     }
 
     fn theme(color: &str) -> ThemeData {
-        ThemeData { light: palette(color), dark: palette(color), radius: 0.625 }
+        ThemeData { light: palette(color), dark: palette(color), radius: 0.625, relations: None }
+    }
+
+    #[test]
+    fn relation_colors_are_checked_and_uppercased() {
+        let mut data = theme("#000000");
+        data.relations = Some([("love".to_owned(), " #e11d48 ".to_owned())].into());
+        let (_, _, data) = normalize_theme("Aube", "", data).unwrap();
+        assert_eq!(data.relations.unwrap()["love"], "#E11D48");
+
+        let mut unknown = theme("#000000");
+        unknown.relations = Some([("crush".to_owned(), "#E11D48".to_owned())].into());
+        assert!(normalize_theme("Aube", "", unknown).is_err());
+
+        let mut injected = theme("#000000");
+        injected.relations = Some([("love".to_owned(), "red;}".to_owned())].into());
+        assert!(normalize_theme("Aube", "", injected).is_err());
+
+        let mut empty = theme("#000000");
+        empty.relations = Some(Default::default());
+        let (_, _, data) = normalize_theme("Aube", "", empty).unwrap();
+        assert!(data.relations.is_none());
+    }
+
+    #[test]
+    fn older_themes_without_relation_colors_still_load() {
+        let json = serde_json::to_string(&theme("#111111")).unwrap();
+        assert!(!json.contains("relations"));
+        let back: ThemeData = serde_json::from_str(&json).unwrap();
+        assert!(back.relations.is_none());
     }
 
     #[test]

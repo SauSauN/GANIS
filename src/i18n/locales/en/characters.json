@@ -1,51 +1,261 @@
 {
-  "roles": {
-    "main": "Main character",
-    "secondary": "Secondary character",
-    "antagonist": "Antagonist",
-    "extra": "Extra"
+  "levels": {
+    "title": "Profile detail level",
+    "firstTime": "Choose how detailed the character profiles of this project are. It applies to every character and can be changed in the project settings.",
+    "continue": "Continue",
+    "current": "Profiles at {{level}} level.",
+    "change": "Change",
+    "count": "15 fields",
+    "countMore": "+ 15 fields",
+    "basic": {
+      "label": "Basic",
+      "theme": "Identity",
+      "goal": "Identify the character"
+    },
+    "intermediate": {
+      "label": "Medium",
+      "theme": "Appearance",
+      "goal": "Picture and recognise the character"
+    },
+    "advanced": {
+      "label": "Advanced",
+      "theme": "Personality",
+      "goal": "Build a believable character who evolves"
+    },
+    "collapse": "Collapse",
+    "expand": "Expand"
+  },
+  "lists": {
+    "names": {
+      "role": "Roles",
+      "status": "Statuses",
+      "gender": "Genders",
+      "build": "Builds"
+    },
+    "role": {
+      "main": "Main",
+      "secondary": "Secondary",
+      "antagonist": "Antagonist",
+      "mentor": "Mentor",
+      "ally": "Ally",
+      "extra": "Extra"
+    },
+    "status": {
+      "alive": "Alive",
+      "dead": "Deceased",
+      "missing": "Missing",
+      "transformed": "Transformed",
+      "newIdentity": "New identity",
+      "unknown": "Unknown"
+    },
+    "gender": {
+      "female": "Female",
+      "male": "Male",
+      "nonBinary": "Non-binary",
+      "other": "Other"
+    },
+    "build": {
+      "slim": "Slim",
+      "athletic": "Athletic",
+      "average": "Average",
+      "muscular": "Muscular",
+      "stocky": "Stocky",
+      "heavy": "Heavy"
+    }
+  },
+  "fields": {
+    "fullName": "Full name",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "role": "Role in the story",
+    "status": "Current status",
+    "portrait": "Main image",
+    "gallery": "Visual reference gallery",
+    "nickname": "Nickname / Alias",
+    "age": "Age",
+    "birthDate": "Date of birth",
+    "gender": "Gender",
+    "occupation": "Occupation / Activity",
+    "origin": "Origin",
+    "firstAppearance": "First appearance",
+    "description": "General description",
+    "mainGoal": "Main goal",
+    "distinctiveTrait": "Distinctive feature",
+    "notes": "Author's notes",
+    "height": "Height",
+    "build": "Build",
+    "silhouette": "Silhouette",
+    "skinTone": "Skin colour / Complexion",
+    "face": "Face",
+    "eyes": "Eyes",
+    "hair": "Hair",
+    "distinguishingMarks": "Distinguishing marks",
+    "voice": "Voice",
+    "postureGait": "Posture and gait",
+    "clothingStyle": "Clothing style",
+    "mainOutfit": "Main outfit",
+    "accessories": "Signature accessories",
+    "colorPalette": "Colour palette",
+    "psychology": "Psychological description",
+    "traits": "Character traits",
+    "strengths": "Strengths",
+    "flaws": "Flaws",
+    "motivations": "Motivations",
+    "deepDesire": "Deepest desire",
+    "fears": "Fears",
+    "weaknesses": "Weaknesses",
+    "coreValues": "Core values",
+    "beliefs": "Beliefs and convictions",
+    "formativeEvent": "Formative past event",
+    "secret": "Secret",
+    "innerConflict": "Inner conflict",
+    "adversityResponse": "Response to adversity",
+    "plannedArc": "Planned development"
+  },
+  "placeholders": {
+    "firstName": "E.g. Aldric",
+    "lastName": "E.g. Venn",
+    "nickname": "E.g. The Raven",
+    "age": "E.g. 32, mid-forties…",
+    "occupation": "E.g. Captain of the guard, smuggler…",
+    "origin": "E.g. Port of Ysmir, a fishing family…",
+    "description": "Who is this character, in a few lines? What you need to know about them at first glance.",
+    "mainGoal": "E.g. Find their missing sister",
+    "distinctiveTrait": "E.g. A scar across the cheek, never smiles…",
+    "notes": "Ideas, references, open questions…",
+    "height": "E.g. 1.80 m, tall for their age…",
+    "silhouette": "E.g. Slender, broad-shouldered…",
+    "skinTone": "E.g. Tanned, pale, freckled…",
+    "face": "E.g. Angular face, square jaw…",
+    "eyes": "E.g. Steel grey, almond-shaped…",
+    "hair": "E.g. Brown, short, always messy…",
+    "distinguishingMarks": "E.g. Wrist tattoo, scar, limp…",
+    "voice": "E.g. Deep and calm, slight northern accent…",
+    "postureGait": "E.g. Stands very straight, hurried walk…",
+    "clothingStyle": "E.g. Practical and worn, dark colours…",
+    "mainOutfit": "E.g. Leather coat, sailor's boots…",
+    "accessories": "E.g. A pocket watch, an iron ring…",
+    "psychology": "How do they think and react? Their temperament, moods, how they relate to others.",
+    "motivations": "What drives them, day to day and in the story.",
+    "deepDesire": "E.g. To finally be recognised by their father",
+    "fears": "E.g. Abandonment, deep water…",
+    "weaknesses": "E.g. Trusts too quickly, quick-tempered…",
+    "coreValues": "E.g. Loyalty above all",
+    "beliefs": "E.g. Believes everyone deserves a second chance",
+    "formativeEvent": "The past event that shaped them, and how.",
+    "secret": "What they hide, from whom, and what would happen if it came out.",
+    "innerConflict": "The two forces pulling against each other inside them.",
+    "adversityResponse": "E.g. Runs away first, then comes back to fight",
+    "plannedArc": "Who they are at the start of the story, who they become by the end.",
+    "tags": "E.g. Stubborn, generous… (Enter to add)"
+  },
+  "choice": {
+    "none": "Not specified",
+    "add": "+ Add a value…",
+    "newPlaceholder": "New value",
+    "confirm": "Add",
+    "cancel": "Cancel"
+  },
+  "tags": {
+    "remove": "Remove “{{tag}}”"
+  },
+  "colors": {
+    "add": "Add a colour",
+    "remove": "Remove {{color}}"
+  },
+  "reference": {
+    "emptyPlan": "Story plan is empty",
+    "deleted": "Deleted item"
+  },
+  "gallery": {
+    "add": "Add",
+    "remove": "Remove image",
+    "open": "Enlarge image",
+    "hint": "{{count}} / {{max}} images · you can also drop them here."
+  },
+  "portrait": {
+    "add": "Add an image",
+    "change": "Change",
+    "remove": "Remove image",
+    "saving": "Saving image…",
+    "alt": "Image of {{name}}",
+    "drop": "Drop an image here",
+    "errors": {
+      "notImage": "This file is not an image.",
+      "fileTooLarge": "This file is too large (25 MB max).",
+      "unreadable": "This image could not be read."
+    }
+  },
+  "profile": {
+    "newCharacter": "New character",
+    "progress": "Profile completion"
   },
   "create": {
-    "preview": "Preview of the creation form. Saving characters will be enabled with the project database.",
-    "identity": {
-      "title": "Identity",
-      "description": "What is the character's name and what role do they play?",
-      "name": "Name",
-      "namePlaceholder": "Character name",
-      "nickname": "Nickname",
-      "nicknamePlaceholder": "Nickname or alias (optional)",
-      "role": "Role in the plot"
-    },
-    "description": {
-      "title": "Description",
-      "description": "What can be seen and what can be sensed about the character.",
-      "appearance": "Physical appearance",
-      "appearancePlaceholder": "Height, build, distinctive features, clothing style…",
-      "personality": "Personality",
-      "personalityPlaceholder": "Temperament, strengths, flaws, quirks…"
-    },
-    "background": {
-      "title": "Background and motivations",
-      "description": "Where the character comes from and what drives them.",
-      "history": "Personal history",
-      "historyPlaceholder": "Past, family, defining events…",
-      "motivations": "Motivations",
-      "motivationsPlaceholder": "What drives them to act…",
-      "goals": "Goals and conflicts",
-      "goalsPlaceholder": "What they want to achieve, what stands in their way…"
-    },
-    "notes": {
-      "title": "Private notes",
-      "description": "Free-form remarks, visible only in this project.",
-      "label": "Notes",
-      "placeholder": "Ideas, references, open questions…"
-    },
-    "save": "Save character",
-    "saveUnavailable": "Saving will be available with the project database",
-    "reset": "Reset",
-    "errors": {
-      "nameRequired": "Character name is required.",
-      "nameTooLong": "The name cannot exceed {{max}} characters."
+    "save": "Create character",
+    "saving": "Creating…",
+    "reset": "Clear",
+    "imagesFailed": "The character was created, but an image could not be saved: {{message}}"
+  },
+  "errors": {
+    "nameRequired": "Enter at least a first name or a last name.",
+    "nameTooLong": "First and last names cannot exceed {{max}} characters."
+  },
+  "edit": {
+    "loading": "Loading character…",
+    "updatedAt": "Modified on {{date}}",
+    "saved": "Changes saved.",
+    "delete": "Delete",
+    "deleteTitle": "Delete “{{name}}”?",
+    "deleteDescription": "Their profile and images will be permanently deleted.",
+    "deleteConfirm": "Delete",
+    "notFound": {
+      "title": "This character no longer exists",
+      "description": "It may have been deleted.",
+      "close": "Close tab"
     }
+  },
+  "list": {
+    "search": "Search",
+    "allRoles": "All",
+    "count_one": "{{count}} character",
+    "count_other": "{{count}} characters",
+    "noMatch": "No character matches your search.",
+    "emptyTitle": "No characters",
+    "emptyDescription": "Create your first character: start with their identity, you can expand it later.",
+    "create": "New character",
+    "loading": "Loading characters…",
+    "retry": "Retry",
+    "searchPlaceholder": "Search by name, alias, occupation, origin…",
+    "allStatuses": "All statuses",
+    "sortLabel": "Sort",
+    "sort": {
+      "name": "Sort by name",
+      "recent": "Recently modified",
+      "completion": "Most complete profile",
+      "role": "By role"
+    },
+    "layoutLabel": "Display",
+    "layout": {
+      "grid": "Cards",
+      "table": "Table"
+    },
+    "results_one": "{{count}} result",
+    "results_other": "{{count}} results",
+    "clearFilters": "Clear filters",
+    "noDescription": "No description yet.",
+    "completion": "Profile {{percent}}% complete",
+    "columns": {
+      "character": "Character",
+      "completion": "Profile completion",
+      "relations": "Relationships"
+    }
+  },
+  "sidebar": {
+    "title": "Characters",
+    "empty": "No characters",
+    "loading": "Loading…"
+  },
+  "tab": {
+    "fallback": "Character"
   }
 }

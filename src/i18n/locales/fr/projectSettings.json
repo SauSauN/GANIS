@@ -11,6 +11,10 @@
     "danger": {
       "label": "Duplication et suppression",
       "description": "Dupliquer ou supprimer définitivement le projet."
+    },
+    "characters": {
+      "label": "Personnages",
+      "description": "Niveau de détail des fiches et listes de valeurs proposées."
     }
   },
   "info": {
@@ -41,5 +45,19 @@
     "deleteTitle": "Supprimer le projet",
     "deleteDescription": "La suppression est définitive et ne peut pas être annulée.",
     "deleteFailed": "Impossible de supprimer le projet."
+  },
+  "characters": {
+    "title": "Niveau de détail des fiches",
+    "description": "S'applique à tous les personnages du projet. Changer de niveau n'efface rien : les champs masqués réapparaissent si vous remontez de niveau.",
+    "saved": "Enregistré.",
+    "failed": "L'enregistrement a échoué.",
+    "lists": {
+      "title": "Listes personnalisables",
+      "description": "Valeurs proposées dans les fiches de ce projet. Une valeur retirée reste sur les fiches qui l'utilisent.",
+      "placeholder": "Nouvelle valeur",
+      "add": "Ajouter",
+      "remove": "Retirer « {{value}} »",
+      "reset": "Valeurs par défaut"
+    }
   }
 }

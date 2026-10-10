@@ -11,6 +11,10 @@
     "danger": {
       "label": "Duplicate and delete",
       "description": "Duplicate or permanently delete the project."
+    },
+    "characters": {
+      "label": "Characters",
+      "description": "Profile detail level and the values offered in lists."
     }
   },
   "info": {
@@ -41,5 +45,19 @@
     "deleteTitle": "Delete project",
     "deleteDescription": "Deletion is permanent and cannot be undone.",
     "deleteFailed": "Unable to delete the project."
+  },
+  "characters": {
+    "title": "Profile detail level",
+    "description": "Applies to every character in the project. Changing the level deletes nothing: hidden fields come back if you raise the level again.",
+    "saved": "Saved.",
+    "failed": "Saving failed.",
+    "lists": {
+      "title": "Custom lists",
+      "description": "Values offered in this project's profiles. A removed value stays on the profiles that use it.",
+      "placeholder": "New value",
+      "add": "Add",
+      "remove": "Remove “{{value}}”",
+      "reset": "Default values"
+    }
   }
 }

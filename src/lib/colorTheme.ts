@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-import type { ThemeData, ThemePalette } from "@/types";
+import type { RelationType, ThemeData, ThemePalette } from "@/types";
 
 /**
  * Thèmes de couleurs (packages de type `theme`, §20.2).
@@ -58,6 +58,19 @@ function isPalette(value: unknown): value is ThemePalette {
   return PALETTE_KEYS.every((key) => isHexColor(record[key]));
 }
 
+/** Couleurs des relations d'un thème : absentes, ou des couleurs hexadécimales. */
+function isRelationColors(value: unknown): boolean {
+  if (value === undefined) {
+    return true;
+  }
+
+  if (typeof value !== "object" || value === null || Array.isArray(value)) {
+    return false;
+  }
+
+  return Object.values(value as Record<string, unknown>).every(isHexColor);
+}
+
 /**
  * Vérifie des données de thème venues d'ailleurs (cache local).
  * Rien d'autre qu'une couleur hexadécimale n'atteint la feuille de style.
@@ -72,6 +85,7 @@ export function isThemeData(value: unknown): value is ThemeData {
   return (
     isPalette(record.light) &&
     isPalette(record.dark) &&
+    isRelationColors(record.relations) &&
     typeof record.radius === "number" &&
     Number.isFinite(record.radius) &&
     record.radius >= RADIUS_MIN &&
@@ -456,6 +470,35 @@ function subscribe(onChange: () => void) {
 /** Identifiant du thème actif, mis à jour dès qu'il change. */
 export function useActiveColorThemeId(): string {
   return useSyncExternalStore(subscribe, getActiveColorThemeId);
+}
+
+// ----------------------------------------------------------------------------
+// Couleurs des relations (personnalisables par un thème)
+// ----------------------------------------------------------------------------
+
+type RelationColors = Partial<Record<RelationType, string>>;
+
+const NO_RELATION_COLORS: RelationColors = {};
+let relationCache: { key: string; colors: RelationColors } | null = null;
+
+/**
+ * Couleurs des relations définies par le thème actif (vide : couleurs par
+ * défaut). Le même objet est renvoyé tant qu'elles ne changent pas.
+ */
+export function getThemeRelationColors(): RelationColors {
+  const colors = resolveStored(readStored())?.relations ?? NO_RELATION_COLORS;
+  const key = JSON.stringify(colors);
+
+  if (relationCache?.key !== key) {
+    relationCache = { key, colors };
+  }
+
+  return relationCache.colors;
+}
+
+/** Couleurs des relations du thème actif, mises à jour dès qu'il change. */
+export function useThemeRelationColors(): RelationColors {
+  return useSyncExternalStore(subscribe, getThemeRelationColors);
 }
 
 // ----------------------------------------------------------------------------

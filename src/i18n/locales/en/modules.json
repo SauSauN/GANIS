@@ -39,7 +39,7 @@
     "characters": {
       "create": {
         "label": "Create a character",
-        "description": "Identity, description, background and motivations."
+        "description": "Identity, appearance and personality, in three levels of detail."
       },
       "list": {
         "label": "Character list",

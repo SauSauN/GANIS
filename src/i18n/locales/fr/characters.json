@@ -1,51 +1,261 @@
 {
-  "roles": {
-    "main": "Personnage principal",
-    "secondary": "Personnage secondaire",
-    "antagonist": "Antagoniste",
-    "extra": "Figurant"
+  "levels": {
+    "title": "Niveau de détail des fiches",
+    "firstTime": "Choisissez le niveau de détail des fiches de ce projet. Il s'applique à tous les personnages et se change dans les paramètres du projet.",
+    "continue": "Continuer",
+    "current": "Fiches au niveau {{level}}.",
+    "change": "Modifier",
+    "count": "15 champs",
+    "countMore": "+ 15 champs",
+    "basic": {
+      "label": "Basique",
+      "theme": "L'identité",
+      "goal": "Identifier le personnage"
+    },
+    "intermediate": {
+      "label": "Moyen",
+      "theme": "L'apparence",
+      "goal": "Visualiser et reconnaître le personnage"
+    },
+    "advanced": {
+      "label": "Avancé",
+      "theme": "La personnalité",
+      "goal": "Construire un personnage crédible et évolutif"
+    },
+    "collapse": "Replier",
+    "expand": "Déplier"
+  },
+  "lists": {
+    "names": {
+      "role": "Rôles",
+      "status": "Statuts",
+      "gender": "Genres",
+      "build": "Corpulences"
+    },
+    "role": {
+      "main": "Principal",
+      "secondary": "Secondaire",
+      "antagonist": "Antagoniste",
+      "mentor": "Mentor",
+      "ally": "Allié",
+      "extra": "Figurant"
+    },
+    "status": {
+      "alive": "Vivant",
+      "dead": "Décédé",
+      "missing": "Disparu",
+      "transformed": "Transformé",
+      "newIdentity": "Identité changée",
+      "unknown": "Inconnu"
+    },
+    "gender": {
+      "female": "Femme",
+      "male": "Homme",
+      "nonBinary": "Non-binaire",
+      "other": "Autre"
+    },
+    "build": {
+      "slim": "Mince",
+      "athletic": "Athlétique",
+      "average": "Moyenne",
+      "muscular": "Musclée",
+      "stocky": "Trapue",
+      "heavy": "Corpulente"
+    }
+  },
+  "fields": {
+    "fullName": "Nom complet",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "role": "Rôle dans l'histoire",
+    "status": "Statut actuel",
+    "portrait": "Image principale",
+    "gallery": "Galerie de références visuelles",
+    "nickname": "Surnom / Alias",
+    "age": "Âge",
+    "birthDate": "Date de naissance",
+    "gender": "Genre",
+    "occupation": "Profession / Activité",
+    "origin": "Origine",
+    "firstAppearance": "Première apparition",
+    "description": "Description générale",
+    "mainGoal": "Objectif principal",
+    "distinctiveTrait": "Particularité distinctive",
+    "notes": "Notes de l'auteur",
+    "height": "Taille",
+    "build": "Corpulence",
+    "silhouette": "Silhouette",
+    "skinTone": "Couleur de peau / Teint",
+    "face": "Visage",
+    "eyes": "Yeux",
+    "hair": "Cheveux",
+    "distinguishingMarks": "Signes distinctifs",
+    "voice": "Voix",
+    "postureGait": "Posture et démarche",
+    "clothingStyle": "Style vestimentaire",
+    "mainOutfit": "Tenue principale",
+    "accessories": "Accessoires caractéristiques",
+    "colorPalette": "Palette de couleurs",
+    "psychology": "Description psychologique",
+    "traits": "Traits de caractère",
+    "strengths": "Qualités",
+    "flaws": "Défauts",
+    "motivations": "Motivations",
+    "deepDesire": "Désir profond",
+    "fears": "Peurs",
+    "weaknesses": "Faiblesses",
+    "coreValues": "Valeurs fondamentales",
+    "beliefs": "Croyances et convictions",
+    "formativeEvent": "Événement marquant du passé",
+    "secret": "Secret",
+    "innerConflict": "Conflit intérieur",
+    "adversityResponse": "Réaction face aux difficultés",
+    "plannedArc": "Évolution prévue"
+  },
+  "placeholders": {
+    "firstName": "Ex. Aldric",
+    "lastName": "Ex. Venn",
+    "nickname": "Ex. Le Corbeau",
+    "age": "Ex. 32 ans, la quarantaine…",
+    "occupation": "Ex. Capitaine de la garde, contrebandier…",
+    "origin": "Ex. Port d'Ysmir, famille de pêcheurs…",
+    "description": "Qui est ce personnage, en quelques lignes ? Ce qu'il faut savoir de lui au premier coup d'œil.",
+    "mainGoal": "Ex. Retrouver sa sœur disparue",
+    "distinctiveTrait": "Ex. Une cicatrice qui lui barre la joue, ne sourit jamais…",
+    "notes": "Idées, références, questions à trancher…",
+    "height": "Ex. 1,80 m, grand pour son âge…",
+    "silhouette": "Ex. Élancée, épaules larges…",
+    "skinTone": "Ex. Hâlé, pâle, taches de rousseur…",
+    "face": "Ex. Visage anguleux, mâchoire carrée…",
+    "eyes": "Ex. Gris acier, en amande…",
+    "hair": "Ex. Bruns, courts, toujours en désordre…",
+    "distinguishingMarks": "Ex. Tatouage au poignet, cicatrice, boiterie…",
+    "voice": "Ex. Grave et posée, léger accent du nord…",
+    "postureGait": "Ex. Se tient très droit, démarche pressée…",
+    "clothingStyle": "Ex. Pratique et usé, couleurs sombres…",
+    "mainOutfit": "Ex. Manteau de cuir, bottes de marin…",
+    "accessories": "Ex. Une montre à gousset, un anneau de fer…",
+    "psychology": "Comment pense-t-il, comment réagit-il ? Son tempérament, ses humeurs, son rapport aux autres.",
+    "motivations": "Ce qui le pousse à agir, au quotidien et dans l'histoire.",
+    "deepDesire": "Ex. Être enfin reconnu par son père",
+    "fears": "Ex. L'abandon, l'eau profonde…",
+    "weaknesses": "Ex. Fait confiance trop vite, colérique…",
+    "coreValues": "Ex. La loyauté avant tout",
+    "beliefs": "Ex. Croit que chacun mérite une seconde chance",
+    "formativeEvent": "L'épisode de son passé qui l'a façonné, et comment.",
+    "secret": "Ce qu'il cache, à qui, et ce qui arriverait si cela se savait.",
+    "innerConflict": "Les deux forces qui s'opposent en lui.",
+    "adversityResponse": "Ex. Fuit d'abord, puis revient se battre",
+    "plannedArc": "Qui il est au début de l'histoire, qui il devient à la fin.",
+    "tags": "Ex. Têtu, généreux… (Entrée pour ajouter)"
+  },
+  "choice": {
+    "none": "Non précisé",
+    "add": "+ Ajouter une valeur…",
+    "newPlaceholder": "Nouvelle valeur",
+    "confirm": "Ajouter",
+    "cancel": "Annuler"
+  },
+  "tags": {
+    "remove": "Retirer « {{tag}} »"
+  },
+  "colors": {
+    "add": "Ajouter une couleur",
+    "remove": "Retirer {{color}}"
+  },
+  "reference": {
+    "emptyPlan": "Plan du récit vide",
+    "deleted": "Élément supprimé"
+  },
+  "gallery": {
+    "add": "Ajouter",
+    "remove": "Retirer l'image",
+    "open": "Agrandir l'image",
+    "hint": "{{count}} / {{max}} images · vous pouvez aussi les glisser ici."
+  },
+  "portrait": {
+    "add": "Ajouter une image",
+    "change": "Changer",
+    "remove": "Retirer l'image",
+    "saving": "Enregistrement de l'image…",
+    "alt": "Image de {{name}}",
+    "drop": "Déposez une image ici",
+    "errors": {
+      "notImage": "Ce fichier n'est pas une image.",
+      "fileTooLarge": "Ce fichier est trop lourd (25 Mo au maximum).",
+      "unreadable": "Cette image n'a pas pu être lue."
+    }
+  },
+  "profile": {
+    "newCharacter": "Nouveau personnage",
+    "progress": "Fiche remplie"
   },
   "create": {
-    "preview": "Aperçu de l'interface de création. L'enregistrement des personnages sera activé avec la base de données du projet.",
-    "identity": {
-      "title": "Identité",
-      "description": "Comment s'appelle le personnage et quel rôle joue-t-il ?",
-      "name": "Nom",
-      "namePlaceholder": "Nom du personnage",
-      "nickname": "Surnom",
-      "nicknamePlaceholder": "Surnom ou alias (facultatif)",
-      "role": "Rôle dans l'intrigue"
-    },
-    "description": {
-      "title": "Description",
-      "description": "Ce qui se voit et ce qui se devine du personnage.",
-      "appearance": "Apparence physique",
-      "appearancePlaceholder": "Taille, silhouette, traits marquants, style vestimentaire…",
-      "personality": "Personnalité",
-      "personalityPlaceholder": "Caractère, qualités, défauts, manies…"
-    },
-    "background": {
-      "title": "Parcours et motivations",
-      "description": "D'où vient le personnage et ce qui le fait avancer.",
-      "history": "Histoire personnelle",
-      "historyPlaceholder": "Passé, famille, événements fondateurs…",
-      "motivations": "Motivations",
-      "motivationsPlaceholder": "Ce qui le pousse à agir…",
-      "goals": "Objectifs et conflits",
-      "goalsPlaceholder": "Ce qu'il cherche à obtenir, ce qui s'y oppose…"
-    },
-    "notes": {
-      "title": "Notes privées",
-      "description": "Remarques libres, visibles uniquement dans ce projet.",
-      "label": "Notes",
-      "placeholder": "Idées, références, questions ouvertes…"
-    },
-    "save": "Enregistrer le personnage",
-    "saveUnavailable": "L'enregistrement sera disponible avec la base de données du projet",
-    "reset": "Réinitialiser",
-    "errors": {
-      "nameRequired": "Le nom du personnage est requis.",
-      "nameTooLong": "Le nom ne peut pas dépasser {{max}} caractères."
+    "save": "Créer le personnage",
+    "saving": "Création…",
+    "reset": "Effacer",
+    "imagesFailed": "Le personnage a été créé, mais une image n'a pas pu être enregistrée : {{message}}"
+  },
+  "errors": {
+    "nameRequired": "Indiquez au moins un prénom ou un nom.",
+    "nameTooLong": "Le prénom et le nom ne peuvent pas dépasser {{max}} caractères."
+  },
+  "edit": {
+    "loading": "Chargement du personnage…",
+    "updatedAt": "Modifié le {{date}}",
+    "saved": "Modifications enregistrées.",
+    "delete": "Supprimer",
+    "deleteTitle": "Supprimer « {{name}} » ?",
+    "deleteDescription": "Sa fiche et ses images seront définitivement supprimées.",
+    "deleteConfirm": "Supprimer",
+    "notFound": {
+      "title": "Ce personnage n'existe plus",
+      "description": "Il a peut-être été supprimé.",
+      "close": "Fermer l'onglet"
     }
+  },
+  "list": {
+    "search": "Rechercher",
+    "allRoles": "Tous",
+    "count_one": "{{count}} personnage",
+    "count_other": "{{count}} personnages",
+    "noMatch": "Aucun personnage ne correspond à votre recherche.",
+    "emptyTitle": "Aucun personnage",
+    "emptyDescription": "Créez votre premier personnage : son identité d'abord, vous l'enrichirez ensuite.",
+    "create": "Nouveau personnage",
+    "loading": "Chargement des personnages…",
+    "retry": "Réessayer",
+    "searchPlaceholder": "Rechercher par nom, alias, profession, origine…",
+    "allStatuses": "Tous les statuts",
+    "sortLabel": "Trier",
+    "sort": {
+      "name": "Trier par nom",
+      "recent": "Modifiés récemment",
+      "completion": "Fiche la plus remplie",
+      "role": "Par rôle"
+    },
+    "layoutLabel": "Affichage",
+    "layout": {
+      "grid": "Cartes",
+      "table": "Tableau"
+    },
+    "results_one": "{{count}} résultat",
+    "results_other": "{{count}} résultats",
+    "clearFilters": "Effacer les filtres",
+    "noDescription": "Pas encore de description.",
+    "completion": "Fiche remplie à {{percent}} %",
+    "columns": {
+      "character": "Personnage",
+      "completion": "Fiche remplie",
+      "relations": "Relations"
+    }
+  },
+  "sidebar": {
+    "title": "Personnages",
+    "empty": "Aucun personnage",
+    "loading": "Chargement…"
+  },
+  "tab": {
+    "fallback": "Personnage"
   }
 }

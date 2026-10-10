@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
 import { findBuiltinTheme, getActiveColorThemeId, resetColorTheme } from "@/lib/colorTheme";
 import { canDevelop } from "@/lib/roles";
+import { clearOpenTabs } from "@/lib/tabLayout";
 import { usePackageStore } from "@/stores/packageStore";
 import { useProjectStore } from "@/stores/projectStore";
 import type { User } from "@/types";
@@ -167,6 +168,8 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     useProjectStore.getState().reset();
     usePackageStore.getState().reset();
+    // Les onglets ouverts sont oubliés (les épinglés restent).
+    clearOpenTabs();
 
     set({
       user: null,

@@ -4,6 +4,15 @@ import type {
   AccountCreated,
   ApiErrorPayload,
   AppInfo,
+  Character,
+  CharacterInput,
+  CharacterPortrait,
+  CharacterListKey,
+  CharacterSettings,
+  GalleryImage,
+  GraphPosition,
+  Relation,
+  RelationInput,
   Diagnostics,
   ErrorCode,
   LoginResult,
@@ -497,6 +506,96 @@ export const api = {
   /** Supprime un élément et tout ce qu'il contient. */
   deleteStructureNode: (projectId: string, nodeId: string) =>
     call<void>("delete_structure_node", { projectId, nodeId }),
+
+  // -------------------------------------------------------------------------
+  // Personnages
+  // -------------------------------------------------------------------------
+
+  /** Réglages des personnages du projet (niveau de détail des fiches). */
+  getCharacterSettings: (projectId: string) =>
+    call<CharacterSettings>("get_character_settings", { projectId }),
+
+  /** Choisit le niveau de détail de toutes les fiches du projet. */
+  setCharacterDetailLevel: (projectId: string, level: string) =>
+    call<CharacterSettings>("set_character_detail_level", { projectId, level }),
+
+  /** Remplace une liste personnalisable (`null` : valeurs par défaut). */
+  setCharacterList: (projectId: string, list: CharacterListKey, values: string[] | null) =>
+    call<CharacterSettings>("set_character_list", { projectId, list, values }),
+
+  /** Images de la galerie d'un personnage (sans leur contenu). */
+  listCharacterGallery: (projectId: string, characterId: string) =>
+    call<GalleryImage[]>("list_character_gallery", { projectId, characterId }),
+
+  /** Contenu d'une image de la galerie. */
+  getCharacterGalleryImage: (projectId: string, imageId: string) =>
+    call<CharacterPortrait>("get_character_gallery_image", { projectId, imageId }),
+
+  /** Ajoute une image à la galerie (`data` : image en base64). */
+  addCharacterGalleryImage: (projectId: string, characterId: string, data: string) =>
+    call<GalleryImage>("add_character_gallery_image", { projectId, characterId, data }),
+
+  /** Supprime une image de la galerie. */
+  deleteCharacterGalleryImage: (projectId: string, imageId: string) =>
+    call<void>("delete_character_gallery_image", { projectId, imageId }),
+
+  /** Tous les personnages du projet, par ordre alphabétique. */
+  listCharacters: (projectId: string) =>
+    call<Character[]>("list_characters", { projectId }),
+
+  /** Crée un personnage. */
+  createCharacter: (projectId: string, input: CharacterInput) =>
+    call<Character>("create_character", { projectId, input }),
+
+  /** Remplace la fiche d'un personnage. */
+  updateCharacter: (projectId: string, characterId: string, input: CharacterInput) =>
+    call<Character>("update_character", { projectId, characterId, input }),
+
+  /** Supprime un personnage et sa photo. */
+  deleteCharacter: (projectId: string, characterId: string) =>
+    call<void>("delete_character", { projectId, characterId }),
+
+  /** Photo d'un personnage (`null` : pas de photo). */
+  getCharacterPortrait: (projectId: string, characterId: string) =>
+    call<CharacterPortrait | null>("get_character_portrait", { projectId, characterId }),
+
+  /** Remplace la photo d'un personnage (`data` : image en base64). */
+  setCharacterPortrait: (projectId: string, characterId: string, data: string) =>
+    call<Character>("set_character_portrait", { projectId, characterId, data }),
+
+  /** Retire la photo d'un personnage. */
+  removeCharacterPortrait: (projectId: string, characterId: string) =>
+    call<Character>("remove_character_portrait", { projectId, characterId }),
+
+  // -------------------------------------------------------------------------
+  // Relations entre personnages
+  // -------------------------------------------------------------------------
+
+  /** Toutes les relations du projet. */
+  listRelations: (projectId: string) => call<Relation[]>("list_relations", { projectId }),
+
+  /** Crée une relation. */
+  createRelation: (projectId: string, input: RelationInput) =>
+    call<Relation>("create_relation", { projectId, input }),
+
+  /** Remplace une relation. */
+  updateRelation: (projectId: string, relationId: string, input: RelationInput) =>
+    call<Relation>("update_relation", { projectId, relationId, input }),
+
+  /** Supprime une relation. */
+  deleteRelation: (projectId: string, relationId: string) =>
+    call<void>("delete_relation", { projectId, relationId }),
+
+  /** Positions de la disposition libre du graphe. */
+  getGraphPositions: (projectId: string) =>
+    call<GraphPosition[]>("get_graph_positions", { projectId }),
+
+  /** Enregistre des positions de la disposition libre. */
+  saveGraphPositions: (projectId: string, positions: GraphPosition[]) =>
+    call<void>("save_graph_positions", { projectId, positions }),
+
+  /** Efface la disposition libre. */
+  clearGraphPositions: (projectId: string) => call<void>("clear_graph_positions", { projectId }),
 
   // -------------------------------------------------------------------------
   // Packages et mode développeur
