@@ -30,6 +30,12 @@ interface UpdateProjectInput {
 interface ProjectState {
   projects: Project[];
   currentProjectId: string | null;
+  /**
+   * Dernier projet ouvert pendant la session. Contrairement à
+   * `currentProjectId`, il est gardé en quittant l'espace de travail : le
+   * bouton « Revenir au projet » de la barre du haut y ramène.
+   */
+  lastProjectId: string | null;
   query: string;
   loading: boolean;
   error: string | null;
@@ -73,6 +79,7 @@ const initial: Pick<
   ProjectState,
   | "projects"
   | "currentProjectId"
+  | "lastProjectId"
   | "query"
   | "loading"
   | "error"
@@ -80,6 +87,7 @@ const initial: Pick<
 > = {
   projects: [],
   currentProjectId: null,
+  lastProjectId: null,
   query: "",
   loading: false,
   error: null,
@@ -357,6 +365,8 @@ export const useProjectStore =
               state.currentProjectId === id
                 ? null
                 : state.currentProjectId,
+            lastProjectId:
+              state.lastProjectId === id ? null : state.lastProjectId,
             loading: false,
             error: null,
           }));
@@ -379,7 +389,7 @@ export const useProjectStore =
               throw new Error("Projet non trouvé.");
             }
 
-            set({ currentProjectId: id });
+            set({ currentProjectId: id, lastProjectId: id });
 
             return project;
           }
@@ -389,6 +399,7 @@ export const useProjectStore =
           set((state) => ({
             projects: upsert(state.projects, project),
             currentProjectId: id,
+            lastProjectId: id,
             error: null,
           }));
 

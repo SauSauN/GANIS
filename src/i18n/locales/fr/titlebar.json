@@ -17,5 +17,6 @@
     "restore": "Restaurer",
     "close": "Fermer"
   },
-  "packages": "Packages"
+  "packages": "Packages",
+  "backToProject": "Revenir au projet « {{name}} »"
 }

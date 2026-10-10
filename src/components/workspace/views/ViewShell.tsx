@@ -12,7 +12,7 @@ export function ViewShell({ title, description, children }: ViewShellProps) {
     <div className="flex-1 overflow-y-auto p-8">
       <div className="mx-auto max-w-2xl space-y-6">
         <div>
-          <h2 className="text-xl font-semibold">{title}</h2>
+          <h2 className="sr-only">{title}</h2>
           <p className="text-sm text-muted-foreground">{description}</p>
         </div>
 

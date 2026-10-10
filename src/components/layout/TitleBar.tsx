@@ -1,7 +1,7 @@
 import type { MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useMatch } from "react-router-dom";
-import { Blocks, Moon, Settings, Sun } from "lucide-react";
+import { Blocks, Moon, Settings, Sun, Undo2 } from "lucide-react";
 import ganisLogo from "@/assets/ganis-logo.png";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { useGuardedNavigate } from "@/components/layout/UnsavedChangesGuard";
@@ -45,6 +45,14 @@ export function TitleBar() {
   const projectName = useProjectStore((s) =>
     s.projects.find((project) => project.id === projectId)?.name,
   );
+
+  // Dernier projet ouvert : hors de l'espace de travail (paramètres
+  // généraux, packages, tableau de bord…), un bouton y ramène directement,
+  // avec ses onglets tels qu'on les a laissés.
+  const lastProject = useProjectStore((s) =>
+    s.projects.find((project) => project.id === s.lastProjectId),
+  );
+  const showBackToProject = Boolean(user && lastProject && !projectId);
 
   const theme = useResolvedTheme();
 
@@ -138,6 +146,18 @@ export function TitleBar() {
             inscription, configuration). Une fois connecté, elle se change
             dans le menu du compte. */}
         {!user && <LanguageSwitcher className="mr-1" />}
+
+        {showBackToProject && lastProject && (
+          <button
+            type="button"
+            onClick={() => navigate(`/workspace/${lastProject.id}`)}
+            aria-label={t("backToProject", { name: lastProject.name })}
+            title={t("backToProject", { name: lastProject.name })}
+            className={cn(iconButton, "w-auto max-w-56 gap-1.5 px-2")}
+          >
+            <Undo2 className="h-4 w-4 shrink-0" />
+          </button>
+        )}
 
         <button
           type="button"

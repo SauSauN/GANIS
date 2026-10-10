@@ -324,7 +324,7 @@ export function CharacterSheet({
               maxLength={MAX_NAME_LENGTH}
               aria-invalid={nameError ? true : undefined}
               disabled={disabled}
-              onChange={(e) => set("lastName", e.target.value)}
+              onChange={(e) => set("lastName", e.target.value.toLocaleUpperCase())}
             />
           </div>
           {nameError && (

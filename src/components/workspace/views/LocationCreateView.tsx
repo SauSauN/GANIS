@@ -192,7 +192,12 @@ export function LocationCreateView({ projectId, feature, onOpenFeature }: Locati
 
   if (!draft.type) {
     return (
-      <PageShell title={t("picker.title")} description={t("picker.description")}>
+      <PageShell title={feature.label}>
+        <div className="mb-5">
+          <h2 className="text-lg font-semibold">{t("picker.title")}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{t("picker.description")}</p>
+        </div>
+
         {parent && (
           <p className="mb-4 inline-flex items-center gap-1.5 rounded-md bg-primary/10 px-3 py-1.5 text-sm text-primary">
             <MapPin className="size-4" aria-hidden="true" />

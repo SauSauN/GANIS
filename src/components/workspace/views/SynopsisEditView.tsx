@@ -380,13 +380,11 @@ export function SynopsisEditView({
             EN-TÊTE
             ================================================================ */}
 
-        <header className="mb-8">
+        <header className="mb-6">
 
-          <h1 className="text-3xl font-semibold tracking-tight">
-            {feature.label}
-          </h1>
+          <h1 className="sr-only">{feature.label}</h1>
 
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+          <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
             {feature.description}
           </p>
         </header>

@@ -33,13 +33,15 @@ export function PageShell({ title, description, actions, children }: PageShellPr
   return (
     <main className="relative flex min-h-0 flex-1 overflow-y-auto overscroll-contain">
       <div className="mx-auto w-full max-w-5xl px-6 py-8 pb-24 lg:px-10">
-        {(title || actions) && (
-          <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
-            <div className="min-w-0">
-              {title && <h1 className="break-words text-3xl font-semibold tracking-tight">{title}</h1>}
+        {/* Pas de grand titre visible : le nom de la page est déjà dans son
+            onglet. Il reste lisible par les lecteurs d'écran. */}
+        {title && <h1 className="sr-only">{title}</h1>}
 
+        {(description || actions) && (
+          <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
               {description && (
-                <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{description}</p>
+                <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{description}</p>
               )}
             </div>
 

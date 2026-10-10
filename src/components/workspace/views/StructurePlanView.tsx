@@ -592,7 +592,7 @@ function Shell({ feature, children }: { feature: WorkspaceFeature; children: Rea
     <div className="flex-1 overflow-y-auto p-8">
       <div className="mx-auto max-w-4xl space-y-5">
         <div>
-          <h2 className="text-xl font-semibold">{feature.label}</h2>
+          <h2 className="sr-only">{feature.label}</h2>
           <p className="text-sm text-muted-foreground">{feature.description}</p>
         </div>
 

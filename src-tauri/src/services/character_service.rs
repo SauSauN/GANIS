@@ -420,7 +420,8 @@ fn clean_value(def: &'static FieldDef, raw: &str) -> AppResult<Option<String>> {
 
 async fn clean_input(pool: &SqlitePool, input: &CharacterInput) -> AppResult<CleanInput> {
     let first_name = clean_name(&input.first_name)?;
-    let last_name = clean_name(&input.last_name)?;
+    // Nom de famille toujours en majuscules (« Aldric VENN »).
+    let last_name = clean_name(&input.last_name)?.to_uppercase();
 
     if first_name.is_empty() && last_name.is_empty() {
         return Err(AppError::validation("Le prénom ou le nom du personnage est requis.")
@@ -1136,7 +1137,8 @@ mod tests {
             .into_iter()
             .map(|c| format!("{} {}", c.first_name, c.last_name).trim().to_owned())
             .collect();
-        assert_eq!(names, ["arthur", "Gandalf", "Zoé Roux"]);
+        // Nom de famille enregistré en majuscules.
+        assert_eq!(names, ["arthur", "GANDALF", "Zoé ROUX"]);
 
         assert!(update_character(&pool, "inconnu", &input("A", "", &[])).await.is_err());
         assert!(delete_character(&pool, "inconnu").await.is_err());

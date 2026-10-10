@@ -195,7 +195,7 @@
     background-color: transparent;
     background-clip: content-box;
     border: 2px solid transparent;
-    border-radius: 9999px;
+    border-radius: calc(var(--radius) * 1000);
   }
 
   [data-scrolling]::-webkit-scrollbar-thumb {
@@ -212,3 +212,21 @@
    `-webkit-app-region` qui est spécifique à Electron et
    interfère avec le comportement de Tauri v2.
    ============================================================ */
+/* ============================================================================
+   Arrondi des coins : tout suit le réglage du thème (--radius)
+   ============================================================================
+   Tailwind donne à `rounded-full` (pastilles, badges, avatars) et à `rounded`
+   une valeur fixe, qui ignorait le réglage « arrondi des coins » des thèmes :
+   à 0 rem, ces éléments restaient ronds. Ici :
+   - `rounded-full` : en pilule / cercle tant que --radius > 0, carré à 0 ;
+   - `rounded` : petit arrondi proportionnel (0,25 rem pour le thème par
+     défaut, à 0,625 rem).
+   Règles hors couche (@layer) : elles passent devant les utilitaires de
+   Tailwind. */
+.rounded-full {
+  border-radius: calc(var(--radius) * 1000);
+}
+
+.rounded {
+  border-radius: calc(var(--radius) * 0.4);
+}

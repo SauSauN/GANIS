@@ -130,9 +130,9 @@ export function serializeList(values: string[]): string {
 /** Longueur maximale du prénom, et du nom (identique à Rust). */
 export const MAX_NAME_LENGTH = 100;
 
-/** Prénom et nom, dans cet ordre (« Aldric Venn »). */
+/** Prénom et nom, dans cet ordre, le nom en majuscules (« Aldric VENN »). */
 export function fullName(person: { firstName: string; lastName: string }): string {
-  return [person.firstName.trim(), person.lastName.trim()].filter(Boolean).join(" ");
+  return [person.firstName.trim(), person.lastName.trim().toLocaleUpperCase()].filter(Boolean).join(" ");
 }
 
 /** Erreur du prénom et du nom, vérifiée avant l'envoi (Rust vérifie aussi). */
@@ -164,7 +164,7 @@ export function emptyDraft(): CharacterDraft {
 export function draftFromCharacter(character: Character): CharacterDraft {
   return {
     firstName: character.firstName,
-    lastName: character.lastName,
+    lastName: character.lastName.toLocaleUpperCase(),
     role: character.role,
     status: character.status,
     fields: { ...character.fields },
@@ -209,7 +209,7 @@ export function toInput(draft: CharacterDraft): CharacterInput {
   return {
     ...draft,
     firstName: draft.firstName.trim(),
-    lastName: draft.lastName.trim(),
+    lastName: draft.lastName.trim().toLocaleUpperCase(),
     fields: cleanFields(draft.fields),
   };
 }
