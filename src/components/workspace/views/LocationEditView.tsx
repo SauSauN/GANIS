@@ -19,6 +19,7 @@ import {
 import { LocationGallery } from "@/components/locations/LocationGallery";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import { PlaceLinksCard } from "@/components/locations/PlaceLinksCard";
+import { StoryLinksCard } from "@/components/structure/StoryLinksCard";
 import { LocationSheet } from "@/components/locations/LocationSheet";
 import { LocationThumb, TypeBadge } from "@/components/locations/LocationVisuals";
 import { useLocationLabels } from "@/components/locations/useLocationLabels";
@@ -332,6 +333,13 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
                 projectId={projectId}
                 side="location"
                 id={location.id}
+                onOpenFeature={onOpenFeature}
+              />
+              <StoryLinksCard
+                projectId={projectId}
+                side="location"
+                id={location.id}
+                firstAppearance={location.fields.firstAppearance}
                 onOpenFeature={onOpenFeature}
               />
               {childrenCard}

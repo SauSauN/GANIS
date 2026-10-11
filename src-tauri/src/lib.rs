@@ -75,6 +75,9 @@ pub fn run() {
             // -----------------------------------------------------------------
             // 3. État partagé
             // -----------------------------------------------------------------
+            // Imports .ganix et exports interrompus par un arrêt brutal.
+            services::ganix_service::clean_leftovers(&data_dir);
+
             let state = AppState::new(app_db, data_dir);
 
             app.manage(state);
@@ -106,6 +109,10 @@ pub fn run() {
             commands::projects::update_project,
             commands::projects::duplicate_project,
             commands::projects::delete_project,
+            commands::ganix::export_project,
+            commands::ganix::inspect_ganix,
+            commands::ganix::confirm_ganix_import,
+            commands::ganix::cancel_ganix_import,
             commands::synopsis::get_synopsis,
             commands::synopsis::update_synopsis,
             commands::characters::get_character_settings,
@@ -150,6 +157,14 @@ pub fn run() {
             commands::relations::clear_graph_positions,
             commands::structure::get_structure,
             commands::structure::set_structure_template,
+            commands::structure::set_structure_levels,
+            commands::structure::set_structure_auto_numbering,
+            commands::structure::renumber_structure,
+            commands::structure_links::list_structure_links,
+            commands::structure_links::link_structure_character,
+            commands::structure_links::unlink_structure_character,
+            commands::structure_links::link_structure_location,
+            commands::structure_links::unlink_structure_location,
             commands::structure::create_structure_node,
             commands::structure::update_structure_node,
             commands::structure::move_structure_node,

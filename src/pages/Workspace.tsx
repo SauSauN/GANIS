@@ -45,6 +45,7 @@ import {
   useUnsavedStore,
 } from "@/lib/unsavedChanges";
 import { useCharacterStore } from "@/stores/characterStore";
+import { useStructureStore } from "@/stores/structureStore";
 import { useProjectStore } from "@/stores/projectStore";
 
 /**
@@ -177,6 +178,9 @@ export default function Workspace() {
    * que le personnage est renommé.
    */
   useCharacterStore((state) => state.characters);
+
+  /** Même chose pour les fiches des éléments du découpage (« Chapitre 3 »). */
+  useStructureStore((state) => state.structure);
 
   /** Onglets avec des modifications non enregistrées (point ● sur l'onglet). */
   const unsavedEntries = useUnsavedStore((state) => state.entries);

@@ -4,6 +4,7 @@ import {
   Archive,
   ArchiveRestore,
   Copy,
+  Download,
   Star,
   Trash2,
 } from "lucide-react";
@@ -29,10 +30,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CharacterSettingsSection } from "@/components/characters/CharacterSettingsSection";
 import { LocationSettingsSection } from "@/components/locations/LocationSettingsSection";
+import { StructureSettingsSection } from "@/components/structure/StructureSettingsSection";
 import {
   PROJECT_SETTINGS_SECTIONS,
   type ProjectSettingsId,
 } from "@/components/project-settings/sections";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
 import { useProjectStore } from "@/stores/projectStore";
@@ -92,6 +95,7 @@ type Feedback =
       formKey: "nameRequired" | "nameTooLong" | "descriptionTooLong";
     }
   | { kind: "success"; copied: string }
+  | { kind: "success"; exported: string }
   | { kind: "error"; text: string };
 
 /** Erreur de Rust si elle a un message, sinon le message de secours traduit. */
@@ -121,7 +125,9 @@ function FeedbackMessage({
           })
         : "copied" in feedback
           ? t("danger.duplicated", { name: feedback.copied })
-          : feedback.text;
+          : "exported" in feedback
+            ? t("projects:ganix.export.done", { file: feedback.exported })
+            : feedback.text;
 
   return (
     <p
@@ -198,6 +204,10 @@ export function ProjectSettingsPanel({
 
         {section === "locations" && (
           <LocationSettingsSection projectId={project.id} />
+        )}
+
+        {section === "structure" && (
+          <StructureSettingsSection project={project} />
         )}
 
         {section === "danger" && (
@@ -516,7 +526,7 @@ function StatusSection({ project }: { project: Project }) {
 // ----------------------------------------------------------------------------
 
 function DangerSection({ project }: { project: Project }) {
-  const { t } = useTranslation(["projectSettings", "dashboard", "common"]);
+  const { t } = useTranslation(["projectSettings", "dashboard", "projects", "common"]);
   const duplicateProject = useProjectStore(
     (state) => state.duplicateProject,
   );
@@ -531,6 +541,11 @@ function DangerSection({ project }: { project: Project }) {
   const [duplicateFeedback, setDuplicateFeedback] =
     useState<Feedback | null>(null);
 
+  const [exporting, setExporting] = useState(false);
+
+  const [exportFeedback, setExportFeedback] =
+    useState<Feedback | null>(null);
+
   const [confirmOpen, setConfirmOpen] =
     useState(false);
 
@@ -539,6 +554,30 @@ function DangerSection({ project }: { project: Project }) {
 
   const [deleteError, setDeleteError] =
     useState<Feedback | null>(null);
+
+  async function handleExport() {
+    setExporting(true);
+    setExportFeedback(null);
+
+    try {
+      const file = await api.exportProject(
+        project.id,
+        t("projects:ganix.export.dialogTitle"),
+      );
+
+      if (file) {
+        setExportFeedback({ kind: "success", exported: file });
+      }
+    } catch (e) {
+      setExportFeedback(
+        e instanceof Error
+          ? { kind: "error", text: e.message }
+          : { kind: "error", text: t("projects:ganix.export.failed") },
+      );
+    } finally {
+      setExporting(false);
+    }
+  }
 
   async function handleDuplicate() {
     setDuplicating(true);
@@ -573,6 +612,34 @@ function DangerSection({ project }: { project: Project }) {
 
   return (
     <div className="space-y-8">
+      {/* Export .ganix */}
+      <Card className={cardClass}>
+        <CardHeader className={cardHeaderClass}>
+          <CardTitle>{t("danger.exportTitle")}</CardTitle>
+
+          <CardDescription>{t("danger.exportDescription")}</CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-3 px-6 py-6">
+          <p className="rounded-md border border-warning/30 bg-warning/5 px-3 py-2 text-xs text-muted-foreground">
+            {t("projects:ganix.export.notEncrypted")}
+          </p>
+
+          <Button
+            type="button"
+            variant="outline"
+            disabled={exporting}
+            onClick={() => void handleExport()}
+          >
+            <Download className="mr-2 h-4 w-4" />
+
+            {exporting ? t("danger.exporting") : t("danger.export")}
+          </Button>
+
+          <FeedbackMessage feedback={exportFeedback} />
+        </CardContent>
+      </Card>
+
       {/* Duplication */}
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>

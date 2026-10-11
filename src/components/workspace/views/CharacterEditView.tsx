@@ -20,6 +20,7 @@ import { CharacterSheet } from "@/components/characters/CharacterForm";
 import { CharacterGallery } from "@/components/characters/fields/GalleryField";
 import { CharacterRelationsCard } from "@/components/relations/CharacterRelationsCard";
 import { PlaceLinksCard } from "@/components/locations/PlaceLinksCard";
+import { StoryLinksCard } from "@/components/structure/StoryLinksCard";
 import {
   PageShell,
   cardClass,
@@ -285,6 +286,13 @@ export function CharacterEditView({
               projectId={projectId}
               side="character"
               id={character.id}
+              onOpenFeature={onOpenFeature}
+            />
+            <StoryLinksCard
+              projectId={projectId}
+              side="character"
+              id={character.id}
+              firstAppearance={character.fields.firstAppearance}
               onOpenFeature={onOpenFeature}
             />
             <div className="flex min-h-10 flex-wrap items-center gap-4">

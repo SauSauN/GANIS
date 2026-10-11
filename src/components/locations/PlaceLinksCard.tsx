@@ -1,14 +1,14 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link2, MapPinned, Pencil, Plus, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CharacterAvatar } from "@/components/characters/CharacterAvatar";
 import { LocationThumb, TypeBadge } from "@/components/locations/LocationVisuals";
 import { PlaceLinkDialog } from "@/components/locations/PlaceLinkDialog";
+import { useProjectStructure } from "@/components/structure/useProjectStructure";
 import { useLocationLabels } from "@/components/locations/useLocationLabels";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import { cardContentClass } from "@/components/workspace/views/PageShell";
-import { api } from "@/lib/api";
 import { characterTabId, fullName } from "@/lib/characters";
 import { locationTabId } from "@/lib/locations";
 import {
@@ -33,26 +33,14 @@ interface PlaceLinksCardProps {
   onOpenFeature: (featureId: string) => void;
 }
 
-/** Titres des éléments du plan (périodes des liens), chargés une fois. */
+/** Noms des éléments du plan (périodes des liens), chargés une fois. */
 function useStructureTitles(projectId: string): Map<string, string> {
-  const [titles, setTitles] = useState<Map<string, string>>(new Map());
+  const { structure, labelOf } = useProjectStructure(projectId);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    api
-      .getStructure(projectId)
-      .then((structure) => {
-        if (!cancelled) setTitles(new Map(structure.nodes.map((node) => [node.id, node.title])));
-      })
-      .catch(() => {});
-
-    return () => {
-      cancelled = true;
-    };
-  }, [projectId]);
-
-  return titles;
+  return useMemo(
+    () => new Map((structure?.nodes ?? []).map((node) => [node.id, labelOf(node)])),
+    [structure, labelOf],
+  );
 }
 
 /**

@@ -48,6 +48,54 @@
     "delete": "Delete project",
     "noDescription": "No description.",
     "updatedAt": "Updated {{date}}",
-    "archived": "Archived"
+    "archived": "Archived",
+    "export": "Export as .ganix"
+  },
+  "ganix": {
+    "export": {
+      "dialogTitle": "Export project",
+      "exporting": "Exporting “{{name}}”…",
+      "done": "Project exported: {{file}}",
+      "failed": "The project could not be exported.",
+      "notEncrypted": "The .ganix file is not encrypted: it opens in any GANIS, from any account. Keep it somewhere safe."
+    },
+    "import": {
+      "button": "Import a .ganix",
+      "dialogTitle": "Open a .ganix project",
+      "checking": "Checking the file…",
+      "failed": "The project could not be imported.",
+      "title": "Import this project?",
+      "description": "The file has been checked. Nothing is added to your account until you confirm.",
+      "exportedAt": "Exported on {{date}}",
+      "createdWith": "Created with {{app}}",
+      "size": "Size: {{size}}",
+      "counts": {
+        "characters": "Characters",
+        "locations": "Locations",
+        "structureNodes": "Structure items",
+        "relations": "Relations",
+        "placeLinks": "Character ↔ location links"
+      },
+      "conflictTitle": "You already have this project",
+      "conflictDescription": "A project in your account comes from this file. What would you like to do?",
+      "modes": {
+        "copy": {
+          "label": "Import as a copy",
+          "description": "Adds a new project named “{{name}} (importé)”. Your current project is unchanged."
+        },
+        "replace": {
+          "label": "Replace my project",
+          "description": "Your project's content is replaced by the file's. A .ganix backup of the current version is made first."
+        }
+      },
+      "replaceConfirm": "I confirm replacing my current project.",
+      "encryptionNote": "The project will be encrypted with a new key as soon as it is added to your account.",
+      "confirm": "Import",
+      "confirmReplace": "Replace",
+      "importing": "Importing…",
+      "done": "Project “{{name}}” imported.",
+      "replaced": "Project “{{name}}” replaced. Backup of the previous version: {{file}} (GANIS “sauvegardes” folder).",
+      "encryptionNoteReplace": "The received data will be encrypted with your project's key."
+    }
   }
 }

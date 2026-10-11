@@ -40,6 +40,8 @@ const node = (id: string, parentId: string | null, level: number, position: numb
   title: id,
   summary: "",
   position,
+  numbered: true,
+  number: null,
   createdAt: "2026-10-10T00:00:00Z",
   updatedAt: "2026-10-10T00:00:00Z",
 });

@@ -1107,7 +1107,7 @@ mod tests {
     #[tokio::test]
     async fn first_appearance_points_to_an_existing_structure_node() {
         let pool = pool().await;
-        let node = crate::services::structure_service::create_node(&pool, None, 1, "Chapitre 1")
+        let node = crate::services::structure_service::create_node(&pool, crate::models::project::ProjectType::Novel, None, 1, "Chapitre 1", None)
             .await
             .unwrap();
 

@@ -126,7 +126,16 @@
     "summaryTooLong": "Le résumé ne peut pas dépasser {{max}} caractères.",
     "invalidLevel": "Niveau de découpage invalide.",
     "invalidParent": "Un élément ne peut contenir que des éléments de niveau inférieur.",
-    "invalidTemplate": "Modèle de découpage inconnu."
+    "invalidTemplate": "Modèle de découpage inconnu.",
+    "levelsInUse": "Des éléments utilisent {{used}} niveaux : le modèle n'en a que {{max}}. Retirez d'abord les éléments des niveaux en trop.",
+    "levelNameEmpty": "Chaque niveau doit avoir un nom.",
+    "levelNameTooLong": "Le nom d'un niveau ne peut pas dépasser {{max}} caractères.",
+    "levelCount": "Le découpage compte de 1 à {{max}} niveaux.",
+    "levelInUse": "Ce niveau contient encore {{count}} élément(s) : déplacez-les ou supprimez-les d'abord.",
+    "levelsReordered": "L'ordre des niveaux existants ne peut pas changer.",
+    "invalidNumbering": "Numérotation invalide.",
+    "invalidNumber": "Le numéro doit être compris entre 0 et {{max}}.",
+    "invalidColor": "Couleur invalide."
   },
   "character": {
     "notFound": "Personnage introuvable.",
@@ -179,5 +188,17 @@
     "invalidType": "Nature de lien inconnue.",
     "labelTooLong": "La précision ne peut pas dépasser {{max}} caractères.",
     "descriptionTooLong": "La description ne peut pas dépasser {{max}} caractères."
+  },
+  "ganix": {
+    "unreadable": "Ce fichier .ganix est illisible.",
+    "damaged": "Ce fichier est endommagé ou incomplet. Essayez de le télécharger ou de l'exporter à nouveau.",
+    "unsafe": "Ce fichier contient des éléments non autorisés et a été refusé.",
+    "notGanix": "Ce fichier n'est pas un projet GANIS.",
+    "tooNew": "Ce projet a été créé avec une version plus récente de GANIS : mettez l'application à jour pour l'ouvrir.",
+    "stagingMissing": "Cet import n'est plus disponible. Choisissez à nouveau le fichier.",
+    "migrationFailed": "Ce projet n'a pas pu être mis à jour pour cette version de GANIS."
+  },
+  "structureLink": {
+    "invalidRole": "Rôle inconnu."
   }
 }

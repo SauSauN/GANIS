@@ -20,8 +20,10 @@ import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/section
 import i18n from "@/i18n";
 import { characterIdOfTab, fullName } from "@/lib/characters";
 import { locationIdOfTab } from "@/lib/locations";
+import { nodeHeading, numberNodes, resolveLevels, structureNodeIdOfTab } from "@/lib/structure";
 import { useCharacterStore } from "@/stores/characterStore";
 import { useLocationStore } from "@/stores/locationStore";
+import { useStructureStore } from "@/stores/structureStore";
 
 /**
  * Registre des modules de l'espace de travail.
@@ -235,6 +237,35 @@ function locationFeature(tabId: string, locationId: string): WorkspaceFeature {
   };
 }
 
+/**
+ * Fiche d'un élément du découpage (onglet `structure-node:<id>`) :
+ * fonctionnalité du module Découpage, dont le libellé est le nom de
+ * l'élément (« Chapitre 3 — Le départ »).
+ */
+function structureNodeFeature(tabId: string, nodeId: string): WorkspaceFeature {
+  return {
+    id: tabId,
+    icon: ListTree,
+    get label() {
+      const structure = useStructureStore.getState().structure;
+      const node = structure?.nodes.find((item) => item.id === nodeId);
+
+      if (!structure || !node) return i18n.t("structure:node.fallback");
+
+      const levels = resolveLevels(structure, (template, index, form) =>
+        index < 3
+          ? i18n.t(`structure:templates.${template}.levels.${String(index) as "0" | "1" | "2"}.${form}`)
+          : i18n.t("structure:levels.fallback", { number: index + 1 }),
+      );
+
+      return nodeHeading(node, levels, numberNodes(structure.nodes, levels, structure.autoNumbering)).label;
+    },
+    get description() {
+      return i18n.t("modules:features.structure.plan.description");
+    },
+  };
+}
+
 /** Retrouve une fonctionnalité (et son module) par son identifiant. */
 export function findFeature(
   featureId: string,
@@ -254,6 +285,15 @@ export function findFeature(
     return {
       module: getModule("locations"),
       feature: locationFeature(featureId, locationId),
+    };
+  }
+
+  const nodeId = structureNodeIdOfTab(featureId);
+
+  if (nodeId) {
+    return {
+      module: getModule("structure"),
+      feature: structureNodeFeature(featureId, nodeId),
     };
   }
 

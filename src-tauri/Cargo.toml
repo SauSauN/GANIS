@@ -68,6 +68,14 @@ chacha20poly1305 = "0.10"
 zeroize = "1"
 # Encodage texte des données chiffrées.
 base64 = "0.22"
+
+# --- Format .ganix (projet portable) ---
+# Archive ZIP : manifeste, empreintes, données et images du projet (§23).
+zip = { version = "2", default-features = false, features = ["deflate"] }
+# Contenu du .ganix écrit en XML (manifeste, empreintes, données du projet).
+quick-xml = "0.42"
+# Lecture ligne par ligne des tables à l'export.
+futures-util = { version = "0.3", default-features = false }
 # SQLCipher : chiffrement complet des bases de projet.
 # Ce paquet est celui qu'utilise déjà sqlx ; cette ligne remplace seulement
 # SQLite par SQLCipher (même API, fichiers chiffrés). OpenSSL est compilé

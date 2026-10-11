@@ -6,6 +6,7 @@ import {
   Archive,
   ArchiveRestore,
   Copy,
+  Download,
   FileText,
   Pencil,
   Star,
@@ -33,6 +34,8 @@ interface ProjectCardProps {
   onToggleArchive: (project: Project) => void;
   onEdit: (project: Project) => void;
   onDuplicate: (project: Project) => void;
+  /** Export en `.ganix` (facultatif). */
+  onExport?: (project: Project) => void;
   onDelete: (project: Project) => void;
 }
 
@@ -50,6 +53,7 @@ export function ProjectCard({
   onToggleArchive,
   onEdit,
   onDuplicate,
+  onExport,
   onDelete,
 }: ProjectCardProps) {
   const { t, i18n } = useTranslation("projects");
@@ -142,6 +146,19 @@ export function ProjectCard({
             >
               <Copy className="h-4 w-4" />
             </Button>
+
+            {onExport && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon-sm"
+                title={t("card.export")}
+                aria-label={t("card.export")}
+                onClick={action(onExport)}
+              >
+                <Download className="h-4 w-4" />
+              </Button>
+            )}
 
             <Button
               type="button"

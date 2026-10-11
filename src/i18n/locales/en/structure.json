@@ -5,21 +5,15 @@
       "levels": {
         "0": {
           "one": "Part",
-          "other": "Parts",
-          "add": "Add a part",
-          "new": "Part"
+          "other": "Parts"
         },
         "1": {
           "one": "Chapter",
-          "other": "Chapters",
-          "add": "Add a chapter",
-          "new": "Chapter"
+          "other": "Chapters"
         },
         "2": {
           "one": "Scene",
-          "other": "Scenes",
-          "add": "Add a scene",
-          "new": "Scene"
+          "other": "Scenes"
         }
       }
     },
@@ -28,21 +22,15 @@
       "levels": {
         "0": {
           "one": "Volume",
-          "other": "Volumes",
-          "add": "Add a volume",
-          "new": "Volume"
+          "other": "Volumes"
         },
         "1": {
           "one": "Chapter",
-          "other": "Chapters",
-          "add": "Add a chapter",
-          "new": "Chapter"
+          "other": "Chapters"
         },
         "2": {
           "one": "Page",
-          "other": "Pages",
-          "add": "Add a page",
-          "new": "Page"
+          "other": "Pages"
         }
       }
     },
@@ -51,21 +39,15 @@
       "levels": {
         "0": {
           "one": "Act",
-          "other": "Acts",
-          "add": "Add an act",
-          "new": "Act"
+          "other": "Acts"
         },
         "1": {
           "one": "Sequence",
-          "other": "Sequences",
-          "add": "Add a sequence",
-          "new": "Sequence"
+          "other": "Sequences"
         },
         "2": {
           "one": "Scene",
-          "other": "Scenes",
-          "add": "Add a scene",
-          "new": "Scene"
+          "other": "Scenes"
         }
       }
     },
@@ -74,21 +56,15 @@
       "levels": {
         "0": {
           "one": "Season",
-          "other": "Seasons",
-          "add": "Add a season",
-          "new": "Season"
+          "other": "Seasons"
         },
         "1": {
           "one": "Episode",
-          "other": "Episodes",
-          "add": "Add an episode",
-          "new": "Episode"
+          "other": "Episodes"
         },
         "2": {
           "one": "Scene",
-          "other": "Scenes",
-          "add": "Add a scene",
-          "new": "Scene"
+          "other": "Scenes"
         }
       }
     },
@@ -97,21 +73,15 @@
       "levels": {
         "0": {
           "one": "Act",
-          "other": "Acts",
-          "add": "Add an act",
-          "new": "Act"
+          "other": "Acts"
         },
         "1": {
           "one": "Quest",
-          "other": "Quests",
-          "add": "Add a quest",
-          "new": "Quest"
+          "other": "Quests"
         },
         "2": {
           "one": "Mission",
-          "other": "Missions",
-          "add": "Add a mission",
-          "new": "Mission"
+          "other": "Missions"
         }
       }
     },
@@ -120,21 +90,15 @@
       "levels": {
         "0": {
           "one": "Scenario",
-          "other": "Scenarios",
-          "add": "Add a scenario",
-          "new": "Scenario"
+          "other": "Scenarios"
         },
         "1": {
           "one": "Session",
-          "other": "Sessions",
-          "add": "Add a session",
-          "new": "Session"
+          "other": "Sessions"
         },
         "2": {
           "one": "Encounter",
-          "other": "Encounters",
-          "add": "Add an encounter",
-          "new": "Encounter"
+          "other": "Encounters"
         }
       }
     },
@@ -143,35 +107,33 @@
       "levels": {
         "0": {
           "one": "Part",
-          "other": "Parts",
-          "add": "Add a part",
-          "new": "Part"
+          "other": "Parts"
         },
         "1": {
           "one": "Section",
-          "other": "Sections",
-          "add": "Add a section",
-          "new": "Section"
+          "other": "Sections"
         },
         "2": {
           "one": "Item",
-          "other": "Items",
-          "add": "Add an item",
-          "new": "Item"
+          "other": "Items"
         }
       }
     }
   },
   "template": {
     "label": "Structure template",
-    "auto": "Based on project type ({{name}})",
-    "hint": "Changing the template only renames the levels: nothing is lost."
+    "auto": "Based on the project type ({{name}})",
+    "hint": "The template sets the starting levels and their numbering. You can then rename them and add more.",
+    "custom": "Custom levels",
+    "replaceTitle": "Go back to the template levels?",
+    "replaceDescription": "Your custom names and numbering will be replaced by those of the “{{name}}” template. No element of the plan is deleted.",
+    "replaceConfirm": "Use the template"
   },
   "plan": {
     "addAtRoot": "Add at the top level",
     "empty": {
       "title": "Your structure is empty",
-      "description": "Start with whichever level suits you: you can always add the others later."
+      "description": "Add a first element at the level that suits you: numbers are computed automatically."
     },
     "untitled": "Untitled",
     "contains_one": "{{count}} item",
@@ -184,14 +146,20 @@
       "edit": "Edit",
       "moveUp": "Move up",
       "moveDown": "Move down",
-      "delete": "Delete"
+      "delete": "Delete",
+      "open": "Open the profile"
     },
     "edit": {
-      "title": "Title",
+      "title": "Title (optional)",
       "summary": "Summary",
       "summaryPlaceholder": "What happens here, in a few lines.",
       "save": "Save",
-      "cancel": "Cancel"
+      "cancel": "Cancel",
+      "titlePlaceholder": "Without a title, it shows as “{{label}}”",
+      "numbered": "Number this element",
+      "numberedHint": "Uncheck for a prologue, an interlude…: it takes no number and does not shift the next ones.",
+      "number": "Number",
+      "numberInvalid": "The number must be a whole number between 0 and {{max}}."
     },
     "delete": {
       "title": "Delete “{{title}}”?",
@@ -202,6 +170,144 @@
     },
     "loading": "Loading structure…",
     "loadFailed": "Unable to load the structure.",
-    "retry": "Retry"
+    "retry": "Retry",
+    "add": "Add: {{name}}",
+    "insertAfter": "Insert: {{name}} right after",
+    "unnumbered": "not numbered"
+  },
+  "levels": {
+    "fallback": "Level {{number}}",
+    "customize": "Customize",
+    "close": "Close",
+    "title": "Structure levels",
+    "description": "Name each level, choose its numbering and its color. A level's color applies to all its elements, including those created later.",
+    "position": "Level {{number}}",
+    "one": "Name",
+    "other": "Plural",
+    "numbering": "Numbering",
+    "numberings": {
+      "continuous": "Continues across the project",
+      "perParent": "Restarts in each “{{parent}}”",
+      "perParentRoot": "Restarts in each parent element",
+      "none": "No number"
+    },
+    "start": "Starts at",
+    "digits": "Format",
+    "count_one": "{{count}} element",
+    "count_other": "{{count}} elements",
+    "insertAbove": "Insert a level above",
+    "insertBelow": "Insert a level below",
+    "remove": "Remove this level",
+    "removeDisabled": "This level contains elements: move or delete them first.",
+    "max": "{{max}} levels at most.",
+    "newName": "Level",
+    "example": "Preview",
+    "save": "Save levels",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "saved": "Levels saved.",
+    "reset": "Back to the template"
+  },
+  "numbering": {
+    "title": "Automatic numbering",
+    "description": "When on, numbers follow the order of the plan: they change by themselves when you add, move or delete an element. When off, each element keeps the number it got when created; you can change it by hand and “Renumber” puts all numbers back in order.",
+    "toggle": "Update numbers automatically",
+    "autoOn": "Automatic numbering",
+    "autoOff": "Fixed numbers",
+    "renumber": "Renumber",
+    "renumberHint": "Put all numbers back in the order of the plan",
+    "confirmTitle": "Renumber the whole plan?",
+    "confirmDescription": "All numbers are put back in the order of the plan, following each level's numbering. Numbers chosen by hand are replaced.",
+    "saved": "Setting saved.",
+    "statusOn": "On: numbers follow the order of the plan. When turned off, each element keeps the number it shows.",
+    "statusOff": "Off: each element keeps its number."
+  },
+  "sidebar": {
+    "title": "Outline",
+    "loading": "Loading…",
+    "empty": "The plan is empty.",
+    "expand": "Expand",
+    "collapse": "Collapse"
+  },
+  "node": {
+    "fallback": "Plan element",
+    "loading": "Loading…",
+    "notFound": {
+      "title": "Element not found",
+      "description": "It may have been deleted from the plan.",
+      "close": "Close tab"
+    },
+    "profile": {
+      "topLevel": "At the top of the plan",
+      "contains_one": "Contains {{count}} element",
+      "contains_other": "Contains {{count}} elements",
+      "unnumbered": "Not numbered",
+      "openPlan": "Show in the plan",
+      "path": "Location in the plan",
+      "noSummary": "No summary yet."
+    },
+    "sections": {
+      "info": {
+        "title": "Information",
+        "description": "Title, number and summary."
+      },
+      "characters": {
+        "title": "Characters",
+        "description": "Who appears in “{{name}}”, and how.",
+        "add": "Add",
+        "choose": "Choose a character…",
+        "empty": "No linked character yet.",
+        "noneLeft": "All the project's characters are already linked.",
+        "noItems": "The project has no character yet.",
+        "firstAppearance": "First appearance here"
+      },
+      "locations": {
+        "title": "Locations",
+        "description": "Where “{{name}}” takes place, and the locations mentioned.",
+        "add": "Add",
+        "choose": "Choose a location…",
+        "empty": "No linked location yet.",
+        "noneLeft": "All the project's locations are already linked.",
+        "noItems": "The project has no location yet.",
+        "firstAppearance": "First appearance here"
+      },
+      "children": {
+        "title": "Contents",
+        "description": "What “{{name}}” contains.",
+        "add": "Add: {{name}}",
+        "empty": "No element yet."
+      }
+    },
+    "inside": "In the elements it contains",
+    "insideHint": "Linked to a contained element (a scene of this chapter…). “+” links them directly to this element too.",
+    "remove": "Remove",
+    "role": "Role",
+    "roles": {
+      "character": {
+        "present": "Present",
+        "pov": "Point of view",
+        "mentioned": "Mentioned"
+      },
+      "location": {
+        "setting": "Setting",
+        "mentioned": "Mentioned"
+      }
+    },
+    "saved": "Saved.",
+    "delete": "Delete"
+  },
+  "story": {
+    "title": "In the story",
+    "characterDescription": "The plan elements where this character appears.",
+    "locationDescription": "The plan elements that take place in this location or mention it.",
+    "empty": "Not linked to the plan yet: link it from the profile of a chapter, a scene…",
+    "firstAppearance": "First appearance"
+  },
+  "colors": {
+    "custom": "Other color…",
+    "level": "Color",
+    "useDefault": "Default color",
+    "inSettings": "Level colors are set in the project settings and apply to all their elements.",
+    "openSettings": "Choose colors"
   }
 }

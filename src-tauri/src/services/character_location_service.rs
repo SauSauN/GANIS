@@ -309,7 +309,7 @@ mod tests {
         let pool = pool().await;
         let aldric = character(&pool, "Aldric", &[]).await;
         let valona = place(&pool, "Valona", &[]).await;
-        let chapter = structure_service::create_node(&pool, None, 0, "Chapitre 1").await.unwrap();
+        let chapter = structure_service::create_node(&pool, crate::models::project::ProjectType::Novel, None, 0, "Chapitre 1", None).await.unwrap();
 
         let link = create_link(&pool, &input(&aldric, &valona, "born")).await.unwrap();
         assert_eq!(link.label, "Maison familiale");

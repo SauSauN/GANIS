@@ -78,6 +78,43 @@ export interface Project {
 }
 
 // ----------------------------------------------------------------------------
+// Format .ganix (export / import d'un projet)
+// ----------------------------------------------------------------------------
+
+/** Contenu d'un `.ganix`, compté à la vérification. */
+export interface GanixCounts {
+  characters: number;
+  locations: number;
+  structureNodes: number;
+  relations: number;
+  placeLinks: number;
+}
+
+/** Aperçu d'un `.ganix` vérifié, en attente de confirmation. */
+export interface GanixPreview {
+  stagingId: string;
+  name: string;
+  description: string;
+  type: ProjectType;
+  status: ProjectStatus;
+  exportedAt: string; // RFC 3339, UTC
+  createdWith: string;
+  counts: GanixCounts;
+  sizeBytes: number;
+  /** L'utilisateur a déjà ce projet : copie ou remplacement. */
+  alreadyOwned: boolean;
+}
+
+/** Choix quand l'utilisateur a déjà le projet du fichier. */
+export type GanixImportMode = "copy" | "replace";
+
+export interface GanixImportOutcome {
+  project: Project;
+  /** Remplacement : nom du fichier de sauvegarde de l'ancienne version. */
+  backupFile: string | null;
+}
+
+// ----------------------------------------------------------------------------
 // Synopsis
 // ----------------------------------------------------------------------------
 
@@ -106,8 +143,9 @@ export interface Synopsis {
 // ----------------------------------------------------------------------------
 
 /**
- * Modèle de découpage : il donne un nom à chacun des trois niveaux
- * (ex. roman : Partie › Chapitre › Scène). Voir `lib/structure.ts`.
+ * Modèle de découpage : il donne un nom et une numérotation à chacun des
+ * trois niveaux (ex. roman : Partie › Chapitre › Scène). Voir
+ * `lib/structure.ts`.
  */
 export type StructureTemplateId =
   | "novel"
@@ -118,19 +156,89 @@ export type StructureTemplateId =
   | "rpg"
   | "generic";
 
+/**
+ * Numérotation d'un niveau : continue dans tout le projet, qui repart dans
+ * chaque élément parent, ou aucune.
+ */
+export type StructureNumbering = "continuous" | "perParent" | "none";
+
+/** Niveau du découpage (correspond à `StructureLevel` en Rust). */
+export interface StructureLevel {
+  /** Identifiant stable (suit le niveau quand on en insère ou retire un). */
+  id: string;
+  /** Nom au singulier ; `null` : nom du modèle, traduit. */
+  one: string | null;
+  /** Nom au pluriel ; `null` : nom du modèle, traduit. */
+  other: string | null;
+  numbering: StructureNumbering;
+  /** Premier numéro (souvent 1). */
+  start: number;
+  /** Nombre minimal de chiffres (2 → « 01 »). */
+  digits: number;
+  /** Couleur « #rrggbb » ; `null` : couleur par défaut selon la place du niveau. */
+  color: string | null;
+}
+
+/** Niveau envoyé pour personnaliser le découpage (`id` absent : nouveau). */
+export interface StructureLevelInput {
+  id?: string;
+  one: string;
+  other: string;
+  numbering: StructureNumbering;
+  start: number;
+  digits: number;
+  color?: string | null;
+}
+
 /** Élément du découpage (correspond à `StructureNode` en Rust). */
 export interface StructureNode {
   id: string;
   /** `null` : élément à la racine. */
   parentId: string | null;
-  /** Niveau : 0, 1 ou 2. Son nom dépend du modèle. */
+  /** Niveau (0 = le plus large). */
   level: number;
+  /** Titre facultatif : « Chapitre 3 — <titre> ». */
   title: string;
   summary: string;
   /** Ordre parmi les éléments de même parent. */
   position: number;
+  /** Faux : élément hors numérotation (prologue, interlude…). */
+  numbered: boolean;
+  /**
+   * Numéro enregistré (numérotation non automatique). Ignoré quand la
+   * numérotation est automatique : le numéro est alors calculé.
+   */
+  number: number | null;
   createdAt: string; // RFC 3339, UTC
   updatedAt: string; // RFC 3339, UTC
+}
+
+/** Rôle d'un personnage dans un élément du découpage. */
+export type NodeCharacterRole = "present" | "pov" | "mentioned";
+
+/** Rôle d'un lieu dans un élément du découpage. */
+export type NodeLocationRole = "setting" | "mentioned";
+
+/** Personnage lié à un élément du découpage. */
+export interface NodeCharacterLink {
+  nodeId: string;
+  characterId: string;
+  role: NodeCharacterRole;
+  createdAt: string; // RFC 3339, UTC
+}
+
+/** Lieu lié à un élément du découpage. */
+export interface NodeLocationLink {
+  nodeId: string;
+  locationId: string;
+  role: NodeLocationRole;
+  createdAt: string; // RFC 3339, UTC
+}
+
+/** Personnages et lieux liés aux éléments du découpage. */
+export interface StructureLinks {
+  characters: NodeCharacterLink[];
+  locations: NodeLocationLink[];
 }
 
 /** Découpage complet d'un projet. */
@@ -138,6 +246,16 @@ export interface Structure {
   template: StructureTemplateId;
   /** Faux : le modèle suit le type du projet. */
   templateChosen: boolean;
+  /** Niveaux, du plus large au plus fin (1 à 5). */
+  levels: StructureLevel[];
+  /** Vrai si les niveaux ont été personnalisés. */
+  levelsCustom: boolean;
+  /**
+   * Vrai : les numéros suivent l'ordre du plan (ils changent à chaque ajout,
+   * déplacement ou suppression). Faux (par défaut) : chaque élément garde
+   * son numéro ; « Renuméroter » les remet dans l'ordre.
+   */
+  autoNumbering: boolean;
   /** Tous les éléments, triés par parent puis par position. */
   nodes: StructureNode[];
 }

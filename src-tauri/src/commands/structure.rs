@@ -4,7 +4,8 @@
 //! qui vérifie d'abord que l'utilisateur connecté en est le propriétaire.
 
 use crate::error::{AppError, AppResult};
-use crate::services::structure_service::{self, MoveDirection, Structure, StructureNode};
+use crate::models::project::ProjectType;
+use crate::services::structure_service::{self, LevelInput, MoveDirection, Structure, StructureNode};
 use crate::services::{project_service, project_storage};
 use crate::state::AppState;
 use serde::Deserialize;
@@ -17,33 +18,76 @@ async fn project_pool(state: &AppState, project_id: &str) -> AppResult<SqlitePoo
     project_storage::pool_for_user(state, project_id, &user.id).await
 }
 
+/// Base du projet et type du projet (qui donne le modèle par défaut).
+async fn project_pool_and_type(state: &AppState, project_id: &str) -> AppResult<(SqlitePool, ProjectType)> {
+    let user = state.require_user().await?;
+    let pool = project_storage::pool_for_user(state, project_id, &user.id).await?;
+
+    // Le type du projet n'est pas chiffré : pas besoin de la clé du compte.
+    let project = project_service::find_stored(&state.app_db, project_id, &user.id)
+        .await?
+        .ok_or_else(|| AppError::not_found("Projet non trouvé.").with_key("project.notFound"))?;
+
+    Ok((pool, project.project_type))
+}
+
 /// Découpage complet du projet (modèle et éléments).
 #[tauri::command(rename_all = "camelCase")]
 pub async fn get_structure(
     state: State<'_, AppState>,
     project_id: String,
 ) -> AppResult<Structure> {
-    let user = state.require_user().await?;
-    let pool = project_storage::pool_for_user(&state, &project_id, &user.id).await?;
+    let (pool, project_type) = project_pool_and_type(&state, &project_id).await?;
 
-    // Le type du projet n'est pas chiffré : pas besoin de la clé du compte.
-    let project = project_service::find_stored(&state.app_db, &project_id, &user.id)
-        .await?
-        .ok_or_else(|| AppError::not_found("Projet non trouvé.").with_key("project.notFound"))?;
-
-    structure_service::get_structure(&pool, project.project_type).await
+    structure_service::get_structure(&pool, project_type).await
 }
 
-/// Choisit le modèle de découpage (`null` : il suit le type du projet).
+/// Active ou désactive la mise à jour automatique des numéros.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn set_structure_auto_numbering(
+    state: State<'_, AppState>,
+    project_id: String,
+    enabled: bool,
+) -> AppResult<()> {
+    let (pool, project_type) = project_pool_and_type(&state, &project_id).await?;
+
+    structure_service::set_auto_numbering(&pool, project_type, enabled).await
+}
+
+/// Remet tous les numéros dans l'ordre du plan (« Renuméroter »).
+#[tauri::command(rename_all = "camelCase")]
+pub async fn renumber_structure(
+    state: State<'_, AppState>,
+    project_id: String,
+) -> AppResult<()> {
+    let (pool, project_type) = project_pool_and_type(&state, &project_id).await?;
+
+    structure_service::renumber(&pool, project_type).await
+}
+
+/// Choisit le modèle de découpage (`null` : il suit le type du projet). Les
+/// niveaux redeviennent ceux du modèle.
 #[tauri::command(rename_all = "camelCase")]
 pub async fn set_structure_template(
     state: State<'_, AppState>,
     project_id: String,
     template: Option<String>,
 ) -> AppResult<()> {
-    let pool = project_pool(&state, &project_id).await?;
+    let (pool, project_type) = project_pool_and_type(&state, &project_id).await?;
 
-    structure_service::set_template(&pool, template.as_deref()).await
+    structure_service::set_template(&pool, project_type, template.as_deref()).await
+}
+
+/// Personnalise les niveaux (noms, numérotation, ajout ou retrait).
+#[tauri::command(rename_all = "camelCase")]
+pub async fn set_structure_levels(
+    state: State<'_, AppState>,
+    project_id: String,
+    levels: Vec<LevelInput>,
+) -> AppResult<()> {
+    let (pool, project_type) = project_pool_and_type(&state, &project_id).await?;
+
+    structure_service::set_levels(&pool, project_type, &levels).await
 }
 
 #[derive(Debug, Deserialize)]
@@ -51,29 +95,45 @@ pub async fn set_structure_template(
 pub struct CreateStructureNodeInput {
     pub parent_id: Option<String>,
     pub level: i64,
+    /// Facultatif : sans titre, l'élément s'affiche « Chapitre 3 ».
+    #[serde(default)]
     pub title: String,
+    /// Élément après lequel insérer (même parent) ; absent : à la fin.
+    pub after_id: Option<String>,
 }
 
-/// Ajoute un élément à la fin de son parent (ou de la racine).
+/// Ajoute un élément à la fin de son parent (ou de la racine), ou juste
+/// après un autre.
 #[tauri::command(rename_all = "camelCase")]
 pub async fn create_structure_node(
     state: State<'_, AppState>,
     project_id: String,
     input: CreateStructureNodeInput,
 ) -> AppResult<StructureNode> {
-    let pool = project_pool(&state, &project_id).await?;
+    let (pool, project_type) = project_pool_and_type(&state, &project_id).await?;
 
-    structure_service::create_node(&pool, input.parent_id.as_deref(), input.level, &input.title)
-        .await
+    structure_service::create_node(
+        &pool,
+        project_type,
+        input.parent_id.as_deref(),
+        input.level,
+        &input.title,
+        input.after_id.as_deref(),
+    )
+    .await
 }
 
 #[derive(Debug, Deserialize)]
 pub struct UpdateStructureNodeInput {
     pub title: Option<String>,
     pub summary: Option<String>,
+    /// Faux : élément hors numérotation (prologue, interlude…).
+    pub numbered: Option<bool>,
+    /// Numéro choisi (numérotation non automatique).
+    pub number: Option<i64>,
 }
 
-/// Modifie le titre et/ou le résumé d'un élément.
+/// Modifie le titre, le résumé et/ou la numérotation d'un élément.
 #[tauri::command(rename_all = "camelCase")]
 pub async fn update_structure_node(
     state: State<'_, AppState>,
@@ -83,8 +143,15 @@ pub async fn update_structure_node(
 ) -> AppResult<StructureNode> {
     let pool = project_pool(&state, &project_id).await?;
 
-    structure_service::update_node(&pool, &node_id, input.title.as_deref(), input.summary.as_deref())
-        .await
+    structure_service::update_node(
+        &pool,
+        &node_id,
+        input.title.as_deref(),
+        input.summary.as_deref(),
+        input.numbered,
+        input.number,
+    )
+    .await
 }
 
 /// Monte ou descend un élément parmi ceux de même parent.

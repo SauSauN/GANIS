@@ -27,7 +27,7 @@ use std::path::{Path, PathBuf};
 use uuid::Uuid;
 
 /// Sous-dossier du dossier de données qui contient les projets.
-const PROJECTS_DIR: &str = "projets";
+pub(crate) const PROJECTS_DIR: &str = "projets";
 
 /// Copie chiffrée en cours de préparation, à côté de `project.db`.
 ///
@@ -80,7 +80,7 @@ async fn is_db_ready(state: &AppState, project_id: &str) -> AppResult<bool> {
     Ok(value.unwrap_or(0) != 0)
 }
 
-async fn mark_db_ready(state: &AppState, project_id: &str) -> AppResult<()> {
+pub(crate) async fn mark_db_ready(state: &AppState, project_id: &str) -> AppResult<()> {
     sqlx::query("UPDATE projects SET db_ready = 1 WHERE id = ?")
         .bind(project_id)
         .execute(&state.app_db)

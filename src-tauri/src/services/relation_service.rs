@@ -443,8 +443,8 @@ mod tests {
         let pool = pool().await;
         let a = character(&pool, "Ana").await;
         let b = character(&pool, "Bruno").await;
-        let c1 = structure_service::create_node(&pool, None, 1, "Chapitre 1").await.unwrap();
-        let c2 = structure_service::create_node(&pool, None, 1, "Chapitre 2").await.unwrap();
+        let c1 = structure_service::create_node(&pool, crate::models::project::ProjectType::Novel, None, 1, "Chapitre 1", None).await.unwrap();
+        let c2 = structure_service::create_node(&pool, crate::models::project::ProjectType::Novel, None, 1, "Chapitre 2", None).await.unwrap();
 
         let mut with_period = input(&a, &b);
         with_period.since_node = Some(c1.id.clone());

@@ -1169,7 +1169,7 @@ mod tests {
         )
         .await
         .unwrap();
-        let node = structure_service::create_node(&pool, None, 0, "Chapitre 1")
+        let node = structure_service::create_node(&pool, crate::models::project::ProjectType::Novel, None, 0, "Chapitre 1", None)
             .await
             .unwrap();
 

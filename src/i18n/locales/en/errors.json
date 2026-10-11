@@ -126,7 +126,16 @@
     "summaryTooLong": "The summary cannot exceed {{max}} characters.",
     "invalidLevel": "Invalid structure level.",
     "invalidParent": "An item can only contain items of a lower level.",
-    "invalidTemplate": "Unknown structure template."
+    "invalidTemplate": "Unknown structure template.",
+    "levelsInUse": "Elements use {{used}} levels: the template only has {{max}}. First remove the elements from the extra levels.",
+    "levelNameEmpty": "Each level needs a name.",
+    "levelNameTooLong": "A level name cannot exceed {{max}} characters.",
+    "levelCount": "The structure has 1 to {{max}} levels.",
+    "levelInUse": "This level still contains {{count}} element(s): move or delete them first.",
+    "levelsReordered": "The order of existing levels cannot change.",
+    "invalidNumbering": "Invalid numbering.",
+    "invalidNumber": "The number must be between 0 and {{max}}.",
+    "invalidColor": "Invalid color."
   },
   "character": {
     "notFound": "Character not found.",
@@ -179,5 +188,17 @@
     "invalidType": "Unknown kind of link.",
     "labelTooLong": "The detail cannot exceed {{max}} characters.",
     "descriptionTooLong": "The description cannot exceed {{max}} characters."
+  },
+  "ganix": {
+    "unreadable": "This .ganix file cannot be read.",
+    "damaged": "This file is damaged or incomplete. Try downloading or exporting it again.",
+    "unsafe": "This file contains disallowed content and was refused.",
+    "notGanix": "This file is not a GANIS project.",
+    "tooNew": "This project was created with a newer version of GANIS: update the application to open it.",
+    "stagingMissing": "This import is no longer available. Please choose the file again.",
+    "migrationFailed": "This project could not be updated for this version of GANIS."
+  },
+  "structureLink": {
+    "invalidRole": "Unknown role."
   }
 }

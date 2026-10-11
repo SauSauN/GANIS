@@ -22,10 +22,17 @@ import type {
   RelationInput,
   // Diagnostics, // utilisé par getDiagnostics (en commentaire)
   ErrorCode,
+  GanixImportMode,
+  GanixImportOutcome,
+  GanixPreview,
   LoginResult,
   Project,
   // Role, // utilisé par createUser (en commentaire)
   Structure,
+  StructureLevelInput,
+  StructureLinks,
+  NodeCharacterRole,
+  NodeLocationRole,
   StructureNode,
   Synopsis,
   ThemeData,
@@ -455,6 +462,33 @@ export const api = {
     call<void>("delete_project", { projectId }),
 
   // -------------------------------------------------------------------------
+  // Format .ganix
+  // -------------------------------------------------------------------------
+
+  /**
+   * Exporte un projet dans un fichier `.ganix` choisi par l'utilisateur
+   * (fenêtre ouverte par Rust). Retourne le nom du fichier écrit, ou `null`
+   * si l'utilisateur a annulé.
+   */
+  exportProject: (projectId: string, dialogTitle: string) =>
+    call<string | null>("export_project", { projectId, dialogTitle }),
+
+  /**
+   * Fait choisir un `.ganix`, le vérifie et le met en attente. Retourne
+   * l'aperçu, ou `null` si l'utilisateur a annulé.
+   */
+  inspectGanix: (dialogTitle: string) =>
+    call<GanixPreview | null>("inspect_ganix", { dialogTitle }),
+
+  /** Ajoute au compte le projet en attente. */
+  confirmGanixImport: (stagingId: string, mode: GanixImportMode) =>
+    call<GanixImportOutcome>("confirm_ganix_import", { stagingId, mode }),
+
+  /** Abandonne un import en attente (aucune trace). */
+  cancelGanixImport: (stagingId: string) =>
+    call<void>("cancel_ganix_import", { stagingId }),
+
+  // -------------------------------------------------------------------------
   // Synopsis
   // -------------------------------------------------------------------------
 
@@ -489,21 +523,47 @@ export const api = {
   getStructure: (projectId: string) =>
     call<Structure>("get_structure", { projectId }),
 
-  /** Choisit le modèle de découpage (`null` : il suit le type du projet). */
+  /**
+   * Choisit le modèle de découpage (`null` : il suit le type du projet).
+   * Les niveaux redeviennent ceux du modèle.
+   */
   setStructureTemplate: (projectId: string, template: string | null) =>
     call<void>("set_structure_template", { projectId, template }),
 
-  /** Ajoute un élément à la fin de son parent (ou de la racine). */
+  /** Personnalise les niveaux : noms, numérotation, ajout ou retrait. */
+  setStructureLevels: (projectId: string, levels: StructureLevelInput[]) =>
+    call<void>("set_structure_levels", { projectId, levels }),
+
+  /** Active ou désactive la mise à jour automatique des numéros. */
+  setStructureAutoNumbering: (projectId: string, enabled: boolean) =>
+    call<void>("set_structure_auto_numbering", { projectId, enabled }),
+
+  /** Remet tous les numéros dans l'ordre du plan (« Renuméroter »). */
+  renumberStructure: (projectId: string) =>
+    call<void>("renumber_structure", { projectId }),
+
+  /**
+   * Ajoute un élément à la fin de son parent (ou de la racine), ou juste
+   * après `afterId` (même parent). Le titre est facultatif.
+   */
   createStructureNode: (
     projectId: string,
-    input: { parentId: string | null; level: number; title: string },
+    input: {
+      parentId: string | null;
+      level: number;
+      title?: string;
+      afterId?: string | null;
+    },
   ) => call<StructureNode>("create_structure_node", { projectId, input }),
 
-  /** Modifie le titre et/ou le résumé d'un élément. */
+  /**
+   * Modifie le titre, le résumé, la numérotation et/ou le numéro (choisi à
+   * la main, numérotation non automatique) d'un élément.
+   */
   updateStructureNode: (
     projectId: string,
     nodeId: string,
-    input: { title?: string; summary?: string },
+    input: { title?: string; summary?: string; numbered?: boolean; number?: number },
   ) =>
     call<StructureNode>("update_structure_node", { projectId, nodeId, input }),
 
@@ -517,6 +577,26 @@ export const api = {
   /** Supprime un élément et tout ce qu'il contient. */
   deleteStructureNode: (projectId: string, nodeId: string) =>
     call<void>("delete_structure_node", { projectId, nodeId }),
+
+  /** Personnages et lieux liés aux éléments du découpage. */
+  listStructureLinks: (projectId: string) =>
+    call<StructureLinks>("list_structure_links", { projectId }),
+
+  /** Lie un personnage à un élément (ou change son rôle). */
+  linkStructureCharacter: (projectId: string, nodeId: string, characterId: string, role: NodeCharacterRole) =>
+    call<void>("link_structure_character", { projectId, nodeId, characterId, role }),
+
+  /** Retire un personnage d'un élément. */
+  unlinkStructureCharacter: (projectId: string, nodeId: string, characterId: string) =>
+    call<void>("unlink_structure_character", { projectId, nodeId, characterId }),
+
+  /** Lie un lieu à un élément (ou change son rôle). */
+  linkStructureLocation: (projectId: string, nodeId: string, locationId: string, role: NodeLocationRole) =>
+    call<void>("link_structure_location", { projectId, nodeId, locationId, role }),
+
+  /** Retire un lieu d'un élément. */
+  unlinkStructureLocation: (projectId: string, nodeId: string, locationId: string) =>
+    call<void>("unlink_structure_location", { projectId, nodeId, locationId }),
 
   // -------------------------------------------------------------------------
   // Personnages

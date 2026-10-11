@@ -5,21 +5,15 @@
       "levels": {
         "0": {
           "one": "Partie",
-          "other": "Parties",
-          "add": "Ajouter une partie",
-          "new": "Partie"
+          "other": "Parties"
         },
         "1": {
           "one": "Chapitre",
-          "other": "Chapitres",
-          "add": "Ajouter un chapitre",
-          "new": "Chapitre"
+          "other": "Chapitres"
         },
         "2": {
           "one": "Scène",
-          "other": "Scènes",
-          "add": "Ajouter une scène",
-          "new": "Scène"
+          "other": "Scènes"
         }
       }
     },
@@ -28,21 +22,15 @@
       "levels": {
         "0": {
           "one": "Tome",
-          "other": "Tomes",
-          "add": "Ajouter un tome",
-          "new": "Tome"
+          "other": "Tomes"
         },
         "1": {
           "one": "Chapitre",
-          "other": "Chapitres",
-          "add": "Ajouter un chapitre",
-          "new": "Chapitre"
+          "other": "Chapitres"
         },
         "2": {
           "one": "Page",
-          "other": "Pages",
-          "add": "Ajouter une page",
-          "new": "Page"
+          "other": "Pages"
         }
       }
     },
@@ -51,21 +39,15 @@
       "levels": {
         "0": {
           "one": "Acte",
-          "other": "Actes",
-          "add": "Ajouter un acte",
-          "new": "Acte"
+          "other": "Actes"
         },
         "1": {
           "one": "Séquence",
-          "other": "Séquences",
-          "add": "Ajouter une séquence",
-          "new": "Séquence"
+          "other": "Séquences"
         },
         "2": {
           "one": "Scène",
-          "other": "Scènes",
-          "add": "Ajouter une scène",
-          "new": "Scène"
+          "other": "Scènes"
         }
       }
     },
@@ -74,21 +56,15 @@
       "levels": {
         "0": {
           "one": "Saison",
-          "other": "Saisons",
-          "add": "Ajouter une saison",
-          "new": "Saison"
+          "other": "Saisons"
         },
         "1": {
           "one": "Épisode",
-          "other": "Épisodes",
-          "add": "Ajouter un épisode",
-          "new": "Épisode"
+          "other": "Épisodes"
         },
         "2": {
           "one": "Scène",
-          "other": "Scènes",
-          "add": "Ajouter une scène",
-          "new": "Scène"
+          "other": "Scènes"
         }
       }
     },
@@ -97,21 +73,15 @@
       "levels": {
         "0": {
           "one": "Acte",
-          "other": "Actes",
-          "add": "Ajouter un acte",
-          "new": "Acte"
+          "other": "Actes"
         },
         "1": {
           "one": "Quête",
-          "other": "Quêtes",
-          "add": "Ajouter une quête",
-          "new": "Quête"
+          "other": "Quêtes"
         },
         "2": {
           "one": "Mission",
-          "other": "Missions",
-          "add": "Ajouter une mission",
-          "new": "Mission"
+          "other": "Missions"
         }
       }
     },
@@ -120,21 +90,15 @@
       "levels": {
         "0": {
           "one": "Scénario",
-          "other": "Scénarios",
-          "add": "Ajouter un scénario",
-          "new": "Scénario"
+          "other": "Scénarios"
         },
         "1": {
           "one": "Session",
-          "other": "Sessions",
-          "add": "Ajouter une session",
-          "new": "Session"
+          "other": "Sessions"
         },
         "2": {
           "one": "Rencontre",
-          "other": "Rencontres",
-          "add": "Ajouter une rencontre",
-          "new": "Rencontre"
+          "other": "Rencontres"
         }
       }
     },
@@ -143,21 +107,15 @@
       "levels": {
         "0": {
           "one": "Partie",
-          "other": "Parties",
-          "add": "Ajouter une partie",
-          "new": "Partie"
+          "other": "Parties"
         },
         "1": {
           "one": "Section",
-          "other": "Sections",
-          "add": "Ajouter une section",
-          "new": "Section"
+          "other": "Sections"
         },
         "2": {
           "one": "Élément",
-          "other": "Éléments",
-          "add": "Ajouter un élément",
-          "new": "Élément"
+          "other": "Éléments"
         }
       }
     }
@@ -165,13 +123,17 @@
   "template": {
     "label": "Modèle de découpage",
     "auto": "Selon le type du projet ({{name}})",
-    "hint": "Changer de modèle ne modifie que les noms des niveaux : aucun élément n'est perdu."
+    "hint": "Le modèle donne les niveaux de départ, avec leur numérotation. Vous pouvez ensuite les renommer et en ajouter.",
+    "custom": "Niveaux personnalisés",
+    "replaceTitle": "Revenir aux niveaux du modèle ?",
+    "replaceDescription": "Vos noms et votre numérotation personnalisés seront remplacés par ceux du modèle « {{name}} ». Aucun élément du plan n'est supprimé.",
+    "replaceConfirm": "Utiliser le modèle"
   },
   "plan": {
     "addAtRoot": "Ajouter à la racine",
     "empty": {
       "title": "Votre découpage est vide",
-      "description": "Commencez par le niveau qui vous convient : vous pourrez toujours ajouter les autres ensuite."
+      "description": "Ajoutez un premier élément au niveau qui vous convient : les numéros se calculent tout seuls."
     },
     "untitled": "Sans titre",
     "contains_one": "{{count}} élément",
@@ -184,14 +146,20 @@
       "edit": "Modifier",
       "moveUp": "Monter",
       "moveDown": "Descendre",
-      "delete": "Supprimer"
+      "delete": "Supprimer",
+      "open": "Ouvrir la fiche"
     },
     "edit": {
-      "title": "Titre",
+      "title": "Titre (facultatif)",
       "summary": "Résumé",
       "summaryPlaceholder": "Ce qui s'y passe, en quelques lignes.",
       "save": "Enregistrer",
-      "cancel": "Annuler"
+      "cancel": "Annuler",
+      "titlePlaceholder": "Sans titre, il s'affiche « {{label}} »",
+      "numbered": "Numéroter cet élément",
+      "numberedHint": "Décochez pour un prologue, un interlude… : il ne prend pas de numéro et ne décale pas les suivants.",
+      "number": "Numéro",
+      "numberInvalid": "Le numéro doit être un nombre entier entre 0 et {{max}}."
     },
     "delete": {
       "title": "Supprimer « {{title}} » ?",
@@ -202,6 +170,144 @@
     },
     "loading": "Chargement du découpage…",
     "loadFailed": "Impossible de charger le découpage.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "add": "Ajouter : {{name}}",
+    "insertAfter": "Insérer : {{name}} juste après",
+    "unnumbered": "hors numérotation"
+  },
+  "levels": {
+    "fallback": "Niveau {{number}}",
+    "customize": "Personnaliser",
+    "close": "Fermer",
+    "title": "Niveaux du découpage",
+    "description": "Nommez chaque niveau, choisissez sa numérotation et sa couleur. La couleur d'un niveau s'applique à tous ses éléments, y compris ceux créés ensuite.",
+    "position": "Niveau {{number}}",
+    "one": "Nom",
+    "other": "Pluriel",
+    "numbering": "Numérotation",
+    "numberings": {
+      "continuous": "Continue dans tout le projet",
+      "perParent": "Repart dans chaque « {{parent}} »",
+      "perParentRoot": "Repart dans chaque élément parent",
+      "none": "Sans numéro"
+    },
+    "start": "Commence à",
+    "digits": "Format",
+    "count_one": "{{count}} élément",
+    "count_other": "{{count}} éléments",
+    "insertAbove": "Insérer un niveau au-dessus",
+    "insertBelow": "Insérer un niveau en dessous",
+    "remove": "Retirer ce niveau",
+    "removeDisabled": "Ce niveau contient des éléments : déplacez-les ou supprimez-les d'abord.",
+    "max": "{{max}} niveaux au maximum.",
+    "newName": "Niveau",
+    "example": "Aperçu",
+    "save": "Enregistrer les niveaux",
+    "saving": "Enregistrement…",
+    "cancel": "Annuler",
+    "saved": "Niveaux enregistrés.",
+    "reset": "Revenir au modèle"
+  },
+  "numbering": {
+    "title": "Numérotation automatique",
+    "description": "Activée, les numéros suivent l'ordre du plan : ils changent tout seuls quand vous ajoutez, déplacez ou supprimez un élément. Désactivée, chaque élément garde le numéro reçu à sa création ; vous pouvez le changer à la main et « Renuméroter » remet tous les numéros dans l'ordre.",
+    "toggle": "Mettre à jour les numéros automatiquement",
+    "autoOn": "Numérotation automatique",
+    "autoOff": "Numéros fixes",
+    "renumber": "Renuméroter",
+    "renumberHint": "Remettre tous les numéros dans l'ordre du plan",
+    "confirmTitle": "Renuméroter tout le plan ?",
+    "confirmDescription": "Tous les numéros sont remis dans l'ordre du plan, selon la numérotation de chaque niveau. Les numéros choisis à la main sont remplacés.",
+    "saved": "Réglage enregistré.",
+    "statusOn": "Activée : les numéros suivent l'ordre du plan. En la désactivant, chaque élément garde le numéro qu'il affiche.",
+    "statusOff": "Désactivée : chaque élément garde son numéro."
+  },
+  "sidebar": {
+    "title": "Arborescence",
+    "loading": "Chargement…",
+    "empty": "Le plan est vide.",
+    "expand": "Déplier",
+    "collapse": "Replier"
+  },
+  "node": {
+    "fallback": "Élément du découpage",
+    "loading": "Chargement…",
+    "notFound": {
+      "title": "Élément introuvable",
+      "description": "Il a peut-être été supprimé du plan.",
+      "close": "Fermer l'onglet"
+    },
+    "profile": {
+      "topLevel": "À la racine du plan",
+      "contains_one": "Contient {{count}} élément",
+      "contains_other": "Contient {{count}} éléments",
+      "unnumbered": "Hors numérotation",
+      "openPlan": "Voir dans le plan",
+      "path": "Emplacement dans le plan",
+      "noSummary": "Pas encore de résumé."
+    },
+    "sections": {
+      "info": {
+        "title": "Informations",
+        "description": "Titre, numéro et résumé."
+      },
+      "characters": {
+        "title": "Personnages",
+        "description": "Qui apparaît dans « {{name}} », et comment.",
+        "add": "Ajouter",
+        "choose": "Choisir un personnage…",
+        "empty": "Aucun personnage lié pour l'instant.",
+        "noneLeft": "Tous les personnages du projet sont déjà liés.",
+        "noItems": "Le projet n'a pas encore de personnage.",
+        "firstAppearance": "Première apparition ici"
+      },
+      "locations": {
+        "title": "Lieux",
+        "description": "Où se déroule « {{name}} », et les lieux cités.",
+        "add": "Ajouter",
+        "choose": "Choisir un lieu…",
+        "empty": "Aucun lieu lié pour l'instant.",
+        "noneLeft": "Tous les lieux du projet sont déjà liés.",
+        "noItems": "Le projet n'a pas encore de lieu.",
+        "firstAppearance": "Première apparition ici"
+      },
+      "children": {
+        "title": "Contenu",
+        "description": "Ce que contient « {{name}} ».",
+        "add": "Ajouter : {{name}}",
+        "empty": "Aucun élément pour l'instant."
+      }
+    },
+    "inside": "Dans les éléments contenus",
+    "insideHint": "Liés à un élément contenu (une scène de ce chapitre…). « + » les lie aussi directement à cet élément.",
+    "remove": "Retirer",
+    "role": "Rôle",
+    "roles": {
+      "character": {
+        "present": "Présent",
+        "pov": "Point de vue",
+        "mentioned": "Cité"
+      },
+      "location": {
+        "setting": "Lieu de l'action",
+        "mentioned": "Cité"
+      }
+    },
+    "saved": "Enregistré.",
+    "delete": "Supprimer"
+  },
+  "story": {
+    "title": "Dans le récit",
+    "characterDescription": "Les éléments du plan où apparaît ce personnage.",
+    "locationDescription": "Les éléments du plan qui se déroulent dans ce lieu ou le citent.",
+    "empty": "Pas encore lié au plan : liez-le depuis la fiche d'un chapitre, d'une scène…",
+    "firstAppearance": "Première apparition"
+  },
+  "colors": {
+    "custom": "Autre couleur…",
+    "level": "Couleur",
+    "useDefault": "Couleur par défaut",
+    "inSettings": "Les couleurs des niveaux se règlent dans les paramètres du projet et s'appliquent à tous leurs éléments.",
+    "openSettings": "Choisir les couleurs"
   }
 }

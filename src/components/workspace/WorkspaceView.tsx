@@ -16,11 +16,13 @@ import {
   ComingSoonView,
   EmptyListView,
 } from "@/components/workspace/views/GenericViews";
+import { StructureNodeView } from "@/components/workspace/views/StructureNodeView";
 import { StructurePlanView } from "@/components/workspace/views/StructurePlanView";
 import { SynopsisEditView } from "@/components/workspace/views/SynopsisEditView";
 import { WorkspaceHome } from "@/components/workspace/WorkspaceHome";
 import { characterIdOfTab } from "@/lib/characters";
 import { locationIdOfTab } from "@/lib/locations";
+import { structureNodeIdOfTab } from "@/lib/structure";
 import type { Project } from "@/types";
 
 interface WorkspaceViewProps {
@@ -75,8 +77,21 @@ export function WorkspaceView({
   // ---------------------------------------------------------------------------
   // Découpage du récit
   // ---------------------------------------------------------------------------
+  const structureNodeId = structureNodeIdOfTab(tabId);
+
+  if (structureNodeId) {
+    return (
+      <StructureNodeView
+        projectId={project.id}
+        nodeId={structureNodeId}
+        onClose={() => onCloseTab(tabId)}
+        onOpenFeature={onOpenFeature}
+      />
+    );
+  }
+
   if (tabId === "structure.plan") {
-    return <StructurePlanView project={project} feature={feature} />;
+    return <StructurePlanView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
   // ---------------------------------------------------------------------------

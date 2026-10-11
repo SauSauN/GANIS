@@ -533,3 +533,131 @@ async fn an_unreadable_project_does_not_hide_the_others() {
     assert_eq!(projects.len(), 1);
     assert_eq!(projects[0].name, "Intact");
 }
+#[tokio::test]
+async fn ganix_export_then_import_gives_a_new_encrypted_project() {
+    use crate::services::ganix_service;
+
+    let env = env().await;
+    register_alice(&env).await;
+    login(&env, "alice", "motdepasse1").await;
+    let id = create_project_with_text(&env, "Exporté", "Texte voyageur").await;
+
+    // Export : fichier lisible par tout GANIS, donc non chiffré.
+    let (user, key) = env.state.require_session().await.unwrap();
+    let project = project_service::find_by_id_for_user(&env.state.app_db, &id, &user.id, &key)
+        .await
+        .unwrap()
+        .unwrap();
+    let pool = project_storage::pool_for_user(&env.state, &id, &user.id).await.unwrap();
+    let file = env.dir.join(ganix_service::suggested_file_name(&project.name));
+    ganix_service::write_ganix(&pool, &project, &file, &ganix_service::work_dir(&env.dir))
+        .await
+        .unwrap();
+    assert!(file.ends_with("Exporté.ganix"));
+
+    // Import par le même compte : copie, nouvel identifiant.
+    let preview = ganix_service::stage_import(&env.dir, &env.state.app_db, &user.id, &file)
+        .await
+        .unwrap();
+    assert!(preview.already_owned);
+    assert_eq!(preview.name, "Exporté");
+
+    let outcome = ganix_service::confirm_import(
+        &env.state,
+        &user.id,
+        &key,
+        &preview.staging_id,
+        ganix_service::ImportMode::Copy,
+    )
+    .await
+    .unwrap();
+    assert!(outcome.backup_file.is_none());
+    let copy = outcome.project;
+    assert_ne!(copy.id, id);
+    assert_eq!(copy.name, "Exporté (importé)");
+    assert_eq!(read_text(&env, &copy.id).await, "Texte voyageur");
+    assert!(!project_db::is_plaintext_sqlite(&db_path(&env, &copy.id)));
+    assert!(!file_contains(&db_path(&env, &copy.id), "voyageur"));
+
+    // La zone d'attente a disparu : on ne peut pas confirmer deux fois.
+    assert!(ganix_service::confirm_import(&env.state, &user.id, &key, &preview.staging_id, Default::default())
+        .await
+        .is_err());
+
+    // Une zone d'attente n'est confirmable que par son propriétaire.
+    let preview = ganix_service::stage_import(&env.dir, &env.state.app_db, &user.id, &file)
+        .await
+        .unwrap();
+    assert!(ganix_service::confirm_import(&env.state, "quelqu-un-d-autre", &key, &preview.staging_id, Default::default())
+        .await
+        .is_err());
+    ganix_service::cancel_import(&env.dir, &preview.staging_id).unwrap();
+    assert!(!env.dir.join("staging").join(&preview.staging_id).exists());
+
+    // Remplacement : l'original reçoit le contenu du fichier, même
+    // identifiant, après une sauvegarde automatique.
+    sqlx::query("UPDATE synopsis SET content = 'Modifié depuis' WHERE id = 'default'")
+        .execute(&pool)
+        .await
+        .unwrap();
+    project_service::update_project(&env.state.app_db, &id, &user.id, &key, Some("Renommé"), None, None, None, None, None)
+        .await
+        .unwrap();
+
+    let preview = ganix_service::stage_import(&env.dir, &env.state.app_db, &user.id, &file)
+        .await
+        .unwrap();
+    let outcome = ganix_service::confirm_import(
+        &env.state,
+        &user.id,
+        &key,
+        &preview.staging_id,
+        ganix_service::ImportMode::Replace,
+    )
+    .await
+    .unwrap();
+
+    assert_eq!(outcome.project.id, id);
+    assert_eq!(outcome.project.name, "Exporté");
+    assert_eq!(read_text(&env, &id).await, "Texte voyageur");
+    assert!(!project_db::is_plaintext_sqlite(&db_path(&env, &id)));
+
+    // La sauvegarde contient l'état d'avant le remplacement.
+    let backup = ganix_service::backup_dir(&env.dir).join(outcome.backup_file.unwrap());
+    assert!(backup.to_string_lossy().contains("Renommé - avant import"));
+    let preview = ganix_service::stage_import(&env.dir, &env.state.app_db, &user.id, &backup)
+        .await
+        .unwrap();
+    assert_eq!(preview.name, "Renommé");
+    ganix_service::cancel_import(&env.dir, &preview.staging_id).unwrap();
+
+    // Aucun dossier de travail laissé à côté des projets.
+    let leftovers: Vec<_> = std::fs::read_dir(env.dir.join("projets"))
+        .unwrap()
+        .flatten()
+        .filter(|e| e.file_name().to_string_lossy().contains('.'))
+        .collect();
+    assert!(leftovers.is_empty());
+}
+
+#[test]
+fn interrupted_replacement_is_undone_at_startup() {
+    use crate::services::ganix_service;
+
+    let dir = std::env::temp_dir().join(format!("ganis-replace-{}", uuid::Uuid::new_v4()));
+    let projects = dir.join("projets");
+    let id = uuid::Uuid::new_v4().to_string();
+
+    // Arrêt entre les deux renommages : seul l'ancien dossier existe.
+    std::fs::create_dir_all(projects.join(format!("{id}.replaced"))).unwrap();
+    std::fs::write(projects.join(format!("{id}.replaced")).join("project.db"), b"ancien").unwrap();
+    std::fs::create_dir_all(projects.join(format!("{id}.import"))).unwrap();
+
+    ganix_service::clean_leftovers(&dir);
+
+    assert_eq!(std::fs::read(projects.join(&id).join("project.db")).unwrap(), b"ancien");
+    assert!(!projects.join(format!("{id}.replaced")).exists());
+    assert!(!projects.join(format!("{id}.import")).exists());
+
+    std::fs::remove_dir_all(dir).unwrap();
+}
