@@ -270,7 +270,7 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
         event.stopPropagation();
         onClick();
       }}
-      className="flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
+      className="flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
     >
       {icon}
     </button>
@@ -320,7 +320,7 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
                   className="flex items-center gap-1 py-0.5"
                   style={indent(row.depth)}
                 >
-                  <span className="size-5 shrink-0" />
+                  <span className="size-6 shrink-0" />
                   <Folder className="size-4 shrink-0 text-primary" />
                   <FolderNameInput
                     initial={isRename ? row.folder.name : ""}
@@ -362,7 +362,7 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
                   onDragLeave={() => setDropTarget(null)}
                   onDrop={(event) => void onDrop(event, folder.id)}
                   className={cn(
-                    "group/folder flex items-center rounded-md",
+                    "group/folder relative flex items-center rounded-md",
                     dropTarget === folder.id && "bg-primary/10 ring-1 ring-primary",
                   )}
                   style={indent(row.depth)}
@@ -372,7 +372,7 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
                     onClick={() => toggle(folder.id)}
                     aria-label={open ? t("sidebar.collapse") : t("sidebar.expand")}
                     className={cn(
-                      "flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent",
+                      "flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent",
                       !hasContent && "invisible",
                     )}
                   >
@@ -396,7 +396,7 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
                   <div
                     role="group"
                     aria-label={t("sidebar.actions")}
-                    className="hidden shrink-0 items-center group-focus-within/folder:flex group-hover/folder:flex"
+                    className="pointer-events-none absolute inset-y-0 right-0 flex items-center rounded-r-md bg-sidebar pl-1 opacity-0 transition-opacity group-focus-within/folder:pointer-events-auto group-focus-within/folder:opacity-100 group-hover/folder:pointer-events-auto group-hover/folder:opacity-100"
                   >
                     {iconButton(t("sidebar.newNoteIn"), <FilePlus2 className="size-3.5" />, () => void newNote(folder.id))}
                     {iconButton(t("sidebar.newSubfolder"), <FolderPlus className="size-3.5" />, () => startFolder(folder.id))}
@@ -423,7 +423,7 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
                 className="flex items-center"
                 style={indent(row.depth)}
               >
-                <span className="size-5 shrink-0" />
+                <span className="size-6 shrink-0" />
                 <button
                   type="button"
                   aria-current={active ? "page" : undefined}

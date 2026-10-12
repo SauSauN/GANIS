@@ -45,7 +45,7 @@ function CalloutView({ node, updateAttributes, deleteNode, editor }: ReactNodeVi
       {editor.isEditable && (
         <div
           contentEditable={false}
-          className="absolute -top-3 right-2 flex items-center gap-1 rounded-full border bg-background px-1.5 py-0.5 opacity-0 shadow-sm transition-opacity group-hover/callout:opacity-100 focus-within:opacity-100"
+          className="absolute -top-4 right-2 flex items-center gap-0.5 rounded-full border bg-background px-1 py-0.5 opacity-0 shadow-sm transition-opacity group-hover/callout:opacity-100 focus-within:opacity-100"
         >
           {STICKY_COLORS.map((item) => (
             <button
@@ -55,19 +55,23 @@ function CalloutView({ node, updateAttributes, deleteNode, editor }: ReactNodeVi
               aria-label={t(`colors.${item}`)}
               aria-pressed={item === color}
               onClick={() => updateAttributes({ color: item })}
-              className={cn(
-                "size-3.5 rounded-full border border-black/10",
-                item === color && "ring-2 ring-ring ring-offset-1",
-              )}
-              style={{ background: STICKY_STYLES[item].swatch }}
-            />
+              className="flex size-6 items-center justify-center rounded-full hover:bg-muted"
+            >
+              <span
+                className={cn(
+                  "size-3.5 rounded-full border border-black/10",
+                  item === color && "ring-2 ring-ring ring-offset-1",
+                )}
+                style={{ background: STICKY_STYLES[item].swatch }}
+              />
+            </button>
           ))}
           <button
             type="button"
             title={t("editor.callout.remove")}
             aria-label={t("editor.callout.remove")}
             onClick={() => deleteNode()}
-            className="ml-1 flex size-4 items-center justify-center rounded text-muted-foreground hover:text-destructive"
+            className="ml-1 flex size-6 items-center justify-center rounded text-muted-foreground hover:text-destructive"
           >
             <Trash2 className="size-3" />
           </button>

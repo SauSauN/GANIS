@@ -101,7 +101,7 @@ function ChainItemView({ editor, getPos, node, deleteNode }: ReactNodeViewProps)
             onClick={remove}
             title={t("editor.chain.remove")}
             aria-label={t("editor.chain.remove")}
-            className="absolute -top-2 -right-2 hidden size-5 items-center justify-center rounded-full border bg-background text-muted-foreground shadow-sm group-hover/cell:flex hover:text-destructive"
+            className="absolute -top-3 -right-3 flex size-6 items-center justify-center rounded-full border bg-background text-muted-foreground opacity-0 shadow-sm transition-opacity group-hover/cell:opacity-100 focus-visible:opacity-100 hover:text-destructive"
           >
             <X className="size-3" />
           </button>

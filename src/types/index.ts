@@ -633,6 +633,88 @@ export interface StickyNote {
 export type StickyUpdate = Partial<Pick<StickyNote, "text" | "color" | "x" | "y" | "width" | "height" | "z">>;
 
 // ----------------------------------------------------------------------------
+// Corbeille (voir `trash_service.rs`)
+// ----------------------------------------------------------------------------
+
+export type TrashKind =
+  | "character"
+  | "location"
+  | "structureNode"
+  | "note"
+  | "noteFolder"
+  | "sticky"
+  | "relation"
+  | "placeLink";
+
+export interface TrashItem {
+  id: string;
+  kind: TrashKind;
+  /** Identifiant de l'élément supprimé. */
+  itemId: string;
+  label: string;
+  deletedAt: string;
+}
+
+// ----------------------------------------------------------------------------
+// Historique, versions et recherche (voir `history_service.rs`, `search_service.rs`)
+// ----------------------------------------------------------------------------
+
+export type ActivityAction = "created" | "updated" | "deleted" | "restored" | "versionRestored" | "moved";
+
+/** Type d'élément du journal (ceux de la corbeille, plus le synopsis). */
+export type HistoryKind = TrashKind | "synopsis";
+
+export interface Activity {
+  id: string;
+  at: string;
+  action: ActivityAction;
+  kind: HistoryKind;
+  itemId: string;
+  label: string;
+  /** Suppression : identifiant de l'entrée de la corbeille. */
+  detail: string;
+}
+
+/** Éléments qui ont des versions. */
+export type VersionKind = "character" | "location" | "structureNode" | "note" | "synopsis";
+
+export interface Version {
+  id: string;
+  /** Vide : version automatique. */
+  name: string;
+  createdAt: string;
+  /** Colonnes de l'élément (`fields`, `content`… en texte JSON). */
+  data: Record<string, string | number | null>;
+}
+
+export interface VersionList {
+  current: Record<string, string | number | null>;
+  versions: Version[];
+}
+
+/** Calendrier de travail (tableau de bord). */
+export interface WorkCalendar {
+  year: number;
+  firstYear: number | null;
+  days: Array<{
+    day: string;
+    actions: number;
+    minutes: number;
+    projects: Array<{ projectId: string; actions: number; minutes: number }>;
+  }>;
+}
+
+export type SearchKind = "character" | "location" | "structureNode" | "note" | "noteFolder" | "sticky";
+
+export interface SearchHit {
+  kind: SearchKind;
+  id: string;
+  title: string;
+  snippet: string;
+  inTitle: boolean;
+}
+
+// ----------------------------------------------------------------------------
 // Libellés pour l'interface
 // ----------------------------------------------------------------------------
 

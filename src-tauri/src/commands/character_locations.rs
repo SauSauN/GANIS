@@ -5,6 +5,7 @@
 //! qui vérifie d'abord que l'utilisateur connecté en est le propriétaire.
 
 use crate::error::AppResult;
+use crate::services::history_service as history;
 use crate::services::character_location_service::{
     self, CharacterLocation, CharacterLocationInput,
 };
@@ -37,7 +38,11 @@ pub async fn create_character_location(
     input: CharacterLocationInput,
 ) -> AppResult<CharacterLocation> {
     let pool = project_pool(&state, &project_id).await?;
-    character_location_service::create_link(&pool, &input).await
+    let result = character_location_service::create_link(&pool, &input).await;
+    if result.is_ok() {
+        history::touch_day(&pool).await;
+    }
+    result
 }
 
 /// Remplace un lien.
@@ -49,7 +54,11 @@ pub async fn update_character_location(
     input: CharacterLocationInput,
 ) -> AppResult<CharacterLocation> {
     let pool = project_pool(&state, &project_id).await?;
-    character_location_service::update_link(&pool, &link_id, &input).await
+    let result = character_location_service::update_link(&pool, &link_id, &input).await;
+    if result.is_ok() {
+        history::touch_day(&pool).await;
+    }
+    result
 }
 
 /// Supprime un lien.
@@ -58,7 +67,9 @@ pub async fn delete_character_location(
     state: State<'_, AppState>,
     project_id: String,
     link_id: String,
-) -> AppResult<()> {
+) -> AppResult<String> {
     let pool = project_pool(&state, &project_id).await?;
-    character_location_service::delete_link(&pool, &link_id).await
+    let trash_id = character_location_service::delete_link(&pool, &link_id).await?;
+    history::record_deleted(&pool, &trash_id).await;
+    Ok(trash_id)
 }

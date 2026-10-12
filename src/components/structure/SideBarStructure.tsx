@@ -76,7 +76,7 @@ export function SideBarStructure({ projectId, activeTab, onOpenFeature }: SideBa
                   onClick={() => toggle(node.id)}
                   aria-label={expanded ? t("sidebar.collapse") : t("sidebar.expand")}
                   className={cn(
-                    "flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent",
+                    "flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent",
                     node.children.length === 0 && "invisible",
                   )}
                 >

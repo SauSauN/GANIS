@@ -16,6 +16,8 @@ import { NoteEditView } from "@/components/workspace/views/NoteEditView";
 import { NotesListView } from "@/components/workspace/views/NotesListView";
 import { RelationsView } from "@/components/workspace/views/RelationsView";
 import { StickyWallView } from "@/components/workspace/views/StickyWallView";
+import { TrashView } from "@/components/workspace/views/TrashView";
+import { HistoryView } from "@/components/workspace/views/HistoryView";
 import {
   ComingSoonView,
   EmptyListView,
@@ -75,6 +77,14 @@ export function WorkspaceView({
   // ---------------------------------------------------------------------------
   // Synopsis
   // ---------------------------------------------------------------------------
+  if (tabId === "history") {
+    return <HistoryView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "trash") {
+    return <TrashView projectId={project.id} feature={feature} />;
+  }
+
   if (tabId === "synopsis.edit") {
     return <SynopsisEditView projectId={project.id} feature={feature} />;
   }

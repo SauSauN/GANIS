@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { VersionsButton } from "@/components/history/VersionsDialog";
 import { useTranslation } from "react-i18next";
 import { Loader2, MapPinOff, Network, Plus, Save, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -381,10 +382,18 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
                 </p>
               )}
 
+              <VersionsButton
+                className="ml-auto"
+                projectId={projectId}
+                kind="location"
+                itemId={locationId}
+                name={location?.name ?? ""}
+              />
+
               <Button
                 type="button"
                 variant="ghost"
-                className="ml-auto text-destructive hover:text-destructive"
+                className="text-destructive hover:text-destructive"
                 disabled={saving || deleting}
                 onClick={() => {
                   setDeleteError(null);

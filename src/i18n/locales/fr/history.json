@@ -1,0 +1,28 @@
+{
+  "description": "Tout ce qui s'est passé dans le projet ces 90 derniers jours. Un clic sur un nom ouvre l'élément ; un élément supprimé encore dans la corbeille peut être restauré d'ici.",
+  "filter": "Filtrer par type",
+  "all": "Tous les types",
+  "refresh": "Actualiser",
+  "loading": "Chargement de l'historique…",
+  "empty": "Rien dans l'historique pour l'instant.",
+  "restore": "Restaurer",
+  "actions": {
+    "created": "Créé :",
+    "updated": "Modifié :",
+    "deleted": "Supprimé :",
+    "restored": "Restauré :",
+    "versionRestored": "Version restaurée :",
+    "moved": "Déplacé :"
+  },
+  "kinds": {
+    "character": "Personnage",
+    "location": "Lieu",
+    "structureNode": "Élément du découpage",
+    "note": "Note",
+    "noteFolder": "Dossier de notes",
+    "sticky": "Post-it",
+    "relation": "Relation",
+    "placeLink": "Lien personnage – lieu",
+    "synopsis": "Synopsis"
+  }
+}

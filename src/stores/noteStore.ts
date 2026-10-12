@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
+import { announceDeletion } from "@/lib/trash";
 import { folderAndDescendants } from "@/lib/notes";
 import type {
   Note,
@@ -151,7 +152,9 @@ export const useNoteStore = create<NoteState>((set, get) => {
     },
 
     deleteFolder: async (projectId, id) => {
-      await api.deleteNoteFolder(projectId, id);
+      const before = get().folders.find((item) => item.id === id);
+      const trashId = await api.deleteNoteFolder(projectId, id);
+      announceDeletion(projectId, trashId, "noteFolder", before?.name ?? "");
       if (!mine(projectId)) return;
 
       // Comme Rust : sous-dossiers supprimés, leurs notes remontent à la racine.
@@ -182,7 +185,9 @@ export const useNoteStore = create<NoteState>((set, get) => {
     },
 
     deleteNote: async (projectId, id) => {
-      await api.deleteNote(projectId, id);
+      const before = get().notes.find((item) => item.id === id);
+      const trashId = await api.deleteNote(projectId, id);
+      announceDeletion(projectId, trashId, "note", before?.title ?? "");
       if (mine(projectId)) set({ notes: get().notes.filter((note) => note.id !== id) });
     },
 
@@ -249,7 +254,9 @@ export const useNoteStore = create<NoteState>((set, get) => {
     },
 
     deleteSticky: async (projectId, id) => {
-      await api.deleteStickyNote(projectId, id);
+      const before = get().stickies.find((item) => item.id === id);
+      const trashId = await api.deleteStickyNote(projectId, id);
+      announceDeletion(projectId, trashId, "sticky", (before?.text ?? "").replace(/\s+/g, " ").slice(0, 40));
       if (mine(projectId)) set({ stickies: get().stickies.filter((item) => item.id !== id) });
     },
 

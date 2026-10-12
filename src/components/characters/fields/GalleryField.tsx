@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type DragEvent } from "react";
+import { useConfirmImageRemoval } from "@/components/common/useConfirmImageRemoval";
 import { useTranslation } from "react-i18next";
 import { ImagePlus, Loader2, X } from "lucide-react";
 import {
@@ -48,6 +49,7 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
 
   const full = items.length >= MAX_GALLERY_IMAGES;
   const locked = disabled || busy || full;
+  const removal = useConfirmImageRemoval<string>((id) => onRemove(id));
 
   function onDrop(event: DragEvent) {
     setDragOver(false);
@@ -93,7 +95,7 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
 
             <button
               type="button"
-              onClick={() => onRemove(item.id)}
+              onClick={() => removal.ask(item.id)}
               disabled={disabled || busy}
               aria-label={t("gallery.remove")}
               title={t("gallery.remove")}
@@ -151,6 +153,7 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
           <img src={zoomed.url} alt="" className="max-h-[70vh] w-full rounded-md object-contain" />
         )}
       </Dialog>
+      {removal.dialog}
     </div>
   );
 }

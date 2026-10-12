@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import i18n from "@/i18n";
+import { isWriteCommand, useSaveStatusStore } from "@/lib/saveStatus";
 import type {
   AccountCreated,
   ApiErrorPayload,
@@ -40,6 +41,13 @@ import type {
   StickyColor,
   StickyNote,
   StickyUpdate,
+  TrashItem,
+  Activity,
+  Version,
+  VersionKind,
+  VersionList,
+  SearchHit,
+  WorkCalendar,
   StructureNode,
   Synopsis,
   ThemeData,
@@ -61,6 +69,19 @@ const translate = i18n.t.bind(i18n) as unknown as (
  * 3. sinon → un message générique selon le code (`errors.codes.*`).
  */
 export function translateApiError(error: ApiError): string {
+  const message = translateMessage(error);
+
+  // Piste de solution, quand il y en a une (`errors.json` › `hints`).
+  const hintKey = error.key && i18n.exists(`errors:hints.${error.key}`)
+    ? `errors:hints.${error.key}`
+    : !error.key && i18n.exists(`errors:hints.codes.${error.code}`)
+      ? `errors:hints.codes.${error.code}`
+      : null;
+
+  return hintKey ? `${message} ${translate(hintKey)}` : message;
+}
+
+function translateMessage(error: ApiError): string {
   if (error.key && i18n.exists(`errors:${error.key}`)) {
     const params: Record<string, unknown> = { ...error.params };
 
@@ -238,10 +259,20 @@ async function call<T>(
   command: string,
   args?: Record<string, unknown>,
 ): Promise<T> {
+  // Les écritures sont signalées à la barre d'état (voir `saveStatus.ts`).
+  const writes = isWriteCommand(command);
+  const status = useSaveStatusStore.getState();
+
+  if (writes) status.begin();
+
   try {
-    return await invoke<T>(command, args);
+    const result = await invoke<T>(command, args);
+    if (writes) status.succeed();
+    return result;
   } catch (e) {
-    throw normalize(e);
+    const error = normalize(e);
+    if (writes) status.fail(error.message);
+    throw error;
   }
 }
 
@@ -583,7 +614,7 @@ export const api = {
 
   /** Supprime un élément et tout ce qu'il contient. */
   deleteStructureNode: (projectId: string, nodeId: string) =>
-    call<void>("delete_structure_node", { projectId, nodeId }),
+    call<string>("delete_structure_node", { projectId, nodeId }),
 
   /** Personnages et lieux liés aux éléments du découpage. */
   listStructureLinks: (projectId: string) =>
@@ -606,6 +637,59 @@ export const api = {
     call<void>("unlink_structure_location", { projectId, nodeId, locationId }),
 
   // -------------------------------------------------------------------------
+  // Corbeille (les suppressions ci-dessous renvoient l'identifiant de
+  // l'entrée de la corbeille, pour proposer « Annuler »)
+  // -------------------------------------------------------------------------
+
+  listTrash: (projectId: string) =>
+    call<TrashItem[]>("list_trash", { projectId }),
+
+  /** Remet un élément à sa place ; renvoie l'entrée restaurée. */
+  restoreTrash: (projectId: string, trashId: string) =>
+    call<TrashItem>("restore_trash", { projectId, trashId }),
+
+  purgeTrash: (projectId: string, trashId: string) =>
+    call<void>("purge_trash", { projectId, trashId }),
+
+  emptyTrash: (projectId: string) =>
+    call<void>("empty_trash", { projectId }),
+
+  // -------------------------------------------------------------------------
+  // Historique, versions, recherche
+  // -------------------------------------------------------------------------
+
+  /** Journal du projet, ou d'un seul élément (`kind` + `itemId`). */
+  listActivity: (projectId: string, filter: { kind?: string; itemId?: string; limit?: number } = {}) =>
+    call<Activity[]>("list_activity", {
+      projectId,
+      kind: filter.kind ?? null,
+      itemId: filter.itemId ?? null,
+      limit: filter.limit ?? null,
+    }),
+
+  listVersions: (projectId: string, kind: VersionKind, itemId: string) =>
+    call<VersionList>("list_versions", { projectId, kind, itemId }),
+
+  /** Version nommée de l'état actuel (« Avant réécriture »). */
+  createVersion: (projectId: string, kind: VersionKind, itemId: string, name: string) =>
+    call<Version>("create_version", { projectId, kind, itemId, name }),
+
+  /** Remet l'élément dans l'état de la version ; l'état actuel est gardé. */
+  restoreVersion: (projectId: string, versionId: string) =>
+    call<void>("restore_version", { projectId, versionId }),
+
+  deleteVersion: (projectId: string, versionId: string) =>
+    call<void>("delete_version", { projectId, versionId }),
+
+  /** Volume de travail jour par jour d'une année, tous projets confondus. */
+  getWorkCalendar: (year: number) =>
+    call<WorkCalendar>("get_work_calendar", { year }),
+
+  /** Recherche dans tout le projet (sans casse ni accents). */
+  searchProject: (projectId: string, query: string) =>
+    call<SearchHit[]>("search_project", { projectId, query }),
+
+  // -------------------------------------------------------------------------
   // Notes
   // -------------------------------------------------------------------------
 
@@ -625,7 +709,7 @@ export const api = {
 
   /** Supprime un dossier et ses sous-dossiers ; leurs notes remontent à la racine. */
   deleteNoteFolder: (projectId: string, folderId: string) =>
-    call<void>("delete_note_folder", { projectId, folderId }),
+    call<string>("delete_note_folder", { projectId, folderId }),
 
   /** Notes du projet, sans leur contenu (épinglées d'abord, puis les plus récentes). */
   listNotes: (projectId: string) =>
@@ -644,7 +728,7 @@ export const api = {
     call<Note>("move_note", { projectId, noteId, folderId }),
 
   deleteNote: (projectId: string, noteId: string) =>
-    call<void>("delete_note", { projectId, noteId }),
+    call<string>("delete_note", { projectId, noteId }),
 
   /** Post-it du mur. */
   listStickyNotes: (projectId: string) =>
@@ -661,7 +745,7 @@ export const api = {
     call<StickyNote>("raise_sticky_note", { projectId, stickyId }),
 
   deleteStickyNote: (projectId: string, stickyId: string) =>
-    call<void>("delete_sticky_note", { projectId, stickyId }),
+    call<string>("delete_sticky_note", { projectId, stickyId }),
 
   // -------------------------------------------------------------------------
   // Personnages
@@ -713,7 +797,7 @@ export const api = {
 
   /** Supprime un lien. */
   deleteCharacterLocation: (projectId: string, linkId: string) =>
-    call<void>("delete_character_location", { projectId, linkId }),
+    call<string>("delete_character_location", { projectId, linkId }),
 
   // -------------------------------------------------------------------------
   // Lieux
@@ -733,7 +817,7 @@ export const api = {
 
   /** Supprime un lieu (ses lieux contenus remontent d'un niveau). */
   deleteLocation: (projectId: string, locationId: string) =>
-    call<void>("delete_location", { projectId, locationId }),
+    call<string>("delete_location", { projectId, locationId }),
 
   /** Réglages des lieux du projet (types ajoutés, listes). */
   getLocationSettings: (projectId: string) =>
@@ -799,7 +883,7 @@ export const api = {
 
   /** Supprime un personnage et sa photo. */
   deleteCharacter: (projectId: string, characterId: string) =>
-    call<void>("delete_character", { projectId, characterId }),
+    call<string>("delete_character", { projectId, characterId }),
 
   /** Photo d'un personnage (`null` : pas de photo). */
   getCharacterPortrait: (projectId: string, characterId: string) =>
@@ -830,7 +914,7 @@ export const api = {
 
   /** Supprime une relation. */
   deleteRelation: (projectId: string, relationId: string) =>
-    call<void>("delete_relation", { projectId, relationId }),
+    call<string>("delete_relation", { projectId, relationId }),
 
   /** Positions de la disposition libre du graphe. */
   getGraphPositions: (projectId: string) =>

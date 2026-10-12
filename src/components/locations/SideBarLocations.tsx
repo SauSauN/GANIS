@@ -72,7 +72,7 @@ export function SideBarLocations({ projectId, activeTab, onOpenFeature }: SideBa
                   onClick={() => toggle(location.id)}
                   aria-label={open ? t("list.collapse") : t("list.expand")}
                   className={cn(
-                    "flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent",
+                    "flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent",
                     children.length === 0 && "invisible",
                   )}
                 >

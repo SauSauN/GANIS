@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
+import { announceDeletion, placeLinkLabel } from "@/lib/trash";
 import type { CharacterLocation, CharacterLocationInput } from "@/types";
 
 /*
@@ -78,7 +79,9 @@ export const usePlaceLinkStore = create<PlaceLinkState>((set, get) => {
     },
 
     deleteLink: async (projectId, id) => {
-      await api.deleteCharacterLocation(projectId, id);
+      const before = get().links.find((item) => item.id === id);
+      const trashId = await api.deleteCharacterLocation(projectId, id);
+      announceDeletion(projectId, trashId, "placeLink", placeLinkLabel(projectId, before));
       if (get().projectId !== projectId) return;
       set({ links: get().links.filter((item) => item.id !== id) });
     },

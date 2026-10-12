@@ -9,6 +9,7 @@ import {
   Baseline,
   Bold,
   ChevronDown,
+  Code,
   Code2,
   Highlighter,
   Italic,
@@ -17,6 +18,7 @@ import {
   ListChecks,
   ListOrdered,
   Minus,
+  MoreHorizontal,
   Quote,
   Redo2,
   RemoveFormatting,
@@ -79,6 +81,7 @@ function ToolMenu({
   indicator,
   children,
   wide,
+  alignRight,
 }: {
   icon: LucideIcon;
   label: string;
@@ -87,9 +90,13 @@ function ToolMenu({
   indicator?: string | null;
   children: (close: () => void) => ReactNode;
   wide?: boolean;
+  /** Menu ouvert vers la gauche (bouton en fin de barre). */
+  alignRight?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  /** Pas assez de place à droite : le menu s'ouvre vers la gauche. */
+  const [toLeft, setToLeft] = useState(false);
 
   useEffect(() => {
     if (!open) return;
@@ -116,7 +123,11 @@ function ToolMenu({
         aria-haspopup="menu"
         aria-expanded={open}
         onMouseDown={(event) => event.preventDefault()}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => {
+          const rect = ref.current?.getBoundingClientRect();
+          setToLeft(Boolean(alignRight && rect && rect.left + 260 > window.innerWidth));
+          setOpen((value) => !value);
+        }}
         className={cn(
           "flex h-7 shrink-0 items-center gap-0.5 rounded px-1 text-foreground/80 hover:bg-accent hover:text-foreground",
           (active || open) && "bg-primary/15 text-primary",
@@ -138,7 +149,8 @@ function ToolMenu({
         <div
           role="menu"
           className={cn(
-            "absolute top-full left-0 z-40 mt-1 rounded-lg border bg-popover p-1.5 text-popover-foreground shadow-lg",
+            "absolute top-full z-40 mt-1 rounded-lg border bg-popover p-1.5 text-popover-foreground shadow-lg",
+            toLeft ? "right-0" : "left-0",
             wide ? "w-56" : "w-auto",
           )}
         >
@@ -349,8 +361,6 @@ export function NoteToolbar({ editor }: { editor: Editor }) {
       <ToolButton icon={Italic} label={t("editor.italic")} active={state.italic} onClick={() => chain().toggleItalic().run()} />
       <ToolButton icon={Underline} label={t("editor.underline")} active={state.underline} onClick={() => chain().toggleUnderline().run()} />
       <ToolButton icon={Strikethrough} label={t("editor.strike")} active={state.strike} onClick={() => chain().toggleStrike().run()} />
-      <ToolButton icon={SupIcon} label={t("editor.superscript")} active={state.sup} onClick={() => chain().toggleSuperscript().run()} />
-      <ToolButton icon={SubIcon} label={t("editor.subscript")} active={state.sub} onClick={() => chain().toggleSubscript().run()} />
 
       <ToolMenu icon={Baseline} label={t("editor.color")} indicator={state.color ?? "currentColor"}>
         {(close) => (
@@ -386,13 +396,11 @@ export function NoteToolbar({ editor }: { editor: Editor }) {
         )}
       </ToolMenu>
 
-      <ToolButton icon={RemoveFormatting} label={t("editor.clear")} onClick={() => chain().unsetAllMarks().run()} />
       <Separator />
 
       <ToolButton icon={AlignLeft} label={t("editor.align.left")} active={state.align === "left"} onClick={() => chain().setTextAlign("left").run()} />
       <ToolButton icon={AlignCenter} label={t("editor.align.center")} active={state.align === "center"} onClick={() => chain().setTextAlign("center").run()} />
       <ToolButton icon={AlignRight} label={t("editor.align.right")} active={state.align === "right"} onClick={() => chain().setTextAlign("right").run()} />
-      <ToolButton icon={AlignJustify} label={t("editor.align.justify")} active={state.align === "justify"} onClick={() => chain().setTextAlign("justify").run()} />
       <Separator />
 
       <ToolButton icon={List} label={t("editor.bulletList")} active={state.bullet} onClick={() => chain().toggleBulletList().run()} />
@@ -401,8 +409,6 @@ export function NoteToolbar({ editor }: { editor: Editor }) {
       <Separator />
 
       <ToolButton icon={Quote} label={t("editor.quote")} active={state.quote} onClick={() => chain().toggleBlockquote().run()} />
-      <ToolButton icon={Code2} label={t("editor.codeBlock")} active={state.codeBlock} onClick={() => chain().toggleCodeBlock().run()} />
-      <ToolButton icon={Minus} label={t("editor.rule")} onClick={() => chain().setHorizontalRule().run()} />
 
       <ToolMenu icon={Link2} label={t("editor.link.label")} active={state.link}>
         {(close) => (
@@ -488,6 +494,55 @@ export function NoteToolbar({ editor }: { editor: Editor }) {
       />
       <ToolButton icon={GitCommitHorizontal} label={t("editor.chain.insert")} onClick={() => chain().insertChain().run()} />
       <ToolButton icon={Workflow} label={t("editor.diagram.insert")} onClick={() => chain().insertDiagram().run()} />
+      <Separator />
+
+      {/* Outils moins courants, regroupés pour alléger la barre. */}
+      <ToolMenu
+        icon={MoreHorizontal}
+        label={t("editor.more")}
+        alignRight
+        active={state.sup || state.sub || state.code || state.codeBlock || state.align === "justify"}
+        wide
+      >
+        {(close) => {
+          const item = (icon: typeof Bold, label: string, active: boolean, action: () => boolean) => {
+            const Icon = icon;
+            return (
+              <button
+                type="button"
+                role="menuitemcheckbox"
+                aria-checked={active}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => {
+                  action();
+                  close();
+                }}
+                className={cn(
+                  "flex h-8 w-full items-center gap-2 rounded px-2 text-left text-sm hover:bg-accent",
+                  active && "text-primary",
+                )}
+              >
+                <Icon className="size-4" />
+                <span className="flex-1">{label}</span>
+                {active && <span aria-hidden>✓</span>}
+              </button>
+            );
+          };
+          return (
+            <>
+              {item(SupIcon, t("editor.superscript"), state.sup, () => chain().toggleSuperscript().run())}
+              {item(SubIcon, t("editor.subscript"), state.sub, () => chain().toggleSubscript().run())}
+              {item(Code, t("editor.code"), state.code, () => chain().toggleCode().run())}
+              {item(AlignJustify, t("editor.align.justify"), state.align === "justify", () => chain().setTextAlign("justify").run())}
+              <div className="my-1 h-px bg-border" />
+              {item(Code2, t("editor.codeBlock"), state.codeBlock, () => chain().toggleCodeBlock().run())}
+              {item(Minus, t("editor.rule"), false, () => chain().setHorizontalRule().run())}
+              <div className="my-1 h-px bg-border" />
+              {item(RemoveFormatting, t("editor.clear"), false, () => chain().unsetAllMarks().run())}
+            </>
+          );
+        }}
+      </ToolMenu>
     </div>
   );
 }

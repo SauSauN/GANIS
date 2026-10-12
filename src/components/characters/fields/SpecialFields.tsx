@@ -314,7 +314,7 @@ export function ColorsField({ id, value, onChange, disabled }: ColorsFieldProps)
             disabled={disabled}
             onClick={() => onChange(serializeList(colors.filter((_, i) => i !== index)))}
             aria-label={t("colors.remove", { color })}
-            className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full border bg-background opacity-0 shadow-sm transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+            className="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full border bg-background opacity-0 shadow-sm transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
           >
             <X className="size-2.5" />
           </button>

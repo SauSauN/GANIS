@@ -718,12 +718,35 @@ pub async fn update_character(
     get_character(pool, id).await
 }
 
-/// Supprime un personnage (et ses images).
+/// Supprime un personnage (et ses images) ; il va dans la corbeille.
+/// Renvoie l'identifiant de l'entrée de la corbeille.
 ///
 /// Ses liens avec des lieux sont supprimés avec lui (base) ; les champs de
 /// lieux qui le désignaient (« Dirigeant »…) sont vidés.
-pub async fn delete_character(pool: &SqlitePool, id: &str) -> AppResult<()> {
+pub async fn delete_character(pool: &SqlitePool, id: &str) -> AppResult<String> {
     let mut tx = pool.begin().await?;
+
+    let mut snapshot = crate::services::trash_service::Snapshot::new();
+    snapshot.capture(&mut tx, "characters", "id", id).await?;
+    if snapshot.is_empty() {
+        return Err(not_found());
+    }
+    let label: String = sqlx::query_scalar("SELECT trim(first_name || ' ' || last_name) FROM characters WHERE id = ?")
+        .bind(id)
+        .fetch_one(&mut *tx)
+        .await?;
+
+    for key in crate::services::location_service::character_field_keys() {
+        let path = format!("$.{key}");
+        let ids: Vec<String> = sqlx::query_scalar("SELECT id FROM locations WHERE json_extract(fields, ?) = ?")
+            .bind(&path)
+            .bind(id)
+            .fetch_all(&mut *tx)
+            .await?;
+        for location in ids {
+            snapshot.restore_json("locations", &location, "fields", &path, id, None);
+        }
+    }
 
     let result = sqlx::query("DELETE FROM characters WHERE id = ?")
         .bind(id)
@@ -745,9 +768,10 @@ pub async fn delete_character(pool: &SqlitePool, id: &str) -> AppResult<()> {
             .await?;
     }
 
+    let trash_id = snapshot.store(&mut tx, "character", id, &label).await?;
     tx.commit().await?;
 
-    Ok(())
+    Ok(trash_id)
 }
 
 /// Clés des champs de la fiche qui désignent un lieu (« Origine »).

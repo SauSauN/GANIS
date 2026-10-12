@@ -5,6 +5,7 @@
 //! qui vérifie d'abord que l'utilisateur connecté en est le propriétaire.
 
 use crate::error::AppResult;
+use crate::services::history_service as history;
 use crate::services::note_service::{
     self, Note, NoteFolder, NoteSummary, NoteUpdate, StickyNote, StickyUpdate,
 };
@@ -32,7 +33,10 @@ pub async fn create_note_folder(
     parent_id: Option<String>,
     name: String,
 ) -> AppResult<NoteFolder> {
-    note_service::create_folder(&project_pool(&state, &project_id).await?, parent_id.as_deref(), &name).await
+    let pool = project_pool(&state, &project_id).await?;
+    let created = note_service::create_folder(&pool, parent_id.as_deref(), &name).await?;
+    history::record(&pool, "created", "noteFolder", &created.id, &created.name, "").await;
+    Ok(created)
 }
 
 #[tauri::command(rename_all = "camelCase")]
@@ -56,8 +60,11 @@ pub async fn move_note_folder(
 }
 
 #[tauri::command(rename_all = "camelCase")]
-pub async fn delete_note_folder(state: State<'_, AppState>, project_id: String, folder_id: String) -> AppResult<()> {
-    note_service::delete_folder(&project_pool(&state, &project_id).await?, &folder_id).await
+pub async fn delete_note_folder(state: State<'_, AppState>, project_id: String, folder_id: String) -> AppResult<String> {
+    let pool = project_pool(&state, &project_id).await?;
+    let trash_id = note_service::delete_folder(&pool, &folder_id).await?;
+    history::record_deleted(&pool, &trash_id).await;
+    Ok(trash_id)
 }
 
 // --- Notes ------------------------------------------------------------------
@@ -79,7 +86,10 @@ pub async fn create_note(
     folder_id: Option<String>,
     title: String,
 ) -> AppResult<Note> {
-    note_service::create_note(&project_pool(&state, &project_id).await?, folder_id.as_deref(), &title).await
+    let pool = project_pool(&state, &project_id).await?;
+    let created = note_service::create_note(&pool, folder_id.as_deref(), &title).await?;
+    history::record(&pool, "created", "note", &created.id, &created.title, "").await;
+    Ok(created)
 }
 
 #[tauri::command(rename_all = "camelCase")]
@@ -89,7 +99,17 @@ pub async fn update_note(
     note_id: String,
     input: NoteUpdate,
 ) -> AppResult<Note> {
-    note_service::update_note(&project_pool(&state, &project_id).await?, &note_id, &input).await
+    let pool = project_pool(&state, &project_id).await?;
+    // Titre ou contenu : une version et une ligne au journal. Épingle seule : non.
+    let edits_text = input.title.is_some() || input.content.is_some();
+    if edits_text {
+        history::snapshot_before(&pool, "note", &note_id).await;
+    }
+    let saved = note_service::update_note(&pool, &note_id, &input).await?;
+    if edits_text {
+        history::record(&pool, "updated", "note", &saved.id, &saved.title, "").await;
+    }
+    Ok(saved)
 }
 
 #[tauri::command(rename_all = "camelCase")]
@@ -99,12 +119,20 @@ pub async fn move_note(
     note_id: String,
     folder_id: Option<String>,
 ) -> AppResult<Note> {
-    note_service::move_note(&project_pool(&state, &project_id).await?, &note_id, folder_id.as_deref()).await
+    let pool = project_pool(&state, &project_id).await?;
+    let result = note_service::move_note(&pool, &note_id, folder_id.as_deref()).await;
+    if result.is_ok() {
+        history::touch_day(&pool).await;
+    }
+    result
 }
 
 #[tauri::command(rename_all = "camelCase")]
-pub async fn delete_note(state: State<'_, AppState>, project_id: String, note_id: String) -> AppResult<()> {
-    note_service::delete_note(&project_pool(&state, &project_id).await?, &note_id).await
+pub async fn delete_note(state: State<'_, AppState>, project_id: String, note_id: String) -> AppResult<String> {
+    let pool = project_pool(&state, &project_id).await?;
+    let trash_id = note_service::delete_note(&pool, &note_id).await?;
+    history::record_deleted(&pool, &trash_id).await;
+    Ok(trash_id)
 }
 
 // --- Post-it ----------------------------------------------------------------
@@ -122,7 +150,12 @@ pub async fn create_sticky_note(
     x: f64,
     y: f64,
 ) -> AppResult<StickyNote> {
-    note_service::create_sticky(&project_pool(&state, &project_id).await?, &color, x, y).await
+    let pool = project_pool(&state, &project_id).await?;
+    let result = note_service::create_sticky(&pool, &color, x, y).await;
+    if result.is_ok() {
+        history::touch_day(&pool).await;
+    }
+    result
 }
 
 #[tauri::command(rename_all = "camelCase")]
@@ -132,7 +165,12 @@ pub async fn update_sticky_note(
     sticky_id: String,
     input: StickyUpdate,
 ) -> AppResult<StickyNote> {
-    note_service::update_sticky(&project_pool(&state, &project_id).await?, &sticky_id, &input).await
+    let pool = project_pool(&state, &project_id).await?;
+    let result = note_service::update_sticky(&pool, &sticky_id, &input).await;
+    if result.is_ok() {
+        history::touch_day(&pool).await;
+    }
+    result
 }
 
 #[tauri::command(rename_all = "camelCase")]
@@ -141,6 +179,9 @@ pub async fn raise_sticky_note(state: State<'_, AppState>, project_id: String, s
 }
 
 #[tauri::command(rename_all = "camelCase")]
-pub async fn delete_sticky_note(state: State<'_, AppState>, project_id: String, sticky_id: String) -> AppResult<()> {
-    note_service::delete_sticky(&project_pool(&state, &project_id).await?, &sticky_id).await
+pub async fn delete_sticky_note(state: State<'_, AppState>, project_id: String, sticky_id: String) -> AppResult<String> {
+    let pool = project_pool(&state, &project_id).await?;
+    let trash_id = note_service::delete_sticky(&pool, &sticky_id).await?;
+    history::record_deleted(&pool, &trash_id).await;
+    Ok(trash_id)
 }

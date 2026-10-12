@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { VersionsButton } from "@/components/history/VersionsDialog";
 import { useTranslation } from "react-i18next";
 import { Loader2, Save, Trash2, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -328,10 +329,18 @@ export function CharacterEditView({
                 </p>
               )}
 
+              <VersionsButton
+                className="ml-auto"
+                projectId={projectId}
+                kind="character"
+                itemId={characterId}
+                name={character ? fullName(character) : ""}
+              />
+
               <Button
                 type="button"
                 variant="ghost"
-                className="ml-auto text-destructive hover:text-destructive"
+                className="text-destructive hover:text-destructive"
                 disabled={saving || deleting}
                 onClick={() => {
                   setDeleteError(null);

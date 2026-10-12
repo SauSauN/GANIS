@@ -19,5 +19,10 @@
     "passwordNeedsLetterAndDigit": "Le mot de passe doit contenir au moins une lettre et un chiffre.",
     "passwordMismatch": "Les deux mots de passe ne correspondent pas.",
     "emailInvalid": "L'adresse e-mail n'est pas valide."
+  },
+  "image": {
+    "removeTitle": "Retirer cette image ?",
+    "removeBody": "L'image sera supprimée du projet. Elle ne va pas dans la corbeille : pour la retrouver, il faudra l'ajouter de nouveau.",
+    "removeConfirm": "Retirer l'image"
   }
 }

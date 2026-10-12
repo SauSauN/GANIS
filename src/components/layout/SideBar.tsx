@@ -6,10 +6,10 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { Input } from "@/components/ui/input";
 import { SideBarCharacters } from "@/components/characters/SideBarCharacters";
 import { SideBarLocations } from "@/components/locations/SideBarLocations";
 import { SideBarNotes } from "@/components/notes/SideBarNotes";
+import { SideBarSearch } from "@/components/search/SideBarSearch";
 import { SideBarStructure } from "@/components/structure/SideBarStructure";
 import {
   getModule,
@@ -188,12 +188,7 @@ export function SideBar({
         </div>
 
         {module.id === "search" ? (
-          <div className="space-y-2 px-4">
-            <Input disabled placeholder={t("search.placeholder")} />
-            <p className="text-xs text-muted-foreground">
-              {t("search.unavailable")}
-            </p>
-          </div>
+          <SideBarSearch projectId={projectId} onOpenFeature={onOpenFeature} />
         ) : (
           <ul className="px-2">
             {module.features.map(({ id, label, icon: Icon }) => (

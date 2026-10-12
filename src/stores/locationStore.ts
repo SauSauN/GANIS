@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
+import { announceDeletion } from "@/lib/trash";
 import { useCharacterStore } from "@/stores/characterStore";
 import { usePlaceLinkStore } from "@/stores/placeLinkStore";
 import type {
@@ -142,7 +143,9 @@ export const useLocationStore = create<LocationState>((set, get) => {
     },
 
     deleteLocation: async (projectId, id) => {
-      await api.deleteLocation(projectId, id);
+      const before = get().locations.find((item) => item.id === id);
+      const trashId = await api.deleteLocation(projectId, id);
+      announceDeletion(projectId, trashId, "location", before?.name ?? "");
 
       // Rust a supprimé ses liens avec des personnages, et remplacé
       // l'« Origine » qui le désignait par son nom : relue.

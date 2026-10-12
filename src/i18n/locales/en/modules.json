@@ -79,6 +79,14 @@
         "label": "Sticky-note wall",
         "description": "Sticky notes you can place freely, for loose ideas."
       }
+    },
+    "trash": {
+      "label": "Trash",
+      "description": "Items deleted less than 30 days ago, ready to restore."
+    },
+    "history": {
+      "label": "History",
+      "description": "What was done in the project, day by day."
     }
   }
 }

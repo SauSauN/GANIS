@@ -1,9 +1,10 @@
 import type { MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useMatch } from "react-router-dom";
-import { Blocks, Moon, Settings, Sun, Undo2 } from "lucide-react";
+import { Activity, Blocks, Moon, Settings, Sun, Undo2 } from "lucide-react";
 import ganisLogo from "@/assets/ganis-logo.png";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { MenuBar } from "@/components/layout/MenuBar";
 import { useGuardedNavigate } from "@/components/layout/UnsavedChangesGuard";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { WindowControls } from "@/components/layout/WindowControls";
@@ -11,9 +12,6 @@ import { applyTheme, useResolvedTheme, type Theme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { useProjectStore } from "@/stores/projectStore";
-
-/** Menus de l'application (libellés dans `titlebar.json`). */
-const MENUS = ["file", "edit", "view", "project", "help"] as const;
 
 const iconButton =
   "flex h-7 w-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground";
@@ -38,6 +36,7 @@ export function TitleBar() {
 
   const onSettingsPage = useMatch("/settings") !== null;
   const onPackagesPage = useMatch("/packages/*") !== null;
+  const onDashboard = useMatch("/dashboard") !== null;
 
   const match = useMatch("/workspace/:projectId");
   const projectId = match?.params.projectId;
@@ -101,24 +100,8 @@ export function TitleBar() {
           </span>
         </button>
 
-        {user && (
-          <nav
-            className="hidden items-center md:flex"
-            aria-label={t("menusLabel")}
-          >
-            {MENUS.map((menu) => (
-              <button
-                key={menu}
-                type="button"
-                disabled
-                title={t("comingSoon")}
-                className="h-7 rounded px-2 text-muted-foreground enabled:hover:bg-secondary"
-              >
-                {t(`menus.${menu}`)}
-              </button>
-            ))}
-          </nav>
-        )}
+        {/* Menus de l'application (voir `MenuBar`) */}
+        {user && <MenuBar />}
       </div>
 
       {/* ------------------------------------------------------------------ */}
@@ -172,6 +155,19 @@ export function TitleBar() {
             <Moon className="h-4 w-4" />
           )}
         </button>
+
+        {/* Rythme de travail : seulement sur le tableau de bord */}
+        {user && onDashboard && (
+          <button
+            type="button"
+            onClick={() => navigate("/activity")}
+            aria-label={t("activity")}
+            title={t("activity")}
+            className={iconButton}
+          >
+            <Activity className="h-4 w-4" />
+          </button>
+        )}
 
         {/* Packages (thèmes) */}
         {user && (

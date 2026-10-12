@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { VersionsButton } from "@/components/history/VersionsDialog";
 import { useTranslation } from "react-i18next";
 import type { Editor } from "@tiptap/react";
 import { Pin, PinOff, RefreshCw, Save, Trash2 } from "lucide-react";
@@ -242,6 +243,7 @@ export function NoteEditView({ projectId, noteId, onClose }: NoteEditViewProps) 
                 <Save className="mr-1.5 size-4" />
                 {saving ? t("common:actions.saving") : t("common:actions.save")}
               </Button>
+              <VersionsButton projectId={projectId} kind="note" itemId={noteId} name={note.title || t("untitled")} />
               <Button
                 variant="ghost"
                 size="icon-sm"

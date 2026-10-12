@@ -1,4 +1,5 @@
 import { useRef, useState, type DragEvent } from "react";
+import { useConfirmImageRemoval } from "@/components/common/useConfirmImageRemoval";
 import { useTranslation } from "react-i18next";
 import { ImagePlus, Loader2, Trash2 } from "lucide-react";
 import { AvatarFace, type AvatarSize } from "@/components/characters/CharacterAvatar";
@@ -41,6 +42,7 @@ export function PortraitPicker({
 
   const locked = disabled || busy;
   const ring = paletteRing(ringColors);
+  const removal = useConfirmImageRemoval(() => onRemove());
 
   function pickFirst(files: FileList | null) {
     const file = files?.[0];
@@ -78,7 +80,7 @@ export function PortraitPicker({
       <button
         type="button"
         disabled={locked}
-        onClick={() => (url ? onRemove() : inputRef.current?.click())}
+        onClick={() => (url ? removal.ask() : inputRef.current?.click())}
         onDragOver={onDragOver}
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
@@ -150,6 +152,7 @@ export function PortraitPicker({
           {error}
         </p>
       )}
+      {removal.dialog}
     </div>
   );
 }

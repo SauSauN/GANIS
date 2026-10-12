@@ -40,6 +40,7 @@ import { useStructureLabels } from "@/components/structure/useProjectStructure";
 import { useStructureStore } from "@/stores/structureStore";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { api } from "@/lib/api";
+import { announceDeletion } from "@/lib/trash";
 import {
   buildStructureTree,
   countByLevel,
@@ -324,13 +325,17 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
     if (!toDelete) return;
 
     const id = toDelete.id;
+    const label = headingOf(toDelete).label;
     setToDelete(null);
 
     if (draft?.id === id) {
       setDraft(null);
     }
 
-    await run(() => api.deleteStructureNode(project.id, id));
+    await run(async () => {
+      const trashId = await api.deleteStructureNode(project.id, id);
+      announceDeletion(project.id, trashId, "structureNode", label);
+    });
   }
 
   async function changeTemplate(template: StructureTemplateId | null) {

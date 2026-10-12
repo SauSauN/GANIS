@@ -1,5 +1,6 @@
 import {
   FileText,
+  History,
   Info,
   LayoutGrid,
   List,
@@ -13,6 +14,7 @@ import {
   Search,
   Settings,
   StickyNote,
+  Trash2,
   UserPlus,
   UserRound,
   Users,
@@ -84,6 +86,8 @@ export const SETTINGS_PREFIX = "settings:";
 type FeatureId =
   | typeof HOME_TAB
   | "synopsis.edit"
+  | "trash"
+  | "history"
   | "characters.create"
   | "characters.list"
   | "characters.relations"
@@ -148,6 +152,8 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
   defineModule("details", FileText, [
     defineFeature(HOME_TAB, Info),
     defineFeature("synopsis.edit", PenLine),
+    defineFeature("history", History),
+    defineFeature("trash", Trash2),
   ]),
   defineListModule("characters", Users, [
     defineFeature("characters.create", UserPlus),

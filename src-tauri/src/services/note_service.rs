@@ -274,12 +274,24 @@ pub async fn move_folder(pool: &SqlitePool, id: &str, parent_id: Option<&str>) -
 
 /// Supprime un dossier et ses sous-dossiers ; leurs notes reviennent à la
 /// racine.
-pub async fn delete_folder(pool: &SqlitePool, id: &str) -> AppResult<()> {
-    let result = sqlx::query("DELETE FROM note_folders WHERE id = ?").bind(id).execute(pool).await?;
-    if result.rows_affected() == 0 {
+pub async fn delete_folder(pool: &SqlitePool, id: &str) -> AppResult<String> {
+    let mut tx = pool.begin().await?;
+    let mut snapshot = crate::services::trash_service::Snapshot::new();
+    snapshot.capture(&mut tx, "note_folders", "id", id).await?;
+    if snapshot.is_empty() {
         return Err(folder_not_found());
     }
-    Ok(())
+    let label: String = sqlx::query_scalar("SELECT name FROM note_folders WHERE id = ?")
+        .bind(id)
+        .fetch_one(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM note_folders WHERE id = ?").bind(id).execute(&mut *tx).await?;
+
+    let trash_id = snapshot.store(&mut tx, "noteFolder", id, &label).await?;
+    tx.commit().await?;
+
+    Ok(trash_id)
 }
 
 // ----------------------------------------------------------------------------
@@ -374,12 +386,24 @@ pub async fn move_note(pool: &SqlitePool, id: &str, folder_id: Option<&str>) -> 
     get_note(pool, id).await
 }
 
-pub async fn delete_note(pool: &SqlitePool, id: &str) -> AppResult<()> {
-    let result = sqlx::query("DELETE FROM notes WHERE id = ?").bind(id).execute(pool).await?;
-    if result.rows_affected() == 0 {
+pub async fn delete_note(pool: &SqlitePool, id: &str) -> AppResult<String> {
+    let mut tx = pool.begin().await?;
+    let mut snapshot = crate::services::trash_service::Snapshot::new();
+    snapshot.capture(&mut tx, "notes", "id", id).await?;
+    if snapshot.is_empty() {
         return Err(note_not_found());
     }
-    Ok(())
+    let label: String = sqlx::query_scalar("SELECT title FROM notes WHERE id = ?")
+        .bind(id)
+        .fetch_one(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM notes WHERE id = ?").bind(id).execute(&mut *tx).await?;
+
+    let trash_id = snapshot.store(&mut tx, "note", id, &label).await?;
+    tx.commit().await?;
+
+    Ok(trash_id)
 }
 
 // ----------------------------------------------------------------------------
@@ -469,12 +493,24 @@ pub async fn raise_sticky(pool: &SqlitePool, id: &str) -> AppResult<StickyNote> 
     update_sticky(pool, id, &StickyUpdate { z: Some(top.unwrap_or(0) + 1), ..StickyUpdate::default() }).await
 }
 
-pub async fn delete_sticky(pool: &SqlitePool, id: &str) -> AppResult<()> {
-    let result = sqlx::query("DELETE FROM sticky_notes WHERE id = ?").bind(id).execute(pool).await?;
-    if result.rows_affected() == 0 {
+pub async fn delete_sticky(pool: &SqlitePool, id: &str) -> AppResult<String> {
+    let mut tx = pool.begin().await?;
+    let mut snapshot = crate::services::trash_service::Snapshot::new();
+    snapshot.capture(&mut tx, "sticky_notes", "id", id).await?;
+    if snapshot.is_empty() {
         return Err(sticky_not_found());
     }
-    Ok(())
+    let label: String = sqlx::query_scalar("SELECT substr(replace(text, char(10), ' '), 1, 80) FROM sticky_notes WHERE id = ?")
+        .bind(id)
+        .fetch_one(&mut *tx)
+        .await?;
+
+    sqlx::query("DELETE FROM sticky_notes WHERE id = ?").bind(id).execute(&mut *tx).await?;
+
+    let trash_id = snapshot.store(&mut tx, "sticky", id, &label).await?;
+    tx.commit().await?;
+
+    Ok(trash_id)
 }
 
 #[cfg(test)]

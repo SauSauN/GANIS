@@ -153,7 +153,7 @@ function StickyCard({
         onPointerCancel={end}
       >
         <GripHorizontal className="size-3.5 opacity-50" />
-        <div className="ml-1 hidden items-center gap-1 group-hover/sticky:flex group-focus-within/sticky:flex">
+        <div className="ml-1 flex items-center opacity-0 transition-opacity group-hover/sticky:opacity-100 group-focus-within/sticky:opacity-100">
           {STICKY_COLORS.map((color) => (
             <button
               key={color}
@@ -167,12 +167,16 @@ function StickyCard({
                   onError(error instanceof ApiError ? error.message : String(error)),
                 )
               }
-              className={cn(
-                "size-3 rounded-full border border-black/20",
-                color === sticky.color && "ring-2 ring-black/40 ring-offset-1",
-              )}
-              style={{ background: STICKY_STYLES[color].swatch }}
-            />
+              className="flex size-6 items-center justify-center rounded-full hover:bg-black/10"
+            >
+              <span
+                className={cn(
+                  "size-3 rounded-full border border-black/20",
+                  color === sticky.color && "ring-2 ring-black/40 ring-offset-1",
+                )}
+                style={{ background: STICKY_STYLES[color].swatch }}
+              />
+            </button>
           ))}
         </div>
         <button
@@ -181,7 +185,7 @@ function StickyCard({
           aria-label={t("wall.delete")}
           onPointerDown={(event) => event.stopPropagation()}
           onClick={onDelete}
-          className="ml-auto flex size-5 items-center justify-center rounded opacity-0 group-hover/sticky:opacity-70 hover:!opacity-100 focus-visible:opacity-100"
+          className="ml-auto flex size-6 items-center justify-center rounded opacity-0 group-hover/sticky:opacity-70 group-focus-within/sticky:opacity-70 hover:!opacity-100 hover:bg-black/10 focus-visible:opacity-100"
         >
           <X className="size-3.5" />
         </button>

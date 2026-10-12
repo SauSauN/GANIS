@@ -5,6 +5,8 @@ import { useLocationStore } from "@/stores/locationStore";
 import { usePlaceLinkStore } from "@/stores/placeLinkStore";
 import { useRelationStore } from "@/stores/relationStore";
 import { useNoteStore } from "@/stores/noteStore";
+import { useToastStore } from "@/stores/toastStore";
+import { useTrashStore } from "@/stores/trashStore";
 import { useStructureStore } from "@/stores/structureStore";
 import { useSynopsisStore } from "@/stores/synopsisStore";
 import type {
@@ -365,6 +367,8 @@ export const useProjectStore =
           usePlaceLinkStore.getState().reset();
           useStructureStore.getState().reset();
           useNoteStore.getState().reset();
+          useTrashStore.getState().reset();
+          useToastStore.getState().clear();
         }
 
         set((state) => ({
@@ -450,6 +454,8 @@ export const useProjectStore =
         usePlaceLinkStore.getState().reset();
         useStructureStore.getState().reset();
         useNoteStore.getState().reset();
+        useTrashStore.getState().reset();
+        useToastStore.getState().clear();
 
         set({
           currentProjectId: null,
@@ -466,6 +472,8 @@ export const useProjectStore =
         usePlaceLinkStore.getState().reset();
         useStructureStore.getState().reset();
         useNoteStore.getState().reset();
+        useTrashStore.getState().reset();
+        useToastStore.getState().clear();
 
         set(initial);
       },

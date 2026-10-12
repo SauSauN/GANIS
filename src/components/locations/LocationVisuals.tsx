@@ -1,4 +1,5 @@
 import { useRef, useState, type DragEvent } from "react";
+import { useConfirmImageRemoval } from "@/components/common/useConfirmImageRemoval";
 import { useTranslation } from "react-i18next";
 import { ImagePlus, Loader2, Trash2 } from "lucide-react";
 import {
@@ -160,12 +161,14 @@ export function BannerPicker({
   const actionLabel = url ? t("image.remove") : t("image.choose");
   const ActionIcon = url ? Trash2 : ImagePlus;
 
+  const removal = useConfirmImageRemoval(() => onRemove());
+
   return (
     <div className="w-full space-y-2">
       <button
         type="button"
         disabled={locked}
-        onClick={() => (url ? onRemove() : inputRef.current?.click())}
+        onClick={() => (url ? removal.ask() : inputRef.current?.click())}
         onDragOver={onDragOver}
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
@@ -231,6 +234,7 @@ export function BannerPicker({
           {error}
         </p>
       )}
+      {removal.dialog}
     </div>
   );
 }

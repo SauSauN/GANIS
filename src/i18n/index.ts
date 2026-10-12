@@ -9,6 +9,13 @@ import enErrors from "./locales/en/errors.json";
 import enLocations from "./locales/en/locations.json";
 import enLogin from "./locales/en/login.json";
 import enModules from "./locales/en/modules.json";
+import enWorkCalendar from "./locales/en/workCalendar.json";
+import enSearch from "./locales/en/search.json";
+import enHistory from "./locales/en/history.json";
+import enVersions from "./locales/en/versions.json";
+import enTrash from "./locales/en/trash.json";
+import enMenus from "./locales/en/menus.json";
+import enHelp from "./locales/en/help.json";
 import enNotes from "./locales/en/notes.json";
 import enPackages from "./locales/en/packages.json";
 import enProjectSettings from "./locales/en/projectSettings.json";
@@ -38,6 +45,13 @@ import frErrors from "./locales/fr/errors.json";
 import frLocations from "./locales/fr/locations.json";
 import frLogin from "./locales/fr/login.json";
 import frModules from "./locales/fr/modules.json";
+import frWorkCalendar from "./locales/fr/workCalendar.json";
+import frSearch from "./locales/fr/search.json";
+import frHistory from "./locales/fr/history.json";
+import frVersions from "./locales/fr/versions.json";
+import frTrash from "./locales/fr/trash.json";
+import frMenus from "./locales/fr/menus.json";
+import frHelp from "./locales/fr/help.json";
 import frNotes from "./locales/fr/notes.json";
 import frPackages from "./locales/fr/packages.json";
 import frProjectSettings from "./locales/fr/projectSettings.json";
@@ -110,6 +124,13 @@ export const resources = {
     errors: frErrors,
     login: frLogin,
     modules: frModules,
+    workCalendar: frWorkCalendar,
+    search: frSearch,
+    history: frHistory,
+    versions: frVersions,
+    trash: frTrash,
+    menus: frMenus,
+    help: frHelp,
     notes: frNotes,
     packages: frPackages,
     projectSettings: frProjectSettings,
@@ -141,6 +162,13 @@ export const resources = {
     errors: enErrors,
     login: enLogin,
     modules: enModules,
+    workCalendar: enWorkCalendar,
+    search: enSearch,
+    history: enHistory,
+    versions: enVersions,
+    trash: enTrash,
+    menus: enMenus,
+    help: enHelp,
     notes: enNotes,
     packages: enPackages,
     projectSettings: enProjectSettings,
@@ -220,6 +248,13 @@ void i18n.use(initReactI18next).init({
     "errors",
     "login",
     "modules",
+    "workCalendar",
+    "search",
+    "history",
+    "versions",
+    "trash",
+    "menus",
+    "help",
     "notes",
     "packages",
     "projectSettings",

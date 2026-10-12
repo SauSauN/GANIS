@@ -97,7 +97,9 @@
       "larger": "Agrandir le schéma",
       "smaller": "Réduire le schéma",
       "hint": "Tirez depuis le bord d'une boîte pour créer une flèche. Cliquez sur une boîte ou une flèche pour la modifier."
-    }
+    },
+    "more": "Plus d'outils",
+    "code": "Code dans le texte"
   },
   "sidebar": {
     "title": "Dossiers et notes",

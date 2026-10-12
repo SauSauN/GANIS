@@ -201,7 +201,7 @@ const BoxNodeView = memo(function BoxNodeView({ data, selected }: NodeProps<BoxN
           id={side.id}
           type="source"
           position={side.position}
-          className="!size-2.5 !border-background !bg-primary opacity-0 transition-opacity group-hover/diagram:opacity-100"
+          className="!size-3.5 !border-2 !border-background !bg-primary opacity-0 transition-opacity group-hover/diagram:opacity-100"
         />
       ))}
     </div>
@@ -386,18 +386,22 @@ function DiagramCanvas({ node, updateAttributes, deleteNode, editor }: ReactNode
                 onChange={(event) => setNodeData(selectedNode.id, { label: event.target.value })}
                 className="h-7 min-w-40 flex-1 resize-none rounded border border-input bg-background px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-ring"
               />
-              <div className="flex items-center gap-1">
+              <div className="flex items-center">
                 <button
                   type="button"
                   title={t("editor.diagram.noColor")}
                   aria-label={t("editor.diagram.noColor")}
                   aria-pressed={!selectedNode.data.color}
                   onClick={() => setNodeData(selectedNode.id, { color: null })}
-                  className={cn(
-                    "size-4 rounded-full border bg-card",
-                    !selectedNode.data.color && "ring-2 ring-ring ring-offset-1",
-                  )}
-                />
+                  className="flex size-6 items-center justify-center rounded-full hover:bg-muted"
+                >
+                  <span
+                    className={cn(
+                      "size-4 rounded-full border bg-card",
+                      !selectedNode.data.color && "ring-2 ring-ring ring-offset-1",
+                    )}
+                  />
+                </button>
                 {STICKY_COLORS.map((color) => (
                   <button
                     key={color}
@@ -406,12 +410,16 @@ function DiagramCanvas({ node, updateAttributes, deleteNode, editor }: ReactNode
                     aria-label={t(`colors.${color}`)}
                     aria-pressed={selectedNode.data.color === color}
                     onClick={() => setNodeData(selectedNode.id, { color })}
-                    className={cn(
-                      "size-4 rounded-full border border-black/10",
-                      selectedNode.data.color === color && "ring-2 ring-ring ring-offset-1",
-                    )}
-                    style={{ background: STICKY_STYLES[color].swatch }}
-                  />
+                    className="flex size-6 items-center justify-center rounded-full hover:bg-muted"
+                  >
+                    <span
+                      className={cn(
+                        "size-4 rounded-full border border-black/10",
+                        selectedNode.data.color === color && "ring-2 ring-ring ring-offset-1",
+                      )}
+                      style={{ background: STICKY_STYLES[color].swatch }}
+                    />
+                  </button>
                 ))}
               </div>
             </>

@@ -1,0 +1,241 @@
+{
+  "guide": {
+    "title": "Guide de démarrage",
+    "description": "Les bases de GANIS en quelques étapes. Vous le retrouvez à tout moment dans Aide › Guide de démarrage.",
+    "progress": "Étape {{current}} sur {{total}}",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "finish": "C'est parti !",
+    "close": "Fermer le guide",
+    "steps": {
+      "projects": {
+        "title": "Vos projets",
+        "text": "Le tableau de bord rassemble vos projets : roman, manga, film, série, jeu… Créez-en un avec « Nouveau projet » (Ctrl+N). Chaque projet est chiffré sur votre ordinateur et peut être exporté en fichier .ganix pour une sauvegarde ou un autre ordinateur."
+      },
+      "layout": {
+        "title": "L'espace de travail",
+        "text": "À gauche, la barre des modules (Détails, Personnages, Lieux, Découpage, Notes). Le panneau du milieu liste les fonctions et les éléments du module ; chaque élément s'ouvre dans un onglet. Clic droit sur un onglet pour l'épingler ou fermer les autres."
+      },
+      "characters": {
+        "title": "Personnages et lieux",
+        "text": "Créez vos personnages (identité, apparence, personnalité) et vos lieux (du continent à la pièce). Reliez-les : relations entre personnages, lieux de vie, origine… Le graphe des relations montre tout votre monde d'un coup d'œil."
+      },
+      "structure": {
+        "title": "Le découpage du récit",
+        "text": "Parties, chapitres, scènes (ou actes et séquences pour un film…) : le plan s'adapte au type de projet. Les noms, la numérotation et les couleurs des niveaux se règlent dans les paramètres du projet. Chaque élément a sa fiche avec ses personnages et ses lieux."
+      },
+      "notes": {
+        "title": "Notes et post-it",
+        "text": "Les notes s'écrivent avec un vrai éditeur : titres, polices, listes, tableaux, encadrés, cases enchaînées et schémas. Rangez-les dans des dossiers. Le mur de post-it accueille les idées en vrac."
+      },
+      "saving": {
+        "title": "Enregistrement",
+        "text": "Un point ● sur un onglet signale des modifications non enregistrées. Enregistrez avec Ctrl+S, ou laissez l'enregistrement automatique le faire. La barre d'état, en bas, indique toujours où vous en êtes : enregistrement en cours, enregistré, ou échec."
+      },
+      "trash": {
+        "title": "Corbeille et annulation",
+        "text": "Une suppression peut être annulée tout de suite avec « Annuler » (ou Ctrl+Z). Les éléments supprimés restent 30 jours dans la corbeille (Projet › Corbeille), d'où vous pouvez les restaurer."
+      },
+      "keyboard": {
+        "title": "Raccourcis clavier",
+        "text": "Ctrl+N pour créer, Ctrl+S pour enregistrer, Ctrl+W pour fermer l'onglet, Ctrl+Tab pour changer d'onglet, Ctrl+K pour tout retrouver. La liste complète : Aide › Raccourcis clavier (Ctrl+/). Alt ou F10 donne le clavier à la barre de menus."
+      }
+    }
+  },
+  "shortcuts": {
+    "title": "Raccourcis clavier",
+    "description": "Les raccourcis de GANIS. Ceux de l'éditeur s'utilisent dans une note.",
+    "shift": "Maj",
+    "groups": {
+      "general": "Général",
+      "tabs": "Onglets",
+      "editor": "Éditeur de note"
+    },
+    "actions": {
+      "new": "Créer (selon le module)",
+      "save": "Enregistrer l'onglet",
+      "saveAll": "Tout enregistrer",
+      "closeTab": "Fermer l'onglet",
+      "nextTab": "Onglet suivant",
+      "previousTab": "Onglet précédent",
+      "guide": "Guide de démarrage",
+      "shortcuts": "Raccourcis clavier",
+      "palette": "Palette : pages, actions, recherche",
+      "center": "Aide de GANIS"
+    },
+    "reference": {
+      "undoDeletion": "Annuler la dernière suppression (hors d'un champ)",
+      "escape": "Fermer une fenêtre ou un menu",
+      "quit": "Quitter GANIS",
+      "moveTab": "Déplacer l'onglet",
+      "tabMenu": "Menu de l'onglet",
+      "undo": "Annuler",
+      "redo": "Rétablir",
+      "bold": "Gras",
+      "italic": "Italique",
+      "underline": "Souligné",
+      "strike": "Barré",
+      "highlight": "Surligner",
+      "code": "Code",
+      "headings": "Titre 1, 2, 3",
+      "paragraph": "Paragraphe",
+      "orderedList": "Liste numérotée",
+      "bulletList": "Liste à puces",
+      "taskList": "Liste de cases à cocher",
+      "quote": "Citation",
+      "align": "Aligner : gauche, centre, droite, justifié",
+      "indent": "Augmenter / diminuer le retrait d'une liste"
+    }
+  },
+  "about": {
+    "tagline": "L'atelier des auteurs et des scénaristes.",
+    "version": "Version {{version}}",
+    "offline": "GANIS fonctionne entièrement hors ligne : vos projets restent sur cet ordinateur, chiffrés."
+  },
+  "center": {
+    "title": "Aide de GANIS",
+    "description": "Comment fonctionne chaque partie de l'application, et réponses aux questions fréquentes.",
+    "openGuide": "Guide de démarrage",
+    "openShortcuts": "Raccourcis clavier",
+    "search": "Chercher dans l'aide…",
+    "noMatch": "Aucune rubrique ne correspond.",
+    "sections": {
+      "workspace": {
+        "title": "L'espace de travail",
+        "intro": "Un projet s'ouvre dans l'espace de travail : modules à gauche, panneau au milieu, onglets au centre.",
+        "items": [
+          "La barre de gauche donne accès aux modules : Détails, Personnages, Lieux, Découpage, Notes, Recherche, et les paramètres du projet en bas.",
+          "Le panneau du milieu liste les fonctions du module et ses éléments ; un clic ouvre un onglet. Glissez son bord droit pour l'élargir, ou vers la gauche pour le fermer.",
+          "Les onglets se déplacent par glisser-déposer. Clic droit sur un onglet : l'épingler, fermer les autres, ceux à droite…",
+          "Un point ● sur un onglet signale des modifications non enregistrées. La barre d'état, en bas, indique toujours si tout est enregistré.",
+          "Ctrl+K ouvre la palette : tapez le nom d'une page, d'une action ou d'un élément pour y aller directement."
+        ]
+      },
+      "details": {
+        "title": "Détails du projet",
+        "intro": "L'accueil du projet résume votre histoire ; le synopsis la raconte.",
+        "items": [
+          "Accueil du projet : description, type, statut et aperçu du synopsis.",
+          "Synopsis : le résumé de l'histoire, avec ses genres, sous-genres et son ton.",
+          "Historique : tout ce qui a été créé, modifié, supprimé ou restauré dans le projet, jour par jour.",
+          "Corbeille : les éléments supprimés depuis moins de 30 jours, à restaurer."
+        ]
+      },
+      "characters": {
+        "title": "Personnages",
+        "intro": "Chaque personnage a sa fiche, ses images et ses relations.",
+        "items": [
+          "La fiche a trois niveaux de détail (essentiel, intermédiaire, avancé), choisis pour tout le projet dans les paramètres.",
+          "Image principale et galerie de références : glissez des images directement sur la fiche.",
+          "Relations : liens familiaux, amicaux, rivalités… Le graphe des relations montre tout le monde d'un coup d'œil ; les personnages s'y déplacent librement.",
+          "Lieux : où le personnage vit, travaille, a grandi — avec, si vous le souhaitez, la période du récit concernée."
+        ]
+      },
+      "locations": {
+        "title": "Lieux",
+        "intro": "Les lieux s'emboîtent : un continent contient des royaumes, qui contiennent des villes…",
+        "items": [
+          "Le type d'un lieu (ville, forêt, palais…) choisit les champs de sa fiche. Vous pouvez créer vos propres types dans les paramètres.",
+          "Le panneau du module montre les lieux en arbre ; « Ajouter un lieu dans… » crée un lieu à l'intérieur d'un autre.",
+          "Chaque fiche a une bannière, une galerie et la liste des personnages liés."
+        ]
+      },
+      "structure": {
+        "title": "Découpage du récit",
+        "intro": "Le plan de votre histoire, adapté au type de projet.",
+        "items": [
+          "Roman : parties, chapitres, scènes. Film : actes, séquences, scènes. Manga : tomes, chapitres, pages… Les noms se changent dans les paramètres du projet.",
+          "Les numéros se calculent seuls ; vous pouvez sortir un élément de la numérotation (prologue, interlude).",
+          "La numérotation automatique (renumérotation à chaque déplacement) s'active dans les paramètres du projet, tout comme la couleur de chaque niveau.",
+          "La fiche d'un élément montre son résumé, ses personnages (point de vue, présents…) et ses lieux."
+        ]
+      },
+      "notes": {
+        "title": "Notes et post-it",
+        "intro": "Tout ce qui ne rentre pas ailleurs : recherches, idées, documentation.",
+        "items": [
+          "L'éditeur propose titres, polices, tailles, couleurs, listes, tableaux et liens. Les outils moins courants sont dans le menu « … » au bout de la barre.",
+          "Encadré post-it : un bloc coloré au milieu du texte. Cases enchaînées : une suite d'étapes reliées par des flèches, avec « + » pour en insérer. Schéma : des boîtes reliées, que l'on déplace et relie à la souris.",
+          "Rangez les notes dans des dossiers par glisser-déposer dans le panneau ; épinglez les plus importantes.",
+          "Le mur de post-it accueille les idées en vrac : déplacez-les par leur bandeau, agrandissez-les par leur coin."
+        ]
+      },
+      "search": {
+        "title": "Recherche",
+        "intro": "Retrouvez n'importe quoi dans le projet.",
+        "items": [
+          "Le module Recherche cherche dans les personnages, les lieux, le découpage, les notes (contenu compris) et les post-it.",
+          "Les accents et les majuscules ne comptent pas : « chateau » trouve « Château ». Plusieurs mots : tous doivent apparaître.",
+          "Ctrl+K fait la même chose depuis n'importe où, et propose aussi les pages et les actions."
+        ]
+      },
+      "history": {
+        "title": "Historique, versions et corbeille",
+        "intro": "Rien n'est perdu par erreur.",
+        "items": [
+          "Après une suppression, « Annuler » apparaît quelques secondes (ou Ctrl+Z hors d'un champ). Ensuite, l'élément reste 30 jours dans la corbeille.",
+          "Restaurer un élément ramène aussi ce qui avait disparu avec lui : images, relations, sous-éléments…",
+          "Versions : le bouton « Versions » d'une note, du synopsis ou d'une fiche montre ses états précédents, compare avec l'état actuel (supprimé en rouge, ajouté en vert) et permet de revenir en arrière. L'état actuel est gardé avant toute restauration.",
+          "Une version est prise automatiquement au début de chaque séance de modification ; vous pouvez aussi en créer une avec un nom (« Avant réécriture »).",
+          "L'historique du projet (Détails › Historique) liste toutes les actions des 90 derniers jours."
+        ]
+      },
+      "files": {
+        "title": "Projets, fichiers et sécurité",
+        "intro": "Vos projets restent sur cet ordinateur.",
+        "items": [
+          "Chaque projet est chiffré : sans votre mot de passe, ses données sont illisibles.",
+          "Exporter en .ganix (Fichier › Exporter) crée une copie complète du projet, à garder en sauvegarde ou à ouvrir sur un autre ordinateur. Attention : ce fichier n'est pas chiffré.",
+          "Importer un .ganix (Fichier › Importer) ajoute le projet, ou remplace celui qui existe (une sauvegarde est faite avant).",
+          "GANIS fonctionne entièrement hors ligne."
+        ]
+      },
+      "settings": {
+        "title": "Paramètres",
+        "intro": "Deux niveaux de réglages.",
+        "items": [
+          "Paramètres du projet (en bas de la barre de gauche) : informations, statuts, niveau de détail des personnages, types de lieux, découpage et couleurs.",
+          "Paramètres généraux (roue dentée en haut) : compte, mot de passe, clé de récupération, langue, thème, enregistrement automatique.",
+          "Packages : des thèmes de couleurs pour toute l'application."
+        ]
+      }
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "items": [
+        {
+          "q": "J'ai supprimé quelque chose par erreur.",
+          "a": "Cliquez sur « Annuler » dans le message qui apparaît, ou appuyez sur Ctrl+Z. Plus tard : Projet › Corbeille, puis « Restaurer »."
+        },
+        {
+          "q": "J'ai modifié une fiche et je veux revenir en arrière.",
+          "a": "Ouvrez la fiche, cliquez sur « Versions », choisissez l'état voulu dans la liste et cliquez sur « Restaurer cette version »."
+        },
+        {
+          "q": "Mes modifications sont-elles enregistrées ?",
+          "a": "Regardez la barre d'état en bas à droite : « Enregistré à … » signifie que tout est enregistré. Ctrl+S enregistre l'onglet ; « Tout enregistrer » enregistre tout."
+        },
+        {
+          "q": "J'ai oublié mon mot de passe.",
+          "a": "Sur l'écran de connexion, choisissez « Mot de passe oublié » et saisissez votre clé de récupération (6 groupes de 6 caractères), reçue à la création du compte."
+        },
+        {
+          "q": "Comment travailler sur un autre ordinateur ?",
+          "a": "Exportez le projet en .ganix (Fichier › Exporter), copiez le fichier, puis importez-le dans GANIS sur l'autre ordinateur."
+        },
+        {
+          "q": "Pourquoi les numéros de chapitres ne changent-ils pas quand je les déplace ?",
+          "a": "La numérotation automatique est désactivée par défaut. Activez-la dans Paramètres du projet › Découpage, ou renumérotez à la main."
+        },
+        {
+          "q": "Comment changer les noms « Partie, Chapitre, Scène » ?",
+          "a": "Paramètres du projet › Découpage › Personnaliser : nom de chaque niveau, numérotation et couleur."
+        },
+        {
+          "q": "Une image refuse de s'ajouter.",
+          "a": "GANIS accepte PNG, JPEG, WebP et GIF, jusqu'à la taille indiquée. Réenregistrez l'image en JPEG ou réduisez sa taille."
+        }
+      ]
+    }
+  }
+}

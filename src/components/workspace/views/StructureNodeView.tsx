@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { VersionsButton } from "@/components/history/VersionsDialog";
 import { useTranslation } from "react-i18next";
 import {
   ChevronRight,
@@ -40,6 +41,7 @@ import {
   fieldClass,
 } from "@/components/workspace/views/PageShell";
 import { api } from "@/lib/api";
+import { announceDeletion } from "@/lib/trash";
 import { characterTabId, fullName } from "@/lib/characters";
 import { locationTabId } from "@/lib/locations";
 import {
@@ -203,7 +205,8 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
     setError(null);
 
     try {
-      await api.deleteStructureNode(projectId, nodeId);
+      const trashId = await api.deleteStructureNode(projectId, nodeId);
+      announceDeletion(projectId, trashId, "structureNode", node ? headingOf(node).label : "");
       setConfirmDelete(false);
       await reload();
       onClose();
@@ -472,10 +475,17 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
                     {error}
                   </p>
                 )}
+                <VersionsButton
+                  className="ml-auto"
+                  projectId={projectId}
+                  kind="structureNode"
+                  itemId={nodeId}
+                  name={name}
+                />
                 <Button
                   type="button"
                   variant="ghost"
-                  className="ml-auto text-destructive hover:text-destructive"
+                  className="text-destructive hover:text-destructive"
                   disabled={saving || deleting}
                   onClick={() => setConfirmDelete(true)}
                 >

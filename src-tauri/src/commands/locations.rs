@@ -4,6 +4,7 @@
 //! qui vérifie d'abord que l'utilisateur connecté en est le propriétaire.
 
 use crate::error::AppResult;
+use crate::services::history_service as history;
 use crate::services::character_service::Portrait;
 use crate::services::location_service::{
     self, CustomTypeInput, Location, LocationImage, LocationInput, LocationSettings,
@@ -37,7 +38,9 @@ pub async fn create_location(
     input: LocationInput,
 ) -> AppResult<Location> {
     let pool = project_pool(&state, &project_id).await?;
-    location_service::create_location(&pool, &input).await
+    let created = location_service::create_location(&pool, &input).await?;
+    history::record(&pool, "created", "location", &created.id, &created.name, "").await;
+    Ok(created)
 }
 
 /// Remplace la fiche d'un lieu.
@@ -49,7 +52,10 @@ pub async fn update_location(
     input: LocationInput,
 ) -> AppResult<Location> {
     let pool = project_pool(&state, &project_id).await?;
-    location_service::update_location(&pool, &location_id, &input).await
+    history::snapshot_before(&pool, "location", &location_id).await;
+    let saved = location_service::update_location(&pool, &location_id, &input).await?;
+    history::record(&pool, "updated", "location", &saved.id, &saved.name, "").await;
+    Ok(saved)
 }
 
 /// Supprime un lieu (ses lieux contenus remontent d'un niveau).
@@ -58,9 +64,11 @@ pub async fn delete_location(
     state: State<'_, AppState>,
     project_id: String,
     location_id: String,
-) -> AppResult<()> {
+) -> AppResult<String> {
     let pool = project_pool(&state, &project_id).await?;
-    location_service::delete_location(&pool, &location_id).await
+    let trash_id = location_service::delete_location(&pool, &location_id).await?;
+    history::record_deleted(&pool, &trash_id).await;
+    Ok(trash_id)
 }
 
 /// Réglages des lieux du projet (types ajoutés, listes).

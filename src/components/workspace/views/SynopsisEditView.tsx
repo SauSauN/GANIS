@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { VersionsButton } from "@/components/history/VersionsDialog";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
 import { useTranslation } from "react-i18next";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -527,6 +528,14 @@ export function SynopsisEditView({
               {t("saveFailed")}
             </p>
           )}
+
+          <VersionsButton
+            className="ml-auto"
+            projectId={projectId}
+            kind="synopsis"
+            itemId="default"
+            name={t("card.title")}
+          />
         </div>
       </div>
     </main>

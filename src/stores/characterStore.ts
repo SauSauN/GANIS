@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
+import { announceDeletion } from "@/lib/trash";
 import { fullName } from "@/lib/characters";
 import { useLocationStore } from "@/stores/locationStore";
 import { usePlaceLinkStore } from "@/stores/placeLinkStore";
@@ -184,7 +185,9 @@ export const useCharacterStore = create<CharacterState>((set, get) => {
     },
 
     deleteCharacter: async (projectId, id) => {
-      await api.deleteCharacter(projectId, id);
+      const before = get().characters.find((item) => item.id === id);
+      const trashId = await api.deleteCharacter(projectId, id);
+      announceDeletion(projectId, trashId, "character", before ? fullName(before) : "");
 
       // Rust a supprimé ses relations et ses liens avec des lieux, et vidé
       // les champs de lieux qui le désignaient (« Dirigeant ») : relus.

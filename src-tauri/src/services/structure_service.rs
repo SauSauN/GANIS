@@ -1077,17 +1077,24 @@ pub async fn move_node(
 }
 
 /// Supprime un élément et tout ce qu'il contient.
-pub async fn delete_node(pool: &SqlitePool, id: &str) -> AppResult<()> {
-    let result = sqlx::query("DELETE FROM structure_nodes WHERE id = ?")
-        .bind(id)
-        .execute(pool)
-        .await?;
-
-    if result.rows_affected() == 0 {
+pub async fn delete_node(pool: &SqlitePool, id: &str) -> AppResult<String> {
+    let mut tx = pool.begin().await?;
+    let mut snapshot = crate::services::trash_service::Snapshot::new();
+    snapshot.capture(&mut tx, "structure_nodes", "id", id).await?;
+    if snapshot.is_empty() {
         return Err(node_not_found());
     }
+    let label: String = sqlx::query_scalar("SELECT title FROM structure_nodes WHERE id = ?")
+        .bind(id)
+        .fetch_one(&mut *tx)
+        .await?;
 
-    Ok(())
+    sqlx::query("DELETE FROM structure_nodes WHERE id = ?").bind(id).execute(&mut *tx).await?;
+
+    let trash_id = snapshot.store(&mut tx, "structureNode", id, &label).await?;
+    tx.commit().await?;
+
+    Ok(trash_id)
 }
 
 #[cfg(test)]

@@ -744,9 +744,10 @@ pub async fn update_location(
     get_location(pool, id).await
 }
 
-/// Supprime un lieu. Ses lieux contenus remontent d'un niveau (ils sont
+/// Supprime un lieu ; il va dans la corbeille (renvoie l'identifiant de
+/// l'entrée). Ses lieux contenus remontent d'un niveau (ils sont
 /// rattachés au parent du lieu supprimé).
-pub async fn delete_location(pool: &SqlitePool, id: &str) -> AppResult<()> {
+pub async fn delete_location(pool: &SqlitePool, id: &str) -> AppResult<String> {
     let mut tx = pool.begin().await?;
 
     let parent: Option<Option<String>> =
@@ -758,6 +759,14 @@ pub async fn delete_location(pool: &SqlitePool, id: &str) -> AppResult<()> {
     let Some(parent) = parent else {
         return Err(not_found());
     };
+
+    // Corbeille : les lieux contenus reviendront dans celui-ci.
+    let mut snapshot = crate::services::trash_service::Snapshot::new();
+    let children: Vec<String> = sqlx::query_scalar("SELECT id FROM locations WHERE parent_id = ?")
+        .bind(id)
+        .fetch_all(&mut *tx)
+        .await?;
+    snapshot.restore_column("locations", &children, "parent_id", Some(id.to_owned()), parent.clone());
 
     sqlx::query("UPDATE locations SET parent_id = ?, updated_at = ? WHERE parent_id = ?")
         .bind(&parent)
@@ -775,6 +784,15 @@ pub async fn delete_location(pool: &SqlitePool, id: &str) -> AppResult<()> {
     for key in crate::services::character_service::place_field_keys() {
         let path = format!("$.{key}");
 
+        let ids: Vec<String> = sqlx::query_scalar("SELECT id FROM characters WHERE json_extract(fields, ?) = ?")
+            .bind(&path)
+            .bind(id)
+            .fetch_all(&mut *tx)
+            .await?;
+        for character in ids {
+            snapshot.restore_json("characters", &character, "fields", &path, id, Some(&name));
+        }
+
         sqlx::query("UPDATE characters SET fields = json_set(fields, ?, ?) WHERE json_extract(fields, ?) = ?")
             .bind(&path)
             .bind(&name)
@@ -784,14 +802,17 @@ pub async fn delete_location(pool: &SqlitePool, id: &str) -> AppResult<()> {
             .await?;
     }
 
+    snapshot.capture(&mut tx, "locations", "id", id).await?;
+
     sqlx::query("DELETE FROM locations WHERE id = ?")
         .bind(id)
         .execute(&mut *tx)
         .await?;
 
+    let trash_id = snapshot.store(&mut tx, "location", id, &name).await?;
     tx.commit().await?;
 
-    Ok(())
+    Ok(trash_id)
 }
 
 async fn touch(pool: &SqlitePool, id: &str) -> AppResult<()> {

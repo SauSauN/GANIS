@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useDashboardIntent, useRegisterCommands } from "@/lib/commands";
 import { useNavigate } from "react-router-dom";
 import {
   Archive,
@@ -57,7 +58,7 @@ const RECENT_LIMIT = 3;
  */
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { t } = useTranslation(["dashboard", "projects", "common"]);
+  const { t } = useTranslation(["dashboard", "projects", "common", "menus"]);
 
   const user = useAuthStore((state) => state.user);
 
@@ -251,6 +252,22 @@ export default function Dashboard() {
     setEditing(null);
     setFormOpen(true);
   }
+
+  // Menus et raccourcis : Ctrl+N crée un projet ; « Importer un .ganix ».
+  useRegisterCommands({
+    new: { label: t("menus:file.newIn.newProject"), run: openCreateDialog },
+    importGanix: { disabled: inspecting, run: () => void handleInspect() },
+  });
+
+  // Action demandée depuis un menu avant d'arriver ici.
+  const intent = useDashboardIntent((state) => state.intent);
+  useEffect(() => {
+    if (!intent) return;
+    const taken = useDashboardIntent.getState().take();
+    if (taken === "newProject") openCreateDialog();
+    if (taken === "importGanix") void handleInspect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [intent]);
 
   function openEditDialog(project: Project) {
     setEditing(project);

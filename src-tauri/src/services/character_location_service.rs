@@ -225,17 +225,24 @@ pub async fn update_link(
 }
 
 /// Supprime un lien.
-pub async fn delete_link(pool: &SqlitePool, id: &str) -> AppResult<()> {
-    let result = sqlx::query("DELETE FROM character_locations WHERE id = ?")
-        .bind(id)
-        .execute(pool)
-        .await?;
-
-    if result.rows_affected() == 0 {
+pub async fn delete_link(pool: &SqlitePool, id: &str) -> AppResult<String> {
+    let mut tx = pool.begin().await?;
+    let mut snapshot = crate::services::trash_service::Snapshot::new();
+    snapshot.capture(&mut tx, "character_locations", "id", id).await?;
+    if snapshot.is_empty() {
         return Err(not_found());
     }
+    let label: String = sqlx::query_scalar("SELECT trim(c.first_name || ' ' || c.last_name) || ' – ' || l.name FROM character_locations k JOIN characters c ON c.id = k.character_id JOIN locations l ON l.id = k.location_id WHERE k.id = ?")
+        .bind(id)
+        .fetch_one(&mut *tx)
+        .await?;
 
-    Ok(())
+    sqlx::query("DELETE FROM character_locations WHERE id = ?").bind(id).execute(&mut *tx).await?;
+
+    let trash_id = snapshot.store(&mut tx, "placeLink", id, &label).await?;
+    tx.commit().await?;
+
+    Ok(trash_id)
 }
 
 #[cfg(test)]

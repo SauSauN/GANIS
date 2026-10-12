@@ -4,6 +4,7 @@
 //! qui vérifie d'abord que l'utilisateur connecté en est le propriétaire.
 
 use crate::error::{AppError, AppResult};
+use crate::services::history_service as history;
 use crate::models::project::ProjectType;
 use crate::services::structure_service::{self, LevelInput, MoveDirection, Structure, StructureNode};
 use crate::services::{project_service, project_storage};
@@ -112,7 +113,7 @@ pub async fn create_structure_node(
 ) -> AppResult<StructureNode> {
     let (pool, project_type) = project_pool_and_type(&state, &project_id).await?;
 
-    structure_service::create_node(
+    let created = structure_service::create_node(
         &pool,
         project_type,
         input.parent_id.as_deref(),
@@ -120,7 +121,9 @@ pub async fn create_structure_node(
         &input.title,
         input.after_id.as_deref(),
     )
-    .await
+    .await?;
+    history::record(&pool, "created", "structureNode", &created.id, &created.title, "").await;
+    Ok(created)
 }
 
 #[derive(Debug, Deserialize)]
@@ -143,7 +146,8 @@ pub async fn update_structure_node(
 ) -> AppResult<StructureNode> {
     let pool = project_pool(&state, &project_id).await?;
 
-    structure_service::update_node(
+    history::snapshot_before(&pool, "structureNode", &node_id).await;
+    let saved = structure_service::update_node(
         &pool,
         &node_id,
         input.title.as_deref(),
@@ -151,7 +155,9 @@ pub async fn update_structure_node(
         input.numbered,
         input.number,
     )
-    .await
+    .await?;
+    history::record(&pool, "updated", "structureNode", &saved.id, &saved.title, "").await;
+    Ok(saved)
 }
 
 /// Monte ou descend un élément parmi ceux de même parent.
@@ -164,7 +170,11 @@ pub async fn move_structure_node(
 ) -> AppResult<()> {
     let pool = project_pool(&state, &project_id).await?;
 
-    structure_service::move_node(&pool, &node_id, direction).await
+    let result = structure_service::move_node(&pool, &node_id, direction).await;
+    if result.is_ok() {
+        history::touch_day(&pool).await;
+    }
+    result
 }
 
 /// Supprime un élément et tout ce qu'il contient.
@@ -173,8 +183,10 @@ pub async fn delete_structure_node(
     state: State<'_, AppState>,
     project_id: String,
     node_id: String,
-) -> AppResult<()> {
+) -> AppResult<String> {
     let pool = project_pool(&state, &project_id).await?;
 
-    structure_service::delete_node(&pool, &node_id).await
+    let trash_id = structure_service::delete_node(&pool, &node_id).await?;
+    history::record_deleted(&pool, &trash_id).await;
+    Ok(trash_id)
 }

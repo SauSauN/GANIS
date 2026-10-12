@@ -79,6 +79,14 @@
         "label": "Mur de post-it",
         "description": "Des post-it à placer librement, pour les idées en vrac."
       }
+    },
+    "trash": {
+      "label": "Corbeille",
+      "description": "Les éléments supprimés depuis moins de 30 jours, à restaurer."
+    },
+    "history": {
+      "label": "Historique",
+      "description": "Ce qui a été fait dans le projet, jour par jour."
     }
   }
 }

@@ -4,6 +4,12 @@
   "save": {
     "idle": "Prêt",
     "saving": "Enregistrement…",
-    "error": "Échec de l'enregistrement"
+    "error": "Échec de l'enregistrement",
+    "savedAt": "Enregistré à {{time}}",
+    "unsaved_one": "{{count}} modification non enregistrée",
+    "unsaved_other": "{{count}} modifications non enregistrées",
+    "saveAll": "Tout enregistrer",
+    "saveAllHint": "Enregistrer toutes les modifications (Ctrl+Alt+S)",
+    "dismiss": "Masquer l'erreur"
   }
 }

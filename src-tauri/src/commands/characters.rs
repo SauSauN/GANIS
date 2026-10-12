@@ -4,6 +4,7 @@
 //! qui vérifie d'abord que l'utilisateur connecté en est le propriétaire.
 
 use crate::error::AppResult;
+use crate::services::history_service as history;
 use crate::services::character_service::{
     self, Character, CharacterInput, CharacterSettings, GalleryImage, Portrait,
 };
@@ -36,7 +37,10 @@ pub async fn create_character(
     input: CharacterInput,
 ) -> AppResult<Character> {
     let pool = project_pool(&state, &project_id).await?;
-    character_service::create_character(&pool, &input).await
+    let created = character_service::create_character(&pool, &input).await?;
+    let label = format!("{} {}", created.first_name, created.last_name);
+    history::record(&pool, "created", "character", &created.id, label.trim(), "").await;
+    Ok(created)
 }
 
 /// Remplace la fiche d'un personnage.
@@ -48,7 +52,11 @@ pub async fn update_character(
     input: CharacterInput,
 ) -> AppResult<Character> {
     let pool = project_pool(&state, &project_id).await?;
-    character_service::update_character(&pool, &character_id, &input).await
+    history::snapshot_before(&pool, "character", &character_id).await;
+    let saved = character_service::update_character(&pool, &character_id, &input).await?;
+    let label = format!("{} {}", saved.first_name, saved.last_name);
+    history::record(&pool, "updated", "character", &saved.id, label.trim(), "").await;
+    Ok(saved)
 }
 
 /// Supprime un personnage et sa photo.
@@ -57,9 +65,11 @@ pub async fn delete_character(
     state: State<'_, AppState>,
     project_id: String,
     character_id: String,
-) -> AppResult<()> {
+) -> AppResult<String> {
     let pool = project_pool(&state, &project_id).await?;
-    character_service::delete_character(&pool, &character_id).await
+    let trash_id = character_service::delete_character(&pool, &character_id).await?;
+    history::record_deleted(&pool, &trash_id).await;
+    Ok(trash_id)
 }
 
 /// Photo d'un personnage (`null` : pas de photo).
