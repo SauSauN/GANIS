@@ -4,6 +4,9 @@ import { ProtectedRoute } from "@/components/layout/ProtectedRoute";
 import { SetupGate } from "@/components/layout/SetupGate";
 import { TitleBar } from "@/components/layout/TitleBar";
 import { UnsavedChangesGuard } from "@/components/layout/UnsavedChangesGuard";
+import { HelpDialogs } from "@/components/layout/HelpDialogs";
+import { ShortcutHandler } from "@/components/layout/ShortcutHandler";
+import { Toaster } from "@/components/layout/Toaster";
 
 import Welcome from "@/pages/Welcome";
 import Login from "@/pages/Login";
@@ -14,6 +17,7 @@ import Dashboard from "@/pages/Dashboard";
 import Workspace from "@/pages/Workspace";
 import Settings from "@/pages/Settings";
 import Packages from "@/pages/Packages";
+import Activity from "@/pages/Activity";
 import ThemeEditor from "@/pages/ThemeEditor";
 
 export default function App() {
@@ -27,6 +31,11 @@ export default function App() {
 
       {/* Modifications non enregistrées : question avant de quitter */}
       <UnsavedChangesGuard />
+
+      {/* Raccourcis clavier, fenêtres d'aide et messages temporaires */}
+      <ShortcutHandler />
+      <HelpDialogs />
+      <Toaster />
 
       {/* ------------------------------------------------------------------ */}
       {/* Contenu principal                                                    */}
@@ -97,6 +106,12 @@ export default function App() {
               <Route
                 path="/packages"
                 element={<Packages />}
+              />
+
+              {/* Rythme de travail (bouton de la barre du haut, sur le tableau de bord) */}
+              <Route
+                path="/activity"
+                element={<Activity />}
               />
 
               {/* Éditeur de thème (mode développeur, vérifié par Rust) */}

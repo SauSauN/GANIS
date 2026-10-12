@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Blocks,
@@ -20,7 +21,7 @@ import { useUnsavedStore } from "@/lib/unsavedChanges";
 import { useAuthStore } from "@/stores/authStore";
 
 const itemClass =
-  "flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-left text-sm hover:bg-accent";
+  "flex h-8 w-full items-center gap-2 rounded-sm px-2 text-left text-sm hover:bg-accent";
 
 /**
  * Langue de l'interface, sous forme de ligne du menu.
@@ -85,6 +86,30 @@ export function UserMenu() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
 
+  // Ouvert au clic (convention des menus), fermé au clic extérieur ou avec Échap.
+  const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (event: MouseEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+        buttonRef.current?.focus();
+      }
+    };
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
   if (!user) {
     return null;
   }
@@ -96,10 +121,14 @@ export function UserMenu() {
   }
 
   return (
-    <div className="group relative">
+    <div ref={rootRef} className="relative">
       <button
+        ref={buttonRef}
         type="button"
-        className="flex h-7 items-center gap-2 rounded px-2 text-sm hover:bg-secondary"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+        className={cn("flex h-7 items-center gap-2 rounded px-2 text-sm hover:bg-secondary", open && "bg-secondary")}
         aria-label={t("label")}
         title={t("label")}
       >
@@ -110,13 +139,21 @@ export function UserMenu() {
         </span>
       </button>
 
-      <div className="absolute right-0 top-full z-50 hidden w-56 flex-col rounded-md border bg-popover p-1 text-popover-foreground shadow-md group-hover:flex group-focus-within:flex">
-        <button type="button" onClick={() => navigate("/settings")} className={itemClass}>
+      {open && (
+      <div
+        role="menu"
+        onClick={(event) => {
+          // Un choix ferme le menu (pas la langue, qui reste visible).
+          if ((event.target as HTMLElement).closest("[data-close]")) setOpen(false);
+        }}
+        className="absolute right-0 top-full z-50 mt-1 flex w-56 flex-col rounded-md border bg-popover p-1 text-popover-foreground shadow-md"
+      >
+        <button type="button" data-close onClick={() => navigate("/settings")} className={itemClass}>
           <Settings className="h-4 w-4" />
           {t("settings")}
         </button>
 
-        <button type="button" onClick={() => navigate("/packages")} className={itemClass}>
+        <button type="button" data-close onClick={() => navigate("/packages")} className={itemClass}>
           <Blocks className="h-4 w-4" />
           {t("packages")}
         </button>
@@ -128,6 +165,7 @@ export function UserMenu() {
 
         <button
           type="button"
+          data-close
           onClick={handleLogout}
           className={cn(itemClass, "text-destructive hover:bg-destructive/10")}
         >
@@ -135,6 +173,7 @@ export function UserMenu() {
           {t("logout")}
         </button>
       </div>
+      )}
     </div>
   );
 }

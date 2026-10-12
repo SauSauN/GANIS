@@ -1,9 +1,17 @@
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
 import { useCharacterStore } from "@/stores/characterStore";
+import { useLocationStore } from "@/stores/locationStore";
+import { usePlaceLinkStore } from "@/stores/placeLinkStore";
 import { useRelationStore } from "@/stores/relationStore";
+import { useNoteStore } from "@/stores/noteStore";
+import { useToastStore } from "@/stores/toastStore";
+import { useTrashStore } from "@/stores/trashStore";
+import { useStructureStore } from "@/stores/structureStore";
 import { useSynopsisStore } from "@/stores/synopsisStore";
 import type {
+  GanixImportMode,
+  GanixImportOutcome,
   Project,
   ProjectStatus,
   ProjectType,
@@ -28,6 +36,12 @@ interface UpdateProjectInput {
 interface ProjectState {
   projects: Project[];
   currentProjectId: string | null;
+  /**
+   * Dernier projet ouvert pendant la session. Contrairement à
+   * `currentProjectId`, il est gardé en quittant l'espace de travail : le
+   * bouton « Revenir au projet » de la barre du haut y ramène.
+   */
+  lastProjectId: string | null;
   query: string;
   loading: boolean;
   error: string | null;
@@ -55,6 +69,8 @@ interface ProjectState {
   duplicateProject: (id: string) => Promise<Project>;
 
   deleteProject: (id: string) => Promise<void>;
+  /** Confirme l'import d'un `.ganix` vérifié et l'ajoute à la liste. */
+  importGanix: (stagingId: string, mode: GanixImportMode) => Promise<GanixImportOutcome>;
 
   /**
    * Ouvre un projet : enregistre l'ouverture côté Rust, met à jour
@@ -71,6 +87,7 @@ const initial: Pick<
   ProjectState,
   | "projects"
   | "currentProjectId"
+  | "lastProjectId"
   | "query"
   | "loading"
   | "error"
@@ -78,6 +95,7 @@ const initial: Pick<
 > = {
   projects: [],
   currentProjectId: null,
+  lastProjectId: null,
   query: "",
   loading: false,
   error: null,
@@ -336,6 +354,31 @@ export const useProjectStore =
         }
       },
 
+      importGanix: async (stagingId, mode) => {
+        const outcome = await api.confirmGanixImport(stagingId, mode);
+
+        // Remplacement : les données gardées en mémoire pour ce projet sont
+        // périmées et seront relues à la prochaine ouverture.
+        if (outcome.backupFile) {
+          useSynopsisStore.getState().reset();
+          useCharacterStore.getState().reset();
+          useRelationStore.getState().reset();
+          useLocationStore.getState().reset();
+          usePlaceLinkStore.getState().reset();
+          useStructureStore.getState().reset();
+          useNoteStore.getState().reset();
+          useTrashStore.getState().reset();
+          useToastStore.getState().clear();
+        }
+
+        set((state) => ({
+          projects: upsert(state.projects, outcome.project),
+          error: null,
+        }));
+
+        return outcome;
+      },
+
       deleteProject: async (id) => {
         set({
           loading: true,
@@ -355,6 +398,8 @@ export const useProjectStore =
               state.currentProjectId === id
                 ? null
                 : state.currentProjectId,
+            lastProjectId:
+              state.lastProjectId === id ? null : state.lastProjectId,
             loading: false,
             error: null,
           }));
@@ -377,7 +422,7 @@ export const useProjectStore =
               throw new Error("Projet non trouvé.");
             }
 
-            set({ currentProjectId: id });
+            set({ currentProjectId: id, lastProjectId: id });
 
             return project;
           }
@@ -387,6 +432,7 @@ export const useProjectStore =
           set((state) => ({
             projects: upsert(state.projects, project),
             currentProjectId: id,
+            lastProjectId: id,
             error: null,
           }));
 
@@ -400,10 +446,16 @@ export const useProjectStore =
       },
 
       closeProject: () => {
-        // Le synopsis et les personnages appartiennent au projet qu'on quitte.
+        // Le synopsis, les personnages et les lieux appartiennent au projet qu'on quitte.
         useSynopsisStore.getState().reset();
         useCharacterStore.getState().reset();
         useRelationStore.getState().reset();
+        useLocationStore.getState().reset();
+        usePlaceLinkStore.getState().reset();
+        useStructureStore.getState().reset();
+        useNoteStore.getState().reset();
+        useTrashStore.getState().reset();
+        useToastStore.getState().clear();
 
         set({
           currentProjectId: null,
@@ -416,6 +468,12 @@ export const useProjectStore =
         useSynopsisStore.getState().reset();
         useCharacterStore.getState().reset();
         useRelationStore.getState().reset();
+        useLocationStore.getState().reset();
+        usePlaceLinkStore.getState().reset();
+        useStructureStore.getState().reset();
+        useNoteStore.getState().reset();
+        useTrashStore.getState().reset();
+        useToastStore.getState().clear();
 
         set(initial);
       },

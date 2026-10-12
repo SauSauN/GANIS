@@ -4,7 +4,7 @@
   {"key": "birthDate", "level": "basic", "kind": "date", "maxLength": 200},
   {"key": "gender", "level": "basic", "kind": "choice", "maxLength": 60, "list": "gender"},
   {"key": "occupation", "level": "basic", "kind": "text", "maxLength": 200},
-  {"key": "origin", "level": "basic", "kind": "text", "maxLength": 200},
+  {"key": "origin", "level": "basic", "kind": "place", "maxLength": 200},
   {"key": "firstAppearance", "level": "basic", "kind": "reference", "maxLength": 200},
   {"key": "description", "level": "basic", "kind": "longText", "maxLength": 20000},
   {"key": "mainGoal", "level": "basic", "kind": "text", "maxLength": 1000},

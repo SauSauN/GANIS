@@ -1,0 +1,78 @@
+{
+  "label": "Menus",
+  "shift": "Shift",
+  "menus": {
+    "file": "File",
+    "edit": "Edit",
+    "view": "View",
+    "project": "Project",
+    "help": "Help"
+  },
+  "file": {
+    "new": "New",
+    "newIn": {
+      "characters.create": "New character",
+      "locations.create": "New location",
+      "structure.plan": "New structure item",
+      "notes.create": "New note",
+      "newProject": "New project"
+    },
+    "save": "Save",
+    "saveAll": "Save all",
+    "closeTab": "Close tab",
+    "export": "Export project (.ganix)…",
+    "import": "Import a .ganix file…",
+    "dashboard": "Dashboard",
+    "settings": "General settings",
+    "quit": "Quit",
+    "newChoose": "New…"
+  },
+  "edit": {
+    "undo": "Undo",
+    "redo": "Redo",
+    "cut": "Cut",
+    "copy": "Copy",
+    "paste": "Paste",
+    "selectAll": "Select all",
+    "trash": "Trash…",
+    "nothing": "Nothing to undo here: place the cursor in a field first.",
+    "pasteBlocked": "The clipboard can't be read from the menu: use Ctrl+V.",
+    "search": "Search…",
+    "history": "History…"
+  },
+  "view": {
+    "togglePanel": "Side panel",
+    "showPanel": "Show side panel",
+    "hidePanel": "Hide side panel",
+    "toggleRail": "Module bar",
+    "railNames": "Module bar: icons and names",
+    "railIcons": "Module bar: icons only",
+    "nextTab": "Next tab",
+    "previousTab": "Previous tab",
+    "darkTheme": "Dark theme",
+    "lightTheme": "Light theme"
+  },
+  "project": {
+    "home": "Project home",
+    "synopsis": "Synopsis",
+    "settings": "Project settings",
+    "trash": "Trash",
+    "export": "Export as .ganix…",
+    "history": "History"
+  },
+  "help": {
+    "guide": "Getting started",
+    "shortcuts": "Keyboard shortcuts",
+    "about": "About GANIS",
+    "center": "GANIS Help"
+  },
+  "create": {
+    "title": "What do you want to create?",
+    "description": "Pick with the mouse or type the number.",
+    "character": "A character",
+    "location": "A location",
+    "structure": "A structure item",
+    "note": "A note",
+    "sticky": "A sticky note"
+  }
+}

@@ -6,8 +6,11 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { useTranslation } from "react-i18next";
-import { Input } from "@/components/ui/input";
 import { SideBarCharacters } from "@/components/characters/SideBarCharacters";
+import { SideBarLocations } from "@/components/locations/SideBarLocations";
+import { SideBarNotes } from "@/components/notes/SideBarNotes";
+import { SideBarSearch } from "@/components/search/SideBarSearch";
+import { SideBarStructure } from "@/components/structure/SideBarStructure";
 import {
   getModule,
   type ModuleId,
@@ -185,12 +188,7 @@ export function SideBar({
         </div>
 
         {module.id === "search" ? (
-          <div className="space-y-2 px-4">
-            <Input disabled placeholder={t("search.placeholder")} />
-            <p className="text-xs text-muted-foreground">
-              {t("search.unavailable")}
-            </p>
-          </div>
+          <SideBarSearch projectId={projectId} onOpenFeature={onOpenFeature} />
         ) : (
           <ul className="px-2">
             {module.features.map(({ id, label, icon: Icon }) => (
@@ -219,6 +217,25 @@ export function SideBar({
             activeTab={activeTab}
             onOpenFeature={onOpenFeature}
           />
+        )}
+
+        {/* Lieux du projet, en arborescence. */}
+        {module.id === "locations" && (
+          <SideBarLocations
+            projectId={projectId}
+            activeTab={activeTab}
+            onOpenFeature={onOpenFeature}
+          />
+        )}
+
+        {/* Découpage du récit, en arborescence, sous « Plan du récit ». */}
+        {module.id === "structure" && (
+          <SideBarStructure projectId={projectId} activeTab={activeTab} onOpenFeature={onOpenFeature} />
+        )}
+
+        {/* Dossiers et notes, en arborescence. */}
+        {module.id === "notes" && (
+          <SideBarNotes projectId={projectId} activeTab={activeTab} onOpenFeature={onOpenFeature} />
         )}
       </aside>
 

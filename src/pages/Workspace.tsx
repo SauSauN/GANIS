@@ -10,6 +10,7 @@ import { SideBar } from "@/components/layout/SideBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import {
   HOME_TAB,
+  SETTINGS_PREFIX,
   findFeature,
   type ModuleId,
 } from "@/components/workspace/modules";
@@ -18,6 +19,8 @@ import {
   type TabInfo,
 } from "@/components/workspace/WorkspaceTabs";
 import { WorkspaceView } from "@/components/workspace/WorkspaceView";
+import { CreateChooser } from "@/components/workspace/CreateChooser";
+import { CommandPalette } from "@/components/search/CommandPalette";
 
 import i18n from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -42,9 +45,17 @@ import {
 import {
   UnsavedTabContext,
   discardEntries,
+  saveEntries,
   useUnsavedStore,
 } from "@/lib/unsavedChanges";
+import { api } from "@/lib/api";
+import { useRegisterCommands } from "@/lib/commands";
+import { showGuideOnce } from "@/lib/shortcuts";
+import { toast } from "@/stores/toastStore";
+import { useReloadStore } from "@/stores/reloadStore";
 import { useCharacterStore } from "@/stores/characterStore";
+import { useNoteStore } from "@/stores/noteStore";
+import { useStructureStore } from "@/stores/structureStore";
 import { useProjectStore } from "@/stores/projectStore";
 
 /**
@@ -67,8 +78,16 @@ function tabMeta(
     : null;
 }
 
+/** Ctrl+N : ce qui se crée dans chaque module (ailleurs : « Que voulez-vous créer ? »). */
+const NEW_TARGETS: Partial<Record<ModuleId, string>> = {
+  characters: "characters.create",
+  locations: "locations.create",
+  structure: "structure.plan",
+  notes: "notes.create",
+};
+
 export default function Workspace() {
-  const { t } = useTranslation(["workspace", "unsaved"]);
+  const { t } = useTranslation(["workspace", "unsaved", "menus", "projects"]);
 
   const { projectId } = useParams<{
     projectId: string;
@@ -178,8 +197,21 @@ export default function Workspace() {
    */
   useCharacterStore((state) => state.characters);
 
+  /** Même chose pour les fiches des éléments du découpage (« Chapitre 3 »). */
+  useStructureStore((state) => state.structure);
+
+  /** Et des notes (le titre de la note). */
+  useNoteStore((state) => state.notes);
+
   /** Onglets avec des modifications non enregistrées (point ● sur l'onglet). */
   const unsavedEntries = useUnsavedStore((state) => state.entries);
+
+  /** Palette de commandes (Ctrl+K) et « Que voulez-vous créer ? ». */
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [chooserOpen, setChooserOpen] = useState(false);
+
+  /** Écrans à recréer (restauration d'une version). */
+  const reloadCounts = useReloadStore((state) => state.counts);
 
   /**
    * Question « Enregistrer ? » avant de fermer des onglets modifiés,
@@ -252,6 +284,61 @@ export default function Workspace() {
       closeProject();
     };
   }, [closeProject]);
+
+  /**
+   * Commandes des menus et des raccourcis clavier (voir `commands.ts`).
+   * Les fonctions appelées sont définies plus bas : elles ne servent
+   * qu'au moment où la commande est exécutée.
+   */
+  const activeDirty = activeTab !== null && activeTab in unsavedEntries;
+  const createTarget = NEW_TARGETS[activeModule] ?? null;
+
+  useRegisterCommands({
+    new: {
+      label: createTarget ? t(`menus:file.newIn.${createTarget}` as never) : t("menus:file.newChoose"),
+      run: () => (createTarget ? openFeature(createTarget) : setChooserOpen(true)),
+    },
+    palette: { run: () => setPaletteOpen(true) },
+    openHistory: { run: () => openFeature("history") },
+    save: {
+      disabled: !activeDirty,
+      run: () => {
+        const tab = activeTabRef.current;
+        if (tab) void saveEntries([tab]);
+      },
+    },
+    saveAll: {
+      disabled: Object.keys(unsavedEntries).length === 0,
+      run: () => void saveEntries(Object.keys(useUnsavedStore.getState().entries)),
+    },
+    closeTab: {
+      disabled: activeTab === null,
+      run: () => {
+        const tab = activeTabRef.current;
+        if (tab) closeTab(tab);
+      },
+    },
+    nextTab: { disabled: layout.tabs.length < 2, run: () => cycleTab(1) },
+    previousTab: { disabled: layout.tabs.length < 2, run: () => cycleTab(-1) },
+    togglePanel: {
+      label: panelOpen ? t("menus:view.hidePanel") : t("menus:view.showPanel"),
+      run: () => setPanelOpen((open) => !open),
+    },
+    toggleRail: {
+      label: railExpanded ? t("menus:view.railIcons") : t("menus:view.railNames"),
+      run: () => setRailExpanded(!railExpanded),
+    },
+    openHome: { run: () => openFeature(HOME_TAB) },
+    openSynopsis: { run: () => openFeature("synopsis.edit") },
+    openProjectSettings: { run: () => openFeature(`${SETTINGS_PREFIX}info`) },
+    openTrash: { run: () => openFeature("trash") },
+    exportProject: { disabled: !project, run: () => void exportCurrentProject() },
+  });
+
+  /** Guide de démarrage : ouvert seul la première fois qu'un projet est ouvert. */
+  useEffect(() => {
+    showGuideOnce();
+  }, []);
 
   /**
    * Si le projet est inexistant ou a été supprimé,
@@ -421,6 +508,31 @@ export default function Workspace() {
     closeTabs(tabId, "this");
   }
 
+  /** Onglet suivant (`1`) ou précédent (`-1`), en boucle. */
+  function cycleTab(delta: 1 | -1) {
+    const tabs = layoutRef.current.tabs;
+    if (tabs.length === 0) return;
+    const index = activeTabRef.current ? tabs.indexOf(activeTabRef.current) : -1;
+    activate(tabs[(index + delta + tabs.length) % tabs.length]);
+  }
+
+  /** Exporte le projet ouvert en `.ganix` (menu Fichier ou Projet). */
+  async function exportCurrentProject() {
+    if (!project) return;
+    try {
+      const file = await api.exportProject(project.id, t("projects:ganix.export.dialogTitle"));
+      if (file) {
+        toast({
+          message: `${t("projects:ganix.export.done", { file })} ${t("projects:ganix.export.notEncrypted")}`,
+          tone: "success",
+          duration: 10000,
+        });
+      }
+    } catch (e) {
+      toast({ message: e instanceof Error ? e.message : t("projects:ganix.export.failed"), tone: "error" });
+    }
+  }
+
   /**
    * Épingle ou désépingle un onglet.
    */
@@ -558,6 +670,8 @@ export default function Workspace() {
                   value={{ id: tabId, label: tabMeta(tabId)?.label ?? tabId }}
                 >
                   <WorkspaceView
+                    // Recréé après une restauration de version (voir `reloadStore`).
+                    key={reloadCounts[tabId] ?? 0}
                     tabId={tabId}
                     project={project}
                     onOpenFeature={openFeature}
@@ -599,6 +713,15 @@ export default function Workspace() {
         onDiscard={closeQueue.discard}
         onCancel={closeQueue.cancel}
       />
+
+      {/* Palette de commandes (Ctrl+K) et choix de création (Ctrl+N) */}
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        projectId={project.id}
+        onOpenFeature={openFeature}
+      />
+      <CreateChooser open={chooserOpen} onClose={() => setChooserOpen(false)} onOpenFeature={openFeature} />
 
       {/* =========================================================
           STATUS BAR

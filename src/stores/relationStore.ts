@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
+import { announceDeletion, relationLabel } from "@/lib/trash";
 import type { GraphPosition, Relation, RelationInput } from "@/types";
 
 /*
@@ -96,7 +97,8 @@ export const useRelationStore = create<RelationState>((set, get) => {
     },
 
     deleteRelation: async (projectId, id) => {
-      await api.deleteRelation(projectId, id);
+      const trashId = await api.deleteRelation(projectId, id);
+      announceDeletion(projectId, trashId, "relation", relationLabel(projectId, get().relations.find((r) => r.id === id)));
       if (mine(projectId)) set({ relations: get().relations.filter((r) => r.id !== id) });
     },
 

@@ -9,12 +9,20 @@
       "description": "Project progress, favorite and archiving."
     },
     "danger": {
-      "label": "Duplicate and delete",
-      "description": "Duplicate or permanently delete the project."
+      "label": "Export, duplication and deletion",
+      "description": "Export as .ganix, duplicate or permanently delete the project."
     },
     "characters": {
       "label": "Characters",
       "description": "Profile detail level and the values offered in lists."
+    },
+    "locations": {
+      "label": "Locations",
+      "description": "Custom location types and statuses."
+    },
+    "structure": {
+      "label": "Structure",
+      "description": "Plan levels, their names and numbering."
     }
   },
   "info": {
@@ -44,7 +52,11 @@
     "duplicateFailed": "Unable to duplicate the project.",
     "deleteTitle": "Delete project",
     "deleteDescription": "Deletion is permanent and cannot be undone.",
-    "deleteFailed": "Unable to delete the project."
+    "deleteFailed": "Unable to delete the project.",
+    "exportTitle": "Export project",
+    "exportDescription": "Downloads the whole project as a “project name.ganix” file, to import from the GANIS dashboard (on this computer or another).",
+    "export": "Export as .ganix",
+    "exporting": "Exporting…"
   },
   "characters": {
     "title": "Profile detail level",

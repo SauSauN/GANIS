@@ -1,0 +1,32 @@
+{
+  "placeholder": "Search the project…",
+  "clear": "Clear",
+  "hint": "Characters, locations, structure, notes and sticky notes. Ignores accents and capitals.",
+  "searching": "Searching…",
+  "none": "No results.",
+  "count_one": "{{count}} result",
+  "count_other": "{{count}} results",
+  "kinds": {
+    "character": "Characters",
+    "location": "Locations",
+    "structureNode": "Structure",
+    "note": "Notes",
+    "noteFolder": "Folders",
+    "sticky": "Sticky notes"
+  },
+  "untitled": {
+    "character": "Unnamed character",
+    "location": "Unnamed location",
+    "structureNode": "Untitled item",
+    "note": "Untitled note",
+    "noteFolder": "Folder",
+    "sticky": "Sticky note"
+  },
+  "palette": {
+    "title": "Command palette",
+    "placeholder": "Go to a page, run an action or find an item…",
+    "suggestions": "Suggestions",
+    "actions": "Pages and actions",
+    "commands": "Action"
+  }
+}

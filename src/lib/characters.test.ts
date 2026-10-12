@@ -24,8 +24,10 @@ import en from "@/i18n/locales/en/characters.json";
 
 describe("nom et initiales", () => {
   it("assemble prénom et nom", () => {
-    expect(fullName({ firstName: " Aldric ", lastName: "Venn" })).toBe("Aldric Venn");
-    expect(fullName({ firstName: "", lastName: "Gandalf" })).toBe("Gandalf");
+    // Le nom de famille est toujours affiché en majuscules.
+    expect(fullName({ firstName: " Aldric ", lastName: "Venn" })).toBe("Aldric VENN");
+    expect(fullName({ firstName: "", lastName: "Gandalf" })).toBe("GANDALF");
+    expect(fullName({ firstName: "Gandalf", lastName: "" })).toBe("Gandalf");
   });
 
   it("prend le premier et le dernier mot", () => {

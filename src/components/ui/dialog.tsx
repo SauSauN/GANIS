@@ -5,6 +5,8 @@ interface DialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   children: React.ReactNode;
+  /** Classes du panneau (ex. largeur plus grande que `max-w-lg`). */
+  className?: string;
 }
 
 /** Identifiants du titre et de la description, pour `aria-labelledby`. */
@@ -23,7 +25,7 @@ const FOCUSABLE =
  *   et revient à l'élément d'origine à la fermeture ;
  * - Échap ou un clic sur le fond ferment la fenêtre.
  */
-function Dialog({ open, onOpenChange, children }: DialogProps) {
+function Dialog({ open, onOpenChange, children, className }: DialogProps) {
   const panelRef = React.useRef<HTMLDivElement>(null);
   const titleId = React.useId();
   const descriptionId = React.useId();
@@ -98,7 +100,10 @@ function Dialog({ open, onOpenChange, children }: DialogProps) {
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
         tabIndex={-1}
-        className="w-full max-w-lg rounded-lg border bg-card p-6 shadow-lg outline-none"
+        className={cn(
+          "max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-lg border bg-card p-6 shadow-lg outline-none",
+          className,
+        )}
         onClick={(e) => e.stopPropagation()}
       >
         <DialogIdsContext.Provider value={{ titleId, descriptionId }}>

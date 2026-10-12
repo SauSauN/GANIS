@@ -1,16 +1,19 @@
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useDashboardIntent, useRegisterCommands } from "@/lib/commands";
 import { useNavigate } from "react-router-dom";
 import {
   Archive,
   ChevronDown,
   ChevronRight,
   Clock,
+  FileUp,
   FolderOpen,
   Plus,
   Search,
   Star,
 } from "lucide-react";
+import { GanixImportDialog } from "@/components/projects/GanixImportDialog";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import {
   ProjectFormDialog,
@@ -34,10 +37,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { useProjectStore } from "@/stores/projectStore";
-import type { Project } from "@/types";
+import type { GanixImportMode, GanixPreview, Project } from "@/types";
 
 type Filter = "all" | "favorites" | "archived";
 
@@ -54,7 +58,7 @@ const RECENT_LIMIT = 3;
  */
 export default function Dashboard() {
   const navigate = useNavigate();
-  const { t } = useTranslation(["dashboard", "common"]);
+  const { t } = useTranslation(["dashboard", "projects", "common", "menus"]);
 
   const user = useAuthStore((state) => state.user);
 
@@ -69,6 +73,7 @@ export default function Dashboard() {
   );
   const deleteProject = useProjectStore((state) => state.deleteProject);
   const openProject = useProjectStore((state) => state.openProject);
+  const importGanix = useProjectStore((state) => state.importGanix);
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
@@ -84,6 +89,12 @@ export default function Dashboard() {
   const [deletingBusy, setDeletingBusy] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  /** Message de réussite (export, import). */
+  const [notice, setNotice] = useState<string | null>(null);
+
+  /** Import .ganix : vérification en cours, puis aperçu à confirmer. */
+  const [inspecting, setInspecting] = useState(false);
+  const [preview, setPreview] = useState<GanixPreview | null>(null);
 
   useEffect(() => {
     void fetchProjects();
@@ -143,6 +154,7 @@ export default function Dashboard() {
   /** Exécute une action sur un projet en gérant l'état et les erreurs. */
   async function run(project: Project, task: () => Promise<unknown>) {
     setActionError(null);
+    setNotice(null);
     setBusyId(project.id);
 
     try {
@@ -171,10 +183,91 @@ export default function Dashboard() {
     }
   }
 
+  /** Exporte un projet en `<nom du projet>.ganix`. */
+  function handleExport(project: Project) {
+    void run(project, async () => {
+      const file = await api.exportProject(
+        project.id,
+        t("projects:ganix.export.dialogTitle"),
+      );
+
+      if (file) {
+        setNotice(
+          `${t("projects:ganix.export.done", { file })}\n${t("projects:ganix.export.notEncrypted")}`,
+        );
+      }
+    });
+  }
+
+  /** Choisit un `.ganix`, le fait vérifier puis montre l'aperçu. */
+  async function handleInspect() {
+    setActionError(null);
+    setNotice(null);
+    setInspecting(true);
+
+    try {
+      const result = await api.inspectGanix(
+        t("projects:ganix.import.dialogTitle"),
+      );
+      setPreview(result);
+    } catch (e) {
+      setActionError(
+        e instanceof Error ? e.message : t("projects:ganix.import.failed"),
+      );
+    } finally {
+      setInspecting(false);
+    }
+  }
+
+  async function handleConfirmImport(mode: GanixImportMode) {
+    if (!preview) return;
+
+    const outcome = await importGanix(preview.stagingId, mode);
+
+    setPreview(null);
+    setNotice(
+      outcome.backupFile
+        ? t("projects:ganix.import.replaced", {
+            name: outcome.project.name,
+            file: outcome.backupFile,
+          })
+        : t("projects:ganix.import.done", { name: outcome.project.name }),
+    );
+
+    // Le projet importé apparaît dans la liste.
+    setFilter("all");
+    setSearch("");
+    setListOpen(true);
+  }
+
+  function handleCancelImport() {
+    if (preview) {
+      // Rien à signaler si la zone d'attente a déjà disparu.
+      void api.cancelGanixImport(preview.stagingId).catch(() => {});
+    }
+    setPreview(null);
+  }
+
   function openCreateDialog() {
     setEditing(null);
     setFormOpen(true);
   }
+
+  // Menus et raccourcis : Ctrl+N crée un projet ; « Importer un .ganix ».
+  useRegisterCommands({
+    new: { label: t("menus:file.newIn.newProject"), run: openCreateDialog },
+    importGanix: { disabled: inspecting, run: () => void handleInspect() },
+  });
+
+  // Action demandée depuis un menu avant d'arriver ici.
+  const intent = useDashboardIntent((state) => state.intent);
+  useEffect(() => {
+    if (!intent) return;
+    const taken = useDashboardIntent.getState().take();
+    if (taken === "newProject") openCreateDialog();
+    if (taken === "importGanix") void handleInspect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [intent]);
 
   function openEditDialog(project: Project) {
     setEditing(project);
@@ -252,6 +345,7 @@ export default function Dashboard() {
         onDuplicate={(item) =>
           void run(item, () => duplicateProject(item.id))
         }
+        onExport={handleExport}
         onDelete={setDeleting}
       />
     );
@@ -312,10 +406,23 @@ export default function Dashboard() {
               </p>
             </div>
 
-            <Button onClick={openCreateDialog}>
-              <Plus className="mr-2 h-4 w-4" />
-              {t("newProject")}
-            </Button>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                disabled={inspecting}
+                onClick={() => void handleInspect()}
+              >
+                <FileUp className="mr-2 h-4 w-4" />
+                {inspecting
+                  ? t("projects:ganix.import.checking")
+                  : t("projects:ganix.import.button")}
+              </Button>
+
+              <Button onClick={openCreateDialog}>
+                <Plus className="mr-2 h-4 w-4" />
+                {t("newProject")}
+              </Button>
+            </div>
           </div>
 
           {/* Recherche */}
@@ -337,6 +444,22 @@ export default function Dashboard() {
               className="mt-6 rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
             >
               {actionError ?? error}
+            </div>
+          )}
+
+          {notice && !actionError && (
+            <div
+              role="status"
+              className="mt-6 flex items-start justify-between gap-4 rounded-md border border-success/30 bg-success/5 px-4 py-3 text-sm text-success"
+            >
+              <span className="whitespace-pre-line">{notice}</span>
+              <button
+                type="button"
+                className="shrink-0 text-xs underline-offset-2 hover:underline"
+                onClick={() => setNotice(null)}
+              >
+                {t("common:actions.close")}
+              </button>
             </div>
           )}
 
@@ -440,10 +563,20 @@ export default function Dashboard() {
                       !searching &&
                       projects.length === 0 && (
                         <CardContent>
-                          <Button onClick={openCreateDialog}>
-                            <Plus className="mr-2 h-4 w-4" />
-                            {t("empty.createFirst")}
-                          </Button>
+                          <div className="flex flex-wrap gap-2">
+                            <Button onClick={openCreateDialog}>
+                              <Plus className="mr-2 h-4 w-4" />
+                              {t("empty.createFirst")}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              disabled={inspecting}
+                              onClick={() => void handleInspect()}
+                            >
+                              <FileUp className="mr-2 h-4 w-4" />
+                              {t("projects:ganix.import.button")}
+                            </Button>
+                          </div>
                         </CardContent>
                       )}
                   </Card>
@@ -464,6 +597,13 @@ export default function Dashboard() {
         onOpenChange={setFormOpen}
         project={editing}
         onSubmit={handleSubmit}
+      />
+
+      {/* Import .ganix : aperçu et confirmation */}
+      <GanixImportDialog
+        preview={preview}
+        onConfirm={handleConfirmImport}
+        onCancel={handleCancelImport}
       />
 
       {/* Confirmation de suppression */}

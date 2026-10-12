@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { VersionsButton } from "@/components/history/VersionsDialog";
 import { useTranslation } from "react-i18next";
 import { Loader2, Save, Trash2, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,8 @@ import {
 import { CharacterSheet } from "@/components/characters/CharacterForm";
 import { CharacterGallery } from "@/components/characters/fields/GalleryField";
 import { CharacterRelationsCard } from "@/components/relations/CharacterRelationsCard";
+import { PlaceLinksCard } from "@/components/locations/PlaceLinksCard";
+import { StoryLinksCard } from "@/components/structure/StoryLinksCard";
 import {
   PageShell,
   cardClass,
@@ -280,6 +283,19 @@ export function CharacterEditView({
               characterId={character.id}
               onOpenGraph={() => onOpenFeature("characters.relations")}
             />
+            <PlaceLinksCard
+              projectId={projectId}
+              side="character"
+              id={character.id}
+              onOpenFeature={onOpenFeature}
+            />
+            <StoryLinksCard
+              projectId={projectId}
+              side="character"
+              id={character.id}
+              firstAppearance={character.fields.firstAppearance}
+              onOpenFeature={onOpenFeature}
+            />
             <div className="flex min-h-10 flex-wrap items-center gap-4">
               <Button type="submit" disabled={!dirty || saving}>
                 {saving ? <Loader2 className="animate-spin" /> : <Save />}
@@ -313,10 +329,18 @@ export function CharacterEditView({
                 </p>
               )}
 
+              <VersionsButton
+                className="ml-auto"
+                projectId={projectId}
+                kind="character"
+                itemId={characterId}
+                name={character ? fullName(character) : ""}
+              />
+
               <Button
                 type="button"
                 variant="ghost"
-                className="ml-auto text-destructive hover:text-destructive"
+                className="text-destructive hover:text-destructive"
                 disabled={saving || deleting}
                 onClick={() => {
                   setDeleteError(null);

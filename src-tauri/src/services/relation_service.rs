@@ -274,17 +274,24 @@ pub async fn update_relation(
 }
 
 /// Supprime une relation.
-pub async fn delete_relation(pool: &SqlitePool, id: &str) -> AppResult<()> {
-    let result = sqlx::query("DELETE FROM character_relations WHERE id = ?")
-        .bind(id)
-        .execute(pool)
-        .await?;
-
-    if result.rows_affected() == 0 {
+pub async fn delete_relation(pool: &SqlitePool, id: &str) -> AppResult<String> {
+    let mut tx = pool.begin().await?;
+    let mut snapshot = crate::services::trash_service::Snapshot::new();
+    snapshot.capture(&mut tx, "character_relations", "id", id).await?;
+    if snapshot.is_empty() {
         return Err(not_found());
     }
+    let label: String = sqlx::query_scalar("SELECT trim(a.first_name || ' ' || a.last_name) || ' – ' || trim(b.first_name || ' ' || b.last_name) FROM character_relations r JOIN characters a ON a.id = r.source_id JOIN characters b ON b.id = r.target_id WHERE r.id = ?")
+        .bind(id)
+        .fetch_one(&mut *tx)
+        .await?;
 
-    Ok(())
+    sqlx::query("DELETE FROM character_relations WHERE id = ?").bind(id).execute(&mut *tx).await?;
+
+    let trash_id = snapshot.store(&mut tx, "relation", id, &label).await?;
+    tx.commit().await?;
+
+    Ok(trash_id)
 }
 
 // ----------------------------------------------------------------------------
@@ -443,8 +450,8 @@ mod tests {
         let pool = pool().await;
         let a = character(&pool, "Ana").await;
         let b = character(&pool, "Bruno").await;
-        let c1 = structure_service::create_node(&pool, None, 1, "Chapitre 1").await.unwrap();
-        let c2 = structure_service::create_node(&pool, None, 1, "Chapitre 2").await.unwrap();
+        let c1 = structure_service::create_node(&pool, crate::models::project::ProjectType::Novel, None, 1, "Chapitre 1", None).await.unwrap();
+        let c2 = structure_service::create_node(&pool, crate::models::project::ProjectType::Novel, None, 1, "Chapitre 2", None).await.unwrap();
 
         let mut with_period = input(&a, &b);
         with_period.since_node = Some(c1.id.clone());

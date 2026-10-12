@@ -126,7 +126,16 @@
     "summaryTooLong": "Le résumé ne peut pas dépasser {{max}} caractères.",
     "invalidLevel": "Niveau de découpage invalide.",
     "invalidParent": "Un élément ne peut contenir que des éléments de niveau inférieur.",
-    "invalidTemplate": "Modèle de découpage inconnu."
+    "invalidTemplate": "Modèle de découpage inconnu.",
+    "levelsInUse": "Des éléments utilisent {{used}} niveaux : le modèle n'en a que {{max}}. Retirez d'abord les éléments des niveaux en trop.",
+    "levelNameEmpty": "Chaque niveau doit avoir un nom.",
+    "levelNameTooLong": "Le nom d'un niveau ne peut pas dépasser {{max}} caractères.",
+    "levelCount": "Le découpage compte de 1 à {{max}} niveaux.",
+    "levelInUse": "Ce niveau contient encore {{count}} élément(s) : déplacez-les ou supprimez-les d'abord.",
+    "levelsReordered": "L'ordre des niveaux existants ne peut pas changer.",
+    "invalidNumbering": "Numérotation invalide.",
+    "invalidNumber": "Le numéro doit être compris entre 0 et {{max}}.",
+    "invalidColor": "Couleur invalide."
   },
   "character": {
     "notFound": "Personnage introuvable.",
@@ -152,5 +161,131 @@
     "invalidIntensity": "L'intensité va de 1 à 5.",
     "labelTooLong": "Le nom de la relation ne peut pas dépasser {{max}} caractères.",
     "descriptionTooLong": "La description ne peut pas dépasser {{max}} caractères."
+  },
+  "location": {
+    "notFound": "Lieu introuvable.",
+    "imageNotFound": "Image introuvable.",
+    "fieldTooLong": "Un champ dépasse {{max}} caractères.",
+    "invalidValue": "Valeur invalide.",
+    "tooManyTags": "{{max}} étiquettes au maximum.",
+    "nameRequired": "Indiquez le nom du lieu.",
+    "nameTooLong": "Le nom ne peut pas dépasser {{max}} caractères.",
+    "invalidType": "Type de lieu inconnu.",
+    "parentNotFound": "Le lieu parent est introuvable.",
+    "parentCycle": "Un lieu ne peut pas être placé dans lui-même ni dans un lieu qu'il contient.",
+    "unknownField": "Champ de fiche inconnu.",
+    "typeNameRequired": "Indiquez le nom du type.",
+    "invalidCategory": "Catégorie inconnue.",
+    "typeDuplicate": "Le type « {{name}} » existe déjà.",
+    "typeInUse": "Le type « {{name}} » est encore utilisé par {{count}} lieu(x) : changez d'abord leur type.",
+    "tooManyTypes": "{{max}} types personnalisés au maximum.",
+    "invalidList": "Liste inconnue.",
+    "listTooLong": "Une liste ne peut pas contenir plus de {{max}} valeurs.",
+    "galleryFull": "La galerie est pleine ({{max}} images au maximum)."
+  },
+  "placeLink": {
+    "notFound": "Lien introuvable.",
+    "invalidType": "Nature de lien inconnue.",
+    "labelTooLong": "La précision ne peut pas dépasser {{max}} caractères.",
+    "descriptionTooLong": "La description ne peut pas dépasser {{max}} caractères."
+  },
+  "ganix": {
+    "unreadable": "Ce fichier .ganix est illisible.",
+    "damaged": "Ce fichier est endommagé ou incomplet. Essayez de le télécharger ou de l'exporter à nouveau.",
+    "unsafe": "Ce fichier contient des éléments non autorisés et a été refusé.",
+    "notGanix": "Ce fichier n'est pas un projet GANIS.",
+    "tooNew": "Ce projet a été créé avec une version plus récente de GANIS : mettez l'application à jour pour l'ouvrir.",
+    "stagingMissing": "Cet import n'est plus disponible. Choisissez à nouveau le fichier.",
+    "migrationFailed": "Ce projet n'a pas pu être mis à jour pour cette version de GANIS."
+  },
+  "structureLink": {
+    "invalidRole": "Rôle inconnu."
+  },
+  "note": {
+    "folderNotFound": "Ce dossier n'existe plus.",
+    "notFound": "Cette note n'existe plus.",
+    "stickyNotFound": "Ce post-it n'existe plus.",
+    "folderNameEmpty": "Le nom du dossier ne peut pas être vide.",
+    "folderNameTooLong": "Le nom du dossier ne doit pas dépasser {{max}} caractères.",
+    "titleTooLong": "Le titre ne doit pas dépasser {{max}} caractères.",
+    "contentTooLarge": "La note est trop volumineuse (maximum {{max}} Mo).",
+    "invalidContent": "Le contenu de la note est illisible.",
+    "stickyTooLong": "Un post-it ne doit pas dépasser {{max}} caractères.",
+    "invalidColor": "Couleur inconnue.",
+    "invalidGeometry": "Position ou taille du post-it invalide.",
+    "folderCycle": "Un dossier ne peut pas être déplacé dans l'un de ses sous-dossiers."
+  },
+  "trash": {
+    "notFound": "Cet élément n'est plus dans la corbeille.",
+    "unreadable": "Cet élément de la corbeille est illisible.",
+    "restoreBlocked": "Restauration impossible : l'élément qui le contenait a été supprimé. Restaurez-le d'abord."
+  },
+  "hints": {
+    "codes": {
+      "INTERNAL": "Réessayez ; si le problème continue, redémarrez GANIS.",
+      "DATABASE": "Réessayez dans un instant. Si l'erreur revient, exportez le projet en .ganix (Fichier › Exporter) pour le mettre à l'abri, puis redémarrez GANIS.",
+      "IO": "Vérifiez qu'il reste de la place sur le disque et que le dossier n'est pas en lecture seule.",
+      "UNAUTHORIZED": "Reconnectez-vous.",
+      "NOT_FOUND": "Il a peut-être été supprimé : regardez dans la corbeille (Projet › Corbeille)."
+    },
+    "auth": {
+      "invalidCredentials": "Vérifiez les majuscules. Mot de passe oublié ? Utilisez votre clé de récupération.",
+      "usernameTaken": "Choisissez un autre nom, ou connectez-vous si c'est votre compte.",
+      "currentPasswordWrong": "Vérifiez les majuscules du mot de passe actuel."
+    },
+    "project": {
+      "notFound": "Il a peut-être été supprimé ou importé sous un autre nom : revenez au tableau de bord.",
+      "dataMissing": "Si vous avez une sauvegarde .ganix, importez-la depuis le tableau de bord."
+    },
+    "recovery": {
+      "invalid": "La clé figure dans le fichier enregistré à la création du compte (6 groupes de 6 caractères)."
+    },
+    "structure": {
+      "levelInUse": "Ouvrez le plan du récit pour déplacer ou supprimer ces éléments.",
+      "levelsInUse": "Ouvrez le plan du récit pour retirer les éléments des niveaux en trop.",
+      "invalidParent": "Choisissez un parent d'un niveau au-dessus, ou ajoutez l'élément à la racine."
+    },
+    "character": {
+      "invalidImage": "Ouvrez l'image dans un logiciel de dessin et enregistrez-la en PNG ou JPEG.",
+      "imageTooLarge": "Réduisez sa taille (par exemple 2000 pixels de large) ou enregistrez-la en JPEG.",
+      "galleryFull": "Retirez une image avant d'en ajouter une autre.",
+      "nameRequired": "Le prénom ou le nom suffit, le reste peut attendre."
+    },
+    "location": {
+      "typeInUse": "Ouvrez la liste des lieux, filtrez par ce type et changez-le, puis réessayez.",
+      "parentCycle": "Choisissez un lieu parent qui n'est pas contenu dans celui-ci.",
+      "galleryFull": "Retirez une image avant d'en ajouter une autre.",
+      "typeDuplicate": "Donnez un autre nom au type, ou utilisez celui qui existe."
+    },
+    "ganix": {
+      "unreadable": "Réexportez le projet depuis le GANIS d'origine (Fichier › Exporter), puis réessayez.",
+      "unsafe": "Ne l'ouvrez pas : demandez une nouvelle exportation à la personne qui vous l'a envoyé.",
+      "notGanix": "Choisissez un fichier qui se termine par .ganix.",
+      "migrationFailed": "Mettez GANIS à jour, puis réessayez l'import.",
+      "stagingMissing": "Fichier › Importer un fichier .ganix…"
+    },
+    "note": {
+      "contentTooLarge": "Découpez-la en plusieurs notes, ou retirez les grands schémas.",
+      "folderCycle": "Glissez-le plutôt sur un autre dossier, ou sur « Dossiers et notes » pour le sortir."
+    },
+    "trash": {
+      "notFound": "Il a peut-être été restauré ou supprimé définitivement : ouvrez Projet › Corbeille."
+    },
+    "history": {
+      "itemNotFound": "Il a peut-être été supprimé : regardez dans la corbeille.",
+      "restoreFailed": "Cet élément a trop changé depuis : copiez à la main ce dont vous avez besoin depuis la comparaison."
+    },
+    "internal": "Réessayez ; si le problème continue, redémarrez GANIS.",
+    "database": "Réessayez dans un instant. Si l'erreur revient, exportez le projet en .ganix (Fichier › Exporter) pour le mettre à l'abri, puis redémarrez GANIS.",
+    "io": "Vérifiez qu'il reste de la place sur le disque et que le dossier n'est pas en lecture seule.",
+    "unauthorized": "Reconnectez-vous."
+  },
+  "history": {
+    "unknownKind": "Cet élément n'a pas de versions.",
+    "versionNotFound": "Cette version n'existe plus.",
+    "itemNotFound": "Cet élément n'existe plus.",
+    "nameEmpty": "Donnez un nom à la version.",
+    "unreadable": "Cette version est illisible.",
+    "restoreFailed": "Cette version ne peut plus être restaurée."
   }
 }

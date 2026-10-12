@@ -1,0 +1,78 @@
+{
+  "label": "Menus",
+  "shift": "Maj",
+  "menus": {
+    "file": "Fichier",
+    "edit": "Édition",
+    "view": "Affichage",
+    "project": "Projet",
+    "help": "Aide"
+  },
+  "file": {
+    "new": "Nouveau",
+    "newIn": {
+      "characters.create": "Nouveau personnage",
+      "locations.create": "Nouveau lieu",
+      "structure.plan": "Nouvel élément du découpage",
+      "notes.create": "Nouvelle note",
+      "newProject": "Nouveau projet"
+    },
+    "save": "Enregistrer",
+    "saveAll": "Tout enregistrer",
+    "closeTab": "Fermer l'onglet",
+    "export": "Exporter le projet (.ganix)…",
+    "import": "Importer un fichier .ganix…",
+    "dashboard": "Tableau de bord",
+    "settings": "Paramètres généraux",
+    "quit": "Quitter",
+    "newChoose": "Nouveau…"
+  },
+  "edit": {
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "cut": "Couper",
+    "copy": "Copier",
+    "paste": "Coller",
+    "selectAll": "Tout sélectionner",
+    "trash": "Corbeille…",
+    "nothing": "Rien à annuler ici : placez d'abord le curseur dans un champ.",
+    "pasteBlocked": "Le presse-papiers n'est pas accessible depuis le menu : utilisez Ctrl+V.",
+    "search": "Rechercher…",
+    "history": "Historique…"
+  },
+  "view": {
+    "togglePanel": "Panneau latéral",
+    "showPanel": "Afficher le panneau latéral",
+    "hidePanel": "Masquer le panneau latéral",
+    "toggleRail": "Barre des modules",
+    "railNames": "Barre des modules : icônes et noms",
+    "railIcons": "Barre des modules : icônes seules",
+    "nextTab": "Onglet suivant",
+    "previousTab": "Onglet précédent",
+    "darkTheme": "Thème sombre",
+    "lightTheme": "Thème clair"
+  },
+  "project": {
+    "home": "Accueil du projet",
+    "synopsis": "Synopsis",
+    "settings": "Paramètres du projet",
+    "trash": "Corbeille",
+    "export": "Exporter en .ganix…",
+    "history": "Historique"
+  },
+  "help": {
+    "guide": "Guide de démarrage",
+    "shortcuts": "Raccourcis clavier",
+    "about": "À propos de GANIS",
+    "center": "Aide de GANIS"
+  },
+  "create": {
+    "title": "Que voulez-vous créer ?",
+    "description": "Choisissez avec la souris ou tapez le chiffre.",
+    "character": "Un personnage",
+    "location": "Un lieu",
+    "structure": "Un élément du découpage",
+    "note": "Une note",
+    "sticky": "Un post-it"
+  }
+}

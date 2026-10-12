@@ -53,11 +53,11 @@
     "locations": {
       "create": {
         "label": "Create a location",
-        "description": "Description, history and features of the location."
+        "description": "City, kingdom, forest… a sheet tailored to each type of place."
       },
       "list": {
         "label": "Location list",
-        "description": "All the locations in your world."
+        "description": "Every place in your world, nested inside one another."
       }
     },
     "structure": {
@@ -74,7 +74,19 @@
       "list": {
         "label": "Note list",
         "description": "All your project notes."
+      },
+      "wall": {
+        "label": "Sticky-note wall",
+        "description": "Sticky notes you can place freely, for loose ideas."
       }
+    },
+    "trash": {
+      "label": "Trash",
+      "description": "Items deleted less than 30 days ago, ready to restore."
+    },
+    "history": {
+      "label": "History",
+      "description": "What was done in the project, day by day."
     }
   }
 }

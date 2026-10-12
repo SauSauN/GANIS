@@ -1,5 +1,6 @@
 import { invoke } from "@tauri-apps/api/core";
 import i18n from "@/i18n";
+import { isWriteCommand, useSaveStatusStore } from "@/lib/saveStatus";
 import type {
   AccountCreated,
   ApiErrorPayload,
@@ -11,14 +12,42 @@ import type {
   CharacterSettings,
   GalleryImage,
   GraphPosition,
+  CharacterLocation,
+  CharacterLocationInput,
+  Location,
+  LocationImage,
+  LocationInput,
+  LocationSettings,
+  CustomLocationType,
   Relation,
   RelationInput,
-  Diagnostics,
+  // Diagnostics, // utilisé par getDiagnostics (en commentaire)
   ErrorCode,
+  GanixImportMode,
+  GanixImportOutcome,
+  GanixPreview,
   LoginResult,
   Project,
-  Role,
+  // Role, // utilisé par createUser (en commentaire)
   Structure,
+  StructureLevelInput,
+  StructureLinks,
+  NodeCharacterRole,
+  NodeLocationRole,
+  Note,
+  NoteFolder,
+  NoteSummary,
+  NoteUpdate,
+  StickyColor,
+  StickyNote,
+  StickyUpdate,
+  TrashItem,
+  Activity,
+  Version,
+  VersionKind,
+  VersionList,
+  SearchHit,
+  WorkCalendar,
   StructureNode,
   Synopsis,
   ThemeData,
@@ -40,6 +69,19 @@ const translate = i18n.t.bind(i18n) as unknown as (
  * 3. sinon → un message générique selon le code (`errors.codes.*`).
  */
 export function translateApiError(error: ApiError): string {
+  const message = translateMessage(error);
+
+  // Piste de solution, quand il y en a une (`errors.json` › `hints`).
+  const hintKey = error.key && i18n.exists(`errors:hints.${error.key}`)
+    ? `errors:hints.${error.key}`
+    : !error.key && i18n.exists(`errors:hints.codes.${error.code}`)
+      ? `errors:hints.codes.${error.code}`
+      : null;
+
+  return hintKey ? `${message} ${translate(hintKey)}` : message;
+}
+
+function translateMessage(error: ApiError): string {
   if (error.key && i18n.exists(`errors:${error.key}`)) {
     const params: Record<string, unknown> = { ...error.params };
 
@@ -217,10 +259,20 @@ async function call<T>(
   command: string,
   args?: Record<string, unknown>,
 ): Promise<T> {
+  // Les écritures sont signalées à la barre d'état (voir `saveStatus.ts`).
+  const writes = isWriteCommand(command);
+  const status = useSaveStatusStore.getState();
+
+  if (writes) status.begin();
+
   try {
-    return await invoke<T>(command, args);
+    const result = await invoke<T>(command, args);
+    if (writes) status.succeed();
+    return result;
   } catch (e) {
-    throw normalize(e);
+    const error = normalize(e);
+    if (writes) status.fail(error.message);
+    throw error;
   }
 }
 
@@ -255,39 +307,41 @@ export const api = {
     email?: string;
   }) => call<AccountCreated>("setup_admin", { input }),
 
-  /**
-   * Liste les comptes utilisateurs locaux.
-   *
-   * La protection administrateur est effectuée côté Rust.
-   */
-  listUsers: () => call<User[]>("list_users"),
-
-  /**
-   * Modifie le rôle d'un utilisateur.
-   *
-   * La vérification des droits administrateur est effectuée
-   * côté backend Rust.
-   */
-  updateUserRole: (userId: string, role: User["role"]) =>
-    call<User>("update_user_role", {
-      userId,
-      role,
-    }),
-
-  /**
-   * Crée un compte avec un rôle précis (administrateur uniquement).
-   */
-  createUser: (input: {
-    username: string;
-    password: string;
-    email?: string;
-    role: Role;
-  }) => call<User>("create_user", { input }),
-
-  /**
-   * Supprime un compte local, avec ses projets (administrateur uniquement).
-   */
-  deleteUser: (userId: string) => call<void>("delete_user", { userId }),
+  // Commandes d'administration désactivées côté Rust (mises en commentaire
+  // dans src-tauri/src/lib.rs). À décommenter en même temps qu'elles.
+  // /**
+  //  * Liste les comptes utilisateurs locaux.
+  //  *
+  //  * La protection administrateur est effectuée côté Rust.
+  //  */
+  // listUsers: () => call<User[]>("list_users"),
+  //
+  // /**
+  //  * Modifie le rôle d'un utilisateur.
+  //  *
+  //  * La vérification des droits administrateur est effectuée
+  //  * côté backend Rust.
+  //  */
+  // updateUserRole: (userId: string, role: User["role"]) =>
+  //   call<User>("update_user_role", {
+  //     userId,
+  //     role,
+  //   }),
+  //
+  // /**
+  //  * Crée un compte avec un rôle précis (administrateur uniquement).
+  //  */
+  // createUser: (input: {
+  //   username: string;
+  //   password: string;
+  //   email?: string;
+  //   role: Role;
+  // }) => call<User>("create_user", { input }),
+  //
+  // /**
+  //  * Supprime un compte local, avec ses projets (administrateur uniquement).
+  //  */
+  // deleteUser: (userId: string) => call<void>("delete_user", { userId }),
 
   /**
    * Indique si au moins un compte utilisateur existe.
@@ -372,10 +426,12 @@ export const api = {
     newPassword: string;
   }) => call<void>("change_password", { input }),
 
-  /**
-   * Rapport de diagnostic (administrateur ou développeur).
-   */
-  getDiagnostics: () => call<Diagnostics>("get_diagnostics"),
+  // Commande de diagnostic désactivée côté Rust (mise en commentaire
+  // dans src-tauri/src/lib.rs). À décommenter en même temps qu'elle.
+  // /**
+  //  * Rapport de diagnostic (administrateur ou développeur).
+  //  */
+  // getDiagnostics: () => call<Diagnostics>("get_diagnostics"),
 
   // -------------------------------------------------------------------------
   // Phase 4 — Projets
@@ -444,6 +500,33 @@ export const api = {
     call<void>("delete_project", { projectId }),
 
   // -------------------------------------------------------------------------
+  // Format .ganix
+  // -------------------------------------------------------------------------
+
+  /**
+   * Exporte un projet dans un fichier `.ganix` choisi par l'utilisateur
+   * (fenêtre ouverte par Rust). Retourne le nom du fichier écrit, ou `null`
+   * si l'utilisateur a annulé.
+   */
+  exportProject: (projectId: string, dialogTitle: string) =>
+    call<string | null>("export_project", { projectId, dialogTitle }),
+
+  /**
+   * Fait choisir un `.ganix`, le vérifie et le met en attente. Retourne
+   * l'aperçu, ou `null` si l'utilisateur a annulé.
+   */
+  inspectGanix: (dialogTitle: string) =>
+    call<GanixPreview | null>("inspect_ganix", { dialogTitle }),
+
+  /** Ajoute au compte le projet en attente. */
+  confirmGanixImport: (stagingId: string, mode: GanixImportMode) =>
+    call<GanixImportOutcome>("confirm_ganix_import", { stagingId, mode }),
+
+  /** Abandonne un import en attente (aucune trace). */
+  cancelGanixImport: (stagingId: string) =>
+    call<void>("cancel_ganix_import", { stagingId }),
+
+  // -------------------------------------------------------------------------
   // Synopsis
   // -------------------------------------------------------------------------
 
@@ -478,21 +561,47 @@ export const api = {
   getStructure: (projectId: string) =>
     call<Structure>("get_structure", { projectId }),
 
-  /** Choisit le modèle de découpage (`null` : il suit le type du projet). */
+  /**
+   * Choisit le modèle de découpage (`null` : il suit le type du projet).
+   * Les niveaux redeviennent ceux du modèle.
+   */
   setStructureTemplate: (projectId: string, template: string | null) =>
     call<void>("set_structure_template", { projectId, template }),
 
-  /** Ajoute un élément à la fin de son parent (ou de la racine). */
+  /** Personnalise les niveaux : noms, numérotation, ajout ou retrait. */
+  setStructureLevels: (projectId: string, levels: StructureLevelInput[]) =>
+    call<void>("set_structure_levels", { projectId, levels }),
+
+  /** Active ou désactive la mise à jour automatique des numéros. */
+  setStructureAutoNumbering: (projectId: string, enabled: boolean) =>
+    call<void>("set_structure_auto_numbering", { projectId, enabled }),
+
+  /** Remet tous les numéros dans l'ordre du plan (« Renuméroter »). */
+  renumberStructure: (projectId: string) =>
+    call<void>("renumber_structure", { projectId }),
+
+  /**
+   * Ajoute un élément à la fin de son parent (ou de la racine), ou juste
+   * après `afterId` (même parent). Le titre est facultatif.
+   */
   createStructureNode: (
     projectId: string,
-    input: { parentId: string | null; level: number; title: string },
+    input: {
+      parentId: string | null;
+      level: number;
+      title?: string;
+      afterId?: string | null;
+    },
   ) => call<StructureNode>("create_structure_node", { projectId, input }),
 
-  /** Modifie le titre et/ou le résumé d'un élément. */
+  /**
+   * Modifie le titre, le résumé, la numérotation et/ou le numéro (choisi à
+   * la main, numérotation non automatique) d'un élément.
+   */
   updateStructureNode: (
     projectId: string,
     nodeId: string,
-    input: { title?: string; summary?: string },
+    input: { title?: string; summary?: string; numbered?: boolean; number?: number },
   ) =>
     call<StructureNode>("update_structure_node", { projectId, nodeId, input }),
 
@@ -505,7 +614,138 @@ export const api = {
 
   /** Supprime un élément et tout ce qu'il contient. */
   deleteStructureNode: (projectId: string, nodeId: string) =>
-    call<void>("delete_structure_node", { projectId, nodeId }),
+    call<string>("delete_structure_node", { projectId, nodeId }),
+
+  /** Personnages et lieux liés aux éléments du découpage. */
+  listStructureLinks: (projectId: string) =>
+    call<StructureLinks>("list_structure_links", { projectId }),
+
+  /** Lie un personnage à un élément (ou change son rôle). */
+  linkStructureCharacter: (projectId: string, nodeId: string, characterId: string, role: NodeCharacterRole) =>
+    call<void>("link_structure_character", { projectId, nodeId, characterId, role }),
+
+  /** Retire un personnage d'un élément. */
+  unlinkStructureCharacter: (projectId: string, nodeId: string, characterId: string) =>
+    call<void>("unlink_structure_character", { projectId, nodeId, characterId }),
+
+  /** Lie un lieu à un élément (ou change son rôle). */
+  linkStructureLocation: (projectId: string, nodeId: string, locationId: string, role: NodeLocationRole) =>
+    call<void>("link_structure_location", { projectId, nodeId, locationId, role }),
+
+  /** Retire un lieu d'un élément. */
+  unlinkStructureLocation: (projectId: string, nodeId: string, locationId: string) =>
+    call<void>("unlink_structure_location", { projectId, nodeId, locationId }),
+
+  // -------------------------------------------------------------------------
+  // Corbeille (les suppressions ci-dessous renvoient l'identifiant de
+  // l'entrée de la corbeille, pour proposer « Annuler »)
+  // -------------------------------------------------------------------------
+
+  listTrash: (projectId: string) =>
+    call<TrashItem[]>("list_trash", { projectId }),
+
+  /** Remet un élément à sa place ; renvoie l'entrée restaurée. */
+  restoreTrash: (projectId: string, trashId: string) =>
+    call<TrashItem>("restore_trash", { projectId, trashId }),
+
+  purgeTrash: (projectId: string, trashId: string) =>
+    call<void>("purge_trash", { projectId, trashId }),
+
+  emptyTrash: (projectId: string) =>
+    call<void>("empty_trash", { projectId }),
+
+  // -------------------------------------------------------------------------
+  // Historique, versions, recherche
+  // -------------------------------------------------------------------------
+
+  /** Journal du projet, ou d'un seul élément (`kind` + `itemId`). */
+  listActivity: (projectId: string, filter: { kind?: string; itemId?: string; limit?: number } = {}) =>
+    call<Activity[]>("list_activity", {
+      projectId,
+      kind: filter.kind ?? null,
+      itemId: filter.itemId ?? null,
+      limit: filter.limit ?? null,
+    }),
+
+  listVersions: (projectId: string, kind: VersionKind, itemId: string) =>
+    call<VersionList>("list_versions", { projectId, kind, itemId }),
+
+  /** Version nommée de l'état actuel (« Avant réécriture »). */
+  createVersion: (projectId: string, kind: VersionKind, itemId: string, name: string) =>
+    call<Version>("create_version", { projectId, kind, itemId, name }),
+
+  /** Remet l'élément dans l'état de la version ; l'état actuel est gardé. */
+  restoreVersion: (projectId: string, versionId: string) =>
+    call<void>("restore_version", { projectId, versionId }),
+
+  deleteVersion: (projectId: string, versionId: string) =>
+    call<void>("delete_version", { projectId, versionId }),
+
+  /** Volume de travail jour par jour d'une année, tous projets confondus. */
+  getWorkCalendar: (year: number) =>
+    call<WorkCalendar>("get_work_calendar", { year }),
+
+  /** Recherche dans tout le projet (sans casse ni accents). */
+  searchProject: (projectId: string, query: string) =>
+    call<SearchHit[]>("search_project", { projectId, query }),
+
+  // -------------------------------------------------------------------------
+  // Notes
+  // -------------------------------------------------------------------------
+
+  /** Dossiers de notes du projet. */
+  listNoteFolders: (projectId: string) =>
+    call<NoteFolder[]>("list_note_folders", { projectId }),
+
+  createNoteFolder: (projectId: string, parentId: string | null, name: string) =>
+    call<NoteFolder>("create_note_folder", { projectId, parentId, name }),
+
+  renameNoteFolder: (projectId: string, folderId: string, name: string) =>
+    call<NoteFolder>("rename_note_folder", { projectId, folderId, name }),
+
+  /** Déplace un dossier (`null` : à la racine). Refusé dans l'un de ses sous-dossiers. */
+  moveNoteFolder: (projectId: string, folderId: string, parentId: string | null) =>
+    call<NoteFolder>("move_note_folder", { projectId, folderId, parentId }),
+
+  /** Supprime un dossier et ses sous-dossiers ; leurs notes remontent à la racine. */
+  deleteNoteFolder: (projectId: string, folderId: string) =>
+    call<string>("delete_note_folder", { projectId, folderId }),
+
+  /** Notes du projet, sans leur contenu (épinglées d'abord, puis les plus récentes). */
+  listNotes: (projectId: string) =>
+    call<NoteSummary[]>("list_notes", { projectId }),
+
+  getNote: (projectId: string, noteId: string) =>
+    call<Note>("get_note", { projectId, noteId }),
+
+  createNote: (projectId: string, folderId: string | null, title: string) =>
+    call<Note>("create_note", { projectId, folderId, title }),
+
+  updateNote: (projectId: string, noteId: string, input: NoteUpdate) =>
+    call<Note>("update_note", { projectId, noteId, input }),
+
+  moveNote: (projectId: string, noteId: string, folderId: string | null) =>
+    call<Note>("move_note", { projectId, noteId, folderId }),
+
+  deleteNote: (projectId: string, noteId: string) =>
+    call<string>("delete_note", { projectId, noteId }),
+
+  /** Post-it du mur. */
+  listStickyNotes: (projectId: string) =>
+    call<StickyNote[]>("list_sticky_notes", { projectId }),
+
+  createStickyNote: (projectId: string, color: StickyColor, x: number, y: number) =>
+    call<StickyNote>("create_sticky_note", { projectId, color, x, y }),
+
+  updateStickyNote: (projectId: string, stickyId: string, input: StickyUpdate) =>
+    call<StickyNote>("update_sticky_note", { projectId, stickyId, input }),
+
+  /** Met un post-it au premier plan. */
+  raiseStickyNote: (projectId: string, stickyId: string) =>
+    call<StickyNote>("raise_sticky_note", { projectId, stickyId }),
+
+  deleteStickyNote: (projectId: string, stickyId: string) =>
+    call<string>("delete_sticky_note", { projectId, stickyId }),
 
   // -------------------------------------------------------------------------
   // Personnages
@@ -539,6 +779,96 @@ export const api = {
   deleteCharacterGalleryImage: (projectId: string, imageId: string) =>
     call<void>("delete_character_gallery_image", { projectId, imageId }),
 
+  // -------------------------------------------------------------------------
+  // Liens personnage ↔ lieu
+  // -------------------------------------------------------------------------
+
+  /** Tous les liens personnage ↔ lieu du projet. */
+  listCharacterLocations: (projectId: string) =>
+    call<CharacterLocation[]>("list_character_locations", { projectId }),
+
+  /** Crée un lien. */
+  createCharacterLocation: (projectId: string, input: CharacterLocationInput) =>
+    call<CharacterLocation>("create_character_location", { projectId, input }),
+
+  /** Remplace un lien. */
+  updateCharacterLocation: (projectId: string, linkId: string, input: CharacterLocationInput) =>
+    call<CharacterLocation>("update_character_location", { projectId, linkId, input }),
+
+  /** Supprime un lien. */
+  deleteCharacterLocation: (projectId: string, linkId: string) =>
+    call<string>("delete_character_location", { projectId, linkId }),
+
+  // -------------------------------------------------------------------------
+  // Lieux
+  // -------------------------------------------------------------------------
+
+  /** Tous les lieux du projet, par nom. */
+  listLocations: (projectId: string) =>
+    call<Location[]>("list_locations", { projectId }),
+
+  /** Crée un lieu. */
+  createLocation: (projectId: string, input: LocationInput) =>
+    call<Location>("create_location", { projectId, input }),
+
+  /** Remplace la fiche d'un lieu. */
+  updateLocation: (projectId: string, locationId: string, input: LocationInput) =>
+    call<Location>("update_location", { projectId, locationId, input }),
+
+  /** Supprime un lieu (ses lieux contenus remontent d'un niveau). */
+  deleteLocation: (projectId: string, locationId: string) =>
+    call<string>("delete_location", { projectId, locationId }),
+
+  /** Réglages des lieux du projet (types ajoutés, listes). */
+  getLocationSettings: (projectId: string) =>
+    call<LocationSettings>("get_location_settings", { projectId }),
+
+  /** Remplace les types de lieux ajoutés par l'auteur (`id` absent : nouveau). */
+  setLocationCustomTypes: (
+    projectId: string,
+    types: Array<Omit<CustomLocationType, "id"> & { id?: string }>,
+  ) => call<LocationSettings>("set_location_custom_types", { projectId, types }),
+
+  /** Remplace une liste personnalisable (`null` : valeurs par défaut). */
+  setLocationList: (projectId: string, list: "status", values: string[] | null) =>
+    call<LocationSettings>("set_location_list", { projectId, list, values }),
+
+  /** Image principale d'un lieu (`null` : pas d'image). */
+  getLocationPortrait: (projectId: string, locationId: string) =>
+    call<CharacterPortrait | null>("get_location_portrait", { projectId, locationId }),
+
+  /** Remplace l'image principale (`data` : image en base64). */
+  setLocationPortrait: (projectId: string, locationId: string, data: string) =>
+    call<Location>("set_location_portrait", { projectId, locationId, data }),
+
+  /** Retire l'image principale. */
+  removeLocationPortrait: (projectId: string, locationId: string) =>
+    call<Location>("remove_location_portrait", { projectId, locationId }),
+
+  /** Images de la galerie d'un lieu (sans leur contenu). */
+  listLocationGallery: (projectId: string, locationId: string) =>
+    call<LocationImage[]>("list_location_gallery", { projectId, locationId }),
+
+  /** Contenu d'une image de la galerie. */
+  getLocationGalleryImage: (projectId: string, imageId: string) =>
+    call<CharacterPortrait>("get_location_gallery_image", { projectId, imageId }),
+
+  /** Ajoute une image à la galerie (`data` : image en base64). */
+  addLocationGalleryImage: (
+    projectId: string,
+    locationId: string,
+    data: string,
+    caption: string | null = null,
+  ) => call<LocationImage>("add_location_gallery_image", { projectId, locationId, data, caption }),
+
+  /** Change la légende d'une image. */
+  setLocationGalleryCaption: (projectId: string, imageId: string, caption: string | null) =>
+    call<void>("set_location_gallery_caption", { projectId, imageId, caption }),
+
+  /** Supprime une image de la galerie. */
+  deleteLocationGalleryImage: (projectId: string, imageId: string) =>
+    call<void>("delete_location_gallery_image", { projectId, imageId }),
+
   /** Tous les personnages du projet, par ordre alphabétique. */
   listCharacters: (projectId: string) =>
     call<Character[]>("list_characters", { projectId }),
@@ -553,7 +883,7 @@ export const api = {
 
   /** Supprime un personnage et sa photo. */
   deleteCharacter: (projectId: string, characterId: string) =>
-    call<void>("delete_character", { projectId, characterId }),
+    call<string>("delete_character", { projectId, characterId }),
 
   /** Photo d'un personnage (`null` : pas de photo). */
   getCharacterPortrait: (projectId: string, characterId: string) =>
@@ -584,7 +914,7 @@ export const api = {
 
   /** Supprime une relation. */
   deleteRelation: (projectId: string, relationId: string) =>
-    call<void>("delete_relation", { projectId, relationId }),
+    call<string>("delete_relation", { projectId, relationId }),
 
   /** Positions de la disposition libre du graphe. */
   getGraphPositions: (projectId: string) =>

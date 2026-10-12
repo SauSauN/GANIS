@@ -288,7 +288,7 @@ function SortableTab({
           onTogglePin(tab.id);
         }}
         className={cn(
-          "flex h-5 w-5 shrink-0 items-center justify-center rounded hover:bg-secondary",
+          "flex h-6 w-6 shrink-0 items-center justify-center rounded hover:bg-secondary",
           !tab.pinned &&
             "opacity-0 focus-visible:opacity-100 group-focus-within:opacity-100 group-hover:opacity-100",
         )}
@@ -321,7 +321,7 @@ function SortableTab({
               : t("tab.close")
           }
           onClick={() => onClose(tab.id)}
-          className="flex h-5 w-5 shrink-0 items-center justify-center rounded hover:bg-secondary"
+          className="flex h-6 w-6 shrink-0 items-center justify-center rounded hover:bg-secondary"
         >
           {/* Comme VS Code : un point tant que ce n'est pas enregistré,
               la croix au survol pour pouvoir fermer quand même. */}

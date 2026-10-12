@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { VersionsButton } from "@/components/history/VersionsDialog";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
 import { useTranslation } from "react-i18next";
 import { useEditor, EditorContent } from "@tiptap/react";
@@ -380,13 +381,11 @@ export function SynopsisEditView({
             EN-TÊTE
             ================================================================ */}
 
-        <header className="mb-8">
+        <header className="mb-6">
 
-          <h1 className="text-3xl font-semibold tracking-tight">
-            {feature.label}
-          </h1>
+          <h1 className="sr-only">{feature.label}</h1>
 
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">
+          <p className="max-w-3xl text-sm leading-6 text-muted-foreground">
             {feature.description}
           </p>
         </header>
@@ -529,6 +528,14 @@ export function SynopsisEditView({
               {t("saveFailed")}
             </p>
           )}
+
+          <VersionsButton
+            className="ml-auto"
+            projectId={projectId}
+            kind="synopsis"
+            itemId="default"
+            name={t("card.title")}
+          />
         </div>
       </div>
     </main>

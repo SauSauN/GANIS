@@ -53,11 +53,11 @@
     "locations": {
       "create": {
         "label": "Créer un lieu",
-        "description": "Description, histoire et caractéristiques du lieu."
+        "description": "Ville, royaume, forêt… une fiche adaptée à chaque type de lieu."
       },
       "list": {
         "label": "Liste des lieux",
-        "description": "Tous les lieux de votre univers."
+        "description": "Tous les lieux de votre univers, rangés les uns dans les autres."
       }
     },
     "structure": {
@@ -74,7 +74,19 @@
       "list": {
         "label": "Liste des notes",
         "description": "Toutes vos notes de projet."
+      },
+      "wall": {
+        "label": "Mur de post-it",
+        "description": "Des post-it à placer librement, pour les idées en vrac."
       }
+    },
+    "trash": {
+      "label": "Corbeille",
+      "description": "Les éléments supprimés depuis moins de 30 jours, à restaurer."
+    },
+    "history": {
+      "label": "Historique",
+      "description": "Ce qui a été fait dans le projet, jour par jour."
     }
   }
 }

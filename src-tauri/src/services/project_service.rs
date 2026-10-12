@@ -35,6 +35,12 @@ const COLUMNS: &str = "id, name, description, project_type, status, \
 /// Suffixe ajouté au nom d'un projet dupliqué.
 const COPY_SUFFIX: &str = " (copie)";
 
+/// Suffixe du nom d'un projet importé alors que l'utilisateur l'a déjà.
+pub const IMPORT_SUFFIX: &str = " (importé)";
+
+/// Longueur maximale d'un nom de projet (pour ajouter un suffixe).
+pub const MAX_PROJECT_NAME_CHARS: usize = MAX_NAME_CHARS;
+
 fn validate_name(name: &str) -> AppResult<()> {
     if name.is_empty() {
         return Err(AppError::validation(
@@ -157,6 +163,7 @@ pub async fn create_project(
         pool,
         owner_id,
         account_key,
+        None,
         name,
         description,
         project_type,
@@ -165,18 +172,51 @@ pub async fn create_project(
     .await
 }
 
-/// Insère une ligne dans `projects`, avec une nouvelle clé de projet, et
-/// retourne le projet créé (déchiffré) et sa clé.
-async fn insert_project(
+/// Crée la ligne d'un projet importé (.ganix). `id` : identifiant à garder
+/// (`None` : nouvel identifiant, quand celui du fichier est déjà pris).
+#[allow(clippy::too_many_arguments)]
+pub async fn create_imported_project(
     pool: &SqlitePool,
     owner_id: &str,
     account_key: &SecretKey,
+    id: Option<&str>,
     name: &str,
     description: &str,
     project_type: ProjectType,
     status: ProjectStatus,
 ) -> AppResult<(Project, SecretKey)> {
-    let id = Uuid::new_v4().to_string();
+    let name = name.trim();
+    let description = description.trim();
+
+    validate_name(name)?;
+    validate_description(description)?;
+
+    insert_project(pool, owner_id, account_key, id, name, description, project_type, status).await
+}
+
+/// Vrai si un projet (de n'importe quel compte) porte cet identifiant.
+pub async fn id_exists(pool: &SqlitePool, id: &str) -> AppResult<bool> {
+    let found: Option<String> = sqlx::query_scalar("SELECT id FROM projects WHERE id = ?")
+        .bind(id)
+        .fetch_optional(pool)
+        .await?;
+    Ok(found.is_some())
+}
+
+/// Insère une ligne dans `projects`, avec une nouvelle clé de projet, et
+/// retourne le projet créé (déchiffré) et sa clé.
+#[allow(clippy::too_many_arguments)]
+async fn insert_project(
+    pool: &SqlitePool,
+    owner_id: &str,
+    account_key: &SecretKey,
+    id: Option<&str>,
+    name: &str,
+    description: &str,
+    project_type: ProjectType,
+    status: ProjectStatus,
+) -> AppResult<(Project, SecretKey)> {
+    let id = id.map(str::to_owned).unwrap_or_else(|| Uuid::new_v4().to_string());
     let now = crate::utils::now_utc();
 
     let project_key = SecretKey::generate();
@@ -295,11 +335,28 @@ pub async fn list_projects_for_user(
     owner_id: &str,
     account_key: &SecretKey,
 ) -> AppResult<Vec<Project>> {
-    list_stored_for_user(pool, owner_id)
-        .await?
-        .into_iter()
-        .map(|project| reveal(project, account_key))
-        .collect()
+    let stored = list_stored_for_user(pool, owner_id).await?;
+    let mut projects = Vec::with_capacity(stored.len());
+
+    // Un projet dont le nom ou la description ne se déchiffre plus (ligne
+    // abîmée) est écarté de la liste au lieu de faire échouer tout le
+    // tableau de bord. Il n'est ni modifié ni supprimé : l'erreur est
+    // journalisée pour pouvoir le réparer.
+    for project in stored {
+        let id = project.id.clone();
+
+        match reveal(project, account_key) {
+            Ok(project) => projects.push(project),
+            Err(error) => tracing::error!(
+                project = %id,
+                error = %error,
+                detail = error.detail().unwrap_or_default(),
+                "Projet illisible écarté de la liste"
+            ),
+        }
+    }
+
+    Ok(projects)
 }
 
 /// Identifiants des projets d'un utilisateur (sans rien déchiffrer).
@@ -467,6 +524,7 @@ pub async fn duplicate_project(
         pool,
         owner_id,
         account_key,
+        None,
         &copy_name,
         &source.description,
         source.project_type,

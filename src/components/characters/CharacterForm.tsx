@@ -11,6 +11,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PortraitPicker } from "@/components/characters/PortraitPicker";
+import { PlaceField } from "@/components/locations/PlaceField";
 import {
   ChoiceField,
   ColorsField,
@@ -233,6 +234,18 @@ export function CharacterSheet({
                   disabled={disabled}
                 />
               );
+            case "place":
+              return (
+                <PlaceField
+                  id={id}
+                  projectId={projectId}
+                  value={value}
+                  onChange={change}
+                  placeholder={placeholder}
+                  maxLength={field.maxLength}
+                  disabled={disabled}
+                />
+              );
             case "tags":
               return (
                 <TagsField
@@ -311,7 +324,7 @@ export function CharacterSheet({
               maxLength={MAX_NAME_LENGTH}
               aria-invalid={nameError ? true : undefined}
               disabled={disabled}
-              onChange={(e) => set("lastName", e.target.value)}
+              onChange={(e) => set("lastName", e.target.value.toLocaleUpperCase())}
             />
           </div>
           {nameError && (
@@ -397,19 +410,6 @@ export function CharacterSheet({
               {listLabel("status", draft.status)}
             </span>
           </div>
-
-          {palette.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-1" aria-label={label("colorPalette")}>
-              {palette.map((color, index) => (
-                <span
-                  key={`${color}-${index}`}
-                  className="size-5 rounded-full border shadow-sm"
-                  style={{ backgroundColor: color }}
-                  title={color}
-                />
-              ))}
-            </div>
-          )}
 
           <div className="w-full space-y-3 border-t pt-4 text-left">
             <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">

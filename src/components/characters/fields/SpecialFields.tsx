@@ -4,17 +4,17 @@ import { Check, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { fieldClass } from "@/components/workspace/views/PageShell";
-import { api } from "@/lib/api";
 import {
   isDefaultValue,
   listValues,
   parseList,
   serializeList,
 } from "@/lib/characters";
-import { buildStructureTree, flattenVisible, levelKey } from "@/lib/structure";
+import { useProjectStructure } from "@/components/structure/useProjectStructure";
+import { buildStructureTree, flattenVisible } from "@/lib/structure";
 import { cn } from "@/lib/utils";
 import { useCharacterStore } from "@/stores/characterStore";
-import type { CharacterListKey, Structure } from "@/types";
+import type { CharacterListKey } from "@/types";
 
 // ----------------------------------------------------------------------------
 // Libellé d'une valeur de liste
@@ -314,7 +314,7 @@ export function ColorsField({ id, value, onChange, disabled }: ColorsFieldProps)
             disabled={disabled}
             onClick={() => onChange(serializeList(colors.filter((_, i) => i !== index)))}
             aria-label={t("colors.remove", { color })}
-            className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full border bg-background opacity-0 shadow-sm transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
+            className="absolute -top-2 -right-2 flex size-6 items-center justify-center rounded-full border bg-background opacity-0 shadow-sm transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
           >
             <X className="size-2.5" />
           </button>
@@ -351,26 +351,6 @@ export function ColorsField({ id, value, onChange, disabled }: ColorsFieldProps)
 // Première apparition (élément du découpage)
 // ----------------------------------------------------------------------------
 
-/** Découpage du projet, chargé une fois par vue. */
-function useStructure(projectId: string): Structure | null {
-  const [structure, setStructure] = useState<Structure | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    api
-      .getStructure(projectId)
-      .then((next) => !cancelled && setStructure(next))
-      .catch(() => !cancelled && setStructure(null));
-
-    return () => {
-      cancelled = true;
-    };
-  }, [projectId]);
-
-  return structure;
-}
-
 interface ReferenceFieldProps {
   id: string;
   projectId: string;
@@ -385,15 +365,10 @@ interface ReferenceFieldProps {
  */
 export function ReferenceField({ id, projectId, value, onChange, disabled }: ReferenceFieldProps) {
   const { t } = useTranslation(["characters", "structure"]);
-  const structure = useStructure(projectId);
+  const { structure, labelOf } = useProjectStructure(projectId);
 
   const nodes = structure ? flattenVisible(buildStructureTree(structure.nodes), new Set()) : [];
   const known = !value || nodes.some((node) => node.id === value);
-
-  const levelName = (level: number) =>
-    structure
-      ? t(`structure:templates.${structure.template}.levels.${levelKey(level)}.one`)
-      : "";
 
   return (
     <select
@@ -408,8 +383,8 @@ export function ReferenceField({ id, projectId, value, onChange, disabled }: Ref
       </option>
       {nodes.map((node) => (
         <option key={node.id} value={node.id}>
-          {"  ".repeat(node.depth)}
-          {levelName(node.level)} · {node.title}
+          {"\u00a0\u00a0".repeat(node.depth)}
+          {labelOf(node)}
         </option>
       ))}
       {!known && structure && <option value={value}>{t("reference.deleted")}</option>}

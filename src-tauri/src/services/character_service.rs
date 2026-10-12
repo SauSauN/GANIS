@@ -113,6 +113,9 @@ pub enum FieldKind {
     Choice,
     /// Élément du découpage du récit (identifiant).
     Reference,
+    /// Lieu du projet (identifiant) ou, à défaut, texte libre (lieu qui
+    /// n'existe pas encore dans le projet).
+    Place,
     /// Étiquettes : tableau JSON de textes.
     Tags,
     /// Couleurs : tableau JSON de « #rrggbb ».
@@ -135,7 +138,7 @@ const fn def(key: &'static str, level: DetailLevel, kind: FieldKind, max_chars: 
 }
 
 use DetailLevel::{Advanced, Basic, Intermediate};
-use FieldKind::{Choice, Colors, Date, LongText, Reference, Tags, Text};
+use FieldKind::{Choice, Colors, Date, LongText, Place, Reference, Tags, Text};
 
 /// Champs enregistrés dans `fields` (même ordre que l'interface).
 pub const FIELDS: &[FieldDef] = &[
@@ -145,7 +148,7 @@ pub const FIELDS: &[FieldDef] = &[
     def("birthDate", Basic, Date, SHORT),
     def("gender", Basic, Choice, MAX_CHOICE_CHARS),
     def("occupation", Basic, Text, SHORT),
-    def("origin", Basic, Text, SHORT),
+    def("origin", Basic, Place, SHORT),
     def("firstAppearance", Basic, Reference, SHORT),
     def("description", Basic, LongText, LONG),
     def("mainGoal", Basic, Text, MEDIUM),
@@ -364,7 +367,7 @@ fn clean_value(def: &'static FieldDef, raw: &str) -> AppResult<Option<String>> {
     }
 
     match def.kind {
-        Text | LongText | Choice | Reference => {
+        Text | LongText | Choice | Reference | Place => {
             if value.chars().count() > def.max_chars {
                 return Err(too_long(def.key, def.max_chars));
             }
@@ -417,7 +420,8 @@ fn clean_value(def: &'static FieldDef, raw: &str) -> AppResult<Option<String>> {
 
 async fn clean_input(pool: &SqlitePool, input: &CharacterInput) -> AppResult<CleanInput> {
     let first_name = clean_name(&input.first_name)?;
-    let last_name = clean_name(&input.last_name)?;
+    // Nom de famille toujours en majuscules (« Aldric VENN »).
+    let last_name = clean_name(&input.last_name)?.to_uppercase();
 
     if first_name.is_empty() && last_name.is_empty() {
         return Err(AppError::validation("Le prénom ou le nom du personnage est requis.")
@@ -481,7 +485,7 @@ fn image_too_large() -> AppError {
 }
 
 /// Décode et vérifie une image envoyée en base64.
-fn decode_image(data: &str) -> AppResult<(Vec<u8>, &'static str)> {
+pub(crate) fn decode_image(data: &str) -> AppResult<(Vec<u8>, &'static str)> {
     let invalid = || {
         AppError::validation("Cette image n'est pas lisible (PNG, JPEG, WebP ou GIF).")
             .with_key("character.invalidImage")
@@ -714,18 +718,65 @@ pub async fn update_character(
     get_character(pool, id).await
 }
 
-/// Supprime un personnage (et ses images).
-pub async fn delete_character(pool: &SqlitePool, id: &str) -> AppResult<()> {
+/// Supprime un personnage (et ses images) ; il va dans la corbeille.
+/// Renvoie l'identifiant de l'entrée de la corbeille.
+///
+/// Ses liens avec des lieux sont supprimés avec lui (base) ; les champs de
+/// lieux qui le désignaient (« Dirigeant »…) sont vidés.
+pub async fn delete_character(pool: &SqlitePool, id: &str) -> AppResult<String> {
+    let mut tx = pool.begin().await?;
+
+    let mut snapshot = crate::services::trash_service::Snapshot::new();
+    snapshot.capture(&mut tx, "characters", "id", id).await?;
+    if snapshot.is_empty() {
+        return Err(not_found());
+    }
+    let label: String = sqlx::query_scalar("SELECT trim(first_name || ' ' || last_name) FROM characters WHERE id = ?")
+        .bind(id)
+        .fetch_one(&mut *tx)
+        .await?;
+
+    for key in crate::services::location_service::character_field_keys() {
+        let path = format!("$.{key}");
+        let ids: Vec<String> = sqlx::query_scalar("SELECT id FROM locations WHERE json_extract(fields, ?) = ?")
+            .bind(&path)
+            .bind(id)
+            .fetch_all(&mut *tx)
+            .await?;
+        for location in ids {
+            snapshot.restore_json("locations", &location, "fields", &path, id, None);
+        }
+    }
+
     let result = sqlx::query("DELETE FROM characters WHERE id = ?")
         .bind(id)
-        .execute(pool)
+        .execute(&mut *tx)
         .await?;
 
     if result.rows_affected() == 0 {
         return Err(not_found());
     }
 
-    Ok(())
+    for key in crate::services::location_service::character_field_keys() {
+        let path = format!("$.{key}");
+
+        sqlx::query("UPDATE locations SET fields = json_remove(fields, ?) WHERE json_extract(fields, ?) = ?")
+            .bind(&path)
+            .bind(&path)
+            .bind(id)
+            .execute(&mut *tx)
+            .await?;
+    }
+
+    let trash_id = snapshot.store(&mut tx, "character", id, &label).await?;
+    tx.commit().await?;
+
+    Ok(trash_id)
+}
+
+/// Clés des champs de la fiche qui désignent un lieu (« Origine »).
+pub fn place_field_keys() -> impl Iterator<Item = &'static str> {
+    FIELDS.iter().filter(|def| def.kind == Place).map(|def| def.key)
 }
 
 // ----------------------------------------------------------------------------
@@ -826,26 +877,17 @@ pub async fn add_gallery_image(
     let (bytes, mime) = decode_image(data)?;
     ensure_character(pool, character_id).await?;
 
-    let count: i64 =
-        sqlx::query_scalar("SELECT COUNT(*) FROM character_images WHERE character_id = ?")
-            .bind(character_id)
-            .fetch_one(pool)
-            .await?;
-
-    if count >= MAX_GALLERY_IMAGES {
-        return Err(AppError::validation("La galerie est pleine.")
-            .with_key("character.galleryFull")
-            .with_param("max", MAX_GALLERY_IMAGES));
-    }
-
     let id = new_id();
     let now = now_utc();
 
-    sqlx::query(
+    // Le comptage et l'ajout se font dans la même requête : deux ajouts
+    // simultanés ne peuvent pas dépasser la limite.
+    let result = sqlx::query(
         r#"
         INSERT INTO character_images (id, character_id, mime, data, position, created_at)
         SELECT ?, ?, ?, ?, COALESCE(MAX(position), -1) + 1, ?
         FROM character_images WHERE character_id = ?
+        HAVING COUNT(*) < ?
         "#,
     )
     .bind(&id)
@@ -854,8 +896,15 @@ pub async fn add_gallery_image(
     .bind(&bytes)
     .bind(&now)
     .bind(character_id)
+    .bind(MAX_GALLERY_IMAGES)
     .execute(pool)
     .await?;
+
+    if result.rows_affected() == 0 {
+        return Err(AppError::validation("La galerie est pleine.")
+            .with_key("character.galleryFull")
+            .with_param("max", MAX_GALLERY_IMAGES));
+    }
 
     touch(pool, character_id).await?;
 
@@ -1082,7 +1131,7 @@ mod tests {
     #[tokio::test]
     async fn first_appearance_points_to_an_existing_structure_node() {
         let pool = pool().await;
-        let node = crate::services::structure_service::create_node(&pool, None, 1, "Chapitre 1")
+        let node = crate::services::structure_service::create_node(&pool, crate::models::project::ProjectType::Novel, None, 1, "Chapitre 1", None)
             .await
             .unwrap();
 
@@ -1112,7 +1161,8 @@ mod tests {
             .into_iter()
             .map(|c| format!("{} {}", c.first_name, c.last_name).trim().to_owned())
             .collect();
-        assert_eq!(names, ["arthur", "Gandalf", "Zoé Roux"]);
+        // Nom de famille enregistré en majuscules.
+        assert_eq!(names, ["arthur", "GANDALF", "Zoé ROUX"]);
 
         assert!(update_character(&pool, "inconnu", &input("A", "", &[])).await.is_err());
         assert!(delete_character(&pool, "inconnu").await.is_err());

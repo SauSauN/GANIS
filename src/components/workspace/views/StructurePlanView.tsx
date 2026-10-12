@@ -14,10 +14,14 @@ import {
   ArrowUp,
   ChevronDown,
   ChevronRight,
+  CornerDownRight,
+  IdCard,
+  ListOrdered,
   ListTree,
   Loader2,
   Pencil,
   Plus,
+  Settings2,
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,65 +34,81 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { StructureLevelsEditor } from "@/components/structure/StructureLevelsEditor";
+import { StructureTemplatePicker } from "@/components/structure/StructureTemplatePicker";
+import { useStructureLabels } from "@/components/structure/useProjectStructure";
+import { useStructureStore } from "@/stores/structureStore";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { api } from "@/lib/api";
+import { announceDeletion } from "@/lib/trash";
 import {
   buildStructureTree,
-  countAtLevel,
   countByLevel,
   flattenVisible,
-  LEVEL_KEYS,
-  levelKey,
-  STRUCTURE_LEVELS,
-  STRUCTURE_TEMPLATES,
-  templateForProjectType,
+  levelOf,
+  MAX_NUMBER,
+  structureNodeTabId,
   type StructureTreeNode,
 } from "@/lib/structure";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
 import { cn } from "@/lib/utils";
-import type { Project, Structure, StructureTemplateId } from "@/types";
+import type { Project, StructureNode, StructureTemplateId } from "@/types";
 
 const fieldClass =
   "w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
 
-/** Couleur du repère de chaque niveau (du plus large au plus fin). */
-const LEVEL_DOT = ["bg-primary", "bg-primary/60", "bg-primary/30"];
-
-/** Valeur du sélecteur quand le modèle suit le type du projet. */
-const AUTO = "auto";
-
 interface StructurePlanViewProps {
   project: Project;
   feature: WorkspaceFeature;
+  /** Ouvre un onglet (fiche d'un élément). */
+  onOpenFeature?: (featureId: string) => void;
 }
 
-/** Élément en cours de modification (titre et résumé). */
+/** Élément en cours de modification (titre, résumé, numérotation). */
 interface Draft {
   id: string;
   title: string;
   summary: string;
+  numbered: boolean;
+  /** Numéro choisi (numérotation non automatique), en texte. */
+  number: string;
   /** Valeurs enregistrées, pour savoir s'il y a des modifications. */
   savedTitle: string;
   savedSummary: string;
+  savedNumbered: boolean;
+  savedNumber: string;
 }
 
 /**
  * Plan du récit : le découpage du projet, en arbre.
  *
  * Les niveaux portent les noms du modèle de découpage (Partie › Chapitre ›
- * Scène pour un roman, Acte › Séquence › Scène pour un film…). Le modèle
- * suit le type du projet, ou un autre choisi ici : changer de modèle ne
- * renomme que les niveaux, aucune donnée n'est touchée.
+ * Scène pour un roman, Acte › Séquence › Scène pour un film…) ou ceux
+ * choisis par l'utilisateur (« Personnaliser » : noms, numérotation, 1 à 5
+ * niveaux).
+ *
+ * Numéros (« Chapitre 3 ») : par défaut, chaque élément garde celui reçu
+ * à sa création (modifiable ; « Renuméroter » les remet dans l'ordre). Avec
+ * la numérotation automatique (paramètres du projet), ils suivent l'ordre
+ * du plan. Le titre est facultatif.
  *
  * Chaque action (ajout, déplacement, suppression) est enregistrée tout de
  * suite. Seule la modification du titre et du résumé passe par
  * « Enregistrer », avec le point ● sur l'onglet tant qu'elle est en cours.
  */
-export function StructurePlanView({ project, feature }: StructurePlanViewProps) {
+export function StructurePlanView({ project, feature, onOpenFeature }: StructurePlanViewProps) {
   const { t } = useTranslation(["structure", "common"]);
 
-  const [structure, setStructure] = useState<Structure | null>(null);
-  const [loadError, setLoadError] = useState<string | null>(null);
+  const structure = useStructureStore((state) =>
+    state.projectId === project.id ? state.structure : null,
+  );
+  const loadError = useStructureStore((state) =>
+    state.projectId === project.id ? state.error : null,
+  );
+  const fetchStructure = useStructureStore((state) => state.fetchStructure);
+  const focus = useStructureStore((state) => state.focus);
+  const clearFocus = useStructureStore((state) => state.clearFocus);
+
   const [actionError, setActionError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -96,6 +116,10 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
   const [draft, setDraft] = useState<Draft | null>(null);
   const [draftError, setDraftError] = useState<string | null>(null);
   const [toDelete, setToDelete] = useState<StructureTreeNode | null>(null);
+  const [customizing, setCustomizing] = useState(false);
+  const [renumbering, setRenumbering] = useState(false);
+  /** Élément montré après un clic dans l'arborescence du panneau latéral. */
+  const [highlight, setHighlight] = useState<string | null>(null);
 
   const titleInputRef = useRef<HTMLInputElement>(null);
 
@@ -103,17 +127,9 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
   // Chargement
   // ---------------------------------------------------------------------------
 
-  const load = useCallback(async () => {
-    try {
-      const next = await api.getStructure(project.id);
-      setStructure(next);
-      setLoadError(null);
-      return next;
-    } catch (e) {
-      setLoadError(e instanceof Error ? e.message : t("plan.loadFailed"));
-      return null;
-    }
-  }, [project.id, t]);
+  // Découpage partagé (voir `structureStore`) : l'arborescence du panneau
+  // latéral, les fiches et les relations voient chaque modification.
+  const load = useCallback(() => fetchStructure(project.id), [fetchStructure, project.id]);
 
   // Rechargé aussi quand le type du projet change (paramètres du projet) :
   // un modèle qui suit le type change avec lui.
@@ -144,7 +160,10 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
 
   const dirty =
     draft !== null &&
-    (draft.title !== draft.savedTitle || draft.summary !== draft.savedSummary);
+    (draft.title !== draft.savedTitle ||
+      draft.summary !== draft.savedSummary ||
+      draft.numbered !== draft.savedNumbered ||
+      draft.number !== draft.savedNumber);
 
   async function saveDraft(): Promise<boolean> {
     if (!draft) return true;
@@ -152,9 +171,18 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
     setDraftError(null);
 
     try {
+      const number = draft.number.trim() === "" ? undefined : Number(draft.number);
+
+      if (number !== undefined && (!Number.isInteger(number) || number < 0 || number > MAX_NUMBER)) {
+        setDraftError(t("plan.edit.numberInvalid", { max: MAX_NUMBER }));
+        return false;
+      }
+
       const saved = await api.updateStructureNode(project.id, draft.id, {
         title: draft.title,
         summary: draft.summary,
+        numbered: draft.numbered,
+        number: draft.number !== draft.savedNumber ? number : undefined,
       });
 
       setDraft(null);
@@ -172,17 +200,26 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
   useUnsavedChanges({
     dirty,
     save: saveDraft,
-    revision: draft ? `${draft.title}\u0000${draft.summary}` : null,
+    revision: draft
+      ? `${draft.title}\u0000${draft.summary}\u0000${draft.numbered}\u0000${draft.number}`
+      : null,
   });
 
-  function startEditing(node: StructureTreeNode) {
+  function startEditing(node: StructureNode) {
     setDraftError(null);
+    const number = numbers.get(node.id);
+    const shown = number === undefined ? "" : String(number);
+
     setDraft({
       id: node.id,
       title: node.title,
       summary: node.summary,
+      numbered: node.numbered,
+      number: shown,
       savedTitle: node.title,
       savedSummary: node.summary,
+      savedNumbered: node.numbered,
+      savedNumber: shown,
     });
   }
 
@@ -202,40 +239,73 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
   // Actions
   // ---------------------------------------------------------------------------
 
-  const template = structure?.template ?? templateForProjectType(project.type);
+  const { levels, numbers, headingOf, colorOf } = useStructureLabels(structure);
+  const autoNumbering = structure?.autoNumbering ?? false;
 
-  const levelLabel = (level: number, form: "one" | "other" | "add" | "new") =>
-    t(`templates.${template}.levels.${levelKey(level)}.${form}`);
+  // Clic dans l'arborescence du panneau latéral : l'élément est déplié,
+  // montré et ouvert (sauf modification en cours sur un autre élément).
+  useEffect(() => {
+    if (!focus || !structure) return;
 
-  async function addNode(parentId: string | null, level: number) {
+    const node = structure.nodes.find((n) => n.id === focus.nodeId);
+    clearFocus();
+    if (!node) return;
+
+    const byId = new Map(structure.nodes.map((n) => [n.id, n]));
+    setCollapsed((current) => {
+      const next = new Set(current);
+      for (let parent = node.parentId; parent; parent = byId.get(parent)?.parentId ?? null) {
+        next.delete(parent);
+      }
+      return next;
+    });
+    setHighlight(node.id);
+
+    if (!dirty) {
+      startEditing(node);
+    }
+
+    requestAnimationFrame(() =>
+      document
+        .getElementById(`structure-node-${node.id}`)
+        ?.scrollIntoView({ block: "center", behavior: "smooth" }),
+    );
+    // Seulement à chaque nouvelle demande.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focus, structure]);
+
+  // Le repère disparaît après quelques secondes.
+  useEffect(() => {
+    if (!highlight) return;
+    const timer = window.setTimeout(() => setHighlight(null), 2500);
+    return () => window.clearTimeout(timer);
+  }, [highlight]);
+
+  /** « Renuméroter » : remet tous les numéros dans l'ordre du plan. */
+  async function renumber() {
+    setRenumbering(false);
+    await run(() => api.renumberStructure(project.id));
+  }
+
+  /** Nom d'un niveau (« Chapitre »), même au-delà du dernier niveau. */
+  const levelName = (level: number) => levelOf(levels, level)?.one ?? "";
+
+  /**
+   * Ajoute un élément sans titre (il s'appelle « Chapitre 4 » d'après sa
+   * place). `afterId` : juste après cet élément, sinon à la fin du parent.
+   */
+  async function addNode(parentId: string | null, level: number, afterId: string | null = null) {
     if (!structure) return;
 
-    const number = countAtLevel(structure.nodes, parentId, level) + 1;
-
     const created = await run(() =>
-      api.createStructureNode(project.id, {
-        parentId,
-        level,
-        title: `${levelLabel(level, "new")} ${number}`,
-      }),
+      api.createStructureNode(project.id, { parentId, level, afterId }),
     );
 
-    if (created) {
-      if (parentId) {
-        setCollapsed((current) => {
-          const next = new Set(current);
-          next.delete(parentId);
-          return next;
-        });
-      }
-
-      // Le nouvel élément s'ouvre tout de suite pour être renommé.
-      setDraft({
-        id: created.id,
-        title: created.title,
-        summary: "",
-        savedTitle: created.title,
-        savedSummary: "",
+    if (created && parentId) {
+      setCollapsed((current) => {
+        const next = new Set(current);
+        next.delete(parentId);
+        return next;
       });
     }
   }
@@ -255,19 +325,21 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
     if (!toDelete) return;
 
     const id = toDelete.id;
+    const label = headingOf(toDelete).label;
     setToDelete(null);
 
     if (draft?.id === id) {
       setDraft(null);
     }
 
-    await run(() => api.deleteStructureNode(project.id, id));
+    await run(async () => {
+      const trashId = await api.deleteStructureNode(project.id, id);
+      announceDeletion(project.id, trashId, "structureNode", label);
+    });
   }
 
-  async function changeTemplate(value: string) {
-    await run(() =>
-      api.setStructureTemplate(project.id, value === AUTO ? null : value),
-    );
+  async function changeTemplate(template: StructureTemplateId | null) {
+    await run(() => api.setStructureTemplate(project.id, template));
   }
 
   // ---------------------------------------------------------------------------
@@ -280,8 +352,8 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
   );
   const rows = useMemo(() => flattenVisible(roots, collapsed), [roots, collapsed]);
   const counts = useMemo(
-    () => (structure ? countByLevel(structure.nodes) : []),
-    [structure],
+    () => (structure ? countByLevel(structure.nodes, Math.max(levels.length, 1)) : []),
+    [structure, levels.length],
   );
 
   /** Frères (même parent), pour savoir si on peut monter ou descendre. */
@@ -316,48 +388,68 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
     );
   }
 
-  const autoName = t(`templates.${templateForProjectType(project.type)}.name`);
-
   return (
     <Shell feature={feature}>
       {/* =====================================================================
-          MODÈLE DE DÉCOUPAGE
+          MODÈLE ET NIVEAUX
           ===================================================================== */}
-      <section className="flex flex-wrap items-end justify-between gap-4 rounded-lg border bg-card p-4">
-        <div className="min-w-56 flex-1 space-y-2">
-          <Label htmlFor="structure-template">{t("template.label")}</Label>
-
-          <select
-            id="structure-template"
-            value={structure.templateChosen ? structure.template : AUTO}
+      <section className="space-y-4 rounded-lg border bg-card p-4">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <StructureTemplatePicker
+            structure={structure}
+            projectType={project.type}
             disabled={busy}
-            onChange={(e) => void changeTemplate(e.target.value)}
-            className={`${fieldClass} h-9 max-w-xs`}
-          >
-            <option value={AUTO}>{t("template.auto", { name: autoName })}</option>
-            {STRUCTURE_TEMPLATES.map((id: StructureTemplateId) => (
-              <option key={id} value={id}>
-                {t(`templates.${id}.name`)}
-              </option>
-            ))}
-          </select>
+            onChange={(template) => void changeTemplate(template)}
+            className="min-w-56 flex-1"
+          />
 
-          <p className="text-xs text-muted-foreground">{t("template.hint")}</p>
+          <Button
+            type="button"
+            size="sm"
+            variant={customizing ? "secondary" : "outline"}
+            aria-expanded={customizing}
+            onClick={() => setCustomizing((open) => !open)}
+          >
+            <Settings2 className="h-3.5 w-3.5" />
+            {t("levels.customize")}
+          </Button>
         </div>
 
-        {/* Niveaux du modèle, avec le nombre d'éléments de chacun */}
-        <ol className="flex flex-wrap items-center gap-1.5 text-sm" aria-label={t("template.label")}>
-          {LEVEL_KEYS.map((key, level) => (
-            <li key={key} className="flex items-center gap-1.5">
-              {level > 0 && <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />}
+        {/* Niveaux, avec le nombre d'éléments de chacun */}
+        <ol className="flex flex-wrap items-center gap-1.5 text-sm" aria-label={t("levels.title")}>
+          {levels.map((level, index) => (
+            <li key={level.id} className="flex items-center gap-1.5">
+              {index > 0 && <ChevronRight className="h-3.5 w-3.5 text-muted-foreground" />}
               <span className="inline-flex items-center gap-1.5 rounded-md border bg-background px-2 py-1">
-                <span className={cn("h-2 w-2 rounded-full", LEVEL_DOT[level])} />
-                {levelLabel(level, "other")}
-                <span className="text-xs text-muted-foreground">{counts[level] ?? 0}</span>
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: level.color }} />
+                {level.other}
+                <span className="text-xs text-muted-foreground tabular-nums">{counts[index] ?? 0}</span>
               </span>
             </li>
           ))}
+          {structure.levelsCustom && (
+            <li className="ml-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary">
+              {t("template.custom")}
+            </li>
+          )}
         </ol>
+
+        {customizing && (
+          <div className="space-y-3 border-t pt-4">
+            <div>
+              <h3 className="text-sm font-semibold">{t("levels.title")}</h3>
+              <p className="text-xs text-muted-foreground">{t("levels.description")}</p>
+            </div>
+            <StructureLevelsEditor
+              projectId={project.id}
+              structure={structure}
+              levels={levels}
+              onSaved={load}
+              onCancel={() => setCustomizing(false)}
+              onOpenColorSettings={onOpenFeature ? () => onOpenFeature("settings:structure") : undefined}
+            />
+          </div>
+        )}
       </section>
 
       {/* =====================================================================
@@ -365,18 +457,39 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
           ===================================================================== */}
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs text-muted-foreground">{t("plan.addAtRoot")}</span>
-        {LEVEL_KEYS.map((key, level) => (
+        {levels.map((level, index) => (
           <Button
-            key={key}
+            key={level.id}
             size="sm"
-            variant={level === 0 ? "default" : "outline"}
+            variant={index === 0 ? "default" : "outline"}
             disabled={busy}
-            onClick={() => void addNode(null, level)}
+            aria-label={t("plan.add", { name: level.one })}
+            onClick={() => void addNode(null, index)}
           >
             <Plus className="h-3.5 w-3.5" />
-            {levelLabel(level, "add")}
+            {level.one}
           </Button>
         ))}
+
+        <span className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
+          {autoNumbering ? (
+            t("numbering.autoOn")
+          ) : (
+            <>
+              {t("numbering.autoOff")}
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={busy || structure.nodes.length === 0}
+                title={t("numbering.renumberHint")}
+                onClick={() => setRenumbering(true)}
+              >
+                <ListOrdered className="h-3.5 w-3.5" />
+                {t("numbering.renumber")}
+              </Button>
+            </>
+          )}
+        </span>
       </div>
 
       {actionError && (
@@ -402,10 +515,12 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
             const isCollapsed = collapsed.has(node.id);
             const editing = draft?.id === node.id;
             const childLevel = node.level + 1;
+            const heading = headingOf(node);
 
             return (
               <div
                 key={node.id}
+                id={`structure-node-${node.id}`}
                 role="treeitem"
                 aria-level={node.depth + 1}
                 aria-expanded={node.children.length > 0 ? !isCollapsed : undefined}
@@ -413,10 +528,15 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
               >
                 <div
                   className={cn(
-                    "group flex min-h-10 items-center gap-2 pr-2",
+                    "group flex min-h-10 items-center gap-2 pr-2 transition-colors duration-700",
                     editing && "bg-muted/40",
+                    highlight === node.id && "bg-primary/10",
                   )}
-                  style={{ paddingLeft: `${0.5 + node.depth * 1.5}rem` }}
+                  // Fine bande de la couleur de l'élément (ou de son niveau).
+                  style={{
+                    paddingLeft: `${0.5 + node.depth * 1.5}rem`,
+                    boxShadow: `inset 3px 0 0 ${colorOf(node)}`,
+                  }}
                 >
                   {node.children.length > 0 ? (
                     <button
@@ -432,18 +552,32 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
                     <span className="w-6 shrink-0" />
                   )}
 
-                  <span className={cn("h-2 w-2 shrink-0 rounded-full", LEVEL_DOT[node.level])} />
-
-                  <span className="shrink-0 text-xs text-muted-foreground">
-                    {levelLabel(node.level, "one")}
-                  </span>
+                  <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: colorOf(node) }} />
 
                   <button
                     type="button"
                     onClick={() => startEditing(node)}
-                    className="min-w-0 truncate text-left text-sm font-medium hover:underline"
+                    className="flex min-w-0 items-baseline gap-1.5 truncate text-left text-sm hover:underline"
                   >
-                    {node.title || t("plan.untitled")}
+                    {heading.number !== null ? (
+                      <>
+                        <span className="shrink-0 font-semibold">{heading.prefix}</span>
+                        {heading.title && (
+                          <span className="truncate">
+                            <span className="text-muted-foreground">— </span>
+                            {heading.title}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <span className="truncate font-semibold">{heading.label}</span>
+                        <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[0.7rem] font-normal text-muted-foreground">
+                          {heading.title ? `${levelName(node.level)} · ` : ""}
+                          {t("plan.unnumbered")}
+                        </span>
+                      </>
+                    )}
                   </button>
 
                   {node.summary && (
@@ -460,15 +594,22 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
                     )}
 
                     <span className="flex items-center gap-0.5 opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100">
-                      {childLevel < STRUCTURE_LEVELS && (
+                      {childLevel < levels.length && (
                         <IconButton
-                          label={levelLabel(childLevel, "add")}
+                          label={t("plan.add", { name: levelName(childLevel) })}
                           disabled={busy}
                           onClick={() => void addNode(node.id, childLevel)}
                         >
                           <Plus className="h-3.5 w-3.5" />
                         </IconButton>
                       )}
+                      <IconButton
+                        label={t("plan.insertAfter", { name: levelName(node.level) })}
+                        disabled={busy}
+                        onClick={() => void addNode(node.parentId, node.level, node.id)}
+                      >
+                        <CornerDownRight className="h-3.5 w-3.5" />
+                      </IconButton>
                       <IconButton
                         label={t("plan.actions.moveUp")}
                         disabled={busy || index <= 0}
@@ -483,6 +624,14 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
                       >
                         <ArrowDown className="h-3.5 w-3.5" />
                       </IconButton>
+                      {onOpenFeature && (
+                        <IconButton
+                          label={t("plan.actions.open")}
+                          onClick={() => onOpenFeature(structureNodeTabId(node.id))}
+                        >
+                          <IdCard className="h-3.5 w-3.5" />
+                        </IconButton>
+                      )}
                       <IconButton label={t("plan.actions.edit")} onClick={() => startEditing(node)}>
                         <Pencil className="h-3.5 w-3.5" />
                       </IconButton>
@@ -512,10 +661,44 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
                         ref={titleInputRef}
                         value={draft.title}
                         maxLength={200}
+                        placeholder={t("plan.edit.titlePlaceholder", {
+                          label: headingOf({ ...node, title: "" }).label,
+                        })}
                         onFocus={(e) => e.currentTarget.select()}
                         onChange={(e) => setDraft({ ...draft, title: e.target.value })}
                       />
                     </div>
+
+                    {!autoNumbering &&
+                      draft.numbered &&
+                      levelOf(levels, node.level)?.numbering !== "none" && (
+                        <div className="max-w-40 space-y-1.5">
+                          <Label htmlFor={`node-number-${node.id}`}>{t("plan.edit.number")}</Label>
+                          <Input
+                            id={`node-number-${node.id}`}
+                            type="number"
+                            min={0}
+                            max={MAX_NUMBER}
+                            value={draft.number}
+                            onChange={(e) => setDraft({ ...draft, number: e.target.value })}
+                          />
+                        </div>
+                      )}
+
+                    <label className="flex max-w-xl items-start gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        className="mt-0.5 size-4 accent-primary"
+                        checked={draft.numbered}
+                        onChange={(e) => setDraft({ ...draft, numbered: e.target.checked })}
+                      />
+                      <span>
+                        {t("plan.edit.numbered")}
+                        <span className="block text-xs text-muted-foreground">
+                          {t("plan.edit.numberedHint")}
+                        </span>
+                      </span>
+                    </label>
 
                     <div className="max-w-xl space-y-1.5">
                       <Label htmlFor={`node-summary-${node.id}`}>{t("plan.edit.summary")}</Label>
@@ -560,11 +743,28 @@ export function StructurePlanView({ project, feature }: StructurePlanViewProps) 
       )}
 
       {/* =====================================================================
+          CONFIRMATION DE RENUMÉROTATION
+          ===================================================================== */}
+      <Dialog open={renumbering} onOpenChange={(open) => !open && setRenumbering(false)}>
+        <DialogHeader>
+          <DialogTitle>{t("numbering.confirmTitle")}</DialogTitle>
+          <DialogDescription>{t("numbering.confirmDescription")}</DialogDescription>
+        </DialogHeader>
+
+        <DialogFooter className="mt-6 gap-2">
+          <Button variant="ghost" onClick={() => setRenumbering(false)}>
+            {t("common:actions.cancel")}
+          </Button>
+          <Button onClick={() => void renumber()}>{t("numbering.renumber")}</Button>
+        </DialogFooter>
+      </Dialog>
+
+      {/* =====================================================================
           CONFIRMATION DE SUPPRESSION
           ===================================================================== */}
       <Dialog open={toDelete !== null} onOpenChange={(open) => !open && setToDelete(null)}>
         <DialogHeader>
-          <DialogTitle>{t("plan.delete.title", { title: toDelete?.title ?? "" })}</DialogTitle>
+          <DialogTitle>{t("plan.delete.title", { title: toDelete ? headingOf(toDelete).label : "" })}</DialogTitle>
           <DialogDescription>
             {toDelete && toDelete.descendants > 0
               ? t("plan.delete.withChildren", { count: toDelete.descendants })
@@ -592,7 +792,7 @@ function Shell({ feature, children }: { feature: WorkspaceFeature; children: Rea
     <div className="flex-1 overflow-y-auto p-8">
       <div className="mx-auto max-w-4xl space-y-5">
         <div>
-          <h2 className="text-xl font-semibold">{feature.label}</h2>
+          <h2 className="sr-only">{feature.label}</h2>
           <p className="text-sm text-muted-foreground">{feature.description}</p>
         </div>
 

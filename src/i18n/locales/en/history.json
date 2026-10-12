@@ -1,0 +1,28 @@
+{
+  "description": "Everything that happened in the project over the last 90 days. Click a name to open the item; a deleted item still in the trash can be restored from here.",
+  "filter": "Filter by type",
+  "all": "All types",
+  "refresh": "Refresh",
+  "loading": "Loading history…",
+  "empty": "Nothing in the history yet.",
+  "restore": "Restore",
+  "actions": {
+    "created": "Created:",
+    "updated": "Edited:",
+    "deleted": "Deleted:",
+    "restored": "Restored:",
+    "versionRestored": "Version restored:",
+    "moved": "Moved:"
+  },
+  "kinds": {
+    "character": "Character",
+    "location": "Location",
+    "structureNode": "Structure item",
+    "note": "Note",
+    "noteFolder": "Note folder",
+    "sticky": "Sticky note",
+    "relation": "Relationship",
+    "placeLink": "Character – location link",
+    "synopsis": "Synopsis"
+  }
+}

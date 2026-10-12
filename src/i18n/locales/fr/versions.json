@@ -1,0 +1,33 @@
+{
+  "button": "Versions",
+  "buttonHint": "Voir les états précédents et revenir en arrière",
+  "title": "Versions : {{name}}",
+  "description": "Les états précédents de cet élément. Choisissez-en un pour le comparer à l'état actuel, puis restaurez-le si besoin : l'état actuel est gardé avant.",
+  "namePlaceholder": "Nommer l'état actuel…",
+  "create": "Créer une version de l'état actuel",
+  "listLabel": "Versions",
+  "loading": "Chargement…",
+  "none": "Pas encore de version.",
+  "noneHint": "Une version est créée automatiquement au début de chaque séance de modification. Vous pouvez aussi nommer l'état actuel ci-contre.",
+  "auto": "Version automatique",
+  "delete": "Supprimer cette version",
+  "compare": "Différences entre la version du {{date}} et l'état actuel",
+  "legend": {
+    "removed": "depuis supprimé",
+    "added": "depuis ajouté"
+  },
+  "identical": "Identique à l'état actuel.",
+  "restore": "Restaurer cette version",
+  "restored": "Version du {{date}} restaurée. L'état précédent a été gardé dans les versions.",
+  "unsavedWarning": "Vos modifications non enregistrées seront perdues.",
+  "fields": {
+    "title": "Titre",
+    "content": "Contenu",
+    "summary": "Résumé",
+    "number": "Numéro",
+    "name": "Nom",
+    "type": "Type",
+    "status": "Statut",
+    "parent": "Situé dans"
+  }
+}

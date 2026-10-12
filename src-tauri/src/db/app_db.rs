@@ -8,7 +8,6 @@ use crate::error::{AppError, AppResult};
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use sqlx::SqlitePool;
 use std::path::Path;
-use std::str::FromStr;
 
 /// Initialise ou ouvre la base de données de l'application.
 ///
@@ -21,10 +20,10 @@ pub async fn init_app_db(data_dir: &Path) -> AppResult<SqlitePool> {
     })?;
 
     let db_path = data_dir.join("app.db");
-    let db_url = format!("sqlite://{}", db_path.display());
-
-    let options = SqliteConnectOptions::from_str(&db_url)
-        .map_err(|e| AppError::database(e).with_detail("URL de base de données invalide"))?
+    // Chemin passé tel quel (et non sous forme d'URL « sqlite://… ») : une
+    // URL échoue dès que le chemin contient « % » ou « ? ».
+    let options = SqliteConnectOptions::new()
+        .filename(&db_path)
         .create_if_missing(true)
         .foreign_keys(true)
         .journal_mode(sqlx::sqlite::SqliteJournalMode::Wal)

@@ -13,7 +13,6 @@ use crate::security::crypto::SecretKey;
 use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use sqlx::SqlitePool;
 use std::path::Path;
-use std::str::FromStr;
 
 /// Nom du fichier de base de données d'un projet.
 pub const DB_FILE: &str = "project.db";
@@ -29,10 +28,9 @@ pub async fn open_db(
     db_path: &Path,
     key: Option<&SecretKey>,
 ) -> AppResult<SqlitePool> {
-    let db_url = format!("sqlite://{}", db_path.display());
-
-    let mut options = SqliteConnectOptions::from_str(&db_url)
-        .map_err(|e| AppError::database(e).with_detail("URL de base de projet invalide"))?;
+    // Chemin passé tel quel (et non sous forme d'URL « sqlite://… ») : une
+    // URL échoue dès que le chemin contient « % » ou « ? ».
+    let mut options = SqliteConnectOptions::new().filename(db_path);
 
     // La clé doit être la toute première instruction envoyée à SQLCipher :
     // sqlx garantit que le pragma `key` passe avant tous les autres.
@@ -184,6 +182,22 @@ mod tests {
         pool.close().await;
 
         std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[tokio::test]
+    async fn unusual_characters_in_the_path_are_accepted() {
+        // « % » cassait l'ancienne ouverture par URL (« sqlite://… »).
+        let dir = temp_dir("chemin").join("Élodie 100% #1");
+        let key = SecretKey::generate();
+
+        let pool = init_project_db(&dir, &key).await.unwrap();
+        pool.close().await;
+
+        assert!(dir.join(DB_FILE).exists());
+        let pool = init_project_db(&dir, &key).await.unwrap();
+        pool.close().await;
+
+        std::fs::remove_dir_all(dir.parent().unwrap()).unwrap();
     }
 
     #[tokio::test]

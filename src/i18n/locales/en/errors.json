@@ -126,7 +126,16 @@
     "summaryTooLong": "The summary cannot exceed {{max}} characters.",
     "invalidLevel": "Invalid structure level.",
     "invalidParent": "An item can only contain items of a lower level.",
-    "invalidTemplate": "Unknown structure template."
+    "invalidTemplate": "Unknown structure template.",
+    "levelsInUse": "Elements use {{used}} levels: the template only has {{max}}. First remove the elements from the extra levels.",
+    "levelNameEmpty": "Each level needs a name.",
+    "levelNameTooLong": "A level name cannot exceed {{max}} characters.",
+    "levelCount": "The structure has 1 to {{max}} levels.",
+    "levelInUse": "This level still contains {{count}} element(s): move or delete them first.",
+    "levelsReordered": "The order of existing levels cannot change.",
+    "invalidNumbering": "Invalid numbering.",
+    "invalidNumber": "The number must be between 0 and {{max}}.",
+    "invalidColor": "Invalid color."
   },
   "character": {
     "notFound": "Character not found.",
@@ -152,5 +161,131 @@
     "invalidIntensity": "Intensity ranges from 1 to 5.",
     "labelTooLong": "The relationship name cannot exceed {{max}} characters.",
     "descriptionTooLong": "The description cannot exceed {{max}} characters."
+  },
+  "location": {
+    "notFound": "Location not found.",
+    "imageNotFound": "Image not found.",
+    "fieldTooLong": "A field exceeds {{max}} characters.",
+    "invalidValue": "Invalid value.",
+    "tooManyTags": "{{max}} tags at most.",
+    "nameRequired": "Enter the location's name.",
+    "nameTooLong": "The name cannot exceed {{max}} characters.",
+    "invalidType": "Unknown location type.",
+    "parentNotFound": "The parent location was not found.",
+    "parentCycle": "A location cannot be placed inside itself or inside a place it contains.",
+    "unknownField": "Unknown sheet field.",
+    "typeNameRequired": "Enter the type's name.",
+    "invalidCategory": "Unknown category.",
+    "typeDuplicate": "The type “{{name}}” already exists.",
+    "typeInUse": "The type “{{name}}” is still used by {{count}} location(s): change their type first.",
+    "tooManyTypes": "{{max}} custom types at most.",
+    "invalidList": "Unknown list.",
+    "listTooLong": "A list cannot hold more than {{max}} values.",
+    "galleryFull": "The gallery is full ({{max}} images at most)."
+  },
+  "placeLink": {
+    "notFound": "Link not found.",
+    "invalidType": "Unknown kind of link.",
+    "labelTooLong": "The detail cannot exceed {{max}} characters.",
+    "descriptionTooLong": "The description cannot exceed {{max}} characters."
+  },
+  "ganix": {
+    "unreadable": "This .ganix file cannot be read.",
+    "damaged": "This file is damaged or incomplete. Try downloading or exporting it again.",
+    "unsafe": "This file contains disallowed content and was refused.",
+    "notGanix": "This file is not a GANIS project.",
+    "tooNew": "This project was created with a newer version of GANIS: update the application to open it.",
+    "stagingMissing": "This import is no longer available. Please choose the file again.",
+    "migrationFailed": "This project could not be updated for this version of GANIS."
+  },
+  "structureLink": {
+    "invalidRole": "Unknown role."
+  },
+  "note": {
+    "folderNotFound": "This folder no longer exists.",
+    "notFound": "This note no longer exists.",
+    "stickyNotFound": "This sticky note no longer exists.",
+    "folderNameEmpty": "The folder name cannot be empty.",
+    "folderNameTooLong": "The folder name must not exceed {{max}} characters.",
+    "titleTooLong": "The title must not exceed {{max}} characters.",
+    "contentTooLarge": "The note is too large (maximum {{max}} MB).",
+    "invalidContent": "The note content cannot be read.",
+    "stickyTooLong": "A sticky note must not exceed {{max}} characters.",
+    "invalidColor": "Unknown color.",
+    "invalidGeometry": "Invalid sticky note position or size.",
+    "folderCycle": "A folder cannot be moved into one of its own subfolders."
+  },
+  "trash": {
+    "notFound": "This item is no longer in the trash.",
+    "unreadable": "This trash item cannot be read.",
+    "restoreBlocked": "Cannot restore: the item that contained it was deleted. Restore that one first."
+  },
+  "hints": {
+    "codes": {
+      "INTERNAL": "Try again; if it keeps happening, restart GANIS.",
+      "DATABASE": "Try again in a moment. If it comes back, export the project as .ganix (File › Export) to keep it safe, then restart GANIS.",
+      "IO": "Check that the disk has free space and the folder isn't read-only.",
+      "UNAUTHORIZED": "Sign in again.",
+      "NOT_FOUND": "It may have been deleted: check the trash (Project › Trash)."
+    },
+    "auth": {
+      "invalidCredentials": "Check capital letters. Forgot your password? Use your recovery key.",
+      "usernameTaken": "Pick another name, or sign in if it's your account.",
+      "currentPasswordWrong": "Check the capital letters of your current password."
+    },
+    "project": {
+      "notFound": "It may have been deleted or imported under another name: go back to the dashboard.",
+      "dataMissing": "If you have a .ganix backup, import it from the dashboard."
+    },
+    "recovery": {
+      "invalid": "The key is in the file saved when the account was created (6 groups of 6 characters)."
+    },
+    "structure": {
+      "levelInUse": "Open the story outline to move or delete those items.",
+      "levelsInUse": "Open the story outline to remove items from the extra levels.",
+      "invalidParent": "Pick a parent one level up, or add the item at the root."
+    },
+    "character": {
+      "invalidImage": "Open the image in a drawing app and save it as PNG or JPEG.",
+      "imageTooLarge": "Shrink it (for example 2000 pixels wide) or save it as JPEG.",
+      "galleryFull": "Remove an image before adding another.",
+      "nameRequired": "A first or last name is enough; the rest can wait."
+    },
+    "location": {
+      "typeInUse": "Open the location list, filter by this type and change it, then try again.",
+      "parentCycle": "Pick a parent location that isn't inside this one.",
+      "galleryFull": "Remove an image before adding another.",
+      "typeDuplicate": "Give the type another name, or use the existing one."
+    },
+    "ganix": {
+      "unreadable": "Export the project again from the original GANIS (File › Export), then try again.",
+      "unsafe": "Don't open it: ask the sender for a fresh export.",
+      "notGanix": "Pick a file ending in .ganix.",
+      "migrationFailed": "Update GANIS, then try the import again.",
+      "stagingMissing": "File › Import a .ganix file…"
+    },
+    "note": {
+      "contentTooLarge": "Split it into several notes, or remove large diagrams.",
+      "folderCycle": "Drag it onto another folder instead, or onto “Folders and notes” to move it out."
+    },
+    "trash": {
+      "notFound": "It may have been restored or permanently deleted: open Project › Trash."
+    },
+    "history": {
+      "itemNotFound": "It may have been deleted: check the trash.",
+      "restoreFailed": "This item has changed too much since: copy what you need by hand from the comparison."
+    },
+    "internal": "Try again; if it keeps happening, restart GANIS.",
+    "database": "Try again in a moment. If it comes back, export the project as .ganix (File › Export) to keep it safe, then restart GANIS.",
+    "io": "Check that the disk has free space and the folder isn't read-only.",
+    "unauthorized": "Sign in again."
+  },
+  "history": {
+    "unknownKind": "This item has no versions.",
+    "versionNotFound": "This version no longer exists.",
+    "itemNotFound": "This item no longer exists.",
+    "nameEmpty": "Give the version a name.",
+    "unreadable": "This version cannot be read.",
+    "restoreFailed": "This version can no longer be restored."
   }
 }

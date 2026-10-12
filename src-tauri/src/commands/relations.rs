@@ -5,6 +5,7 @@
 //! qui vérifie d'abord que l'utilisateur connecté en est le propriétaire.
 
 use crate::error::AppResult;
+use crate::services::history_service as history;
 use crate::services::project_storage;
 use crate::services::relation_service::{self, GraphPosition, Relation, RelationInput};
 use crate::state::AppState;
@@ -35,7 +36,11 @@ pub async fn create_relation(
     input: RelationInput,
 ) -> AppResult<Relation> {
     let pool = project_pool(&state, &project_id).await?;
-    relation_service::create_relation(&pool, &input).await
+    let result = relation_service::create_relation(&pool, &input).await;
+    if result.is_ok() {
+        history::touch_day(&pool).await;
+    }
+    result
 }
 
 /// Remplace une relation.
@@ -47,7 +52,11 @@ pub async fn update_relation(
     input: RelationInput,
 ) -> AppResult<Relation> {
     let pool = project_pool(&state, &project_id).await?;
-    relation_service::update_relation(&pool, &relation_id, &input).await
+    let result = relation_service::update_relation(&pool, &relation_id, &input).await;
+    if result.is_ok() {
+        history::touch_day(&pool).await;
+    }
+    result
 }
 
 /// Supprime une relation.
@@ -56,9 +65,11 @@ pub async fn delete_relation(
     state: State<'_, AppState>,
     project_id: String,
     relation_id: String,
-) -> AppResult<()> {
+) -> AppResult<String> {
     let pool = project_pool(&state, &project_id).await?;
-    relation_service::delete_relation(&pool, &relation_id).await
+    let trash_id = relation_service::delete_relation(&pool, &relation_id).await?;
+    history::record_deleted(&pool, &trash_id).await;
+    Ok(trash_id)
 }
 
 /// Positions des personnages dans la disposition libre du graphe.

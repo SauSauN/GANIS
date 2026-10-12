@@ -300,9 +300,7 @@ export function RelationsView({ projectId, feature, onOpenFeature }: RelationsVi
       {/* En-tête : une seule ligne */}
       <header className="flex h-16 shrink-0 items-center gap-3 border-b px-5">
         <div className="flex min-w-0 items-baseline gap-3">
-          <h1 className="truncate text-xl font-semibold tracking-tight" title={feature.label}>
-            {t("sheet.title")}
-          </h1>
+          <h1 className="sr-only">{feature.label}</h1>
           {ready && (
             <span className="shrink-0 text-sm text-muted-foreground">{t("view.count", { count: relations.length })}</span>
           )}
