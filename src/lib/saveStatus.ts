@@ -29,6 +29,7 @@ const WRITE_PREFIXES = [
   "remove_",
   "rename_",
   "renumber_",
+  "reorder_",
   "restore_",
   "save_graph_",
   "set_",

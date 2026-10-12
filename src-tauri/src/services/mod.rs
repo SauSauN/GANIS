@@ -7,6 +7,7 @@ pub mod auth_service;
 pub mod character_location_service;
 pub mod character_service;
 pub mod diagnostics_service;
+pub mod document_service;
 pub mod ganix_service;
 pub mod history_service;
 pub mod keyring_service;

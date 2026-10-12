@@ -35,8 +35,8 @@
 //! ```
 //!
 //! Types d'une valeur (attribut `type`, absent pour un texte) : `integer`,
-//! `real`, `null`, `asset` (image dans `assets/`), `blob` (autres données
-//! binaires, en base64) et `text-base64` (texte contenant des caractères
+//! `real`, `null`, `asset` (image, ou document de 64 Ko et plus en `.bin`,
+//! dans `assets/`), `blob` (autres données binaires, en base64) et `text-base64` (texte contenant des caractères
 //! interdits en XML). Aucune donnée de compte n'est exportée (ni mot de
 //! passe, ni clé, ni identifiant d'utilisateur).
 //!
@@ -97,6 +97,9 @@ const MANIFEST: &str = "manifest.xml";
 const CHECKSUMS: &str = "checksums.xml";
 const DATA: &str = "project.xml";
 const ASSETS_PREFIX: &str = "assets/";
+/// Contenus binaires (hors images) écrits à part, en `assets/xx/<empreinte>.bin`,
+/// à partir de cette taille ; les plus petits restent en base64 dans le XML.
+const BIN_ASSET_MIN_BYTES: usize = 64 * 1024;
 
 /// Fichiers de la zone d'attente (jamais dans une archive).
 const STAGED_DB: &str = "staged.db";
@@ -356,7 +359,7 @@ fn parse_asset_name(name: &str) -> Option<(&str, &str)> {
     let ok = hash.len() == 64
         && hex(hash)
         && folder == &hash[..2]
-        && matches!(extension, "png" | "jpg" | "webp" | "gif");
+        && matches!(extension, "png" | "jpg" | "webp" | "gif" | "bin");
 
     ok.then_some((hash, extension))
 }
@@ -946,6 +949,21 @@ fn write_value<W: Write>(
                     if !export.assets.contains_key(&name) {
                         let path = work_dir.join(STAGED_ASSETS).join(format!("{hash}.{extension}"));
                         std::fs::write(&path, &value).map_err(|e| io_error("Image", e))?;
+                        export.assets_bytes += value.len() as u64;
+                        export.assets.insert(name.clone(), path);
+                    }
+
+                    write_text_element(writer, column, &[("type", "asset")], &name)
+                }
+                // Gros contenu (documents du découpage : PDF, Word…) : fichier
+                // à part, comme les images, plutôt qu'en base64 dans le XML.
+                None if value.len() >= BIN_ASSET_MIN_BYTES => {
+                    let hash = sha256_hex(&value);
+                    let name = asset_entry_name(&hash, "bin");
+
+                    if !export.assets.contains_key(&name) {
+                        let path = work_dir.join(STAGED_ASSETS).join(format!("{hash}.bin"));
+                        std::fs::write(&path, &value).map_err(|e| io_error("Document", e))?;
                         export.assets_bytes += value.len() as u64;
                         export.assets.insert(name.clone(), path);
                     }
@@ -1768,7 +1786,10 @@ async fn stage_files(dir: &Path, source: &Path) -> AppResult<(Manifest, Counts)>
         let read = File::open(&path)
             .and_then(|mut f| f.read(&mut head))
             .map_err(|e| io_error("Image en attente", e))?;
-        if image_extension(&head[..read]) != Some(extension) {
+        // Fichier « bin » (document) : contenu libre, mais jamais une image
+        // déguisée (les images ont leur propre extension).
+        let real = image_extension(&head[..read]);
+        if (extension == "bin" && real.is_some()) || (extension != "bin" && real != Some(extension)) {
             return Err(unsafe_archive(format!("ASSET_TYPE_INVALID : {name}")));
         }
 
@@ -2424,6 +2445,40 @@ mod tests {
         // Les fichiers extraits ont disparu ; seule la base reconstruite reste.
         assert!(!staging.join(DATA).exists());
         assert!(!staging.join(STAGED_ASSETS).exists());
+
+        source.close().await;
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[tokio::test]
+    async fn large_documents_are_written_apart_and_come_back() {
+        let dir = temp_dir("documents");
+        let source = encrypted_project(&dir.join("source")).await;
+        sqlx::query(
+            "INSERT INTO structure_nodes (id, parent_id, level, title, summary, position, created_at, updated_at) \
+             VALUES ('ch1', NULL, 0, 'Chapitre 1', '', 0, 'x', 'x')",
+        )
+        .execute(&source)
+        .await
+        .unwrap();
+        let big: Vec<u8> = (0..200_000u32).map(|i| (i % 251) as u8).collect();
+        crate::services::document_service::add(&source, "ch1", "Chapitre 1.pdf", &big).await.unwrap();
+        crate::services::document_service::add(&source, "ch1", "notes.txt", b"petit").await.unwrap();
+
+        let target = dir.join("Docs.ganix");
+        write_ganix(&source, &project("Docs"), &target, &dir.join("work")).await.unwrap();
+
+        let bin = asset_entry_name(&sha256_hex(&big), "bin");
+        assert!(entries(&target).iter().any(|(name, _)| *name == bin));
+        let xml = String::from_utf8(entry(&target, DATA)).unwrap();
+        assert!(xml.contains(&format!("<data type=\"asset\">{bin}</data>")));
+
+        let staging = dir.join("staging");
+        std::fs::create_dir_all(&staging).unwrap();
+        stage_files(&staging, &target).await.unwrap();
+        let rebuilt = open_plain(&staging.join(STAGED_DB)).await.unwrap();
+        assert_eq!(dump(&rebuilt).await, dump(&source).await);
+        rebuilt.close().await;
 
         source.close().await;
         std::fs::remove_dir_all(dir).unwrap();

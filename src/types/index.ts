@@ -640,6 +640,7 @@ export type TrashKind =
   | "character"
   | "location"
   | "structureNode"
+  | "document"
   | "note"
   | "noteFolder"
   | "sticky"
@@ -704,7 +705,8 @@ export interface WorkCalendar {
   }>;
 }
 
-export type SearchKind = "character" | "location" | "structureNode" | "note" | "noteFolder" | "sticky";
+/** `document` : l'identifiant est celui de l'élément du découpage qui le contient. */
+export type SearchKind = "character" | "location" | "structureNode" | "document" | "note" | "noteFolder" | "sticky";
 
 export interface SearchHit {
   kind: SearchKind;
@@ -740,3 +742,43 @@ export const ROLE_LABELS: Record<Role, string> = {
   developer: "Développeur",
   user: "Utilisateur",
 };
+// ----------------------------------------------------------------------------
+// Documents rangés dans le découpage (voir `document_service.rs`)
+// ----------------------------------------------------------------------------
+
+export interface StructureDocument {
+  id: string;
+  nodeId: string;
+  /** Nom du fichier, avec son extension. */
+  name: string;
+  mime: string;
+  /** Taille en octets. */
+  size: number;
+  note: string;
+  position: number;
+  createdAt: string;
+  updatedAt: string;
+  /** Nombre de versions précédentes. */
+  versions: number;
+}
+
+export interface DocumentVersion {
+  id: string;
+  name: string;
+  mime: string;
+  size: number;
+  createdAt: string;
+}
+
+/** Document ouvert dans une autre application. */
+export interface ExternalStatus {
+  open: boolean;
+  changed: boolean;
+  path: string;
+}
+
+export interface ExternalSync {
+  status: ExternalStatus;
+  /** Document mis à jour : ses modifications viennent d'être reprises. */
+  document: StructureDocument | null;
+}

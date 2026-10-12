@@ -1,0 +1,132 @@
+{
+  "title": "Documents",
+  "description": "The files of “{{name}}”: pages, PDFs, Word files, images, sounds…",
+  "loading": "Loading documents…",
+  "empty": {
+    "title": "Add files",
+    "hint": "Or drop them here: your whole chapter (one image per page), the PDF, the script in Word… They are encrypted with the project."
+  },
+  "dropHere": "Drop to file in “{{name}}”",
+  "dropHint": "Drop files on this card to add them. Enter: open · F2: rename · Alt+↑/↓: reorder.",
+  "newTextName": "New text.md",
+  "updatedOn": "edited {{date}}",
+  "versionsShort_one": "{{count}} version",
+  "versionsShort_other": "{{count}} versions",
+  "saved": "Copy saved: {{name}}.",
+  "replaced": "“{{name}}” replaced. The previous file is kept in the versions.",
+  "moved": "“{{name}}” filed in “{{target}}”.",
+  "kinds": {
+    "other": "File"
+  },
+  "actions": {
+    "open": "Open",
+    "openNamed": "Open “{{name}}”",
+    "openExternal": "Edit in its application",
+    "openExternalNamed": "Edit “{{name}}” in its application",
+    "openExternalHint": "Opens the file in its application (Word, Acrobat, Clip Studio…). Every save there comes back here automatically.",
+    "rename": "Rename",
+    "addNote": "Add a note",
+    "editNote": "Edit the note",
+    "replace": "Replace with another file…",
+    "versions": "Versions",
+    "versionsCount_one": "Versions ({{count}})",
+    "versionsCount_other": "Versions ({{count}})",
+    "saveAs": "Save as…",
+    "move": "File in…",
+    "up": "Move up",
+    "down": "Move down",
+    "delete": "Delete",
+    "more": "More actions for “{{name}}”",
+    "newText": "New text",
+    "newTextHint": "Create a text (script, dialogue…) to write in GANIS",
+    "add": "Add files"
+  },
+  "adding": {
+    "picking": "Choosing files…",
+    "progress": "Adding {{index}}/{{count}}: {{name}}",
+    "done_one": "{{count}} document added.",
+    "done_other": "{{count}} documents added.",
+    "tooLarge": "Larger than 300 MB, not added: {{names}}."
+  },
+  "dialogs": {
+    "add": "Add documents to “{{name}}”",
+    "saveAs": "Save a copy of the document",
+    "replace": "Replace “{{name}}”"
+  },
+  "external": {
+    "open": "“{{name}}” is open in another application",
+    "hint": "Every save there comes back here (the previous content stays in the versions). This working copy is not encrypted: click “Finish” when you are done.",
+    "finish": "Finish",
+    "badge": "Open elsewhere",
+    "synced": "“{{name}}” updated from the other application."
+  },
+  "reading": {
+    "open_one": "Read the page",
+    "open_other": "Read the {{count}} pages",
+    "hint": "Continuous reading of the images, in the order below.",
+    "page": "Page {{index}} of {{count}}",
+    "pageLabel": "Page {{index}}: {{name}}",
+    "joined": "Joined pages",
+    "width": {
+      "label": "Page width",
+      "page": "Whole page",
+      "narrow": "Reading",
+      "wide": "Full width"
+    }
+  },
+  "viewer": {
+    "position": "{{index}} of {{count}}",
+    "previous": "Previous document",
+    "next": "Next document",
+    "close": "Close",
+    "loading": "Loading…",
+    "unsaved": "The text has unsaved changes.",
+    "saveAndContinue": "Save",
+    "discard": "Don't save",
+    "keepEditing": "Keep writing",
+    "zoom": {
+      "label": "Zoom",
+      "fit": "Fit to window",
+      "width": "Fit to width",
+      "actual": "Actual size"
+    },
+    "wordPreview": "Text preview: the exact layout (fonts, margins) is visible in Word.",
+    "editInWord": "Edit in Word",
+    "wordUnreadable": "This Word file cannot be displayed. Open it in its application.",
+    "words_one": "{{count}} word",
+    "words_other": "{{count}} words",
+    "modified": "edited",
+    "save": "Save",
+    "saved": "“{{name}}” saved. The previous version is kept.",
+    "noPreview": "No preview for this file type",
+    "noPreviewHint": "Open it in its application: your saves there will come back into the project.",
+    "unsafeHint": "This file type could start a program: GANIS will not open it. You can save a copy."
+  },
+  "versions": {
+    "title": "Versions of “{{name}}”",
+    "description": "Each replacement, edit in another application or saved text keeps the previous content (20 versions at most). Restoring keeps the current content first.",
+    "current": "Current version",
+    "empty": "No previous version yet.",
+    "restore": "Restore",
+    "restored": "Version from {{date}} restored.",
+    "delete": "Delete this version",
+    "confirmDelete": "Delete for good?"
+  },
+  "note": {
+    "title": "Note on “{{name}}”",
+    "description": "A reminder for yourself: pages to redo, version sent to the publisher…",
+    "placeholder": "Your note…"
+  },
+  "move": {
+    "title": "File “{{name}}” in…",
+    "description": "The document goes to the end of the chosen item's documents.",
+    "label": "Structure item",
+    "current": "current",
+    "confirm": "File here"
+  },
+  "keys": {
+    "enter": "Enter",
+    "delete": "Del",
+    "escape": "Esc"
+  }
+}

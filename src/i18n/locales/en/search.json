@@ -1,7 +1,7 @@
 {
   "placeholder": "Search the project…",
   "clear": "Clear",
-  "hint": "Characters, locations, structure, notes and sticky notes. Ignores accents and capitals.",
+  "hint": "Characters, locations, structure, documents, notes and sticky notes. Ignores accents and capitals.",
   "searching": "Searching…",
   "none": "No results.",
   "count_one": "{{count}} result",
@@ -10,6 +10,7 @@
     "character": "Characters",
     "location": "Locations",
     "structureNode": "Structure",
+    "document": "Documents",
     "note": "Notes",
     "noteFolder": "Folders",
     "sticky": "Sticky notes"
@@ -18,6 +19,7 @@
     "character": "Unnamed character",
     "location": "Unnamed location",
     "structureNode": "Untitled item",
+    "document": "Untitled document",
     "note": "Untitled note",
     "noteFolder": "Folder",
     "sticky": "Sticky note"

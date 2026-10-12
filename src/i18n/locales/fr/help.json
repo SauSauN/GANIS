@@ -147,7 +147,9 @@
           "Roman : parties, chapitres, scènes. Film : actes, séquences, scènes. Manga : tomes, chapitres, pages… Les noms se changent dans les paramètres du projet.",
           "Les numéros se calculent seuls ; vous pouvez sortir un élément de la numérotation (prologue, interlude).",
           "La numérotation automatique (renumérotation à chaque déplacement) s'active dans les paramètres du projet, tout comme la couleur de chaque niveau.",
-          "La fiche d'un élément montre son résumé, ses personnages (point de vue, présents…) et ses lieux."
+          "La fiche d'un élément montre son résumé, ses personnages (point de vue, présents…) et ses lieux.",
+          "Documents : dans la fiche d'un élément, rangez ses fichiers (pages de manga, PDF, Word, images, sons…) avec « Ajouter des fichiers » ou par glisser-déposer. Ils sont chiffrés avec le projet et exportés dans le .ganix.",
+          "Cliquez sur un document pour le lire dans GANIS ; « Lire les pages » enchaîne les images d'un chapitre. « Modifier dans l'application » l'ouvre dans Word, Acrobat, Clip Studio… : chaque enregistrement est repris, l'ancien contenu reste dans les versions."
         ]
       },
       "notes": {
@@ -210,6 +212,14 @@
         {
           "q": "J'ai modifié une fiche et je veux revenir en arrière.",
           "a": "Ouvrez la fiche, cliquez sur « Versions », choisissez l'état voulu dans la liste et cliquez sur « Restaurer cette version »."
+        },
+        {
+          "q": "Comment ranger mon chapitre de manga dans GANIS ?",
+          "a": "Ouvrez la fiche du chapitre (plan du récit › clic sur le chapitre), puis « Ajouter des fichiers » ou déposez toutes les pages sur la carte « Documents ». Rangez-les dans l'ordre (Alt+↑/↓), puis « Lire les pages » pour une lecture continue."
+        },
+        {
+          "q": "J'ai modifié un document dans Word : est-il à jour dans GANIS ?",
+          "a": "Oui, s'il a été ouvert avec « Modifier dans l'application » : chaque enregistrement dans Word est repris en quelques secondes. Cliquez « Terminer » quand vous avez fini (la copie de travail, non chiffrée, est alors supprimée)."
         },
         {
           "q": "Mes modifications sont-elles enregistrées ?",

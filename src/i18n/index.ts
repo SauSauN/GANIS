@@ -10,6 +10,7 @@ import enLocations from "./locales/en/locations.json";
 import enLogin from "./locales/en/login.json";
 import enModules from "./locales/en/modules.json";
 import enWorkCalendar from "./locales/en/workCalendar.json";
+import enDocuments from "./locales/en/documents.json";
 import enSearch from "./locales/en/search.json";
 import enHistory from "./locales/en/history.json";
 import enVersions from "./locales/en/versions.json";
@@ -46,6 +47,7 @@ import frLocations from "./locales/fr/locations.json";
 import frLogin from "./locales/fr/login.json";
 import frModules from "./locales/fr/modules.json";
 import frWorkCalendar from "./locales/fr/workCalendar.json";
+import frDocuments from "./locales/fr/documents.json";
 import frSearch from "./locales/fr/search.json";
 import frHistory from "./locales/fr/history.json";
 import frVersions from "./locales/fr/versions.json";
@@ -125,6 +127,7 @@ export const resources = {
     login: frLogin,
     modules: frModules,
     workCalendar: frWorkCalendar,
+    documents: frDocuments,
     search: frSearch,
     history: frHistory,
     versions: frVersions,
@@ -163,6 +166,7 @@ export const resources = {
     login: enLogin,
     modules: enModules,
     workCalendar: enWorkCalendar,
+    documents: enDocuments,
     search: enSearch,
     history: enHistory,
     versions: enVersions,
@@ -249,6 +253,7 @@ void i18n.use(initReactI18next).init({
     "login",
     "modules",
     "workCalendar",
+    "documents",
     "search",
     "history",
     "versions",

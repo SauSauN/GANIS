@@ -278,7 +278,15 @@
     "internal": "Réessayez ; si le problème continue, redémarrez GANIS.",
     "database": "Réessayez dans un instant. Si l'erreur revient, exportez le projet en .ganix (Fichier › Exporter) pour le mettre à l'abri, puis redémarrez GANIS.",
     "io": "Vérifiez qu'il reste de la place sur le disque et que le dossier n'est pas en lecture seule.",
-    "unauthorized": "Reconnectez-vous."
+    "unauthorized": "Reconnectez-vous.",
+    "documents": {
+      "tooLarge": "Découpez-le (un fichier par chapitre ou par planche) ou compressez-le.",
+      "tooMany": "Ajoutez-les en plusieurs fois.",
+      "fileError": "Vérifiez que le fichier n'est pas ouvert ailleurs et que vous avez le droit d'y accéder.",
+      "unsafeType": "Enregistrez-le ailleurs avec « Enregistrer sous… » si vous devez l'utiliser.",
+      "openFailed": "Installez une application pour ce type de fichier, ou utilisez « Enregistrer sous… ».",
+      "nodeNotFound": "Rouvrez le plan du récit : l'élément a peut-être été supprimé."
+    }
   },
   "history": {
     "unknownKind": "Cet élément n'a pas de versions.",
@@ -287,5 +295,15 @@
     "nameEmpty": "Donnez un nom à la version.",
     "unreadable": "Cette version est illisible.",
     "restoreFailed": "Cette version ne peut plus être restaurée."
+  },
+  "documents": {
+    "notFound": "Ce document n'existe plus.",
+    "nodeNotFound": "Cet élément du découpage n'existe plus.",
+    "versionNotFound": "Cette version du document n'existe plus.",
+    "tooLarge": "« {{name}} » dépasse 300 Mo.",
+    "tooMany": "Trop de fichiers à la fois ({{max}} au plus).",
+    "fileError": "Le fichier n'a pas pu être lu ou écrit.",
+    "unsafeType": "Ce type de fichier pourrait lancer un programme : GANIS ne l'ouvre pas.",
+    "openFailed": "Aucune application n'a pu ouvrir ce document."
   }
 }

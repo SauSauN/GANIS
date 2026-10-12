@@ -4,6 +4,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { FileText, type LucideIcon } from "lucide-react";
 
 import { ActivityBar } from "@/components/layout/ActivityBar";
+import { ExternalDocumentsWatcher } from "@/components/documents/ExternalDocumentsWatcher";
 import { UnsavedChangesDialog } from "@/components/layout/UnsavedChangesDialog";
 import { useUnsavedQueue } from "@/components/layout/useUnsavedQueue";
 import { SideBar } from "@/components/layout/SideBar";
@@ -722,6 +723,9 @@ export default function Workspace() {
         onOpenFeature={openFeature}
       />
       <CreateChooser open={chooserOpen} onClose={() => setChooserOpen(false)} onOpenFeature={openFeature} />
+
+      {/* Documents ouverts dans une autre application : modifications reprises */}
+      <ExternalDocumentsWatcher projectId={project.id} />
 
       {/* =========================================================
           STATUS BAR

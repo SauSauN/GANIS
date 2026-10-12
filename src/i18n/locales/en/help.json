@@ -147,7 +147,9 @@
           "Novel: parts, chapters, scenes. Film: acts, sequences, scenes. Manga: volumes, chapters, pages… Names can be changed in the project settings.",
           "Numbers are computed for you; an item can be left out of the numbering (prologue, interlude).",
           "Automatic numbering (renumbering on every move) is turned on in the project settings, as is each level's colour.",
-          "An item's sheet shows its summary, its characters (point of view, present…) and its locations."
+          "An item's sheet shows its summary, its characters (point of view, present…) and its locations.",
+          "Documents: in an item's sheet, keep its files (manga pages, PDFs, Word files, images, sounds…) with “Add files” or by drag and drop. They are encrypted with the project and exported in the .ganix.",
+          "Click a document to read it in GANIS; “Read the pages” chains a chapter's images. “Edit in its application” opens it in Word, Acrobat, Clip Studio…: every save comes back, the previous content stays in the versions."
         ]
       },
       "notes": {
@@ -210,6 +212,14 @@
         {
           "q": "I edited a sheet and want to go back.",
           "a": "Open the sheet, click “Versions”, pick the state you want and click “Restore this version”."
+        },
+        {
+          "q": "How do I keep my manga chapter in GANIS?",
+          "a": "Open the chapter's sheet (story outline › click the chapter), then “Add files” or drop all the pages on the “Documents” card. Put them in order (Alt+↑/↓), then “Read the pages” for continuous reading."
+        },
+        {
+          "q": "I edited a document in Word: is it up to date in GANIS?",
+          "a": "Yes, if it was opened with “Edit in its application”: every save in Word comes back within seconds. Click “Finish” when you are done (the unencrypted working copy is then deleted)."
         },
         {
           "q": "Are my changes saved?",

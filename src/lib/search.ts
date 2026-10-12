@@ -14,6 +14,8 @@ export function itemTabId(kind: HistoryKind, id: string): string | null {
     case "location":
       return locationTabId(id);
     case "structureNode":
+    // Document : `id` est celui de l'élément du découpage qui le contient.
+    case "document":
       return structureNodeTabId(id);
     case "note":
       return noteTabId(id);
@@ -29,7 +31,7 @@ export function itemTabId(kind: HistoryKind, id: string): string | null {
 }
 
 /** Ordre des groupes de résultats. */
-export const SEARCH_ORDER: SearchHit["kind"][] = ["character", "location", "structureNode", "note", "noteFolder", "sticky"];
+export const SEARCH_ORDER: SearchHit["kind"][] = ["character", "location", "structureNode", "document", "note", "noteFolder", "sticky"];
 
 /**
  * Résultats de recherche dans le projet, relus 200 ms après la dernière

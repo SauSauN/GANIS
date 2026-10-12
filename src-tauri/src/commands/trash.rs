@@ -24,7 +24,18 @@ pub async fn list_trash(state: State<'_, AppState>, project_id: String) -> AppRe
 pub async fn restore_trash(state: State<'_, AppState>, project_id: String, trash_id: String) -> AppResult<TrashItem> {
     let pool = project_pool(&state, &project_id).await?;
     let item = trash_service::restore(&pool, &trash_id).await?;
-    history::record(&pool, "restored", &item.kind, &item.item_id, &item.label, "").await;
+    // Document : l'élément du découpage qui le contient (lien du journal).
+    let detail = if item.kind == "document" {
+        crate::services::document_service::find(&pool, &item.item_id)
+            .await
+            .ok()
+            .flatten()
+            .map(|d| d.node_id)
+            .unwrap_or_default()
+    } else {
+        String::new()
+    };
+    history::record(&pool, "restored", &item.kind, &item.item_id, &item.label, &detail).await;
     Ok(item)
 }
 

@@ -8,6 +8,7 @@ import {
   MapPinned,
   Network,
   NotebookText,
+  Paperclip,
   RefreshCw,
   RotateCcw,
   StickyNote,
@@ -28,6 +29,7 @@ const ICONS: Record<HistoryKind, LucideIcon> = {
   character: UserRound,
   location: MapPinned,
   structureNode: ListTree,
+  document: Paperclip,
   note: NotebookText,
   noteFolder: Folder,
   sticky: StickyNote,
@@ -153,7 +155,9 @@ export function HistoryView({ projectId, feature, onOpenFeature }: HistoryViewPr
               <ol className="divide-y rounded-xl border bg-card shadow-sm">
                 {group.items.map((item) => {
                   const Icon = ICONS[item.kind] ?? FileText;
-                  const tab = item.action === "deleted" ? null : itemTabId(item.kind, item.itemId);
+                  // Document : sa fiche est celle de l'élément du découpage qui le contient.
+                  const target = item.kind === "document" ? item.detail : item.itemId;
+                  const tab = item.action === "deleted" || !target ? null : itemTabId(item.kind, target);
                   return (
                     <li key={item.id} className="flex items-center gap-3 px-4 py-2.5">
                       <span className="w-12 shrink-0 text-xs tabular-nums text-muted-foreground">{timeOf(item.at, i18n.language)}</span>

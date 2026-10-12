@@ -1,7 +1,7 @@
 {
   "placeholder": "Rechercher dans le projet…",
   "clear": "Effacer",
-  "hint": "Personnages, lieux, découpage, notes et post-it. Sans tenir compte des accents ni des majuscules.",
+  "hint": "Personnages, lieux, découpage, documents, notes et post-it. Sans tenir compte des accents ni des majuscules.",
   "searching": "Recherche…",
   "none": "Aucun résultat.",
   "count_one": "{{count}} résultat",
@@ -10,6 +10,7 @@
     "character": "Personnages",
     "location": "Lieux",
     "structureNode": "Découpage",
+    "document": "Documents",
     "note": "Notes",
     "noteFolder": "Dossiers",
     "sticky": "Post-it"
@@ -18,6 +19,7 @@
     "character": "Personnage sans nom",
     "location": "Lieu sans nom",
     "structureNode": "Élément sans titre",
+    "document": "Document sans nom",
     "note": "Note sans titre",
     "noteFolder": "Dossier",
     "sticky": "Post-it"

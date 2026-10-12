@@ -7,6 +7,7 @@ pub mod auth;
 pub mod character_locations;
 pub mod characters;
 pub mod diagnostics;
+pub mod documents;
 pub mod ganix;
 pub mod history;
 pub mod locations;
