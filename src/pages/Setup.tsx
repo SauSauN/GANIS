@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { RecoveryKeyPanel } from "@/components/auth/RecoveryKeyPanel";
 import { Feather } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,6 +15,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api, ApiError } from "@/lib/api";
+import { RECOVERY_KEY_ENABLED } from "@/lib/recoveryKey";
 import {
   checkEmail,
   checkPassword,
@@ -59,6 +61,8 @@ export default function Setup() {
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<SetupError | null>(null);
   const [loading, setLoading] = useState(false);
+  // Clé de récupération du compte créé, montrée une seule fois.
+  const [recoveryKey, setRecoveryKey] = useState<string | null>(null);
 
   function validate(): ValidationIssue | null {
     return (
@@ -82,8 +86,10 @@ export default function Setup() {
 
     setLoading(true);
 
+    let created: { recoveryKey: string | null };
+
     try {
-      await api.setupAdmin({
+      created = await api.setupAdmin({
         username: username.trim(),
         password,
         email: email.trim() || undefined,
@@ -100,11 +106,32 @@ export default function Setup() {
       return;
     }
 
-    markDone();
-
+    // La connexion se fait tout de suite, pendant que le mot de passe est
+    // encore en mémoire ; l'accès au tableau de bord attend que la clé de
+    // récupération soit notée.
     const loggedIn = await login(username.trim(), password);
 
-    navigate(loggedIn ? "/dashboard" : "/", { replace: true });
+    setPassword("");
+    setConfirm("");
+    setLoading(false);
+
+    if (!loggedIn) {
+      markDone();
+      navigate("/", { replace: true });
+      return;
+    }
+
+    // Clé de récupération (si activées) : montrée avant le tableau de bord.
+    if (created.recoveryKey) {
+      setRecoveryKey(created.recoveryKey);
+    } else {
+      onRecoveryKeyConfirmed();
+    }
+  }
+
+  function onRecoveryKeyConfirmed() {
+    markDone();
+    navigate("/dashboard", { replace: true });
   }
 
   const errorMessage = !error
@@ -114,6 +141,23 @@ export default function Setup() {
       : "key" in error
         ? t("errors.failed")
         : error.text;
+
+  if (recoveryKey) {
+    return (
+      <main className="flex flex-1 items-center justify-center bg-background px-4 py-6">
+        <Card className="w-full max-w-lg">
+          <CardContent className="py-2">
+            <RecoveryKeyPanel
+              recoveryKey={recoveryKey}
+              username={username.trim()}
+              context="created"
+              onConfirmed={onRecoveryKeyConfirmed}
+            />
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
 
   return (
     <main className="flex flex-1 items-center justify-center bg-background px-4 py-6">
@@ -168,6 +212,7 @@ export default function Setup() {
               />
               <p className="text-xs text-muted-foreground">
                 {t("password.hint")}
+                {!RECOVERY_KEY_ENABLED && <> {t("password.warning")}</>}
               </p>
             </div>
 

@@ -1,0 +1,60 @@
+{
+  "undo": "Annuler",
+  "kinds": {
+    "character": "Personnage",
+    "location": "Lieu",
+    "structureNode": "Élément du découpage",
+    "note": "Note",
+    "noteFolder": "Dossier de notes",
+    "sticky": "Post-it",
+    "relation": "Relation",
+    "placeLink": "Lien personnage – lieu"
+  },
+  "deleted": {
+    "character": "Personnage « {{name}} » supprimé.",
+    "location": "Lieu « {{name}} » supprimé.",
+    "structureNode": "« {{name}} » supprimé du découpage.",
+    "note": "Note « {{name}} » supprimée.",
+    "noteFolder": "Dossier « {{name}} » supprimé.",
+    "sticky": "Post-it « {{name}} » supprimé.",
+    "relation": "Relation « {{name}} » supprimée.",
+    "placeLink": "Lien « {{name}} » supprimé."
+  },
+  "restored": {
+    "character": "Personnage « {{name}} » restauré.",
+    "location": "Lieu « {{name}} » restauré.",
+    "structureNode": "« {{name}} » restauré dans le découpage.",
+    "note": "Note « {{name}} » restaurée.",
+    "noteFolder": "Dossier « {{name}} » restauré.",
+    "sticky": "Post-it « {{name}} » restauré.",
+    "relation": "Relation « {{name}} » restaurée.",
+    "placeLink": "Lien « {{name}} » restauré."
+  },
+  "untitled": {
+    "character": "Personnage sans nom",
+    "location": "Lieu sans nom",
+    "structureNode": "Élément sans titre",
+    "note": "Note sans titre",
+    "noteFolder": "Dossier sans nom",
+    "sticky": "Post-it vide",
+    "relation": "Relation",
+    "placeLink": "Lien"
+  },
+  "view": {
+    "description": "Les éléments supprimés restent ici 30 jours. En les restaurant, tout ce qui avait disparu avec eux revient aussi (images, relations, sous-éléments…).",
+    "empty": "Vider la corbeille",
+    "emptyTitle": "Vider la corbeille ?",
+    "emptyBody_one": "L'élément de la corbeille sera supprimé définitivement.",
+    "emptyBody_other": "Les {{count}} éléments de la corbeille seront supprimés définitivement.",
+    "nothing": "La corbeille est vide.",
+    "loading": "Chargement de la corbeille…",
+    "retry": "Réessayer",
+    "restore": "Restaurer",
+    "restoring": "Restauration…",
+    "purge": "Supprimer définitivement",
+    "purgeNamed": "Supprimer définitivement « {{name}} »",
+    "purgeTitle": "Supprimer définitivement « {{name}} » ?",
+    "purgeBody": "Il ne pourra plus être restauré.",
+    "deletedOn": "supprimé le {{date}}"
+  }
+}

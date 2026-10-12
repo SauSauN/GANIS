@@ -48,6 +48,54 @@
     "delete": "Supprimer le projet",
     "noDescription": "Aucune description.",
     "updatedAt": "Modifié le {{date}}",
-    "archived": "Archivé"
+    "archived": "Archivé",
+    "export": "Exporter en .ganix"
+  },
+  "ganix": {
+    "export": {
+      "dialogTitle": "Exporter le projet",
+      "exporting": "Export de « {{name}} »…",
+      "done": "Projet exporté : {{file}}",
+      "failed": "L'export du projet a échoué.",
+      "notEncrypted": "Le fichier .ganix n'est pas chiffré : il s'ouvre sur tout GANIS, depuis n'importe quel compte. Gardez-le en lieu sûr."
+    },
+    "import": {
+      "button": "Importer un .ganix",
+      "dialogTitle": "Ouvrir un projet .ganix",
+      "checking": "Vérification du fichier…",
+      "failed": "L'import du projet a échoué.",
+      "title": "Importer ce projet ?",
+      "description": "Le fichier a été vérifié. Rien n'est ajouté à votre compte avant votre confirmation.",
+      "exportedAt": "Exporté le {{date}}",
+      "createdWith": "Créé avec {{app}}",
+      "size": "Taille : {{size}}",
+      "counts": {
+        "characters": "Personnages",
+        "locations": "Lieux",
+        "structureNodes": "Éléments de structure",
+        "relations": "Relations",
+        "placeLinks": "Liens personnage ↔ lieu"
+      },
+      "conflictTitle": "Vous avez déjà ce projet",
+      "conflictDescription": "Un projet de votre compte vient de ce fichier. Que voulez-vous faire ?",
+      "modes": {
+        "copy": {
+          "label": "Importer comme copie",
+          "description": "Ajoute un nouveau projet nommé « {{name}} (importé) ». Votre projet actuel ne change pas."
+        },
+        "replace": {
+          "label": "Remplacer mon projet",
+          "description": "Le contenu de votre projet est remplacé par celui du fichier. Une sauvegarde .ganix de la version actuelle est faite avant."
+        }
+      },
+      "replaceConfirm": "Je confirme le remplacement de mon projet actuel.",
+      "encryptionNote": "Le projet sera chiffré avec une nouvelle clé dès son ajout à votre compte.",
+      "confirm": "Importer",
+      "confirmReplace": "Remplacer",
+      "importing": "Import…",
+      "done": "Projet « {{name}} » importé.",
+      "replaced": "Projet « {{name}} » remplacé. Sauvegarde de l'ancienne version : {{file}} (dossier « sauvegardes » de GANIS).",
+      "encryptionNoteReplace": "Les données reçues seront chiffrées avec la clé de votre projet."
+    }
   }
 }

@@ -1,0 +1,33 @@
+{
+  "button": "Versions",
+  "buttonHint": "See earlier states and go back",
+  "title": "Versions: {{name}}",
+  "description": "Earlier states of this item. Pick one to compare it with the current state, then restore it if needed: the current state is kept first.",
+  "namePlaceholder": "Name the current state…",
+  "create": "Create a version of the current state",
+  "listLabel": "Versions",
+  "loading": "Loading…",
+  "none": "No version yet.",
+  "noneHint": "A version is created automatically at the start of each editing session. You can also name the current state on the left.",
+  "auto": "Automatic version",
+  "delete": "Delete this version",
+  "compare": "Differences between the version of {{date}} and the current state",
+  "legend": {
+    "removed": "removed since",
+    "added": "added since"
+  },
+  "identical": "Same as the current state.",
+  "restore": "Restore this version",
+  "restored": "Version of {{date}} restored. The previous state was kept in the versions.",
+  "unsavedWarning": "Your unsaved changes will be lost.",
+  "fields": {
+    "title": "Title",
+    "content": "Content",
+    "summary": "Summary",
+    "number": "Number",
+    "name": "Name",
+    "type": "Type",
+    "status": "Status",
+    "parent": "Located in"
+  }
+}

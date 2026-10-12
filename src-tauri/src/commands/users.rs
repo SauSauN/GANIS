@@ -122,13 +122,15 @@ pub async fn delete_user(
 
     // Les projets sont relevés avant la suppression : une fois le compte
     // supprimé, la base de l'application ne les connaît plus.
-    let projects =
-        project_service::list_projects_for_user(&state.app_db, &user_id).await?;
+    // Seuls leurs identifiants sont lus : l'administrateur n'a pas la clé
+    // de ce compte et ne peut rien en déchiffrer.
+    let project_ids =
+        project_service::list_project_ids_for_user(&state.app_db, &user_id).await?;
 
     user_service::delete_by_id(&state.app_db, &user_id).await?;
 
-    for project in projects {
-        project_storage::delete_storage(&state, &project.id).await;
+    for project_id in project_ids {
+        project_storage::delete_storage(&state, &project_id).await;
     }
 
     Ok(())
@@ -136,34 +138,28 @@ pub async fn delete_user(
 
 /// Met à jour l'adresse e-mail de l'utilisateur connecté.
 ///
-/// Une valeur vide supprime l'adresse.
+/// L'adresse est chiffrée avec la clé du compte. Une valeur vide la
+/// supprime.
 #[tauri::command(rename_all = "camelCase")]
 pub async fn update_profile(
     state: State<'_, AppState>,
     input: UpdateProfileInput,
 ) -> AppResult<UserPublic> {
-    let current = state.require_user().await?;
+    let (current, account_key) = state.require_session().await?;
 
     let email = auth_service::normalize_email(input.email.as_deref())?;
 
-    if let Some(address) = email.as_deref() {
-        if let Some(owner) =
-            user_service::find_by_email(&state.app_db, address).await?
-        {
-            if owner.id != current.id {
-                return Err(AppError::conflict(
-                    "Cette adresse e-mail est déjà utilisée.",
-                ).with_key("auth.emailTaken"));
-            }
-        }
-    }
+    let sealed = email
+        .as_deref()
+        .map(|address| user_service::seal_email(&account_key, &current.id, address))
+        .transpose()?;
 
-    let updated =
-        user_service::update_email(&state.app_db, &current.id, email.as_deref())
+    let stored =
+        user_service::update_email(&state.app_db, &current.id, sealed.as_deref())
             .await?;
 
     // Garde la session en mémoire synchronisée avec la base.
-    state.set_current_user(Some(updated.clone())).await;
+    let updated = state.refresh_current_user(stored).await?;
 
     Ok(UserPublic::from(updated))
 }
@@ -174,13 +170,6 @@ pub async fn change_password(
     state: State<'_, AppState>,
     input: ChangePasswordInput,
 ) -> AppResult<()> {
-    let current = state.require_user().await?;
-
-    auth_service::change_password(
-        &state.app_db,
-        &current.id,
-        &input.current_password,
-        &input.new_password,
-    )
-    .await
+    auth_service::change_password(&state, &input.current_password, &input.new_password)
+        .await
 }

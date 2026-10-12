@@ -5,6 +5,7 @@
 //! en est bien le propriétaire.
 
 use crate::error::AppResult;
+use crate::services::history_service as history;
 use crate::services::project_storage;
 use crate::services::synopsis_service::{self, Synopsis};
 use crate::state::AppState;
@@ -45,12 +46,15 @@ pub async fn update_synopsis(
     let project_pool =
         project_storage::pool_for_user(&state, &project_id, &user.id).await?;
 
-    synopsis_service::update_synopsis(
+    history::snapshot_before(&project_pool, "synopsis", "default").await;
+    let saved = synopsis_service::update_synopsis(
         &project_pool,
         &input.content,
         &input.genres,
         &input.subgenres,
         &input.tone,
     )
-    .await
+    .await?;
+    history::record(&project_pool, "updated", "synopsis", "default", "", "").await;
+    Ok(saved)
 }

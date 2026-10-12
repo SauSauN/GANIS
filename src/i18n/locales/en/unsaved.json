@@ -1,0 +1,30 @@
+{
+  "title": {
+    "one": "Save changes to “{{name}}”?"
+  },
+  "progress": "Item {{current}} of {{total}}",
+  "description": {
+    "closeTabs": "Your changes will be lost if you close without saving.",
+    "leave": "Your changes will be lost if you leave this page without saving.",
+    "quit": "Your changes will be lost if you close GANIS without saving."
+  },
+  "save": {
+    "closeTabs": "Save",
+    "leave": "Save and continue",
+    "quit": "Save and quit"
+  },
+  "discard": {
+    "closeTabs": "Don't save",
+    "leave": "Don't save",
+    "quit": "Quit without saving"
+  },
+  "cancel": "Cancel",
+  "saving": "Saving…",
+  "remaining_one": "You'll then choose for the next item.",
+  "remaining_other": "You'll then choose for each of the next {{count}} items.",
+  "saveFailed": "“{{name}}” couldn't be saved. Cancel to fix the error shown, or continue without saving it.",
+  "tab": {
+    "unsaved": "Unsaved changes",
+    "unsavedNamed": "{{name}} (unsaved)"
+  }
+}

@@ -4,10 +4,13 @@ import { Navigate, useParams } from "react-router-dom";
 import { FileText, type LucideIcon } from "lucide-react";
 
 import { ActivityBar } from "@/components/layout/ActivityBar";
+import { UnsavedChangesDialog } from "@/components/layout/UnsavedChangesDialog";
+import { useUnsavedQueue } from "@/components/layout/useUnsavedQueue";
 import { SideBar } from "@/components/layout/SideBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import {
   HOME_TAB,
+  SETTINGS_PREFIX,
   findFeature,
   type ModuleId,
 } from "@/components/workspace/modules";
@@ -16,6 +19,8 @@ import {
   type TabInfo,
 } from "@/components/workspace/WorkspaceTabs";
 import { WorkspaceView } from "@/components/workspace/WorkspaceView";
+import { CreateChooser } from "@/components/workspace/CreateChooser";
+import { CommandPalette } from "@/components/search/CommandPalette";
 
 import i18n from "@/i18n";
 import { cn } from "@/lib/utils";
@@ -27,7 +32,9 @@ import {
   addTab,
   closeTabs as closeTabsInLayout,
   initialLayout,
+  loadOpenTabs,
   moveTab as moveTabInLayout,
+  saveOpenTabs,
   savePinnedTabs,
   shiftTab as shiftTabInLayout,
   tabsToClose,
@@ -35,6 +42,20 @@ import {
   type CloseScope,
   type TabLayout,
 } from "@/lib/tabLayout";
+import {
+  UnsavedTabContext,
+  discardEntries,
+  saveEntries,
+  useUnsavedStore,
+} from "@/lib/unsavedChanges";
+import { api } from "@/lib/api";
+import { useRegisterCommands } from "@/lib/commands";
+import { showGuideOnce } from "@/lib/shortcuts";
+import { toast } from "@/stores/toastStore";
+import { useReloadStore } from "@/stores/reloadStore";
+import { useCharacterStore } from "@/stores/characterStore";
+import { useNoteStore } from "@/stores/noteStore";
+import { useStructureStore } from "@/stores/structureStore";
 import { useProjectStore } from "@/stores/projectStore";
 
 /**
@@ -57,8 +78,16 @@ function tabMeta(
     : null;
 }
 
+/** Ctrl+N : ce qui se crée dans chaque module (ailleurs : « Que voulez-vous créer ? »). */
+const NEW_TARGETS: Partial<Record<ModuleId, string>> = {
+  characters: "characters.create",
+  locations: "locations.create",
+  structure: "structure.plan",
+  notes: "notes.create",
+};
+
 export default function Workspace() {
-  const { t } = useTranslation("workspace");
+  const { t } = useTranslation(["workspace", "unsaved", "menus", "projects"]);
 
   const { projectId } = useParams<{
     projectId: string;
@@ -94,6 +123,15 @@ export default function Workspace() {
   const railExpanded = useRailExpanded();
 
   /**
+   * Onglet actif à l'arrivée : celui qu'on avait quitté plus tôt dans la
+   * session (retour du tableau de bord, des paramètres…), sinon l'accueil.
+   */
+  const [startTab] = useState<string | null>(() => {
+    const session = loadOpenTabs(projectId ?? "", (id) => tabMeta(id) !== null);
+    return session ? session.active : HOME_TAB;
+  });
+
+  /**
    * Module sélectionné dans la barre de gauche.
    *
    * Au départ, c'est le module qui contient l'onglet ouvert à l'arrivée
@@ -101,7 +139,7 @@ export default function Workspace() {
    * zone centrale restent ainsi toujours cohérentes.
    */
   const [activeModule, setActiveModule] = useState<ModuleId>(
-    () => findFeature(HOME_TAB)?.module.id ?? "details",
+    () => findFeature(startTab ?? HOME_TAB)?.module.id ?? "details",
   );
 
   /**
@@ -137,8 +175,11 @@ export default function Workspace() {
    *
    * null = aucun onglet ouvert.
    */
-  const [activeTab, setActiveTab] =
-    useState<string | null>(HOME_TAB);
+  const [activeTab, setActiveTab] = useState<string | null>(() =>
+    startTab && layout.tabs.includes(startTab)
+      ? startTab
+      : (layout.tabs[0] ?? null),
+  );
 
   /**
    * Devient vrai dès que le projet a été vu dans le store.
@@ -148,6 +189,44 @@ export default function Workspace() {
    * au tableau de bord.
    */
   const seenRef = useRef(false);
+
+  /**
+   * Personnages chargés : le libellé d'un onglet de fiche est le nom du
+   * personnage (voir `findFeature`). S'abonner ici renomme l'onglet dès
+   * que le personnage est renommé.
+   */
+  useCharacterStore((state) => state.characters);
+
+  /** Même chose pour les fiches des éléments du découpage (« Chapitre 3 »). */
+  useStructureStore((state) => state.structure);
+
+  /** Et des notes (le titre de la note). */
+  useNoteStore((state) => state.notes);
+
+  /** Onglets avec des modifications non enregistrées (point ● sur l'onglet). */
+  const unsavedEntries = useUnsavedStore((state) => state.entries);
+
+  /** Palette de commandes (Ctrl+K) et « Que voulez-vous créer ? ». */
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [chooserOpen, setChooserOpen] = useState(false);
+
+  /** Écrans à recréer (restauration d'une version). */
+  const reloadCounts = useReloadStore((state) => state.counts);
+
+  /**
+   * Question « Enregistrer ? » avant de fermer des onglets modifiés,
+   * posée pour chaque onglet, l'un après l'autre.
+   */
+  const closeQueue = useUnsavedQueue();
+
+  /**
+   * Dernière disposition et dernier onglet actif : une fermeture qui suit un
+   * enregistrement (asynchrone) doit partir de l'état à jour.
+   */
+  const layoutRef = useRef(layout);
+  layoutRef.current = layout;
+  const activeTabRef = useRef(activeTab);
+  activeTabRef.current = activeTab;
 
   if (project) {
     seenRef.current = true;
@@ -187,6 +266,16 @@ export default function Workspace() {
   }, [projectId, layout.pinned]);
 
   /**
+   * Mémorise les onglets ouverts et l'onglet actif jusqu'à la déconnexion :
+   * en revenant dans le projet, on les retrouve tels quels.
+   */
+  useEffect(() => {
+    if (projectId) {
+      saveOpenTabs(projectId, { tabs: layout.tabs, active: activeTab });
+    }
+  }, [projectId, layout.tabs, activeTab]);
+
+  /**
    * Le projet courant est réinitialisé lorsqu'on quitte
    * l'espace de travail.
    */
@@ -195,6 +284,61 @@ export default function Workspace() {
       closeProject();
     };
   }, [closeProject]);
+
+  /**
+   * Commandes des menus et des raccourcis clavier (voir `commands.ts`).
+   * Les fonctions appelées sont définies plus bas : elles ne servent
+   * qu'au moment où la commande est exécutée.
+   */
+  const activeDirty = activeTab !== null && activeTab in unsavedEntries;
+  const createTarget = NEW_TARGETS[activeModule] ?? null;
+
+  useRegisterCommands({
+    new: {
+      label: createTarget ? t(`menus:file.newIn.${createTarget}` as never) : t("menus:file.newChoose"),
+      run: () => (createTarget ? openFeature(createTarget) : setChooserOpen(true)),
+    },
+    palette: { run: () => setPaletteOpen(true) },
+    openHistory: { run: () => openFeature("history") },
+    save: {
+      disabled: !activeDirty,
+      run: () => {
+        const tab = activeTabRef.current;
+        if (tab) void saveEntries([tab]);
+      },
+    },
+    saveAll: {
+      disabled: Object.keys(unsavedEntries).length === 0,
+      run: () => void saveEntries(Object.keys(useUnsavedStore.getState().entries)),
+    },
+    closeTab: {
+      disabled: activeTab === null,
+      run: () => {
+        const tab = activeTabRef.current;
+        if (tab) closeTab(tab);
+      },
+    },
+    nextTab: { disabled: layout.tabs.length < 2, run: () => cycleTab(1) },
+    previousTab: { disabled: layout.tabs.length < 2, run: () => cycleTab(-1) },
+    togglePanel: {
+      label: panelOpen ? t("menus:view.hidePanel") : t("menus:view.showPanel"),
+      run: () => setPanelOpen((open) => !open),
+    },
+    toggleRail: {
+      label: railExpanded ? t("menus:view.railIcons") : t("menus:view.railNames"),
+      run: () => setRailExpanded(!railExpanded),
+    },
+    openHome: { run: () => openFeature(HOME_TAB) },
+    openSynopsis: { run: () => openFeature("synopsis.edit") },
+    openProjectSettings: { run: () => openFeature(`${SETTINGS_PREFIX}info`) },
+    openTrash: { run: () => openFeature("trash") },
+    exportProject: { disabled: !project, run: () => void exportCurrentProject() },
+  });
+
+  /** Guide de démarrage : ouvert seul la première fois qu'un projet est ouvert. */
+  useEffect(() => {
+    showGuideOnce();
+  }, []);
 
   /**
    * Si le projet est inexistant ou a été supprimé,
@@ -250,6 +394,9 @@ export default function Workspace() {
    * reste alors repéré dans la barre (voir `linked`).
    */
   function activate(tabId: string | null) {
+    // Mis à jour tout de suite : une fermeture enchaînée (questions
+    // successives) doit voir le nouvel onglet actif sans attendre le rendu.
+    activeTabRef.current = tabId;
     setActiveTab(tabId);
 
     const owner = tabId ? findFeature(tabId)?.module.id : undefined;
@@ -286,21 +433,53 @@ export default function Workspace() {
    * - s'il n'en reste aucun, la zone centrale est vide.
    */
   function closeTabs(tabId: string, scope: CloseScope) {
-    const closing = tabsToClose(layout, tabId, scope);
+    const closing = tabsToClose(layoutRef.current, tabId, scope);
+    const isUnsaved = (id: string) => id in useUnsavedStore.getState().entries;
+
+    const unsaved = closing.filter(isUnsaved);
+    const clean = closing.filter((id) => !isUnsaved(id));
+
+    // Les onglets sans modification se ferment tout de suite.
+    closeTabIds(clean, tabId);
+
+    if (unsaved.length === 0) {
+      return;
+    }
+
+    // Les onglets modifiés : un par un. Chaque onglet est affiché, la
+    // question est posée pour lui seul, puis il est fermé (s'il est
+    // enregistré ou abandonné) avant de passer au suivant. « Annuler »
+    // laisse ouverts celui-ci et les suivants.
+    closeQueue.start(unsaved, {
+      onShow: (id) => activate(id),
+      onResolved: (id) => closeTabIds([id], tabId),
+    });
+  }
+
+  /**
+   * Ferme réellement ces onglets (aucune question).
+   *
+   * Si l'onglet actif en fait partie, `anchor` devient actif s'il est
+   * resté ouvert, sinon le voisin le plus proche.
+   */
+  function closeTabIds(closing: string[], anchor: string) {
+    const layout = layoutRef.current;
+    const activeTab = activeTabRef.current;
     const next = closeTabsInLayout(layout, closing);
 
     if (next === layout) {
       return;
     }
 
+    layoutRef.current = next;
     setLayout(next);
 
     if (!activeTab || !closing.includes(activeTab)) {
       return;
     }
 
-    if (next.tabs.includes(tabId)) {
-      activate(tabId);
+    if (next.tabs.includes(anchor)) {
+      activate(anchor);
       return;
     }
 
@@ -314,10 +493,44 @@ export default function Workspace() {
   }
 
   /**
+   * Ferme un onglet sans poser de question : ses modifications éventuelles
+   * sont abandonnées (ex. le personnage de la fiche vient d'être supprimé).
+   */
+  function forceCloseTab(tabId: string) {
+    discardEntries([tabId]);
+    closeTabIds([tabId], tabId);
+  }
+
+  /**
    * Ferme un seul onglet (croix de l'onglet).
    */
   function closeTab(tabId: string) {
     closeTabs(tabId, "this");
+  }
+
+  /** Onglet suivant (`1`) ou précédent (`-1`), en boucle. */
+  function cycleTab(delta: 1 | -1) {
+    const tabs = layoutRef.current.tabs;
+    if (tabs.length === 0) return;
+    const index = activeTabRef.current ? tabs.indexOf(activeTabRef.current) : -1;
+    activate(tabs[(index + delta + tabs.length) % tabs.length]);
+  }
+
+  /** Exporte le projet ouvert en `.ganix` (menu Fichier ou Projet). */
+  async function exportCurrentProject() {
+    if (!project) return;
+    try {
+      const file = await api.exportProject(project.id, t("projects:ganix.export.dialogTitle"));
+      if (file) {
+        toast({
+          message: `${t("projects:ganix.export.done", { file })} ${t("projects:ganix.export.notEncrypted")}`,
+          tone: "success",
+          duration: 10000,
+        });
+      }
+    } catch (e) {
+      toast({ message: e instanceof Error ? e.message : t("projects:ganix.export.failed"), tone: "error" });
+    }
   }
 
   /**
@@ -355,6 +568,7 @@ export default function Workspace() {
             label: meta.label,
             icon: meta.icon,
             pinned: layout.pinned.includes(id),
+            dirty: id in unsavedEntries,
           },
         ]
       : [];
@@ -401,6 +615,7 @@ export default function Workspace() {
         {panelOpen && (
           <SideBar
             module={activeModule}
+            projectId={project.id}
             projectName={project.name}
             activeTab={activeTab}
             onOpenFeature={openFeature}
@@ -411,7 +626,10 @@ export default function Workspace() {
         {/* =========================================================
             ZONE CENTRALE
             ========================================================= */}
-        <main className="flex min-w-0 flex-1 flex-col">
+        {/* `workspace-drawer-host` : les panneaux latéraux (relation…)
+            s'ouvrent dans cette zone, à la hauteur de la barre de gauche,
+            sans recouvrir la barre de titre ni la barre d'état. */}
+        <main id="workspace-drawer-host" className="relative flex min-w-0 flex-1 flex-col">
           {/* =======================================================
               ONGLETS (épinglables et déplaçables)
 
@@ -446,11 +664,20 @@ export default function Workspace() {
                   activeTab !== tabId && "hidden",
                 )}
               >
-                <WorkspaceView
-                  tabId={tabId}
-                  project={project}
-                  onOpenFeature={openFeature}
-                />
+                {/* L'onglet est connu des écrans qui signalent leurs
+                    modifications non enregistrées. */}
+                <UnsavedTabContext.Provider
+                  value={{ id: tabId, label: tabMeta(tabId)?.label ?? tabId }}
+                >
+                  <WorkspaceView
+                    // Recréé après une restauration de version (voir `reloadStore`).
+                    key={reloadCounts[tabId] ?? 0}
+                    tabId={tabId}
+                    project={project}
+                    onOpenFeature={openFeature}
+                    onCloseTab={forceCloseTab}
+                  />
+                </UnsavedTabContext.Provider>
               </div>
             ))
           ) : (
@@ -473,6 +700,28 @@ export default function Workspace() {
           )}
         </main>
       </div>
+
+      {/* =========================================================
+          « ENREGISTRER LES MODIFICATIONS ? » (fermeture d'onglets)
+          ========================================================= */}
+      <UnsavedChangesDialog
+        reason="closeTabs"
+        question={closeQueue.question}
+        busy={closeQueue.busy}
+        failed={closeQueue.failed}
+        onSave={closeQueue.save}
+        onDiscard={closeQueue.discard}
+        onCancel={closeQueue.cancel}
+      />
+
+      {/* Palette de commandes (Ctrl+K) et choix de création (Ctrl+N) */}
+      <CommandPalette
+        open={paletteOpen}
+        onClose={() => setPaletteOpen(false)}
+        projectId={project.id}
+        onOpenFeature={openFeature}
+      />
+      <CreateChooser open={chooserOpen} onClose={() => setChooserOpen(false)} onOpenFeature={openFeature} />
 
       {/* =========================================================
           STATUS BAR

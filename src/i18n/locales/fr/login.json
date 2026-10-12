@@ -10,5 +10,6 @@
   "errors": {
     "usernameRequired": "Le nom d'utilisateur est requis.",
     "passwordRequired": "Le mot de passe est requis."
-  }
+  },
+  "forgotPassword": "Mot de passe oublié ?"
 }

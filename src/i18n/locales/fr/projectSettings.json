@@ -9,8 +9,20 @@
       "description": "Avancement du projet, favori et archivage."
     },
     "danger": {
-      "label": "Duplication et suppression",
-      "description": "Dupliquer ou supprimer définitivement le projet."
+      "label": "Export, duplication et suppression",
+      "description": "Exporter en .ganix, dupliquer ou supprimer définitivement le projet."
+    },
+    "characters": {
+      "label": "Personnages",
+      "description": "Niveau de détail des fiches et listes de valeurs proposées."
+    },
+    "locations": {
+      "label": "Lieux",
+      "description": "Types de lieux personnalisés et statuts."
+    },
+    "structure": {
+      "label": "Découpage",
+      "description": "Niveaux du plan, leurs noms et leur numérotation."
     }
   },
   "info": {
@@ -40,6 +52,24 @@
     "duplicateFailed": "Impossible de dupliquer le projet.",
     "deleteTitle": "Supprimer le projet",
     "deleteDescription": "La suppression est définitive et ne peut pas être annulée.",
-    "deleteFailed": "Impossible de supprimer le projet."
+    "deleteFailed": "Impossible de supprimer le projet.",
+    "exportTitle": "Exporter le projet",
+    "exportDescription": "Télécharge tout le projet dans un fichier « nom du projet.ganix », à importer depuis le tableau de bord de GANIS (sur cet ordinateur ou un autre).",
+    "export": "Exporter en .ganix",
+    "exporting": "Export…"
+  },
+  "characters": {
+    "title": "Niveau de détail des fiches",
+    "description": "S'applique à tous les personnages du projet. Changer de niveau n'efface rien : les champs masqués réapparaissent si vous remontez de niveau.",
+    "saved": "Enregistré.",
+    "failed": "L'enregistrement a échoué.",
+    "lists": {
+      "title": "Listes personnalisables",
+      "description": "Valeurs proposées dans les fiches de ce projet. Une valeur retirée reste sur les fiches qui l'utilisent.",
+      "placeholder": "Nouvelle valeur",
+      "add": "Ajouter",
+      "remove": "Retirer « {{value}} »",
+      "reset": "Valeurs par défaut"
+    }
   }
 }

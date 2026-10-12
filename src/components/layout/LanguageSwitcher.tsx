@@ -1,11 +1,12 @@
+import type { ChangeEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { ChevronDown } from "lucide-react";
 
 import {
-  LANGUAGE_NAMES,
-  LANGUAGES,
-  isLanguage,
-  setLanguage,
   DEFAULT_LANGUAGE,
+  isLanguage,
+  LANGUAGES,
+  setLanguage,
 } from "@/i18n";
 import { cn } from "@/lib/utils";
 
@@ -13,54 +14,52 @@ interface LanguageSwitcherProps {
   className?: string;
 }
 
-/**
- * Sélecteur de langue compact (FR / EN).
- *
- * Chaque bouton affiche le code de la langue et annonce son nom complet,
- * écrit dans sa propre langue (`lang`), pour les lecteurs d'écran.
- */
-export function LanguageSwitcher({ className }: LanguageSwitcherProps) {
+export function LanguageSwitcher({
+  className,
+}: LanguageSwitcherProps) {
   const { t, i18n } = useTranslation("common");
 
   const current = isLanguage(i18n.resolvedLanguage)
     ? i18n.resolvedLanguage
     : DEFAULT_LANGUAGE;
 
-  return (
-    <div
-      role="group"
-      aria-label={t("language.label")}
-      className={cn(
-        "inline-flex items-center gap-0.5 rounded-lg border bg-card p-0.5",
-        className,
-      )}
-    >
-      {LANGUAGES.map((language) => {
-        const active = language === current;
+  async function handleLanguageChange(
+    event: ChangeEvent<HTMLSelectElement>,
+  ): Promise<void> {
+    const language = event.target.value;
 
-        return (
-          <button
-            key={language}
-            type="button"
-            lang={language}
-            aria-pressed={active}
-            aria-label={LANGUAGE_NAMES[language]}
-            title={LANGUAGE_NAMES[language]}
-            onClick={() => {
-              if (!active) void setLanguage(language);
-            }}
-            className={cn(
-              "h-6 rounded-md px-2 text-xs font-medium uppercase transition-colors outline-none",
-              "focus-visible:ring-3 focus-visible:ring-ring/50",
-              active
-                ? "bg-primary text-primary-foreground"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground",
-            )}
-          >
-            {language}
-          </button>
-        );
-      })}
+    if (isLanguage(language) && language !== current) {
+      await setLanguage(language);
+    }
+  }
+
+  return (
+    <div className={cn("relative inline-flex items-center", className)}>
+      <select
+        value={current}
+        onChange={handleLanguageChange}
+        aria-label={t("language.label")}
+        title={current.toUpperCase()}
+        className={cn(
+          "h-7 w-12 appearance-none rounded-md",
+          "cursor-pointer border border-transparent",
+          "bg-transparent pl-2 pr-5 text-xs font-medium",
+          "text-foreground hover:bg-secondary",
+          "focus-visible:outline-none",
+          "focus-visible:ring-2 focus-visible:ring-ring/50",
+        )}
+      >
+        {LANGUAGES.map((language) => (
+          <option key={language} value={language} lang={language}>
+            {language.toUpperCase()}
+          </option>
+        ))}
+      </select>
+
+      <ChevronDown
+        aria-hidden="true"
+        className="pointer-events-none absolute right-1 h-3 w-3 text-muted-foreground"
+      />
     </div>
   );
 }

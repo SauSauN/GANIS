@@ -11,7 +11,8 @@
     "username": "Username",
     "password": "Password",
     "submit": "Sign in",
-    "submitting": "Signing in…"
+    "submitting": "Signing in…",
+    "forgotPassword": "Forgot your password?"
   },
   "noAccount": "Don't have an account yet?"
 }

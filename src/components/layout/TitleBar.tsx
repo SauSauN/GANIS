@@ -1,17 +1,17 @@
 import type { MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { useMatch, useNavigate } from "react-router-dom";
-import { Feather, Moon, Settings, Sun } from "lucide-react";
+import { useMatch } from "react-router-dom";
+import { Activity, Blocks, Moon, Settings, Sun, Undo2 } from "lucide-react";
+import ganisLogo from "@/assets/ganis-logo.png";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { MenuBar } from "@/components/layout/MenuBar";
+import { useGuardedNavigate } from "@/components/layout/UnsavedChangesGuard";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { WindowControls } from "@/components/layout/WindowControls";
 import { applyTheme, useResolvedTheme, type Theme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { useProjectStore } from "@/stores/projectStore";
-
-/** Menus de l'application (libellés dans `titlebar.json`). */
-const MENUS = ["file", "edit", "view", "project", "help"] as const;
 
 const iconButton =
   "flex h-7 w-7 items-center justify-center rounded text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground";
@@ -28,12 +28,15 @@ const iconButton =
  * afin que les boutons restent cliquables.
  */
 export function TitleBar() {
-  const navigate = useNavigate();
+  // Demande d'abord quoi faire des modifications non enregistrées.
+  const navigate = useGuardedNavigate();
   const { t } = useTranslation("titlebar");
 
   const user = useAuthStore((s) => s.user);
 
   const onSettingsPage = useMatch("/settings") !== null;
+  const onPackagesPage = useMatch("/packages/*") !== null;
+  const onDashboard = useMatch("/dashboard") !== null;
 
   const match = useMatch("/workspace/:projectId");
   const projectId = match?.params.projectId;
@@ -41,6 +44,14 @@ export function TitleBar() {
   const projectName = useProjectStore((s) =>
     s.projects.find((project) => project.id === projectId)?.name,
   );
+
+  // Dernier projet ouvert : hors de l'espace de travail (paramètres
+  // généraux, packages, tableau de bord…), un bouton y ramène directement,
+  // avec ses onglets tels qu'on les a laissés.
+  const lastProject = useProjectStore((s) =>
+    s.projects.find((project) => project.id === s.lastProjectId),
+  );
+  const showBackToProject = Boolean(user && lastProject && !projectId);
 
   const theme = useResolvedTheme();
 
@@ -77,31 +88,20 @@ export function TitleBar() {
           onClick={() => navigate(user ? "/dashboard" : "/")}
           className="flex h-7 items-center gap-2 rounded px-2 font-semibold hover:bg-secondary"
         >
-          <Feather className="h-4 w-4 text-primary" />
+          <img
+            src={ganisLogo}
+            alt=""
+            aria-hidden="true"
+            className="h-6 w-6 shrink-0 object-contain"
+          />
 
           <span className="hidden sm:inline">
             GANIS
           </span>
         </button>
 
-        {user && (
-          <nav
-            className="hidden items-center md:flex"
-            aria-label={t("menusLabel")}
-          >
-            {MENUS.map((menu) => (
-              <button
-                key={menu}
-                type="button"
-                disabled
-                title={t("comingSoon")}
-                className="h-7 rounded px-2 text-muted-foreground enabled:hover:bg-secondary"
-              >
-                {t(`menus.${menu}`)}
-              </button>
-            ))}
-          </nav>
-        )}
+        {/* Menus de l'application (voir `MenuBar`) */}
+        {user && <MenuBar />}
       </div>
 
       {/* ------------------------------------------------------------------ */}
@@ -125,8 +125,22 @@ export function TitleBar() {
         className="flex items-center gap-1 pr-2"
         onMouseDown={stopDrag}
       >
-        {/* Langue de l'interface (seul emplacement du sélecteur) */}
-        <LanguageSwitcher className="mr-1" />
+        {/* Langue de l'interface avant connexion (accueil, connexion,
+            inscription, configuration). Une fois connecté, elle se change
+            dans le menu du compte. */}
+        {!user && <LanguageSwitcher className="mr-1" />}
+
+        {showBackToProject && lastProject && (
+          <button
+            type="button"
+            onClick={() => navigate(`/workspace/${lastProject.id}`)}
+            aria-label={t("backToProject", { name: lastProject.name })}
+            title={t("backToProject", { name: lastProject.name })}
+            className={cn(iconButton, "w-auto max-w-56 gap-1.5 px-2")}
+          >
+            <Undo2 className="h-4 w-4 shrink-0" />
+          </button>
+        )}
 
         <button
           type="button"
@@ -141,6 +155,33 @@ export function TitleBar() {
             <Moon className="h-4 w-4" />
           )}
         </button>
+
+        {/* Rythme de travail : seulement sur le tableau de bord */}
+        {user && onDashboard && (
+          <button
+            type="button"
+            onClick={() => navigate("/activity")}
+            aria-label={t("activity")}
+            title={t("activity")}
+            className={iconButton}
+          >
+            <Activity className="h-4 w-4" />
+          </button>
+        )}
+
+        {/* Packages (thèmes) */}
+        {user && (
+          <button
+            type="button"
+            onClick={() => navigate("/packages")}
+            aria-label={t("packages")}
+            title={t("packages")}
+            aria-current={onPackagesPage ? "page" : undefined}
+            className={cn(iconButton, onPackagesPage && "bg-secondary text-foreground")}
+          >
+            <Blocks className="h-4 w-4" />
+          </button>
+        )}
 
         {/* Paramètres généraux (compte, apparence) */}
         {user && (

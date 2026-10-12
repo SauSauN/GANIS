@@ -2,24 +2,30 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
+  Code2,
   Palette,
+  Save,
   User as UserIcon,
   type LucideIcon,
 } from "lucide-react";
 import { StatusBar } from "@/components/layout/StatusBar";
 import { AccountSection } from "@/components/settings/AccountSection";
 import { AppearanceSection } from "@/components/settings/AppearanceSection";
+import { DeveloperSection } from "@/components/settings/DeveloperSection";
+import { SavingSection } from "@/components/settings/SavingSection";
 import { Button } from "@/components/ui/button";
 import { clampPanelWidth, usePanelWidth } from "@/lib/preferences";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 
-type SectionId = "account" | "appearance";
+type SectionId = "account" | "appearance" | "saving" | "developer";
 
 /** Sections, dans l'ordre du menu (libellés dans `settings.json`). */
 const SECTIONS: { id: SectionId; icon: LucideIcon }[] = [
   { id: "account", icon: UserIcon },
   { id: "appearance", icon: Palette },
+  { id: "saving", icon: Save },
+  { id: "developer", icon: Code2 },
 ];
 
 /** Entrée du menu : même style que le panneau latéral de l'espace de travail. */
@@ -118,6 +124,8 @@ export default function Settings() {
             <section aria-live="polite" className="min-w-0">
               {section === "account" && <AccountSection />}
               {section === "appearance" && <AppearanceSection />}
+              {section === "saving" && <SavingSection />}
+              {section === "developer" && <DeveloperSection />}
             </section>
           </div>
         </main>

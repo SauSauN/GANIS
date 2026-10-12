@@ -1,5 +1,6 @@
 //! Utilitaires communs : identifiants et dates.
 
+use crate::error::{AppError, AppResult};
 use chrono::{SecondsFormat, Utc};
 use uuid::Uuid;
 
@@ -16,6 +17,21 @@ pub fn now_utc() -> String {
 /// Horodatage Unix en secondes (utile pour les expirations de session).
 pub fn now_unix() -> i64 {
     Utc::now().timestamp()
+}
+
+/// Exécute un calcul lourd (Argon2…) sur un fil dédié.
+///
+/// Les commandes Tauri sont asynchrones : un calcul de plusieurs centaines
+/// de millisecondes lancé directement bloquerait un fil du moteur async et
+/// pourrait figer les autres commandes (et donc l'interface).
+pub async fn run_blocking<T, F>(task: F) -> AppResult<T>
+where
+    T: Send + 'static,
+    F: FnOnce() -> AppResult<T> + Send + 'static,
+{
+    tokio::task::spawn_blocking(task)
+        .await
+        .map_err(|e| AppError::internal(e).with_detail("Calcul interrompu"))?
 }
 
 #[cfg(test)]

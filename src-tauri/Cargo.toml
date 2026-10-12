@@ -21,6 +21,8 @@ tauri-build = { version = "2", features = [] }
 # --- Tauri ---
 tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
+# Fenêtre « Enregistrer sous » (fichier de la clé de récupération).
+tauri-plugin-dialog = "2"
 
 # --- Sérialisation ---
 serde = { version = "1", features = ["derive"] }
@@ -40,7 +42,7 @@ sqlx = { version = "0.8", default-features = false, features = [
 
 # --- Runtime async (Phase 2) ---
 # Nécessaire pour `tokio::sync::Mutex` dans state.rs.
-tokio = { version = "1", features = ["sync"] }
+tokio = { version = "1", features = ["sync", "rt"] }
 
 # --- Utilitaires ---
 chrono = "0.4.45"
@@ -58,6 +60,32 @@ argon2 = "0.5"
 rand = "0.8"
 # Hachage SHA-256 pour les tokens de session.
 sha2 = "0.10"
+
+# --- Chiffrement des données (voir src/security/mod.rs) ---
+# Chiffrement authentifié des clés et des champs sensibles.
+chacha20poly1305 = "0.10"
+# Effacement des clés de la mémoire dès qu'elles ne servent plus.
+zeroize = "1"
+# Encodage texte des données chiffrées.
+base64 = "0.22"
+
+# --- Format .ganix (projet portable) ---
+# Archive ZIP : manifeste, empreintes, données et images du projet (§23).
+zip = { version = "2", default-features = false, features = ["deflate"] }
+# Contenu du .ganix écrit en XML (manifeste, empreintes, données du projet).
+quick-xml = "0.42"
+# Lecture ligne par ligne des tables à l'export.
+futures-util = { version = "0.3", default-features = false }
+# SQLCipher : chiffrement complet des bases de projet.
+# Ce paquet est celui qu'utilise déjà sqlx ; cette ligne remplace seulement
+# SQLite par SQLCipher (même API, fichiers chiffrés). OpenSSL est compilé
+# avec l'application : rien à installer pour l'utilisateur final.
+# Compilation sous Windows : Perl est nécessaire (Strawberry Perl).
+libsqlite3-sys = { version = "0.30", features = ["bundled-sqlcipher-vendored-openssl"] }
+
+[dev-dependencies]
+# Tests asynchrones des services (base SQLite en mémoire).
+tokio = { version = "1", features = ["sync", "macros", "rt"] }
 
 # Read the optimization guideline for more details: https://tauri.app/concept/size/#cargo-configuration
 [profile.release]

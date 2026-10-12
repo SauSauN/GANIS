@@ -1,0 +1,129 @@
+{
+  "types": {
+    "family": "Famille",
+    "love": "Amour",
+    "friendship": "Amitié",
+    "alliance": "Alliance",
+    "professional": "Travail",
+    "mentor": "Mentor / élève",
+    "political": "Politique",
+    "rivalry": "Rivalité",
+    "enmity": "Inimitié",
+    "betrayal": "Trahison",
+    "secret": "Secret partagé",
+    "other": "Autre"
+  },
+  "sentiments": {
+    "positive": "Positive",
+    "neutral": "Neutre",
+    "negative": "Négative"
+  },
+  "intensity": {
+    "label": "Intensité",
+    "1": "Faible",
+    "2": "Modérée",
+    "3": "Moyenne",
+    "4": "Forte",
+    "5": "Très forte"
+  },
+  "form": {
+    "createTitle": "Nouvelle relation",
+    "editTitle": "Modifier la relation",
+    "source": "Personnage",
+    "target": "En relation avec",
+    "choose": "Choisir…",
+    "swap": "Inverser les deux personnages",
+    "type": "Type",
+    "label": "Nom de la relation",
+    "labelPlaceholder": "Ex. Frère aîné, ancienne fiancée, rival de toujours…",
+    "description": "Description",
+    "descriptionPlaceholder": "Comment cette relation est née, ce qu'elle implique, comment elle évolue…",
+    "sentiment": "Tonalité",
+    "direction": "Sens",
+    "mutual": "Réciproque",
+    "oneWay": "À sens unique",
+    "oneWayHint": "{{source}} → {{target}}",
+    "period": "Période dans le récit",
+    "since": "Depuis",
+    "until": "Jusqu'à",
+    "start": "Le début de l'histoire",
+    "end": "La fin de l'histoire",
+    "create": "Créer la relation",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "deleteConfirm": "Supprimer définitivement cette relation ?",
+    "missingCharacters": "Choisissez les deux personnages.",
+    "sameCharacter": "Choisissez deux personnages différents.",
+    "moreDetails": "Plus de détails : intensité, tonalité, période, description"
+  },
+  "view": {
+    "newRelation": "Nouvelle relation",
+    "views": {
+      "graph": "Graphe",
+      "matrix": "Matrice",
+      "list": "Liste"
+    },
+    "layouts": {
+      "force": "Réseau",
+      "circle": "Cercle",
+      "groups": "Par rôle",
+      "ego": "Centré",
+      "free": "Libre"
+    },
+    "layoutHints": {
+      "force": "Les personnages liés se rapprochent.",
+      "circle": "Tous les personnages en cercle.",
+      "groups": "Regroupés par rôle dans l'histoire.",
+      "ego": "Un personnage au centre, ses proches autour.",
+      "free": "Déplacez les personnages : leur place est enregistrée."
+    },
+    "center": "Au centre",
+    "types": "Types",
+    "allTypes": "Tous les types",
+    "search": "Rechercher un personnage",
+    "showLabels": "Noms des relations",
+    "showIsolated": "Personnages sans relation",
+    "period": "Moment de l'histoire",
+    "wholeStory": "Toute l'histoire",
+    "resetLayout": "Réinitialiser la disposition",
+    "legend": "Légende",
+    "dragHint": "Glissez le « + » d'un personnage vers un autre pour les relier.",
+    "count_one": "{{count}} relation",
+    "count_other": "{{count}} relations",
+    "loading": "Chargement des relations…",
+    "retry": "Réessayer",
+    "noCharacters": "Créez au moins deux personnages pour pouvoir les relier.",
+    "createCharacter": "Créer un personnage",
+    "noRelations": "Aucune relation pour l'instant",
+    "noRelationsHint": "Créez une première relation, ou glissez d'un personnage à un autre dans le graphe.",
+    "noMatch": "Aucune relation ne correspond aux filtres.",
+    "details": {
+      "relations": "Relations",
+      "openSheet": "Ouvrir la fiche",
+      "none": "Aucune relation",
+      "close": "Fermer"
+    },
+    "filters": "Filtres",
+    "fullscreen": "Plein écran",
+    "exitFullscreen": "Quitter le plein écran (Échap)",
+    "resetFilters": "Réinitialiser les filtres"
+  },
+  "list": {
+    "characters": "Personnages",
+    "type": "Type",
+    "name": "Nom",
+    "period": "Période",
+    "intensity": "Intensité",
+    "edit": "Modifier"
+  },
+  "matrix": {
+    "hint": "Chaque case montre les relations entre le personnage de la ligne et celui de la colonne. Cliquez sur une case vide pour en créer une."
+  },
+  "sheet": {
+    "title": "Relations",
+    "add": "Ajouter une relation",
+    "empty": "Aucune relation pour ce personnage.",
+    "graph": "Voir le graphe"
+  }
+}

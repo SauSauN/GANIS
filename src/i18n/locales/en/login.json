@@ -10,5 +10,6 @@
   "errors": {
     "usernameRequired": "Username is required.",
     "passwordRequired": "Password is required."
-  }
+  },
+  "forgotPassword": "Forgot your password?"
 }

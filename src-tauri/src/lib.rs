@@ -9,6 +9,7 @@ mod utils;
 
 mod db;
 mod models;
+mod security;
 mod state;
 
 mod services;
@@ -41,6 +42,7 @@ fn app_info() -> AppResult<AppInfo> {
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
+        .plugin(tauri_plugin_dialog::init())
         .setup(|app| {
             // -----------------------------------------------------------------
             // 1. Journalisation
@@ -73,6 +75,9 @@ pub fn run() {
             // -----------------------------------------------------------------
             // 3. État partagé
             // -----------------------------------------------------------------
+            // Imports .ganix et exports interrompus par un arrêt brutal.
+            services::ganix_service::clean_leftovers(&data_dir);
+
             let state = AppState::new(app_db, data_dir);
 
             app.manage(state);
@@ -88,6 +93,9 @@ pub fn run() {
             commands::auth::register,
             commands::auth::login,
             commands::auth::logout,
+            commands::auth::recover_account,
+            commands::auth::regenerate_recovery_key,
+            commands::auth::save_recovery_key_file,
             //commands::users::list_users,
             //commands::users::create_user,
             //commands::users::update_user_role,
@@ -101,8 +109,99 @@ pub fn run() {
             commands::projects::update_project,
             commands::projects::duplicate_project,
             commands::projects::delete_project,
+            commands::ganix::export_project,
+            commands::ganix::inspect_ganix,
+            commands::ganix::confirm_ganix_import,
+            commands::ganix::cancel_ganix_import,
             commands::synopsis::get_synopsis,
             commands::synopsis::update_synopsis,
+            commands::characters::get_character_settings,
+            commands::characters::set_character_detail_level,
+            commands::characters::set_character_list,
+            commands::characters::list_character_gallery,
+            commands::characters::get_character_gallery_image,
+            commands::characters::add_character_gallery_image,
+            commands::characters::delete_character_gallery_image,
+            commands::characters::list_characters,
+            commands::characters::create_character,
+            commands::characters::update_character,
+            commands::characters::delete_character,
+            commands::characters::get_character_portrait,
+            commands::characters::set_character_portrait,
+            commands::characters::remove_character_portrait,
+            commands::character_locations::list_character_locations,
+            commands::character_locations::create_character_location,
+            commands::character_locations::update_character_location,
+            commands::character_locations::delete_character_location,
+            commands::locations::list_locations,
+            commands::locations::create_location,
+            commands::locations::update_location,
+            commands::locations::delete_location,
+            commands::locations::get_location_settings,
+            commands::locations::set_location_custom_types,
+            commands::locations::set_location_list,
+            commands::locations::get_location_portrait,
+            commands::locations::set_location_portrait,
+            commands::locations::remove_location_portrait,
+            commands::locations::list_location_gallery,
+            commands::locations::get_location_gallery_image,
+            commands::locations::add_location_gallery_image,
+            commands::locations::set_location_gallery_caption,
+            commands::locations::delete_location_gallery_image,
+            commands::history::list_activity,
+            commands::history::list_versions,
+            commands::history::create_version,
+            commands::history::restore_version,
+            commands::history::delete_version,
+            commands::history::search_project,
+            commands::history::get_work_calendar,
+            commands::trash::list_trash,
+            commands::trash::restore_trash,
+            commands::trash::purge_trash,
+            commands::trash::empty_trash,
+            commands::notes::list_note_folders,
+            commands::notes::create_note_folder,
+            commands::notes::rename_note_folder,
+            commands::notes::move_note_folder,
+            commands::notes::delete_note_folder,
+            commands::notes::list_notes,
+            commands::notes::get_note,
+            commands::notes::create_note,
+            commands::notes::update_note,
+            commands::notes::move_note,
+            commands::notes::delete_note,
+            commands::notes::list_sticky_notes,
+            commands::notes::create_sticky_note,
+            commands::notes::update_sticky_note,
+            commands::notes::raise_sticky_note,
+            commands::notes::delete_sticky_note,
+            commands::relations::list_relations,
+            commands::relations::create_relation,
+            commands::relations::update_relation,
+            commands::relations::delete_relation,
+            commands::relations::get_graph_positions,
+            commands::relations::save_graph_positions,
+            commands::relations::clear_graph_positions,
+            commands::structure::get_structure,
+            commands::structure::set_structure_template,
+            commands::structure::set_structure_levels,
+            commands::structure::set_structure_auto_numbering,
+            commands::structure::renumber_structure,
+            commands::structure_links::list_structure_links,
+            commands::structure_links::link_structure_character,
+            commands::structure_links::unlink_structure_character,
+            commands::structure_links::link_structure_location,
+            commands::structure_links::unlink_structure_location,
+            commands::structure::create_structure_node,
+            commands::structure::update_structure_node,
+            commands::structure::move_structure_node,
+            commands::structure::delete_structure_node,
+            commands::packages::become_developer,
+            commands::packages::leave_developer_mode,
+            commands::packages::list_my_packages,
+            commands::packages::create_theme_package,
+            commands::packages::update_theme_package,
+            commands::packages::delete_package,
             //commands::diagnostics::get_diagnostics,
         ])
         .run(tauri::generate_context!())

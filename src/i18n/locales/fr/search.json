@@ -1,0 +1,32 @@
+{
+  "placeholder": "Rechercher dans le projet…",
+  "clear": "Effacer",
+  "hint": "Personnages, lieux, découpage, notes et post-it. Sans tenir compte des accents ni des majuscules.",
+  "searching": "Recherche…",
+  "none": "Aucun résultat.",
+  "count_one": "{{count}} résultat",
+  "count_other": "{{count}} résultats",
+  "kinds": {
+    "character": "Personnages",
+    "location": "Lieux",
+    "structureNode": "Découpage",
+    "note": "Notes",
+    "noteFolder": "Dossiers",
+    "sticky": "Post-it"
+  },
+  "untitled": {
+    "character": "Personnage sans nom",
+    "location": "Lieu sans nom",
+    "structureNode": "Élément sans titre",
+    "note": "Note sans titre",
+    "noteFolder": "Dossier",
+    "sticky": "Post-it"
+  },
+  "palette": {
+    "title": "Palette de commandes",
+    "placeholder": "Aller à une page, lancer une action ou chercher un élément…",
+    "suggestions": "Suggestions",
+    "actions": "Pages et actions",
+    "commands": "Action"
+  }
+}

@@ -167,4 +167,28 @@ pub struct Project {
     #[serde(rename = "lastOpenedAt")]
     #[sqlx(rename = "last_opened_at")]
     pub last_opened_at: Option<String>,
+
+    // ------------------------------------------------------------------
+    // Chiffrement (jamais envoyé à l'interface)
+    // ------------------------------------------------------------------
+    //
+    // En base, `name` et `description` restent vides pour un projet
+    // chiffré : les valeurs sont dans `*_sealed`, chiffrées avec la clé du
+    // compte. `project_service` les déchiffre avant de rendre le projet.
+
+    /// Nom chiffré.
+    #[serde(skip)]
+    #[sqlx(default)]
+    pub name_sealed: Option<String>,
+
+    /// Description chiffrée.
+    #[serde(skip)]
+    #[sqlx(default)]
+    pub description_sealed: Option<String>,
+
+    /// Clé du projet, enfermée par la clé du compte. `None` : projet créé
+    /// avant le chiffrement, pas encore chiffré.
+    #[serde(skip)]
+    #[sqlx(default)]
+    pub wrapped_key: Option<String>,
 }

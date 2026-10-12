@@ -1,0 +1,180 @@
+{
+  "untitled": "Untitled",
+  "colors": {
+    "yellow": "Yellow",
+    "pink": "Pink",
+    "green": "Green",
+    "blue": "Blue",
+    "purple": "Purple",
+    "orange": "Orange"
+  },
+  "tab": {
+    "fallback": "Note"
+  },
+  "editor": {
+    "toolbar": "Note formatting",
+    "placeholder": "Write your note…",
+    "undo": "Undo (Ctrl+Z)",
+    "redo": "Redo (Ctrl+Y)",
+    "block": {
+      "label": "Paragraph style",
+      "paragraph": "Paragraph",
+      "h1": "Heading 1",
+      "h2": "Heading 2",
+      "h3": "Heading 3"
+    },
+    "font": {
+      "label": "Font",
+      "default": "Default font"
+    },
+    "size": {
+      "label": "Text size",
+      "default": "Size"
+    },
+    "bold": "Bold (Ctrl+B)",
+    "italic": "Italic (Ctrl+I)",
+    "underline": "Underline (Ctrl+U)",
+    "strike": "Strikethrough",
+    "superscript": "Superscript",
+    "subscript": "Subscript",
+    "color": "Text color",
+    "colorReset": "Default color",
+    "highlight": "Highlight",
+    "highlightReset": "Remove highlight",
+    "clear": "Clear formatting",
+    "align": {
+      "left": "Align left",
+      "center": "Center",
+      "right": "Align right",
+      "justify": "Justify"
+    },
+    "bulletList": "Bulleted list",
+    "orderedList": "Numbered list",
+    "taskList": "Checklist",
+    "quote": "Quote",
+    "codeBlock": "Code block",
+    "rule": "Divider",
+    "link": {
+      "label": "Link",
+      "url": "Link address",
+      "apply": "Apply",
+      "remove": "Remove link"
+    },
+    "table": {
+      "label": "Table",
+      "insert": "Insert a table (3 × 3, with header)",
+      "insertPlain": "Insert a table without header",
+      "rowBefore": "Add row above",
+      "rowAfter": "Add row below",
+      "colBefore": "Add column left",
+      "colAfter": "Add column right",
+      "toggleHeader": "Toggle header row",
+      "merge": "Merge or split cells",
+      "deleteRow": "Delete row",
+      "deleteCol": "Delete column",
+      "delete": "Delete table"
+    },
+    "callout": {
+      "insert": "Sticky-note box",
+      "unwrap": "Remove sticky-note box",
+      "remove": "Delete the box and its content"
+    },
+    "chain": {
+      "insert": "Linked boxes",
+      "addBefore": "Add a box here",
+      "addAfter": "Add a box after",
+      "remove": "Delete this box"
+    },
+    "diagram": {
+      "insert": "Diagram (boxes and arrows)",
+      "addBox": "Add a box",
+      "boxPlaceholder": "Box",
+      "boxLabel": "Box text",
+      "linkLabel": "Arrow text (optional)",
+      "noColor": "No color",
+      "removeSelection": "Delete",
+      "remove": "Delete diagram",
+      "larger": "Enlarge diagram",
+      "smaller": "Shrink diagram",
+      "hint": "Drag from the edge of a box to draw an arrow. Click a box or an arrow to edit it."
+    },
+    "more": "More tools",
+    "code": "Inline code"
+  },
+  "sidebar": {
+    "title": "Folders and notes",
+    "loading": "Loading…",
+    "empty": "No notes yet.",
+    "newNote": "New note",
+    "newFolder": "New folder",
+    "newNoteIn": "New note in this folder",
+    "newSubfolder": "New subfolder",
+    "rename": "Rename",
+    "delete": "Delete folder",
+    "expand": "Expand",
+    "collapse": "Collapse",
+    "folderName": "Folder name",
+    "folderPlaceholder": "Folder name, then Enter",
+    "dropRoot": "Drop here to move out of the folder",
+    "pinned": "Pinned",
+    "actions": "Folder actions"
+  },
+  "folder": {
+    "root": "No folder",
+    "deleteTitle": "Delete the folder “{{name}}”?",
+    "deleteBody": "Its subfolders are deleted too. The notes they contain are kept and moved out of the folder.",
+    "deleteConfirm": "Delete folder"
+  },
+  "list": {
+    "search": "Search notes…",
+    "allFolders": "All folders",
+    "rootOnly": "Not in a folder",
+    "empty": "No notes yet.",
+    "noMatch": "No note matches.",
+    "count_one": "{{count}} note",
+    "count_other": "{{count}} notes",
+    "updated": "Edited {{date}}",
+    "newNote": "New note",
+    "newFolder": "New folder",
+    "noExcerpt": "Empty note",
+    "pinned": "Pinned"
+  },
+  "create": {
+    "card": "New note",
+    "cardDescription": "Give it a title (optional) and pick its folder. You write the content in the editor afterwards.",
+    "title": "Title",
+    "titlePlaceholder": "E.g. Research on the period",
+    "folder": "Folder",
+    "submit": "Create note",
+    "creating": "Creating…"
+  },
+  "edit": {
+    "titlePlaceholder": "Note title",
+    "folder": "Folder",
+    "pin": "Pin note",
+    "unpin": "Unpin",
+    "delete": "Delete note",
+    "deleteTitle": "Delete “{{title}}”?",
+    "deleteBody": "The note and all its content (tables, diagrams…) will be permanently deleted.",
+    "deleteConfirm": "Delete note",
+    "saved": "Note saved",
+    "saveFailed": "Save failed",
+    "loading": "Loading note…",
+    "notFound": "This note no longer exists.",
+    "retry": "Retry",
+    "updated": "Edited {{date}}"
+  },
+  "wall": {
+    "add": "Add a sticky note",
+    "addColor": "Add a {{color}} sticky note",
+    "hint": "Move a sticky note by its top strip, resize it from its corner. Clicking brings it to the front.",
+    "empty": "The wall is empty: add a first sticky note.",
+    "placeholder": "Write here…",
+    "delete": "Delete sticky note",
+    "loading": "Loading the wall…",
+    "resize": "Resize",
+    "count_one": "{{count}} sticky note",
+    "count_other": "{{count}} sticky notes",
+    "retry": "Retry"
+  }
+}

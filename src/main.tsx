@@ -4,14 +4,16 @@ import { HashRouter } from "react-router-dom";
 // Initialise la traduction avant le premier rendu (langue enregistrée).
 import "@/i18n";
 import App from "./App";
+import { initColorTheme } from "@/lib/colorTheme";
 import { initTextSize } from "@/lib/preferences";
 import { initAutoHideScrollbars } from "@/lib/scrollbars";
 import { initTheme } from "@/lib/theme";
 import "./index.css";
 
-// Applique le thème et la taille du texte avant le premier rendu
-// pour éviter un flash.
+// Applique le thème (mode et couleurs) et la taille du texte avant le
+// premier rendu pour éviter un flash.
 initTheme();
+initColorTheme();
 initTextSize();
 
 // Les barres de défilement n'apparaissent que pendant un défilement.

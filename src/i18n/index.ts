@@ -6,18 +6,32 @@ import enCharacters from "./locales/en/characters.json";
 import enCommon from "./locales/en/common.json";
 import enDashboard from "./locales/en/dashboard.json";
 import enErrors from "./locales/en/errors.json";
+import enLocations from "./locales/en/locations.json";
 import enLogin from "./locales/en/login.json";
 import enModules from "./locales/en/modules.json";
+import enWorkCalendar from "./locales/en/workCalendar.json";
+import enSearch from "./locales/en/search.json";
+import enHistory from "./locales/en/history.json";
+import enVersions from "./locales/en/versions.json";
+import enTrash from "./locales/en/trash.json";
+import enMenus from "./locales/en/menus.json";
+import enHelp from "./locales/en/help.json";
+import enNotes from "./locales/en/notes.json";
+import enPackages from "./locales/en/packages.json";
 import enProjectSettings from "./locales/en/projectSettings.json";
 import enProjects from "./locales/en/projects.json";
+import enRecovery from "./locales/en/recovery.json";
+import enRelations from "./locales/en/relations.json";
 import enRegister from "./locales/en/register.json";
 import enSettings from "./locales/en/settings.json";
 import enSetup from "./locales/en/setup.json";
 import enSidebar from "./locales/en/sidebar.json";
 import enStatusbar from "./locales/en/statusbar.json";
+import enStructure from "./locales/en/structure.json";
 import enSynopsis from "./locales/en/synopsis.json";
 import enTabs from "./locales/en/tabs.json";
 import enTitlebar from "./locales/en/titlebar.json";
+import enUnsaved from "./locales/en/unsaved.json";
 import enUsermenu from "./locales/en/usermenu.json";
 import enViews from "./locales/en/views.json";
 import enWelcome from "./locales/en/welcome.json";
@@ -28,18 +42,32 @@ import frCharacters from "./locales/fr/characters.json";
 import frCommon from "./locales/fr/common.json";
 import frDashboard from "./locales/fr/dashboard.json";
 import frErrors from "./locales/fr/errors.json";
+import frLocations from "./locales/fr/locations.json";
 import frLogin from "./locales/fr/login.json";
 import frModules from "./locales/fr/modules.json";
+import frWorkCalendar from "./locales/fr/workCalendar.json";
+import frSearch from "./locales/fr/search.json";
+import frHistory from "./locales/fr/history.json";
+import frVersions from "./locales/fr/versions.json";
+import frTrash from "./locales/fr/trash.json";
+import frMenus from "./locales/fr/menus.json";
+import frHelp from "./locales/fr/help.json";
+import frNotes from "./locales/fr/notes.json";
+import frPackages from "./locales/fr/packages.json";
 import frProjectSettings from "./locales/fr/projectSettings.json";
 import frProjects from "./locales/fr/projects.json";
+import frRecovery from "./locales/fr/recovery.json";
+import frRelations from "./locales/fr/relations.json";
 import frRegister from "./locales/fr/register.json";
 import frSettings from "./locales/fr/settings.json";
 import frSetup from "./locales/fr/setup.json";
 import frSidebar from "./locales/fr/sidebar.json";
 import frStatusbar from "./locales/fr/statusbar.json";
+import frStructure from "./locales/fr/structure.json";
 import frSynopsis from "./locales/fr/synopsis.json";
 import frTabs from "./locales/fr/tabs.json";
 import frTitlebar from "./locales/fr/titlebar.json";
+import frUnsaved from "./locales/fr/unsaved.json";
 import frUsermenu from "./locales/fr/usermenu.json";
 import frViews from "./locales/fr/views.json";
 import frWelcome from "./locales/fr/welcome.json";
@@ -90,21 +118,35 @@ export const resources = {
   fr: {
     activitybar: frActivitybar,
     characters: frCharacters,
+    locations: frLocations,
     common: frCommon,
     dashboard: frDashboard,
     errors: frErrors,
     login: frLogin,
     modules: frModules,
+    workCalendar: frWorkCalendar,
+    search: frSearch,
+    history: frHistory,
+    versions: frVersions,
+    trash: frTrash,
+    menus: frMenus,
+    help: frHelp,
+    notes: frNotes,
+    packages: frPackages,
     projectSettings: frProjectSettings,
     projects: frProjects,
+    recovery: frRecovery,
+    relations: frRelations,
     register: frRegister,
     settings: frSettings,
     setup: frSetup,
     sidebar: frSidebar,
     statusbar: frStatusbar,
+    structure: frStructure,
     synopsis: frSynopsis,
     tabs: frTabs,
     titlebar: frTitlebar,
+    unsaved: frUnsaved,
     usermenu: frUsermenu,
     views: frViews,
     welcome: frWelcome,
@@ -114,21 +156,35 @@ export const resources = {
   en: {
     activitybar: enActivitybar,
     characters: enCharacters,
+    locations: enLocations,
     common: enCommon,
     dashboard: enDashboard,
     errors: enErrors,
     login: enLogin,
     modules: enModules,
+    workCalendar: enWorkCalendar,
+    search: enSearch,
+    history: enHistory,
+    versions: enVersions,
+    trash: enTrash,
+    menus: enMenus,
+    help: enHelp,
+    notes: enNotes,
+    packages: enPackages,
     projectSettings: enProjectSettings,
     projects: enProjects,
+    recovery: enRecovery,
+    relations: enRelations,
     register: enRegister,
     settings: enSettings,
     setup: enSetup,
     sidebar: enSidebar,
     statusbar: enStatusbar,
+    structure: enStructure,
     synopsis: enSynopsis,
     tabs: enTabs,
     titlebar: enTitlebar,
+    unsaved: enUnsaved,
     usermenu: enUsermenu,
     views: enViews,
     welcome: enWelcome,
@@ -192,16 +248,29 @@ void i18n.use(initReactI18next).init({
     "errors",
     "login",
     "modules",
+    "workCalendar",
+    "search",
+    "history",
+    "versions",
+    "trash",
+    "menus",
+    "help",
+    "notes",
+    "packages",
     "projectSettings",
     "projects",
+    "recovery",
+    "relations",
     "register",
     "settings",
     "setup",
     "sidebar",
     "statusbar",
+    "structure",
     "synopsis",
     "tabs",
     "titlebar",
+    "unsaved",
     "usermenu",
     "views",
     "welcome",

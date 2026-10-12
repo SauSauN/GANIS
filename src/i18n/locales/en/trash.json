@@ -1,0 +1,60 @@
+{
+  "undo": "Undo",
+  "kinds": {
+    "character": "Character",
+    "location": "Location",
+    "structureNode": "Structure item",
+    "note": "Note",
+    "noteFolder": "Note folder",
+    "sticky": "Sticky note",
+    "relation": "Relationship",
+    "placeLink": "Character – location link"
+  },
+  "deleted": {
+    "character": "Character “{{name}}” deleted.",
+    "location": "Location “{{name}}” deleted.",
+    "structureNode": "“{{name}}” deleted from the structure.",
+    "note": "Note “{{name}}” deleted.",
+    "noteFolder": "Folder “{{name}}” deleted.",
+    "sticky": "Sticky note “{{name}}” deleted.",
+    "relation": "Relationship “{{name}}” deleted.",
+    "placeLink": "Link “{{name}}” deleted."
+  },
+  "restored": {
+    "character": "Character “{{name}}” restored.",
+    "location": "Location “{{name}}” restored.",
+    "structureNode": "“{{name}}” restored in the structure.",
+    "note": "Note “{{name}}” restored.",
+    "noteFolder": "Folder “{{name}}” restored.",
+    "sticky": "Sticky note “{{name}}” restored.",
+    "relation": "Relationship “{{name}}” restored.",
+    "placeLink": "Link “{{name}}” restored."
+  },
+  "untitled": {
+    "character": "Unnamed character",
+    "location": "Unnamed location",
+    "structureNode": "Untitled item",
+    "note": "Untitled note",
+    "noteFolder": "Unnamed folder",
+    "sticky": "Empty sticky note",
+    "relation": "Relationship",
+    "placeLink": "Link"
+  },
+  "view": {
+    "description": "Deleted items stay here for 30 days. Restoring one also brings back everything that went with it (images, relationships, sub-items…).",
+    "empty": "Empty trash",
+    "emptyTitle": "Empty the trash?",
+    "emptyBody_one": "The item in the trash will be permanently deleted.",
+    "emptyBody_other": "The {{count}} items in the trash will be permanently deleted.",
+    "nothing": "The trash is empty.",
+    "loading": "Loading the trash…",
+    "retry": "Retry",
+    "restore": "Restore",
+    "restoring": "Restoring…",
+    "purge": "Delete permanently",
+    "purgeNamed": "Delete “{{name}}” permanently",
+    "purgeTitle": "Delete “{{name}}” permanently?",
+    "purgeBody": "It can no longer be restored.",
+    "deletedOn": "deleted {{date}}"
+  }
+}

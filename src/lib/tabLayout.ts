@@ -51,7 +51,10 @@ function arrayMove<T>(list: T[], from: number, to: number): T[] {
 
 /**
  * Disposition de départ d'un projet : ses onglets épinglés mémorisés,
- * suivis de l'onglet d'accueil (s'il n'est pas déjà épinglé).
+ * suivis
+ * - des onglets laissés ouverts plus tôt dans la session (on revient du
+ *   tableau de bord, des paramètres…), s'il y en a ;
+ * - sinon de l'onglet d'accueil (s'il n'est pas déjà épinglé).
  */
 export function initialLayout(
   projectId: string,
@@ -59,6 +62,11 @@ export function initialLayout(
   isValid: (id: string) => boolean,
 ): TabLayout {
   const pinned = loadPinnedTabs(projectId, isValid);
+  const session = loadOpenTabs(projectId, isValid);
+
+  if (session) {
+    return normalize({ tabs: [...pinned, ...session.tabs], pinned });
+  }
 
   return normalize({
     tabs: pinned.includes(homeTab) ? pinned : [...pinned, homeTab],
@@ -294,5 +302,92 @@ export function savePinnedTabs(projectId: string, pinned: string[]): void {
     }
   } catch {
     /* stockage indisponible : les onglets ne seront simplement pas mémorisés */
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Onglets ouverts pendant la session (par projet)
+//
+// Quitter l'espace de travail (tableau de bord, paramètres généraux,
+// extensions…) ne ferme pas les onglets : on les retrouve en revenant.
+// Ils ne sont oubliés qu'à la déconnexion (`clearOpenTabs`). Les onglets
+// épinglés, eux, restent toujours (voir plus haut).
+// ----------------------------------------------------------------------------
+
+const SESSION_PREFIX = "ganis-open-tabs:";
+
+/** Nombre maximal d'onglets ouverts mémorisés par projet. */
+const MAX_OPEN = 100;
+
+export interface OpenTabs {
+  /** Onglets ouverts, dans l'ordre d'affichage. */
+  tabs: string[];
+  /** Onglet actif (`null` : aucun onglet ouvert). */
+  active: string | null;
+}
+
+/**
+ * Onglets laissés ouverts dans ce projet pendant la session, ou `null` si
+ * le projet n'a pas encore été ouvert depuis la connexion.
+ */
+export function loadOpenTabs(
+  projectId: string,
+  isValid: (id: string) => boolean,
+): OpenTabs | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_PREFIX + projectId);
+
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = JSON.parse(raw) as Partial<OpenTabs> | null;
+
+    if (!parsed || !Array.isArray(parsed.tabs)) {
+      return null;
+    }
+
+    const tabs = unique(
+      parsed.tabs.filter(
+        (id): id is string => typeof id === "string" && isValid(id),
+      ),
+    ).slice(0, MAX_OPEN);
+
+    const active =
+      typeof parsed.active === "string" && tabs.includes(parsed.active)
+        ? parsed.active
+        : null;
+
+    return { tabs, active };
+  } catch {
+    return null;
+  }
+}
+
+/** Mémorise les onglets ouverts d'un projet jusqu'à la déconnexion. */
+export function saveOpenTabs(projectId: string, open: OpenTabs): void {
+  try {
+    sessionStorage.setItem(SESSION_PREFIX + projectId, JSON.stringify(open));
+  } catch {
+    /* stockage indisponible : les onglets seront rouverts comme au départ */
+  }
+}
+
+/** Oublie les onglets ouverts de tous les projets (déconnexion). */
+export function clearOpenTabs(): void {
+  try {
+    const keys: string[] = [];
+
+    for (let index = 0; index < sessionStorage.length; index += 1) {
+      const key = sessionStorage.key(index);
+
+      if (key?.startsWith(SESSION_PREFIX)) {
+        keys.push(key);
+      }
+    }
+
+    keys.forEach((key) => sessionStorage.removeItem(key));
+  } catch {
+    /* stockage indisponible : rien à oublier */
   }
 }

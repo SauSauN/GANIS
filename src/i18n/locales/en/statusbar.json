@@ -4,6 +4,12 @@
   "save": {
     "idle": "Ready",
     "saving": "Saving…",
-    "error": "Saving failed"
+    "error": "Save failed",
+    "savedAt": "Saved at {{time}}",
+    "unsaved_one": "{{count}} unsaved change",
+    "unsaved_other": "{{count}} unsaved changes",
+    "saveAll": "Save all",
+    "saveAllHint": "Save all changes (Ctrl+Alt+S)",
+    "dismiss": "Hide the error"
   }
 }

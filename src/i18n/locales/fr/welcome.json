@@ -11,7 +11,8 @@
     "username": "Nom d'utilisateur",
     "password": "Mot de passe",
     "submit": "Se connecter",
-    "submitting": "Connexion…"
+    "submitting": "Connexion…",
+    "forgotPassword": "Mot de passe oublié ?"
   },
   "noAccount": "Pas encore de compte ?"
 }

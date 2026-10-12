@@ -12,7 +12,8 @@
   },
   "password": {
     "label": "Password",
-    "hint": "At least 8 characters, with one letter and one digit."
+    "hint": "At least 8 characters, with one letter and one digit.",
+    "warning": "Remember it well: without it, your projects cannot be recovered."
   },
   "confirm": "Confirm password",
   "submit": "Create administrator account",
