@@ -2253,6 +2253,18 @@ mod tests {
             .await
             .unwrap();
 
+        // Notes : dossier, note (document JSON de l'éditeur) et post-it
+        // (coordonnées décimales).
+        for sql in [
+            "INSERT INTO note_folders (id, parent_id, name, position, created_at, updated_at) VALUES ('f1', NULL, 'Recherches', 0, 'x', 'x')",
+            "INSERT INTO notes (id, folder_id, title, content, excerpt, pinned, created_at, updated_at) \
+             VALUES ('n1', 'f1', 'Magie', '{\"type\":\"doc\",\"content\":[{\"type\":\"diagram\",\"attrs\":{\"data\":{\"boxes\":[]}}}]}', 'Magie & <ambre>', 1, 'x', 'x')",
+            "INSERT INTO sticky_notes (id, text, color, x, y, width, height, z, created_at, updated_at) \
+             VALUES ('s1', 'Idée', 'pink', 12.5, -3.25, 220, 180, 2, 'x', 'x')",
+        ] {
+            sqlx::query(sql).execute(&pool).await.unwrap();
+        }
+
         pool
     }
 

@@ -9,6 +9,7 @@ import enErrors from "./locales/en/errors.json";
 import enLocations from "./locales/en/locations.json";
 import enLogin from "./locales/en/login.json";
 import enModules from "./locales/en/modules.json";
+import enNotes from "./locales/en/notes.json";
 import enPackages from "./locales/en/packages.json";
 import enProjectSettings from "./locales/en/projectSettings.json";
 import enProjects from "./locales/en/projects.json";
@@ -37,6 +38,7 @@ import frErrors from "./locales/fr/errors.json";
 import frLocations from "./locales/fr/locations.json";
 import frLogin from "./locales/fr/login.json";
 import frModules from "./locales/fr/modules.json";
+import frNotes from "./locales/fr/notes.json";
 import frPackages from "./locales/fr/packages.json";
 import frProjectSettings from "./locales/fr/projectSettings.json";
 import frProjects from "./locales/fr/projects.json";
@@ -108,6 +110,7 @@ export const resources = {
     errors: frErrors,
     login: frLogin,
     modules: frModules,
+    notes: frNotes,
     packages: frPackages,
     projectSettings: frProjectSettings,
     projects: frProjects,
@@ -138,6 +141,7 @@ export const resources = {
     errors: enErrors,
     login: enLogin,
     modules: enModules,
+    notes: enNotes,
     packages: enPackages,
     projectSettings: enProjectSettings,
     projects: enProjects,
@@ -216,6 +220,7 @@ void i18n.use(initReactI18next).init({
     "errors",
     "login",
     "modules",
+    "notes",
     "packages",
     "projectSettings",
     "projects",

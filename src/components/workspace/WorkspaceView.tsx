@@ -11,7 +11,11 @@ import { CharacterListView } from "@/components/workspace/views/CharacterListVie
 import { LocationCreateView } from "@/components/workspace/views/LocationCreateView";
 import { LocationEditView } from "@/components/workspace/views/LocationEditView";
 import { LocationListView } from "@/components/workspace/views/LocationListView";
+import { NoteCreateView } from "@/components/workspace/views/NoteCreateView";
+import { NoteEditView } from "@/components/workspace/views/NoteEditView";
+import { NotesListView } from "@/components/workspace/views/NotesListView";
 import { RelationsView } from "@/components/workspace/views/RelationsView";
+import { StickyWallView } from "@/components/workspace/views/StickyWallView";
 import {
   ComingSoonView,
   EmptyListView,
@@ -22,6 +26,7 @@ import { SynopsisEditView } from "@/components/workspace/views/SynopsisEditView"
 import { WorkspaceHome } from "@/components/workspace/WorkspaceHome";
 import { characterIdOfTab } from "@/lib/characters";
 import { locationIdOfTab } from "@/lib/locations";
+import { noteIdOfTab } from "@/lib/notes";
 import { structureNodeIdOfTab } from "@/lib/structure";
 import type { Project } from "@/types";
 
@@ -156,6 +161,35 @@ export function WorkspaceView({
 
   if (tabId === "locations.list") {
     return <LocationListView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Notes
+  // ---------------------------------------------------------------------------
+  const noteId = noteIdOfTab(tabId);
+
+  if (noteId) {
+    return (
+      <NoteEditView
+        // Une autre note dans le même onglet : éditeur neuf.
+        key={noteId}
+        projectId={project.id}
+        noteId={noteId}
+        onClose={() => onCloseTab(tabId)}
+      />
+    );
+  }
+
+  if (tabId === "notes.create") {
+    return <NoteCreateView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "notes.list") {
+    return <NotesListView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "notes.wall") {
+    return <StickyWallView projectId={project.id} feature={feature} />;
   }
 
   // ---------------------------------------------------------------------------

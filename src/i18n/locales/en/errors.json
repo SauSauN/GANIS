@@ -200,5 +200,19 @@
   },
   "structureLink": {
     "invalidRole": "Unknown role."
+  },
+  "note": {
+    "folderNotFound": "This folder no longer exists.",
+    "notFound": "This note no longer exists.",
+    "stickyNotFound": "This sticky note no longer exists.",
+    "folderNameEmpty": "The folder name cannot be empty.",
+    "folderNameTooLong": "The folder name must not exceed {{max}} characters.",
+    "titleTooLong": "The title must not exceed {{max}} characters.",
+    "contentTooLarge": "The note is too large (maximum {{max}} MB).",
+    "invalidContent": "The note content cannot be read.",
+    "stickyTooLong": "A sticky note must not exceed {{max}} characters.",
+    "invalidColor": "Unknown color.",
+    "invalidGeometry": "Invalid sticky note position or size.",
+    "folderCycle": "A folder cannot be moved into one of its own subfolders."
   }
 }

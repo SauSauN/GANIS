@@ -45,6 +45,7 @@ import {
   useUnsavedStore,
 } from "@/lib/unsavedChanges";
 import { useCharacterStore } from "@/stores/characterStore";
+import { useNoteStore } from "@/stores/noteStore";
 import { useStructureStore } from "@/stores/structureStore";
 import { useProjectStore } from "@/stores/projectStore";
 
@@ -181,6 +182,9 @@ export default function Workspace() {
 
   /** Même chose pour les fiches des éléments du découpage (« Chapitre 3 »). */
   useStructureStore((state) => state.structure);
+
+  /** Et des notes (le titre de la note). */
+  useNoteStore((state) => state.notes);
 
   /** Onglets avec des modifications non enregistrées (point ● sur l'onglet). */
   const unsavedEntries = useUnsavedStore((state) => state.entries);

@@ -74,6 +74,10 @@
       "list": {
         "label": "Note list",
         "description": "All your project notes."
+      },
+      "wall": {
+        "label": "Sticky-note wall",
+        "description": "Sticky notes you can place freely, for loose ideas."
       }
     }
   }

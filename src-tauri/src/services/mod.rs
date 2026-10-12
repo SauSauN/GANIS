@@ -11,6 +11,7 @@ pub mod ganix_service;
 pub mod keyring_service;
 pub mod location_service;
 pub mod login_throttle;
+pub mod note_service;
 pub mod package_service;
 pub mod project_service;
 pub mod project_storage;

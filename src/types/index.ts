@@ -575,6 +575,64 @@ export interface ApiErrorPayload {
 }
 
 // ----------------------------------------------------------------------------
+// Notes (voir `note_service.rs`)
+// ----------------------------------------------------------------------------
+
+/** Dossier de notes ; `parentId` nul : à la racine. */
+export interface NoteFolder {
+  id: string;
+  parentId: string | null;
+  name: string;
+  position: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Note sans son contenu (listes, panneau latéral). */
+export interface NoteSummary {
+  id: string;
+  folderId: string | null;
+  title: string;
+  /** Début du texte, pour les listes. */
+  excerpt: string;
+  pinned: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Note complète : `content` est le document de l'éditeur, en JSON (vide : note neuve). */
+export interface Note extends NoteSummary {
+  content: string;
+}
+
+/** Champs modifiés d'une note (les autres restent inchangés). */
+export interface NoteUpdate {
+  title?: string;
+  content?: string;
+  excerpt?: string;
+  pinned?: boolean;
+}
+
+export type StickyColor = "yellow" | "pink" | "green" | "blue" | "purple" | "orange";
+
+/** Post-it du mur. */
+export interface StickyNote {
+  id: string;
+  text: string;
+  color: StickyColor;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  /** Ordre d'empilement : le plus grand est au premier plan. */
+  z: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type StickyUpdate = Partial<Pick<StickyNote, "text" | "color" | "x" | "y" | "width" | "height" | "z">>;
+
+// ----------------------------------------------------------------------------
 // Libellés pour l'interface
 // ----------------------------------------------------------------------------
 

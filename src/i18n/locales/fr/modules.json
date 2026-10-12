@@ -74,6 +74,10 @@
       "list": {
         "label": "Liste des notes",
         "description": "Toutes vos notes de projet."
+      },
+      "wall": {
+        "label": "Mur de post-it",
+        "description": "Des post-it à placer librement, pour les idées en vrac."
       }
     }
   }

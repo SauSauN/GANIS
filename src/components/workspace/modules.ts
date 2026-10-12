@@ -1,11 +1,13 @@
 import {
   FileText,
   Info,
+  LayoutGrid,
   List,
   ListTree,
   MapPin,
   MapPinned,
   Network,
+  NotebookText,
   PenLine,
   Plus,
   Search,
@@ -20,9 +22,11 @@ import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/section
 import i18n from "@/i18n";
 import { characterIdOfTab, fullName } from "@/lib/characters";
 import { locationIdOfTab } from "@/lib/locations";
+import { noteIdOfTab } from "@/lib/notes";
 import { nodeHeading, numberNodes, resolveLevels, structureNodeIdOfTab } from "@/lib/structure";
 import { useCharacterStore } from "@/stores/characterStore";
 import { useLocationStore } from "@/stores/locationStore";
+import { useNoteStore } from "@/stores/noteStore";
 import { useStructureStore } from "@/stores/structureStore";
 
 /**
@@ -87,7 +91,8 @@ type FeatureId =
   | "locations.list"
   | "structure.plan"
   | "notes.create"
-  | "notes.list";
+  | "notes.list"
+  | "notes.wall";
 
 /** Modules qui ont une liste (et donc un message de liste vide). */
 type ListModuleId = "characters" | "locations" | "notes";
@@ -161,6 +166,7 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
   defineListModule("notes", StickyNote, [
     defineFeature("notes.create", Plus),
     defineFeature("notes.list", List),
+    defineFeature("notes.wall", LayoutGrid),
   ]),
   defineModule("search", Search, []),
 ];
@@ -266,6 +272,25 @@ function structureNodeFeature(tabId: string, nodeId: string): WorkspaceFeature {
   };
 }
 
+/**
+ * Note ouverte (onglet `note:<id>`) : fonctionnalité du module Notes, dont
+ * le libellé est le titre de la note.
+ */
+function noteFeature(tabId: string, noteId: string): WorkspaceFeature {
+  return {
+    id: tabId,
+    icon: NotebookText,
+    get label() {
+      const note = useNoteStore.getState().notes.find((item) => item.id === noteId);
+
+      return note ? note.title || i18n.t("notes:untitled") : i18n.t("notes:tab.fallback");
+    },
+    get description() {
+      return i18n.t("modules:features.notes.list.description");
+    },
+  };
+}
+
 /** Retrouve une fonctionnalité (et son module) par son identifiant. */
 export function findFeature(
   featureId: string,
@@ -294,6 +319,15 @@ export function findFeature(
     return {
       module: getModule("structure"),
       feature: structureNodeFeature(featureId, nodeId),
+    };
+  }
+
+  const noteId = noteIdOfTab(featureId);
+
+  if (noteId) {
+    return {
+      module: getModule("notes"),
+      feature: noteFeature(featureId, noteId),
     };
   }
 

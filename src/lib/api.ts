@@ -33,6 +33,13 @@ import type {
   StructureLinks,
   NodeCharacterRole,
   NodeLocationRole,
+  Note,
+  NoteFolder,
+  NoteSummary,
+  NoteUpdate,
+  StickyColor,
+  StickyNote,
+  StickyUpdate,
   StructureNode,
   Synopsis,
   ThemeData,
@@ -597,6 +604,64 @@ export const api = {
   /** Retire un lieu d'un élément. */
   unlinkStructureLocation: (projectId: string, nodeId: string, locationId: string) =>
     call<void>("unlink_structure_location", { projectId, nodeId, locationId }),
+
+  // -------------------------------------------------------------------------
+  // Notes
+  // -------------------------------------------------------------------------
+
+  /** Dossiers de notes du projet. */
+  listNoteFolders: (projectId: string) =>
+    call<NoteFolder[]>("list_note_folders", { projectId }),
+
+  createNoteFolder: (projectId: string, parentId: string | null, name: string) =>
+    call<NoteFolder>("create_note_folder", { projectId, parentId, name }),
+
+  renameNoteFolder: (projectId: string, folderId: string, name: string) =>
+    call<NoteFolder>("rename_note_folder", { projectId, folderId, name }),
+
+  /** Déplace un dossier (`null` : à la racine). Refusé dans l'un de ses sous-dossiers. */
+  moveNoteFolder: (projectId: string, folderId: string, parentId: string | null) =>
+    call<NoteFolder>("move_note_folder", { projectId, folderId, parentId }),
+
+  /** Supprime un dossier et ses sous-dossiers ; leurs notes remontent à la racine. */
+  deleteNoteFolder: (projectId: string, folderId: string) =>
+    call<void>("delete_note_folder", { projectId, folderId }),
+
+  /** Notes du projet, sans leur contenu (épinglées d'abord, puis les plus récentes). */
+  listNotes: (projectId: string) =>
+    call<NoteSummary[]>("list_notes", { projectId }),
+
+  getNote: (projectId: string, noteId: string) =>
+    call<Note>("get_note", { projectId, noteId }),
+
+  createNote: (projectId: string, folderId: string | null, title: string) =>
+    call<Note>("create_note", { projectId, folderId, title }),
+
+  updateNote: (projectId: string, noteId: string, input: NoteUpdate) =>
+    call<Note>("update_note", { projectId, noteId, input }),
+
+  moveNote: (projectId: string, noteId: string, folderId: string | null) =>
+    call<Note>("move_note", { projectId, noteId, folderId }),
+
+  deleteNote: (projectId: string, noteId: string) =>
+    call<void>("delete_note", { projectId, noteId }),
+
+  /** Post-it du mur. */
+  listStickyNotes: (projectId: string) =>
+    call<StickyNote[]>("list_sticky_notes", { projectId }),
+
+  createStickyNote: (projectId: string, color: StickyColor, x: number, y: number) =>
+    call<StickyNote>("create_sticky_note", { projectId, color, x, y }),
+
+  updateStickyNote: (projectId: string, stickyId: string, input: StickyUpdate) =>
+    call<StickyNote>("update_sticky_note", { projectId, stickyId, input }),
+
+  /** Met un post-it au premier plan. */
+  raiseStickyNote: (projectId: string, stickyId: string) =>
+    call<StickyNote>("raise_sticky_note", { projectId, stickyId }),
+
+  deleteStickyNote: (projectId: string, stickyId: string) =>
+    call<void>("delete_sticky_note", { projectId, stickyId }),
 
   // -------------------------------------------------------------------------
   // Personnages

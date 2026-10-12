@@ -4,6 +4,7 @@ import { useCharacterStore } from "@/stores/characterStore";
 import { useLocationStore } from "@/stores/locationStore";
 import { usePlaceLinkStore } from "@/stores/placeLinkStore";
 import { useRelationStore } from "@/stores/relationStore";
+import { useNoteStore } from "@/stores/noteStore";
 import { useStructureStore } from "@/stores/structureStore";
 import { useSynopsisStore } from "@/stores/synopsisStore";
 import type {
@@ -363,6 +364,7 @@ export const useProjectStore =
           useLocationStore.getState().reset();
           usePlaceLinkStore.getState().reset();
           useStructureStore.getState().reset();
+          useNoteStore.getState().reset();
         }
 
         set((state) => ({
@@ -447,6 +449,7 @@ export const useProjectStore =
         useLocationStore.getState().reset();
         usePlaceLinkStore.getState().reset();
         useStructureStore.getState().reset();
+        useNoteStore.getState().reset();
 
         set({
           currentProjectId: null,
@@ -462,6 +465,7 @@ export const useProjectStore =
         useLocationStore.getState().reset();
         usePlaceLinkStore.getState().reset();
         useStructureStore.getState().reset();
+        useNoteStore.getState().reset();
 
         set(initial);
       },

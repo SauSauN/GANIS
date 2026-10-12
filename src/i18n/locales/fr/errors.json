@@ -200,5 +200,19 @@
   },
   "structureLink": {
     "invalidRole": "Rôle inconnu."
+  },
+  "note": {
+    "folderNotFound": "Ce dossier n'existe plus.",
+    "notFound": "Cette note n'existe plus.",
+    "stickyNotFound": "Ce post-it n'existe plus.",
+    "folderNameEmpty": "Le nom du dossier ne peut pas être vide.",
+    "folderNameTooLong": "Le nom du dossier ne doit pas dépasser {{max}} caractères.",
+    "titleTooLong": "Le titre ne doit pas dépasser {{max}} caractères.",
+    "contentTooLarge": "La note est trop volumineuse (maximum {{max}} Mo).",
+    "invalidContent": "Le contenu de la note est illisible.",
+    "stickyTooLong": "Un post-it ne doit pas dépasser {{max}} caractères.",
+    "invalidColor": "Couleur inconnue.",
+    "invalidGeometry": "Position ou taille du post-it invalide.",
+    "folderCycle": "Un dossier ne peut pas être déplacé dans l'un de ses sous-dossiers."
   }
 }

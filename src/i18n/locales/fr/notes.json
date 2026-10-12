@@ -1,0 +1,178 @@
+{
+  "untitled": "Sans titre",
+  "colors": {
+    "yellow": "Jaune",
+    "pink": "Rose",
+    "green": "Vert",
+    "blue": "Bleu",
+    "purple": "Violet",
+    "orange": "Orange"
+  },
+  "tab": {
+    "fallback": "Note"
+  },
+  "editor": {
+    "toolbar": "Mise en forme de la note",
+    "placeholder": "Écrivez votre note…",
+    "undo": "Annuler (Ctrl+Z)",
+    "redo": "Rétablir (Ctrl+Y)",
+    "block": {
+      "label": "Style du paragraphe",
+      "paragraph": "Paragraphe",
+      "h1": "Titre 1",
+      "h2": "Titre 2",
+      "h3": "Titre 3"
+    },
+    "font": {
+      "label": "Police",
+      "default": "Police par défaut"
+    },
+    "size": {
+      "label": "Taille du texte",
+      "default": "Taille"
+    },
+    "bold": "Gras (Ctrl+B)",
+    "italic": "Italique (Ctrl+I)",
+    "underline": "Souligné (Ctrl+U)",
+    "strike": "Barré",
+    "superscript": "Exposant",
+    "subscript": "Indice",
+    "color": "Couleur du texte",
+    "colorReset": "Couleur par défaut",
+    "highlight": "Surligner",
+    "highlightReset": "Retirer le surlignage",
+    "clear": "Effacer la mise en forme",
+    "align": {
+      "left": "Aligner à gauche",
+      "center": "Centrer",
+      "right": "Aligner à droite",
+      "justify": "Justifier"
+    },
+    "bulletList": "Liste à puces",
+    "orderedList": "Liste numérotée",
+    "taskList": "Liste de cases à cocher",
+    "quote": "Citation",
+    "codeBlock": "Bloc de code",
+    "rule": "Ligne de séparation",
+    "link": {
+      "label": "Lien",
+      "url": "Adresse du lien",
+      "apply": "Appliquer",
+      "remove": "Retirer le lien"
+    },
+    "table": {
+      "label": "Tableau",
+      "insert": "Insérer un tableau (3 × 3, avec en-tête)",
+      "insertPlain": "Insérer un tableau sans en-tête",
+      "rowBefore": "Ajouter une ligne au-dessus",
+      "rowAfter": "Ajouter une ligne en dessous",
+      "colBefore": "Ajouter une colonne à gauche",
+      "colAfter": "Ajouter une colonne à droite",
+      "toggleHeader": "Ligne d'en-tête oui / non",
+      "merge": "Fusionner ou séparer les cellules",
+      "deleteRow": "Supprimer la ligne",
+      "deleteCol": "Supprimer la colonne",
+      "delete": "Supprimer le tableau"
+    },
+    "callout": {
+      "insert": "Encadré post-it",
+      "unwrap": "Retirer l'encadré post-it",
+      "remove": "Supprimer l'encadré et son contenu"
+    },
+    "chain": {
+      "insert": "Cases enchaînées",
+      "addBefore": "Ajouter une case ici",
+      "addAfter": "Ajouter une case après",
+      "remove": "Supprimer cette case"
+    },
+    "diagram": {
+      "insert": "Schéma (boîtes et flèches)",
+      "addBox": "Ajouter une boîte",
+      "boxPlaceholder": "Boîte",
+      "boxLabel": "Texte de la boîte",
+      "linkLabel": "Texte de la flèche (facultatif)",
+      "noColor": "Sans couleur",
+      "removeSelection": "Supprimer",
+      "remove": "Supprimer le schéma",
+      "larger": "Agrandir le schéma",
+      "smaller": "Réduire le schéma",
+      "hint": "Tirez depuis le bord d'une boîte pour créer une flèche. Cliquez sur une boîte ou une flèche pour la modifier."
+    }
+  },
+  "sidebar": {
+    "title": "Dossiers et notes",
+    "loading": "Chargement…",
+    "empty": "Aucune note pour l'instant.",
+    "newNote": "Nouvelle note",
+    "newFolder": "Nouveau dossier",
+    "newNoteIn": "Nouvelle note dans ce dossier",
+    "newSubfolder": "Nouveau sous-dossier",
+    "rename": "Renommer",
+    "delete": "Supprimer le dossier",
+    "expand": "Déplier",
+    "collapse": "Replier",
+    "folderName": "Nom du dossier",
+    "folderPlaceholder": "Nom du dossier puis Entrée",
+    "dropRoot": "Déposer ici pour sortir du dossier",
+    "pinned": "Épinglée",
+    "actions": "Actions du dossier"
+  },
+  "folder": {
+    "root": "Aucun dossier",
+    "deleteTitle": "Supprimer le dossier « {{name}} » ?",
+    "deleteBody": "Ses sous-dossiers sont supprimés aussi. Les notes qu'ils contiennent sont conservées et déplacées hors dossier.",
+    "deleteConfirm": "Supprimer le dossier"
+  },
+  "list": {
+    "search": "Rechercher une note…",
+    "allFolders": "Tous les dossiers",
+    "rootOnly": "Hors dossier",
+    "empty": "Aucune note pour l'instant.",
+    "noMatch": "Aucune note ne correspond.",
+    "count_one": "{{count}} note",
+    "count_other": "{{count}} notes",
+    "updated": "Modifiée le {{date}}",
+    "newNote": "Nouvelle note",
+    "newFolder": "Nouveau dossier",
+    "noExcerpt": "Note vide",
+    "pinned": "Épinglée"
+  },
+  "create": {
+    "card": "Nouvelle note",
+    "cardDescription": "Donnez-lui un titre (facultatif) et choisissez son dossier. Le contenu s'écrit ensuite dans l'éditeur.",
+    "title": "Titre",
+    "titlePlaceholder": "Ex. : Recherches sur l'époque",
+    "folder": "Dossier",
+    "submit": "Créer la note",
+    "creating": "Création…"
+  },
+  "edit": {
+    "titlePlaceholder": "Titre de la note",
+    "folder": "Dossier",
+    "pin": "Épingler la note",
+    "unpin": "Ne plus épingler",
+    "delete": "Supprimer la note",
+    "deleteTitle": "Supprimer « {{title}} » ?",
+    "deleteBody": "La note et tout son contenu (tableaux, schémas…) seront supprimés définitivement.",
+    "deleteConfirm": "Supprimer la note",
+    "saved": "Note enregistrée",
+    "saveFailed": "Échec de l'enregistrement",
+    "loading": "Chargement de la note…",
+    "notFound": "Cette note n'existe plus.",
+    "retry": "Réessayer",
+    "updated": "Modifiée le {{date}}"
+  },
+  "wall": {
+    "add": "Ajouter un post-it",
+    "addColor": "Ajouter un post-it {{color}}",
+    "hint": "Déplacez un post-it par son bandeau, agrandissez-le par son coin. Un clic le met au premier plan.",
+    "empty": "Le mur est vide : ajoutez un premier post-it.",
+    "placeholder": "Écrivez ici…",
+    "delete": "Supprimer le post-it",
+    "loading": "Chargement du mur…",
+    "resize": "Redimensionner",
+    "count_one": "{{count}} post-it",
+    "count_other": "{{count}} post-it",
+    "retry": "Réessayer"
+  }
+}

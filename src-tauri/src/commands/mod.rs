@@ -9,6 +9,7 @@ pub mod characters;
 pub mod diagnostics;
 pub mod ganix;
 pub mod locations;
+pub mod notes;
 pub mod packages;
 pub mod projects;
 pub mod relations;

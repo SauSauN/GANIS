@@ -9,6 +9,7 @@ import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { SideBarCharacters } from "@/components/characters/SideBarCharacters";
 import { SideBarLocations } from "@/components/locations/SideBarLocations";
+import { SideBarNotes } from "@/components/notes/SideBarNotes";
 import { SideBarStructure } from "@/components/structure/SideBarStructure";
 import {
   getModule,
@@ -235,6 +236,11 @@ export function SideBar({
         {/* Découpage du récit, en arborescence, sous « Plan du récit ». */}
         {module.id === "structure" && (
           <SideBarStructure projectId={projectId} activeTab={activeTab} onOpenFeature={onOpenFeature} />
+        )}
+
+        {/* Dossiers et notes, en arborescence. */}
+        {module.id === "notes" && (
+          <SideBarNotes projectId={projectId} activeTab={activeTab} onOpenFeature={onOpenFeature} />
         )}
       </aside>
 
