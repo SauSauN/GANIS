@@ -14,6 +14,8 @@ import {
   findType,
   flattenTree,
   hiddenFilledKeys,
+  levelFieldKeys,
+  levelHiddenFilledKeys,
   isBlankLocationDraft,
   locationIdOfTab,
   locationNameError,
@@ -169,5 +171,27 @@ describe("fiche d'un lieu", () => {
   it("reconnaît les onglets de fiche", () => {
     expect(locationIdOfTab(locationTabId("abc"))).toBe("abc");
     expect(locationIdOfTab("locations.list")).toBeNull();
+  });
+});
+
+describe("niveau de détail des fiches de lieux", () => {
+  it("chaque niveau ajoute des champs au précédent", () => {
+    const basic = levelFieldKeys("city", "settlement", "basic");
+    const intermediate = levelFieldKeys("city", "settlement", "intermediate");
+    const advanced = levelFieldKeys("port", "settlement", "advanced");
+
+    expect([...basic].sort()).toEqual(["description", "notes"]);
+    expect(intermediate.has("aliases")).toBe(true);
+    expect(intermediate.has("population")).toBe(true);
+    expect(intermediate.has("history")).toBe(false);
+    expect(advanced.has("history")).toBe(true);
+    expect([...advanced].length).toBeGreaterThan([...intermediate].length);
+  });
+
+  it("garde les champs remplis que le niveau cache, sans ceux d'un autre type", () => {
+    const fields = { population: "20 000", history: "Fondée jadis", formerly: "La cité blanche", description: "Blanche" };
+    expect(levelHiddenFilledKeys(fields, "city", "settlement", "basic").sort()).toEqual(["history", "population"]);
+    expect(levelHiddenFilledKeys(fields, "city", "settlement", "advanced")).toEqual([]);
+    expect(levelHiddenFilledKeys(fields, "city", "settlement", null)).toEqual([]);
   });
 });

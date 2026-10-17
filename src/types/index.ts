@@ -364,6 +364,8 @@ export interface CustomLocationType {
 
 /** Réglages des lieux du projet. */
 export interface LocationSettings {
+  /** Niveau de détail des fiches (`null` : pas encore choisi). */
+  detailLevel: CharacterDetailLevel | null;
   customTypes: CustomLocationType[];
   /** Listes personnalisées (absente : valeurs par défaut). */
   lists: Partial<Record<"status", string[]>>;
@@ -586,6 +588,14 @@ export interface NoteFolder {
   position: number;
   createdAt: string;
   updatedAt: string;
+  /** Dossier des notes système (créé par GANIS, ne se modifie pas). */
+  system?: boolean;
+}
+
+/** Option « notes système » du projet. */
+export interface SystemNotesSettings {
+  enabled: boolean;
+  language: string;
 }
 
 /** Note sans son contenu (listes, panneau latéral). */
@@ -598,6 +608,8 @@ export interface NoteSummary {
   pinned: boolean;
   createdAt: string;
   updatedAt: string;
+  /** Note système : reprend le texte d'une fiche (titres fixes). */
+  system?: boolean;
 }
 
 /** Note complète : `content` est le document de l'éditeur, en JSON (vide : note neuve). */
@@ -663,7 +675,7 @@ export interface TrashItem {
 export type ActivityAction = "created" | "updated" | "deleted" | "restored" | "versionRestored" | "moved";
 
 /** Type d'élément du journal (ceux de la corbeille, plus le synopsis). */
-export type HistoryKind = TrashKind | "synopsis";
+export type HistoryKind = TrashKind | "synopsis" | "plot";
 
 export interface Activity {
   id: string;
@@ -677,7 +689,7 @@ export interface Activity {
 }
 
 /** Éléments qui ont des versions. */
-export type VersionKind = "character" | "location" | "structureNode" | "note" | "synopsis";
+export type VersionKind = "character" | "location" | "structureNode" | "note" | "synopsis" | "plot";
 
 export interface Version {
   id: string;
@@ -706,7 +718,7 @@ export interface WorkCalendar {
 }
 
 /** `document` : l'identifiant est celui de l'élément du découpage qui le contient. */
-export type SearchKind = "character" | "location" | "structureNode" | "document" | "note" | "noteFolder" | "sticky";
+export type SearchKind = "character" | "location" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky";
 
 export interface SearchHit {
   kind: SearchKind;

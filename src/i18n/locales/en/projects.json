@@ -60,8 +60,8 @@
       "notEncrypted": "The .ganix file is not encrypted: it opens in any GANIS, from any account. Keep it somewhere safe."
     },
     "import": {
-      "button": "Import a .ganix",
-      "dialogTitle": "Open a .ganix project",
+      "button": "Import a project",
+      "dialogTitle": "Open a project",
       "checking": "Checking the file…",
       "failed": "The project could not be imported.",
       "title": "Import this project?",

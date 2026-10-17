@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { useEffect } from "react";
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
@@ -78,7 +79,7 @@ export const useRelationStore = create<RelationState>((set, get) => {
         });
       } catch (error) {
         if (request !== latestFetch) return;
-        set({ loading: false, error: messageOf(error, "Impossible de charger les relations.") });
+        set({ loading: false, error: messageOf(error, i18n.t("errors:load.relations")) });
       }
     },
 

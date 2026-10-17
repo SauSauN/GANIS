@@ -39,6 +39,7 @@ fn table_of(kind: &str) -> AppResult<&'static str> {
         "structureNode" => Ok("structure_nodes"),
         "note" => Ok("notes"),
         "synopsis" => Ok("synopsis"),
+        "plot" => Ok("plot"),
         _ => Err(AppError::validation("Type d'élément sans versions.").with_key("history.unknownKind")),
     }
 }

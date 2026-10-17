@@ -1,7 +1,8 @@
 import { useEffect } from "react";
 import { create } from "zustand";
 import i18n from "@/i18n";
-import { api, ApiError } from "@/lib/api";
+import { errorText as sharedErrorText } from "@/lib/errors";
+import { api } from "@/lib/api";
 import { toast } from "@/stores/toastStore";
 import type { StructureDocument } from "@/types";
 
@@ -210,7 +211,7 @@ export async function loadDocumentBlob(projectId: string, document: Pick<Structu
 
 /** Message d'erreur affichable. */
 export function errorText(error: unknown): string {
-  return error instanceof ApiError ? error.message : error instanceof Error ? error.message : String(error);
+  return sharedErrorText(error);
 }
 
 /**

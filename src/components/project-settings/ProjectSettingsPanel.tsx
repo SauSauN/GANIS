@@ -31,6 +31,8 @@ import { Label } from "@/components/ui/label";
 import { CharacterSettingsSection } from "@/components/characters/CharacterSettingsSection";
 import { LocationSettingsSection } from "@/components/locations/LocationSettingsSection";
 import { StructureSettingsSection } from "@/components/structure/StructureSettingsSection";
+import { PlotSettingsSection } from "@/components/plot/PlotSettingsSection";
+import { NoteSettingsSection } from "@/components/notes/NoteSettingsSection";
 import {
   PROJECT_SETTINGS_SECTIONS,
   type ProjectSettingsId,
@@ -209,6 +211,12 @@ export function ProjectSettingsPanel({
         {section === "structure" && (
           <StructureSettingsSection project={project} />
         )}
+
+        {section === "plot" && (
+          <PlotSettingsSection projectId={project.id} />
+        )}
+
+        {section === "notes" && <NoteSettingsSection projectId={project.id} />}
 
         {section === "danger" && (
           <DangerSection project={project} />

@@ -251,3 +251,15 @@
 .docx-preview img { max-width: 100%; height: auto; display: inline-block; }
 .docx-preview a { color: #2563eb; text-decoration: underline; }
 .docx-preview hr { border-color: #e5e5e5; }
+
+/* Accessibilité : moins d'animations si le système le demande */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

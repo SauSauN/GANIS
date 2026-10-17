@@ -18,6 +18,7 @@ import type {
   LocationImage,
   LocationInput,
   LocationSettings,
+  SystemNotesSettings,
   CustomLocationType,
   Relation,
   RelationInput,
@@ -723,6 +724,16 @@ export const api = {
 
   /** Notes du projet, sans leur contenu (épinglées d'abord, puis les plus récentes). */
   // -------------------------------------------------------------------------
+  // Trame
+  // -------------------------------------------------------------------------
+
+  getPlot: (projectId: string) => call<{ data: string; updatedAt: string }>("get_plot", { projectId }),
+
+  /** Enregistre toute la trame (document JSON). */
+  updatePlot: (projectId: string, data: string) =>
+    call<string>("update_plot", { projectId, data }),
+
+  // -------------------------------------------------------------------------
   // Documents rangés dans le découpage
   // -------------------------------------------------------------------------
 
@@ -802,6 +813,13 @@ export const api = {
 
   closeStructureDocumentExternal: (projectId: string, documentId: string) =>
     call<StructureDocument | null>("close_structure_document_external", { projectId, documentId }),
+
+  getSystemNotes: (projectId: string) => call<SystemNotesSettings>("get_system_notes", { projectId }),
+
+  setSystemNotes: (projectId: string, enabled: boolean, language: string) =>
+    call<SystemNotesSettings>("set_system_notes", { projectId, enabled, language }),
+
+  syncSystemNotes: (projectId: string, language: string) => call<void>("sync_system_notes", { projectId, language }),
 
   listNotes: (projectId: string) =>
     call<NoteSummary[]>("list_notes", { projectId }),
@@ -923,6 +941,9 @@ export const api = {
   /** Remplace une liste personnalisable (`null` : valeurs par défaut). */
   setLocationList: (projectId: string, list: "status", values: string[] | null) =>
     call<LocationSettings>("set_location_list", { projectId, list, values }),
+
+  setLocationDetailLevel: (projectId: string, level: string) =>
+    call<LocationSettings>("set_location_detail_level", { projectId, level }),
 
   /** Image principale d'un lieu (`null` : pas d'image). */
   getLocationPortrait: (projectId: string, locationId: string) =>

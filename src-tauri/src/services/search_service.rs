@@ -185,7 +185,7 @@ pub async fn search(pool: &SqlitePool, query: &str) -> AppResult<Vec<SearchHit>>
     }));
 
     let rows: Vec<(String, String, String)> =
-        sqlx::query_as("SELECT id, title, content FROM notes").fetch_all(pool).await?;
+        sqlx::query_as("SELECT id, title, content FROM notes WHERE id NOT IN (SELECT note_id FROM system_notes)").fetch_all(pool).await?;
     candidates.extend(rows.into_iter().map(|(id, title, content)| Candidate {
         kind: "note",
         id,
@@ -210,6 +210,10 @@ pub async fn search(pool: &SqlitePool, query: &str) -> AppResult<Vec<SearchHit>>
         title: name,
         body: if text.is_empty() { note } else { format!("{note} {text}") },
     }));
+
+    // Événements de la trame (document JSON).
+    let rows = crate::services::plot_service::search_rows(pool).await?;
+    candidates.extend(rows.into_iter().map(|(id, title, body)| Candidate { kind: "plotEvent", id, title, body }));
 
     let rows: Vec<(String, String)> = sqlx::query_as("SELECT id, text FROM sticky_notes").fetch_all(pool).await?;
     candidates.extend(rows.into_iter().map(|(id, text)| Candidate {

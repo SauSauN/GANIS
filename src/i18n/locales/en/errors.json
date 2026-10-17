@@ -181,7 +181,8 @@
     "tooManyTypes": "{{max}} custom types at most.",
     "invalidList": "Unknown list.",
     "listTooLong": "A list cannot hold more than {{max}} values.",
-    "galleryFull": "The gallery is full ({{max}} images at most)."
+    "galleryFull": "The gallery is full ({{max}} images at most).",
+    "invalidLevel": "Unknown detail level."
   },
   "placeLink": {
     "notFound": "Link not found.",
@@ -305,5 +306,16 @@
     "fileError": "The file could not be read or written.",
     "unsafeType": "This file type could start a program: GANIS will not open it.",
     "openFailed": "No application could open this document."
+  },
+  "unexpected": "An unexpected error occurred. Try again; if it happens again, restart GANIS.",
+  "load": {
+    "notes": "Could not load the notes.",
+    "stickies": "Could not load the sticky-note wall.",
+    "relations": "Could not load the relationships.",
+    "synopsis": "Could not load the synopsis.",
+    "saveSynopsis": "Could not save the synopsis.",
+    "characters": "Could not load the characters.",
+    "locations": "Could not load the locations.",
+    "setup": "Could not check the GANIS setup."
   }
 }

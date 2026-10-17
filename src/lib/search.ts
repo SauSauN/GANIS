@@ -4,10 +4,11 @@ import { characterTabId } from "@/lib/characters";
 import { locationTabId } from "@/lib/locations";
 import { noteTabId } from "@/lib/notes";
 import { structureNodeTabId } from "@/lib/structure";
+import { usePlotStore } from "@/stores/plotStore";
 import type { HistoryKind, SearchHit } from "@/types";
 
 /** Onglet qui montre un élément (fiche, note…). `null` : pas d'onglet propre. */
-export function itemTabId(kind: HistoryKind, id: string): string | null {
+export function itemTabId(kind: HistoryKind | SearchHit["kind"], id: string): string | null {
   switch (kind) {
     case "character":
       return characterTabId(id);
@@ -25,13 +26,26 @@ export function itemTabId(kind: HistoryKind, id: string): string | null {
       return "notes.wall";
     case "synopsis":
       return "synopsis.edit";
+    case "plot":
+    case "plotEvent":
+      return "plot.board";
     default:
       return null;
   }
 }
 
+/**
+ * Ouvre un résultat de recherche : son onglet, et pour un événement de la
+ * trame, le plateau centré sur lui.
+ */
+export function openSearchHit(hit: SearchHit, onOpenFeature: (featureId: string) => void) {
+  if (hit.kind === "plotEvent") usePlotStore.getState().requestFocus(hit.id);
+  const tab = itemTabId(hit.kind, hit.id);
+  if (tab) onOpenFeature(tab);
+}
+
 /** Ordre des groupes de résultats. */
-export const SEARCH_ORDER: SearchHit["kind"][] = ["character", "location", "structureNode", "document", "note", "noteFolder", "sticky"];
+export const SEARCH_ORDER: SearchHit["kind"][] = ["character", "location", "structureNode", "document", "plotEvent", "note", "noteFolder", "sticky"];
 
 /**
  * Résultats de recherche dans le projet, relus 200 ms après la dernière

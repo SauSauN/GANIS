@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
 import type { Synopsis } from "@/types";
@@ -99,7 +100,7 @@ export const useSynopsisStore = create<SynopsisState>((set, get) => ({
 
       set({
         loading: false,
-        error: messageOf(error, "Impossible de charger le synopsis."),
+        error: messageOf(error, i18n.t("errors:load.synopsis")),
       });
     }
   },
@@ -126,7 +127,7 @@ export const useSynopsisStore = create<SynopsisState>((set, get) => ({
       if (get().projectId === projectId) {
         set({
           saving: false,
-          error: messageOf(error, "Impossible d'enregistrer le synopsis."),
+          error: messageOf(error, i18n.t("errors:load.saveSynopsis")),
         });
       } else {
         set({ saving: false });

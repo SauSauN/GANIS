@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 import { usePortraitUrl, useProjectCharacters } from "@/stores/characterStore";
 import { useRelationStore } from "@/stores/relationStore";
 import type { RelationInput } from "@/types";
+import { errorText } from "@/lib/errors";
 
 interface RelationDialogProps {
   projectId: string;
@@ -179,7 +180,7 @@ export function RelationDialog({
       else await createRelation(projectId, draft);
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
     } finally {
       setBusy(false);
     }
@@ -193,7 +194,7 @@ export function RelationDialog({
       await deleteRelation(projectId, relationId);
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
     } finally {
       setBusy(false);
     }

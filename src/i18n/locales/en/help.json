@@ -152,6 +152,18 @@
           "Click a document to read it in GANIS; “Read the pages” chains a chapter's images. “Edit in its application” opens it in Word, Acrobat, Clip Studio…: every save comes back, the previous content stays in the versions."
         ]
       },
+      "plot": {
+        "title": "Plot",
+        "intro": "The board of parallel plots: one column per plot, time going down.",
+        "items": [
+          "Double-click a column to place an event; drag cards to change their moment or plot.",
+          "Drag a card's round handle onto another to create a link: impact, influence or crossing.",
+          "Link each event to the project: point of view, characters present, location, structure chapter and notes.",
+          "“Story reading” shows the events in reading order (by default the structure's) with everything attached, chapter documents included.",
+          "Character, location and structure item sheets show their events under “In the plot”.",
+          "Ctrl+Z undoes each action on the board. The “Tension” button shows the tension curve; plot colours are set in Project settings › Plot."
+        ]
+      },
       "notes": {
         "title": "Notes and sticky notes",
         "intro": "Everything that doesn't fit elsewhere: research, ideas, documentation.",
@@ -220,6 +232,10 @@
         {
           "q": "I edited a document in Word: is it up to date in GANIS?",
           "a": "Yes, if it was opened with “Edit in its application”: every save in Word comes back within seconds. Click “Finish” when you are done (the unencrypted working copy is then deleted)."
+        },
+        {
+          "q": "How do I read my story in the order the reader discovers it?",
+          "a": "Link the plot events to chapters (“Told in” field), then open Plot › Story reading: the order follows the structure. You can also choose a manual order at the top of the reading view."
         },
         {
           "q": "Are my changes saved?",

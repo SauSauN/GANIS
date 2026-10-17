@@ -60,8 +60,8 @@
       "notEncrypted": "Le fichier .ganix n'est pas chiffré : il s'ouvre sur tout GANIS, depuis n'importe quel compte. Gardez-le en lieu sûr."
     },
     "import": {
-      "button": "Importer un .ganix",
-      "dialogTitle": "Ouvrir un projet .ganix",
+      "button": "Importer un projet",
+      "dialogTitle": "Ouvrir un projet",
       "checking": "Vérification du fichier…",
       "failed": "L'import du projet a échoué.",
       "title": "Importer ce projet ?",

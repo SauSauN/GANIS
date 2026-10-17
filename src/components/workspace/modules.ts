@@ -1,4 +1,6 @@
 import {
+  BookOpen,
+  Columns3,
   FileText,
   History,
   Info,
@@ -18,6 +20,7 @@ import {
   UserPlus,
   UserRound,
   Users,
+  Waypoints,
   type LucideIcon,
 } from "lucide-react";
 import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/sections";
@@ -51,6 +54,7 @@ export type ModuleId =
   | "characters"
   | "locations"
   | "structure"
+  | "plot"
   | "notes"
   | "search"
   | "settings";
@@ -94,6 +98,8 @@ type FeatureId =
   | "locations.create"
   | "locations.list"
   | "structure.plan"
+  | "plot.board"
+  | "plot.reading"
   | "notes.create"
   | "notes.list"
   | "notes.wall";
@@ -168,6 +174,12 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
   // séquences… ) dépendent du type de projet. Voir `lib/structure.ts`.
   defineModule("structure", ListTree, [
     defineFeature("structure.plan", ListTree),
+  ]),
+  // Trame : plateau vertical des intrigues parallèles, lecture de
+  // l'histoire et analyse. Voir `lib/plot.ts`.
+  defineModule("plot", Waypoints, [
+    defineFeature("plot.board", Columns3),
+    defineFeature("plot.reading", BookOpen),
   ]),
   defineListModule("notes", StickyNote, [
     defineFeature("notes.create", Plus),

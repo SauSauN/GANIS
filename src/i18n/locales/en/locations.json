@@ -356,6 +356,10 @@
       "title": "Information kept from the previous type",
       "description": "These fields don't apply to this type and are hidden. They are not deleted: they will come back if you switch to a type that uses them.",
       "list": "Fields: {{fields}}."
+    },
+    "hiddenByLevel": {
+      "title": "Fields hidden by the detail level",
+      "description": "These filled-in fields are kept but not shown at the chosen level: {{fields}}. Change the level in Project settings › Locations."
     }
   },
   "picker": {
@@ -450,7 +454,13 @@
       "remove": "Remove “{{value}}”"
     },
     "saved": "Saved.",
-    "failed": "Saving failed."
+    "failed": "Saving failed.",
+    "level": {
+      "title": "Sheet detail level",
+      "description": "Applies to every location sheet. Fields already filled in are never erased.",
+      "saved": "Level saved.",
+      "failed": "The level could not be saved."
+    }
   },
   "links": {
     "characterTitle": "Linked places",
@@ -511,6 +521,29 @@
       "backToList": "Choose from places",
       "notInProject": "Not a project place yet.",
       "open": "Open the place's sheet"
+    }
+  },
+  "levels": {
+    "title": "Sheet detail level",
+    "firstTime": "Choose the detail level of this project’s location sheets. It applies to every location and can be changed in the project settings.",
+    "continue": "Continue",
+    "basic": {
+      "label": "Basic",
+      "theme": "The essentials",
+      "goal": "Place and describe the location",
+      "count": "6 fields"
+    },
+    "intermediate": {
+      "label": "Intermediate",
+      "theme": "The setting",
+      "goal": "Bring the place to life: other names, climate, population, government…",
+      "count": "+ 7 to 14 fields"
+    },
+    "advanced": {
+      "label": "Advanced",
+      "theme": "The depth",
+      "goal": "Build a rich place: type-specific details and history",
+      "count": "+ 1 to 6 fields"
     }
   }
 }

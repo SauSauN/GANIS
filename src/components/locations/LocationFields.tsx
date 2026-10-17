@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { useProjectCharacters } from "@/stores/characterStore";
 import { useLocationStore } from "@/stores/locationStore";
 import type { Location, LocationSettings } from "@/types";
+import { errorText } from "@/lib/errors";
 
 const selectClass = cn(fieldClass, "h-9");
 
@@ -339,7 +340,7 @@ export function StatusSelect({
       setAdding(false);
       setDraft("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
     } finally {
       setBusy(false);
     }

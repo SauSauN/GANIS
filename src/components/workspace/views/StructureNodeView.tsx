@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { VersionsButton } from "@/components/history/VersionsDialog";
 import { DocumentsCard } from "@/components/documents/DocumentsCard";
+import { SceneEventsCard } from "@/components/plot/SceneEventsCard";
 import { useTranslation } from "react-i18next";
 import {
   ChevronRight,
@@ -61,6 +62,7 @@ import { useProjectCharacters } from "@/stores/characterStore";
 import { useProjectLocations } from "@/stores/locationStore";
 import { useProjectStructureLinks, useStructureStore } from "@/stores/structureStore";
 import type { NodeCharacterRole, NodeLocationRole, StructureNode } from "@/types";
+import { errorText } from "@/lib/errors";
 
 const CHARACTER_ROLES: NodeCharacterRole[] = ["present", "pov", "mentioned"];
 const LOCATION_ROLES: NodeLocationRole[] = ["setting", "mentioned"];
@@ -185,7 +187,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
       if (fresh) setSaved(true);
       return true;
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
       return false;
     } finally {
       setSaving(false);
@@ -214,7 +216,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
       await reload();
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
       setConfirmDelete(false);
     } finally {
       setDeleting(false);
@@ -227,7 +229,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
     try {
       await action();
     } catch (e) {
-      setLinkError(e instanceof Error ? e.message : String(e));
+      setLinkError(errorText(e));
     }
   }
 
@@ -313,7 +315,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
       await api.createStructureNode(projectId, { parentId: nodeId, level: childLevel });
       await reload();
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
     }
   }
 
@@ -506,6 +508,8 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
           </InfoCard>
 
           <DocumentsCard projectId={projectId} nodeId={nodeId} name={name} nodeOptions={nodeOptions} />
+
+          <SceneEventsCard projectId={projectId} nodeId={nodeId} name={name} onOpenFeature={onOpenFeature} />
 
           <LinkSection
             storageKey="ganis.nodeSheet.characters.collapsed"

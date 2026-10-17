@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
 import { findBuiltinTheme, getActiveColorThemeId, resetColorTheme } from "@/lib/colorTheme";
@@ -89,7 +90,7 @@ function syncThemesWithRole(user: User | null) {
 const messageOf = (e: unknown): string =>
   e instanceof ApiError
     ? e.message
-    : "Une erreur inattendue est survenue.";
+    : i18n.t("errors:unexpected");
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,

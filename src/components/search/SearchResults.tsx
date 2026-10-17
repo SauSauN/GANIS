@@ -7,6 +7,7 @@ import {
   Paperclip,
   StickyNote,
   UserRound,
+  Waypoints,
   type LucideIcon,
 } from "lucide-react";
 import { SEARCH_ORDER } from "@/lib/search";
@@ -18,6 +19,7 @@ export const SEARCH_ICONS: Record<SearchHit["kind"], LucideIcon> = {
   location: MapPinned,
   structureNode: ListTree,
   document: Paperclip,
+  plotEvent: Waypoints,
   note: NotebookText,
   noteFolder: Folder,
   sticky: StickyNote,

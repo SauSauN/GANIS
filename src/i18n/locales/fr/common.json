@@ -24,5 +24,6 @@
     "removeTitle": "Retirer cette image ?",
     "removeBody": "L'image sera supprimée du projet. Elle ne va pas dans la corbeille : pour la retrouver, il faudra l'ajouter de nouveau.",
     "removeConfirm": "Retirer l'image"
-  }
+  },
+  "loading": "Chargement…"
 }

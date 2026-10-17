@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { VersionsButton } from "@/components/history/VersionsDialog";
 import { useTranslation } from "react-i18next";
 import type { Editor } from "@tiptap/react";
-import { Pin, PinOff, RefreshCw, Save, Trash2 } from "lucide-react";
+import { FolderLock, Pin, PinOff, RefreshCw, Save, Trash2 } from "lucide-react";
 import { ConfirmDialog } from "@/components/notes/ConfirmDialog";
 import { FolderSelect, formatNoteDate } from "@/components/notes/FolderSelect";
 import { NoteEditor } from "@/components/notes/editor/NoteEditor";
@@ -10,14 +10,20 @@ import { Button } from "@/components/ui/button";
 import { api, ApiError } from "@/lib/api";
 import { makeExcerpt, MAX_NOTE_TITLE, parseNoteContent } from "@/lib/notes";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
+import { useCharacterStore } from "@/stores/characterStore";
+import { useLocationStore } from "@/stores/locationStore";
 import { useNoteStore, useProjectNotes } from "@/stores/noteStore";
+import { useStructureStore } from "@/stores/structureStore";
 import type { Note } from "@/types";
+import { errorText } from "@/lib/errors";
 
 interface NoteEditViewProps {
   projectId: string;
   noteId: string;
   /** Ferme l'onglet sans question (note supprimée). */
   onClose: () => void;
+  /** Ouvre la fiche d'un élément cité dans la note. */
+  onOpenFeature?: (featureId: string) => void;
 }
 
 type SaveStatus = "idle" | "saved" | "error";
@@ -29,7 +35,14 @@ type SaveStatus = "idle" | "saved" | "error";
  * question des onglets, ou enregistrement automatique). Le dossier et
  * l'épingle s'appliquent tout de suite.
  */
-export function NoteEditView({ projectId, noteId, onClose }: NoteEditViewProps) {
+/** Fiches relues après l'enregistrement d'une note système. */
+function refreshSheets(projectId: string) {
+  void useCharacterStore.getState().fetchCharacters(projectId);
+  void useLocationStore.getState().fetchLocations(projectId);
+  void useStructureStore.getState().fetchStructure(projectId);
+}
+
+export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: NoteEditViewProps) {
   const { t, i18n } = useTranslation(["notes", "common"]);
   const { folders, notes } = useProjectNotes(projectId);
   /** Résumé dans la liste : suit les déplacements faits ailleurs (panneau, dossier supprimé). */
@@ -70,7 +83,7 @@ export function NoteEditView({ projectId, noteId, onClose }: NoteEditViewProps) 
       setSavedTitle(loaded.title);
     } catch (error) {
       if (error instanceof ApiError && error.key === "note.notFound") setNotFound(true);
-      else setLoadError(error instanceof ApiError ? error.message : String(error));
+      else setLoadError(errorText(error));
     }
   }, [projectId, noteId]);
 
@@ -114,6 +127,8 @@ export function NoteEditView({ projectId, noteId, onClose }: NoteEditViewProps) 
         excerpt: makeExcerpt(editor.getText({ blockSeparator: " " })),
       });
       setNote(saved);
+      // Note système : le texte est allé dans la fiche, qu'on relit.
+      if (saved.system) refreshSheets(projectId);
       // Ce qui a été tapé pendant l'enregistrement reste « non enregistré ».
       setSavedTitle(sentTitle);
       setSavedVersion(version);
@@ -122,7 +137,7 @@ export function NoteEditView({ projectId, noteId, onClose }: NoteEditViewProps) 
       statusTimer.current = window.setTimeout(() => setSaveStatus("idle"), 2500);
       return true;
     } catch (error) {
-      setActionError(error instanceof ApiError ? error.message : String(error));
+      setActionError(errorText(error));
       setSaveStatus("error");
       return false;
     } finally {
@@ -150,7 +165,7 @@ export function NoteEditView({ projectId, noteId, onClose }: NoteEditViewProps) 
       const saved = await updateNote(projectId, noteId, { pinned: !note.pinned });
       setNote((current) => (current ? { ...current, pinned: saved.pinned } : current));
     } catch (error) {
-      setActionError(error instanceof ApiError ? error.message : String(error));
+      setActionError(errorText(error));
     }
   }
 
@@ -161,7 +176,7 @@ export function NoteEditView({ projectId, noteId, onClose }: NoteEditViewProps) 
       await moveNote(projectId, noteId, folderId);
       setNote((current) => (current ? { ...current, folderId } : current));
     } catch (error) {
-      setActionError(error instanceof ApiError ? error.message : String(error));
+      setActionError(errorText(error));
     }
   }
 
@@ -199,8 +214,15 @@ export function NoteEditView({ projectId, noteId, onClose }: NoteEditViewProps) 
     <main className="relative flex min-h-0 flex-1 overflow-y-auto overscroll-contain">
       <div className="mx-auto w-full max-w-5xl px-6 py-6 pb-24 lg:px-10">
         <header className="mb-4 space-y-3">
+          {note.system && (
+            <p className="flex items-start gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
+              <FolderLock className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+              <span>{t("system.banner")}</span>
+            </p>
+          )}
           <input
             value={title}
+            readOnly={note.system}
             maxLength={MAX_NOTE_TITLE}
             onChange={(event) => setTitle(event.target.value)}
             placeholder={t("edit.titlePlaceholder")}
@@ -212,6 +234,7 @@ export function NoteEditView({ projectId, noteId, onClose }: NoteEditViewProps) 
             <label className="flex items-center gap-2 text-muted-foreground">
               {t("edit.folder")}
               <FolderSelect
+                disabled={note.system}
                 folders={folders}
                 value={summary ? summary.folderId : note.folderId}
                 onChange={(folderId) => void changeFolder(folderId)}
@@ -243,17 +266,21 @@ export function NoteEditView({ projectId, noteId, onClose }: NoteEditViewProps) 
                 <Save className="mr-1.5 size-4" />
                 {saving ? t("common:actions.saving") : t("common:actions.save")}
               </Button>
-              <VersionsButton projectId={projectId} kind="note" itemId={noteId} name={note.title || t("untitled")} />
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                title={t("edit.delete")}
-                aria-label={t("edit.delete")}
-                onClick={() => setConfirmDelete(true)}
-                className="text-muted-foreground hover:text-destructive"
-              >
-                <Trash2 className="size-4" />
-              </Button>
+              {!note.system && (
+                <>
+                  <VersionsButton projectId={projectId} kind="note" itemId={noteId} name={note.title || t("untitled")} />
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    title={t("edit.delete")}
+                    aria-label={t("edit.delete")}
+                    onClick={() => setConfirmDelete(true)}
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </>
+              )}
             </div>
           </div>
 
@@ -265,9 +292,12 @@ export function NoteEditView({ projectId, noteId, onClose }: NoteEditViewProps) 
         </header>
 
         <NoteEditor
+          projectId={projectId}
+          onOpenFeature={onOpenFeature}
           initialContent={parseNoteContent(note.content)}
           onChange={onEditorChange}
           onReady={onEditorReady}
+          system={note.system}
         />
       </div>
 

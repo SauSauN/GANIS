@@ -244,7 +244,7 @@ function AboutDialog({ open, onClose }: { open: boolean; onClose: () => void }) 
 // Aide intégrée (une rubrique par module + questions fréquentes)
 // ----------------------------------------------------------------------------
 
-const CENTER_SECTIONS = ["workspace", "details", "characters", "locations", "structure", "notes", "search", "history", "files", "settings", "faq"] as const;
+const CENTER_SECTIONS = ["workspace", "details", "characters", "locations", "structure", "plot", "notes", "search", "history", "files", "settings", "faq"] as const;
 type CenterSection = (typeof CENTER_SECTIONS)[number];
 
 interface SectionContent {

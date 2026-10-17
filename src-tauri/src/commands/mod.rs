@@ -13,6 +13,7 @@ pub mod history;
 pub mod locations;
 pub mod notes;
 pub mod packages;
+pub mod plot;
 pub mod projects;
 pub mod relations;
 pub mod structure;

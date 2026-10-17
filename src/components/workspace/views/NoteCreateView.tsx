@@ -8,9 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { cardClass, cardContentClass, cardHeaderClass, PageShell } from "@/components/workspace/views/PageShell";
-import { ApiError } from "@/lib/api";
 import { MAX_NOTE_TITLE, noteTabId } from "@/lib/notes";
 import { useNoteStore, useProjectNotes } from "@/stores/noteStore";
+import { errorText } from "@/lib/errors";
 
 interface NoteCreateViewProps {
   projectId: string;
@@ -53,7 +53,7 @@ export function NoteCreateView({ projectId, feature, onOpenFeature }: NoteCreate
       setTitle("");
       onOpenFeature(noteTabId(note.id));
     } catch (cause) {
-      setError(cause instanceof ApiError ? cause.message : String(cause));
+      setError(errorText(cause));
     } finally {
       setBusy(false);
     }

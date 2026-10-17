@@ -1,3 +1,6 @@
+import { lazy, Suspense } from "react";
+import { useTranslation } from "react-i18next";
+import { Loader2 } from "lucide-react";
 import { ProjectSettingsPanel } from "@/components/project-settings/ProjectSettingsPanel";
 import type { ProjectSettingsId } from "@/components/project-settings/sections";
 import {
@@ -12,17 +15,12 @@ import { LocationCreateView } from "@/components/workspace/views/LocationCreateV
 import { LocationEditView } from "@/components/workspace/views/LocationEditView";
 import { LocationListView } from "@/components/workspace/views/LocationListView";
 import { NoteCreateView } from "@/components/workspace/views/NoteCreateView";
-import { NoteEditView } from "@/components/workspace/views/NoteEditView";
 import { NotesListView } from "@/components/workspace/views/NotesListView";
-import { RelationsView } from "@/components/workspace/views/RelationsView";
-import { StickyWallView } from "@/components/workspace/views/StickyWallView";
 import { TrashView } from "@/components/workspace/views/TrashView";
-import { HistoryView } from "@/components/workspace/views/HistoryView";
 import {
   ComingSoonView,
   EmptyListView,
 } from "@/components/workspace/views/GenericViews";
-import { StructureNodeView } from "@/components/workspace/views/StructureNodeView";
 import { StructurePlanView } from "@/components/workspace/views/StructurePlanView";
 import { SynopsisEditView } from "@/components/workspace/views/SynopsisEditView";
 import { WorkspaceHome } from "@/components/workspace/WorkspaceHome";
@@ -31,6 +29,19 @@ import { locationIdOfTab } from "@/lib/locations";
 import { noteIdOfTab } from "@/lib/notes";
 import { structureNodeIdOfTab } from "@/lib/structure";
 import type { Project } from "@/types";
+
+/*
+ * Interfaces lourdes (éditeur de notes, graphe des relations, mur de post-it,
+ * trame, visionneuse de documents…) chargées à la première ouverture :
+ * l'application démarre plus vite.
+ */
+const NoteEditView = lazy(() => import("@/components/workspace/views/NoteEditView").then((module) => ({ default: module.NoteEditView })));
+const RelationsView = lazy(() => import("@/components/workspace/views/RelationsView").then((module) => ({ default: module.RelationsView })));
+const StickyWallView = lazy(() => import("@/components/workspace/views/StickyWallView").then((module) => ({ default: module.StickyWallView })));
+const HistoryView = lazy(() => import("@/components/workspace/views/HistoryView").then((module) => ({ default: module.HistoryView })));
+const StructureNodeView = lazy(() => import("@/components/workspace/views/StructureNodeView").then((module) => ({ default: module.StructureNodeView })));
+const PlotBoard = lazy(() => import("@/components/plot/PlotBoard").then((module) => ({ default: module.PlotBoard })));
+const PlotReadingView = lazy(() => import("@/components/plot/PlotReadingView").then((module) => ({ default: module.PlotReadingView })));
 
 interface WorkspaceViewProps {
   /** Identifiant de l'onglet à afficher. */
@@ -47,7 +58,23 @@ interface WorkspaceViewProps {
  * Pour brancher une nouvelle interface : ajouter la fonctionnalité dans
  * `modules.ts`, puis son cas ici.
  */
-export function WorkspaceView({
+export function WorkspaceView(props: WorkspaceViewProps) {
+  const { t } = useTranslation("common");
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-0 flex-1 items-center justify-center text-sm text-muted-foreground" role="status">
+          <Loader2 className="mr-2 size-4 animate-spin" aria-hidden="true" />
+          {t("loading")}
+        </main>
+      }
+    >
+      <WorkspaceContent {...props} />
+    </Suspense>
+  );
+}
+
+function WorkspaceContent({
   tabId,
   project,
   onOpenFeature,
@@ -104,6 +131,18 @@ export function WorkspaceView({
       />
     );
   }
+
+  // ---------------------------------------------------------------------------
+  // Trame
+  // ---------------------------------------------------------------------------
+  if (tabId === "plot.board") {
+    return <PlotBoard projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "plot.reading") {
+    return <PlotReadingView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
 
   if (tabId === "structure.plan") {
     return <StructurePlanView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
@@ -186,6 +225,7 @@ export function WorkspaceView({
         projectId={project.id}
         noteId={noteId}
         onClose={() => onCloseTab(tabId)}
+        onOpenFeature={onOpenFeature}
       />
     );
   }

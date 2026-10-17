@@ -13,17 +13,19 @@ import {
   RotateCcw,
   StickyNote,
   UserRound,
+  Waypoints,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { fieldClass, PageShell } from "@/components/workspace/views/PageShell";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import { itemTabId } from "@/lib/search";
 import { restoreFromTrash } from "@/lib/trash";
 import { cn } from "@/lib/utils";
 import { useTrashStore } from "@/stores/trashStore";
 import type { Activity, HistoryKind } from "@/types";
+import { errorText } from "@/lib/errors";
 
 const ICONS: Record<HistoryKind, LucideIcon> = {
   character: UserRound,
@@ -36,6 +38,7 @@ const ICONS: Record<HistoryKind, LucideIcon> = {
   relation: Network,
   placeLink: MapPin,
   synopsis: FileText,
+  plot: Waypoints,
 };
 
 const KINDS = Object.keys(ICONS) as HistoryKind[];
@@ -76,7 +79,7 @@ export function HistoryView({ projectId, feature, onOpenFeature }: HistoryViewPr
     try {
       setItems(await api.listActivity(projectId, { kind: kind || undefined, limit: 500 }));
     } catch (cause) {
-      setError(cause instanceof ApiError ? cause.message : String(cause));
+      setError(errorText(cause));
     }
   }, [projectId, kind]);
 

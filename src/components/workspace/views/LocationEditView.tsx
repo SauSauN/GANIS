@@ -21,6 +21,7 @@ import { LocationGallery } from "@/components/locations/LocationGallery";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import { PlaceLinksCard } from "@/components/locations/PlaceLinksCard";
 import { StoryLinksCard } from "@/components/structure/StoryLinksCard";
+import { PlotInStoryCard } from "@/components/plot/PlotInStoryCard";
 import { LocationSheet } from "@/components/locations/LocationSheet";
 import { LocationThumb, TypeBadge } from "@/components/locations/LocationVisuals";
 import { useLocationLabels } from "@/components/locations/useLocationLabels";
@@ -49,6 +50,7 @@ import {
   useProjectLocation,
   useProjectLocations,
 } from "@/stores/locationStore";
+import { errorText } from "@/lib/errors";
 
 interface LocationEditViewProps {
   projectId: string;
@@ -125,7 +127,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
       setSaveStatus("saved");
       return true;
     } catch (e) {
-      setSaveError(e instanceof Error ? e.message : String(e));
+      setSaveError(errorText(e));
       return false;
     } finally {
       setSaving(false);
@@ -165,7 +167,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
     try {
       await removePortrait(projectId, locationId);
     } catch (e) {
-      setBannerError(e instanceof Error ? e.message : String(e));
+      setBannerError(errorText(e));
     } finally {
       setBannerBusy(false);
     }
@@ -180,7 +182,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
       setConfirmDelete(false);
       onClose();
     } catch (e) {
-      setDeleteError(e instanceof Error ? e.message : String(e));
+      setDeleteError(errorText(e));
     } finally {
       setDeleting(false);
     }
@@ -343,6 +345,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
                 firstAppearance={location.fields.firstAppearance}
                 onOpenFeature={onOpenFeature}
               />
+              <PlotInStoryCard projectId={projectId} target={{ type: "location", id: location.id }} name={location.name} onOpenFeature={onOpenFeature} />
               {childrenCard}
             </>
           }

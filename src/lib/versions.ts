@@ -1,3 +1,4 @@
+import { plotSummary } from "@/lib/plot";
 import type { VersionKind } from "@/types";
 
 /*
@@ -93,6 +94,8 @@ export function readableFields(kind: VersionKind, row: Row, resolve: (id: string
   const named = (value: string) => (isId(value) ? (resolve(value) ?? value) : value);
 
   switch (kind) {
+    case "plot":
+      return [{ key: "data", label: "versions:fields.plot", text: plotSummary(row.data, "—") }];
     case "note":
       return [
         { key: "title", label: "versions:fields.title", text: str(row.title) },

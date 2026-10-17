@@ -1,7 +1,7 @@
 {
   "placeholder": "Rechercher dans le projet…",
   "clear": "Effacer",
-  "hint": "Personnages, lieux, découpage, documents, notes et post-it. Sans tenir compte des accents ni des majuscules.",
+  "hint": "Personnages, lieux, découpage, documents, trame, notes et post-it. Sans tenir compte des accents ni des majuscules.",
   "searching": "Recherche…",
   "none": "Aucun résultat.",
   "count_one": "{{count}} résultat",
@@ -11,6 +11,7 @@
     "location": "Lieux",
     "structureNode": "Découpage",
     "document": "Documents",
+    "plotEvent": "Trame",
     "note": "Notes",
     "noteFolder": "Dossiers",
     "sticky": "Post-it"
@@ -22,7 +23,8 @@
     "document": "Document sans nom",
     "note": "Note sans titre",
     "noteFolder": "Dossier",
-    "sticky": "Post-it"
+    "sticky": "Post-it",
+    "plotEvent": "Événement sans titre"
   },
   "palette": {
     "title": "Palette de commandes",
@@ -30,5 +32,6 @@
     "suggestions": "Suggestions",
     "actions": "Pages et actions",
     "commands": "Action"
-  }
+  },
+  "escapeKey": "Échap"
 }

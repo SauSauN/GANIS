@@ -152,6 +152,18 @@
           "Cliquez sur un document pour le lire dans GANIS ; « Lire les pages » enchaîne les images d'un chapitre. « Modifier dans l'application » l'ouvre dans Word, Acrobat, Clip Studio… : chaque enregistrement est repris, l'ancien contenu reste dans les versions."
         ]
       },
+      "plot": {
+        "title": "Trame",
+        "intro": "Le plateau des intrigues parallèles : une colonne par trame, le temps vers le bas.",
+        "items": [
+          "Double-cliquez dans une colonne pour poser un événement ; glissez les cartes pour les changer de moment ou de trame.",
+          "Tirez la poignée ronde d'une carte vers une autre pour créer un lien : impact, influence ou croisement.",
+          "Reliez chaque événement au projet : point de vue, personnages présents, lieu, chapitre du découpage et notes.",
+          "« Lecture de l'histoire » affiche les événements dans l'ordre du lecteur (par défaut celui du découpage) avec tout ce qui s'y rattache, documents du chapitre compris.",
+          "Les fiches des personnages, des lieux et des éléments du découpage montrent leurs événements dans « Dans la trame ».",
+          "Ctrl+Z annule chaque geste sur le plateau. Le bouton « Tension » affiche la courbe de tension ; les couleurs des trames se règlent dans Paramètres du projet › Trame."
+        ]
+      },
       "notes": {
         "title": "Notes et post-it",
         "intro": "Tout ce qui ne rentre pas ailleurs : recherches, idées, documentation.",
@@ -220,6 +232,10 @@
         {
           "q": "J'ai modifié un document dans Word : est-il à jour dans GANIS ?",
           "a": "Oui, s'il a été ouvert avec « Modifier dans l'application » : chaque enregistrement dans Word est repris en quelques secondes. Cliquez « Terminer » quand vous avez fini (la copie de travail, non chiffrée, est alors supprimée)."
+        },
+        {
+          "q": "Comment lire mon histoire dans l'ordre où le lecteur la découvre ?",
+          "a": "Reliez les événements de la trame aux chapitres (champ « Raconté dans »), puis ouvrez Trame › Lecture de l'histoire : l'ordre suit le découpage. Vous pouvez aussi choisir un ordre manuel en haut de la lecture."
         },
         {
           "q": "Mes modifications sont-elles enregistrées ?",

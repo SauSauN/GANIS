@@ -20,6 +20,7 @@ import {
 import { LIST_KEYS, listValues } from "@/lib/characters";
 import { useCharacterStore, useProjectCharacters } from "@/stores/characterStore";
 import type { CharacterDetailLevel, CharacterListKey } from "@/types";
+import { errorText } from "@/lib/errors";
 
 type Feedback = "saved" | "failed" | null;
 
@@ -133,7 +134,7 @@ function ListEditor({
       await setList(projectId, list, next);
       return true;
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
       return false;
     } finally {
       setBusy(false);

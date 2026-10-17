@@ -181,7 +181,8 @@
     "tooManyTypes": "{{max}} types personnalisés au maximum.",
     "invalidList": "Liste inconnue.",
     "listTooLong": "Une liste ne peut pas contenir plus de {{max}} valeurs.",
-    "galleryFull": "La galerie est pleine ({{max}} images au maximum)."
+    "galleryFull": "La galerie est pleine ({{max}} images au maximum).",
+    "invalidLevel": "Niveau de détail inconnu."
   },
   "placeLink": {
     "notFound": "Lien introuvable.",
@@ -305,5 +306,16 @@
     "fileError": "Le fichier n'a pas pu être lu ou écrit.",
     "unsafeType": "Ce type de fichier pourrait lancer un programme : GANIS ne l'ouvre pas.",
     "openFailed": "Aucune application n'a pu ouvrir ce document."
+  },
+  "unexpected": "Une erreur inattendue est survenue. Réessayez ; si elle revient, redémarrez GANIS.",
+  "load": {
+    "notes": "Impossible de charger les notes.",
+    "stickies": "Impossible de charger le mur de post-it.",
+    "relations": "Impossible de charger les relations.",
+    "synopsis": "Impossible de charger le synopsis.",
+    "saveSynopsis": "Impossible d'enregistrer le synopsis.",
+    "characters": "Impossible de charger les personnages.",
+    "locations": "Impossible de charger les lieux.",
+    "setup": "Impossible de vérifier la configuration de GANIS."
   }
 }

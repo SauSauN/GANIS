@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { create } from "zustand";
+import i18n from "@/i18n";
 import { api, ApiError } from "@/lib/api";
 import { announceDeletion } from "@/lib/trash";
 import { folderAndDescendants } from "@/lib/notes";
@@ -124,6 +125,8 @@ export const useNoteStore = create<NoteState>((set, get) => {
       });
 
       try {
+        // Notes système : titres dans la langue du logiciel, contenu à jour des fiches.
+        await api.syncSystemNotes(projectId, i18n.language).catch(() => undefined);
         const [folders, notes] = await Promise.all([
           api.listNoteFolders(projectId),
           api.listNotes(projectId),
@@ -133,7 +136,7 @@ export const useNoteStore = create<NoteState>((set, get) => {
         set({ folders, notes, loaded: true, loading: false });
       } catch (error) {
         if (request !== latestFetch) return;
-        set({ loading: false, error: messageOf(error, "Impossible de charger les notes.") });
+        set({ loading: false, error: messageOf(error, i18n.t("errors:load.notes")) });
       }
     },
 
@@ -218,7 +221,7 @@ export const useNoteStore = create<NoteState>((set, get) => {
         set({ stickies, stickiesLoaded: true });
       } catch (error) {
         if (request !== latestStickies || !mine(projectId)) return;
-        set({ stickiesError: messageOf(error, "Impossible de charger le mur de post-it.") });
+        set({ stickiesError: messageOf(error, i18n.t("errors:load.stickies")) });
       }
     },
 
