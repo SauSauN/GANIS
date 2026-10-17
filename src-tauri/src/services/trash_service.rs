@@ -373,6 +373,8 @@ async fn expire(pool: &SqlitePool) -> AppResult<()> {
 /// Contenu de la corbeille, le plus récent d'abord.
 pub async fn list(pool: &SqlitePool) -> AppResult<Vec<TrashItem>> {
     expire(pool).await?;
+    // Contenus de documents qui ne servent plus (entrées expirées).
+    crate::services::document_service::clean_orphans(pool).await?;
     Ok(sqlx::query_as::<_, TrashItem>(
         "SELECT id, kind, item_id, label, deleted_at FROM trash ORDER BY deleted_at DESC, rowid DESC",
     )
@@ -488,13 +490,13 @@ pub async fn purge(pool: &SqlitePool, id: &str) -> AppResult<()> {
     if result.rows_affected() == 0 {
         return Err(trash_not_found());
     }
-    Ok(())
+    crate::services::document_service::clean_orphans(pool).await
 }
 
 /// Vide la corbeille.
 pub async fn empty(pool: &SqlitePool) -> AppResult<()> {
     sqlx::query("DELETE FROM trash").execute(pool).await?;
-    Ok(())
+    crate::services::document_service::clean_orphans(pool).await
 }
 
 #[cfg(test)]

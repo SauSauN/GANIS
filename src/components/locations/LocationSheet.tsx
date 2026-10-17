@@ -38,15 +38,15 @@ import {
   cardContentClass,
 } from "@/components/workspace/views/PageShell";
 import {
-  IDENTITY_FIELDS,
   MAX_LOCATION_NAME_LENGTH,
-  STORY_FIELDS,
   ancestorsOf,
   categoryFields,
   childrenOf,
   fieldByKey,
   findType,
   hiddenFilledKeys,
+  levelHiddenFilledKeys,
+  levelParts,
   typeFields,
   type LocationDraft,
   type LocationField,
@@ -202,9 +202,11 @@ export function LocationSheet({
   const CategoryIcon = category ? CATEGORY_ICONS[category] : typeIcon(draft.type, undefined);
   const TypeIcon = typeIcon(draft.type, category);
 
-  const ownFields = categoryFields(category);
-  const specificFields = typeFields(draft.type, category);
+  const parts = levelParts(settings.detailLevel);
+  const ownFields = parts.category ? categoryFields(category) : [];
+  const specificFields = parts.type ? typeFields(draft.type, category) : [];
   const hidden = hiddenFilledKeys(draft.fields, draft.type, category);
+  const hiddenByLevel = levelHiddenFilledKeys(draft.fields, draft.type, category, settings.detailLevel);
 
   // Emplacement : parents connus d'après le brouillon (parent choisi).
   const parent = draft.parentId ? locations.find((item) => item.id === draft.parentId) : undefined;
@@ -381,7 +383,7 @@ export function LocationSheet({
             )}
           </Field>
 
-          {IDENTITY_FIELDS.map((key) => renderField(fieldByKey(key)))}
+          {parts.identity.map((key) => renderField(fieldByKey(key)))}
         </Section>
 
         {category && ownFields.length > 0 && (
@@ -414,7 +416,7 @@ export function LocationSheet({
           title={t("sections.story.title")}
           description={t("sections.story.description")}
         >
-          {STORY_FIELDS.map((key) => renderField(fieldByKey(key)))}
+          {parts.story.map((key) => renderField(fieldByKey(key)))}
         </Section>
 
         <GallerySection>{gallery}</GallerySection>
@@ -427,6 +429,18 @@ export function LocationSheet({
               <p className="text-muted-foreground">{t("sections.hidden.description")}</p>
               <p className="text-muted-foreground">
                 {t("sections.hidden.list", { fields: hidden.map(labels.field).join(", ") })}
+              </p>
+            </div>
+          </div>
+        )}
+
+        {hiddenByLevel.length > 0 && (
+          <div className="flex gap-3 rounded-lg border border-dashed bg-muted/30 px-4 py-3 text-sm">
+            <EyeOff className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <div className="space-y-1">
+              <p className="font-medium">{t("sections.hiddenByLevel.title")}</p>
+              <p className="text-muted-foreground">
+                {t("sections.hiddenByLevel.description", { fields: hiddenByLevel.map(labels.field).join(", ") })}
               </p>
             </div>
           </div>

@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { useEffect } from "react";
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
@@ -5,6 +6,7 @@ import { announceDeletion } from "@/lib/trash";
 import { useCharacterStore } from "@/stores/characterStore";
 import { usePlaceLinkStore } from "@/stores/placeLinkStore";
 import type {
+  CharacterDetailLevel,
   CustomLocationType,
   Location,
   LocationInput,
@@ -55,6 +57,7 @@ interface LocationState {
     types: Array<Omit<CustomLocationType, "id"> & { id?: string }>,
   ) => Promise<LocationSettings>;
   setStatusList: (projectId: string, values: string[] | null) => Promise<void>;
+  setDetailLevel: (projectId: string, level: CharacterDetailLevel) => Promise<void>;
 
   setPortrait: (projectId: string, id: string, data: string) => Promise<Location>;
   removePortrait: (projectId: string, id: string) => Promise<Location>;
@@ -65,7 +68,7 @@ interface LocationState {
   reset: () => void;
 }
 
-const EMPTY_SETTINGS: LocationSettings = { customTypes: [], lists: {} };
+const EMPTY_SETTINGS: LocationSettings = { detailLevel: null, customTypes: [], lists: {} };
 
 let latestFetch = 0;
 const loadingPortraits = new Set<string>();
@@ -126,7 +129,7 @@ export const useLocationStore = create<LocationState>((set, get) => {
       } catch (error) {
         if (request !== latestFetch) return;
 
-        set({ loading: false, error: messageOf(error, "Impossible de charger les lieux.") });
+        set({ loading: false, error: messageOf(error, i18n.t("errors:load.locations")) });
       }
     },
 
@@ -181,6 +184,11 @@ export const useLocationStore = create<LocationState>((set, get) => {
 
     setStatusList: async (projectId, values) => {
       const settings = await api.setLocationList(projectId, "status", values);
+      if (get().projectId === projectId) set({ settings });
+    },
+
+    setDetailLevel: async (projectId, level) => {
+      const settings = await api.setLocationDetailLevel(projectId, level);
       if (get().projectId === projectId) set({ settings });
     },
 

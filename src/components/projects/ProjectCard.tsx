@@ -8,6 +8,8 @@ import {
   Copy,
   Download,
   FileText,
+  Globe,
+  Lock,
   Pencil,
   Star,
   Trash2,
@@ -68,6 +70,9 @@ export function ProjectCard({
   const archiveLabel = project.isArchived
     ? t("card.unarchive")
     : t("card.archive");
+
+  const isPublic = project.visibility === "public";
+  const VisibilityIcon = isPublic ? Globe : Lock;
 
   function action(handler: (project: Project) => void) {
     return (event: MouseEvent) => {
@@ -198,8 +203,14 @@ export function ProjectCard({
       </CardHeader>
 
       <CardContent className="space-y-1 text-xs text-muted-foreground">
-        <div className="flex items-center justify-between">
-          <span>{t(`types.${project.type}`)}</span>
+        <div className="flex items-center justify-between gap-2">
+          <span className="flex items-center gap-2">
+            {t(`types.${project.type}`)}
+            <span className="inline-flex items-center gap-1 rounded-full border px-1.5 py-px text-[10px] font-medium">
+              <VisibilityIcon className="h-3 w-3" />
+              {t(`visibility.${project.visibility}`)}
+            </span>
+          </span>
           <span>{t(`statuses.${project.status}`)}</span>
         </div>
 

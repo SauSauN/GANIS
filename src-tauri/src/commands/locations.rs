@@ -16,8 +16,7 @@ use tauri::State;
 
 /// Base du projet, après vérification du propriétaire.
 async fn project_pool(state: &AppState, project_id: &str) -> AppResult<SqlitePool> {
-    let user = state.require_user().await?;
-    project_storage::pool_for_user(state, project_id, &user.id).await
+    project_storage::pool_for_request(state, project_id).await
 }
 
 /// Tous les lieux du projet.
@@ -102,6 +101,17 @@ pub async fn set_location_list(
 ) -> AppResult<LocationSettings> {
     let pool = project_pool(&state, &project_id).await?;
     location_service::set_list(&pool, &list, values.as_deref()).await
+}
+
+/// Choisit le niveau de détail de toutes les fiches de lieux du projet.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn set_location_detail_level(
+    state: State<'_, AppState>,
+    project_id: String,
+    level: String,
+) -> AppResult<LocationSettings> {
+    let pool = project_pool(&state, &project_id).await?;
+    location_service::set_detail_level(&pool, &level).await
 }
 
 /// Image principale d'un lieu.

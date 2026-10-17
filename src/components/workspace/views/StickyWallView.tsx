@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { GripHorizontal, Plus, RefreshCw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
-import { ApiError } from "@/lib/api";
 import {
   MAX_STICKY_TEXT,
   STICKY_COLORS,
@@ -15,6 +14,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useNoteStore, useProjectStickies } from "@/stores/noteStore";
 import type { StickyColor, StickyNote } from "@/types";
+import { errorText } from "@/lib/errors";
 
 interface StickyWallViewProps {
   projectId: string;
@@ -63,7 +63,7 @@ function StickyCard({
     const value = pending.current;
     if (value === null) return;
     pending.current = null;
-    onChange({ text: value }).catch((error) => onError(error instanceof ApiError ? error.message : String(error)));
+    onChange({ text: value }).catch((error) => onError(errorText(error)));
   }
 
   useEffect(() => () => flush(), []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -122,7 +122,7 @@ function StickyCard({
     if (!changed) return;
 
     const input = g.kind === "move" ? { x: result.x, y: result.y } : { width: result.width, height: result.height };
-    onChange(input).catch((error) => onError(error instanceof ApiError ? error.message : String(error)));
+    onChange(input).catch((error) => onError(errorText(error)));
   }
 
   const box = live ?? sticky;
@@ -164,7 +164,7 @@ function StickyCard({
               onPointerDown={(event) => event.stopPropagation()}
               onClick={() =>
                 onChange({ color }).catch((error) =>
-                  onError(error instanceof ApiError ? error.message : String(error)),
+                  onError(errorText(error)),
                 )
               }
               className="flex size-6 items-center justify-center rounded-full hover:bg-black/10"
@@ -236,7 +236,7 @@ export function StickyWallView({ projectId, feature }: StickyWallViewProps) {
   const [message, setMessage] = useState<string | null>(null);
   const wallRef = useRef<HTMLDivElement>(null);
 
-  const report = (cause: unknown) => setMessage(cause instanceof ApiError ? cause.message : String(cause));
+  const report = (cause: unknown) => setMessage(errorText(cause));
 
   async function add(color: StickyColor) {
     setMessage(null);

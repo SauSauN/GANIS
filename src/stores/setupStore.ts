@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { create } from "zustand";
 import { api, isTauri } from "@/lib/api";
 
@@ -50,7 +51,7 @@ export const useSetupStore = create<SetupState>((set) => ({
         error:
           e instanceof Error
             ? e.message
-            : "Impossible de vérifier la configuration de GANIS.",
+            : i18n.t("errors:load.setup"),
       });
     }
   },

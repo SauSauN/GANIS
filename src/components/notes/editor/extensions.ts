@@ -11,6 +11,9 @@ import { Placeholder } from "@tiptap/extensions";
 import { Callout } from "@/components/notes/editor/Callout";
 import { Chain, ChainItem } from "@/components/notes/editor/Chain";
 import { Diagram } from "@/components/notes/editor/Diagram";
+import { EntityMention, type EntityMentionOptions } from "@/components/notes/editor/EntityMention";
+import { ProtectedHeadings } from "@/components/notes/editor/ProtectedHeadings";
+import { SpellCheck, type SpellCheckOptions } from "@/components/notes/editor/SpellCheck";
 
 /** Adresses acceptées pour un lien : jamais `javascript:` ni `data:`. */
 export function isSafeLink(url: string): boolean {
@@ -22,7 +25,10 @@ export function isSafeLink(url: string): boolean {
  * écarté à la lecture d'une note (le document enregistré ne peut rien
  * contenir d'autre).
  */
-export function noteExtensions(placeholder: string): Extensions {
+export function noteExtensions(
+  placeholder: string,
+  options: { mentions?: EntityMentionOptions; spelling?: SpellCheckOptions; lockHeadings?: boolean } = {},
+): Extensions {
   return [
     StarterKit.configure({
       heading: { levels: [1, 2, 3] },
@@ -47,5 +53,8 @@ export function noteExtensions(placeholder: string): Extensions {
     Chain,
     ChainItem,
     Diagram,
+    EntityMention.configure(options.mentions ?? {}),
+    ...(options.spelling ? [SpellCheck.configure(options.spelling)] : []),
+    ...(options.lockHeadings ? [ProtectedHeadings] : []),
   ];
 }

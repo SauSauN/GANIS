@@ -1,20 +1,24 @@
 //! Commandes Tauri liées à la gestion des projets.
 //!
-//! Chaque commande exige une session ouverte. L'identifiant de l'utilisateur
-//! est toujours pris dans l'état Rust, jamais fourni par l'interface : un
-//! compte ne peut donc agir que sur ses propres projets.
+//! Deux sortes de projets (voir `project_service`) :
+//!
+//! - **publics** : créés sans connexion (bouton « Commencer » de l'accueil).
+//!   Toute personne qui utilise GANIS sur cet appareil peut les ouvrir ;
+//! - **privés** : créés par un compte connecté, chiffrés avec la clé de ce
+//!   compte. Seul ce compte, connecté, peut les ouvrir.
+//!
+//! L'identité vient toujours de l'état Rust (`AppState::viewer`), jamais de
+//! l'interface : un invité n'atteint que les projets publics, un compte
+//! connecté ses projets privés et les projets publics.
 //!
 //! Les données de chaque projet (base SQLite chiffrée) sont gérées par
 //! `services::project_storage` : créées avec le projet, copiées à la
 //! duplication, supprimées avec lui.
-//!
-//! La clé du compte, ouverte à la connexion, est nécessaire pour lire le
-//! nom et la description des projets et pour ouvrir leurs bases.
 
 use crate::error::{AppError, AppResult};
-use crate::models::project::{Project, ProjectStatus, ProjectType};
+use crate::models::project::{Project, ProjectStatus, ProjectType, ProjectVisibility};
 use crate::services::{project_service, project_storage};
-use crate::state::AppState;
+use crate::state::{AppState, Viewer};
 use tauri::State;
 
 #[derive(Debug, serde::Deserialize)]
@@ -42,7 +46,14 @@ pub struct UpdateProjectInput {
     pub is_archived: Option<bool>,
 }
 
-/// Crée un projet pour l'utilisateur actuellement connecté.
+/// Crée un projet.
+///
+/// La visibilité est automatique, rien n'est demandé :
+/// - sans connexion : projet public ;
+/// - connecté : projet privé.
+///
+/// Elle peut ensuite être changée dans les paramètres du projet
+/// (`set_project_visibility`).
 ///
 /// Si le stockage du projet ne peut pas être créé, la création est annulée.
 #[tauri::command]
@@ -50,22 +61,35 @@ pub async fn create_project(
     state: State<'_, AppState>,
     input: CreateProjectInput,
 ) -> AppResult<Project> {
-    let (user, account_key) = state.require_session().await?;
+    let viewer = state.viewer().await;
 
-    let (project, project_key) = project_service::create_project(
-        &state.app_db,
-        &user.id,
-        &account_key,
-        &input.name,
-        &input.description,
-        input.project_type,
-    )
-    .await?;
+    let (project, project_key) = match &viewer {
+        Viewer::Account { user_id, key } => {
+            project_service::create_project(
+                &state.app_db,
+                user_id,
+                key,
+                &input.name,
+                &input.description,
+                input.project_type,
+            )
+            .await?
+        }
+        _ => {
+            project_service::create_public_project(
+                &state.app_db,
+                &input.name,
+                &input.description,
+                input.project_type,
+            )
+            .await?
+        }
+    };
 
     if let Err(error) =
         project_storage::create_storage(&state, &project.id, &project_key).await
     {
-        let _ = project_service::delete_project(&state.app_db, &project.id, &user.id).await;
+        let _ = project_service::delete_for_viewer(&state.app_db, &project.id, &viewer).await;
 
         return Err(error);
     }
@@ -73,25 +97,26 @@ pub async fn create_project(
     Ok(project)
 }
 
-/// Liste les projets appartenant à l'utilisateur courant.
+/// Liste les projets accessibles : projets publics, et projets privés du
+/// compte connecté.
 #[tauri::command]
 pub async fn list_projects(
     state: State<'_, AppState>,
 ) -> AppResult<Vec<Project>> {
-    let (user, account_key) = state.require_session().await?;
+    let viewer = state.viewer().await;
 
-    project_service::list_projects_for_user(&state.app_db, &user.id, &account_key).await
+    project_service::list_for_viewer(&state.app_db, &viewer).await
 }
 
-/// Récupère un projet appartenant à l'utilisateur courant.
+/// Récupère un projet accessible.
 #[tauri::command]
 pub async fn get_project(
     state: State<'_, AppState>,
     project_id: String,
 ) -> AppResult<Project> {
-    let (user, account_key) = state.require_session().await?;
+    let viewer = state.viewer().await;
 
-    project_service::find_by_id_for_user(&state.app_db, &project_id, &user.id, &account_key)
+    project_service::find_for_viewer(&state.app_db, &project_id, &viewer)
         .await?
         .ok_or_else(|| AppError::not_found("Projet non trouvé.").with_key("project.notFound"))
 }
@@ -106,14 +131,14 @@ pub async fn open_project(
     state: State<'_, AppState>,
     project_id: String,
 ) -> AppResult<Project> {
-    let (user, account_key) = state.require_session().await?;
+    let viewer = state.viewer().await;
 
-    project_storage::pool_for_user(&state, &project_id, &user.id).await?;
+    project_storage::pool_for_viewer(&state, &project_id, &viewer).await?;
 
-    project_service::mark_opened(&state.app_db, &project_id, &user.id, &account_key).await
+    project_service::mark_opened_for_viewer(&state.app_db, &project_id, &viewer).await
 }
 
-/// Met à jour un projet appartenant à l'utilisateur courant.
+/// Met à jour un projet accessible.
 ///
 /// Seuls les champs fournis (`Some(...)`) sont modifiés.
 #[tauri::command]
@@ -122,13 +147,12 @@ pub async fn update_project(
     project_id: String,
     input: UpdateProjectInput,
 ) -> AppResult<Project> {
-    let (user, account_key) = state.require_session().await?;
+    let viewer = state.viewer().await;
 
-    project_service::update_project(
+    project_service::update_for_viewer(
         &state.app_db,
         &project_id,
-        &user.id,
-        &account_key,
+        &viewer,
         input.name.as_deref(),
         input.description.as_deref(),
         input.project_type,
@@ -139,8 +163,27 @@ pub async fn update_project(
     .await
 }
 
-/// Duplique un projet appartenant à l'utilisateur courant, données
-/// (synopsis, etc.) comprises.
+/// Rend un projet privé (rattaché au compte connecté, chiffré) ou public
+/// (ouvrable sans connexion). Réservé à un compte connecté ; un projet
+/// privé ne peut être rendu public que par son propriétaire.
+#[tauri::command]
+pub async fn set_project_visibility(
+    state: State<'_, AppState>,
+    project_id: String,
+    visibility: ProjectVisibility,
+) -> AppResult<Project> {
+    let (user, account_key) = state.require_session().await?;
+
+    // Ouvre la base : vérifie l'accès et chiffre au besoin un projet privé
+    // d'avant le chiffrement (sa clé doit exister pour être conservée).
+    project_storage::pool_for_request(&state, &project_id).await?;
+
+    project_service::set_visibility(&state.app_db, &project_id, &user.id, &account_key, visibility)
+        .await
+}
+
+/// Duplique un projet accessible, données (synopsis, etc.) comprises. La
+/// copie garde la visibilité de l'original.
 ///
 /// Si les données ne peuvent pas être copiées, la copie est annulée.
 #[tauri::command]
@@ -148,22 +191,15 @@ pub async fn duplicate_project(
     state: State<'_, AppState>,
     project_id: String,
 ) -> AppResult<Project> {
-    let (user, account_key) = state.require_session().await?;
+    let viewer = state.viewer().await;
 
     let (copy, copy_key) =
-        project_service::duplicate_project(&state.app_db, &project_id, &user.id, &account_key)
-            .await?;
+        project_service::duplicate_for_viewer(&state.app_db, &project_id, &viewer).await?;
 
-    if let Err(error) = project_storage::duplicate_storage(
-        &state,
-        &project_id,
-        &copy.id,
-        &user.id,
-        &copy_key,
-    )
-    .await
+    if let Err(error) =
+        project_storage::duplicate_storage(&state, &project_id, &copy.id, &viewer, &copy_key).await
     {
-        let _ = project_service::delete_project(&state.app_db, &copy.id, &user.id).await;
+        let _ = project_service::delete_for_viewer(&state.app_db, &copy.id, &viewer).await;
 
         return Err(error);
     }
@@ -171,16 +207,15 @@ pub async fn duplicate_project(
     Ok(copy)
 }
 
-/// Supprime un projet appartenant à l'utilisateur courant, ainsi que
-/// ses données.
+/// Supprime un projet accessible, ainsi que ses données.
 #[tauri::command]
 pub async fn delete_project(
     state: State<'_, AppState>,
     project_id: String,
 ) -> AppResult<()> {
-    let user = state.require_user().await?;
+    let viewer = state.viewer().await;
 
-    project_service::delete_project(&state.app_db, &project_id, &user.id).await?;
+    project_service::delete_for_viewer(&state.app_db, &project_id, &viewer).await?;
 
     project_storage::delete_storage(&state, &project_id).await;
 

@@ -10,5 +10,8 @@
   },
   "packages": "Packages",
   "backToProject": "Back to project “{{name}}”",
-  "activity": "Work rhythm"
+  "activity": "Work rhythm",
+  "guest": {
+    "signIn": "Sign in"
+  }
 }

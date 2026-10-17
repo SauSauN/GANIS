@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
 import { findBuiltinTheme, getActiveColorThemeId, resetColorTheme } from "@/lib/colorTheme";
@@ -11,10 +12,34 @@ import type { User } from "@/types";
  * L'état affiché ici n'est qu'un reflet de l'interface.
  * La session réelle et les droits sont gérés par Rust (Phase 3).
  * Aucun mot de passe ni jeton n'est conservé dans ce store.
+ *
+ * Deux façons d'utiliser GANIS :
+ * - **sans connexion** (bouton « Commencer » de l'accueil) : mode invité,
+ *   seuls les projets publics sont accessibles, et tout projet créé est
+ *   public ;
+ * - **connecté** : projets privés du compte (chiffrés) et projets publics.
+ *
+ * Rust décide seul de ce qui est accessible : ce store ne sert qu'à
+ * l'affichage et à la navigation.
  */
+
+interface LoginOptions {
+  /**
+   * Garde le projet ouvert et ses onglets (connexion demandée depuis un
+   * projet public, pour le rendre privé). Par défaut, la liste des projets
+   * et les onglets sont oubliés puis relus avec les droits du compte.
+   */
+  keepWorkspace?: boolean;
+}
 
 interface AuthState {
   user: User | null;
+
+  /**
+   * Vrai après « Commencer » : l'application est utilisée sans connexion.
+   * Toujours faux quand un compte est connecté.
+   */
+  guest: boolean;
   loading: boolean;
   error: string | null;
 
@@ -32,6 +57,7 @@ interface AuthState {
   login: (
     username: string,
     password: string,
+    options?: LoginOptions,
   ) => Promise<boolean>;
 
   /**
@@ -54,11 +80,8 @@ interface AuthState {
    */
   setUser: (user: User) => void;
 
-  /**
-   * Connexion de développement uniquement.
-   * Cette fonction ne doit pas être utilisée en production.
-   */
-  devLogin: () => void;
+  /** Entre dans l'application sans connexion (projets publics). */
+  startGuest: () => void;
 }
 
 /**
@@ -89,10 +112,11 @@ function syncThemesWithRole(user: User | null) {
 const messageOf = (e: unknown): string =>
   e instanceof ApiError
     ? e.message
-    : "Une erreur inattendue est survenue.";
+    : i18n.t("errors:unexpected");
 
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
+  guest: false,
   loading: false,
   error: null,
   pendingRecoveryKey: null,
@@ -101,7 +125,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ pendingRecoveryKey: null });
   },
 
-  login: async (username, password) => {
+  login: async (username, password, options) => {
     set({
       loading: true,
       error: null,
@@ -113,8 +137,16 @@ export const useAuthStore = create<AuthState>((set) => ({
         password,
       });
 
+      // Les projets affichés jusque-là (mode invité) sont oubliés : la
+      // liste est relue avec les droits du compte.
+      if (!options?.keepWorkspace) {
+        useProjectStore.getState().reset();
+        clearOpenTabs();
+      }
+
       set({
         user,
+        guest: false,
         loading: false,
         pendingRecoveryKey: recoveryKey,
       });
@@ -173,6 +205,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
     set({
       user: null,
+      guest: false,
       error: null,
       pendingRecoveryKey: null,
     });
@@ -197,24 +230,16 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  devLogin: () => {
-    if (!import.meta.env.DEV) {
+  startGuest: () => {
+    // Un compte resté connecté n'a rien à faire en mode invité.
+    if (useAuthStore.getState().user) {
       return;
     }
 
-    const now = new Date().toISOString();
-
-    useProjectStore.getState().seedDemo();
+    useProjectStore.getState().reset();
 
     set({
-      user: {
-        id: "dev-user",
-        username: "demo",
-        email: null,
-        role: "user",
-        createdAt: now,
-        updatedAt: now,
-      },
+      guest: true,
       error: null,
     });
   },

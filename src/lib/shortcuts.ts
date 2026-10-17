@@ -121,7 +121,11 @@ export const useHelpStore = create<HelpState>((set) => ({
 
 const GUIDE_SEEN_KEY = "ganis-guide-seen";
 
-/** Le guide de démarrage s'ouvre seul la première fois qu'un projet est ouvert. */
+/**
+ * Le guide de démarrage s'ouvre seul une fois, à la première arrivée sur
+ * le tableau de bord (avec ou sans compte). Ensuite : Aide › Guide de
+ * démarrage.
+ */
 export function showGuideOnce() {
   try {
     if (localStorage.getItem(GUIDE_SEEN_KEY)) return;

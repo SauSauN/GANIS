@@ -1,0 +1,132 @@
+{
+  "title": "Documents",
+  "description": "Les fichiers de « {{name}} » : pages, PDF, Word, images, sons…",
+  "loading": "Chargement des documents…",
+  "empty": {
+    "title": "Ajouter des fichiers",
+    "hint": "Ou déposez-les ici : tout votre chapitre (une image par page), le PDF, le scénario en Word… Ils sont chiffrés avec le projet."
+  },
+  "dropHere": "Déposez pour ranger dans « {{name}} »",
+  "dropHint": "Déposez des fichiers sur cette carte pour les ajouter. Entrée : ouvrir · F2 : renommer · Alt+↑/↓ : changer l'ordre.",
+  "newTextName": "Nouveau texte.md",
+  "updatedOn": "modifié le {{date}}",
+  "versionsShort_one": "{{count}} version",
+  "versionsShort_other": "{{count}} versions",
+  "saved": "Copie enregistrée : {{name}}.",
+  "replaced": "« {{name}} » remplacé. L'ancien fichier est gardé dans les versions.",
+  "moved": "« {{name}} » rangé dans « {{target}} ».",
+  "kinds": {
+    "other": "Fichier"
+  },
+  "actions": {
+    "open": "Ouvrir",
+    "openNamed": "Ouvrir « {{name}} »",
+    "openExternal": "Modifier dans l'application",
+    "openExternalNamed": "Modifier « {{name}} » dans son application",
+    "openExternalHint": "Ouvre le fichier dans son application (Word, Acrobat, Clip Studio…). Vos enregistrements y sont repris ici automatiquement.",
+    "rename": "Renommer",
+    "addNote": "Ajouter une note",
+    "editNote": "Modifier la note",
+    "replace": "Remplacer par un autre fichier…",
+    "versions": "Versions",
+    "versionsCount_one": "Versions ({{count}})",
+    "versionsCount_other": "Versions ({{count}})",
+    "saveAs": "Enregistrer sous…",
+    "move": "Ranger dans…",
+    "up": "Monter",
+    "down": "Descendre",
+    "delete": "Supprimer",
+    "more": "Autres actions pour « {{name}} »",
+    "newText": "Nouveau texte",
+    "newTextHint": "Créer un texte (scénario, dialogues…) à écrire dans GANIS",
+    "add": "Ajouter des fichiers"
+  },
+  "adding": {
+    "picking": "Choix des fichiers…",
+    "progress": "Ajout {{index}}/{{count}} : {{name}}",
+    "done_one": "{{count}} document ajouté.",
+    "done_other": "{{count}} documents ajoutés.",
+    "tooLarge": "Plus de 300 Mo, non ajouté : {{names}}."
+  },
+  "dialogs": {
+    "add": "Ajouter des documents à « {{name}} »",
+    "saveAs": "Enregistrer une copie du document",
+    "replace": "Remplacer « {{name}} »"
+  },
+  "external": {
+    "open": "« {{name}} » est ouvert dans une autre application",
+    "hint": "Chaque enregistrement y est repris ici (l'ancien contenu reste dans les versions). Cette copie de travail n'est pas chiffrée : cliquez « Terminer » quand vous avez fini.",
+    "finish": "Terminer",
+    "badge": "Ouvert ailleurs",
+    "synced": "« {{name}} » mis à jour depuis l'autre application."
+  },
+  "reading": {
+    "open_one": "Lire la page",
+    "open_other": "Lire les {{count}} pages",
+    "hint": "Lecture continue des images, dans l'ordre ci-dessous.",
+    "page": "Page {{index}} sur {{count}}",
+    "pageLabel": "Page {{index}} : {{name}}",
+    "joined": "Pages jointes",
+    "width": {
+      "label": "Largeur des pages",
+      "page": "Page entière",
+      "narrow": "Lecture",
+      "wide": "Pleine largeur"
+    }
+  },
+  "viewer": {
+    "position": "{{index}} sur {{count}}",
+    "previous": "Document précédent",
+    "next": "Document suivant",
+    "close": "Fermer",
+    "loading": "Chargement…",
+    "unsaved": "Le texte a des modifications non enregistrées.",
+    "saveAndContinue": "Enregistrer",
+    "discard": "Ne pas enregistrer",
+    "keepEditing": "Continuer à écrire",
+    "zoom": {
+      "label": "Zoom",
+      "fit": "Ajuster à la fenêtre",
+      "width": "Ajuster à la largeur",
+      "actual": "Taille réelle"
+    },
+    "wordPreview": "Aperçu du texte : la mise en page exacte (polices, marges) est visible dans Word.",
+    "editInWord": "Modifier dans Word",
+    "wordUnreadable": "Ce fichier Word ne peut pas être affiché. Ouvrez-le dans son application.",
+    "words_one": "{{count}} mot",
+    "words_other": "{{count}} mots",
+    "modified": "modifié",
+    "save": "Enregistrer",
+    "saved": "« {{name}} » enregistré. La version précédente est gardée.",
+    "noPreview": "Pas d'aperçu pour ce type de fichier",
+    "noPreviewHint": "Ouvrez-le dans son application : vos enregistrements y seront repris dans le projet.",
+    "unsafeHint": "Ce type de fichier pourrait lancer un programme : GANIS ne l'ouvre pas. Vous pouvez en enregistrer une copie."
+  },
+  "versions": {
+    "title": "Versions de « {{name}} »",
+    "description": "Chaque remplacement, modification dans une autre application ou texte enregistré garde l'ancien contenu (20 versions au plus). Restaurer garde d'abord le contenu actuel.",
+    "current": "Version actuelle",
+    "empty": "Aucune version précédente pour l'instant.",
+    "restore": "Restaurer",
+    "restored": "Version du {{date}} restaurée.",
+    "delete": "Supprimer cette version",
+    "confirmDelete": "Supprimer définitivement ?"
+  },
+  "note": {
+    "title": "Note sur « {{name}} »",
+    "description": "Une remarque pour vous : planches à reprendre, version envoyée à l'éditeur…",
+    "placeholder": "Votre note…"
+  },
+  "move": {
+    "title": "Ranger « {{name}} » dans…",
+    "description": "Le document passe à la fin des documents de l'élément choisi.",
+    "label": "Élément du découpage",
+    "current": "actuel",
+    "confirm": "Ranger ici"
+  },
+  "keys": {
+    "enter": "Entrée",
+    "delete": "Suppr",
+    "escape": "Échap"
+  }
+}

@@ -6,7 +6,10 @@
     "pinNamed": "Pin tab {{name}}",
     "unpinNamed": "Unpin tab {{name}}",
     "close": "Close tab",
-    "closeNamed": "Close tab {{name}}"
+    "closeNamed": "Close tab {{name}}",
+    "maximizeHint": "Double-click: maximize",
+    "restoreHint": "Double-click: restore layout",
+    "restore": "Restore layout"
   },
   "nav": {
     "left_one": "Show hidden tab on the left ({{count}} hidden)",

@@ -8,6 +8,7 @@ import { api } from "@/lib/api";
 import { GALLERY_MAX_SIDE, PortraitError, preparePortrait } from "@/lib/portraitImage";
 import { useLocationStore } from "@/stores/locationStore";
 import type { LocationImage } from "@/types";
+import { errorText } from "@/lib/errors";
 
 /** Images déjà chargées (par identifiant), gardées le temps de la session. */
 const urlCache = new Map<string, string>();
@@ -49,7 +50,7 @@ export function LocationGallery({ label, projectId, locationId, disabled }: Loca
     api
       .listLocationGallery(projectId, locationId)
       .then((list) => !cancelled && setImages(list))
-      .catch((e) => !cancelled && setError(e instanceof Error ? e.message : String(e)));
+      .catch((e) => !cancelled && setError(errorText(e)));
 
     return () => {
       cancelled = true;

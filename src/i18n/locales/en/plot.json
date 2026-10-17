@@ -1,0 +1,553 @@
+{
+  "loading": "Loading the plot…",
+  "untitled": "Untitled",
+  "undo": "Undo",
+  "keys": {
+    "escape": "Esc"
+  },
+  "defaults": {
+    "mainLane": "Main plot",
+    "parallelLane": "Subplot {{number}}",
+    "newEvent": "New event",
+    "copyOf": "{{name}} (copy)"
+  },
+  "status": {
+    "idea": "Idea",
+    "draft": "Draft",
+    "written": "Written",
+    "revised": "Revised"
+  },
+  "kinds": {
+    "impact": {
+      "name": "Impact",
+      "description": "Directly changes what happens in the target plot."
+    },
+    "influence": {
+      "name": "Influence",
+      "description": "Prepares or colours the target plot without changing it right away."
+    },
+    "meeting": {
+      "name": "Crossing",
+      "description": "Both plots meet at the same moment."
+    }
+  },
+  "toolbar": {
+    "zoom": "Zoom",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "zoomReset": "Back to 100%",
+    "fit": "Fit",
+    "undo": "Undo",
+    "redo": "Redo",
+    "newEvent": "Event",
+    "tour": "Walk through",
+    "tourHint": "Walk through the story event by event, on the board",
+    "reading": "Reading",
+    "readingHint": "Read the story with everything attached to it (characters, locations, chapters, notes…)",
+    "view": "Display",
+    "clean": "Clean view (hide the bars)",
+    "unclean": "Show the bars",
+    "panel": "Right panel",
+    "more": "More",
+    "tensionShow": "Show the tension curve",
+    "tensionHide": "Hide the tension curve",
+    "newLaneShort": "Plot",
+    "newLaneHint": "Add a subplot"
+  },
+  "board": {
+    "time": "Time ↓",
+    "mainLane": "Main plot",
+    "parallelLane": "Subplot",
+    "characterLane": "{{name}}'s plot",
+    "dragLane": "Click to select it, drag to move it",
+    "laneAria": "Plot {{name}}, column {{index}}",
+    "addTo": "Add an event to “{{name}}”",
+    "tension": "Tension",
+    "tensionHint": "calm to intense",
+    "moment": "Moment {{number}}",
+    "eventAria": "{{title}}, {{lane}}, moment {{moment}}, {{status}}",
+    "editTitle": "Event title",
+    "pivot": "Turning point",
+    "handle": "Drag to another event to create a link",
+    "actHint": "Start of an act: click to edit",
+    "written": "Written:",
+    "writtenHint": "Events written or revised",
+    "empty": {
+      "title": "Your plot is empty",
+      "hint": "Double-click a column to place a first event, or create events from the structure (“…” menu)."
+    },
+    "tensionHelp": "Click or drag to draw the tension; double-click to clear a moment",
+    "tensionAria": "Tension curve, moment by moment",
+    "noLanesTitle": "No plots",
+    "noLanesHint": "All plots have been deleted. Add one: the first one becomes the main plot.",
+    "allHiddenTitle": "All plots are hidden",
+    "allHiddenHint": "Show one from the View menu.",
+    "unplaced_one": "{{count}} event without a scene",
+    "unplaced_other": "{{count}} events without a scene",
+    "unplacedHint": "Events not told in any structure item. Click to highlight them on the board.",
+    "pastMoment": "Moment {{number}} (narrative past)",
+    "storyStart": "Story begins",
+    "storyStartHint": "Above: the narrative past (flashbacks, memories, earlier events). Scroll up to go back in time."
+  },
+  "panel": {
+    "label": "Plot details",
+    "close": "Close",
+    "event": "Event",
+    "link": "Link"
+  },
+  "project": {
+    "fromStructure": "Create events from the structure",
+    "templates": "Apply a structure template"
+  },
+  "reading": {
+    "toc": "Contents",
+    "display": "Reading display",
+    "step": "Step by step",
+    "continuous": "Continuous",
+    "showOnBoard": "Show on the board",
+    "emptyTitle": "Nothing to read yet",
+    "emptyHint": "Place events on the plot board: they will read here, with their characters, locations, chapters and notes.",
+    "openBoard": "Open the board",
+    "position": "{{index}} of {{count}}",
+    "noNote": "Nothing is written yet about what happens.",
+    "cast": "Characters",
+    "pov": "Point of view",
+    "place": "Location",
+    "inside": "in {{places}}",
+    "node": "In the structure",
+    "documents_one": "{{count}} document",
+    "documents_other": "{{count}} documents",
+    "notes": "Notes",
+    "chain": "Cause and effect",
+    "mysteries": "Mysteries",
+    "cluePlanted": "Clue planted:",
+    "forMystery": "for “{{question}}”",
+    "revealed": "Revelation:",
+    "notesCount_one": "{{count}} note",
+    "notesCount_other": "{{count}} notes",
+    "alsoTold": "Also told in:",
+    "modes": {
+      "structure": "By outline",
+      "lane": "By storyline"
+    }
+  },
+  "issues": {
+    "title": "Automatic checks",
+    "hint": "Invitations to look at the structure, not errors: nothing is fixed automatically.",
+    "none": "Nothing to report: every plot is connected and time flows the right way.",
+    "untitled": "An event in “{{lane}}” has no title (moment {{moment}}).",
+    "mainGap": "The main plot stays empty for {{count}} moments before “{{title}}”.",
+    "laneIsolated": "The plot “{{lane}}” is not linked to any other.",
+    "laneUnreached": "The plot “{{lane}}” never reaches the main plot, even indirectly.",
+    "backInTime": "The link “{{title}}” goes back in time.",
+    "badDate": "The date of “{{title}}” ({{date}}) is not recognised.",
+    "mysteryNoClue": "The mystery “{{question}}” has no clue.",
+    "mysteryNoAnswer": "The mystery “{{question}}” is marked solved but has no answer.",
+    "noPivot": "No turning point is marked in the story."
+  },
+  "mysteries": {
+    "hint": "A mystery is a question whose answer the reader awaits. Plant its clues in events and pick the event of the revelation.",
+    "question": "Question",
+    "questionPlaceholder": "What is the reader trying to understand?",
+    "status": "Status",
+    "statuses": {
+      "open": "Open",
+      "solved": "Solved",
+      "dropped": "Dropped"
+    },
+    "payoffEvent": "Revealed in",
+    "noEvent": "No event",
+    "answer": "Answer",
+    "answerPlaceholder": "The final truth",
+    "payoff": "Revelation",
+    "payoffPlaceholder": "How the answer is revealed",
+    "clues_one": "{{count}} clue",
+    "clues_other": "{{count}} clues",
+    "clue": "Clue",
+    "plantedIn": "Planted in",
+    "deleteClue": "Delete the clue",
+    "newClue": "New clue",
+    "cluePlaceholder": "A clue to plant…",
+    "addClue": "Add",
+    "delete": "Delete the mystery",
+    "add": "New mystery"
+  },
+  "event": {
+    "title": "Title",
+    "lane": "Plot",
+    "moment": "Moment",
+    "status": "Progress",
+    "pivot": "Turning point (the story shifts)",
+    "note": "What happens",
+    "notePlaceholder": "Action, revelation, decision, what changes for the character…",
+    "project": "In the project",
+    "pov": "Point of view",
+    "none": "None",
+    "openSheet": "Open the sheet",
+    "characters": "Characters present",
+    "removeCharacter": "Remove {{name}}",
+    "addCharacter": "Add a character…",
+    "createCharacter": "Create a character",
+    "location": "Location",
+    "createLocation": "Create a location",
+    "node": "Told in",
+    "nodeHint": "The structure item (chapter, scene…) where the event is told: it sets the reading order and links to the chapter's documents.",
+    "notes": "Notes",
+    "removeNote": "Unlink the note",
+    "addNote": "Link a note…",
+    "writeScene": "Write the scene",
+    "writeSceneHint": "Creates a note linked to this event and opens it",
+    "date": "In-story date (for the timeline)",
+    "datePlaceholder": "e.g. 1987-08-20 or 20 August 1987",
+    "readFromHere": "Read from here",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "details": "Placement and details",
+    "preferScene": "This item contains scenes: pick a scene instead for a more precise reading order.",
+    "alsoNodes": "Also told in",
+    "alsoNodesHint": "Other scenes where the event is told again (memory, other point of view). The main scene sets its place in the reading.",
+    "addAlsoNode": "Add another scene…",
+    "alsoNodesNeedMain": "Choose “Told in” first",
+    "removeAlsoNode": "Remove “{{name}}”",
+    "momentHint": "1, 2, 3…: the main story. −1, −2…: the narrative past, before the story begins."
+  },
+  "link": {
+    "from": "From",
+    "to": "To",
+    "backInTime": "This link goes back in time: the target comes before the source. Fine for a flashback; otherwise reverse the link.",
+    "kind": "Link type",
+    "label": "Link name (shown on the board)",
+    "labelPlaceholder": "e.g. reveals the secret",
+    "note": "Consequence on the target plot",
+    "notePlaceholder": "What does it change, concretely?",
+    "swap": "Reverse",
+    "delete": "Delete the link"
+  },
+  "lane": {
+    "name": "Plot name",
+    "colorInSettings": "Change the colour (project settings)",
+    "character": "Character's plot",
+    "characterHint": "Optional: the plot follows this character (their name shows at the top of the column).",
+    "count_one": "{{count}} event in this plot.",
+    "count_other": "{{count}} events in this plot.",
+    "left": "Left",
+    "right": "Right",
+    "addEvent": "Add an event here",
+    "tour": "Walk through this plot",
+    "makeMain": "Make it the main plot",
+    "hide": "Hide this plot",
+    "solo": "Show only this one",
+    "duplicate": "Duplicate the plot",
+    "openCharacter": "Open the character's sheet",
+    "delete": "Delete the plot and its events"
+  },
+  "row": {
+    "label": "Moment label",
+    "labelPlaceholder": "e.g. Monday night, the storm",
+    "act": "An act starts here",
+    "actPlaceholder": "e.g. Act II: the descent",
+    "tension": "Tension: {{value}} out of 10",
+    "tensionNone": "Tension: not set",
+    "tensionHint": "0: dead calm, 10: breathless. You can also click in the Tension column.",
+    "tensionClear": "Clear the tension",
+    "count_one": "{{count}} event at this moment.",
+    "count_other": "{{count}} events at this moment.",
+    "empty": "This moment is empty.",
+    "simultaneous": "Everything on the same row happens at the same time, in different plots.",
+    "insertBefore": "Insert a moment before",
+    "insertAfter": "Insert a moment after",
+    "delete": "Delete this moment",
+    "deleteBlocked": "A moment can only be deleted when empty"
+  },
+  "view": {
+    "title": "Plot display",
+    "lanes": "Plots shown",
+    "showAll": "Show all",
+    "highlight": "Highlight",
+    "status": "Progress",
+    "character": "Character",
+    "location": "Location",
+    "tag": "Tag",
+    "all": "All",
+    "clear": "Clear the highlight",
+    "links": "Links",
+    "labels": "Link names",
+    "board": "Board",
+    "notes": "Text preview on cards",
+    "tension": "Tension column",
+    "rowLines": "Lines between moments",
+    "rowLinesHint": "Unchecked hides the horizontal lines; act starts stay marked."
+  },
+  "tour": {
+    "label": "Story walk-through",
+    "order": "Walk-through order",
+    "modes": {
+      "structure": "Board",
+      "structureHint": "The board order, moment by moment",
+      "reading": "Reading",
+      "readingHint": "The order in which the reader discovers the story",
+      "lane": "By plot",
+      "laneHint": "Follow a single plot from start to end"
+    },
+    "close": "Close the walk-through",
+    "pickLane": "Plot to walk through",
+    "triggers": "What it triggers",
+    "causedBy": "Caused by",
+    "previous": "Previous",
+    "next": "Next",
+    "fullReading": "Full reading",
+    "fullReadingHint": "Open the story reading at this event",
+    "position": "Event {{index}} of {{count}}: {{title}}"
+  },
+  "dialogs": {
+    "close": "Close",
+    "cancel": "Cancel"
+  },
+  "templates": {
+    "title": "Structure templates",
+    "description": "Pick a template to place its acts and main beats on the moments, create your own, or apply none.",
+    "rows": "Target number of moments",
+    "replace": "Replace existing acts",
+    "applied": "Template “{{name}}” applied.",
+    "three": {
+      "name": "Three acts",
+      "description": "The classic structure: setup, confrontation, resolution.",
+      "beats": [
+        "Act I: setup",
+        "Inciting incident",
+        "Act II: confrontation",
+        "Point of no return",
+        "Act III: resolution"
+      ]
+    },
+    "hero": {
+      "name": "Hero's journey (summary)",
+      "description": "Twelve stages inspired by Joseph Campbell and Christopher Vogler.",
+      "beats": [
+        "Ordinary world",
+        "Call to adventure",
+        "Refusal of the call",
+        "Meeting the mentor",
+        "Crossing the threshold",
+        "Tests, allies, enemies",
+        "Approach to the cave",
+        "Ordeal",
+        "Reward",
+        "The road back",
+        "Resurrection",
+        "Return with the elixir"
+      ]
+    },
+    "stc": {
+      "name": "Save the Cat (simplified)",
+      "description": "Blake Snyder's fifteen beats condensed into ten.",
+      "beats": [
+        "Opening image",
+        "Theme stated",
+        "Setup",
+        "Catalyst",
+        "Debate",
+        "Break into Act II",
+        "Midpoint: false victory or defeat",
+        "Bad guys close in",
+        "All is lost",
+        "Finale"
+      ]
+    },
+    "circle": {
+      "name": "Eight-point circle",
+      "description": "Comfort, need, the unknown, trials, return transformed.",
+      "beats": [
+        "Comfort zone",
+        "A need",
+        "Unfamiliar situation",
+        "Adapting",
+        "What they get",
+        "What it costs",
+        "Return",
+        "Change"
+      ]
+    },
+    "five": {
+      "name": "Five acts (Freytag)",
+      "description": "The classic dramatic pyramid: exposition, rising action, climax, falling action, resolution.",
+      "beats": [
+        "Exposition",
+        "Rising action",
+        "Climax",
+        "Falling action",
+        "Resolution"
+      ]
+    },
+    "seven": {
+      "name": "Seven-point structure",
+      "description": "Dan Wells: start from the ending and build the path to it.",
+      "beats": [
+        "Hook",
+        "First plot turn",
+        "First pinch",
+        "Midpoint",
+        "Second pinch",
+        "Second plot turn",
+        "Resolution"
+      ]
+    },
+    "kishotenketsu": {
+      "name": "Kishōtenketsu",
+      "description": "A four-part structure from East Asia, common in manga, with no mandatory conflict.",
+      "beats": [
+        "Ki: introduction",
+        "Shō: development",
+        "Ten: twist",
+        "Ketsu: conclusion"
+      ]
+    },
+    "fichtean": {
+      "name": "Fichtean curve",
+      "description": "A series of ever-stronger crises, ideal for suspense.",
+      "beats": [
+        "Opening crisis",
+        "First crisis",
+        "Complication",
+        "Major crisis",
+        "Climax",
+        "Falling action"
+      ]
+    },
+    "spine": {
+      "name": "Story spine",
+      "description": "Kenn Adams: “Once upon a time… until one day…”",
+      "beats": [
+        "Once upon a time",
+        "Every day",
+        "But one day",
+        "Because of that",
+        "Because of that, again",
+        "Until finally",
+        "And ever since then"
+      ]
+    },
+    "mystery": {
+      "name": "Mystery",
+      "description": "The beats of a detective plot, from the crime to the reveal.",
+      "beats": [
+        "The crime",
+        "The investigation begins",
+        "Red herrings",
+        "Midpoint revelation",
+        "The detective in danger",
+        "The reveal",
+        "Epilogue"
+      ]
+    },
+    "romance": {
+      "name": "Romance",
+      "description": "The main beats of a love story, from meeting to ending.",
+      "beats": [
+        "The meet",
+        "Attraction",
+        "Getting closer",
+        "Midpoint: commitment",
+        "Doubts",
+        "The break-up",
+        "The grand gesture",
+        "Together"
+      ]
+    },
+    "steps_one": "{{count}} step",
+    "steps_other": "{{count}} steps",
+    "mine": "My templates",
+    "mineEmpty": "No personal template yet. Create your own: one step per line.",
+    "create": "Create a template",
+    "fromActs": "Start from the current acts",
+    "name": "Template name",
+    "namePlaceholder": "E.g. My four-part structure",
+    "stepsLabel": "Steps (one per line, in order)",
+    "stepsPlaceholder": "Setup\nInciting incident\nComplications\nResolution",
+    "stepsHint_one": "{{count}} step, placed at the start.",
+    "stepsHint_other": "{{count}} steps, spread from the first to the last moment.",
+    "save": "Save template",
+    "edit": "Edit “{{name}}”",
+    "remove": "Delete “{{name}}”",
+    "known": "Known templates",
+    "none": "Don’t apply a template",
+    "clear": "Remove the acts from the board",
+    "cleared": "Acts removed from the board."
+  },
+  "import": {
+    "title": "Events from the structure",
+    "description": "Creates one event for each item of a structure level (each chapter, for instance), in outline order, linked to that item and with its summary.",
+    "noStructure": "The structure is empty: create parts, chapters or scenes in the story outline first.",
+    "level": "Structure level",
+    "lane": "In the plot",
+    "skip": "Skip items already linked to an event",
+    "count_one": "{{count}} event will be created.",
+    "count_other": "{{count}} events will be created.",
+    "confirm": "Create ({{count}})",
+    "done_one": "{{count}} event created.",
+    "done_other": "{{count}} events created."
+  },
+  "toasts": {
+    "eventDeleted": "Event “{{name}}” deleted.",
+    "linkDeleted": "Link deleted.",
+    "laneDeleted": "Plot “{{name}}” deleted.",
+    "laneDuplicated": "Plot duplicated.",
+    "laneHidden": "Plot hidden. Use “Display” to show it again."
+  },
+  "sidebar": {
+    "title": "Plots",
+    "hidden": "Plot hidden on the board",
+    "summary": "{{events}} event(s), {{links}} link(s)"
+  },
+  "inStory": {
+    "title": "In the plot",
+    "description": {
+      "character": "Events where {{name}} appears or carries the point of view.",
+      "location": "Events that take place at {{name}}.",
+      "node": "Events told in “{{name}}”."
+    },
+    "empty": {
+      "character": "This character does not appear in any plot event yet.",
+      "location": "No plot event takes place here yet.",
+      "node": "No plot event is told here yet."
+    },
+    "openBoard": "Open the plot board",
+    "read": "Read",
+    "pov": "POV"
+  },
+  "settings": {
+    "colors": "Plot colours",
+    "colorsHint": "Each plot's colour on the board, in the reading and on the sheets. New plots get a free colour automatically.",
+    "colorOf": "Colour of “{{name}}”"
+  },
+  "scene": {
+    "showOnBoard": "Show on the board",
+    "retold": "Told again here",
+    "retoldTitle": "Told again here (memory, other point of view…)",
+    "up": "Move “{{title}}” earlier in the scene",
+    "down": "Move “{{title}}” later in the scene",
+    "upHint": "Earlier in the scene (reading order)",
+    "downHint": "Later in the scene (reading order)",
+    "unlink": "Remove “{{title}}” from this scene",
+    "unlinkHint": "Remove from this scene (the event stays in the plot)",
+    "preferScenes": "This item contains scenes: link events to the scenes instead for a more precise reading order.",
+    "addNew": "Add an event to this scene",
+    "linkExisting": "Link an existing event",
+    "noLane": "Create a plot on the board first.",
+    "newPlaceholder": "What happens (title)",
+    "newTitle": "New event title",
+    "lane": "Plot",
+    "create": "Add",
+    "pick": "Choose an event…",
+    "alreadyPlaced": "already in another scene",
+    "asRetold": "Told again here",
+    "asRetoldHint": "The event keeps its main scene (which sets its place in the reading) and also appears here.",
+    "link": "Link"
+  },
+  "plan": {
+    "events_one": "{{count}} plot event told here",
+    "events_other": "{{count}} plot events told here",
+    "noEvents": "no event",
+    "noEventsHint": "No plot event is told in this scene (scene sheet › In the plot)."
+  }
+}

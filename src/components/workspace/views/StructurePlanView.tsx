@@ -52,7 +52,9 @@ import {
 } from "@/lib/structure";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
 import { cn } from "@/lib/utils";
+import { useProjectPlot } from "@/stores/plotStore";
 import type { Project, StructureNode, StructureTemplateId } from "@/types";
+import { errorText } from "@/lib/errors";
 
 const fieldClass =
   "w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
@@ -98,6 +100,12 @@ interface Draft {
  */
 export function StructurePlanView({ project, feature, onOpenFeature }: StructurePlanViewProps) {
   const { t } = useTranslation(["structure", "common"]);
+  const { t: tp } = useTranslation("plot");
+  // Événements de la trame racontés dans chaque élément (repère dans le plan).
+  const { data: plot } = useProjectPlot(project.id);
+  const plotCounts = new Map<string, number>();
+  for (const event of plot?.events ?? []) if (event.nodeId) plotCounts.set(event.nodeId, (plotCounts.get(event.nodeId) ?? 0) + 1);
+  const usesPlot = plotCounts.size > 0;
 
   const structure = useStructureStore((state) =>
     state.projectId === project.id ? state.structure : null,
@@ -147,7 +155,7 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
       await load();
       return result;
     } catch (e) {
-      setActionError(e instanceof Error ? e.message : String(e));
+      setActionError(errorText(e));
       return null;
     } finally {
       setBusy(false);
@@ -190,7 +198,7 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
 
       return saved.id === draft.id;
     } catch (e) {
-      setDraftError(e instanceof Error ? e.message : String(e));
+      setDraftError(errorText(e));
       return false;
     }
   }
@@ -587,6 +595,17 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
                   )}
 
                   <span className="ml-auto flex shrink-0 items-center gap-0.5">
+                    {plotCounts.get(node.id) ? (
+                      <span className="mr-2 inline-flex items-center gap-1 text-xs text-muted-foreground" title={tp("plan.events", { count: plotCounts.get(node.id) })}>
+                        <span className="size-1.5 rounded-full bg-primary" aria-hidden="true" />
+                        {plotCounts.get(node.id)}
+                      </span>
+                    ) : usesPlot && node.children.length === 0 ? (
+                      <span className="mr-2 inline-flex items-center gap-1 text-xs text-amber-700 dark:text-amber-400" title={tp("plan.noEventsHint")}>
+                        <span className="size-1.5 rounded-full bg-amber-500" aria-hidden="true" />
+                        {tp("plan.noEvents")}
+                      </span>
+                    ) : null}
                     {node.descendants > 0 && (
                       <span className="mr-2 text-xs text-muted-foreground">
                         {t("plan.contains", { count: node.descendants })}

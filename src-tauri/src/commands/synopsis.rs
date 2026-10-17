@@ -18,9 +18,7 @@ pub async fn get_synopsis(
     state: State<'_, AppState>,
     project_id: String,
 ) -> AppResult<Synopsis> {
-    let user = state.require_user().await?;
-    let project_pool =
-        project_storage::pool_for_user(&state, &project_id, &user.id).await?;
+    let project_pool = project_storage::pool_for_request(&state, &project_id).await?;
 
     synopsis_service::get_synopsis(&project_pool).await
 }
@@ -42,9 +40,7 @@ pub async fn update_synopsis(
     project_id: String,
     input: UpdateSynopsisInput,
 ) -> AppResult<Synopsis> {
-    let user = state.require_user().await?;
-    let project_pool =
-        project_storage::pool_for_user(&state, &project_id, &user.id).await?;
+    let project_pool = project_storage::pool_for_request(&state, &project_id).await?;
 
     history::snapshot_before(&project_pool, "synopsis", "default").await;
     let saved = synopsis_service::update_synopsis(

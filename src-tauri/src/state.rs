@@ -14,6 +14,38 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
+/// Personne qui utilise l'application à cet instant.
+///
+/// Sert à l'accès aux projets : un invité (aucune connexion) n'atteint que
+/// les projets publics ; un compte connecté atteint ses projets privés et
+/// les projets publics.
+#[derive(Clone)]
+pub enum Viewer {
+    /// Personne n'est connecté.
+    Guest,
+
+    /// Un compte est connecté, avec la clé de son compte.
+    Account { user_id: String, key: SecretKey },
+}
+
+impl Viewer {
+    /// Identifiant du compte connecté, `None` pour un invité.
+    pub fn user_id(&self) -> Option<&str> {
+        match self {
+            Viewer::Guest => None,
+            Viewer::Account { user_id, .. } => Some(user_id),
+        }
+    }
+
+    /// Clé du compte connecté, `None` pour un invité.
+    pub fn account_key(&self) -> Option<&SecretKey> {
+        match self {
+            Viewer::Guest => None,
+            Viewer::Account { key, .. } => Some(key),
+        }
+    }
+}
+
 /// État global de l'application, accessible depuis toutes
 /// les commandes Tauri.
 pub struct AppState {
@@ -120,6 +152,18 @@ impl AppState {
         let key = self.require_account_key().await?;
 
         Ok((user, key))
+    }
+
+    /// Personne qui utilise l'application : compte connecté (avec sa clé)
+    /// ou invité. N'échoue jamais : sans session, c'est un invité.
+    pub async fn viewer(&self) -> Viewer {
+        let user = self.current_user().await;
+        let key = self.account_key.lock().await.clone();
+
+        match (user, key) {
+            (Some(user), Some(key)) => Viewer::Account { user_id: user.id, key },
+            _ => Viewer::Guest,
+        }
     }
 
     /// Remplace l'utilisateur de la session par sa version relue en base,

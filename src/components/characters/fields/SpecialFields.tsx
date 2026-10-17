@@ -15,6 +15,7 @@ import { buildStructureTree, flattenVisible } from "@/lib/structure";
 import { cn } from "@/lib/utils";
 import { useCharacterStore } from "@/stores/characterStore";
 import type { CharacterListKey } from "@/types";
+import { errorText } from "@/lib/errors";
 
 // ----------------------------------------------------------------------------
 // Libellé d'une valeur de liste
@@ -101,7 +102,7 @@ export function ChoiceField({
       setAdding(false);
       setNewValue("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
     } finally {
       setBusy(false);
     }

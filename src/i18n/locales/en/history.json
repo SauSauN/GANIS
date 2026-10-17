@@ -18,11 +18,13 @@
     "character": "Character",
     "location": "Location",
     "structureNode": "Structure item",
+    "document": "Document",
     "note": "Note",
     "noteFolder": "Note folder",
     "sticky": "Sticky note",
     "relation": "Relationship",
     "placeLink": "Character – location link",
-    "synopsis": "Synopsis"
+    "synopsis": "Synopsis",
+    "plot": "Plot"
   }
 }

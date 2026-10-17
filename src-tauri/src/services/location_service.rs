@@ -29,7 +29,7 @@
 //! Supprimer un lieu fait remonter ses lieux contenus d'un niveau.
 
 use crate::error::{AppError, AppResult};
-use crate::services::character_service::{decode_image, Portrait};
+use crate::services::character_service::{decode_image, DetailLevel, Portrait};
 use crate::utils::{new_id, now_utc};
 use base64::engine::general_purpose::STANDARD as BASE64;
 use base64::Engine;
@@ -225,6 +225,8 @@ pub struct CustomTypeInput {
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct LocationSettings {
+    /// Niveau de détail des fiches (`None` : pas encore choisi).
+    pub detail_level: Option<DetailLevel>,
     pub custom_types: Vec<CustomType>,
     /// Listes personnalisées. Une liste absente : valeurs par défaut.
     pub lists: BTreeMap<String, Vec<String>>,
@@ -494,14 +496,16 @@ async fn clean_input(
 
 /// Réglages des lieux du projet.
 pub async fn get_settings(pool: &SqlitePool) -> AppResult<LocationSettings> {
-    let row: Option<(String, String)> =
-        sqlx::query_as("SELECT custom_types, lists FROM location_settings WHERE id = 'default'")
-            .fetch_optional(pool)
-            .await?;
+    let row: Option<(Option<String>, String, String)> = sqlx::query_as(
+        "SELECT detail_level, custom_types, lists FROM location_settings WHERE id = 'default'",
+    )
+    .fetch_optional(pool)
+    .await?;
 
-    let (custom_types, lists) = row.unwrap_or_else(|| ("[]".to_owned(), "{}".to_owned()));
+    let (level, custom_types, lists) = row.unwrap_or_else(|| (None, "[]".to_owned(), "{}".to_owned()));
 
     Ok(LocationSettings {
+        detail_level: level.as_deref().and_then(DetailLevel::parse),
         custom_types: serde_json::from_str(&custom_types).unwrap_or_default(),
         lists: serde_json::from_str(&lists).unwrap_or_default(),
     })
@@ -520,6 +524,24 @@ async fn save_settings(pool: &SqlitePool, settings: &LocationSettings) -> AppRes
     .await?;
 
     Ok(())
+}
+
+/// Choisit le niveau de détail de toutes les fiches de lieux du projet.
+pub async fn set_detail_level(pool: &SqlitePool, level: &str) -> AppResult<LocationSettings> {
+    let level = DetailLevel::parse(level)
+        .ok_or_else(|| AppError::validation("Niveau de détail inconnu.").with_key("location.invalidLevel"))?;
+
+    sqlx::query(
+        "INSERT INTO location_settings (id, detail_level, custom_types, lists, updated_at) \
+         VALUES ('default', ?, '[]', '{}', ?) \
+         ON CONFLICT (id) DO UPDATE SET detail_level = excluded.detail_level, updated_at = excluded.updated_at",
+    )
+    .bind(level.as_str())
+    .bind(now_utc())
+    .execute(pool)
+    .await?;
+
+    get_settings(pool).await
 }
 
 /// Remplace les types ajoutés par l'auteur.
@@ -1095,6 +1117,21 @@ mod tests {
         }
 
         assert!(catalog.statuses.iter().any(|status| status == DEFAULT_STATUS));
+    }
+
+    #[tokio::test]
+    async fn detail_level_is_a_project_setting() {
+        let pool = pool().await;
+
+        assert_eq!(get_settings(&pool).await.unwrap().detail_level, None);
+
+        let settings = set_detail_level(&pool, "intermediate").await.unwrap();
+        assert_eq!(settings.detail_level, Some(DetailLevel::Intermediate));
+        assert!(set_detail_level(&pool, "expert").await.is_err());
+
+        // Les autres réglages ne l'effacent pas.
+        let settings = set_list(&pool, "status", Some(&["Intact".to_owned()])).await.unwrap();
+        assert_eq!(settings.detail_level, Some(DetailLevel::Intermediate));
     }
 
     #[tokio::test]

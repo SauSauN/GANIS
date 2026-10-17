@@ -77,6 +77,9 @@ pub fn run() {
             // -----------------------------------------------------------------
             // Imports .ganix et exports interrompus par un arrêt brutal.
             services::ganix_service::clean_leftovers(&data_dir);
+            // Copies de documents ouvertes dans une autre application lors
+            // d'une séance précédente (non chiffrées) : supprimées.
+            services::document_service::clean_open_copies(&data_dir);
 
             let state = AppState::new(app_db, data_dir);
 
@@ -107,6 +110,7 @@ pub fn run() {
             commands::projects::get_project,
             commands::projects::open_project,
             commands::projects::update_project,
+            commands::projects::set_project_visibility,
             commands::projects::duplicate_project,
             commands::projects::delete_project,
             commands::ganix::export_project,
@@ -140,6 +144,7 @@ pub fn run() {
             commands::locations::get_location_settings,
             commands::locations::set_location_custom_types,
             commands::locations::set_location_list,
+            commands::locations::set_location_detail_level,
             commands::locations::get_location_portrait,
             commands::locations::set_location_portrait,
             commands::locations::remove_location_portrait,
@@ -170,6 +175,9 @@ pub fn run() {
             commands::notes::update_note,
             commands::notes::move_note,
             commands::notes::delete_note,
+            commands::notes::get_system_notes,
+            commands::notes::set_system_notes,
+            commands::notes::sync_system_notes,
             commands::notes::list_sticky_notes,
             commands::notes::create_sticky_note,
             commands::notes::update_sticky_note,
@@ -196,6 +204,28 @@ pub fn run() {
             commands::structure::update_structure_node,
             commands::structure::move_structure_node,
             commands::structure::delete_structure_node,
+            commands::plot::get_plot,
+            commands::plot::update_plot,
+            commands::documents::list_structure_documents,
+            commands::documents::count_structure_documents,
+            commands::documents::get_structure_document_content,
+            commands::documents::pick_structure_documents,
+            commands::documents::add_structure_document,
+            commands::documents::update_structure_document_content,
+            commands::documents::pick_structure_document_replacement,
+            commands::documents::rename_structure_document,
+            commands::documents::update_structure_document_note,
+            commands::documents::move_structure_document,
+            commands::documents::reorder_structure_documents,
+            commands::documents::delete_structure_document,
+            commands::documents::save_structure_document_as,
+            commands::documents::list_document_versions,
+            commands::documents::get_document_version_content,
+            commands::documents::restore_document_version,
+            commands::documents::delete_document_version,
+            commands::documents::open_structure_document_externally,
+            commands::documents::sync_structure_document_external,
+            commands::documents::close_structure_document_external,
             commands::packages::become_developer,
             commands::packages::leave_developer_mode,
             commands::packages::list_my_packages,

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Activity, ChevronLeft, ChevronRight, Flame, RefreshCw, TrendingDown, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import {
   buildYear,
@@ -16,6 +16,7 @@ import {
   type Level,
 } from "@/lib/workCalendar";
 import type { Project, WorkCalendar } from "@/types";
+import { errorText } from "@/lib/errors";
 
 /** Teinte unique (primaire), du plus clair au plus foncé ; 0 = case vide. */
 const LEVEL_STYLE: Record<Level, string> = {
@@ -74,7 +75,7 @@ export function WorkCalendarCard({ projects, expanded = false }: WorkCalendarCar
     try {
       setCalendar(await api.getWorkCalendar(target));
     } catch (cause) {
-      setError(cause instanceof ApiError ? cause.message : String(cause));
+      setError(errorText(cause));
     }
   }
 
@@ -335,8 +336,9 @@ export function WorkCalendarCard({ projects, expanded = false }: WorkCalendarCar
             </div>
           )}
 
-          {/* Détail du rythme : replié par défaut (fonctions secondaires). */}
-          <details className="group/details border-t pt-3" open={expanded || undefined}>
+          {/* Détail du rythme : replié par défaut, y compris sur la page
+              « Rythme de travail » ; un clic sur l'en-tête l'ouvre ou le referme. */}
+          <details className="group/details border-t pt-3">
             <summary className="flex h-8 cursor-pointer list-none items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden">
               <ChevronRight aria-hidden className="size-4 transition-transform group-open/details:rotate-90" />
               {summary.rhythm !== "none" && (

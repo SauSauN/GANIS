@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { ApiError } from "@/lib/api";
+import { errorText } from "@/lib/errors";
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -32,7 +32,7 @@ export function ConfirmDialog({ open, title, description, confirmLabel, onCancel
     try {
       await onConfirm();
     } catch (cause) {
-      setError(cause instanceof ApiError ? cause.message : String(cause));
+      setError(errorText(cause));
     } finally {
       setBusy(false);
     }

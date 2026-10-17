@@ -53,5 +53,12 @@
     "description": "The project “{{name}}” will be permanently deleted. This action cannot be undone.",
     "confirm": "Delete",
     "deleting": "Deleting…"
+  },
+  "guest": {
+    "title": "Welcome"
+  },
+  "space": {
+    "private": "Private space",
+    "public": "Public space"
   }
 }

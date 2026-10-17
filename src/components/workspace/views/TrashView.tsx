@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import {
   Folder,
   ListTree,
+  Paperclip,
   MapPin,
   MapPinned,
   Network,
@@ -29,6 +30,7 @@ const KIND_ICONS: Record<TrashKind, LucideIcon> = {
   character: UserRound,
   location: MapPinned,
   structureNode: ListTree,
+  document: Paperclip,
   note: NotebookText,
   noteFolder: Folder,
   sticky: StickyNote,

@@ -6,7 +6,9 @@ import { PendingGallery, type PendingImage } from "@/components/characters/field
 import { LocationSheet } from "@/components/locations/LocationSheet";
 import { LocationTypePicker } from "@/components/locations/LocationTypePicker";
 import { useLocationLabels } from "@/components/locations/useLocationLabels";
-import { PageShell } from "@/components/workspace/views/PageShell";
+import { LevelPicker } from "@/components/characters/LevelPicker";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { cardClass, cardContentClass, cardFooterClass, cardHeaderClass, PageShell } from "@/components/workspace/views/PageShell";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { api } from "@/lib/api";
 import {
@@ -22,6 +24,8 @@ import {
 import { GALLERY_MAX_SIDE, PortraitError, preparePortrait } from "@/lib/portraitImage";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
 import { useLocationStore, useProjectLocations } from "@/stores/locationStore";
+import type { CharacterDetailLevel } from "@/types";
+import { errorText } from "@/lib/errors";
 
 interface LocationCreateViewProps {
   projectId: string;
@@ -60,6 +64,21 @@ export function LocationCreateView({ projectId, feature, onOpenFeature }: Locati
   const [gallery, setGallery] = useState<PendingImage[]>([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const setDetailLevel = useLocationStore((state) => state.setDetailLevel);
+  const [pickedLevel, setPickedLevel] = useState<CharacterDetailLevel>("basic");
+  const [levelSaving, setLevelSaving] = useState(false);
+
+  async function confirmLevel() {
+    setLevelSaving(true);
+    setError(null);
+    try {
+      await setDetailLevel(projectId, pickedLevel);
+    } catch (e) {
+      setError(errorText(e));
+    } finally {
+      setLevelSaving(false);
+    }
+  }
 
   // Préréglage demandé (« Ajouter un lieu ici ») : appliqué puis oublié.
   useEffect(() => {
@@ -113,7 +132,7 @@ export function LocationCreateView({ projectId, feature, onOpenFeature }: Locati
         }
       } catch (e) {
         imageFailure = t("create.imagesFailed", {
-          message: e instanceof Error ? e.message : String(e),
+          message: errorText(e),
         });
       }
 
@@ -126,7 +145,7 @@ export function LocationCreateView({ projectId, feature, onOpenFeature }: Locati
       onOpenFeature(locationTabId(created.id));
       return true;
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
       return false;
     } finally {
       setSaving(false);
@@ -182,6 +201,37 @@ export function LocationCreateView({ projectId, feature, onOpenFeature }: Locati
             {t("list.loading")}
           </p>
         )}
+      </PageShell>
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // 0. Premier lieu : choix du niveau de détail (comme les personnages)
+  // ---------------------------------------------------------------------------
+
+  if (!settings.detailLevel) {
+    return (
+      <PageShell title={feature.label}>
+        <Card className={cardClass}>
+          <CardHeader className={cardHeaderClass}>
+            <CardTitle>{t("levels.title")}</CardTitle>
+            <CardDescription>{t("levels.firstTime")}</CardDescription>
+          </CardHeader>
+          <CardContent className={cardContentClass}>
+            <LevelPicker namespace="locations" value={pickedLevel} onChange={setPickedLevel} disabled={levelSaving} />
+          </CardContent>
+          <CardFooter className={`${cardFooterClass} gap-4`}>
+            <Button onClick={() => void confirmLevel()} disabled={levelSaving}>
+              {levelSaving && <Loader2 className="animate-spin" />}
+              {t("levels.continue")}
+            </Button>
+            {error && (
+              <p role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            )}
+          </CardFooter>
+        </Card>
       </PageShell>
     );
   }

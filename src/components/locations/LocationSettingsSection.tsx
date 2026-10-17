@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { LevelPicker } from "@/components/characters/LevelPicker";
 import { CATEGORY_ICONS, categoryTint } from "@/components/locations/locationStyle";
 import { useLocationLabels } from "@/components/locations/useLocationLabels";
 import {
@@ -21,6 +22,8 @@ import {
 import { LOCATION_CATEGORIES, statusValues, type LocationCategory } from "@/lib/locations";
 import { cn } from "@/lib/utils";
 import { useLocationStore, useProjectLocations } from "@/stores/locationStore";
+import type { CharacterDetailLevel } from "@/types";
+import { errorText } from "@/lib/errors";
 
 /**
  * Paramètres du projet › Lieux : types ajoutés par l'auteur (chacun dans
@@ -39,6 +42,22 @@ export function LocationSettingsSection({ projectId }: { projectId: string }) {
   const [error, setError] = useState<string | null>(null);
 
   const types = settings.customTypes;
+  const setDetailLevel = useLocationStore((state) => state.setDetailLevel);
+  const [levelPending, setLevelPending] = useState<CharacterDetailLevel | null>(null);
+  const [levelFeedback, setLevelFeedback] = useState<"saved" | "failed" | null>(null);
+
+  async function chooseLevel(level: CharacterDetailLevel) {
+    setLevelPending(level);
+    setLevelFeedback(null);
+    try {
+      await setDetailLevel(projectId, level);
+      setLevelFeedback("saved");
+    } catch {
+      setLevelFeedback("failed");
+    } finally {
+      setLevelPending(null);
+    }
+  }
 
   async function save(next: typeof types | Array<{ name: string; category: string; id?: string }>) {
     setBusy(true);
@@ -48,7 +67,7 @@ export function LocationSettingsSection({ projectId }: { projectId: string }) {
       await setCustomTypes(projectId, next);
       return true;
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
       return false;
     } finally {
       setBusy(false);
@@ -66,6 +85,27 @@ export function LocationSettingsSection({ projectId }: { projectId: string }) {
 
   return (
     <div className="space-y-8">
+      <Card className={cardClass}>
+        <CardHeader className={cardHeaderClass}>
+          <CardTitle>{t("settings.level.title")}</CardTitle>
+          <CardDescription>{t("settings.level.description")}</CardDescription>
+        </CardHeader>
+
+        <CardContent className={`${cardContentClass} space-y-4`}>
+          <LevelPicker
+            namespace="locations"
+            value={levelPending ?? settings.detailLevel}
+            onChange={(level) => void chooseLevel(level)}
+            disabled={!loaded || levelPending !== null}
+          />
+          {levelFeedback && (
+            <p role={levelFeedback === "failed" ? "alert" : "status"} className={levelFeedback === "failed" ? "text-sm text-destructive" : "text-sm text-success"}>
+              {t(`settings.level.${levelFeedback}`)}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
           <CardTitle>{t("settings.types.title")}</CardTitle>
@@ -181,7 +221,7 @@ function StatusListCard({ projectId }: { projectId: string }) {
       await setStatusList(projectId, next);
       return true;
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
       return false;
     } finally {
       setBusy(false);

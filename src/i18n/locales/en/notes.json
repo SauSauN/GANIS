@@ -13,7 +13,7 @@
   },
   "editor": {
     "toolbar": "Note formatting",
-    "placeholder": "Write your note…",
+    "placeholder": "Write your note… (type “$$” to mention a character, location or structure item)",
     "undo": "Undo (Ctrl+Z)",
     "redo": "Redo (Ctrl+Y)",
     "block": {
@@ -176,5 +176,26 @@
     "count_one": "{{count}} sticky note",
     "count_other": "{{count}} sticky notes",
     "retry": "Retry"
+  },
+  "mentions": {
+    "label": "Project items",
+    "open": "Open “{{name}}”",
+    "missing": "This item no longer exists",
+    "kinds": {
+      "character": "Character",
+      "location": "Location",
+      "node": "Structure"
+    }
+  },
+  "spell": {
+    "menu": "Spelling",
+    "loading": "Looking for suggestions…",
+    "none": "No suggestions",
+    "add": "Add to dictionary",
+    "ignore": "Ignore"
+  },
+  "system": {
+    "banner": "System note: it mirrors the sheet. Headings are fixed; text written under a heading is saved to the sheet, as plain text.",
+    "folder": "System folder"
   }
 }

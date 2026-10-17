@@ -6,7 +6,7 @@
     },
     "status": {
       "label": "Statut et organisation",
-      "description": "Avancement du projet, favori et archivage."
+      "description": "Avancement, favori, archivage et visibilité."
     },
     "danger": {
       "label": "Export, duplication et suppression",
@@ -18,11 +18,19 @@
     },
     "locations": {
       "label": "Lieux",
-      "description": "Types de lieux personnalisés et statuts."
+      "description": "Niveau de détail des fiches, types de lieux personnalisés et statuts."
     },
     "structure": {
       "label": "Découpage",
       "description": "Niveaux du plan, leurs noms et leur numérotation."
+    },
+    "plot": {
+      "label": "Trame",
+      "description": "Couleur de chaque trame du plateau."
+    },
+    "notes": {
+      "label": "Notes",
+      "description": "Notes système : les descriptions des fiches, modifiables depuis les notes."
     }
   },
   "info": {
@@ -70,6 +78,33 @@
       "add": "Ajouter",
       "remove": "Retirer « {{value}} »",
       "reset": "Valeurs par défaut"
+    }
+  },
+  "notes": {
+    "title": "Notes système",
+    "description": "Crée un dossier « Notes système » dans les notes : la description et les notes de l'auteur de chaque personnage et lieu, et le résumé de chaque élément du découpage, s'y lisent et s'y modifient comme des notes.",
+    "toggle": "Créer les notes système",
+    "toggleHint": "Désactivé par défaut. Désactiver retire le dossier ; rien n'est perdu, le texte reste dans les fiches.",
+    "rule1": "Une note par élément, rangée par sorte (Personnages, Lieux, Découpage). Elle suit les fiches : nouveaux éléments, noms et textes à jour.",
+    "rule2": "Les grands titres (#) sont fixes. Le texte écrit sous un titre est enregistré dans le champ correspondant de la fiche.",
+    "rule3": "Ces notes et leur dossier ne se suppriment, ne se renomment et ne se déplacent pas à la main. La mise en forme (gras, listes…) n'est pas gardée : les fiches sont en texte simple.",
+    "enabledDone": "Notes système créées : ouvrez Notes › « Notes système ».",
+    "disabledDone": "Notes système retirées. Le texte reste dans les fiches."
+  },
+  "visibility": {
+    "title": "Visibilité",
+    "makePublic": "Rendre public",
+    "makePrivate": "Rendre privé",
+    "confirmTitle": "Rendre ce projet public ?",
+    "confirmDescription": "Il quittera votre espace privé et pourra être ouvert sans connexion par toute personne utilisant GANIS sur cet ordinateur.",
+    "failed": "Changement de visibilité impossible.",
+    "signIn": {
+      "title": "Connexion requise",
+      "description": "Connectez-vous pour rendre ce projet privé.",
+      "submit": "Se connecter et rendre privé",
+      "submitting": "Connexion…",
+      "createAccount": "Créer un compte",
+      "setupFirst": "Créer le premier compte"
     }
   }
 }

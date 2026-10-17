@@ -5,7 +5,7 @@
 
 use crate::db::init_app_db;
 use crate::db::project_db::{self, open_db, DB_FILE};
-use crate::models::project::ProjectType;
+use crate::models::project::{ProjectType, ProjectVisibility};
 use crate::models::user::Role;
 use crate::services::{auth_service, keyring_service, project_service, project_storage};
 use crate::state::AppState;
@@ -314,7 +314,8 @@ async fn duplicated_project_has_its_own_key() {
         project_service::duplicate_project(&env.state.app_db, &id, &user.id, &key)
             .await
             .unwrap();
-    project_storage::duplicate_storage(&env.state, &id, &copy.id, &user.id, &copy_key)
+    let viewer = env.state.viewer().await;
+    project_storage::duplicate_storage(&env.state, &id, &copy.id, &viewer, &copy_key)
         .await
         .unwrap();
 
@@ -660,4 +661,141 @@ fn interrupted_replacement_is_undone_at_startup() {
     assert!(!projects.join(format!("{id}.import")).exists());
 
     std::fs::remove_dir_all(dir).unwrap();
+}
+// ----------------------------------------------------------------------------
+// Projets publics (créés sans connexion)
+// ----------------------------------------------------------------------------
+
+/// Crée un projet public (sans connexion) et écrit un texte dans son synopsis.
+async fn create_public_project_with_text(env: &TestEnv, name: &str, text: &str) -> String {
+    let (project, project_key) = project_service::create_public_project(
+        &env.state.app_db,
+        name,
+        "Projet ouvert",
+        ProjectType::Manga,
+    )
+    .await
+    .unwrap();
+
+    project_storage::create_storage(&env.state, &project.id, &project_key)
+        .await
+        .unwrap();
+
+    let pool = project_storage::pool_for_request(&env.state, &project.id).await.unwrap();
+
+    sqlx::query("UPDATE synopsis SET content = ? WHERE id = 'default'")
+        .bind(text)
+        .execute(&pool)
+        .await
+        .unwrap();
+
+    project.id
+}
+
+async fn read_text_as_viewer(env: &TestEnv, project_id: &str) -> Option<String> {
+    let pool = project_storage::pool_for_request(&env.state, project_id).await.ok()?;
+
+    sqlx::query_scalar("SELECT content FROM synopsis WHERE id = 'default'")
+        .fetch_one(&pool)
+        .await
+        .ok()
+}
+
+#[tokio::test]
+async fn guest_creates_and_reopens_a_public_project_without_account() {
+    let env = env().await;
+
+    // Aucun compte n'existe : un invité crée un projet.
+    let id = create_public_project_with_text(&env, "Projet libre", "Chapitre un").await;
+
+    // Fermeture des connexions (comme au redémarrage) puis réouverture.
+    env.state.close_project_pools().await;
+    assert_eq!(read_text_as_viewer(&env, &id).await.as_deref(), Some("Chapitre un"));
+
+    let viewer = env.state.viewer().await;
+    let listed = project_service::list_for_viewer(&env.state.app_db, &viewer).await.unwrap();
+    assert_eq!(listed.len(), 1);
+    assert_eq!(listed[0].name, "Projet libre");
+    assert!(listed[0].is_public());
+
+    // Renommage par l'invité : le nom reste en clair.
+    let renamed = project_service::update_for_viewer(
+        &env.state.app_db, &id, &viewer, Some("Projet renommé"), None, None, None, Some(true), None,
+    )
+    .await
+    .unwrap();
+    assert_eq!(renamed.name, "Projet renommé");
+    assert!(renamed.is_favorite);
+}
+
+#[tokio::test]
+async fn private_projects_stay_hidden_from_guests_and_public_ones_are_shared() {
+    let env = env().await;
+    register_alice(&env).await;
+
+    let public_id = create_public_project_with_text(&env, "Commun", "Texte public").await;
+
+    login(&env, "alice", "motdepasse1").await;
+    let private_id = create_project_with_text(&env, "Secret d'Alice", "Texte privé").await;
+
+    // Connectée : Alice voit son projet privé et le projet public.
+    let viewer = env.state.viewer().await;
+    let mut names: Vec<String> = project_service::list_for_viewer(&env.state.app_db, &viewer)
+        .await
+        .unwrap()
+        .into_iter()
+        .map(|p| p.name)
+        .collect();
+    names.sort();
+    assert_eq!(names, vec!["Commun".to_owned(), "Secret d'Alice".to_owned()]);
+    assert_eq!(read_text_as_viewer(&env, &public_id).await.as_deref(), Some("Texte public"));
+
+    auth_service::logout_user(&env.state).await.unwrap();
+
+    // Invité : seulement le projet public, le privé est introuvable.
+    let guest = env.state.viewer().await;
+    let listed = project_service::list_for_viewer(&env.state.app_db, &guest).await.unwrap();
+    assert_eq!(listed.len(), 1);
+    assert_eq!(listed[0].id, public_id);
+    assert!(read_text_as_viewer(&env, &private_id).await.is_none());
+    assert!(project_service::delete_for_viewer(&env.state.app_db, &private_id, &guest).await.is_err());
+
+    // Le projet privé reste chiffré sur le disque.
+    assert!(!file_contains(&db_path(&env, &private_id), "Texte privé"));
+    assert!(!app_db_contains(&env, "Secret d'Alice"));
+}
+
+#[tokio::test]
+async fn public_project_can_become_private_and_back() {
+    let env = env().await;
+    register_alice(&env).await;
+
+    let id = create_public_project_with_text(&env, "À adopter", "Contenu conservé").await;
+
+    login(&env, "alice", "motdepasse1").await;
+    let (user, key) = env.state.require_session().await.unwrap();
+
+    // Public → privé : rattaché à Alice, nom chiffré, données intactes.
+    let private = project_service::set_visibility(
+        &env.state.app_db, &id, &user.id, &key, ProjectVisibility::Private,
+    )
+    .await
+    .unwrap();
+    assert!(!private.is_public());
+    assert_eq!(private.name, "À adopter");
+    env.state.close_project_pools().await;
+    assert_eq!(read_text(&env, &id).await, "Contenu conservé");
+
+    auth_service::logout_user(&env.state).await.unwrap();
+    assert!(read_text_as_viewer(&env, &id).await.is_none());
+
+    // Privé → public : de nouveau ouvrable sans connexion.
+    login(&env, "alice", "motdepasse1").await;
+    let (user, key) = env.state.require_session().await.unwrap();
+    project_service::set_visibility(&env.state.app_db, &id, &user.id, &key, ProjectVisibility::Public)
+        .await
+        .unwrap();
+    auth_service::logout_user(&env.state).await.unwrap();
+
+    assert_eq!(read_text_as_viewer(&env, &id).await.as_deref(), Some("Contenu conservé"));
 }

@@ -18,11 +18,13 @@
     "character": "Personnage",
     "location": "Lieu",
     "structureNode": "Élément du découpage",
+    "document": "Document",
     "note": "Note",
     "noteFolder": "Dossier de notes",
     "sticky": "Post-it",
     "relation": "Relation",
     "placeLink": "Lien personnage – lieu",
-    "synopsis": "Synopsis"
+    "synopsis": "Synopsis",
+    "plot": "Trame"
   }
 }

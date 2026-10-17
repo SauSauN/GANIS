@@ -6,8 +6,10 @@
 //!
 //! Ce module est le seul à ouvrir ces bases. Il garantit :
 //!
-//! - qu'un projet n'est ouvert que par son propriétaire, connecté (sa clé
-//!   de compte est nécessaire pour ouvrir la clé du projet) ;
+//! - qu'un projet privé n'est ouvert que par son propriétaire, connecté (sa
+//!   clé de compte est nécessaire pour ouvrir la clé du projet) ;
+//! - qu'un projet public s'ouvre sans connexion (sa clé est conservée en
+//!   clair, voir `project_service`) ;
 //! - qu'une seule connexion (pool) existe par projet, partagée entre les
 //!   commandes, même lorsque plusieurs arrivent en même temps ;
 //! - qu'une base disparue est signalée par une erreur claire, au lieu
@@ -21,7 +23,7 @@ use crate::error::{AppError, AppResult};
 use crate::models::project::Project;
 use crate::security::crypto::SecretKey;
 use crate::services::project_service;
-use crate::state::AppState;
+use crate::state::{AppState, Viewer};
 use sqlx::SqlitePool;
 use std::path::{Path, PathBuf};
 use uuid::Uuid;
@@ -187,6 +189,50 @@ fn finish_interrupted_encryption(dir: &Path, key_saved: bool) -> AppResult<()> {
 // Ouverture
 // ----------------------------------------------------------------------------
 
+/// Connexion à la base d'un projet pour la personne qui utilise
+/// l'application : projet public (même sans connexion), ou projet privé du
+/// compte connecté.
+///
+/// C'est le point d'entrée des commandes qui travaillent dans un projet.
+pub async fn pool_for_request(state: &AppState, project_id: &str) -> AppResult<SqlitePool> {
+    let viewer = state.viewer().await;
+
+    pool_for_viewer(state, project_id, &viewer).await
+}
+
+/// Connexion à la base d'un projet accessible au visiteur.
+///
+/// Un projet inexistant ou inaccessible donne la même erreur `NotFound`.
+pub async fn pool_for_viewer(
+    state: &AppState,
+    project_id: &str,
+    viewer: &Viewer,
+) -> AppResult<SqlitePool> {
+    let project = project_service::find_stored_for_viewer(&state.app_db, project_id, viewer)
+        .await?
+        .ok_or_else(not_found)?;
+
+    // Projet privé : chemin habituel (propriété, chiffrement d'un ancien
+    // projet, clé enfermée par la clé du compte).
+    if !project.is_public() {
+        let owner_id = viewer.user_id().ok_or_else(not_found)?;
+        return pool_for_user(state, project_id, owner_id).await;
+    }
+
+    let mut pools = state.project_pools.lock().await;
+
+    if let Some(pool) = pools.get(&project.id) {
+        return Ok(pool.clone());
+    }
+
+    let project_key = project_service::project_key_for_viewer(&project, viewer)?;
+    let pool = open_with_key(state, &project.id, &project_key).await?;
+
+    pools.insert(project.id.clone(), pool.clone());
+
+    Ok(pool)
+}
+
 /// Retourne la connexion à la base d'un projet, après avoir vérifié que
 /// le projet appartient à l'utilisateur connecté.
 ///
@@ -244,21 +290,31 @@ async fn open_storage(
         .ok_or_else(|| AppError::internal("Projet sans clé"))?;
 
     let project_key = project_service::unwrap_project_key(account_key, &project.id, wrapped)?;
-    let dir = project_dir(state, &project.id)?;
+
+    open_with_key(state, &project.id, &project_key).await
+}
+
+/// Ouvre (ou crée) la base d'un projet avec sa clé.
+async fn open_with_key(
+    state: &AppState,
+    project_id: &str,
+    project_key: &SecretKey,
+) -> AppResult<SqlitePool> {
+    let dir = project_dir(state, project_id)?;
 
     finish_interrupted_encryption(&dir, true)?;
 
     // Cas normal : la base existe.
     if dir.join(DB_FILE).exists() {
-        let pool = init_project_db(&dir, &project_key).await?;
-        mark_db_ready(state, &project.id).await?;
+        let pool = init_project_db(&dir, project_key).await?;
+        mark_db_ready(state, project_id).await?;
 
         return Ok(pool);
     }
 
     // La base avait été créée mais le fichier a disparu : on le signale
     // plutôt que de repartir d'une base vide qui masquerait la perte.
-    if is_db_ready(state, &project.id).await? {
+    if is_db_ready(state, project_id).await? {
         return Err(AppError::not_found(
             "Les données de ce projet sont introuvables.",
         ).with_key("project.dataMissing")
@@ -266,8 +322,8 @@ async fn open_storage(
     }
 
     // Projet dont la base n'avait jamais été créée.
-    let pool = init_project_db(&dir, &project_key).await?;
-    mark_db_ready(state, &project.id).await?;
+    let pool = init_project_db(&dir, project_key).await?;
+    mark_db_ready(state, project_id).await?;
 
     Ok(pool)
 }
@@ -477,10 +533,10 @@ pub async fn duplicate_storage(
     state: &AppState,
     source_id: &str,
     target_id: &str,
-    owner_id: &str,
+    viewer: &Viewer,
     target_key: &SecretKey,
 ) -> AppResult<()> {
-    let source_pool = pool_for_user(state, source_id, owner_id).await?;
+    let source_pool = pool_for_viewer(state, source_id, viewer).await?;
 
     let dir = project_dir(state, target_id)?;
 

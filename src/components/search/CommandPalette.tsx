@@ -5,7 +5,7 @@ import { SearchResults } from "@/components/search/SearchResults";
 import { Dialog, DialogTitle } from "@/components/ui/dialog";
 import { SETTINGS_MODULE, WORKSPACE_MODULES } from "@/components/workspace/modules";
 import { runCommand, useCommandStore, type CommandId } from "@/lib/commands";
-import { itemTabId, SEARCH_ORDER, useProjectSearch } from "@/lib/search";
+import { openSearchHit, SEARCH_ORDER, useProjectSearch } from "@/lib/search";
 import { formatCombo, shortcutOf, useHelpStore, type AppAction } from "@/lib/shortcuts";
 import { cn } from "@/lib/utils";
 import type { SearchHit } from "@/types";
@@ -122,9 +122,8 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature }: Comm
     }
     const hit = orderedHits[index - shownActions.length];
     if (!hit) return;
-    const tab = itemTabId(hit.kind, hit.id);
     onClose();
-    if (tab) onOpenFeature(tab);
+    openSearchHit(hit, onOpenFeature);
   }
 
   function onKeyDown(event: KeyboardEvent<HTMLInputElement>) {
@@ -157,7 +156,7 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature }: Comm
           aria-controls="command-palette-list"
           className="h-12 flex-1 bg-transparent text-sm outline-none"
         />
-        <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-[0.7rem] text-muted-foreground">Échap</kbd>
+        <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-[0.7rem] text-muted-foreground">{t("search:escapeKey")}</kbd>
       </div>
 
       <div id="command-palette-list" ref={listRef} className="max-h-[60vh] overflow-y-auto p-2">

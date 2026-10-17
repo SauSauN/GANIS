@@ -81,7 +81,7 @@ impl DetailLevel {
         }
     }
 
-    fn parse(value: &str) -> Option<Self> {
+    pub fn parse(value: &str) -> Option<Self> {
         [DetailLevel::Basic, DetailLevel::Intermediate, DetailLevel::Advanced]
             .into_iter()
             .find(|level| level.as_str() == value)

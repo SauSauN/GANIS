@@ -1,0 +1,553 @@
+{
+  "loading": "Chargement de la trame…",
+  "untitled": "Sans titre",
+  "undo": "Annuler",
+  "keys": {
+    "escape": "Échap"
+  },
+  "defaults": {
+    "mainLane": "Trame principale",
+    "parallelLane": "Trame parallèle {{number}}",
+    "newEvent": "Nouvel événement",
+    "copyOf": "{{name}} (copie)"
+  },
+  "status": {
+    "idea": "Idée",
+    "draft": "Brouillon",
+    "written": "Écrit",
+    "revised": "Relu"
+  },
+  "kinds": {
+    "impact": {
+      "name": "Impact",
+      "description": "Change directement ce qui arrive dans la trame visée."
+    },
+    "influence": {
+      "name": "Influence",
+      "description": "Prépare ou colore la trame visée, sans la changer tout de suite."
+    },
+    "meeting": {
+      "name": "Croisement",
+      "description": "Les deux trames se rejoignent au même moment."
+    }
+  },
+  "toolbar": {
+    "zoom": "Zoom",
+    "zoomIn": "Zoomer",
+    "zoomOut": "Dézoomer",
+    "zoomReset": "Revenir à 100 %",
+    "fit": "Ajuster",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "newEvent": "Événement",
+    "tour": "Parcourir",
+    "tourHint": "Parcourir l'histoire événement par événement, sur le plateau",
+    "reading": "Lecture",
+    "readingHint": "Lire l'histoire avec tout ce qui s'y rattache (personnages, lieux, chapitres, notes…)",
+    "view": "Affichage",
+    "clean": "Vue épurée (masquer les barres)",
+    "unclean": "Afficher les barres",
+    "panel": "Panneau de droite",
+    "more": "Plus",
+    "tensionShow": "Afficher la courbe de tension",
+    "tensionHide": "Masquer la courbe de tension",
+    "newLaneShort": "Trame",
+    "newLaneHint": "Ajouter une trame parallèle"
+  },
+  "board": {
+    "time": "Temps ↓",
+    "mainLane": "Trame principale",
+    "parallelLane": "Trame parallèle",
+    "characterLane": "Trame de {{name}}",
+    "dragLane": "Cliquer pour la choisir, glisser pour la déplacer",
+    "laneAria": "Trame {{name}}, colonne {{index}}",
+    "addTo": "Ajouter un événement à « {{name}} »",
+    "tension": "Tension",
+    "tensionHint": "calme à vive",
+    "moment": "Moment {{number}}",
+    "eventAria": "{{title}}, {{lane}}, moment {{moment}}, {{status}}",
+    "editTitle": "Titre de l'événement",
+    "pivot": "Point pivot",
+    "handle": "Tirer vers un autre événement pour créer un lien",
+    "actHint": "Début d'acte : cliquer pour modifier",
+    "written": "Écrit :",
+    "writtenHint": "Événements écrits ou relus",
+    "empty": {
+      "title": "Votre trame est vide",
+      "hint": "Double-cliquez dans une colonne pour poser un premier événement, ou créez les événements depuis le découpage (menu « … »)."
+    },
+    "tensionHelp": "Cliquez ou glissez pour dessiner la tension ; double-clic pour effacer un moment",
+    "tensionAria": "Courbe de tension, moment par moment",
+    "noLanesTitle": "Aucune trame",
+    "noLanesHint": "Toutes les trames ont été supprimées. Ajoutez-en une : la première devient la trame principale.",
+    "allHiddenTitle": "Toutes les trames sont masquées",
+    "allHiddenHint": "Affichez-en une depuis le menu Affichage.",
+    "unplaced_one": "{{count}} événement sans scène",
+    "unplaced_other": "{{count}} événements sans scène",
+    "unplacedHint": "Événements racontés dans aucun élément du découpage. Cliquer les met en avant sur le plateau.",
+    "pastMoment": "Moment {{number}} (passé narratif)",
+    "storyStart": "Début de l'histoire",
+    "storyStartHint": "Au-dessus : le passé narratif (flash-back, souvenirs, événements antérieurs). Faites défiler vers le haut pour y remonter."
+  },
+  "panel": {
+    "label": "Détails de la trame",
+    "close": "Fermer",
+    "event": "Événement",
+    "link": "Lien"
+  },
+  "project": {
+    "fromStructure": "Créer les événements depuis le découpage",
+    "templates": "Appliquer un modèle de structure"
+  },
+  "reading": {
+    "toc": "Sommaire",
+    "display": "Affichage de la lecture",
+    "step": "Pas à pas",
+    "continuous": "En continu",
+    "showOnBoard": "Voir sur le plateau",
+    "emptyTitle": "Rien à lire pour l'instant",
+    "emptyHint": "Posez des événements sur le plateau de la trame : ils se liront ici, avec leurs personnages, lieux, chapitres et notes.",
+    "openBoard": "Ouvrir le plateau",
+    "position": "{{index}} sur {{count}}",
+    "noNote": "Rien n'est encore écrit sur ce qui se passe.",
+    "cast": "Personnages",
+    "pov": "Point de vue",
+    "place": "Lieu",
+    "inside": "dans {{places}}",
+    "node": "Dans le découpage",
+    "documents_one": "{{count}} document",
+    "documents_other": "{{count}} documents",
+    "notes": "Notes",
+    "chain": "Enchaînement",
+    "mysteries": "Mystères",
+    "cluePlanted": "Indice planté :",
+    "forMystery": "pour « {{question}} »",
+    "revealed": "Révélation :",
+    "notesCount_one": "{{count}} note",
+    "notesCount_other": "{{count}} notes",
+    "alsoTold": "Raconté aussi dans :",
+    "modes": {
+      "structure": "Par plan",
+      "lane": "Par trame"
+    }
+  },
+  "issues": {
+    "title": "Repères automatiques",
+    "hint": "Des invitations à regarder la structure, pas des erreurs : rien n'est corrigé tout seul.",
+    "none": "Rien à signaler : chaque trame est reliée et le temps s'écoule dans le bon sens.",
+    "untitled": "Un événement de « {{lane}} » n'a pas de titre (moment {{moment}}).",
+    "mainGap": "La trame principale reste vide pendant {{count}} moments avant « {{title}} ».",
+    "laneIsolated": "La trame « {{lane}} » n'est reliée à aucune autre.",
+    "laneUnreached": "La trame « {{lane}} » n'atteint jamais la trame principale, même indirectement.",
+    "backInTime": "Le lien « {{title}} » remonte dans le temps.",
+    "badDate": "La date de « {{title}} » ({{date}}) n'est pas reconnue.",
+    "mysteryNoClue": "Le mystère « {{question}} » n'a aucun indice.",
+    "mysteryNoAnswer": "Le mystère « {{question}} » est marqué résolu mais n'a pas de réponse.",
+    "noPivot": "Aucun point pivot n'est marqué dans l'histoire."
+  },
+  "mysteries": {
+    "hint": "Un mystère est une question dont le lecteur attend la réponse. Plantez ses indices dans des événements et choisissez celui de la révélation.",
+    "question": "Question",
+    "questionPlaceholder": "Que cherche à comprendre le lecteur ?",
+    "status": "Statut",
+    "statuses": {
+      "open": "Ouvert",
+      "solved": "Résolu",
+      "dropped": "Abandonné"
+    },
+    "payoffEvent": "Révélé dans",
+    "noEvent": "Aucun événement",
+    "answer": "Réponse",
+    "answerPlaceholder": "La vérité finale",
+    "payoff": "Révélation",
+    "payoffPlaceholder": "Comment la réponse est révélée",
+    "clues_one": "{{count}} indice",
+    "clues_other": "{{count}} indices",
+    "clue": "Indice",
+    "plantedIn": "Planté dans",
+    "deleteClue": "Supprimer l'indice",
+    "newClue": "Nouvel indice",
+    "cluePlaceholder": "Un indice à planter…",
+    "addClue": "Ajouter",
+    "delete": "Supprimer le mystère",
+    "add": "Nouveau mystère"
+  },
+  "event": {
+    "title": "Titre",
+    "lane": "Trame",
+    "moment": "Moment",
+    "status": "Avancement",
+    "pivot": "Point pivot (l'histoire bascule)",
+    "note": "Ce qui se passe",
+    "notePlaceholder": "Action, révélation, décision, ce qui change pour le personnage…",
+    "project": "Dans le projet",
+    "pov": "Point de vue",
+    "none": "Aucun",
+    "openSheet": "Ouvrir la fiche",
+    "characters": "Personnages présents",
+    "removeCharacter": "Retirer {{name}}",
+    "addCharacter": "Ajouter un personnage…",
+    "createCharacter": "Créer un personnage",
+    "location": "Lieu",
+    "createLocation": "Créer un lieu",
+    "node": "Raconté dans",
+    "nodeHint": "L'élément du découpage (chapitre, scène…) où l'événement est raconté : il donne l'ordre de lecture et relie aux documents du chapitre.",
+    "notes": "Notes",
+    "removeNote": "Retirer la note",
+    "addNote": "Relier une note…",
+    "writeScene": "Écrire la scène",
+    "writeSceneHint": "Crée une note reliée à cet événement et l'ouvre",
+    "date": "Date dans l'histoire (pour la chronologie)",
+    "datePlaceholder": "ex. 1987-08-20 ou 20 août 1987",
+    "readFromHere": "Lire à partir d'ici",
+    "duplicate": "Dupliquer",
+    "delete": "Supprimer",
+    "details": "Placement et détails",
+    "preferScene": "Cet élément contient des scènes : choisissez plutôt une scène pour un ordre de lecture plus précis.",
+    "alsoNodes": "Raconté aussi dans",
+    "alsoNodesHint": "Autres scènes où l'événement est raconté à nouveau (souvenir, autre point de vue). La scène principale fixe sa place dans la lecture.",
+    "addAlsoNode": "Ajouter une autre scène…",
+    "alsoNodesNeedMain": "Choisissez d’abord « Raconté dans »",
+    "removeAlsoNode": "Retirer « {{name}} »",
+    "momentHint": "1, 2, 3… : l'histoire principale. −1, −2… : le passé narratif, avant le début de l'histoire."
+  },
+  "link": {
+    "from": "Part de",
+    "to": "Atteint",
+    "backInTime": "Ce lien remonte dans le temps : la cible arrive avant la source. C'est cohérent pour un flash-back, sinon inversez le lien.",
+    "kind": "Type de lien",
+    "label": "Nom du lien (affiché sur le plateau)",
+    "labelPlaceholder": "ex. révèle le secret",
+    "note": "Conséquence sur la trame visée",
+    "notePlaceholder": "Qu'est-ce que ça change concrètement ?",
+    "swap": "Inverser le sens",
+    "delete": "Supprimer le lien"
+  },
+  "lane": {
+    "name": "Nom de la trame",
+    "colorInSettings": "Changer la couleur (paramètres du projet)",
+    "character": "Trame d'un personnage",
+    "characterHint": "Facultatif : la trame suit ce personnage (son nom s'affiche en tête de colonne).",
+    "count_one": "{{count}} événement dans cette trame.",
+    "count_other": "{{count}} événements dans cette trame.",
+    "left": "À gauche",
+    "right": "À droite",
+    "addEvent": "Ajouter un événement ici",
+    "tour": "Parcourir cette trame",
+    "makeMain": "En faire la trame principale",
+    "hide": "Masquer cette trame",
+    "solo": "Afficher seulement celle-ci",
+    "duplicate": "Dupliquer la trame",
+    "openCharacter": "Ouvrir la fiche du personnage",
+    "delete": "Supprimer la trame et ses événements"
+  },
+  "row": {
+    "label": "Étiquette du moment",
+    "labelPlaceholder": "ex. Lundi soir, la tempête",
+    "act": "Un acte commence ici",
+    "actPlaceholder": "ex. Acte II : la descente",
+    "tension": "Tension : {{value}} sur 10",
+    "tensionNone": "Tension : non définie",
+    "tensionHint": "0 : calme plat, 10 : à bout de souffle. Vous pouvez aussi cliquer dans la colonne Tension.",
+    "tensionClear": "Effacer la tension",
+    "count_one": "{{count}} événement à ce moment.",
+    "count_other": "{{count}} événements à ce moment.",
+    "empty": "Ce moment est vide.",
+    "simultaneous": "Tout ce qui est sur la même ligne se passe en même temps, dans des trames différentes.",
+    "insertBefore": "Insérer un moment avant",
+    "insertAfter": "Insérer un moment après",
+    "delete": "Supprimer ce moment",
+    "deleteBlocked": "Un moment ne se supprime que s'il est vide"
+  },
+  "view": {
+    "title": "Affichage de la trame",
+    "lanes": "Trames affichées",
+    "showAll": "Tout afficher",
+    "highlight": "Mettre en avant",
+    "status": "Avancement",
+    "character": "Personnage",
+    "location": "Lieu",
+    "tag": "Étiquette",
+    "all": "Tous",
+    "clear": "Effacer la mise en avant",
+    "links": "Liens",
+    "labels": "Noms des liens",
+    "board": "Plateau",
+    "notes": "Aperçu du texte sur les cartes",
+    "tension": "Colonne de tension",
+    "rowLines": "Lignes entre les moments",
+    "rowLinesHint": "Décocher cache les lignes horizontales ; les débuts d’acte restent marqués."
+  },
+  "tour": {
+    "label": "Parcours de l'histoire",
+    "order": "Ordre du parcours",
+    "modes": {
+      "structure": "Plan",
+      "structureHint": "L'ordre du plateau, moment par moment",
+      "reading": "Lecture",
+      "readingHint": "L'ordre dans lequel le lecteur découvre l'histoire",
+      "lane": "Par trame",
+      "laneHint": "Suivre une seule trame du début à la fin"
+    },
+    "close": "Fermer le parcours",
+    "pickLane": "Trame à parcourir",
+    "triggers": "Ce que ça déclenche",
+    "causedBy": "Causé par",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "fullReading": "Lecture complète",
+    "fullReadingHint": "Ouvrir la lecture de l'histoire à cet événement",
+    "position": "Événement {{index}} sur {{count}} : {{title}}"
+  },
+  "dialogs": {
+    "close": "Fermer",
+    "cancel": "Annuler"
+  },
+  "templates": {
+    "title": "Modèles de structure",
+    "description": "Choisissez un modèle pour placer ses actes et ses grandes étapes sur les moments, créez le vôtre, ou n'en appliquez aucun.",
+    "rows": "Nombre de moments visés",
+    "replace": "Remplacer les actes existants",
+    "applied": "Modèle « {{name}} » appliqué.",
+    "three": {
+      "name": "Trois actes",
+      "description": "La structure classique : mise en place, confrontation, résolution.",
+      "beats": [
+        "Acte I : mise en place",
+        "Incident déclencheur",
+        "Acte II : confrontation",
+        "Point de non-retour",
+        "Acte III : résolution"
+      ]
+    },
+    "hero": {
+      "name": "Voyage du héros (résumé)",
+      "description": "Douze étapes inspirées de Joseph Campbell et Christopher Vogler.",
+      "beats": [
+        "Monde ordinaire",
+        "Appel de l'aventure",
+        "Refus de l'appel",
+        "Rencontre avec le mentor",
+        "Passage du seuil",
+        "Épreuves, alliés, ennemis",
+        "Approche de la caverne",
+        "Épreuve suprême",
+        "Récompense",
+        "Le chemin du retour",
+        "Résurrection",
+        "Retour avec l'élixir"
+      ]
+    },
+    "stc": {
+      "name": "Save the Cat (simplifié)",
+      "description": "Blake Snyder, quinze battements condensés en dix.",
+      "beats": [
+        "Image d'ouverture",
+        "Thème énoncé",
+        "Mise en place",
+        "Catalyseur",
+        "Débat",
+        "Passage dans l'acte II",
+        "Milieu : fausse victoire ou défaite",
+        "Les méchants se resserrent",
+        "Tout est perdu",
+        "Finale"
+      ]
+    },
+    "circle": {
+      "name": "Cercle en huit points",
+      "description": "Confort, besoin, inconnu, épreuves, retour transformé.",
+      "beats": [
+        "Zone de confort",
+        "Un besoin",
+        "Environnement inconnu",
+        "Adaptation",
+        "Ce qu'il obtient",
+        "Ce que ça coûte",
+        "Retour",
+        "Changement"
+      ]
+    },
+    "five": {
+      "name": "Cinq actes (Freytag)",
+      "description": "La pyramide classique du théâtre : exposition, montée, climax, chute, dénouement.",
+      "beats": [
+        "Exposition",
+        "Action montante",
+        "Climax",
+        "Action descendante",
+        "Dénouement"
+      ]
+    },
+    "seven": {
+      "name": "Structure en sept points",
+      "description": "Dan Wells : on part de la fin pour construire le chemin.",
+      "beats": [
+        "Accroche",
+        "Premier pivot",
+        "Premier pincement",
+        "Point médian",
+        "Second pincement",
+        "Second pivot",
+        "Résolution"
+      ]
+    },
+    "kishotenketsu": {
+      "name": "Kishōtenketsu",
+      "description": "Structure en quatre temps venue d’Asie, très utilisée en manga : sans conflit obligatoire.",
+      "beats": [
+        "Ki : introduction",
+        "Shō : développement",
+        "Ten : retournement",
+        "Ketsu : conclusion"
+      ]
+    },
+    "fichtean": {
+      "name": "Courbe de Fichte",
+      "description": "Une suite de crises de plus en plus fortes, idéale pour le suspense.",
+      "beats": [
+        "Crise d'ouverture",
+        "Première crise",
+        "Complication",
+        "Crise majeure",
+        "Climax",
+        "Retombée"
+      ]
+    },
+    "spine": {
+      "name": "Colonne vertébrale du récit",
+      "description": "Kenn Adams : « Il était une fois… jusqu’au jour où… »",
+      "beats": [
+        "Il était une fois",
+        "Chaque jour",
+        "Mais un jour",
+        "À cause de cela",
+        "À cause de cela, encore",
+        "Jusqu'à ce que finalement",
+        "Et depuis ce jour"
+      ]
+    },
+    "mystery": {
+      "name": "Enquête / polar",
+      "description": "Les étapes d'une intrigue policière, du crime au démasquage.",
+      "beats": [
+        "Le crime",
+        "L'enquête commence",
+        "Fausses pistes",
+        "Révélation à mi-parcours",
+        "L'enquêteur en danger",
+        "Démasquage",
+        "Épilogue"
+      ]
+    },
+    "romance": {
+      "name": "Romance",
+      "description": "Les grandes étapes d’une histoire d’amour, de la rencontre au dénouement.",
+      "beats": [
+        "La rencontre",
+        "L'attirance",
+        "Le rapprochement",
+        "Point médian : l'engagement",
+        "Les doutes",
+        "La rupture",
+        "Le grand geste",
+        "Ensemble"
+      ]
+    },
+    "steps_one": "{{count}} étape",
+    "steps_other": "{{count}} étapes",
+    "mine": "Mes modèles",
+    "mineEmpty": "Aucun modèle personnel pour l’instant. Créez le vôtre : une étape par ligne.",
+    "create": "Créer un modèle",
+    "fromActs": "Partir des actes actuels",
+    "name": "Nom du modèle",
+    "namePlaceholder": "Ex. Ma structure en quatre temps",
+    "stepsLabel": "Étapes (une par ligne, dans l’ordre)",
+    "stepsPlaceholder": "Situation initiale\nÉlément perturbateur\nPéripéties\nDénouement",
+    "stepsHint_one": "{{count}} étape, placée au début.",
+    "stepsHint_other": "{{count}} étapes, réparties du premier au dernier moment.",
+    "save": "Enregistrer le modèle",
+    "edit": "Modifier « {{name}} »",
+    "remove": "Supprimer « {{name}} »",
+    "known": "Modèles connus",
+    "none": "Ne pas appliquer de modèle",
+    "clear": "Retirer les actes du plateau",
+    "cleared": "Actes retirés du plateau."
+  },
+  "import": {
+    "title": "Événements depuis le découpage",
+    "description": "Crée un événement pour chaque élément d'un niveau du découpage (chaque chapitre, par exemple), dans l'ordre du plan, relié à cet élément et avec son résumé.",
+    "noStructure": "Le découpage est vide : créez d'abord des parties, chapitres ou scènes dans le plan du récit.",
+    "level": "Niveau du découpage",
+    "lane": "Dans la trame",
+    "skip": "Ignorer les éléments déjà reliés à un événement",
+    "count_one": "{{count}} événement sera créé.",
+    "count_other": "{{count}} événements seront créés.",
+    "confirm": "Créer ({{count}})",
+    "done_one": "{{count}} événement créé.",
+    "done_other": "{{count}} événements créés."
+  },
+  "toasts": {
+    "eventDeleted": "Événement « {{name}} » supprimé.",
+    "linkDeleted": "Lien supprimé.",
+    "laneDeleted": "Trame « {{name}} » supprimée.",
+    "laneDuplicated": "Trame dupliquée.",
+    "laneHidden": "Trame masquée. « Affichage » pour la rouvrir."
+  },
+  "sidebar": {
+    "title": "Trames",
+    "hidden": "Trame masquée sur le plateau",
+    "summary": "{{events}} événement(s), {{links}} lien(s)"
+  },
+  "inStory": {
+    "title": "Dans la trame",
+    "description": {
+      "character": "Les événements où {{name}} apparaît ou porte le point de vue.",
+      "location": "Les événements qui se passent à {{name}}.",
+      "node": "Les événements racontés dans « {{name}} »."
+    },
+    "empty": {
+      "character": "Ce personnage n'apparaît encore dans aucun événement de la trame.",
+      "location": "Aucun événement de la trame ne se passe encore ici.",
+      "node": "Aucun événement de la trame n'est encore raconté ici."
+    },
+    "openBoard": "Ouvrir le plateau de la trame",
+    "read": "Lire",
+    "pov": "PDV"
+  },
+  "settings": {
+    "colors": "Couleurs des trames",
+    "colorsHint": "La couleur de chaque trame sur le plateau, dans la lecture et sur les fiches. Les nouvelles trames reçoivent une couleur libre automatiquement.",
+    "colorOf": "Couleur de « {{name}} »"
+  },
+  "scene": {
+    "showOnBoard": "Voir sur le plateau",
+    "retold": "Raconté à nouveau ici",
+    "retoldTitle": "Raconté à nouveau ici (souvenir, autre point de vue…)",
+    "up": "Avancer « {{title}} » dans la scène",
+    "down": "Reculer « {{title}} » dans la scène",
+    "upHint": "Plus tôt dans la scène (ordre de lecture)",
+    "downHint": "Plus tard dans la scène (ordre de lecture)",
+    "unlink": "Retirer « {{title}} » de cette scène",
+    "unlinkHint": "Retirer de cette scène (l'événement reste dans la trame)",
+    "preferScenes": "Cet élément contient des scènes : reliez plutôt les événements aux scènes, l'ordre de lecture sera plus précis.",
+    "addNew": "Ajouter un événement à cette scène",
+    "linkExisting": "Relier un événement existant",
+    "noLane": "Créez d'abord une trame sur le plateau.",
+    "newPlaceholder": "Ce qui se passe (titre)",
+    "newTitle": "Titre du nouvel événement",
+    "lane": "Trame",
+    "create": "Ajouter",
+    "pick": "Choisir un événement…",
+    "alreadyPlaced": "déjà dans une autre scène",
+    "asRetold": "Raconté à nouveau ici",
+    "asRetoldHint": "L'événement garde sa scène principale (qui fixe sa place dans la lecture) et apparaît aussi ici.",
+    "link": "Relier"
+  },
+  "plan": {
+    "events_one": "{{count}} événement de la trame raconté ici",
+    "events_other": "{{count}} événements de la trame racontés ici",
+    "noEvents": "sans événement",
+    "noEventsHint": "Aucun événement de la trame n'est raconté dans cette scène (fiche de la scène › Dans la trame)."
+  }
+}

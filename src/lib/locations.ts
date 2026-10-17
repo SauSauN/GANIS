@@ -1,5 +1,5 @@
 import catalog from "@/lib/locationCatalog.json";
-import type { CustomLocationType, Location, LocationInput, LocationSettings } from "@/types";
+import type { CharacterDetailLevel, CustomLocationType, Location, LocationInput, LocationSettings } from "@/types";
 
 /*
  * Lieux : six catégories, des types (par défaut ou ajoutés par l'auteur),
@@ -146,6 +146,54 @@ const FIELD_KEYS = new Set(LOCATION_FIELDS.map((field) => field.key));
 /** Champs communs à tous les lieux, rangés en deux groupes de la fiche. */
 export const IDENTITY_FIELDS = ["aliases", "firstAppearance", "description"];
 export const STORY_FIELDS = ["history", "notes"];
+
+// ----------------------------------------------------------------------------
+// Niveau de détail des fiches (réglé dans Paramètres du projet › Lieux)
+// ----------------------------------------------------------------------------
+
+/**
+ * Ce que montre chaque niveau :
+ * - Basique (l'essentiel) : nom, type, statut, emplacement, description, notes, images ;
+ * - Moyen (le décor) : + autres noms, première apparition, champs de la catégorie ;
+ * - Avancé (la profondeur) : + champs propres au type, histoire.
+ * Sans niveau choisi, toute la fiche est montrée.
+ */
+export function levelParts(level: CharacterDetailLevel | null) {
+  const rank = level === "basic" ? 0 : level === "intermediate" ? 1 : 2;
+  return {
+    identity: rank === 0 ? ["description"] : IDENTITY_FIELDS,
+    story: rank < 2 ? ["notes"] : STORY_FIELDS,
+    category: rank >= 1,
+    type: rank >= 2,
+  };
+}
+
+/** Clés montrées par la fiche d'un lieu de ce type, à ce niveau. */
+export function levelFieldKeys(
+  type: string,
+  category: LocationCategory | undefined,
+  level: CharacterDetailLevel | null,
+): Set<string> {
+  const parts = levelParts(level);
+  return new Set([
+    ...parts.identity,
+    ...parts.story,
+    ...(parts.category ? categoryFields(category).map((field) => field.key) : []),
+    ...(parts.type ? typeFields(type, category).map((field) => field.key) : []),
+  ]);
+}
+
+/** Champs remplis du type actuel que le niveau de détail ne montre pas (gardés). */
+export function levelHiddenFilledKeys(
+  fields: Record<string, string>,
+  type: string,
+  category: LocationCategory | undefined,
+  level: CharacterDetailLevel | null,
+): string[] {
+  const visible = visibleFieldKeys(type, category);
+  const shown = levelFieldKeys(type, category, level);
+  return Object.keys(fields).filter((key) => visible.has(key) && !shown.has(key) && fields[key]);
+}
 
 const isCommon = (field: LocationField) =>
   field.categories.length === 0 && field.types.length === 0;

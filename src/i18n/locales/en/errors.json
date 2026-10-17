@@ -181,7 +181,8 @@
     "tooManyTypes": "{{max}} custom types at most.",
     "invalidList": "Unknown list.",
     "listTooLong": "A list cannot hold more than {{max}} values.",
-    "galleryFull": "The gallery is full ({{max}} images at most)."
+    "galleryFull": "The gallery is full ({{max}} images at most).",
+    "invalidLevel": "Unknown detail level."
   },
   "placeLink": {
     "notFound": "Link not found.",
@@ -278,7 +279,15 @@
     "internal": "Try again; if it keeps happening, restart GANIS.",
     "database": "Try again in a moment. If it comes back, export the project as .ganix (File › Export) to keep it safe, then restart GANIS.",
     "io": "Check that the disk has free space and the folder isn't read-only.",
-    "unauthorized": "Sign in again."
+    "unauthorized": "Sign in again.",
+    "documents": {
+      "tooLarge": "Split it (one file per chapter or page) or compress it.",
+      "tooMany": "Add them in several goes.",
+      "fileError": "Check that the file is not open elsewhere and that you can access it.",
+      "unsafeType": "Use “Save as…” if you need to use it elsewhere.",
+      "openFailed": "Install an application for this file type, or use “Save as…”.",
+      "nodeNotFound": "Reopen the story outline: the item may have been deleted."
+    }
   },
   "history": {
     "unknownKind": "This item has no versions.",
@@ -287,5 +296,26 @@
     "nameEmpty": "Give the version a name.",
     "unreadable": "This version cannot be read.",
     "restoreFailed": "This version can no longer be restored."
+  },
+  "documents": {
+    "notFound": "This document no longer exists.",
+    "nodeNotFound": "This structure item no longer exists.",
+    "versionNotFound": "This document version no longer exists.",
+    "tooLarge": "“{{name}}” is larger than 300 MB.",
+    "tooMany": "Too many files at once ({{max}} at most).",
+    "fileError": "The file could not be read or written.",
+    "unsafeType": "This file type could start a program: GANIS will not open it.",
+    "openFailed": "No application could open this document."
+  },
+  "unexpected": "An unexpected error occurred. Try again; if it happens again, restart GANIS.",
+  "load": {
+    "notes": "Could not load the notes.",
+    "stickies": "Could not load the sticky-note wall.",
+    "relations": "Could not load the relationships.",
+    "synopsis": "Could not load the synopsis.",
+    "saveSynopsis": "Could not save the synopsis.",
+    "characters": "Could not load the characters.",
+    "locations": "Could not load the locations.",
+    "setup": "Could not check the GANIS setup."
   }
 }

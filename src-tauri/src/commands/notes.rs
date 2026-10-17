@@ -10,20 +10,22 @@ use crate::services::note_service::{
     self, Note, NoteFolder, NoteSummary, NoteUpdate, StickyNote, StickyUpdate,
 };
 use crate::services::project_storage;
+use crate::services::system_note_service::{self, SystemNotesSettings};
 use crate::state::AppState;
 use sqlx::SqlitePool;
 use tauri::State;
 
 async fn project_pool(state: &AppState, project_id: &str) -> AppResult<SqlitePool> {
-    let user = state.require_user().await?;
-    project_storage::pool_for_user(state, project_id, &user.id).await
+    project_storage::pool_for_request(state, project_id).await
 }
 
 // --- Dossiers ----------------------------------------------------------------
 
 #[tauri::command(rename_all = "camelCase")]
 pub async fn list_note_folders(state: State<'_, AppState>, project_id: String) -> AppResult<Vec<NoteFolder>> {
-    note_service::list_folders(&project_pool(&state, &project_id).await?).await
+    let pool = project_pool(&state, &project_id).await?;
+    system_note_service::sync(&pool, None).await?;
+    note_service::list_folders(&pool).await
 }
 
 #[tauri::command(rename_all = "camelCase")]
@@ -71,12 +73,44 @@ pub async fn delete_note_folder(state: State<'_, AppState>, project_id: String, 
 
 #[tauri::command(rename_all = "camelCase")]
 pub async fn list_notes(state: State<'_, AppState>, project_id: String) -> AppResult<Vec<NoteSummary>> {
-    note_service::list_notes(&project_pool(&state, &project_id).await?).await
+    let pool = project_pool(&state, &project_id).await?;
+    system_note_service::sync(&pool, None).await?;
+    note_service::list_notes(&pool).await
 }
 
 #[tauri::command(rename_all = "camelCase")]
 pub async fn get_note(state: State<'_, AppState>, project_id: String, note_id: String) -> AppResult<Note> {
-    note_service::get_note(&project_pool(&state, &project_id).await?, &note_id).await
+    let pool = project_pool(&state, &project_id).await?;
+    system_note_service::sync(&pool, None).await?;
+    note_service::get_note(&pool, &note_id).await
+}
+
+// --- Notes système ------------------------------------------------------------
+
+/// Option « notes système » du projet.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn get_system_notes(state: State<'_, AppState>, project_id: String) -> AppResult<SystemNotesSettings> {
+    system_note_service::settings(&project_pool(&state, &project_id).await?).await
+}
+
+/// Active ou désactive les notes système (titres dans `language`).
+#[tauri::command(rename_all = "camelCase")]
+pub async fn set_system_notes(
+    state: State<'_, AppState>,
+    project_id: String,
+    enabled: bool,
+    language: String,
+) -> AppResult<SystemNotesSettings> {
+    let pool = project_pool(&state, &project_id).await?;
+    let result = system_note_service::set_enabled(&pool, enabled, &language).await?;
+    history::touch_day(&pool).await;
+    Ok(result)
+}
+
+/// Met les notes système à jour (langue du logiciel pour les titres).
+#[tauri::command(rename_all = "camelCase")]
+pub async fn sync_system_notes(state: State<'_, AppState>, project_id: String, language: String) -> AppResult<()> {
+    system_note_service::sync(&project_pool(&state, &project_id).await?, Some(&language)).await
 }
 
 #[tauri::command(rename_all = "camelCase")]

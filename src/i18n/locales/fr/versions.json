@@ -28,6 +28,8 @@
     "name": "Nom",
     "type": "Type",
     "status": "Statut",
-    "parent": "Situé dans"
-  }
+    "parent": "Situé dans",
+    "plot": "Trame"
+  },
+  "deleteConfirm": "Supprimer définitivement ?"
 }

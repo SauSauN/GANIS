@@ -236,3 +236,63 @@
 }
 .note-content .note-diagram-btn:hover { background: var(--accent); }
 .note-content .note-diagram .react-flow__edge-text { font-size: 11px; }
+
+/* Fautes d'orthographe (correcteur de GANIS, dans la langue du logiciel) */
+.note-content .spell-error {
+  text-decoration: underline wavy var(--destructive);
+  text-decoration-skip-ink: none;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+/* Éléments cités avec « $$ » */
+.note-content .note-mention {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+  margin: 0 0.05em;
+  padding: 0 0.4em;
+  border-radius: 0.375rem;
+  background: color-mix(in oklch, var(--primary) 12%, transparent);
+  color: var(--primary);
+  font: inherit;
+  font-weight: 500;
+  line-height: 1.45;
+  vertical-align: baseline;
+  cursor: pointer;
+}
+.note-content .note-mention:hover {
+  background: color-mix(in oklch, var(--primary) 20%, transparent);
+  text-decoration: underline;
+}
+.note-content .note-mention[data-kind="location"] {
+  color: var(--success, var(--primary));
+  background: color-mix(in oklch, var(--success, var(--primary)) 12%, transparent);
+}
+.note-content .note-mention-icon {
+  width: 0.85em;
+  height: 0.85em;
+  flex-shrink: 0;
+}
+.note-content .note-mention-missing {
+  color: var(--muted-foreground);
+  background: var(--muted);
+  text-decoration: line-through;
+  cursor: default;
+}
+
+/* Notes système : les titres sont fixes */
+.note-content.note-system h1,
+.note-content.note-system h2 {
+  cursor: default;
+  user-select: none;
+}
+.note-content.note-system h2 {
+  margin-top: 1.6em;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid var(--border);
+  color: var(--muted-foreground);
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
