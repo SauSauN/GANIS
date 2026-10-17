@@ -111,6 +111,47 @@ impl ProjectType {
     }
 }
 
+/// Visibilité d'un projet.
+///
+/// - `Private` : appartient à un compte, chiffré avec sa clé ; seul ce
+///   compte, connecté, peut l'ouvrir.
+/// - `Public` : créé sans connexion (ou rendu public). N'appartient à
+///   personne : toute personne utilisant GANIS sur cet appareil peut
+///   l'ouvrir, sans se connecter.
+#[derive(
+    Debug,
+    Clone,
+    Copy,
+    PartialEq,
+    Eq,
+    Serialize,
+    Deserialize,
+    sqlx::Type,
+)]
+#[serde(rename_all = "lowercase")]
+#[sqlx(type_name = "TEXT")]
+#[sqlx(rename_all = "lowercase")]
+pub enum ProjectVisibility {
+    Private,
+    Public,
+}
+
+impl Default for ProjectVisibility {
+    fn default() -> Self {
+        ProjectVisibility::Private
+    }
+}
+
+impl ProjectVisibility {
+    /// Représentation utilisée par la base de données.
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            ProjectVisibility::Private => "private",
+            ProjectVisibility::Public => "public",
+        }
+    }
+}
+
 /// Représente un projet narratif.
 ///
 /// Le champ Rust `project_type` est sérialisé en `type` côté frontend.
@@ -168,6 +209,10 @@ pub struct Project {
     #[sqlx(rename = "last_opened_at")]
     pub last_opened_at: Option<String>,
 
+    /// Projet privé (chiffré, lié à un compte) ou public (sans connexion).
+    #[sqlx(default)]
+    pub visibility: ProjectVisibility,
+
     // ------------------------------------------------------------------
     // Chiffrement (jamais envoyé à l'interface)
     // ------------------------------------------------------------------
@@ -191,4 +236,17 @@ pub struct Project {
     #[serde(skip)]
     #[sqlx(default)]
     pub wrapped_key: Option<String>,
+
+    /// Clé d'un projet public, en clair (base64). `None` pour un projet
+    /// privé.
+    #[serde(skip)]
+    #[sqlx(default)]
+    pub public_key: Option<String>,
+}
+
+impl Project {
+    /// Vrai pour un projet public (ouvrable sans connexion).
+    pub fn is_public(&self) -> bool {
+        self.visibility == ProjectVisibility::Public
+    }
 }

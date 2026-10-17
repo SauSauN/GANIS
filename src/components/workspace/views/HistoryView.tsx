@@ -8,32 +8,37 @@ import {
   MapPinned,
   Network,
   NotebookText,
+  Paperclip,
   RefreshCw,
   RotateCcw,
   StickyNote,
   UserRound,
+  Waypoints,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { fieldClass, PageShell } from "@/components/workspace/views/PageShell";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import { itemTabId } from "@/lib/search";
 import { restoreFromTrash } from "@/lib/trash";
 import { cn } from "@/lib/utils";
 import { useTrashStore } from "@/stores/trashStore";
 import type { Activity, HistoryKind } from "@/types";
+import { errorText } from "@/lib/errors";
 
 const ICONS: Record<HistoryKind, LucideIcon> = {
   character: UserRound,
   location: MapPinned,
   structureNode: ListTree,
+  document: Paperclip,
   note: NotebookText,
   noteFolder: Folder,
   sticky: StickyNote,
   relation: Network,
   placeLink: MapPin,
   synopsis: FileText,
+  plot: Waypoints,
 };
 
 const KINDS = Object.keys(ICONS) as HistoryKind[];
@@ -74,7 +79,7 @@ export function HistoryView({ projectId, feature, onOpenFeature }: HistoryViewPr
     try {
       setItems(await api.listActivity(projectId, { kind: kind || undefined, limit: 500 }));
     } catch (cause) {
-      setError(cause instanceof ApiError ? cause.message : String(cause));
+      setError(errorText(cause));
     }
   }, [projectId, kind]);
 
@@ -153,7 +158,9 @@ export function HistoryView({ projectId, feature, onOpenFeature }: HistoryViewPr
               <ol className="divide-y rounded-xl border bg-card shadow-sm">
                 {group.items.map((item) => {
                   const Icon = ICONS[item.kind] ?? FileText;
-                  const tab = item.action === "deleted" ? null : itemTabId(item.kind, item.itemId);
+                  // Document : sa fiche est celle de l'élément du découpage qui le contient.
+                  const target = item.kind === "document" ? item.detail : item.itemId;
+                  const tab = item.action === "deleted" || !target ? null : itemTabId(item.kind, target);
                   return (
                     <li key={item.id} className="flex items-center gap-3 px-4 py-2.5">
                       <span className="w-12 shrink-0 text-xs tabular-nums text-muted-foreground">{timeOf(item.at, i18n.language)}</span>

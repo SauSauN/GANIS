@@ -9,6 +9,7 @@ import { formatCombo, shortcutOf, useHelpStore, type AppAction } from "@/lib/sho
 import { applyTheme, useResolvedTheme } from "@/lib/theme";
 import { undoLastDeletion } from "@/lib/trash";
 import { cn } from "@/lib/utils";
+import { useAuthStore } from "@/stores/authStore";
 import { toast } from "@/stores/toastStore";
 
 type MenuId = "file" | "edit" | "view" | "project" | "help";
@@ -34,6 +35,9 @@ export function MenuBar() {
   const theme = useResolvedTheme();
   const showHelp = useHelpStore((state) => state.show);
   const requestIntent = useDashboardIntent((state) => state.request);
+  // Sans connexion : ni import (les projets importés sont privés), ni
+  // paramètres généraux.
+  const signedIn = useAuthStore((state) => state.user !== null);
 
   const [open, setOpen] = useState<MenuId | null>(null);
   const [active, setActive] = useState(-1);
@@ -106,6 +110,7 @@ export function MenuBar() {
         kind: "item",
         id: "importGanix",
         label: t("file.import"),
+        disabled: !signedIn,
         onSelect: () => {
           if (!runCommand("importGanix")) {
             requestIntent("importGanix");
@@ -115,7 +120,13 @@ export function MenuBar() {
       },
       SEPARATOR,
       { kind: "item", id: "dashboard", label: t("file.dashboard"), onSelect: () => navigate("/dashboard") },
-      { kind: "item", id: "settings", label: t("file.settings"), onSelect: () => navigate("/settings") },
+      {
+        kind: "item",
+        id: "settings",
+        label: t("file.settings"),
+        disabled: !signedIn,
+        onSelect: () => navigate("/settings"),
+      },
       SEPARATOR,
       {
         kind: "item",

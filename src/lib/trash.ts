@@ -9,6 +9,7 @@ import { useStructureStore } from "@/stores/structureStore";
 import { toast, useToastStore } from "@/stores/toastStore";
 import { useTrashStore } from "@/stores/trashStore";
 import { fullName } from "@/lib/characters";
+import { useDocumentStore } from "@/lib/documents";
 import type { CharacterLocation, Relation, TrashKind } from "@/types";
 
 /*
@@ -110,6 +111,9 @@ async function refreshAfterRestore(projectId: string, kind: TrashKind) {
   if (structure.projectId === projectId && ["character", "location", "structureNode"].includes(kind)) {
     tasks.push(structure.fetchStructure(projectId), structure.fetchLinks(projectId));
   }
+
+  // Documents (et ceux d'un élément du découpage restauré).
+  if (kind === "document" || kind === "structureNode") useDocumentStore.getState().invalidate(projectId);
 
   const notes = useNoteStore.getState();
   if (notes.projectId === projectId) {

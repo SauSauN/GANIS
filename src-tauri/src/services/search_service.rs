@@ -19,7 +19,8 @@ const SNIPPET_CHARS: usize = 140;
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchHit {
-    /// character, location, structureNode, note, noteFolder, sticky.
+    /// character, location, structureNode, document (id : celui de
+    /// l'élément du découpage), note, noteFolder, sticky.
     pub kind: String,
     pub id: String,
     pub title: String,
@@ -184,7 +185,7 @@ pub async fn search(pool: &SqlitePool, query: &str) -> AppResult<Vec<SearchHit>>
     }));
 
     let rows: Vec<(String, String, String)> =
-        sqlx::query_as("SELECT id, title, content FROM notes").fetch_all(pool).await?;
+        sqlx::query_as("SELECT id, title, content FROM notes WHERE id NOT IN (SELECT note_id FROM system_notes)").fetch_all(pool).await?;
     candidates.extend(rows.into_iter().map(|(id, title, content)| Candidate {
         kind: "note",
         id,
@@ -199,6 +200,20 @@ pub async fn search(pool: &SqlitePool, query: &str) -> AppResult<Vec<SearchHit>>
         title: name,
         body: String::new(),
     }));
+
+    // Documents rangés dans le découpage : l'identifiant est celui de
+    // l'élément qui les contient (le résultat ouvre sa fiche).
+    let rows = crate::services::document_service::search_rows(pool).await?;
+    candidates.extend(rows.into_iter().map(|(node_id, name, note, text)| Candidate {
+        kind: "document",
+        id: node_id,
+        title: name,
+        body: if text.is_empty() { note } else { format!("{note} {text}") },
+    }));
+
+    // Événements de la trame (document JSON).
+    let rows = crate::services::plot_service::search_rows(pool).await?;
+    candidates.extend(rows.into_iter().map(|(id, title, body)| Candidate { kind: "plotEvent", id, title, body }));
 
     let rows: Vec<(String, String)> = sqlx::query_as("SELECT id, text FROM sticky_notes").fetch_all(pool).await?;
     candidates.extend(rows.into_iter().map(|(id, text)| Candidate {

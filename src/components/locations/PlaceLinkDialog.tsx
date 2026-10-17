@@ -20,6 +20,7 @@ import { cn } from "@/lib/utils";
 import { useProjectLocations } from "@/stores/locationStore";
 import { usePlaceLinkStore } from "@/stores/placeLinkStore";
 import type { CharacterLocationInput } from "@/types";
+import { errorText } from "@/lib/errors";
 
 interface PlaceLinkDialogProps {
   projectId: string;
@@ -73,7 +74,7 @@ export function PlaceLinkDialog({ projectId, linkId, initial, fixed, onClose }: 
       await action();
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
     } finally {
       setBusy(false);
     }

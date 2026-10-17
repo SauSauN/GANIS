@@ -6,7 +6,7 @@
     },
     "status": {
       "label": "Status and organization",
-      "description": "Project progress, favorite and archiving."
+      "description": "Progress, favorite, archiving and visibility."
     },
     "danger": {
       "label": "Export, duplication and deletion",
@@ -18,11 +18,19 @@
     },
     "locations": {
       "label": "Locations",
-      "description": "Custom location types and statuses."
+      "description": "Sheet detail level, custom location types and statuses."
     },
     "structure": {
       "label": "Structure",
       "description": "Plan levels, their names and numbering."
+    },
+    "plot": {
+      "label": "Plot",
+      "description": "The colour of each plot on the board."
+    },
+    "notes": {
+      "label": "Notes",
+      "description": "System notes: sheet descriptions, editable from the notes."
     }
   },
   "info": {
@@ -70,6 +78,33 @@
       "add": "Add",
       "remove": "Remove “{{value}}”",
       "reset": "Default values"
+    }
+  },
+  "notes": {
+    "title": "System notes",
+    "description": "Creates a “System notes” folder in the notes: the description and author’s notes of every character and location, and the summary of every structure item, can be read and edited there like notes.",
+    "toggle": "Create system notes",
+    "toggleHint": "Off by default. Turning it off removes the folder; nothing is lost, the text stays in the sheets.",
+    "rule1": "One note per item, grouped by kind (Characters, Locations, Structure). It follows the sheets: new items, names and texts stay up to date.",
+    "rule2": "The big headings (#) are fixed. Text written under a heading is saved to the matching field of the sheet.",
+    "rule3": "These notes and their folder cannot be deleted, renamed or moved by hand. Formatting (bold, lists…) is not kept: sheets are plain text.",
+    "enabledDone": "System notes created: open Notes › “System notes”.",
+    "disabledDone": "System notes removed. The text stays in the sheets."
+  },
+  "visibility": {
+    "title": "Visibility",
+    "makePublic": "Make public",
+    "makePrivate": "Make private",
+    "confirmTitle": "Make this project public?",
+    "confirmDescription": "It will leave your private space and can be opened without signing in by anyone using GANIS on this computer.",
+    "failed": "Could not change visibility.",
+    "signIn": {
+      "title": "Sign-in required",
+      "description": "Sign in to make this project private.",
+      "submit": "Sign in and make private",
+      "submitting": "Signing in…",
+      "createAccount": "Create an account",
+      "setupFirst": "Create the first account"
     }
   }
 }

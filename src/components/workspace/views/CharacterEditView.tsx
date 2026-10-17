@@ -22,6 +22,7 @@ import { CharacterGallery } from "@/components/characters/fields/GalleryField";
 import { CharacterRelationsCard } from "@/components/relations/CharacterRelationsCard";
 import { PlaceLinksCard } from "@/components/locations/PlaceLinksCard";
 import { StoryLinksCard } from "@/components/structure/StoryLinksCard";
+import { PlotInStoryCard } from "@/components/plot/PlotInStoryCard";
 import {
   PageShell,
   cardClass,
@@ -45,6 +46,7 @@ import {
   useProjectCharacter,
   useProjectCharacters,
 } from "@/stores/characterStore";
+import { errorText } from "@/lib/errors";
 
 interface CharacterEditViewProps {
   projectId: string;
@@ -132,7 +134,7 @@ export function CharacterEditView({
       setSaveStatus("saved");
       return true;
     } catch (e) {
-      setSaveError(e instanceof Error ? e.message : String(e));
+      setSaveError(errorText(e));
       return false;
     } finally {
       setSaving(false);
@@ -172,7 +174,7 @@ export function CharacterEditView({
     try {
       await removePortrait(projectId, characterId);
     } catch (e) {
-      setPortraitError(e instanceof Error ? e.message : String(e));
+      setPortraitError(errorText(e));
     } finally {
       setPortraitBusy(false);
     }
@@ -187,7 +189,7 @@ export function CharacterEditView({
       setConfirmDelete(false);
       onClose();
     } catch (e) {
-      setDeleteError(e instanceof Error ? e.message : String(e));
+      setDeleteError(errorText(e));
     } finally {
       setDeleting(false);
     }
@@ -296,6 +298,7 @@ export function CharacterEditView({
               firstAppearance={character.fields.firstAppearance}
               onOpenFeature={onOpenFeature}
             />
+            <PlotInStoryCard projectId={projectId} target={{ type: "character", id: character.id }} name={fullName(character)} onOpenFeature={onOpenFeature} />
             <div className="flex min-h-10 flex-wrap items-center gap-4">
               <Button type="submit" disabled={!dirty || saving}>
                 {saving ? <Loader2 className="animate-spin" /> : <Save />}

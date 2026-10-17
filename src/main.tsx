@@ -5,6 +5,7 @@ import { HashRouter } from "react-router-dom";
 import "@/i18n";
 import App from "./App";
 import { initColorTheme } from "@/lib/colorTheme";
+import { initNativeGuards } from "@/lib/nativeGuards";
 import { initTextSize } from "@/lib/preferences";
 import { initAutoHideScrollbars } from "@/lib/scrollbars";
 import { initTheme } from "@/lib/theme";
@@ -18,6 +19,10 @@ initTextSize();
 
 // Les barres de défilement n'apparaissent que pendant un défilement.
 initAutoHideScrollbars();
+
+// Pas de menu contextuel natif ni de raccourcis de navigation du
+// navigateur (Actualiser, Retour, Imprimer…) dans l'application.
+initNativeGuards();
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>

@@ -1,5 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { VersionsButton } from "@/components/history/VersionsDialog";
+import { DocumentsCard } from "@/components/documents/DocumentsCard";
+import { SceneEventsCard } from "@/components/plot/SceneEventsCard";
 import { useTranslation } from "react-i18next";
 import {
   ChevronRight,
@@ -48,6 +50,7 @@ import {
   ancestorsOf,
   buildStructureTree,
   descendantIdsOf,
+  flattenVisible,
   levelOf,
   MAX_NUMBER,
   nodeLinks,
@@ -59,6 +62,7 @@ import { useProjectCharacters } from "@/stores/characterStore";
 import { useProjectLocations } from "@/stores/locationStore";
 import { useProjectStructureLinks, useStructureStore } from "@/stores/structureStore";
 import type { NodeCharacterRole, NodeLocationRole, StructureNode } from "@/types";
+import { errorText } from "@/lib/errors";
 
 const CHARACTER_ROLES: NodeCharacterRole[] = ["present", "pov", "mentioned"];
 const LOCATION_ROLES: NodeLocationRole[] = ["setting", "mentioned"];
@@ -88,7 +92,8 @@ interface StructureNodeViewProps {
  * Fiche d'un élément du découpage (partie, chapitre, scène…), dans son
  * propre onglet, comme les fiches des personnages et des lieux :
  * - à gauche, la présentation : nom et numéro, niveau, place dans le plan ;
- * - à droite, les informations (titre, numéro, résumé), les personnages et
+ * - à droite, les informations (titre, numéro, résumé), les documents
+ *   rangés dans l'élément (PDF, Word, pages de manga…), les personnages et
  *   les lieux liés (avec leur rôle, et ceux des éléments contenus), puis
  *   ce que l'élément contient.
  */
@@ -182,7 +187,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
       if (fresh) setSaved(true);
       return true;
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
       return false;
     } finally {
       setSaving(false);
@@ -211,7 +216,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
       await reload();
       onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
       setConfirmDelete(false);
     } finally {
       setDeleting(false);
@@ -224,7 +229,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
     try {
       await action();
     } catch (e) {
-      setLinkError(e instanceof Error ? e.message : String(e));
+      setLinkError(errorText(e));
     }
   }
 
@@ -298,13 +303,19 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   const firstLocations = locations.filter((l) => l.fields.firstAppearance === node.id);
 
   const openNode = (id: string) => onOpenFeature(structureNodeTabId(id));
+  // « Ranger dans… » : tous les éléments, dans l'ordre du plan.
+  const nodeOptions = flattenVisible(buildStructureTree(structure.nodes), new Set()).map((item) => ({
+    id: item.id,
+    label: headingOf(item).label,
+    depth: item.depth,
+  }));
 
   async function addChild() {
     try {
       await api.createStructureNode(projectId, { parentId: nodeId, level: childLevel });
       await reload();
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
     }
   }
 
@@ -495,6 +506,10 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
               </div>
             </form>
           </InfoCard>
+
+          <DocumentsCard projectId={projectId} nodeId={nodeId} name={name} nodeOptions={nodeOptions} />
+
+          <SceneEventsCard projectId={projectId} nodeId={nodeId} name={name} onOpenFeature={onOpenFeature} />
 
           <LinkSection
             storageKey="ganis.nodeSheet.characters.collapsed"

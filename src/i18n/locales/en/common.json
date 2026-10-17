@@ -24,5 +24,6 @@
     "removeTitle": "Remove this image?",
     "removeBody": "The image will be deleted from the project. It doesn't go to the trash: to get it back, you'll have to add it again.",
     "removeConfirm": "Remove image"
-  }
+  },
+  "loading": "Loading…"
 }

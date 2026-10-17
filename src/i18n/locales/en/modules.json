@@ -14,6 +14,9 @@
     "structure": {
       "label": "Structure"
     },
+    "plot": {
+      "label": "Plot"
+    },
     "notes": {
       "label": "Notes",
       "empty": "No notes yet."
@@ -87,6 +90,16 @@
     "history": {
       "label": "History",
       "description": "What was done in the project, day by day."
+    },
+    "plot": {
+      "board": {
+        "label": "Plot board",
+        "description": "Plots in columns, time going down, and their cause-and-effect links."
+      },
+      "reading": {
+        "label": "Story reading",
+        "description": "The story in reading order, with its characters, locations, chapters and notes."
+      }
     }
   }
 }

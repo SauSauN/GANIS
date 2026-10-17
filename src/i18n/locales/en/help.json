@@ -1,7 +1,7 @@
 {
   "guide": {
     "title": "Getting started",
-    "description": "The basics of GANIS in a few steps. Find it again anytime in Help › Getting started.",
+    "description": "All of GANIS in a few steps. Find it again anytime in Help › Getting started.",
     "progress": "Step {{current}} of {{total}}",
     "previous": "Previous",
     "next": "Next",
@@ -10,35 +10,157 @@
     "steps": {
       "projects": {
         "title": "Your projects",
-        "text": "The dashboard gathers your projects: novel, manga, film, series, game… Create one with “New project” (Ctrl+N). Each project is encrypted on your computer and can be exported as a .ganix file for backup or another computer."
+        "text": "The dashboard gathers your projects: novel, manga, film, series, game, tabletop RPG… Create one with “New project” (Ctrl+N); it opens right away.",
+        "points": [
+          "Recently opened projects are at the top of the page.",
+          "Star a project to find it under “Favorites”.",
+          "Archive a finished project: it leaves the main list without being deleted.",
+          "The search bar filters projects by name or description."
+        ]
+      },
+      "spaces": {
+        "title": "Public space, private space",
+        "text": "“Get started” opens the public space, without an account. Once signed in, you are in your private space. The two never mix.",
+        "points": [
+          "Created without an account, a project is public: anyone using GANIS on this computer can open it.",
+          "Created while signed in, a project is private: encrypted and only visible from your account.",
+          "To change it: project settings › Status and organization › Visibility.",
+          "Making a public project private requires signing in; making a private project public asks for confirmation."
+        ]
       },
       "layout": {
         "title": "The workspace",
-        "text": "On the left, the module bar (Details, Characters, Locations, Structure, Notes). The middle panel lists the module's features and items; each item opens in a tab. Right-click a tab to pin it or close the others."
+        "text": "On the left, the module bar: Details, Characters, Locations, Structure, Plot, Notes and Search. The middle panel lists the module's features and items; each opens in a tab.",
+        "points": [
+          "Click a module again to collapse its panel.",
+          "Right-click a tab to pin it, or close the others, those on the left or on the right.",
+          "Pinned tabs come back the next time you open the project.",
+          "“Collapse” keeps only the icons in the left bar."
+        ]
+      },
+      "synopsis": {
+        "title": "The project home",
+        "text": "Every project starts with its sheet: synopsis, genres, tone and general information about the story.",
+        "points": [
+          "Details › Project synopsis to write the summary.",
+          "Name, description and type are edited in the project settings.",
+          "The status (preparing, in progress, paused, done) helps track progress."
+        ]
       },
       "characters": {
-        "title": "Characters and locations",
-        "text": "Create your characters (identity, looks, personality) and locations (from continent to room). Link them: relationships, homes, origin… The relationship graph shows your whole world at a glance."
+        "title": "Characters",
+        "text": "Create your characters: identity, looks and personality, with three levels of detail as needed.",
+        "points": [
+          "Characters › Create a character, or Ctrl+N in the module.",
+          "The level of detail of the sheets is set in the project settings.",
+          "Add a portrait and an image gallery to each sheet.",
+          "Each sheet opens in its own tab, named after the character."
+        ]
+      },
+      "locations": {
+        "title": "Locations",
+        "text": "From continent to room: each location has a sheet suited to its type (city, kingdom, forest…), and locations nest inside each other.",
+        "points": [
+          "Locations › Create a location, then pick its type.",
+          "Place a location inside another to build your world's geography.",
+          "Add your own location types and statuses in the project settings."
+        ]
+      },
+      "relations": {
+        "title": "Relationships and links",
+        "text": "Link your characters to each other (family, friendships, rivalries, alliances) and to their locations (home, origin…). The relationship graph shows your whole world at a glance.",
+        "points": [
+          "Characters › Relationships to open the graph.",
+          "Character ↔ location links are managed from either sheet.",
+          "Structure items also show which characters and locations appear in them."
+        ]
       },
       "structure": {
         "title": "Story structure",
-        "text": "Parts, chapters, scenes (or acts and sequences for a film…): the outline adapts to the project type. Level names, numbering and colors are set in the project settings. Each item has its own sheet with its characters and locations."
+        "text": "Parts, chapters, scenes, or acts and sequences for a film: the outline adapts to the project type.",
+        "points": [
+          "Structure › Story outline to build the tree.",
+          "Level names, numbering and colors are set in the project settings.",
+          "Each item has its own sheet, with its characters, locations and text.",
+          "“Move up” and “Move down” reorder the outline."
+        ]
+      },
+      "plot": {
+        "title": "The plot",
+        "text": "The plot board shows your storylines as columns, time flowing down, and their cause-and-effect links.",
+        "points": [
+          "Add parallel storylines next to the main one.",
+          "Link two events: impact, influence or crossing.",
+          "Track each event's state: idea, draft, written, revised.",
+          "Plot › Read the story: the narrative in reading order."
+        ]
       },
       "notes": {
         "title": "Notes and sticky notes",
-        "text": "Notes come with a real editor: headings, fonts, lists, tables, boxes, linked boxes and diagrams. File them in folders. The sticky-note wall holds loose ideas."
+        "text": "Notes come with a real editor: headings, fonts, lists, tables, boxes, linked boxes and diagrams.",
+        "points": [
+          "File your notes in folders.",
+          "The sticky-note wall holds loose ideas, placed freely.",
+          "Sheet descriptions also exist as system notes, editable from the notes."
+        ]
+      },
+      "search": {
+        "title": "Search",
+        "text": "Find anything in the project: characters, locations, structure, documents, plot, notes and sticky notes.",
+        "points": [
+          "The Search module looks through the whole project, ignoring accents and case.",
+          "Ctrl+K opens the palette: type to jump to an item or run a command.",
+          "Click a result to open it in a tab."
+        ]
       },
       "saving": {
-        "title": "Saving",
-        "text": "A ● dot on a tab means unsaved changes. Save with Ctrl+S, or let autosave do it. The status bar at the bottom always tells you where you stand: saving, saved, or failed."
+        "title": "Saving and versions",
+        "text": "A ● dot on a tab means unsaved changes. Save with Ctrl+S, or let autosave do it.",
+        "points": [
+          "The status bar at the bottom always tells you where you stand: saving, saved or failed.",
+          "A version is created automatically at the start of each editing session.",
+          "“Versions” button: compare a previous state with the current one, then restore it if needed.",
+          "Name the current state to keep an important milestone."
+        ]
       },
       "trash": {
-        "title": "Trash and undo",
-        "text": "A deletion can be undone right away with “Undo” (or Ctrl+Z). Deleted items stay 30 days in the trash (Project › Trash), where you can restore them."
+        "title": "History, trash and undo",
+        "text": "A deletion can be undone right away with “Undo” (or Ctrl+Z). Deleted items stay 30 days in the trash.",
+        "points": [
+          "Project › Trash to restore a deleted item.",
+          "Details › History: everything that happened in the project over the last 90 days.",
+          "In the history, click a name to open the item."
+        ]
+      },
+      "export": {
+        "title": "Back up and share",
+        "text": "Export a project as a .ganix file to back it up or open it on another computer.",
+        "points": [
+          "File › Export project (.ganix), or the download icon on the project card.",
+          "The .ganix file is not encrypted: keep it somewhere safe.",
+          "“Import a project” (with an account) adds it to your private space, or replaces an existing project after a backup.",
+          "Duplicate a project to try a variant without touching the original."
+        ]
+      },
+      "personalize": {
+        "title": "Your GANIS",
+        "text": "Adapt the app to the way you work.",
+        "points": [
+          "Light or dark theme in one click, in the top bar.",
+          "Packages: pick other color themes.",
+          "Settings: language, text size and account.",
+          "Work rhythm: your writing time day by day, and your streaks."
+        ]
       },
       "keyboard": {
         "title": "Keyboard shortcuts",
-        "text": "Ctrl+N to create, Ctrl+S to save, Ctrl+W to close the tab, Ctrl+Tab to switch tabs, Ctrl+K to find anything. Full list: Help › Keyboard shortcuts (Ctrl+/). Alt or F10 moves the keyboard to the menu bar."
+        "text": "Everything can be done from the keyboard too.",
+        "points": [
+          "Ctrl+N create, Ctrl+S save, Ctrl+W close the tab.",
+          "Ctrl+Tab switch tabs, Ctrl+K find anything.",
+          "Alt or F10 moves the keyboard to the menu bar.",
+          "Full list: Help › Keyboard shortcuts (Ctrl+/)."
+        ]
       }
     }
   },
@@ -147,7 +269,21 @@
           "Novel: parts, chapters, scenes. Film: acts, sequences, scenes. Manga: volumes, chapters, pages… Names can be changed in the project settings.",
           "Numbers are computed for you; an item can be left out of the numbering (prologue, interlude).",
           "Automatic numbering (renumbering on every move) is turned on in the project settings, as is each level's colour.",
-          "An item's sheet shows its summary, its characters (point of view, present…) and its locations."
+          "An item's sheet shows its summary, its characters (point of view, present…) and its locations.",
+          "Documents: in an item's sheet, keep its files (manga pages, PDFs, Word files, images, sounds…) with “Add files” or by drag and drop. They are encrypted with the project and exported in the .ganix.",
+          "Click a document to read it in GANIS; “Read the pages” chains a chapter's images. “Edit in its application” opens it in Word, Acrobat, Clip Studio…: every save comes back, the previous content stays in the versions."
+        ]
+      },
+      "plot": {
+        "title": "Plot",
+        "intro": "The board of parallel plots: one column per plot, time going down.",
+        "items": [
+          "Double-click a column to place an event; drag cards to change their moment or plot.",
+          "Drag a card's round handle onto another to create a link: impact, influence or crossing.",
+          "Link each event to the project: point of view, characters present, location, structure chapter and notes.",
+          "“Story reading” shows the events in reading order (by default the structure's) with everything attached, chapter documents included.",
+          "Character, location and structure item sheets show their events under “In the plot”.",
+          "Ctrl+Z undoes each action on the board. The “Tension” button shows the tension curve; plot colours are set in Project settings › Plot."
         ]
       },
       "notes": {
@@ -210,6 +346,18 @@
         {
           "q": "I edited a sheet and want to go back.",
           "a": "Open the sheet, click “Versions”, pick the state you want and click “Restore this version”."
+        },
+        {
+          "q": "How do I keep my manga chapter in GANIS?",
+          "a": "Open the chapter's sheet (story outline › click the chapter), then “Add files” or drop all the pages on the “Documents” card. Put them in order (Alt+↑/↓), then “Read the pages” for continuous reading."
+        },
+        {
+          "q": "I edited a document in Word: is it up to date in GANIS?",
+          "a": "Yes, if it was opened with “Edit in its application”: every save in Word comes back within seconds. Click “Finish” when you are done (the unencrypted working copy is then deleted)."
+        },
+        {
+          "q": "How do I read my story in the order the reader discovers it?",
+          "a": "Link the plot events to chapters (“Told in” field), then open Plot › Story reading: the order follows the structure. You can also choose a manual order at the top of the reading view."
         },
         {
           "q": "Are my changes saved?",

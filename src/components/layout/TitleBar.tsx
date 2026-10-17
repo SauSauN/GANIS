@@ -1,7 +1,7 @@
 import type { MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useMatch } from "react-router-dom";
-import { Activity, Blocks, Moon, Settings, Sun, Undo2 } from "lucide-react";
+import { Activity, Blocks, LogIn, Moon, Settings, Sun, Undo2 } from "lucide-react";
 import ganisLogo from "@/assets/ganis-logo.png";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { MenuBar } from "@/components/layout/MenuBar";
@@ -33,6 +33,10 @@ export function TitleBar() {
   const { t } = useTranslation("titlebar");
 
   const user = useAuthStore((s) => s.user);
+  const guest = useAuthStore((s) => s.guest);
+
+  /** Dans l'application : connecté, ou sans compte après « Commencer ». */
+  const inApp = Boolean(user) || guest;
 
   const onSettingsPage = useMatch("/settings") !== null;
   const onPackagesPage = useMatch("/packages/*") !== null;
@@ -51,7 +55,7 @@ export function TitleBar() {
   const lastProject = useProjectStore((s) =>
     s.projects.find((project) => project.id === s.lastProjectId),
   );
-  const showBackToProject = Boolean(user && lastProject && !projectId);
+  const showBackToProject = Boolean(inApp && lastProject && !projectId);
 
   const theme = useResolvedTheme();
 
@@ -85,7 +89,7 @@ export function TitleBar() {
           type="button"
           title={t("home")}
           aria-label={t("home")}
-          onClick={() => navigate(user ? "/dashboard" : "/")}
+          onClick={() => navigate(inApp ? "/dashboard" : "/")}
           className="flex h-7 items-center gap-2 rounded px-2 font-semibold hover:bg-secondary"
         >
           <img
@@ -101,7 +105,7 @@ export function TitleBar() {
         </button>
 
         {/* Menus de l'application (voir `MenuBar`) */}
-        {user && <MenuBar />}
+        {inApp && <MenuBar />}
       </div>
 
       {/* ------------------------------------------------------------------ */}
@@ -194,6 +198,18 @@ export function TitleBar() {
             className={cn(iconButton, onSettingsPage && "bg-secondary text-foreground")}
           >
             <Settings className="h-4 w-4" />
+          </button>
+        )}
+
+        {/* Sans compte : connexion */}
+        {!user && guest && (
+          <button
+            type="button"
+            onClick={() => navigate("/login")}
+            className="flex h-7 items-center gap-1.5 rounded px-2 text-sm hover:bg-secondary"
+          >
+            <LogIn className="h-4 w-4" />
+            <span className="hidden sm:inline">{t("guest.signIn")}</span>
           </button>
         )}
 

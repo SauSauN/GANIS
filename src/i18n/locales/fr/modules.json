@@ -14,6 +14,9 @@
     "structure": {
       "label": "Découpage"
     },
+    "plot": {
+      "label": "Trame"
+    },
     "notes": {
       "label": "Notes",
       "empty": "Aucune note pour l'instant."
@@ -87,6 +90,16 @@
     "history": {
       "label": "Historique",
       "description": "Ce qui a été fait dans le projet, jour par jour."
+    },
+    "plot": {
+      "board": {
+        "label": "Plateau des trames",
+        "description": "Les intrigues en colonnes, le temps vers le bas, et leurs liens de cause à effet."
+      },
+      "reading": {
+        "label": "Lecture de l'histoire",
+        "description": "L'histoire dans l'ordre du lecteur, avec ses personnages, lieux, chapitres et notes."
+      }
     }
   }
 }

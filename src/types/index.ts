@@ -63,6 +63,15 @@ export type ProjectType =
 
 export type ProjectStatus = "preparing" | "in_progress" | "paused" | "done";
 
+/**
+ * Visibilité d'un projet.
+ *
+ * - `public` : créé sans connexion (bouton « Commencer »). Toute personne
+ *   qui utilise GANIS sur cet appareil peut l'ouvrir.
+ * - `private` : lié à un compte et chiffré ; nécessite la connexion.
+ */
+export type ProjectVisibility = "public" | "private";
+
 export interface Project {
   id: string;
   name: string;
@@ -75,6 +84,8 @@ export interface Project {
   updatedAt: string; // RFC 3339, UTC
   /** Dernière ouverture du projet ; `null` s'il n'a jamais été ouvert. */
   lastOpenedAt?: string | null; // RFC 3339, UTC
+  /** Projet public (sans connexion) ou privé (lié au compte connecté). */
+  visibility: ProjectVisibility;
 }
 
 // ----------------------------------------------------------------------------
@@ -364,6 +375,8 @@ export interface CustomLocationType {
 
 /** Réglages des lieux du projet. */
 export interface LocationSettings {
+  /** Niveau de détail des fiches (`null` : pas encore choisi). */
+  detailLevel: CharacterDetailLevel | null;
   customTypes: CustomLocationType[];
   /** Listes personnalisées (absente : valeurs par défaut). */
   lists: Partial<Record<"status", string[]>>;
@@ -586,6 +599,14 @@ export interface NoteFolder {
   position: number;
   createdAt: string;
   updatedAt: string;
+  /** Dossier des notes système (créé par GANIS, ne se modifie pas). */
+  system?: boolean;
+}
+
+/** Option « notes système » du projet. */
+export interface SystemNotesSettings {
+  enabled: boolean;
+  language: string;
 }
 
 /** Note sans son contenu (listes, panneau latéral). */
@@ -598,6 +619,8 @@ export interface NoteSummary {
   pinned: boolean;
   createdAt: string;
   updatedAt: string;
+  /** Note système : reprend le texte d'une fiche (titres fixes). */
+  system?: boolean;
 }
 
 /** Note complète : `content` est le document de l'éditeur, en JSON (vide : note neuve). */
@@ -640,6 +663,7 @@ export type TrashKind =
   | "character"
   | "location"
   | "structureNode"
+  | "document"
   | "note"
   | "noteFolder"
   | "sticky"
@@ -662,7 +686,7 @@ export interface TrashItem {
 export type ActivityAction = "created" | "updated" | "deleted" | "restored" | "versionRestored" | "moved";
 
 /** Type d'élément du journal (ceux de la corbeille, plus le synopsis). */
-export type HistoryKind = TrashKind | "synopsis";
+export type HistoryKind = TrashKind | "synopsis" | "plot";
 
 export interface Activity {
   id: string;
@@ -676,7 +700,7 @@ export interface Activity {
 }
 
 /** Éléments qui ont des versions. */
-export type VersionKind = "character" | "location" | "structureNode" | "note" | "synopsis";
+export type VersionKind = "character" | "location" | "structureNode" | "note" | "synopsis" | "plot";
 
 export interface Version {
   id: string;
@@ -704,7 +728,8 @@ export interface WorkCalendar {
   }>;
 }
 
-export type SearchKind = "character" | "location" | "structureNode" | "note" | "noteFolder" | "sticky";
+/** `document` : l'identifiant est celui de l'élément du découpage qui le contient. */
+export type SearchKind = "character" | "location" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky";
 
 export interface SearchHit {
   kind: SearchKind;
@@ -740,3 +765,43 @@ export const ROLE_LABELS: Record<Role, string> = {
   developer: "Développeur",
   user: "Utilisateur",
 };
+// ----------------------------------------------------------------------------
+// Documents rangés dans le découpage (voir `document_service.rs`)
+// ----------------------------------------------------------------------------
+
+export interface StructureDocument {
+  id: string;
+  nodeId: string;
+  /** Nom du fichier, avec son extension. */
+  name: string;
+  mime: string;
+  /** Taille en octets. */
+  size: number;
+  note: string;
+  position: number;
+  createdAt: string;
+  updatedAt: string;
+  /** Nombre de versions précédentes. */
+  versions: number;
+}
+
+export interface DocumentVersion {
+  id: string;
+  name: string;
+  mime: string;
+  size: number;
+  createdAt: string;
+}
+
+/** Document ouvert dans une autre application. */
+export interface ExternalStatus {
+  open: boolean;
+  changed: boolean;
+  path: string;
+}
+
+export interface ExternalSync {
+  status: ExternalStatus;
+  /** Document mis à jour : ses modifications viennent d'être reprises. */
+  document: StructureDocument | null;
+}

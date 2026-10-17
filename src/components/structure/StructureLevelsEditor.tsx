@@ -20,6 +20,7 @@ import {
 } from "@/lib/structure";
 import { cn } from "@/lib/utils";
 import type { Structure, StructureNumbering } from "@/types";
+import { errorText } from "@/lib/errors";
 
 const fieldClass =
   "w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
@@ -169,7 +170,7 @@ export function StructureLevelsEditor({
       await onSaved();
       setSaved(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
     } finally {
       setSaving(false);
     }

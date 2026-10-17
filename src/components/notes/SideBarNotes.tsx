@@ -5,6 +5,7 @@ import {
   ChevronRight,
   FilePlus2,
   Folder,
+  FolderLock,
   FolderOpen,
   FolderPlus,
   NotebookText,
@@ -13,7 +14,6 @@ import {
   Trash2,
 } from "lucide-react";
 import { ConfirmDialog } from "@/components/notes/ConfirmDialog";
-import { ApiError } from "@/lib/api";
 import {
   buildFolderTree,
   folderAndDescendants,
@@ -25,6 +25,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useNoteStore, useProjectNotes } from "@/stores/noteStore";
 import type { NoteFolder, NoteSummary } from "@/types";
+import { errorText } from "@/lib/errors";
 
 interface SideBarNotesProps {
   projectId: string;
@@ -162,7 +163,7 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
     return result;
   }, [folders, notes, collapsed, draftParent, renaming, untitled]);
 
-  const report = (cause: unknown) => setError(cause instanceof ApiError ? cause.message : String(cause));
+  const report = (cause: unknown) => setError(errorText(cause));
 
   function toggle(id: string) {
     setCollapsed((current) => {
@@ -356,11 +357,11 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
                   role="treeitem"
                   aria-level={row.depth + 1}
                   aria-expanded={hasContent ? open : undefined}
-                  draggable
+                  draggable={!folder.system}
                   onDragStart={(event) => onDragStart(event, "folder", folder.id)}
-                  onDragOver={(event) => onDragOver(event, folder.id)}
+                  onDragOver={(event) => !folder.system && onDragOver(event, folder.id)}
                   onDragLeave={() => setDropTarget(null)}
-                  onDrop={(event) => void onDrop(event, folder.id)}
+                  onDrop={(event) => !folder.system && void onDrop(event, folder.id)}
                   className={cn(
                     "group/folder relative flex items-center rounded-md",
                     dropTarget === folder.id && "bg-primary/10 ring-1 ring-primary",
@@ -382,10 +383,12 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
                   <button
                     type="button"
                     onClick={() => toggle(folder.id)}
-                    onDoubleClick={() => setRenaming(folder.id)}
+                    onDoubleClick={() => !folder.system && setRenaming(folder.id)}
                     className="flex min-w-0 flex-1 items-center gap-2 rounded-md px-1.5 py-1 text-sm hover:bg-sidebar-accent"
                   >
-                    {open && hasContent ? (
+                    {folder.system ? (
+                      <FolderLock className="size-4 shrink-0 text-muted-foreground" aria-label={t("system.folder")} />
+                    ) : open && hasContent ? (
                       <FolderOpen className="size-4 shrink-0 text-primary" />
                     ) : (
                       <Folder className="size-4 shrink-0 text-primary" />
@@ -393,19 +396,21 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
                     <span className="flex-1 truncate text-left">{folder.name}</span>
                   </button>
 
-                  <div
-                    role="group"
-                    aria-label={t("sidebar.actions")}
-                    className="pointer-events-none absolute inset-y-0 right-0 flex items-center rounded-r-md bg-sidebar pl-1 opacity-0 transition-opacity group-focus-within/folder:pointer-events-auto group-focus-within/folder:opacity-100 group-hover/folder:pointer-events-auto group-hover/folder:opacity-100"
-                  >
-                    {iconButton(t("sidebar.newNoteIn"), <FilePlus2 className="size-3.5" />, () => void newNote(folder.id))}
-                    {iconButton(t("sidebar.newSubfolder"), <FolderPlus className="size-3.5" />, () => startFolder(folder.id))}
-                    {iconButton(t("sidebar.rename"), <Pencil className="size-3" />, () => {
-                      setDraftParent(undefined);
-                      setRenaming(folder.id);
-                    })}
-                    {iconButton(t("sidebar.delete"), <Trash2 className="size-3" />, () => setDeleting(folder))}
-                  </div>
+                  {!folder.system && (
+                    <div
+                      role="group"
+                      aria-label={t("sidebar.actions")}
+                      className="pointer-events-none absolute inset-y-0 right-0 flex items-center rounded-r-md bg-sidebar pl-1 opacity-0 transition-opacity group-focus-within/folder:pointer-events-auto group-focus-within/folder:opacity-100 group-hover/folder:pointer-events-auto group-hover/folder:opacity-100"
+                    >
+                      {iconButton(t("sidebar.newNoteIn"), <FilePlus2 className="size-3.5" />, () => void newNote(folder.id))}
+                      {iconButton(t("sidebar.newSubfolder"), <FolderPlus className="size-3.5" />, () => startFolder(folder.id))}
+                      {iconButton(t("sidebar.rename"), <Pencil className="size-3" />, () => {
+                        setDraftParent(undefined);
+                        setRenaming(folder.id);
+                      })}
+                      {iconButton(t("sidebar.delete"), <Trash2 className="size-3" />, () => setDeleting(folder))}
+                    </div>
+                  )}
                 </li>
               );
             }
@@ -418,7 +423,7 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
                 key={row.note.id}
                 role="treeitem"
                 aria-level={row.depth + 1}
-                draggable
+                draggable={!row.note.system}
                 onDragStart={(event) => onDragStart(event, "note", row.note.id)}
                 className="flex items-center"
                 style={indent(row.depth)}

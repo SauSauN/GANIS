@@ -36,6 +36,7 @@ import { useUnsavedChanges } from "@/lib/unsavedChanges";
 import { api } from "@/lib/api";
 import { useCharacterStore, useProjectCharacters } from "@/stores/characterStore";
 import type { CharacterDetailLevel } from "@/types";
+import { errorText } from "@/lib/errors";
 
 interface CharacterCreateViewProps {
   projectId: string;
@@ -116,7 +117,7 @@ export function CharacterCreateView({ projectId, feature, onOpenFeature }: Chara
         }
       } catch (e) {
         imageFailure = t("create.imagesFailed", {
-          message: e instanceof Error ? e.message : String(e),
+          message: errorText(e),
         });
       }
 
@@ -130,7 +131,7 @@ export function CharacterCreateView({ projectId, feature, onOpenFeature }: Chara
       onOpenFeature(characterTabId(created.id));
       return true;
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
       return false;
     } finally {
       setSaving(false);
@@ -164,7 +165,7 @@ export function CharacterCreateView({ projectId, feature, onOpenFeature }: Chara
     try {
       await setDetailLevel(projectId, pickedLevel);
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
     } finally {
       setLevelSaving(false);
     }

@@ -4,7 +4,7 @@ import { Bookmark, History, RotateCcw, Trash2, X } from "lucide-react";
 import { formatNoteDate } from "@/components/notes/FolderSelect";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogTitle } from "@/components/ui/dialog";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import { discardEntries, UnsavedTabContext, useUnsavedStore } from "@/lib/unsavedChanges";
 import { changedFields, diffWords, readableFields, type FieldChange } from "@/lib/versions";
 import { cn } from "@/lib/utils";
@@ -12,11 +12,13 @@ import { fullName } from "@/lib/characters";
 import { useCharacterStore } from "@/stores/characterStore";
 import { useLocationStore } from "@/stores/locationStore";
 import { useNoteStore } from "@/stores/noteStore";
+import { usePlotStore } from "@/stores/plotStore";
 import { useReloadStore } from "@/stores/reloadStore";
 import { useStructureStore } from "@/stores/structureStore";
 import { useSynopsisStore } from "@/stores/synopsisStore";
 import { toast } from "@/stores/toastStore";
 import type { Version, VersionKind, VersionList } from "@/types";
+import { errorText } from "@/lib/errors";
 
 interface VersionsDialogProps {
   open: boolean;
@@ -60,6 +62,9 @@ async function refresh(projectId: string, kind: VersionKind) {
     case "synopsis":
       await useSynopsisStore.getState().fetchSynopsis(projectId);
       break;
+    case "plot":
+      await usePlotStore.getState().reload(projectId);
+      break;
   }
 }
 
@@ -100,6 +105,8 @@ export function VersionsDialog({ open, onClose, projectId, kind, itemId, name }:
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [newName, setNewName] = useState("");
+  /** Version dont la suppression attend une confirmation (deuxième clic). */
+  const [confirming, setConfirming] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setError(null);
@@ -110,7 +117,7 @@ export function VersionsDialog({ open, onClose, projectId, kind, itemId, name }:
         current && result.versions.some((v) => v.id === current) ? current : (result.versions[0]?.id ?? null),
       );
     } catch (cause) {
-      setError(cause instanceof ApiError ? cause.message : String(cause));
+      setError(errorText(cause));
     }
   }, [projectId, kind, itemId]);
 
@@ -146,7 +153,7 @@ export function VersionsDialog({ open, onClose, projectId, kind, itemId, name }:
       toast({ message: t("restored", { date: formatNoteDate(version.createdAt, i18n.language) }), tone: "success" });
       onClose();
     } catch (cause) {
-      setError(cause instanceof ApiError ? cause.message : String(cause));
+      setError(errorText(cause));
     } finally {
       setBusy(false);
     }
@@ -161,19 +168,25 @@ export function VersionsDialog({ open, onClose, projectId, kind, itemId, name }:
       await load();
       setSelected(created.id);
     } catch (cause) {
-      setError(cause instanceof ApiError ? cause.message : String(cause));
+      setError(errorText(cause));
     } finally {
       setBusy(false);
     }
   }
 
   async function remove(id: string) {
+    // Suppression définitive : un premier clic demande confirmation.
+    if (confirming !== id) {
+      setConfirming(id);
+      return;
+    }
+    setConfirming(null);
     setBusy(true);
     try {
       await api.deleteVersion(projectId, id);
       await load();
     } catch (cause) {
-      setError(cause instanceof ApiError ? cause.message : String(cause));
+      setError(errorText(cause));
     } finally {
       setBusy(false);
     }
@@ -248,16 +261,30 @@ export function VersionsDialog({ open, onClose, projectId, kind, itemId, name }:
                     {item.name || t("auto")}
                   </span>
                 </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => void remove(item.id)}
-                  title={t("delete")}
-                  aria-label={t("delete")}
-                  className="absolute top-1/2 right-1.5 flex size-7 -translate-y-1/2 items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity group-hover/version:opacity-100 hover:text-destructive focus-visible:opacity-100"
-                >
-                  <Trash2 className="size-3.5" />
-                </button>
+                {confirming === item.id ? (
+                  <button
+                    type="button"
+                    autoFocus
+                    disabled={busy}
+                    onClick={() => void remove(item.id)}
+                    onBlur={() => setConfirming(null)}
+                    onKeyDown={(e) => e.key === "Escape" && (e.stopPropagation(), setConfirming(null))}
+                    className="absolute top-1/2 right-1.5 -translate-y-1/2 rounded bg-destructive px-2 py-1 text-xs font-medium text-white"
+                  >
+                    {t("deleteConfirm")}
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void remove(item.id)}
+                    title={t("delete")}
+                    aria-label={t("delete")}
+                    className="absolute top-1/2 right-1.5 flex size-7 -translate-y-1/2 items-center justify-center rounded text-muted-foreground opacity-0 transition-opacity group-hover/version:opacity-100 hover:text-destructive focus-visible:opacity-100"
+                  >
+                    <Trash2 className="size-3.5" />
+                  </button>
+                )}
               </li>
             ))}
           </ul>

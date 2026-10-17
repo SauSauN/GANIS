@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2, Search, X } from "lucide-react";
 import { SearchResults } from "@/components/search/SearchResults";
-import { itemTabId, useProjectSearch } from "@/lib/search";
+import { openSearchHit, useProjectSearch } from "@/lib/search";
 
 interface SideBarSearchProps {
   projectId: string;
@@ -66,10 +66,7 @@ export function SideBarSearch({ projectId, onOpenFeature }: SideBarSearchProps) 
         <SearchResults
           hits={hits}
           query={query}
-          onOpen={(hit) => {
-            const tab = itemTabId(hit.kind, hit.id);
-            if (tab) onOpenFeature(tab);
-          }}
+          onOpen={(hit) => openSearchHit(hit, onOpenFeature)}
         />
       </div>
     </div>

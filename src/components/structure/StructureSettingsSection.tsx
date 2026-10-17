@@ -17,6 +17,7 @@ import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useProjectStructureData } from "@/stores/structureStore";
 import type { Project, StructureTemplateId } from "@/types";
+import { errorText } from "@/lib/errors";
 
 /**
  * Paramètres du projet › Découpage : modèle de départ, puis noms et
@@ -43,7 +44,7 @@ export function StructureSettingsSection({ project }: { project: Project }) {
       await load();
       setAutoSaved(true);
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
     } finally {
       setBusy(false);
     }
@@ -57,7 +58,7 @@ export function StructureSettingsSection({ project }: { project: Project }) {
       await api.setStructureTemplate(project.id, template);
       await load();
     } catch (e) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(errorText(e));
     } finally {
       setBusy(false);
     }

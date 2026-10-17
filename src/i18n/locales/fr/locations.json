@@ -356,6 +356,10 @@
       "title": "Informations gardées de l'ancien type",
       "description": "Ces champs ne s'appliquent pas à ce type et sont masqués. Ils ne sont pas effacés : ils réapparaîtront si vous revenez à un type qui les utilise.",
       "list": "Champs concernés : {{fields}}."
+    },
+    "hiddenByLevel": {
+      "title": "Champs masqués par le niveau de détail",
+      "description": "Ces champs remplis sont gardés mais pas affichés au niveau choisi : {{fields}}. Le niveau se change dans Paramètres du projet › Lieux."
     }
   },
   "picker": {
@@ -450,7 +454,13 @@
       "remove": "Retirer « {{value}} »"
     },
     "saved": "Enregistré.",
-    "failed": "L'enregistrement a échoué."
+    "failed": "L'enregistrement a échoué.",
+    "level": {
+      "title": "Niveau de détail des fiches",
+      "description": "S'applique à toutes les fiches de lieux. Les champs déjà remplis ne sont jamais effacés.",
+      "saved": "Niveau enregistré.",
+      "failed": "Le niveau n'a pas pu être enregistré."
+    }
   },
   "links": {
     "characterTitle": "Lieux liés",
@@ -511,6 +521,29 @@
       "backToList": "Choisir parmi les lieux",
       "notInProject": "Pas encore un lieu du projet.",
       "open": "Ouvrir la fiche du lieu"
+    }
+  },
+  "levels": {
+    "title": "Niveau de détail des fiches",
+    "firstTime": "Choisissez le niveau de détail des fiches de lieux de ce projet. Il s'applique à tous les lieux et se change dans les paramètres du projet.",
+    "continue": "Continuer",
+    "basic": {
+      "label": "Basique",
+      "theme": "L'essentiel",
+      "goal": "Situer et décrire le lieu",
+      "count": "6 champs"
+    },
+    "intermediate": {
+      "label": "Moyen",
+      "theme": "Le décor",
+      "goal": "Donner vie au lieu : autres noms, climat, population, gouvernement…",
+      "count": "+ 7 à 14 champs"
+    },
+    "advanced": {
+      "label": "Avancé",
+      "theme": "La profondeur",
+      "goal": "Construire un lieu riche : détails propres au type et histoire",
+      "count": "+ 1 à 6 champs"
     }
   }
 }

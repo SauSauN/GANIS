@@ -28,6 +28,8 @@
     "name": "Name",
     "type": "Type",
     "status": "Status",
-    "parent": "Located in"
-  }
+    "parent": "Located in",
+    "plot": "Plot"
+  },
+  "deleteConfirm": "Delete for good?"
 }

@@ -16,6 +16,7 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 import { isRecoveryKeyFormat } from "@/lib/recoveryKey";
 import { checkPassword, type ValidationIssue } from "@/lib/validators";
+import { errorText } from "@/lib/errors";
 
 /**
  * Problème affiché sous le formulaire.
@@ -80,7 +81,7 @@ export default function Recover() {
       setDone(true);
     } catch (e) {
       setProblem({
-        text: e instanceof Error ? e.message : String(e),
+        text: errorText(e),
       });
     } finally {
       setLoading(false);

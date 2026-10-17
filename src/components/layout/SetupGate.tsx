@@ -8,10 +8,17 @@ import { useSetupStore } from "@/stores/setupStore";
 const SETUP_PATH = "/setup";
 
 /**
- * Impose l'assistant de configuration initiale tant qu'aucun compte
- * n'existe, et le rend inaccessible ensuite.
+ * Pages liées aux comptes : sans aucun compte, elles mènent à l'assistant.
+ */
+const ACCOUNT_PATHS = ["/login", "/register", "/recover"];
+
+/**
+ * Impose l'assistant de configuration initiale pour les pages de compte
+ * tant qu'aucun compte n'existe, et le rend inaccessible ensuite.
  *
- * - aucun compte → toute page redirige vers /setup ;
+ * - aucun compte → connexion, inscription et récupération redirigent vers
+ *   /setup. L'accueil et les projets publics (« Commencer ») restent
+ *   utilisables sans aucun compte ;
  * - configuration faite → /setup redirige vers l'accueil.
  */
 export function SetupGate({ children }: { children: ReactNode }) {
@@ -53,7 +60,7 @@ export function SetupGate({ children }: { children: ReactNode }) {
 
   const onSetupPage = location.pathname === SETUP_PATH;
 
-  if (needsSetup && !onSetupPage) {
+  if (needsSetup && ACCOUNT_PATHS.includes(location.pathname)) {
     return <Navigate to={SETUP_PATH} replace />;
   }
 

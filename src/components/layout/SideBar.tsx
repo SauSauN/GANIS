@@ -11,6 +11,7 @@ import { SideBarLocations } from "@/components/locations/SideBarLocations";
 import { SideBarNotes } from "@/components/notes/SideBarNotes";
 import { SideBarSearch } from "@/components/search/SideBarSearch";
 import { SideBarStructure } from "@/components/structure/SideBarStructure";
+import { SideBarPlot } from "@/components/plot/SideBarPlot";
 import {
   getModule,
   type ModuleId,
@@ -231,6 +232,11 @@ export function SideBar({
         {/* Découpage du récit, en arborescence, sous « Plan du récit ». */}
         {module.id === "structure" && (
           <SideBarStructure projectId={projectId} activeTab={activeTab} onOpenFeature={onOpenFeature} />
+        )}
+
+        {/* Trames du projet. */}
+        {module.id === "plot" && (
+          <SideBarPlot projectId={projectId} activeTab={activeTab} onOpenFeature={onOpenFeature} />
         )}
 
         {/* Dossiers et notes, en arborescence. */}

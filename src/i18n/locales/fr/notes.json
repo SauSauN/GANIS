@@ -13,7 +13,7 @@
   },
   "editor": {
     "toolbar": "Mise en forme de la note",
-    "placeholder": "Écrivez votre note…",
+    "placeholder": "Écrivez votre note… (« $$ » pour citer un personnage, un lieu ou un élément du découpage)",
     "undo": "Annuler (Ctrl+Z)",
     "redo": "Rétablir (Ctrl+Y)",
     "block": {
@@ -176,5 +176,26 @@
     "count_one": "{{count}} post-it",
     "count_other": "{{count}} post-it",
     "retry": "Réessayer"
+  },
+  "mentions": {
+    "label": "Éléments du projet",
+    "open": "Ouvrir « {{name}} »",
+    "missing": "Cet élément n'existe plus",
+    "kinds": {
+      "character": "Personnage",
+      "location": "Lieu",
+      "node": "Découpage"
+    }
+  },
+  "spell": {
+    "menu": "Orthographe",
+    "loading": "Recherche de suggestions…",
+    "none": "Aucune suggestion",
+    "add": "Ajouter au dictionnaire",
+    "ignore": "Ignorer"
+  },
+  "system": {
+    "banner": "Note système : elle reprend la fiche. Les titres sont fixes ; le texte écrit sous un titre est enregistré dans la fiche, en texte simple.",
+    "folder": "Dossier système"
   }
 }

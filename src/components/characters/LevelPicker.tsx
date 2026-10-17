@@ -12,6 +12,8 @@ const ICONS: Record<CharacterDetailLevel, LucideIcon> = {
 };
 
 interface LevelPickerProps {
+  /** Textes des niveaux : fiches de personnages (par défaut) ou de lieux. */
+  namespace?: "characters" | "locations";
   value: CharacterDetailLevel | null;
   onChange: (level: CharacterDetailLevel) => void;
   disabled?: boolean;
@@ -22,8 +24,9 @@ interface LevelPickerProps {
  * (+ l'apparence), Avancé (+ la personnalité). Les niveaux couverts par le
  * choix sont mis en évidence.
  */
-export function LevelPicker({ value, onChange, disabled }: LevelPickerProps) {
-  const { t } = useTranslation("characters");
+export function LevelPicker({ namespace = "characters", value, onChange, disabled }: LevelPickerProps) {
+  const { t: typed } = useTranslation(namespace);
+  const t = typed as unknown as (key: string) => string;
   const name = useId();
   const selectedIndex = value ? DETAIL_LEVELS.indexOf(value) : -1;
 
@@ -60,7 +63,7 @@ export function LevelPicker({ value, onChange, disabled }: LevelPickerProps) {
               />
               <span className="text-sm font-medium">{t(`levels.${level}.label`)}</span>
               <span className="ml-auto text-xs text-muted-foreground">
-                {index === 0 ? t("levels.count") : t("levels.countMore")}
+                {namespace === "locations" ? t(`levels.${level}.count`) : index === 0 ? t("levels.count") : t("levels.countMore")}
               </span>
             </span>
 

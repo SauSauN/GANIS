@@ -17,6 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useCharacterStore } from "@/stores/characterStore";
 import type { GalleryImage } from "@/types";
+import { errorText } from "@/lib/errors";
 
 /** Nombre maximal d'images (identique à Rust). */
 export const MAX_GALLERY_IMAGES = 30;
@@ -161,7 +162,7 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
 /** Message d'erreur d'une image refusée. */
 function imageError(t: (key: string) => string, e: unknown): string {
   if (e instanceof PortraitError) return t(`portrait.errors.${e.code}`);
-  return e instanceof Error ? e.message : String(e);
+  return errorText(e);
 }
 
 // ----------------------------------------------------------------------------

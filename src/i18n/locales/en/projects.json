@@ -60,8 +60,8 @@
       "notEncrypted": "The .ganix file is not encrypted: it opens in any GANIS, from any account. Keep it somewhere safe."
     },
     "import": {
-      "button": "Import a .ganix",
-      "dialogTitle": "Open a .ganix project",
+      "button": "Import a project",
+      "dialogTitle": "Open a project",
       "checking": "Checking the file…",
       "failed": "The project could not be imported.",
       "title": "Import this project?",
@@ -97,5 +97,11 @@
       "replaced": "Project “{{name}}” replaced. Backup of the previous version: {{file}} (GANIS “sauvegardes” folder).",
       "encryptionNoteReplace": "The received data will be encrypted with your project's key."
     }
+  },
+  "visibility": {
+    "public": "Public",
+    "private": "Private",
+    "madePrivate": "“{{name}}” is now private.",
+    "madePublic": "“{{name}}” is now public."
   }
 }

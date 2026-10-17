@@ -1,190 +1,105 @@
-import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useNavigate } from "react-router-dom";
+import { LogIn } from "lucide-react";
 import ganisLogo from "@/assets/ganis-logo.png";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { RECOVERY_KEY_ENABLED } from "@/lib/recoveryKey";
+import { StoryMap } from "@/components/welcome/StoryMap";
 import { useAuthStore } from "@/stores/authStore";
+import { useSetupStore } from "@/stores/setupStore";
 
+/**
+ * Accueil.
+ *
+ * - « Commencer » : sans compte, ouvre le tableau de bord de l'espace
+ *   public (le guide de démarrage s'y affiche à la première visite).
+ * - « Se connecter » : espace privé du compte.
+ *
+ * À droite, un plateau de trame en miniature (`StoryMap`) donne le ton :
+ * intrigues, scènes, personnages et lieux reliés.
+ */
 export default function Welcome() {
   const navigate = useNavigate();
   const { t } = useTranslation("welcome");
 
   const user = useAuthStore((s) => s.user);
-  const login = useAuthStore((s) => s.login);
-  const error = useAuthStore((s) => s.error);
-  const loading = useAuthStore((s) => s.loading);
-  const devLogin = useAuthStore((s) => s.devLogin);
-
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
+  const startGuest = useAuthStore((s) => s.startGuest);
+  const needsSetup = useSetupStore((s) => s.needsSetup);
 
   if (user) {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const success = await login(username, password);
-
-    if (success) {
-      navigate("/dashboard");
-    }
+  const handleStart = () => {
+    startGuest();
+    navigate("/dashboard");
   };
 
+  /** Aucun compte encore : la connexion passe par l'assistant. */
+  const handleSignIn = () => navigate(needsSetup ? "/setup" : "/login");
+
   return (
-    <main className="relative flex flex-1 items-center justify-center bg-background px-8 py-10">
-      <div className="flex w-full max-w-5xl items-center justify-between gap-16">
-        {/* Présentation GANIS */}
-        <section className="flex flex-1 flex-col">
-          {/* Logo à gauche du titre et du slogan */}
-          <div className="mb-7 flex items-center gap-5">
+    <main className="relative isolate flex flex-1 items-center overflow-hidden bg-background">
+      {/* Trame de points, estompée vers les bords */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 [mask-image:radial-gradient(ellipse_70%_65%_at_65%_50%,black,transparent)]"
+        style={{
+          backgroundImage:
+            "radial-gradient(circle, var(--border) 1px, transparent 1.5px)",
+          backgroundSize: "22px 22px",
+        }}
+      />
+
+      {/* Halo derrière l'illustration */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -z-10 right-[-10%] top-1/2 h-[42rem] w-[42rem] -translate-y-1/2 rounded-full opacity-60 blur-3xl"
+        style={{
+          background:
+            "radial-gradient(circle, color-mix(in oklab, var(--primary) 18%, transparent), transparent 65%)",
+        }}
+      />
+
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-6 py-12 sm:px-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] lg:gap-6">
+        {/* Marque, message, actions */}
+        <section className="relative z-10 max-w-md">
+          <div className="flex items-center gap-3">
             <img
               src={ganisLogo}
-              alt="Logo GANIS"
-              className="h-32 w-32 shrink-0 object-contain"
+              alt=""
+              className="h-11 w-11 shrink-0 object-contain"
             />
-
-            <div className="min-w-0">
-              <h1 className="text-5xl font-semibold tracking-tight">
-                GANIS
-              </h1>
-
-              <p className="mt-3 text-xl text-muted-foreground">
-                {t("tagline")}
-              </p>
+            <div className="leading-tight">
+              <p className="text-lg font-semibold tracking-tight">GANIS</p>
+              <p className="text-sm text-muted-foreground">{t("tagline")}</p>
             </div>
           </div>
 
-          {/* Description de l'application */}
-          <p className="mt-6 max-w-lg text-sm leading-6 text-muted-foreground">
-            {t("intro")}
-          </p>
+          <h1 className="mt-10 text-[2.75rem] font-semibold leading-[1.05] tracking-[-0.03em] text-balance sm:text-6xl">
+            {t("headline")}
+          </h1>
 
-          {/* Actions */}
-          <div className="mt-8 flex items-center gap-3">
-            <Button
-              variant="outline"
-              onClick={() => navigate("/register")}
-            >
-              {t("actions.createAccount")}
+          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+            <Button size="lg" className="sm:min-w-36" onClick={handleStart}>
+              {t("actions.start")}
             </Button>
 
-            {import.meta.env.DEV && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  devLogin();
-                  navigate("/dashboard");
-                }}
-              >
-                {t("actions.demo")}
-              </Button>
-            )}
+            <Button
+              size="lg"
+              variant="outline"
+              className="bg-background/70 backdrop-blur sm:min-w-36"
+              onClick={handleSignIn}
+            >
+              <LogIn className="mr-2 h-4 w-4" />
+              {t("actions.signIn")}
+            </Button>
           </div>
         </section>
 
-        {/* Panneau de connexion */}
-        <section className="w-full max-w-sm">
-          <div className="rounded-3xl border bg-card p-7 shadow-sm">
-            <div className="mb-6">
-              <h2 className="text-xl font-semibold">
-                {t("login.title")}
-              </h2>
-
-              <p className="mt-1 text-sm text-muted-foreground">
-                {t("login.subtitle")}
-              </p>
-            </div>
-
-            <form onSubmit={handleLogin} className="space-y-5">
-              {/* Identifiant */}
-              <div className="space-y-2">
-                <Label htmlFor="username">
-                  {t("login.username")}
-                </Label>
-
-                <Input
-                  id="username"
-                  type="text"
-                  autoComplete="username"
-                  placeholder={t("login.username")}
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
-                />
-              </div>
-
-              {/* Mot de passe */}
-              <div className="space-y-2">
-                <div className="flex items-baseline justify-between gap-2">
-                  <Label htmlFor="password">
-                    {t("login.password")}
-                  </Label>
-
-                  {RECOVERY_KEY_ENABLED && (
-                    <button
-                      type="button"
-                      onClick={() => navigate("/recover")}
-                      className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
-                    >
-                      {t("login.forgotPassword")}
-                    </button>
-                  )}
-                </div>
-
-                <Input
-                  id="password"
-                  type="password"
-                  autoComplete="current-password"
-                  placeholder={t("login.password")}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                />
-              </div>
-
-              {/* Erreur de connexion */}
-              {error && (
-                <p
-                  role="alert"
-                  className="text-sm text-destructive"
-                >
-                  {error}
-                </p>
-              )}
-
-              {/* Bouton de connexion */}
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={loading}
-              >
-                {loading
-                  ? t("login.submitting")
-                  : t("login.submit")}
-              </Button>
-            </form>
-
-            {/* Création de compte */}
-            <div className="mt-6 border-t pt-5 text-center">
-              <p className="text-sm text-muted-foreground">
-                {t("noAccount")}{" "}
-                <button
-                  type="button"
-                  onClick={() => navigate("/register")}
-                  className="font-medium text-foreground underline-offset-4 hover:underline"
-                >
-                  {t("actions.createAccount")}
-                </button>
-              </p>
-            </div>
-          </div>
-        </section>
+        {/* Plateau de trame en miniature */}
+        <div className="relative -mx-4 sm:mx-0">
+          <StoryMap className="mx-auto w-full max-w-[38rem] opacity-90 lg:opacity-100" />
+        </div>
       </div>
     </main>
   );

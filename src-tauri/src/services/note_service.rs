@@ -10,6 +10,7 @@
 //!   une taille.
 
 use crate::error::{AppError, AppResult};
+use crate::services::system_note_service as system;
 use crate::utils::{new_id, now_utc};
 use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
@@ -37,6 +38,8 @@ pub struct NoteFolder {
     pub position: i64,
     pub created_at: String,
     pub updated_at: String,
+    /// Dossier des notes système (ne se modifie pas à la main).
+    pub system: bool,
 }
 
 /// Note sans son contenu (liste).
@@ -50,6 +53,8 @@ pub struct NoteSummary {
     pub pinned: bool,
     pub created_at: String,
     pub updated_at: String,
+    /// Note système : reprend le texte d'une fiche (voir `system_note_service`).
+    pub system: bool,
 }
 
 /// Note complète.
@@ -64,6 +69,7 @@ pub struct Note {
     pub pinned: bool,
     pub created_at: String,
     pub updated_at: String,
+    pub system: bool,
 }
 
 /// Modification d'une note (champs absents : inchangés).
@@ -191,7 +197,8 @@ fn clean_number(value: f64, min: f64, max: f64) -> AppResult<f64> {
 // Dossiers
 // ----------------------------------------------------------------------------
 
-const FOLDER_COLUMNS: &str = "id, parent_id, name, position, created_at, updated_at";
+const FOLDER_COLUMNS: &str = "id, parent_id, name, position, created_at, updated_at, \
+    EXISTS (SELECT 1 FROM system_note_folders s WHERE s.folder_id = note_folders.id) AS system";
 
 pub async fn list_folders(pool: &SqlitePool) -> AppResult<Vec<NoteFolder>> {
     let sql = format!("SELECT {FOLDER_COLUMNS} FROM note_folders ORDER BY position, name");
@@ -213,6 +220,7 @@ async fn check_folder(pool: &SqlitePool, id: Option<&str>) -> AppResult<()> {
 pub async fn create_folder(pool: &SqlitePool, parent_id: Option<&str>, name: &str) -> AppResult<NoteFolder> {
     let name = clean_folder_name(name)?;
     check_folder(pool, parent_id).await?;
+    system::guard_folder(pool, parent_id).await?;
 
     let id = new_id();
     let now = now_utc();
@@ -235,6 +243,7 @@ pub async fn create_folder(pool: &SqlitePool, parent_id: Option<&str>, name: &st
 
 pub async fn rename_folder(pool: &SqlitePool, id: &str, name: &str) -> AppResult<NoteFolder> {
     let name = clean_folder_name(name)?;
+    system::guard_folder(pool, Some(id)).await?;
     let result = sqlx::query("UPDATE note_folders SET name = ?, updated_at = ? WHERE id = ?")
         .bind(&name)
         .bind(now_utc())
@@ -252,6 +261,8 @@ pub async fn rename_folder(pool: &SqlitePool, id: &str, name: &str) -> AppResult
 pub async fn move_folder(pool: &SqlitePool, id: &str, parent_id: Option<&str>) -> AppResult<NoteFolder> {
     find_folder(pool, id).await?.ok_or_else(folder_not_found)?;
     check_folder(pool, parent_id).await?;
+    system::guard_folder(pool, Some(id)).await?;
+    system::guard_folder(pool, parent_id).await?;
 
     let mut cursor = parent_id.map(str::to_owned);
     while let Some(current) = cursor {
@@ -275,6 +286,7 @@ pub async fn move_folder(pool: &SqlitePool, id: &str, parent_id: Option<&str>) -
 /// Supprime un dossier et ses sous-dossiers ; leurs notes reviennent à la
 /// racine.
 pub async fn delete_folder(pool: &SqlitePool, id: &str) -> AppResult<String> {
+    system::guard_folder(pool, Some(id)).await?;
     let mut tx = pool.begin().await?;
     let mut snapshot = crate::services::trash_service::Snapshot::new();
     snapshot.capture(&mut tx, "note_folders", "id", id).await?;
@@ -298,8 +310,10 @@ pub async fn delete_folder(pool: &SqlitePool, id: &str) -> AppResult<String> {
 // Notes
 // ----------------------------------------------------------------------------
 
-const SUMMARY_COLUMNS: &str = "id, folder_id, title, excerpt, pinned, created_at, updated_at";
-const NOTE_COLUMNS: &str = "id, folder_id, title, content, excerpt, pinned, created_at, updated_at";
+const SUMMARY_COLUMNS: &str = "id, folder_id, title, excerpt, pinned, created_at, updated_at, \
+    EXISTS (SELECT 1 FROM system_notes s WHERE s.note_id = notes.id) AS system";
+const NOTE_COLUMNS: &str = "id, folder_id, title, content, excerpt, pinned, created_at, updated_at, \
+    EXISTS (SELECT 1 FROM system_notes s WHERE s.note_id = notes.id) AS system";
 
 /// Toutes les notes, sans leur contenu (épinglées d'abord, puis les plus
 /// récentes).
@@ -320,6 +334,7 @@ pub async fn get_note(pool: &SqlitePool, id: &str) -> AppResult<Note> {
 pub async fn create_note(pool: &SqlitePool, folder_id: Option<&str>, title: &str) -> AppResult<Note> {
     let title = clean_title(title)?;
     check_folder(pool, folder_id).await?;
+    system::guard_folder(pool, folder_id).await?;
 
     let id = new_id();
     let now = now_utc();
@@ -341,6 +356,10 @@ pub async fn create_note(pool: &SqlitePool, folder_id: Option<&str>, title: &str
 
 pub async fn update_note(pool: &SqlitePool, id: &str, update: &NoteUpdate) -> AppResult<Note> {
     let current = get_note(pool, id).await?;
+    if current.system {
+        // Le texte va dans la fiche ; le titre suit le nom de l'élément.
+        return Box::pin(system::update_note(pool, id, update.content.as_deref(), update.pinned)).await;
+    }
 
     let title = match &update.title {
         Some(value) => clean_title(value)?,
@@ -372,6 +391,8 @@ pub async fn update_note(pool: &SqlitePool, id: &str, update: &NoteUpdate) -> Ap
 /// Range une note dans un dossier (`None` : à la racine).
 pub async fn move_note(pool: &SqlitePool, id: &str, folder_id: Option<&str>) -> AppResult<Note> {
     check_folder(pool, folder_id).await?;
+    system::guard_note(pool, id).await?;
+    system::guard_folder(pool, folder_id).await?;
 
     let result = sqlx::query("UPDATE notes SET folder_id = ?, updated_at = ? WHERE id = ?")
         .bind(folder_id)
@@ -387,6 +408,7 @@ pub async fn move_note(pool: &SqlitePool, id: &str, folder_id: Option<&str>) -> 
 }
 
 pub async fn delete_note(pool: &SqlitePool, id: &str) -> AppResult<String> {
+    system::guard_note(pool, id).await?;
     let mut tx = pool.begin().await?;
     let mut snapshot = crate::services::trash_service::Snapshot::new();
     snapshot.capture(&mut tx, "notes", "id", id).await?;
