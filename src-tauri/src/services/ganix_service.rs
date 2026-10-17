@@ -2228,6 +2228,8 @@ mod tests {
             name_sealed: None,
             description_sealed: None,
             wrapped_key: None,
+            visibility: Default::default(),
+            public_key: None,
         }
     }
 

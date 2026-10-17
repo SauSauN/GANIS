@@ -40,6 +40,8 @@ import {
   HEAD,
   linkPath,
   metrics,
+  rowAt,
+  rowTop,
   slotAt,
   smoothPath,
   TENSION_W,
@@ -60,7 +62,9 @@ import {
   eventOf,
   filterActive,
   matchesFilter,
+  momentNumber,
   occupant,
+  pastRowsCount,
   rowsCount,
   STATUS_COLORS,
   visibleLanes,
@@ -170,16 +174,21 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
     window.setTimeout(() => (justDragged.current = false), 0);
   };
 
-  const m = metrics(view.zoom);
+  /** Lignes du passé narratif, au-dessus du début de l'histoire. */
+  const past = data ? pastRowsCount(data) : 0;
+  const m = metrics(view.zoom, past);
   const setView = useCallback((next: PlotView) => {
     setViewState(next);
     writeView(next);
   }, []);
 
   const lanes = data ? visibleLanes(data) : [];
+  /** Moments de l'histoire principale (à partir du début). */
   const rows = data ? rowsCount(data) : 10;
+  /** Lignes affichées : passé narratif + histoire principale. */
+  const total = past + rows;
   const width = lanes.length * m.lane;
-  const height = rows * m.row;
+  const height = total * m.row;
   const columnOf = useCallback((laneId: string) => lanes.findIndex((l) => l.id === laneId), [lanes]);
 
   // Textes liés à chaque événement (pour la recherche et la mise en avant).
@@ -331,7 +340,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
       const p = stagePoint();
       const left = p.x - offset.x;
       const top = p.y - offset.y;
-      const slot = slotAt(m, left + m.node / 2, top + m.nodeHeight / 2, lanes.length, rows);
+      const slot = slotAt(m, left + m.node / 2, top + m.nodeHeight / 2, lanes.length, total);
       last = { type: "move", id: plotEvent.id, left, top, column: slot.column, row: slot.row, moved: true };
       setDrag(last);
     };
@@ -381,7 +390,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
       const under = document.elementFromPoint(pointer.current.x, pointer.current.y)?.closest<HTMLElement>("[data-event]");
       const over = under && under.dataset.event !== plotEvent.id ? under.dataset.event! : null;
       const inside = p.x >= 0 && p.x < lanes.length * m.lane && p.y >= 0;
-      last = { type: "link", from: plotEvent.id, x: p.x, y: p.y, over, slot: !over && inside ? slotAt(m, p.x, p.y, lanes.length, rows) : null };
+      last = { type: "link", from: plotEvent.id, x: p.x, y: p.y, over, slot: !over && inside ? slotAt(m, p.x, p.y, lanes.length, total) : null };
       setDrag(last);
     };
     const onMove = (e: PointerEvent) => {
@@ -481,11 +490,11 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
       const x = clientX - rect.left;
       const y = clientY - rect.top;
       return {
-        row: Math.min(rows - 1, Math.max(0, Math.floor(y / m.row))),
+        row: rowAt(m, y, total),
         value: Math.min(10, Math.max(0, Math.round(((x - 8) / (TENSION_W - 16)) * 10))),
       };
     },
-    [m.row, rows],
+    [m, total],
   );
 
   function onTensionPointerDown(event: ReactPointerEvent) {
@@ -527,7 +536,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
     if (target !== event.currentTarget && !target.closest("svg")) return;
     if (target.closest("[data-link]")) return;
     const rect = stageRef.current!.getBoundingClientRect();
-    const slot = slotAt(m, event.clientX - rect.left, event.clientY - rect.top, lanes.length, rows);
+    const slot = slotAt(m, event.clientX - rect.left, event.clientY - rect.top, lanes.length, total);
     const lane = lanes[slot.column];
     if (lane) openOrCreateAt(projectId, lane.id, slot.row);
   }
@@ -629,6 +638,31 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selection?.type === "event" ? selection.id : null]);
 
+  // --- Passé narratif : ouverture au début de l'histoire --------------------
+
+  // À l'ouverture, le plateau montre le début de l'histoire (moment 1) ; le
+  // passé narratif est au-dessus, on y remonte en faisant défiler.
+  const positioned = useRef(false);
+  const lastPast = useRef(past);
+  useLayoutEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller || !data) return;
+    if (!positioned.current) {
+      positioned.current = true;
+      lastPast.current = past;
+      // Un mince bandeau du passé reste visible en haut : il montre le repère
+      // « Début de l'histoire » et invite à remonter.
+      scroller.scrollTop = Math.max(0, past * m.row - Math.round(m.row * 0.35));
+      return;
+    }
+    // Le passé s'agrandit (événement plus ancien) ou se réduit : on compense
+    // pour que ce qui est à l'écran ne saute pas.
+    if (past !== lastPast.current) {
+      scroller.scrollTop += (past - lastPast.current) * m.row;
+      lastPast.current = past;
+    }
+  }, [Boolean(data), past, m.row]);
+
   // --- Rendu ---------------------------------------------------------------
 
   const geometryOf = useCallback(
@@ -645,8 +679,8 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
 
   const svg = useMemo(() => {
     if (!data) return null;
-    return <BoardSvg data={data} m={m} lanes={lanes} rows={rows} width={width} height={height} view={view} selection={selection} focus={focus} geometryOf={geometryOf} dimmed={dimmed} />;
-  }, [data, m, lanes, rows, width, height, view, selection, focus, geometryOf, dimmed]);
+    return <BoardSvg data={data} m={m} lanes={lanes} rows={total} width={width} height={height} view={view} selection={selection} focus={focus} geometryOf={geometryOf} dimmed={dimmed} />;
+  }, [data, m, lanes, total, width, height, view, selection, focus, geometryOf, dimmed]);
 
   if (loading || !data) {
     return (
@@ -831,7 +865,8 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
           <div className="flex w-max min-w-full">
             {/* Moments */}
             <div className="sticky left-0 z-10 shrink-0 border-r bg-background" style={{ width: GUTTER, height }}>
-              {Array.from({ length: rows }, (_, row) => {
+              {Array.from({ length: total }, (_, index) => {
+                const row = index - past;
                 const isRow = selection?.type === "row" && selection.id === row;
                 const label = data.rowLabels[row];
                 return (
@@ -839,14 +874,15 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                     key={row}
                     type="button"
                     onClick={() => select({ type: "row", id: row })}
-                    title={t("board.moment", { number: row + 1 })}
+                    title={row < 0 ? t("board.pastMoment", { number: momentNumber(row) }) : t("board.moment", { number: momentNumber(row) })}
                     className={cn(
                       "absolute inset-x-0 flex flex-col items-center justify-center gap-0.5 px-1 text-center hover:bg-muted",
+                      row < 0 && "text-muted-foreground",
                       isRow && "bg-muted shadow-[inset_3px_0_0_var(--foreground)]",
                     )}
-                    style={{ top: row * m.row, height: m.row }}
+                    style={{ top: index * m.row, height: m.row }}
                   >
-                    <span className="text-sm font-semibold tabular-nums">{row + 1}</span>
+                    <span className="text-sm font-semibold tabular-nums">{momentNumber(row)}</span>
                     {label && <span className="line-clamp-2 text-[0.65rem] leading-tight break-words text-muted-foreground">{label}</span>}
                   </button>
                 );
@@ -865,7 +901,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                 aria-label={t("board.tensionAria")}
                 title={t("board.tensionHelp")}
               >
-                <TensionCurve data={data} rows={rows} rowHeight={m.row} width={TENSION_W} rowLines={view.rowLines} />
+                <TensionCurve data={data} rows={total} past={past} rowHeight={m.row} width={TENSION_W} rowLines={view.rowLines} />
               </div>
             )}
 
@@ -937,7 +973,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                     role="button"
                     tabIndex={0}
                     aria-pressed={selected}
-                    aria-label={t("board.eventAria", { title: event.title || t("untitled"), lane: lane.name, moment: event.row + 1, status: t(`status.${event.status}`) })}
+                    aria-label={t("board.eventAria", { title: event.title || t("untitled"), lane: lane.name, moment: momentNumber(event.row), status: t(`status.${event.status}`) })}
                     title={event.note || undefined}
                     onPointerDown={(e) => {
                       if ((e.target as Element).closest("[data-handle]") || (e.target as Element).closest("textarea")) return;
@@ -1070,6 +1106,14 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                       </button>
                     );
                   })}
+                {/* Début de l'histoire principale : le passé narratif est au-dessus */}
+                <span
+                  className="pointer-events-auto absolute right-2 z-[3] -translate-y-1/2 rounded-full border border-primary/40 bg-background px-2.5 py-0.5 text-xs font-medium text-primary shadow-sm select-none"
+                  style={{ top: past * m.row }}
+                  title={t("board.storyStartHint")}
+                >
+                  {t("board.storyStart")}
+                </span>
                 {Object.entries(data.acts).map(([row, act]) => (
                   <button
                     key={row}
@@ -1077,7 +1121,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                     onClick={() => select({ type: "row", id: Number(row) })}
                     title={t("board.actHint")}
                     className="pointer-events-auto absolute left-2 max-w-[260px] truncate rounded-b bg-foreground px-2.5 py-0.5 text-xs font-semibold text-background"
-                    style={{ top: Number(row) * m.row }}
+                    style={{ top: rowTop(m, Number(row)) }}
                   >
                     {act}
                   </button>
@@ -1264,15 +1308,19 @@ function BoardSvg({ data, m, lanes, rows, width, height, view, selection, focus,
           ))}
       </defs>
 
-      {selection?.type === "row" && <rect x={0} y={selection.id * m.row} width={width} height={m.row} className="fill-foreground" opacity={0.06} />}
+      {/* Passé narratif : zone teintée au-dessus du début de l'histoire */}
+      {m.past > 0 && <rect x={0} y={0} width={width} height={m.past * m.row} className="fill-muted" opacity={0.55} />}
+      {selection?.type === "row" && <rect x={0} y={rowTop(m, selection.id)} width={width} height={m.row} className="fill-foreground" opacity={0.06} />}
       {acts.map((row, i) =>
-        i % 2 === 1 ? <rect key={`band-${row}`} x={0} y={row * m.row} width={width} height={((acts[i + 1] ?? rows) - row) * m.row} className="fill-foreground" opacity={0.045} /> : null,
+        i % 2 === 1 ? <rect key={`band-${row}`} x={0} y={rowTop(m, row)} width={width} height={((acts[i + 1] ?? rows - m.past) - row) * m.row} className="fill-foreground" opacity={0.045} /> : null,
       )}
       {view.rowLines &&
         Array.from({ length: rows + 1 }, (_, r) => <line key={`grid-${r}`} x1={0} x2={width} y1={r * m.row} y2={r * m.row} className="stroke-border" strokeWidth={1} />)}
       {acts.map((row) => (
-        <line key={`act-${row}`} x1={0} x2={width} y1={row * m.row} y2={row * m.row} className="stroke-foreground" strokeWidth={1.6} opacity={0.5} />
+        <line key={`act-${row}`} x1={0} x2={width} y1={rowTop(m, row)} y2={rowTop(m, row)} className="stroke-foreground" strokeWidth={1.6} opacity={0.5} />
       ))}
+      {/* Début de l'histoire principale */}
+      {m.past > 0 && <line x1={0} x2={width} y1={m.past * m.row} y2={m.past * m.row} className="stroke-primary" strokeWidth={2} strokeDasharray="6 5" opacity={0.7} />}
 
       {lanes.map((lane, i) => {
         const x = i * m.lane + m.lane / 2;
@@ -1285,8 +1333,8 @@ function BoardSvg({ data, m, lanes, rows, width, height, view, selection, focus,
               <line
                 x1={x}
                 x2={x}
-                y1={Math.min(...laneRows) * m.row + m.row / 2}
-                y2={Math.max(...laneRows) * m.row + m.row / 2}
+                y1={rowTop(m, Math.min(...laneRows)) + m.row / 2}
+                y2={rowTop(m, Math.max(...laneRows)) + m.row / 2}
                 stroke={lane.color}
                 strokeWidth={lane.main ? 7 : 4}
                 strokeLinecap="round"
@@ -1366,15 +1414,16 @@ function InlineTitle({ initial, fontSize, label, onDone }: { initial: string; fo
 }
 
 /** Courbe de tension, moment par moment (0 à gauche, 10 à droite). */
-function TensionCurve({ data, rows, rowHeight, width, rowLines }: { data: PlotData; rows: number; rowHeight: number; width: number; rowLines: boolean }) {
+function TensionCurve({ data, rows, past, rowHeight, width, rowLines }: { data: PlotData; rows: number; past: number; rowHeight: number; width: number; rowLines: boolean }) {
+  // `rows` : lignes affichées, passé narratif compris (`past` lignes en haut).
   const height = rows * rowHeight;
   const x0 = 8;
   const xw = width - 16;
   const points = Object.keys(data.tension)
     .map(Number)
-    .filter((r) => r < rows)
+    .filter((r) => r >= -past && r < rows - past)
     .sort((a, b) => a - b)
-    .map((r) => ({ x: x0 + (data.tension[r] / 10) * xw, y: r * rowHeight + rowHeight / 2, row: r }));
+    .map((r) => ({ x: x0 + (data.tension[r] / 10) * xw, y: (r + past) * rowHeight + rowHeight / 2, row: r }));
   return (
     <svg className="pointer-events-none absolute inset-0" width={width} height={height} aria-hidden="true">
       {rowLines && Array.from({ length: rows + 1 }, (_, r) => <line key={r} x1={0} x2={width} y1={r * rowHeight} y2={r * rowHeight} className="stroke-border" strokeWidth={1} />)}

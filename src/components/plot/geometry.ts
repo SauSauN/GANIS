@@ -18,11 +18,17 @@ export interface Metrics {
   nodeHeight: number;
   row: number;
   tension: number;
+  /**
+   * Lignes de passé narratif affichées au-dessus du début de l'histoire :
+   * le moment `row` est dessiné à la ligne `row + past` depuis le haut.
+   */
+  past: number;
 }
 
-export function metrics(zoom: number): Metrics {
+export function metrics(zoom: number, past = 0): Metrics {
   return {
     zoom,
+    past,
     lane: Math.round(BASE.lane * zoom),
     node: Math.round(BASE.node * zoom),
     nodeHeight: Math.round(BASE.nodeHeight * zoom),
@@ -33,21 +39,31 @@ export function metrics(zoom: number): Metrics {
 
 export const clampZoom = (zoom: number) => Math.min(ZOOM_MAX, Math.max(ZOOM_MIN, Math.round(zoom * 100) / 100));
 
+/** Haut de la ligne d'un moment (le passé est au-dessus du moment 0). */
+export function rowTop(m: Metrics, row: number) {
+  return (row + m.past) * m.row;
+}
+
+/** Moment sous une ordonnée du plateau ; `total` : lignes affichées (passé compris). */
+export function rowAt(m: Metrics, y: number, total: number) {
+  return Math.min(total - 1, Math.max(0, Math.floor(y / m.row))) - m.past;
+}
+
 /** Centre d'une case. */
 export function cellCenter(m: Metrics, column: number, row: number) {
-  return { cx: column * m.lane + m.lane / 2, cy: row * m.row + m.row / 2 };
+  return { cx: column * m.lane + m.lane / 2, cy: rowTop(m, row) + m.row / 2 };
 }
 
 /** Coin haut-gauche d'une carte dans sa case. */
 export function cardOrigin(m: Metrics, column: number, row: number) {
-  return { left: column * m.lane + (m.lane - m.node) / 2, top: row * m.row + (m.row - m.nodeHeight) / 2 };
+  return { left: column * m.lane + (m.lane - m.node) / 2, top: rowTop(m, row) + (m.row - m.nodeHeight) / 2 };
 }
 
-/** Case sous un point du plateau. */
-export function slotAt(m: Metrics, x: number, y: number, columns: number, rows: number) {
+/** Case sous un point du plateau ; `total` : lignes affichées (passé compris). */
+export function slotAt(m: Metrics, x: number, y: number, columns: number, total: number) {
   return {
     column: Math.min(columns - 1, Math.max(0, Math.floor(x / m.lane))),
-    row: Math.min(rows - 1, Math.max(0, Math.floor(y / m.row))),
+    row: rowAt(m, y, total),
   };
 }
 

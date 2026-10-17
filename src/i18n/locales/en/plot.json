@@ -84,7 +84,10 @@
     "allHiddenHint": "Show one from the View menu.",
     "unplaced_one": "{{count}} event without a scene",
     "unplaced_other": "{{count}} events without a scene",
-    "unplacedHint": "Events not told in any structure item. Click to highlight them on the board."
+    "unplacedHint": "Events not told in any structure item. Click to highlight them on the board.",
+    "pastMoment": "Moment {{number}} (narrative past)",
+    "storyStart": "Story begins",
+    "storyStartHint": "Above: the narrative past (flashbacks, memories, earlier events). Scroll up to go back in time."
   },
   "panel": {
     "label": "Plot details",
@@ -120,14 +123,13 @@
     "cluePlanted": "Clue planted:",
     "forMystery": "for “{{question}}”",
     "revealed": "Revelation:",
-    "edit": "Edit on the board",
     "notesCount_one": "{{count}} note",
     "notesCount_other": "{{count}} notes",
-    "followStructure": "Structure order",
-    "followStructureHint": "Checked: events placed in a chapter follow the story outline. Unchecked: manual order, set with the arrows in the contents.",
-    "up": "Move up",
-    "down": "Move down",
-    "alsoTold": "Also told in:"
+    "alsoTold": "Also told in:",
+    "modes": {
+      "structure": "By outline",
+      "lane": "By storyline"
+    }
   },
   "issues": {
     "title": "Automatic checks",
@@ -206,7 +208,8 @@
     "alsoNodesHint": "Other scenes where the event is told again (memory, other point of view). The main scene sets its place in the reading.",
     "addAlsoNode": "Add another scene…",
     "alsoNodesNeedMain": "Choose “Told in” first",
-    "removeAlsoNode": "Remove “{{name}}”"
+    "removeAlsoNode": "Remove “{{name}}”",
+    "momentHint": "1, 2, 3…: the main story. −1, −2…: the narrative past, before the story begins."
   },
   "link": {
     "from": "From",

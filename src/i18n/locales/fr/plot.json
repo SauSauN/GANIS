@@ -84,7 +84,10 @@
     "allHiddenHint": "Affichez-en une depuis le menu Affichage.",
     "unplaced_one": "{{count}} événement sans scène",
     "unplaced_other": "{{count}} événements sans scène",
-    "unplacedHint": "Événements racontés dans aucun élément du découpage. Cliquer les met en avant sur le plateau."
+    "unplacedHint": "Événements racontés dans aucun élément du découpage. Cliquer les met en avant sur le plateau.",
+    "pastMoment": "Moment {{number}} (passé narratif)",
+    "storyStart": "Début de l'histoire",
+    "storyStartHint": "Au-dessus : le passé narratif (flash-back, souvenirs, événements antérieurs). Faites défiler vers le haut pour y remonter."
   },
   "panel": {
     "label": "Détails de la trame",
@@ -120,14 +123,13 @@
     "cluePlanted": "Indice planté :",
     "forMystery": "pour « {{question}} »",
     "revealed": "Révélation :",
-    "edit": "Modifier sur le plateau",
     "notesCount_one": "{{count}} note",
     "notesCount_other": "{{count}} notes",
-    "followStructure": "Ordre du découpage",
-    "followStructureHint": "Coché : les événements rangés dans un chapitre suivent le plan du récit. Décoché : ordre manuel, réglable avec les flèches du sommaire.",
-    "up": "Monter",
-    "down": "Descendre",
-    "alsoTold": "Raconté aussi dans :"
+    "alsoTold": "Raconté aussi dans :",
+    "modes": {
+      "structure": "Par plan",
+      "lane": "Par trame"
+    }
   },
   "issues": {
     "title": "Repères automatiques",
@@ -206,7 +208,8 @@
     "alsoNodesHint": "Autres scènes où l'événement est raconté à nouveau (souvenir, autre point de vue). La scène principale fixe sa place dans la lecture.",
     "addAlsoNode": "Ajouter une autre scène…",
     "alsoNodesNeedMain": "Choisissez d’abord « Raconté dans »",
-    "removeAlsoNode": "Retirer « {{name}} »"
+    "removeAlsoNode": "Retirer « {{name}} »",
+    "momentHint": "1, 2, 3… : l'histoire principale. −1, −2… : le passé narratif, avant le début de l'histoire."
   },
   "link": {
     "from": "Part de",

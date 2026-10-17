@@ -4,7 +4,14 @@ import { BookOpen, ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { PlotLinks } from "@/components/plot/usePlotLinks";
 import { Button } from "@/components/ui/button";
 import { fieldClass } from "@/components/workspace/views/PageShell";
-import { eventOf, laneOf, tourList, type PlotData, type TourMode } from "@/lib/plot";
+import {
+  eventOf,
+  laneOf,
+  momentNumber,
+  tourList,
+  type PlotData,
+  type TourMode,
+} from "@/lib/plot";
 import { cn } from "@/lib/utils";
 import { usePlotStore } from "@/stores/plotStore";
 
@@ -100,7 +107,7 @@ export function PlotTour({ data, links, state, onChange, onClose, onOpenFeature 
           ))}
         </div>
         <span className="min-w-0 flex-1 truncate">
-          {t("board.moment", { number: event.row + 1 })} · {lane?.name}
+          {t("board.moment", { number: momentNumber(event.row) })} · {lane?.name}
           {data.rowLabels[event.row] ? ` · ${data.rowLabels[event.row]}` : ""}
         </span>
         <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label={t("tour.close")} title={t("tour.close")}>

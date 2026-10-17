@@ -51,7 +51,6 @@ import {
 } from "@/lib/unsavedChanges";
 import { api } from "@/lib/api";
 import { useRegisterCommands } from "@/lib/commands";
-import { showGuideOnce } from "@/lib/shortcuts";
 import { toast } from "@/stores/toastStore";
 import { useReloadStore } from "@/stores/reloadStore";
 import { useCharacterStore } from "@/stores/characterStore";
@@ -148,6 +147,14 @@ export default function Workspace() {
    */
   const [panelOpen, setPanelOpen] =
     useState(true);
+
+  /**
+   * Onglet agrandi (double-clic sur un onglet) : le contenu occupe tout
+   * l'espace de travail, la barre des modules et le panneau du milieu sont
+   * masqués. Mode temporaire, jamais enregistré : la disposition revient
+   * telle quelle au double-clic suivant.
+   */
+  const [maximized, setMaximized] = useState(false);
 
   /**
    * Indique qu'un projet demandé n'a pas pu être chargé.
@@ -323,11 +330,17 @@ export default function Workspace() {
     previousTab: { disabled: layout.tabs.length < 2, run: () => cycleTab(-1) },
     togglePanel: {
       label: panelOpen ? t("menus:view.hidePanel") : t("menus:view.showPanel"),
-      run: () => setPanelOpen((open) => !open),
+      run: () => {
+        setMaximized(false);
+        setPanelOpen((open) => !open);
+      },
     },
     toggleRail: {
       label: railExpanded ? t("menus:view.railIcons") : t("menus:view.railNames"),
-      run: () => setRailExpanded(!railExpanded),
+      run: () => {
+        setMaximized(false);
+        setRailExpanded(!railExpanded);
+      },
     },
     openHome: { run: () => openFeature(HOME_TAB) },
     openSynopsis: { run: () => openFeature("synopsis.edit") },
@@ -335,11 +348,6 @@ export default function Workspace() {
     openTrash: { run: () => openFeature("trash") },
     exportProject: { disabled: !project, run: () => void exportCurrentProject() },
   });
-
-  /** Guide de démarrage : ouvert seul la première fois qu'un projet est ouvert. */
-  useEffect(() => {
-    showGuideOnce();
-  }, []);
 
   /**
    * Si le projet est inexistant ou a été supprimé,
@@ -370,6 +378,9 @@ export default function Workspace() {
    * Sélection d'un module dans la barre de gauche.
    */
   function selectModule(id: ModuleId) {
+    // Choisir un module rétablit la disposition (barre et panneau visibles).
+    setMaximized(false);
+
     /**
      * Si on clique une seconde fois sur le même module
      * alors que le panneau est ouvert, on le ferme.
@@ -588,12 +599,30 @@ export default function Workspace() {
    */
   const contentIds = [...layout.tabs].sort();
 
+  /** Agrandi seulement s'il reste un onglet à montrer. */
+  const isMaximized = maximized && activeTab !== null;
+
+  /**
+   * Double-clic sur un onglet : l'agrandit (en le choisissant), ou rétablit
+   * la disposition si c'est déjà l'onglet agrandi. Le contenu n'est pas
+   * recréé : il garde son état (saisie, défilement…).
+   */
+  function toggleMaximize(tabId: string) {
+    if (isMaximized && activeTab === tabId) {
+      setMaximized(false);
+      return;
+    }
+    activate(tabId);
+    setMaximized(true);
+  }
+
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-background">
       <div className="flex min-h-0 flex-1">
         {/* =========================================================
             BARRE DE GAUCHE (modules)
             ========================================================= */}
+        {!isMaximized && (
         <ActivityBar
           active={activeModule}
           linked={linkedModule}
@@ -604,6 +633,7 @@ export default function Workspace() {
           }
           onSelect={selectModule}
         />
+        )}
 
         {/* =========================================================
             PANNEAU DU MILIEU (fonctionnalités du module)
@@ -613,7 +643,7 @@ export default function Workspace() {
             un module de la barre de gauche le rouvre à sa largeur
             précédente.
             ========================================================= */}
-        {panelOpen && (
+        {panelOpen && !isMaximized && (
           <SideBar
             module={activeModule}
             projectId={project.id}
@@ -647,6 +677,9 @@ export default function Workspace() {
             onTogglePin={togglePin}
             onMove={moveTab}
             onShift={shiftTab}
+            maximized={isMaximized}
+            onToggleMaximize={toggleMaximize}
+            onRestore={() => setMaximized(false)}
           />
 
           {/* =======================================================

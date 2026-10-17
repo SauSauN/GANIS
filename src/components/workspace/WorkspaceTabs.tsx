@@ -27,6 +27,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Circle,
+  Maximize2,
+  Minimize2,
   Pin,
   PinOff,
   X,
@@ -61,6 +63,15 @@ interface WorkspaceTabsProps {
   onMove: (activeId: string, overId: string) => void;
   /** Déplacement au clavier (Alt + flèches) : une place à gauche ou à droite. */
   onShift: (id: string, delta: -1 | 1) => void;
+  /** Vrai : le contenu des onglets occupe tout l'espace de travail. */
+  maximized: boolean;
+  /**
+   * Double-clic sur un onglet : l'agrandit (le choisit au besoin), ou
+   * rétablit la disposition si c'est déjà l'onglet agrandi.
+   */
+  onToggleMaximize: (id: string) => void;
+  /** Rétablit la disposition (bouton de la barre, quand c'est agrandi). */
+  onRestore: () => void;
 }
 
 // ----------------------------------------------------------------------------
@@ -175,6 +186,9 @@ interface SortableTabProps {
   onOpenMenu: (id: string, x: number, y: number) => void;
   /** Demande de rendre le focus à un élément après le prochain rendu. */
   keepFocus: (elementId: string) => void;
+  /** Onglet actif affiché agrandi. */
+  maximized: boolean;
+  onToggleMaximize: (id: string) => void;
 }
 
 function SortableTab({
@@ -187,6 +201,8 @@ function SortableTab({
   onShift,
   onOpenMenu,
   keepFocus,
+  maximized,
+  onToggleMaximize,
 }: SortableTabProps) {
   const { t } = useTranslation(["tabs", "unsaved"]);
   const { setNodeRef, transform, transition, isDragging, listeners } =
@@ -263,8 +279,9 @@ function SortableTab({
               ? tab.label
               : undefined
         }
-        title={tab.dirty ? `${tab.label} — ${t("unsaved:tab.unsaved")}` : tab.label}
+        title={`${tab.dirty ? `${tab.label} — ${t("unsaved:tab.unsaved")}` : tab.label}\n${maximized ? t("tab.restoreHint") : t("tab.maximizeHint")}`}
         onClick={() => onSelect(tab.id)}
+        onDoubleClick={() => onToggleMaximize(tab.id)}
         onKeyDown={onKeyDown}
         {...listeners}
         className="flex min-w-0 items-center gap-2 whitespace-nowrap"
@@ -272,6 +289,14 @@ function SortableTab({
         <Icon className="h-3.5 w-3.5 shrink-0 text-primary" />
 
         {!tab.pinned && <span className="truncate">{tab.label}</span>}
+
+        {/* Onglet agrandi : petit repère discret */}
+        {maximized && (
+          <Maximize2
+            aria-hidden="true"
+            className="h-3 w-3 shrink-0 text-muted-foreground"
+          />
+        )}
       </button>
 
       <button
@@ -646,6 +671,9 @@ export function WorkspaceTabs({
   onTogglePin,
   onMove,
   onShift,
+  maximized,
+  onToggleMaximize,
+  onRestore,
 }: WorkspaceTabsProps) {
   const { t } = useTranslation("tabs");
 
@@ -814,6 +842,8 @@ export function WorkspaceTabs({
                   keepFocus={(elementId) => {
                     pendingFocus.current = elementId;
                   }}
+                  maximized={maximized && activeTab === tab.id}
+                  onToggleMaximize={onToggleMaximize}
                 />
               );
             })}
@@ -827,6 +857,19 @@ export function WorkspaceTabs({
           hidden={hiddenRight}
           onClick={() => setStart(first + 1)}
         />
+      )}
+
+      {/* Agrandi : rétablir la disposition (même effet qu'un double-clic) */}
+      {maximized && (
+        <button
+          type="button"
+          onClick={onRestore}
+          title={t("tab.restore")}
+          aria-label={t("tab.restore")}
+          className="flex w-9 shrink-0 items-center justify-center border-l border-border text-muted-foreground hover:bg-secondary hover:text-foreground"
+        >
+          <Minimize2 className="h-3.5 w-3.5" />
+        </button>
       )}
 
       {menu && menuTab && (

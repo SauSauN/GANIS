@@ -38,7 +38,7 @@ async fn wait_for_path(
         .map_err(|e| AppError::io(e).with_detail("Emplacement choisi invalide"))
 }
 
-/// Exporte un projet de l'utilisateur dans un fichier `.ganix` choisi par
+/// Exporte un projet accessible (public, ou privé du compte connecté) dans un fichier `.ganix` choisi par
 /// lui (nom proposé : `<nom du projet>.ganix`). Retourne le nom du fichier
 /// écrit, ou `None` si l'utilisateur a annulé.
 ///
@@ -51,12 +51,11 @@ pub async fn export_project(
     project_id: String,
     dialog_title: String,
 ) -> AppResult<Option<String>> {
-    let (user, account_key) = state.require_session().await?;
+    let viewer = state.viewer().await;
 
-    let project =
-        project_service::find_by_id_for_user(&state.app_db, &project_id, &user.id, &account_key)
-            .await?
-            .ok_or_else(|| AppError::not_found("Projet introuvable"))?;
+    let project = project_service::find_for_viewer(&state.app_db, &project_id, &viewer)
+        .await?
+        .ok_or_else(|| AppError::not_found("Projet introuvable"))?;
 
     let (sender, receiver) = tokio::sync::oneshot::channel();
 
@@ -84,7 +83,7 @@ pub async fn export_project(
         target.set_file_name(name);
     }
 
-    let pool = project_storage::pool_for_user(&state, &project_id, &user.id).await?;
+    let pool = project_storage::pool_for_viewer(&state, &project_id, &viewer).await?;
 
     ganix_service::write_ganix(&pool, &project, &target, &ganix_service::work_dir(&state.data_dir))
         .await?;

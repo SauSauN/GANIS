@@ -63,6 +63,15 @@ export type ProjectType =
 
 export type ProjectStatus = "preparing" | "in_progress" | "paused" | "done";
 
+/**
+ * Visibilité d'un projet.
+ *
+ * - `public` : créé sans connexion (bouton « Commencer »). Toute personne
+ *   qui utilise GANIS sur cet appareil peut l'ouvrir.
+ * - `private` : lié à un compte et chiffré ; nécessite la connexion.
+ */
+export type ProjectVisibility = "public" | "private";
+
 export interface Project {
   id: string;
   name: string;
@@ -75,6 +84,8 @@ export interface Project {
   updatedAt: string; // RFC 3339, UTC
   /** Dernière ouverture du projet ; `null` s'il n'a jamais été ouvert. */
   lastOpenedAt?: string | null; // RFC 3339, UTC
+  /** Projet public (sans connexion) ou privé (lié au compte connecté). */
+  visibility: ProjectVisibility;
 }
 
 // ----------------------------------------------------------------------------

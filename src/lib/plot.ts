@@ -4,6 +4,9 @@
  * - une colonne par trame (intrigue principale, intrigues parallèles,
  *   trame d'un personnage, passé…) ;
  * - une ligne par moment de l'histoire, le temps s'écoule vers le bas ;
+ *   le moment 0 est le début de l'histoire principale, les moments
+ *   négatifs forment le passé narratif (flash-back, souvenirs, événements
+ *   antérieurs), affiché au-dessus du début ;
  * - des événements dans les cases, reliés par des liens de cause à effet
  *   (impact, influence, croisement) ;
  * - des actes, une courbe de tension, un ordre de lecture, des questions
@@ -40,7 +43,10 @@ export interface PlotLane {
 export interface PlotEvent {
   id: string;
   laneId: string;
-  /** Moment (0 = le premier), la ligne du plateau. */
+  /**
+   * Moment, la ligne du plateau : 0 = début de l'histoire principale,
+   * 1, 2… la suite ; -1, -2… le passé narratif (-1 juste avant le début).
+   */
   row: number;
   title: string;
   /** Ce qui se passe. */
@@ -166,6 +172,13 @@ export const PLOT_TEMPLATES: Array<{ id: string; beats: number[] }> = [
   { id: "romance", beats: [0, 0.1, 0.25, 0.5, 0.6, 0.75, 0.88, 0.97] },
 ];
 
+/** Moments possibles : du passé le plus lointain au dernier moment. */
+export const MIN_ROW = -9_999;
+export const MAX_ROW = 9_999;
+
+/** Lignes de passé toujours proposées au-dessus du début de l'histoire. */
+export const PAST_MIN_ROWS = 4;
+
 const MAX_TEXT = 20_000;
 const MAX_TITLE = 200;
 const COLOR = /^#[0-9a-f]{6}$/i;
@@ -230,7 +243,7 @@ function dict<T>(value: unknown, read: (v: unknown) => T | undefined): Record<nu
     for (const [key, raw] of Object.entries(value as Record<string, unknown>)) {
       const row = Number.parseInt(key, 10);
       const v = read(raw);
-      if (row >= 0 && row < 10_000 && v !== undefined) out[row] = v;
+      if (Number.isFinite(row) && row >= MIN_ROW && row <= MAX_ROW && v !== undefined) out[row] = v;
     }
   }
   return out;
@@ -283,8 +296,9 @@ export function normalizePlot(raw: unknown, mainName: string): PlotData {
     let id = idOrNull(e.id) ?? newId();
     if (seenEvents.has(id)) id = newId();
     seenEvents.add(id);
-    let row = clamp(Number.parseInt(String(e.row), 10) || 0, 0, 9_999);
-    while (occupied.has(`${laneId}:${row}`)) row++;
+    let row = clamp(Number.parseInt(String(e.row), 10) || 0, MIN_ROW, MAX_ROW);
+    // Case déjà prise (document abîmé) : on s'éloigne du début de l'histoire.
+    while (occupied.has(`${laneId}:${row}`)) row += row < 0 ? -1 : 1;
     occupied.add(`${laneId}:${row}`);
     events.push({
       id,
@@ -468,21 +482,57 @@ export function rowsCount(data: PlotData): number {
   return max + 2;
 }
 
+/**
+ * Nombre de lignes de passé affichées au-dessus du début de l'histoire :
+ * au moins `PAST_MIN_ROWS`, et deux de marge au-dessus du moment le plus
+ * ancien utilisé.
+ */
+export function pastRowsCount(data: PlotData): number {
+  let min = 0;
+  for (const event of data.events) min = Math.min(min, event.row);
+  for (const dict of [data.acts, data.tension, data.rowLabels]) {
+    for (const key of Object.keys(dict)) min = Math.min(min, Number(key));
+  }
+  return Math.max(PAST_MIN_ROWS, -min + 2);
+}
+
+/** Vrai pour un moment du passé narratif (avant le début de l'histoire). */
+export const isPast = (row: number) => row < 0;
+
+/**
+ * Numéro affiché d'un moment : 1, 2, 3… pour l'histoire principale,
+ * −1, −2… pour le passé narratif (−1 juste avant le début).
+ */
+export function momentNumber(row: number): string {
+  return row >= 0 ? String(row + 1) : `\u2212${-row}`;
+}
+
+/** Moment saisi par l'auteur (1, 2… ou -1, -2…) ; `null` si invalide (0, vide). */
+export function rowFromMoment(value: string): number | null {
+  const n = Number.parseInt(value.replace("\u2212", "-"), 10);
+  if (!Number.isFinite(n) || n === 0) return null;
+  return clamp(n > 0 ? n - 1 : n, MIN_ROW, MAX_ROW);
+}
+
 export function occupant(data: PlotData, laneId: string, row: number, exceptId?: string): PlotEvent | undefined {
   return data.events.find((event) => event.laneId === laneId && event.row === row && event.id !== exceptId);
 }
 
 /**
- * Place un événement dans une case ; ceux qui l'occupaient (et ceux en
- * dessous, en cascade) descendent d'un moment. Modifie `data`.
+ * Place un événement dans une case ; ceux qui l'occupaient s'écartent d'un
+ * moment, en cascade, en s'éloignant du début de l'histoire : vers le bas
+ * dans l'histoire principale, vers le haut (plus loin dans le passé) dans
+ * le passé narratif. Le début de l'histoire ne bouge donc jamais. Modifie
+ * `data`.
  */
 export function placeEvent(data: PlotData, event: PlotEvent, laneId: string, row: number) {
-  row = Math.max(0, row);
+  row = clamp(Math.round(row), MIN_ROW, MAX_ROW);
+  const step = row < 0 ? -1 : 1;
   const bump = (r: number) => {
     const other = occupant(data, laneId, r, event.id);
     if (other) {
-      bump(r + 1);
-      other.row = r + 1;
+      bump(r + step);
+      other.row = r + step;
     }
   };
   bump(row);
@@ -505,6 +555,59 @@ export function shiftRows(data: PlotData, from: number, delta: number) {
   data.rowLabels = shiftDict(data.rowLabels, from, delta);
   data.acts = shiftDict(data.acts, from, delta);
   data.tension = shiftDict(data.tension, from, delta);
+}
+
+/** Décale de `delta` les moments du passé jusqu'à `upTo` inclus. Modifie `data`. */
+function shiftPast(data: PlotData, upTo: number, delta: number) {
+  const move = <T>(dict: Record<number, T>) => {
+    const out: Record<number, T> = {};
+    for (const [key, value] of Object.entries(dict)) {
+      const row = Number(key);
+      out[row <= upTo ? row + delta : row] = value;
+    }
+    return out;
+  };
+  for (const event of data.events) if (event.row <= upTo) event.row += delta;
+  data.rowLabels = move(data.rowLabels);
+  data.acts = move(data.acts);
+  data.tension = move(data.tension);
+}
+
+/**
+ * Insère un moment vide juste avant ou juste après `row` et renvoie sa
+ * place. Dans l'histoire principale, ce qui suit descend ; dans le passé,
+ * ce qui précède remonte : le début de l'histoire (moment 0) reste fixe.
+ * Modifie `data`.
+ */
+export function insertMoment(data: PlotData, row: number, side: "before" | "after"): number {
+  if (side === "before") {
+    if (row >= 0) {
+      shiftRows(data, row, 1);
+      return row;
+    }
+    // Dans le passé : nouveau moment juste au-dessus, plus ancien.
+    shiftPast(data, row - 1, -1);
+    return row - 1;
+  }
+  if (row >= 0) {
+    shiftRows(data, row + 1, 1);
+    return row + 1;
+  }
+  shiftPast(data, row, -1);
+  return row;
+}
+
+/**
+ * Retire un moment (vide) : dans l'histoire principale, ce qui suit
+ * remonte ; dans le passé, ce qui précède se rapproche du début. Modifie
+ * `data`.
+ */
+export function removeMoment(data: PlotData, row: number) {
+  delete data.rowLabels[row];
+  delete data.acts[row];
+  delete data.tension[row];
+  if (row >= 0) shiftRows(data, row + 1, -1);
+  else shiftPast(data, row - 1, 1);
 }
 
 /** Événements atteints en suivant les liens (vers l'aval ou vers l'amont). */
@@ -731,7 +834,7 @@ export function computeIssues(data: PlotData, untitled: string): PlotIssue[] {
       out.push({
         target: { type: "event", id: event.id },
         key: "untitled",
-        params: { lane: laneOf(data, event.laneId)?.name ?? "", moment: event.row + 1 },
+        params: { lane: laneOf(data, event.laneId)?.name ?? "", moment: momentNumber(event.row) },
         severity: "warning",
       });
     }
@@ -907,9 +1010,9 @@ export function plotSummary(raw: unknown, untitled: string): string {
   const lines: string[] = [];
   for (const lane of data.lanes) lines.push(`▥ ${lane.name}`);
   for (const event of planOrder(data)) {
-    lines.push(`${event.row + 1}. [${laneOf(data, event.laneId)?.name ?? ""}] ${event.title || untitled}${event.note ? ` — ${event.note}` : ""}`);
+    lines.push(`${momentNumber(event.row)}. [${laneOf(data, event.laneId)?.name ?? ""}] ${event.title || untitled}${event.note ? ` — ${event.note}` : ""}`);
   }
-  for (const [row, act] of Object.entries(data.acts)) lines.push(`§ ${Number(row) + 1} ${act}`);
+  for (const [row, act] of Object.entries(data.acts)) lines.push(`§ ${momentNumber(Number(row))} ${act}`);
   return lines.join("\n");
 }
 

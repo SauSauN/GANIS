@@ -9,8 +9,7 @@ use sqlx::SqlitePool;
 use tauri::State;
 
 async fn project_pool(state: &AppState, project_id: &str) -> AppResult<SqlitePool> {
-    let user = state.require_user().await?;
-    project_storage::pool_for_user(state, project_id, &user.id).await
+    project_storage::pool_for_request(state, project_id).await
 }
 
 /// Journal du projet (ou d'un seul élément), le plus récent d'abord.

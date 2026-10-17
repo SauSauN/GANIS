@@ -1,7 +1,7 @@
 //! Commandes Tauri du découpage du récit (voir `services::structure_service`).
 //!
 //! Chaque commande obtient la base du projet auprès de `project_storage`,
-//! qui vérifie d'abord que l'utilisateur connecté en est le propriétaire.
+//! qui vérifie d'abord que le projet est public ou appartient au compte connecté.
 
 use crate::error::{AppError, AppResult};
 use crate::services::history_service as history;
@@ -15,17 +15,16 @@ use tauri::State;
 
 /// Base du projet, après vérification du propriétaire.
 async fn project_pool(state: &AppState, project_id: &str) -> AppResult<SqlitePool> {
-    let user = state.require_user().await?;
-    project_storage::pool_for_user(state, project_id, &user.id).await
+    project_storage::pool_for_request(state, project_id).await
 }
 
 /// Base du projet et type du projet (qui donne le modèle par défaut).
 async fn project_pool_and_type(state: &AppState, project_id: &str) -> AppResult<(SqlitePool, ProjectType)> {
-    let user = state.require_user().await?;
-    let pool = project_storage::pool_for_user(state, project_id, &user.id).await?;
+    let viewer = state.viewer().await;
+    let pool = project_storage::pool_for_viewer(state, project_id, &viewer).await?;
 
     // Le type du projet n'est pas chiffré : pas besoin de la clé du compte.
-    let project = project_service::find_stored(&state.app_db, project_id, &user.id)
+    let project = project_service::find_stored_for_viewer(&state.app_db, project_id, &viewer)
         .await?
         .ok_or_else(|| AppError::not_found("Projet non trouvé.").with_key("project.notFound"))?;
 

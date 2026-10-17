@@ -28,8 +28,7 @@ use tauri_plugin_dialog::DialogExt;
 const KIND: &str = "document";
 
 async fn project_pool(state: &AppState, project_id: &str) -> AppResult<SqlitePool> {
-    let user = state.require_user().await?;
-    project_storage::pool_for_user(state, project_id, &user.id).await
+    project_storage::pool_for_request(state, project_id).await
 }
 
 fn dialog_title(title: &str) -> String {
@@ -415,9 +414,15 @@ pub struct ExternalSync {
     pub document: Option<StructureDocument>,
 }
 
+/// Dossier des copies ouvertes sans connexion (projets publics).
+const PUBLIC_OPEN_DIR: &str = "public";
+
 async fn open_dir(state: &AppState, document_id: &str) -> AppResult<PathBuf> {
-    let user = state.require_user().await?;
-    Ok(documents::open_dir(&state.data_dir, &user.id, document_id))
+    // Copies ouvertes rangées par compte ; celles d'un invité (projets
+    // publics) dans un dossier commun.
+    let viewer = state.viewer().await;
+    let owner = viewer.user_id().unwrap_or(PUBLIC_OPEN_DIR);
+    Ok(documents::open_dir(&state.data_dir, owner, document_id))
 }
 
 /// Ouvre le document avec l'application associée à son type (Word,

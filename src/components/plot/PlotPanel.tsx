@@ -10,11 +10,14 @@ import { noteTabId } from "@/lib/notes";
 import {
   attachToNode,
   eventOf,
+  insertMoment,
   laneIndex,
   laneOf,
   LINK_KINDS,
   linkOf,
-  shiftRows,
+  momentNumber,
+  removeMoment,
+  rowFromMoment,
   STATUS_COLORS,
   STATUS_ORDER,
   visibleLanes,
@@ -69,7 +72,7 @@ function EventPanel({ projectId, data, links, onOpenFeature, event }: PlotPanelP
   const present = event.characterIds.map((id) => links.character(id)).filter(Boolean);
   const absent = links.characters.filter((c) => !event.characterIds.includes(c.id));
   const projectSummary = [event.povId && links.characterName(event.povId), event.locationId && links.location(event.locationId)?.name].filter(Boolean).join(" · ");
-  const detailsSummary = [lane?.name, t("board.moment", { number: event.row + 1 }).toLowerCase(), event.date].filter(Boolean).join(" · ");
+  const detailsSummary = [lane?.name, t("board.moment", { number: momentNumber(event.row) }).toLowerCase(), event.date].filter(Boolean).join(" · ");
   async function writeScene() {
     try {
       const note = await createNote(projectId, null, event.title || t("untitled"));
@@ -342,13 +345,14 @@ function EventPanel({ projectId, data, links, onOpenFeature, event }: PlotPanelP
             </select>
           </Field>
           <Field label={t("event.moment")}>
+            {/* 1, 2… : histoire principale ; -1, -2… : passé narratif (0 n'existe pas). */}
             <input
               type="number"
-              min={1}
-              value={event.row + 1}
+              value={event.row >= 0 ? event.row + 1 : event.row}
+              title={t("event.momentHint")}
               onChange={(e) => {
-                const row = Math.max(1, Number.parseInt(e.target.value, 10) || 1) - 1;
-                if (row !== event.row) moveEvent(projectId, event.id, event.laneId, row);
+                const row = rowFromMoment(e.target.value);
+                if (row !== null && row !== event.row) moveEvent(projectId, event.id, event.laneId, row);
               }}
               className={input}
             />
@@ -415,7 +419,7 @@ function LinkPanel({ projectId, data, link }: PlotPanelProps & { link: PlotLink 
         <span className="block text-xs text-muted-foreground">{label}</span>
         <span className="block truncate text-sm font-medium">{event.title || t("untitled")}</span>
         <span className="block truncate text-xs text-muted-foreground">
-          {laneOf(data, event.laneId)?.name}, {t("board.moment", { number: event.row + 1 }).toLowerCase()}
+          {laneOf(data, event.laneId)?.name}, {t("board.moment", { number: momentNumber(event.row) }).toLowerCase()}
         </span>
       </span>
     </button>
@@ -614,7 +618,7 @@ function RowPanel({ projectId, data, row }: PlotPanelProps & { row: number }) {
   const tension = data.tension[row];
   return (
     <div className="p-4">
-      <Head kind={t("board.moment", { number: row + 1 })} color="var(--muted-foreground)" />
+      <Head kind={row < 0 ? t("board.pastMoment", { number: momentNumber(row) }) : t("board.moment", { number: momentNumber(row) })} color="var(--muted-foreground)" />
       <Field label={t("row.label")}>
         <input
           value={data.rowLabels[row] ?? ""}
@@ -681,11 +685,13 @@ function RowPanel({ projectId, data, row }: PlotPanelProps & { row: number }) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() =>
+          onClick={() => {
+            let added = row;
             mutate((d) => {
-              shiftRows(d, row, 1);
-            })
-          }
+              added = insertMoment(d, row, "before");
+            });
+            select({ type: "row", id: added });
+          }}
         >
           {t("row.insertBefore")}
         </Button>
@@ -693,10 +699,11 @@ function RowPanel({ projectId, data, row }: PlotPanelProps & { row: number }) {
           variant="outline"
           size="sm"
           onClick={() => {
+            let added = row + 1;
             mutate((d) => {
-              shiftRows(d, row + 1, 1);
+              added = insertMoment(d, row, "after");
             });
-            select({ type: "row", id: row + 1 });
+            select({ type: "row", id: added });
           }}
         >
           {t("row.insertAfter")}
@@ -709,10 +716,7 @@ function RowPanel({ projectId, data, row }: PlotPanelProps & { row: number }) {
           title={count ? t("row.deleteBlocked") : undefined}
           onClick={() => {
             mutate((d) => {
-              delete d.rowLabels[row];
-              delete d.acts[row];
-              delete d.tension[row];
-              shiftRows(d, row + 1, -1);
+              removeMoment(d, row);
             });
             select(null);
           }}

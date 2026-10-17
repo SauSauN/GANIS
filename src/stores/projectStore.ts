@@ -16,6 +16,7 @@ import type {
   Project,
   ProjectStatus,
   ProjectType,
+  ProjectVisibility,
 } from "@/types";
 
 interface CreateProjectInput {
@@ -47,13 +48,6 @@ interface ProjectState {
   loading: boolean;
   error: string | null;
 
-  /**
-   * Vrai uniquement en développement, après « Mode démo » :
-   * les projets sont alors fictifs et gérés en mémoire, sans appel à Rust
-   * (aucune session réelle n'existe dans ce mode).
-   */
-  demo: boolean;
-
   setQuery: (query: string) => void;
   clearError: () => void;
 
@@ -69,6 +63,12 @@ interface ProjectState {
 
   duplicateProject: (id: string) => Promise<Project>;
 
+  /** Rend un projet privé ou public (connexion nécessaire). */
+  setVisibility: (
+    id: string,
+    visibility: ProjectVisibility,
+  ) => Promise<Project>;
+
   deleteProject: (id: string) => Promise<void>;
   /** Confirme l'import d'un `.ganix` vérifié et l'ajoute à la liste. */
   importGanix: (stagingId: string, mode: GanixImportMode) => Promise<GanixImportOutcome>;
@@ -81,7 +81,6 @@ interface ProjectState {
 
   closeProject: () => void;
   reset: () => void;
-  seedDemo: () => void;
 }
 
 const initial: Pick<
@@ -92,7 +91,6 @@ const initial: Pick<
   | "query"
   | "loading"
   | "error"
-  | "demo"
 > = {
   projects: [],
   currentProjectId: null,
@@ -100,7 +98,6 @@ const initial: Pick<
   query: "",
   loading: false,
   error: null,
-  demo: false,
 };
 
 /** Message affichable pour une erreur quelconque. */
@@ -120,7 +117,7 @@ function upsert(projects: Project[], project: Project): Project[] {
 }
 
 export const useProjectStore =
-  create<ProjectState>((set, get) => {
+  create<ProjectState>((set) => {
     /** Enregistre l'erreur dans le store puis la relance. */
     function fail(error: unknown, fallback: string): never {
       const message = messageOf(error, fallback);
@@ -147,11 +144,6 @@ export const useProjectStore =
       },
 
       fetchProjects: async () => {
-        // En mode démo, les projets fictifs restent en mémoire.
-        if (get().demo) {
-          return;
-        }
-
         set({
           loading: true,
           error: null,
@@ -183,31 +175,6 @@ export const useProjectStore =
         });
 
         try {
-          if (get().demo) {
-            const now = new Date().toISOString();
-
-            const project: Project = {
-              id: `demo-${Date.now()}`,
-              name: input.name,
-              description: input.description,
-              type: input.projectType,
-              status: "preparing",
-              isFavorite: false,
-              isArchived: false,
-              createdAt: now,
-              updatedAt: now,
-              lastOpenedAt: null,
-            };
-
-            set((state) => ({
-              projects: [project, ...state.projects],
-              loading: false,
-              error: null,
-            }));
-
-            return project;
-          }
-
           const project = await api.createProject({
             name: input.name,
             description: input.description,
@@ -246,35 +213,6 @@ export const useProjectStore =
             isArchived,
           } = input;
 
-          if (get().demo) {
-            const current = get().projects.find(
-              (item) => item.id === id,
-            );
-
-            if (!current) {
-              throw new Error("Projet non trouvé.");
-            }
-
-            const project: Project = {
-              ...current,
-              name: name ?? current.name,
-              description: description ?? current.description,
-              type: projectType ?? current.type,
-              status: status ?? current.status,
-              isFavorite: isFavorite ?? current.isFavorite,
-              isArchived: isArchived ?? current.isArchived,
-              updatedAt: new Date().toISOString(),
-            };
-
-            set((state) => ({
-              projects: upsert(state.projects, project),
-              loading: false,
-              error: null,
-            }));
-
-            return project;
-          }
-
           const project = await api.updateProject(id, {
             name,
             description,
@@ -306,38 +244,6 @@ export const useProjectStore =
         });
 
         try {
-          if (get().demo) {
-            const source = get().projects.find(
-              (item) => item.id === id,
-            );
-
-            if (!source) {
-              throw new Error("Projet non trouvé.");
-            }
-
-            const now = new Date().toISOString();
-
-            const project: Project = {
-              ...source,
-              id: `demo-${Date.now()}`,
-              name: `${source.name} (copie)`,
-              status: "preparing",
-              isFavorite: false,
-              isArchived: false,
-              createdAt: now,
-              updatedAt: now,
-              lastOpenedAt: null,
-            };
-
-            set((state) => ({
-              projects: [project, ...state.projects],
-              loading: false,
-              error: null,
-            }));
-
-            return project;
-          }
-
           const project = await api.duplicateProject(id);
 
           set((state) => ({
@@ -355,6 +261,30 @@ export const useProjectStore =
         }
       },
 
+      setVisibility: async (id, visibility) => {
+        set({
+          loading: true,
+          error: null,
+        });
+
+        try {
+          const project = await api.setProjectVisibility(id, visibility);
+
+          set((state) => ({
+            projects: upsert(state.projects, project),
+            loading: false,
+            error: null,
+          }));
+
+          return project;
+        } catch (error) {
+          return fail(
+            error,
+            "Changement de visibilité impossible.",
+          );
+        }
+      },
+
       importGanix: async (stagingId, mode) => {
         const outcome = await api.confirmGanixImport(stagingId, mode);
 
@@ -368,7 +298,6 @@ export const useProjectStore =
           usePlaceLinkStore.getState().reset();
           useStructureStore.getState().reset();
           useNoteStore.getState().reset();
-        usePlotStore.getState().reset();
           usePlotStore.getState().reset();
           useTrashStore.getState().reset();
           useToastStore.getState().clear();
@@ -389,9 +318,7 @@ export const useProjectStore =
         });
 
         try {
-          if (!get().demo) {
-            await api.deleteProject(id);
-          }
+          await api.deleteProject(id);
 
           set((state) => ({
             projects: state.projects.filter(
@@ -416,20 +343,6 @@ export const useProjectStore =
 
       openProject: async (id) => {
         try {
-          if (get().demo) {
-            const project = get().projects.find(
-              (item) => item.id === id,
-            );
-
-            if (!project) {
-              throw new Error("Projet non trouvé.");
-            }
-
-            set({ currentProjectId: id, lastProjectId: id });
-
-            return project;
-          }
-
           const project = await api.openProject(id);
 
           set((state) => ({
@@ -467,8 +380,9 @@ export const useProjectStore =
       },
 
       reset: () => {
-        // Appelé à la déconnexion : aucune donnée du compte précédent
-        // ne doit rester en mémoire.
+        // Appelé à la connexion, à la déconnexion et en quittant le mode
+        // invité : aucune donnée de la session précédente ne doit rester
+        // en mémoire.
         useSynopsisStore.getState().reset();
         useCharacterStore.getState().reset();
         useRelationStore.getState().reset();
@@ -481,48 +395,6 @@ export const useProjectStore =
         useToastStore.getState().clear();
 
         set(initial);
-      },
-
-      seedDemo: () => {
-        if (!import.meta.env.DEV) {
-          return;
-        }
-
-        const now = new Date().toISOString();
-
-        set({
-          projects: [
-            {
-              id: "demo-1",
-              name: "Les Cendres d'Ysmir",
-              description:
-                "Saga de fantasy en trois tomes.",
-              type: "novel",
-              status: "in_progress",
-              isFavorite: true,
-              isArchived: false,
-              createdAt: now,
-              updatedAt: now,
-              lastOpenedAt: null,
-            },
-            {
-              id: "demo-2",
-              name: "Kaiju Blues",
-              description:
-                "Manga de science-fiction.",
-              type: "manga",
-              status: "preparing",
-              isFavorite: false,
-              isArchived: false,
-              createdAt: now,
-              updatedAt: now,
-              lastOpenedAt: null,
-            },
-          ],
-          currentProjectId: null,
-          error: null,
-          demo: true,
-        });
       },
     };
   });

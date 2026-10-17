@@ -9,6 +9,8 @@ import {
   Clock,
   FileUp,
   FolderOpen,
+  Globe,
+  Lock,
   Plus,
   Search,
   Star,
@@ -38,10 +40,18 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
+import { projectsInSpace, spaceOf } from "@/lib/projectSpace";
+import { showGuideOnce } from "@/lib/shortcuts";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
+import { usePendingVisibility } from "@/stores/pendingVisibilityStore";
 import { useProjectStore } from "@/stores/projectStore";
-import type { GanixImportMode, GanixPreview, Project } from "@/types";
+import { toast } from "@/stores/toastStore";
+import type {
+  GanixImportMode,
+  GanixPreview,
+  Project,
+} from "@/types";
 
 type Filter = "all" | "favorites" | "archived";
 
@@ -55,12 +65,24 @@ const RECENT_LIMIT = 3;
  * et les favoris.
  *
  * La liste des projets peut être repliée (clic sur son titre).
+ *
+ * Le mode décide de l'espace affiché, sans filtre (voir `projectSpace.ts`) :
+ * - sans connexion (« Commencer ») : espace public, projets publics
+ *   seulement ; les projets créés sont publics ;
+ * - connecté : espace privé, projets privés du compte seulement ; les
+ *   projets créés sont privés.
+ * La visibilité d'un projet se change dans ses paramètres.
+ *
+ * À la toute première visite, le guide de démarrage (Aide › Guide de
+ * démarrage) s'ouvre une fois.
  */
 export default function Dashboard() {
   const navigate = useNavigate();
   const { t } = useTranslation(["dashboard", "projects", "common", "menus"]);
 
   const user = useAuthStore((state) => state.user);
+  const signedIn = user !== null;
+  const space = spaceOf(signedIn);
 
   const projects = useProjectStore((state) => state.projects);
   const loading = useProjectStore((state) => state.loading);
@@ -74,14 +96,17 @@ export default function Dashboard() {
   const deleteProject = useProjectStore((state) => state.deleteProject);
   const openProject = useProjectStore((state) => state.openProject);
   const importGanix = useProjectStore((state) => state.importGanix);
+  const setVisibility = useProjectStore((state) => state.setVisibility);
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
 
   /**
-   * Liste des projets dépliée (vrai) ou repliée (faux).
+   * Liste « Tous les projets » dépliée (vrai) ou repliée (faux).
+   * Repliée à l'ouverture du tableau de bord ; un clic sur son titre, ou
+   * sur une des cartes de filtre, la déplie.
    */
-  const [listOpen, setListOpen] = useState(true);
+  const [listOpen, setListOpen] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Project | null>(null);
@@ -96,24 +121,63 @@ export default function Dashboard() {
   const [inspecting, setInspecting] = useState(false);
   const [preview, setPreview] = useState<GanixPreview | null>(null);
 
+  /** Guide de démarrage : ouvert une seule fois, à la première visite. */
+  useEffect(() => {
+    showGuideOnce();
+  }, []);
+
   useEffect(() => {
     void fetchProjects();
-  }, [fetchProjects]);
+    // La liste dépend de la connexion (projets privés du compte).
+  }, [fetchProjects, user?.id]);
+
+  /** Projets de l'espace courant (jamais de mélange public / privé). */
+  const scoped = useMemo(
+    () => projectsInSpace(projects, space),
+    [projects, space],
+  );
+
+
+  /**
+   * Projet public à rendre privé, demandé avant la connexion (création de
+   * compte, configuration initiale) : appliqué dès l'arrivée du compte.
+   */
+  useEffect(() => {
+    if (!signedIn) return;
+
+    const projectId = usePendingVisibility.getState().take();
+    if (!projectId) return;
+
+    setVisibility(projectId, "private")
+      .then((project) =>
+        toast({
+          tone: "success",
+          message: t("projects:visibility.madePrivate", { name: project.name }),
+        }),
+      )
+      .catch((e) =>
+        toast({
+          tone: "error",
+          message: e instanceof Error ? e.message : t("errors.actionFailed"),
+        }),
+      );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signedIn]);
 
   const counts = useMemo(
     () => ({
-      active: projects.filter((p) => !p.isArchived).length,
-      favorites: projects.filter((p) => p.isFavorite && !p.isArchived)
+      active: scoped.filter((p) => !p.isArchived).length,
+      favorites: scoped.filter((p) => p.isFavorite && !p.isArchived)
         .length,
-      archived: projects.filter((p) => p.isArchived).length,
+      archived: scoped.filter((p) => p.isArchived).length,
     }),
-    [projects],
+    [scoped],
   );
 
   const visible = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return projects
+    return scoped
       .filter((project) => {
         if (filter === "archived") return project.isArchived;
         if (filter === "favorites") {
@@ -128,17 +192,17 @@ export default function Dashboard() {
           project.description.toLowerCase().includes(query),
       )
       .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
-  }, [projects, filter, search]);
+  }, [scoped, filter, search]);
 
   const recent = useMemo(
     () =>
-      projects
+      scoped
         .filter((project) => !project.isArchived && project.lastOpenedAt)
         .sort((a, b) =>
           (b.lastOpenedAt ?? "").localeCompare(a.lastOpenedAt ?? ""),
         )
         .slice(0, RECENT_LIMIT),
-    [projects],
+    [scoped],
   );
 
   const searching = search.trim() !== "";
@@ -146,10 +210,11 @@ export default function Dashboard() {
   const showRecent = filter === "all" && !searching && recent.length > 0;
 
   /**
-   * Pendant une recherche, la liste est toujours affichée :
-   * un résultat ne doit jamais rester caché derrière une section repliée.
+   * Pendant une recherche, la liste est toujours affichée : un résultat ne
+   * doit jamais rester caché derrière une section repliée. Sans aucun
+   * projet, elle l'est aussi : elle porte l'invitation à créer le premier.
    */
-  const listVisible = listOpen || searching;
+  const listVisible = listOpen || searching || scoped.length === 0;
 
   /** Exécute une action sur un projet en gérant l'état et les erreurs. */
   async function run(project: Project, task: () => Promise<unknown>) {
@@ -201,6 +266,9 @@ export default function Dashboard() {
 
   /** Choisit un `.ganix`, le fait vérifier puis montre l'aperçu. */
   async function handleInspect() {
+    // Import réservé aux comptes connectés (le projet importé est privé).
+    if (!signedIn) return;
+
     setActionError(null);
     setNotice(null);
     setInspecting(true);
@@ -256,7 +324,10 @@ export default function Dashboard() {
   // Menus et raccourcis : Ctrl+N crée un projet ; « Importer un .ganix ».
   useRegisterCommands({
     new: { label: t("menus:file.newIn.newProject"), run: openCreateDialog },
-    importGanix: { disabled: inspecting, run: () => void handleInspect() },
+    importGanix: {
+      disabled: inspecting || !signedIn,
+      run: () => void handleInspect(),
+    },
   });
 
   // Action demandée depuis un menu avant d'arriver ici.
@@ -396,27 +467,43 @@ export default function Dashboard() {
           {/* En-tête */}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-semibold tracking-tight">
-                {t("greeting", {
-                  name: user?.username ?? t("defaultName"),
-                })}
-              </h1>
-              <p className="text-sm text-muted-foreground">
-                {t("subtitle")}
-              </p>
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  {signedIn
+                    ? t("greeting", { name: user.username })
+                    : t("guest.title")}
+                </h1>
+
+                {/* Espace courant : privé (connecté) ou public */}
+                <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                  {space === "private" ? (
+                    <Lock className="h-3 w-3" />
+                  ) : (
+                    <Globe className="h-3 w-3" />
+                  )}
+                  {t(`space.${space}`)}
+                </span>
+              </div>
+              {signedIn && (
+                <p className="text-sm text-muted-foreground">
+                  {t("subtitle")}
+                </p>
+              )}
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
-              <Button
-                variant="outline"
-                disabled={inspecting}
-                onClick={() => void handleInspect()}
-              >
-                <FileUp className="mr-2 h-4 w-4" />
-                {inspecting
-                  ? t("projects:ganix.import.checking")
-                  : t("projects:ganix.import.button")}
-              </Button>
+              {signedIn && (
+                <Button
+                  variant="outline"
+                  disabled={inspecting}
+                  onClick={() => void handleInspect()}
+                >
+                  <FileUp className="mr-2 h-4 w-4" />
+                  {inspecting
+                    ? t("projects:ganix.import.checking")
+                    : t("projects:ganix.import.button")}
+                </Button>
+              )}
 
               <Button onClick={openCreateDialog}>
                 <Plus className="mr-2 h-4 w-4" />
@@ -426,7 +513,7 @@ export default function Dashboard() {
           </div>
 
           {/* Recherche */}
-          <div className="relative mt-6">
+          <div className="relative mt-4">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               className="pl-9"
@@ -513,8 +600,8 @@ export default function Dashboard() {
           {/* Liste des projets (repliable) */}
           <section className="mt-8">
             <h2 className="mb-4 text-lg font-semibold">
-              {searching ? (
-                // Pendant une recherche, la liste reste ouverte : pas de bouton.
+              {searching || scoped.length === 0 ? (
+                // Liste forcément ouverte (recherche, aucun projet) : pas de bouton.
                 <span className="flex items-center gap-2">
                   {listTitle}
                   <span className="text-sm font-normal text-muted-foreground">
@@ -568,14 +655,16 @@ export default function Dashboard() {
                               <Plus className="mr-2 h-4 w-4" />
                               {t("empty.createFirst")}
                             </Button>
-                            <Button
-                              variant="outline"
-                              disabled={inspecting}
-                              onClick={() => void handleInspect()}
-                            >
-                              <FileUp className="mr-2 h-4 w-4" />
-                              {t("projects:ganix.import.button")}
-                            </Button>
+                            {signedIn && (
+                              <Button
+                                variant="outline"
+                                disabled={inspecting}
+                                onClick={() => void handleInspect()}
+                              >
+                                <FileUp className="mr-2 h-4 w-4" />
+                                {t("projects:ganix.import.button")}
+                              </Button>
+                            )}
                           </div>
                         </CardContent>
                       )}

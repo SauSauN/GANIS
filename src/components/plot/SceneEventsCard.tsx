@@ -6,7 +6,19 @@ import { useProjectStructure } from "@/components/structure/useProjectStructure"
 import { Button } from "@/components/ui/button";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import { fieldClass } from "@/components/workspace/views/PageShell";
-import { attachToNode, eventOf, eventsOfNode, eventsRetoldIn, laneOf, moveInScene, planOrder, STATUS_COLORS, visibleLanes, type PlotEvent } from "@/lib/plot";
+import {
+  attachToNode,
+  eventOf,
+  eventsOfNode,
+  eventsRetoldIn,
+  laneOf,
+  momentNumber,
+  moveInScene,
+  planOrder,
+  STATUS_COLORS,
+  visibleLanes,
+  type PlotEvent,
+} from "@/lib/plot";
 import { cn } from "@/lib/utils";
 import { usePlotStore, useProjectPlot } from "@/stores/plotStore";
 
@@ -218,7 +230,7 @@ export function SceneEventsCard({ projectId, nodeId, name, onOpenFeature }: Scen
                   .filter((e) => e.laneId === l.id)
                   .map((e) => (
                     <option key={e.id} value={e.id}>
-                      {e.row + 1}. {e.title || t("untitled")}
+                      {momentNumber(e.row)}. {e.title || t("untitled")}
                       {e.nodeId ? ` (${t("scene.alreadyPlaced")})` : ""}
                     </option>
                   ))}

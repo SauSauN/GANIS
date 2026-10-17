@@ -110,6 +110,7 @@ pub fn run() {
             commands::projects::get_project,
             commands::projects::open_project,
             commands::projects::update_project,
+            commands::projects::set_project_visibility,
             commands::projects::duplicate_project,
             commands::projects::delete_project,
             commands::ganix::export_project,

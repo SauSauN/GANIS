@@ -336,8 +336,9 @@ export function WorkCalendarCard({ projects, expanded = false }: WorkCalendarCar
             </div>
           )}
 
-          {/* Détail du rythme : replié par défaut (fonctions secondaires). */}
-          <details className="group/details border-t pt-3" open={expanded || undefined}>
+          {/* Détail du rythme : replié par défaut, y compris sur la page
+              « Rythme de travail » ; un clic sur l'en-tête l'ouvre ou le referme. */}
+          <details className="group/details border-t pt-3">
             <summary className="flex h-8 cursor-pointer list-none items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden">
               <ChevronRight aria-hidden className="size-4 transition-transform group-open/details:rotate-90" />
               {summary.rhythm !== "none" && (

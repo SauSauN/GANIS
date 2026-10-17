@@ -1,7 +1,7 @@
 {
   "guide": {
     "title": "Guide de démarrage",
-    "description": "Les bases de GANIS en quelques étapes. Vous le retrouvez à tout moment dans Aide › Guide de démarrage.",
+    "description": "Tout GANIS en quelques étapes. Vous le retrouvez à tout moment dans Aide › Guide de démarrage.",
     "progress": "Étape {{current}} sur {{total}}",
     "previous": "Précédent",
     "next": "Suivant",
@@ -10,35 +10,157 @@
     "steps": {
       "projects": {
         "title": "Vos projets",
-        "text": "Le tableau de bord rassemble vos projets : roman, manga, film, série, jeu… Créez-en un avec « Nouveau projet » (Ctrl+N). Chaque projet est chiffré sur votre ordinateur et peut être exporté en fichier .ganix pour une sauvegarde ou un autre ordinateur."
+        "text": "Le tableau de bord rassemble vos projets : roman, manga, film, série, jeu, jeu de rôle… Créez-en un avec « Nouveau projet » (Ctrl+N) ; il s'ouvre aussitôt.",
+        "points": [
+          "Les projets récemment ouverts sont en tête de page.",
+          "Étoile : mettez un projet en favori pour le retrouver dans « Favoris ».",
+          "Archivez un projet terminé : il quitte la liste principale sans être supprimé.",
+          "La barre de recherche filtre les projets par nom ou description."
+        ]
+      },
+      "spaces": {
+        "title": "Espace public, espace privé",
+        "text": "« Commencer » ouvre l'espace public, sans compte. Une fois connecté, vous êtes dans votre espace privé. Les deux ne se mélangent jamais.",
+        "points": [
+          "Créé sans compte, un projet est public : toute personne utilisant GANIS sur cet ordinateur peut l'ouvrir.",
+          "Créé une fois connecté, un projet est privé : chiffré et visible seulement depuis votre compte.",
+          "Pour changer : paramètres du projet › Statut et organisation › Visibilité.",
+          "Rendre privé un projet public demande de se connecter ; rendre public un projet privé demande une confirmation."
+        ]
       },
       "layout": {
         "title": "L'espace de travail",
-        "text": "À gauche, la barre des modules (Détails, Personnages, Lieux, Découpage, Notes). Le panneau du milieu liste les fonctions et les éléments du module ; chaque élément s'ouvre dans un onglet. Clic droit sur un onglet pour l'épingler ou fermer les autres."
+        "text": "À gauche, la barre des modules : Détails, Personnages, Lieux, Découpage, Trame, Notes et Recherche. Le panneau du milieu liste les fonctions et les éléments du module ; chacun s'ouvre dans un onglet.",
+        "points": [
+          "Cliquez à nouveau sur un module pour replier son panneau.",
+          "Clic droit sur un onglet : l'épingler, fermer les autres, ceux de gauche ou de droite.",
+          "Les onglets épinglés sont retrouvés à la prochaine ouverture du projet.",
+          "« Réduire » ne garde que les icônes de la barre de gauche."
+        ]
+      },
+      "synopsis": {
+        "title": "L'accueil du projet",
+        "text": "Chaque projet commence par sa fiche : synopsis, genres, ton et informations générales de l'histoire.",
+        "points": [
+          "Détails › Synopsis du projet pour écrire le résumé.",
+          "Le nom, la description et le type se modifient dans les paramètres du projet.",
+          "Le statut (en préparation, en cours, en pause, terminé) aide à suivre l'avancement."
+        ]
       },
       "characters": {
-        "title": "Personnages et lieux",
-        "text": "Créez vos personnages (identité, apparence, personnalité) et vos lieux (du continent à la pièce). Reliez-les : relations entre personnages, lieux de vie, origine… Le graphe des relations montre tout votre monde d'un coup d'œil."
+        "title": "Personnages",
+        "text": "Créez vos personnages : identité, apparence et personnalité, avec trois niveaux de détail selon le besoin.",
+        "points": [
+          "Personnages › Créer un personnage, ou Ctrl+N dans le module.",
+          "Le niveau de détail des fiches se règle dans les paramètres du projet.",
+          "Ajoutez un portrait et une galerie d'images à chaque fiche.",
+          "Chaque fiche s'ouvre dans son propre onglet, au nom du personnage."
+        ]
+      },
+      "locations": {
+        "title": "Lieux",
+        "text": "Du continent à la pièce : chaque lieu a une fiche adaptée à son type (ville, royaume, forêt…), et les lieux se rangent les uns dans les autres.",
+        "points": [
+          "Lieux › Créer un lieu, puis choisissez son type.",
+          "Placez un lieu dans un autre pour bâtir la géographie de votre monde.",
+          "Ajoutez vos propres types de lieux et statuts dans les paramètres du projet."
+        ]
+      },
+      "relations": {
+        "title": "Relations et liens",
+        "text": "Reliez vos personnages entre eux (famille, amitiés, rivalités, alliances) et à leurs lieux (lieu de vie, origine…). Le graphe des relations montre tout votre monde d'un coup d'œil.",
+        "points": [
+          "Personnages › Relations entre personnages pour ouvrir le graphe.",
+          "Les liens personnage ↔ lieu se gèrent depuis la fiche du personnage ou du lieu.",
+          "Les éléments du découpage indiquent aussi quels personnages et lieux y apparaissent."
+        ]
       },
       "structure": {
         "title": "Le découpage du récit",
-        "text": "Parties, chapitres, scènes (ou actes et séquences pour un film…) : le plan s'adapte au type de projet. Les noms, la numérotation et les couleurs des niveaux se règlent dans les paramètres du projet. Chaque élément a sa fiche avec ses personnages et ses lieux."
+        "text": "Parties, chapitres, scènes, ou actes et séquences pour un film : le plan s'adapte au type de projet.",
+        "points": [
+          "Découpage › Plan du récit pour construire l'arborescence.",
+          "Noms, numérotation et couleurs des niveaux se règlent dans les paramètres du projet.",
+          "Chaque élément a sa fiche, avec ses personnages, ses lieux et son texte.",
+          "« Monter » et « Descendre » réordonnent les éléments du plan."
+        ]
+      },
+      "plot": {
+        "title": "La trame",
+        "text": "Le plateau des trames montre vos intrigues en colonnes, le temps vers le bas, et leurs liens de cause à effet.",
+        "points": [
+          "Ajoutez des trames parallèles à la trame principale.",
+          "Reliez deux événements : impact, influence ou croisement.",
+          "Suivez l'état de chaque événement : idée, brouillon, écrit, relu.",
+          "Trame › Lecture de l'histoire : le récit dans l'ordre du lecteur."
+        ]
       },
       "notes": {
         "title": "Notes et post-it",
-        "text": "Les notes s'écrivent avec un vrai éditeur : titres, polices, listes, tableaux, encadrés, cases enchaînées et schémas. Rangez-les dans des dossiers. Le mur de post-it accueille les idées en vrac."
+        "text": "Les notes s'écrivent avec un vrai éditeur : titres, polices, listes, tableaux, encadrés, cases enchaînées et schémas.",
+        "points": [
+          "Rangez vos notes dans des dossiers.",
+          "Le mur de post-it accueille les idées en vrac, à placer librement.",
+          "Les descriptions des fiches existent aussi sous forme de notes système, modifiables depuis les notes."
+        ]
+      },
+      "search": {
+        "title": "Rechercher",
+        "text": "Retrouvez n'importe quoi dans le projet : personnages, lieux, découpage, documents, trame, notes et post-it.",
+        "points": [
+          "Le module Recherche fouille tout le projet, sans tenir compte des accents ni des majuscules.",
+          "Ctrl+K ouvre la palette : tapez pour aller à un élément ou lancer une commande.",
+          "Un clic sur un résultat l'ouvre dans un onglet."
+        ]
       },
       "saving": {
-        "title": "Enregistrement",
-        "text": "Un point ● sur un onglet signale des modifications non enregistrées. Enregistrez avec Ctrl+S, ou laissez l'enregistrement automatique le faire. La barre d'état, en bas, indique toujours où vous en êtes : enregistrement en cours, enregistré, ou échec."
+        "title": "Enregistrement et versions",
+        "text": "Un point ● sur un onglet signale des modifications non enregistrées. Enregistrez avec Ctrl+S, ou laissez l'enregistrement automatique le faire.",
+        "points": [
+          "La barre d'état, en bas, indique toujours où vous en êtes : enregistrement, enregistré ou échec.",
+          "Une version est créée automatiquement au début de chaque séance de modification.",
+          "Bouton « Versions » : comparez un état précédent à l'état actuel, puis restaurez-le si besoin.",
+          "Nommez l'état actuel pour garder un jalon important."
+        ]
       },
       "trash": {
-        "title": "Corbeille et annulation",
-        "text": "Une suppression peut être annulée tout de suite avec « Annuler » (ou Ctrl+Z). Les éléments supprimés restent 30 jours dans la corbeille (Projet › Corbeille), d'où vous pouvez les restaurer."
+        "title": "Historique, corbeille et annulation",
+        "text": "Une suppression peut être annulée tout de suite avec « Annuler » (ou Ctrl+Z). Les éléments supprimés restent 30 jours dans la corbeille.",
+        "points": [
+          "Projet › Corbeille pour restaurer un élément supprimé.",
+          "Détails › Historique : tout ce qui s'est passé dans le projet ces 90 derniers jours.",
+          "Depuis l'historique, un clic sur un nom ouvre l'élément."
+        ]
+      },
+      "export": {
+        "title": "Sauvegarder et partager",
+        "text": "Exportez un projet en fichier .ganix pour le sauvegarder ou l'ouvrir sur un autre ordinateur.",
+        "points": [
+          "Fichier › Exporter le projet (.ganix), ou l'icône de téléchargement sur la carte du projet.",
+          "Le fichier .ganix n'est pas chiffré : rangez-le en lieu sûr.",
+          "« Importer un projet » (avec un compte) l'ajoute à votre espace privé, ou remplace un projet existant après une sauvegarde.",
+          "Dupliquez un projet pour essayer une variante sans toucher à l'original."
+        ]
+      },
+      "personalize": {
+        "title": "Votre GANIS",
+        "text": "Adaptez l'application à votre façon de travailler.",
+        "points": [
+          "Thème clair ou sombre en un clic, dans la barre du haut.",
+          "Packages : choisissez d'autres thèmes de couleurs.",
+          "Paramètres : langue, taille du texte et compte.",
+          "Rythme de travail : votre temps d'écriture jour par jour, et vos séries de jours travaillés."
+        ]
       },
       "keyboard": {
         "title": "Raccourcis clavier",
-        "text": "Ctrl+N pour créer, Ctrl+S pour enregistrer, Ctrl+W pour fermer l'onglet, Ctrl+Tab pour changer d'onglet, Ctrl+K pour tout retrouver. La liste complète : Aide › Raccourcis clavier (Ctrl+/). Alt ou F10 donne le clavier à la barre de menus."
+        "text": "Tout se fait aussi au clavier.",
+        "points": [
+          "Ctrl+N créer, Ctrl+S enregistrer, Ctrl+W fermer l'onglet.",
+          "Ctrl+Tab changer d'onglet, Ctrl+K tout retrouver.",
+          "Alt ou F10 donne le clavier à la barre de menus.",
+          "La liste complète : Aide › Raccourcis clavier (Ctrl+/)."
+        ]
       }
     }
   },

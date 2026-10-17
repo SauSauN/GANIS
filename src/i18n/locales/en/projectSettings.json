@@ -6,7 +6,7 @@
     },
     "status": {
       "label": "Status and organization",
-      "description": "Project progress, favorite and archiving."
+      "description": "Progress, favorite, archiving and visibility."
     },
     "danger": {
       "label": "Export, duplication and deletion",
@@ -90,5 +90,21 @@
     "rule3": "These notes and their folder cannot be deleted, renamed or moved by hand. Formatting (bold, lists…) is not kept: sheets are plain text.",
     "enabledDone": "System notes created: open Notes › “System notes”.",
     "disabledDone": "System notes removed. The text stays in the sheets."
+  },
+  "visibility": {
+    "title": "Visibility",
+    "makePublic": "Make public",
+    "makePrivate": "Make private",
+    "confirmTitle": "Make this project public?",
+    "confirmDescription": "It will leave your private space and can be opened without signing in by anyone using GANIS on this computer.",
+    "failed": "Could not change visibility.",
+    "signIn": {
+      "title": "Sign-in required",
+      "description": "Sign in to make this project private.",
+      "submit": "Sign in and make private",
+      "submitting": "Signing in…",
+      "createAccount": "Create an account",
+      "setupFirst": "Create the first account"
+    }
   }
 }

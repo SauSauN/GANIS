@@ -2,16 +2,25 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   BookOpen,
+  Check,
   ChevronLeft,
   ChevronRight,
+  Download,
   FolderKanban,
+  Globe,
   Keyboard,
   LayoutPanelLeft,
   ListTree,
+  MapPin,
+  Network,
+  Palette,
+  PenLine,
   Save,
+  Search,
   StickyNote,
   Trash2,
   Users,
+  Waypoints,
   X,
   type LucideIcon,
 } from "lucide-react";
@@ -26,14 +35,26 @@ import { cn } from "@/lib/utils";
 // Guide de démarrage
 // ----------------------------------------------------------------------------
 
+/**
+ * Étapes du guide, dans l'ordre. Textes : `help.json` → `guide.steps.<id>`
+ * (`title`, `text`, et `points` : la liste des points clés).
+ */
 const STEPS: Array<{ id: string; icon: LucideIcon }> = [
   { id: "projects", icon: FolderKanban },
+  { id: "spaces", icon: Globe },
   { id: "layout", icon: LayoutPanelLeft },
+  { id: "synopsis", icon: PenLine },
   { id: "characters", icon: Users },
+  { id: "locations", icon: MapPin },
+  { id: "relations", icon: Network },
   { id: "structure", icon: ListTree },
+  { id: "plot", icon: Waypoints },
   { id: "notes", icon: StickyNote },
+  { id: "search", icon: Search },
   { id: "saving", icon: Save },
   { id: "trash", icon: Trash2 },
+  { id: "export", icon: Download },
+  { id: "personalize", icon: Palette },
   { id: "keyboard", icon: Keyboard },
 ];
 
@@ -49,6 +70,10 @@ function GuideDialog({ open, onClose }: { open: boolean; onClose: () => void }) 
   const Icon = current.icon;
   const last = step === STEPS.length - 1;
   const tt = t as unknown as (key: string, options?: Record<string, unknown>) => string;
+  const points = t(`guide.steps.${current.id}.points` as never, {
+    returnObjects: true,
+  }) as unknown;
+  const pointList = Array.isArray(points) ? (points as string[]) : [];
 
   return (
     <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-xl">
@@ -60,13 +85,25 @@ function GuideDialog({ open, onClose }: { open: boolean; onClose: () => void }) 
         <DialogDescription>{t("guide.description")}</DialogDescription>
       </DialogHeader>
 
-      <div className="mt-5 flex gap-4 rounded-lg border bg-muted/30 p-5">
+      {/* Hauteur minimale : les boutons ne sautent pas d'une étape à l'autre. */}
+      <div className="mt-5 flex min-h-[17rem] gap-4 rounded-lg border bg-muted/30 p-5">
         <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
           <Icon className="size-5" />
         </span>
-        <div className="min-w-0 space-y-2">
+        <div className="min-w-0 space-y-3">
           <h3 className="font-semibold">{tt(`guide.steps.${current.id}.title`)}</h3>
           <p className="text-sm leading-6 text-muted-foreground">{tt(`guide.steps.${current.id}.text`)}</p>
+
+          {pointList.length > 0 && (
+            <ul className="space-y-1.5">
+              {pointList.map((point) => (
+                <li key={point} className="flex gap-2 text-sm leading-6">
+                  <Check className="mt-1 size-4 shrink-0 text-primary" />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
 

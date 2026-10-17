@@ -80,10 +80,12 @@ export default function App() {
             />
 
             {/* ============================================================ */}
-            {/* Routes privées                                                */}
+            {/* Projets : avec ou sans connexion                              */}
             {/* ============================================================ */}
+            {/* Sans connexion (« Commencer ») : projets publics seulement.   */}
+            {/* Connecté : projets privés du compte et projets publics.       */}
 
-            <Route element={<ProtectedRoute />}>
+            <Route element={<ProtectedRoute allowGuest />}>
               {/* Tableau de bord */}
               <Route
                 path="/dashboard"
@@ -95,7 +97,13 @@ export default function App() {
                 path="/workspace/:projectId"
                 element={<Workspace />}
               />
+            </Route>
 
+            {/* ============================================================ */}
+            {/* Routes privées (connexion nécessaire)                         */}
+            {/* ============================================================ */}
+
+            <Route element={<ProtectedRoute />}>
               {/* Paramètres (compte, apparence) */}
               <Route
                 path="/settings"

@@ -22,6 +22,12 @@ import {
   eventsOfNode,
   eventsRetoldIn,
   moveInScene,
+  insertMoment,
+  momentNumber,
+  pastRowsCount,
+  removeMoment,
+  rowFromMoment,
+  PAST_MIN_ROWS,
   type PlotData,
   type PlotEvent,
 } from "@/lib/plot";
@@ -106,7 +112,8 @@ describe("plot", () => {
     expect(messy.events[0].status).toBe("idea");
     expect(messy.events[0].tags).toEqual(["Brume"]);
     expect(messy.links).toHaveLength(1);
-    expect(messy.tension).toEqual({ 0: 10 });
+    // Les moments négatifs sont le passé narratif : ils sont gardés.
+    expect(messy.tension).toEqual({ 0: 10, [-2]: 3 });
     expect(messy.questions).toEqual([{ id: expect.any(String), text: "Qui ?", done: false, eventId: null }]);
     expect(messy.clues[0].mysteryId).toBe("m");
     expect(messy.readingFollowsStructure).toBe(true);
@@ -229,5 +236,98 @@ describe("scènes et événements", () => {
     expect(eventsOfNode(data, "s1").map((e) => e.id)).toEqual(["b"]);
     const again = normalizePlot(JSON.parse(JSON.stringify(data)), "P");
     expect(again.sceneOrder.s1).toEqual(["b"]);
+  });
+});
+
+describe("passé narratif (moments négatifs)", () => {
+  it("garde les événements du passé à l'enregistrement et au rechargement", () => {
+    const data = sample();
+    data.events.push(ev("f1", "a", -1, { tags: ["flash-back"] }), ev("f2", "a", -3));
+    data.acts[-3] = "Avant";
+    data.tension[-1] = 4;
+    data.rowLabels[-1] = "La veille";
+    const again = normalizePlot(JSON.parse(JSON.stringify(data)), "Principale");
+    expect(again.events.find((e) => e.id === "f1")?.row).toBe(-1);
+    expect(again.events.find((e) => e.id === "f2")?.row).toBe(-3);
+    expect(again.acts[-3]).toBe("Avant");
+    expect(again.tension[-1]).toBe(4);
+    expect(again.rowLabels[-1]).toBe("La veille");
+  });
+
+  it("projets existants : rien ne change", () => {
+    const again = normalizePlot(JSON.parse(JSON.stringify(sample())), "Principale");
+    expect(again.events.map((e) => e.row)).toEqual([0, 4, 1, 3, 2]);
+    expect(pastRowsCount(again)).toBe(PAST_MIN_ROWS);
+  });
+
+  it("le passé vient avant l'histoire dans l'ordre du plan", () => {
+    const data = sample();
+    data.events.push(ev("f1", "b", -1), ev("f2", "a", -2));
+    expect(planOrder(data).slice(0, 3).map((e) => e.id)).toEqual(["f2", "f1", "e1"]);
+  });
+
+  it("affiche assez de passé au-dessus du moment le plus ancien", () => {
+    const data = sample();
+    data.events.push(ev("f", "a", -7));
+    expect(pastRowsCount(data)).toBe(9);
+  });
+
+  it("numérote −1, −2… avant le début, 1, 2… ensuite", () => {
+    expect(momentNumber(0)).toBe("1");
+    expect(momentNumber(4)).toBe("5");
+    expect(momentNumber(-1)).toBe("\u22121");
+    expect(momentNumber(-3)).toBe("\u22123");
+    expect(rowFromMoment("1")).toBe(0);
+    expect(rowFromMoment("-2")).toBe(-2);
+    expect(rowFromMoment("\u22122")).toBe(-2);
+    expect(rowFromMoment("0")).toBeNull();
+    expect(rowFromMoment("")).toBeNull();
+  });
+
+  it("dans le passé, une case prise fait remonter ses occupants sans franchir le début", () => {
+    const data = sample();
+    data.events.push(ev("f1", "a", -1), ev("f2", "a", -2));
+    const added = ev("n", "a", 0);
+    data.events.push(added);
+    placeEvent(data, added, "a", -1);
+    const row = (id: string) => data.events.find((e) => e.id === id)!.row;
+    expect(row("n")).toBe(-1);
+    expect(row("f1")).toBe(-2);
+    expect(row("f2")).toBe(-3);
+    expect(row("e1")).toBe(0);
+  });
+
+  it("insérer ou retirer un moment du passé ne déplace pas le début de l'histoire", () => {
+    const data = sample();
+    data.events.push(ev("f1", "a", -1), ev("f2", "a", -2));
+    data.acts[0] = "Acte I";
+    expect(insertMoment(data, -1, "before")).toBe(-2);
+    expect(data.events.find((e) => e.id === "f2")!.row).toBe(-3);
+    expect(data.events.find((e) => e.id === "f1")!.row).toBe(-1);
+    expect(data.events.find((e) => e.id === "e1")!.row).toBe(0);
+    expect(data.acts[0]).toBe("Acte I");
+
+    removeMoment(data, -2);
+    expect(data.events.find((e) => e.id === "f2")!.row).toBe(-2);
+    expect(data.events.find((e) => e.id === "e1")!.row).toBe(0);
+
+    // Juste après le dernier moment du passé : entre −1 et le début.
+    expect(insertMoment(data, -1, "after")).toBe(-1);
+    expect(data.events.find((e) => e.id === "f1")!.row).toBe(-2);
+    expect(data.events.find((e) => e.id === "e1")!.row).toBe(0);
+  });
+
+  it("dans l'histoire principale, insérer avant le premier moment reste comme avant", () => {
+    const data = sample();
+    expect(insertMoment(data, 0, "before")).toBe(0);
+    expect(data.events.find((e) => e.id === "e1")!.row).toBe(1);
+  });
+
+  it("les liens vers le passé sont conservés", () => {
+    const data = sample();
+    data.events.push(ev("f1", "c", -2));
+    data.links.push({ id: "k3", from: "f1", to: "e1", kind: "impact", label: "", note: "" });
+    const again = normalizePlot(JSON.parse(JSON.stringify(data)), "Principale");
+    expect(again.links.map((l) => l.id)).toContain("k3");
   });
 });

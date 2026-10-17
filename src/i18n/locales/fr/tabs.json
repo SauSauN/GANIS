@@ -6,7 +6,10 @@
     "pinNamed": "Épingler l'onglet {{name}}",
     "unpinNamed": "Désépingler l'onglet {{name}}",
     "close": "Fermer l'onglet",
-    "closeNamed": "Fermer l'onglet {{name}}"
+    "closeNamed": "Fermer l'onglet {{name}}",
+    "maximizeHint": "Double-clic : agrandir",
+    "restoreHint": "Double-clic : rétablir la disposition",
+    "restore": "Rétablir la disposition"
   },
   "nav": {
     "left_one": "Afficher l'onglet masqué à gauche ({{count}} masqué)",

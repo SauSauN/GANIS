@@ -37,6 +37,7 @@ import {
   PROJECT_SETTINGS_SECTIONS,
   type ProjectSettingsId,
 } from "@/components/project-settings/sections";
+import { VisibilityCard } from "@/components/project-settings/VisibilityCard";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
@@ -519,6 +520,13 @@ function StatusSection({ project }: { project: Project }) {
           </Button>
         </CardContent>
       </Card>
+
+      {/* Visibilité : public / privé */}
+      <VisibilityCard
+        project={project}
+        cardClass={cardClass}
+        cardHeaderClass={cardHeaderClass}
+      />
 
       {error && (
         <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">

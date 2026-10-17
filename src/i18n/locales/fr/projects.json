@@ -97,5 +97,11 @@
       "replaced": "Projet « {{name}} » remplacé. Sauvegarde de l'ancienne version : {{file}} (dossier « sauvegardes » de GANIS).",
       "encryptionNoteReplace": "Les données reçues seront chiffrées avec la clé de votre projet."
     }
+  },
+  "visibility": {
+    "public": "Public",
+    "private": "Privé",
+    "madePrivate": "« {{name}} » est maintenant privé.",
+    "madePublic": "« {{name}} » est maintenant public."
   }
 }

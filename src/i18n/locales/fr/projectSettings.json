@@ -6,7 +6,7 @@
     },
     "status": {
       "label": "Statut et organisation",
-      "description": "Avancement du projet, favori et archivage."
+      "description": "Avancement, favori, archivage et visibilité."
     },
     "danger": {
       "label": "Export, duplication et suppression",
@@ -90,5 +90,21 @@
     "rule3": "Ces notes et leur dossier ne se suppriment, ne se renomment et ne se déplacent pas à la main. La mise en forme (gras, listes…) n'est pas gardée : les fiches sont en texte simple.",
     "enabledDone": "Notes système créées : ouvrez Notes › « Notes système ».",
     "disabledDone": "Notes système retirées. Le texte reste dans les fiches."
+  },
+  "visibility": {
+    "title": "Visibilité",
+    "makePublic": "Rendre public",
+    "makePrivate": "Rendre privé",
+    "confirmTitle": "Rendre ce projet public ?",
+    "confirmDescription": "Il quittera votre espace privé et pourra être ouvert sans connexion par toute personne utilisant GANIS sur cet ordinateur.",
+    "failed": "Changement de visibilité impossible.",
+    "signIn": {
+      "title": "Connexion requise",
+      "description": "Connectez-vous pour rendre ce projet privé.",
+      "submit": "Se connecter et rendre privé",
+      "submitting": "Connexion…",
+      "createAccount": "Créer un compte",
+      "setupFirst": "Créer le premier compte"
+    }
   }
 }

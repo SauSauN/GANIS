@@ -452,6 +452,8 @@ export const api = {
    * Crée un nouveau projet.
    *
    * `projectType` est volontairement en camelCase côté frontend.
+   * Visibilité automatique (décidée par Rust) : public sans connexion,
+   * privé une fois connecté.
    */
   createProject: (input: {
     name: string;
@@ -460,7 +462,18 @@ export const api = {
   }) => call<Project>("create_project", { input }),
 
   /**
-   * Liste les projets accessibles à l'utilisateur courant.
+   * Rend un projet privé (lié au compte connecté) ou public.
+   * Nécessite une connexion.
+   */
+  setProjectVisibility: (
+    projectId: string,
+    visibility: Project["visibility"],
+  ) =>
+    call<Project>("set_project_visibility", { projectId, visibility }),
+
+  /**
+   * Liste les projets accessibles : projets publics, et projets privés du
+   * compte connecté.
    */
   listProjects: () => call<Project[]>("list_projects"),
 

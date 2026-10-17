@@ -2,7 +2,15 @@ import { useTranslation } from "react-i18next";
 import { Waypoints } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
-import { eventsOfCharacter, eventsOfLocation, eventsOfNode, laneOf, STATUS_COLORS, type PlotEvent } from "@/lib/plot";
+import {
+  eventsOfCharacter,
+  eventsOfLocation,
+  eventsOfNode,
+  laneOf,
+  momentNumber,
+  STATUS_COLORS,
+  type PlotEvent,
+} from "@/lib/plot";
 import { usePlotStore, useProjectPlot } from "@/stores/plotStore";
 
 interface PlotInStoryCardProps {
@@ -70,7 +78,7 @@ export function PlotInStoryCard({ projectId, target, name, onOpenFeature }: Plot
                   className="flex w-full items-start gap-3 rounded-lg border border-l-4 bg-card px-3 py-2 text-left transition-colors hover:bg-muted/50"
                   style={{ borderLeftColor: lane?.color }}
                 >
-                  <span className="w-8 shrink-0 pt-0.5 text-xs font-semibold text-muted-foreground tabular-nums">{event.row + 1}</span>
+                  <span className="w-8 shrink-0 pt-0.5 text-xs font-semibold text-muted-foreground tabular-nums">{momentNumber(event.row)}</span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-medium">
                       {event.title || t("untitled")}

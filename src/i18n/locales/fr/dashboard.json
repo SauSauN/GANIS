@@ -53,5 +53,12 @@
     "description": "Le projet « {{name}} » sera supprimé définitivement. Cette action est irréversible.",
     "confirm": "Supprimer",
     "deleting": "Suppression…"
+  },
+  "guest": {
+    "title": "Bienvenue"
+  },
+  "space": {
+    "private": "Espace privé",
+    "public": "Espace public"
   }
 }

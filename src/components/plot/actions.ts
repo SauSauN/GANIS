@@ -4,6 +4,7 @@ import {
   laneIndex,
   laneOf,
   linkOf,
+  MIN_ROW,
   newId,
   nextColor,
   occupant,
@@ -24,6 +25,14 @@ import { toast } from "@/stores/toastStore";
 const t = i18n.t.bind(i18n) as unknown as (key: string, options?: Record<string, unknown>) => string;
 
 const store = () => usePlotStore.getState();
+
+/**
+ * Case « juste après » un moment, pour un nouvel événement : la suivante
+ * dans l'histoire principale ; dans le passé narratif, la même case (son
+ * occupant remonte d'un cran), pour ne jamais franchir le début de
+ * l'histoire.
+ */
+const slotAfter = (row: number) => (row < 0 ? row : row + 1);
 const mutate = (projectId: string, fn: (d: PlotData) => void, key?: string) => store().mutate(projectId, fn, key ? { key } : undefined);
 
 function undoToast(message: string) {
@@ -75,7 +84,7 @@ export function addEventSmart(projectId: string): string | null {
   if (!data) return null;
   if (selection?.type === "event") {
     const event = eventOf(data, selection.id);
-    if (event) return addEvent(projectId, event.laneId, event.row + 1);
+    if (event) return addEvent(projectId, event.laneId, slotAfter(event.row));
   }
   const lane =
     (selection?.type === "lane" && laneOf(data, selection.id)) ||
@@ -166,7 +175,7 @@ export function duplicateEvent(projectId: string, id: string) {
   const copy: PlotEvent = { ...structuredCloneSafe(event), id: newId(), title: t("plot:defaults.copyOf", { name: event.title }) };
   mutate(projectId, (d) => {
     d.events.push(copy);
-    placeEvent(d, d.events[d.events.length - 1], event.laneId, event.row + 1);
+    placeEvent(d, d.events[d.events.length - 1], event.laneId, slotAfter(event.row));
   });
   store().select({ type: "event", id: copy.id });
 }
@@ -230,7 +239,9 @@ export function nudgeSelected(projectId: string, rows: number, columns: number) 
   const lanes = visibleLanes(data);
   const column = lanes.findIndex((l) => l.id === event.laneId);
   const nextColumn = Math.min(lanes.length - 1, Math.max(0, column + columns));
-  const nextRow = Math.max(0, event.row + rows);
+  // Le passé narratif (moments négatifs) est accessible : Alt+↑ depuis le
+  // premier moment y fait entrer l'événement.
+  const nextRow = Math.max(MIN_ROW, event.row + rows);
   if (nextColumn === column && nextRow === event.row) return;
   moveEvent(projectId, event.id, lanes[nextColumn].id, nextRow);
 }

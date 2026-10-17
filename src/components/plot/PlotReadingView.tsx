@@ -6,7 +6,6 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
-  ChevronUp,
   Eye,
   FileStack,
   KeyRound,
@@ -19,7 +18,6 @@ import {
   PenLine,
   Repeat2,
   Rows3,
-  Sparkles,
   StepForward,
   Users,
 } from "lucide-react";
@@ -37,7 +35,16 @@ import { characterTabId } from "@/lib/characters";
 import { errorText, useNodeDocuments } from "@/lib/documents";
 import { locationTabId } from "@/lib/locations";
 import { noteTabId } from "@/lib/notes";
-import { eventOf, laneOf, moveInReadingOrder, STATUS_COLORS, tourList, type PlotData, type PlotEvent, type TourMode } from "@/lib/plot";
+import {
+  eventOf,
+  laneOf,
+  momentNumber,
+  STATUS_COLORS,
+  tourList,
+  type PlotData,
+  type PlotEvent,
+  type TourMode,
+} from "@/lib/plot";
 import { ancestorsOf, structureNodeTabId } from "@/lib/structure";
 import { cn } from "@/lib/utils";
 import { useProjectLocations } from "@/stores/locationStore";
@@ -60,7 +67,8 @@ interface PlotReadingViewProps {
 /** Acte en cours à un moment (le dernier qui commence avant ou à ce moment). */
 function actAt(data: PlotData, row: number): string | null {
   let found: string | null = null;
-  let best = -1;
+  // Les actes peuvent aussi commencer dans le passé narratif (moments négatifs).
+  let best = Number.NEGATIVE_INFINITY;
   for (const [key, value] of Object.entries(data.acts)) {
     const r = Number(key);
     if (r <= row && r > best) {
@@ -85,9 +93,10 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
   const links = usePlotLinks(projectId);
   const focusRequest = usePlotStore((s) => s.focusRequest);
   const requestFocus = usePlotStore((s) => s.requestFocus);
-  const mutate = usePlotStore((s) => s.mutate);
 
-  const [mode, setMode] = useState<TourMode>("reading");
+  // Deux lectures : par plan (ordre du plateau, moment par moment) ou
+  // par trame (une seule trame du début à la fin).
+  const [mode, setMode] = useState<TourMode>("structure");
   const [laneId, setLaneId] = useState<string | null>(null);
   const [continuous, setContinuous] = useState(() => {
     try {
@@ -214,23 +223,7 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
     }
   };
 
-  const modes: TourMode[] = ["reading", "structure", "lane"];
-  const follows = data.readingFollowsStructure;
-  const manual = mode === "reading" && !follows;
-  const ids = list.map((e) => e.id);
-
-  function setFollows(value: boolean) {
-    mutate(projectId, (d) => {
-      d.readingFollowsStructure = value;
-      if (!value && !d.readingOrder.length) d.readingOrder = ids;
-    });
-  }
-
-  function move(id: string, delta: number) {
-    mutate(projectId, (d) => {
-      d.readingOrder = moveInReadingOrder(ids, id, delta);
-    });
-  }
+  const modes: TourMode[] = ["structure", "lane"];
 
   return (
     <main className="flex min-h-0 flex-1 flex-col">
@@ -265,7 +258,7 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
               }}
               className={cn("min-h-8 px-3 font-medium hover:bg-muted", mode === m && "bg-foreground text-background hover:bg-foreground")}
             >
-              {t(`tour.modes.${m}`)}
+              {t(`reading.modes.${m as "structure" | "lane"}`)}
             </button>
           ))}
         </div>
@@ -277,12 +270,6 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
               </option>
             ))}
           </select>
-        )}
-        {mode === "reading" && (
-          <label className="inline-flex min-h-8 items-center gap-2 rounded-md px-2 text-xs hover:bg-muted" title={t("reading.followStructureHint")}>
-            <input type="checkbox" className="size-4 accent-primary" checked={follows} onChange={(e) => setFollows(e.target.checked)} />
-            {t("reading.followStructure")}
-          </label>
         )}
         <div className="flex overflow-hidden rounded-md border text-xs" role="group" aria-label={t("reading.display")}>
           <button
@@ -354,40 +341,16 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
                       type="button"
                       onClick={() => go(event.id)}
                       aria-current={event.id === current?.id ? "true" : undefined}
-                      className={cn("flex min-w-0 flex-1 items-start gap-2 py-1.5 pl-3 text-left text-sm", manual ? "pr-1" : "pr-3", event.id === current?.id && "font-medium")}
+                      className={cn("flex min-w-0 flex-1 items-start gap-2 py-1.5 pr-3 pl-3 text-left text-sm", event.id === current?.id && "font-medium")}
                     >
                       <span className="mt-1.5 size-2 shrink-0 rounded-full" style={{ backgroundColor: lane?.color }} />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate">{event.title || t("untitled")}</span>
                         <span className="block truncate text-xs text-muted-foreground">
-                          {event.nodeId && links.nodePath(event.nodeId) ? links.nodePath(event.nodeId) : `${lane?.name}, ${t("board.moment", { number: event.row + 1 }).toLowerCase()}`}
+                          {event.nodeId && links.nodePath(event.nodeId) ? links.nodePath(event.nodeId) : `${lane?.name}, ${t("board.moment", { number: momentNumber(event.row) }).toLowerCase()}`}
                         </span>
                       </span>
                     </button>
-                    {manual && (
-                      <span className="flex shrink-0 flex-col pr-1 opacity-0 group-hover/toc:opacity-100 focus-within:opacity-100">
-                        <button
-                          type="button"
-                          disabled={i === 0}
-                          onClick={() => move(event.id, -1)}
-                          aria-label={t("reading.up")}
-                          title={t("reading.up")}
-                          className="rounded p-0.5 text-muted-foreground hover:bg-background hover:text-foreground disabled:opacity-30"
-                        >
-                          <ChevronUp className="size-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          disabled={i === list.length - 1}
-                          onClick={() => move(event.id, 1)}
-                          aria-label={t("reading.down")}
-                          title={t("reading.down")}
-                          className="rounded p-0.5 text-muted-foreground hover:bg-background hover:text-foreground disabled:opacity-30"
-                        >
-                          <ChevronDown className="size-3.5" />
-                        </button>
-                      </span>
-                    )}
                   </div>
                 </div>
               );
@@ -417,16 +380,6 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
             current && (
               <div className="mx-auto max-w-3xl px-6 py-8">
                 <EventReading projectId={projectId} data={data} links={links} event={current} position={index + 1} total={list.length} onGo={go} onOpenFeature={onOpenFeature} />
-                <div className="mt-10 flex gap-2 border-t pt-6">
-                  <Button variant="outline" className="flex-1" disabled={index <= 0} onClick={() => go(list[index - 1].id)}>
-                    <ChevronLeft />
-                    <span className="truncate">{index > 0 ? list[index - 1].title || t("untitled") : t("tour.previous")}</span>
-                  </Button>
-                  <Button className="flex-1" disabled={index >= list.length - 1} onClick={() => go(list[index + 1].id)}>
-                    <span className="truncate">{index < list.length - 1 ? list[index + 1].title || t("untitled") : t("tour.next")}</span>
-                    <ChevronRight />
-                  </Button>
-                </div>
               </div>
             )
           )}
@@ -510,7 +463,6 @@ function EventReading({ projectId, data, links, event, position, total, onGo, on
   const structureNodes = useStructureStore((s) => (s.projectId === projectId ? (s.structure?.nodes ?? NO_NODES) : NO_NODES));
   const createNote = useNoteStore((s) => s.createNote);
   const mutate = usePlotStore((s) => s.mutate);
-  const requestFocus = usePlotStore((s) => s.requestFocus);
 
   const lane = laneOf(data, event.laneId);
   const act = actAt(data, event.row);
@@ -568,7 +520,7 @@ function EventReading({ projectId, data, links, event, position, total, onGo, on
         </span>
         <span className={chip}>
           <span className="truncate">
-            {t("board.moment", { number: event.row + 1 })}
+            {t("board.moment", { number: momentNumber(event.row) })}
             {data.rowLabels[event.row] ? ` · ${data.rowLabels[event.row]}` : ""}
           </span>
         </span>
@@ -764,19 +716,6 @@ function EventReading({ projectId, data, links, event, position, total, onGo, on
         )}
       </div>
 
-      <div className="mt-5 flex justify-end">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            requestFocus(event.id);
-            onOpenFeature("plot.board");
-          }}
-        >
-          <Sparkles />
-          {t("reading.edit")}
-        </Button>
-      </div>
     </article>
   );
 }

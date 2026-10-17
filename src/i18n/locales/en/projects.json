@@ -97,5 +97,11 @@
       "replaced": "Project “{{name}}” replaced. Backup of the previous version: {{file}} (GANIS “sauvegardes” folder).",
       "encryptionNoteReplace": "The received data will be encrypted with your project's key."
     }
+  },
+  "visibility": {
+    "public": "Public",
+    "private": "Private",
+    "madePrivate": "“{{name}}” is now private.",
+    "madePublic": "“{{name}}” is now public."
   }
 }

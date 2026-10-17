@@ -58,6 +58,23 @@ impl SecretKey {
         Ok(Self(key))
     }
 
+    /// Clé encodée en base64, pour être conservée telle quelle.
+    ///
+    /// Réservé aux projets publics : leur clé n'a volontairement aucune
+    /// protection (ils doivent s'ouvrir sans connexion).
+    pub fn to_base64(&self) -> Zeroizing<String> {
+        Zeroizing::new(B64.encode(self.0.as_ref()))
+    }
+
+    /// Relit une clé encodée par [`SecretKey::to_base64`].
+    pub fn from_base64(encoded: &str) -> AppResult<Self> {
+        let bytes = Zeroizing::new(
+            B64.decode(encoded.trim())
+                .map_err(|_| AppError::internal("Clé encodée invalide"))?,
+        );
+        Self::from_slice(&bytes)
+    }
+
     pub fn as_bytes(&self) -> &[u8; KEY_LEN] {
         &self.0
     }

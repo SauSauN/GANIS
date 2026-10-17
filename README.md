@@ -38,7 +38,13 @@ Tout reste sur l'ordinateur de l'utilisateur. GANIS fonctionne **sans connexion 
 
 ### Comptes et projets
 
-- **Comptes locaux** : un administrateur est créé au premier lancement, puis d'autres comptes peuvent s'inscrire. Il existe trois rôles : `admin`, `developer` et `user`.
+- **Accueil** : un message court, un plateau de trame en miniature (intrigues, scènes, personnages, lieu) dessiné aux couleurs du thème, et deux boutons : « Commencer » et « Se connecter ».
+- **Deux espaces, jamais mélangés** : sans connexion (« Commencer »), le tableau de bord montre l'**espace public** (projets publics uniquement) ; connecté, l'**espace privé** (projets privés du compte uniquement). Il n'y a pas de filtre : le mode décide. Les projets créés prennent automatiquement la visibilité de l'espace.
+- **Guide de démarrage** : il s'ouvre une seule fois, à la première arrivée sur le tableau de bord (avec ou sans compte), puis reste disponible dans Aide › Guide de démarrage. 16 étapes, chacune avec un court texte et ses points clés : projets, espaces public et privé, espace de travail, accueil du projet, personnages, lieux, relations, découpage, trame, notes, recherche, enregistrement et versions, historique et corbeille, export .ganix, personnalisation, raccourcis.
+- **Changer la visibilité** : paramètres du projet → « Statut et organisation » → « Visibilité ».
+  - Public → privé : immédiat si on est connecté ; sinon une connexion est demandée sur place, puis le projet devient privé. Si la connexion passe par la création d'un compte ou l'assistant, le changement est appliqué à l'arrivée sur le tableau de bord.
+  - Privé → public : confirmation explicite (« Annuler » / « Rendre public »).
+- **Comptes locaux** : un administrateur est créé au premier compte (assistant de configuration), puis d'autres comptes peuvent s'inscrire. Il existe trois rôles : `admin`, `developer` et `user`.
 - **Clé de récupération** : elle est remise à la création du compte et permet de retrouver l'accès en cas de mot de passe oublié. Elle peut être régénérée depuis les paramètres.
 - **Tableau de bord** : création, duplication, suppression et favoris de projets.
   - Types de projet : manga, roman, film, série, jeu, JDR, personnalisé.
@@ -56,11 +62,15 @@ L'espace de travail reprend le modèle d'un éditeur de code : une barre d'activ
 | **Relations** | Liens entre personnages (types et couleurs), graphe interactif aux positions mémorisées |
 | **Lieux** | Fiches hiérarchiques (un lieu peut en contenir d'autres), types personnalisés, portrait, galerie légendée |
 | **Découpage** | Plan du récit en 1 à 5 niveaux (parties, chapitres, scènes…), numérotation automatique ou manuelle, couleurs par niveau, liens vers les personnages et les lieux |
-| **Trame** | Plateau des intrigues parallèles avec vue de lecture et visite guidée |
+| **Trame** | Plateau des intrigues parallèles avec vue de lecture (par plan ou par trame) et visite guidée ; passé narratif au-dessus du début de l'histoire (flash-back, souvenirs, événements antérieurs) |
 | **Notes** | Éditeur riche (Tiptap) : tableaux, encadrés, diagrammes, chaînes, mentions de personnages et de lieux, correcteur orthographique ; dossiers, mur de post-it, notes système synchronisées avec les fiches |
 | **Documents** | Fichiers rangés dans le découpage (PDF, Word, images, textes, sons, vidéos, pages de manga…), lecture intégrée, modification dans l'application associée avec reprise automatique, 20 versions par document |
 | **Recherche** | Recherche globale insensible à la casse et aux accents, palette de commandes (`Ctrl+K`) |
 | **Paramètres** | Réglages propres au projet (personnages, lieux, découpage, trame, notes) |
+
+**Agrandir un onglet** : un double-clic sur un onglet affiche son contenu sur toute la surface de l'espace de travail (la barre des modules et le panneau du milieu sont masqués) ; un nouveau double-clic, ou le bouton à droite de la barre d'onglets, rétablit la disposition. Le contenu de l'onglet garde son état.
+
+**Passé narratif (Trame)** : le moment 1 est le début de l'histoire principale. Au-dessus, les moments −1, −2… forment le passé narratif : on y remonte en faisant défiler vers le haut, on y crée, déplace et relie des événements comme ailleurs. Le plateau s'ouvre toujours au début de l'histoire. Dans les données, ces événements ont simplement un moment (`row`) négatif ; les projets existants ne changent pas.
 
 Les modèles de découpage proposés sont les suivants :
 
@@ -118,10 +128,11 @@ clé de récupération ───────┘                             ├�
 - **Clé de projet** : une clé distincte par projet, enfermée par la clé du compte. Elle chiffre toute la base du projet avec **SQLCipher**.
 - **Champs sensibles de `app.db`** : l'e-mail, ainsi que le nom et la description des projets, sont chiffrés champ par champ avec **XChaCha20-Poly1305**. Un contexte (AAD) lie chaque valeur à sa table, sa colonne et sa ligne.
 - **En mémoire** : la clé du compte n'existe que pendant la session et est effacée à la déconnexion (`zeroize`).
+- **Projets publics** : ils n'appartiennent à aucun compte (`owner_id` vide, `visibility = 'public'`). Leur base reste au format SQLCipher, mais sa clé est conservée en clair dans `app.db` (`public_key`), et leur nom et leur description ne sont pas chiffrés : c'est ce qui permet de les ouvrir sans connexion. Rendre un projet privé enferme cette même clé avec la clé du compte (la base n'est pas réécrite) ; le rendre public fait l'inverse, après confirmation.
 
 ### Ce qui reste lisible
 
-Le nom d'utilisateur, l'empreinte du mot de passe (Argon2id, irréversible), le rôle, les dates, le type, le statut et le favori des projets, et les thèmes créés restent lisibles. Ces informations sont nécessaires à la connexion ou sans valeur pour un tiers.
+Le nom d'utilisateur, l'empreinte du mot de passe (Argon2id, irréversible), le rôle, les dates, le type, le statut et le favori des projets, et les thèmes créés restent lisibles. Le contenu des **projets publics** est lisible par quiconque a accès au dossier de données, par conception. Ces informations sont nécessaires à la connexion ou sans valeur pour un tiers.
 
 ### Autres protections
 
