@@ -29,6 +29,8 @@ export function itemTabId(kind: HistoryKind | SearchHit["kind"], id: string): st
     case "plot":
     case "plotEvent":
       return "plot.board";
+    case "editorial":
+      return "manuscript.editorial";
     default:
       return null;
   }

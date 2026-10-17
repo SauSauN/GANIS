@@ -23,6 +23,8 @@ interface ActivityBarProps {
   expanded: boolean;
   onToggleExpanded: () => void;
   onSelect: (id: ModuleId) => void;
+  /** Modules affichés (selon le type de projet, voir `modulesFor`). */
+  modules?: WorkspaceModule[];
 }
 
 /**
@@ -44,6 +46,7 @@ export function ActivityBar({
   expanded,
   onToggleExpanded,
   onSelect,
+  modules = WORKSPACE_MODULES,
 }: ActivityBarProps) {
   const { t } = useTranslation("activitybar");
 
@@ -123,7 +126,7 @@ export function ActivityBar({
           {expanded && <span className="truncate">{t("collapse.short")}</span>}
         </button>
 
-        {WORKSPACE_MODULES.map(renderModule)}
+        {modules.map(renderModule)}
       </div>
 
       <div>{renderModule(SETTINGS_MODULE)}</div>

@@ -40,6 +40,7 @@ fn table_of(kind: &str) -> AppResult<&'static str> {
         "note" => Ok("notes"),
         "synopsis" => Ok("synopsis"),
         "plot" => Ok("plot"),
+        "editorial" => Ok("editorial"),
         _ => Err(AppError::validation("Type d'élément sans versions.").with_key("history.unknownKind")),
     }
 }

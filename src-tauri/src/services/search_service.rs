@@ -175,13 +175,18 @@ pub async fn search(pool: &SqlitePool, query: &str) -> AppResult<Vec<SearchHit>>
         body: fields_text(&fields),
     }));
 
-    let rows: Vec<(String, String, String)> =
-        sqlx::query_as("SELECT id, title, summary FROM structure_nodes").fetch_all(pool).await?;
-    candidates.extend(rows.into_iter().map(|(id, title, summary)| Candidate {
+    // Résumé, puis texte de l'élément (scène d'un roman), en texte brut.
+    let rows: Vec<(String, String, String, String)> =
+        sqlx::query_as("SELECT id, title, summary, content FROM structure_nodes").fetch_all(pool).await?;
+    candidates.extend(rows.into_iter().map(|(id, title, summary, content)| Candidate {
         kind: "structureNode",
         id,
         title,
-        body: summary,
+        body: if content.is_empty() {
+            summary
+        } else {
+            format!("{summary}\n{}", crate::services::novel_service::plain_text(&content))
+        },
     }));
 
     let rows: Vec<(String, String, String)> =

@@ -54,6 +54,8 @@ import type {
   ExternalStatus,
   ExternalSync,
   StructureNode,
+  Editorial,
+  NovelFields,
   Synopsis,
   ThemeData,
   User,
@@ -582,6 +584,48 @@ export const api = {
   // -------------------------------------------------------------------------
 
   /** Découpage complet du projet (modèle et éléments). */
+  // --------------------------------------------------------------------------
+  // Roman : texte des scènes, objectifs, états, narration, dossier éditorial
+  // --------------------------------------------------------------------------
+
+  /** Texte d'un élément du découpage (HTML de l'éditeur ; vide si aucun). */
+  getStructureNodeContent: (projectId: string, nodeId: string) =>
+    call<string>("get_structure_node_content", { projectId, nodeId }),
+
+  /** Enregistre le texte d'un élément ; renvoie l'élément (mots à jour). */
+  setStructureNodeContent: (projectId: string, nodeId: string, content: string) =>
+    call<StructureNode>("set_structure_node_content", { projectId, nodeId, content }),
+
+  /** Textes de tous les éléments qui en ont un (assemblage du manuscrit). */
+  getManuscriptContents: (projectId: string) =>
+    call<Array<{ id: string; content: string }>>("get_manuscript_contents", { projectId }),
+
+  /** Objectif de mots, état de rédaction et narration d'un élément. */
+  setStructureNodeNovel: (projectId: string, nodeId: string, fields: NovelFields) =>
+    call<StructureNode>("set_structure_node_novel", { projectId, nodeId, fields }),
+
+  /** Objectif de mots du manuscrit (`null` : aucun). */
+  setManuscriptGoal: (projectId: string, goal: number | null) =>
+    call<number | null>("set_manuscript_goal", { projectId, goal }),
+
+  getEditorial: (projectId: string) => call<Editorial>("get_editorial", { projectId }),
+
+  updateEditorial: (projectId: string, input: Partial<Pick<Editorial, "pitch" | "summaryShort" | "summaryLong">>) =>
+    call<Editorial>("update_editorial", { projectId, input }),
+
+  /**
+   * Enregistre un fichier exporté (.docx, .pdf, .txt, .md) à l'emplacement
+   * choisi dans la fenêtre du système. Renvoie le nom du fichier, ou
+   * `null` si l'utilisateur a annulé.
+   */
+  saveExportFile: (fileName: string, dialogTitle: string, data: ArrayBuffer | Uint8Array) =>
+    call<string | null>("save_export_file", toBytes(data), {
+      headers: {
+        "x-file-name": encodeURIComponent(fileName),
+        "x-dialog-title": encodeURIComponent(dialogTitle),
+      },
+    }),
+
   getStructure: (projectId: string) =>
     call<Structure>("get_structure", { projectId }),
 

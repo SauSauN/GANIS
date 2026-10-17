@@ -68,6 +68,14 @@ L'espace de travail reprend le modèle d'un éditeur de code : une barre d'activ
 | **Recherche** | Recherche globale insensible à la casse et aux accents, palette de commandes (`Ctrl+K`) |
 | **Paramètres** | Réglages propres au projet (personnages, lieux, découpage, trame, notes) |
 
+**Outils du romancier (projets de type Roman uniquement)** : un module **Manuscrit** apparaît dans la barre de gauche, et les fiches du découpage gagnent deux cartes.
+- **Texte** (fiche d'une scène, ou d'un chapitre sans scène) : le texte s'écrit dans l'éditeur de GANIS, s'enregistre avec la fiche (Ctrl+S, enregistrement automatique, versions) et son nombre de mots est recalculé par Rust.
+- **Écriture** : objectif de mots (scène, chapitre, partie), état de rédaction des chapitres (À écrire, Premier jet, En révision, Relu, Corrigé — distinct du statut du projet), point de vue (personnage lié avec le rôle « Point de vue »), personne et temps de la narration. Ces réglages ne modifient jamais le texte.
+- **Manuscrit** : le roman d'un seul tenant, assemblé à la demande dans l'ordre du plan (aucune copie : déplacer une scène la déplace ici). Le texte d'une scène est celui de sa fiche ; à défaut, celui de ses documents texte (Word, Markdown, texte). Export Word, PDF ou texte (page de titre, chapitres sur une nouvelle page, numéros de page).
+- **Suivi de rédaction** : mots et objectifs du manuscrit, des parties, chapitres et scènes ; filtre par état de rédaction ; scènes dont la personne ou le temps diffère du reste du roman signalées.
+- **Dossier éditorial** : pitch en une phrase, résumé court, résumé long, indépendants du synopsis (qui peut servir de point de départ), versionnés et exportables séparément (Word, PDF, texte).
+Données : migration `023_novel.sql` (colonnes de `structure_nodes`, objectif dans `structure_settings`, table `editorial`), `services/novel_service.rs`, `commands/novel.rs`, `src/lib/novel.ts`, `src/lib/novelExport.ts`, `src/components/novel/*`.
+
 **Agrandir un onglet** : un double-clic sur un onglet affiche son contenu sur toute la surface de l'espace de travail (la barre des modules et le panneau du milieu sont masqués) ; un nouveau double-clic, ou le bouton à droite de la barre d'onglets, rétablit la disposition. Le contenu de l'onglet garde son état.
 
 **Passé narratif (Trame)** : le moment 1 est le début de l'histoire principale. Au-dessus, les moments −1, −2… forment le passé narratif : on y remonte en faisant défiler vers le haut, on y crée, déplace et relie des événements comme ailleurs. Le plateau s'ouvre toujours au début de l'histoire. Dans les données, ces événements ont simplement un moment (`row`) négatif ; les projets existants ne changent pas.

@@ -29,7 +29,11 @@
     "type": "Type",
     "status": "Statut",
     "parent": "Situé dans",
-    "plot": "Trame"
+    "plot": "Trame",
+    "text": "Texte",
+    "pitch": "Pitch",
+    "summaryShort": "Résumé court",
+    "summaryLong": "Résumé long"
   },
   "deleteConfirm": "Supprimer définitivement ?"
 }

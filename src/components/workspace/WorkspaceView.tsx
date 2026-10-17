@@ -5,6 +5,7 @@ import { ProjectSettingsPanel } from "@/components/project-settings/ProjectSetti
 import type { ProjectSettingsId } from "@/components/project-settings/sections";
 import {
   HOME_TAB,
+  NOVEL_FEATURES,
   SETTINGS_PREFIX,
   findFeature,
 } from "@/components/workspace/modules";
@@ -42,6 +43,10 @@ const HistoryView = lazy(() => import("@/components/workspace/views/HistoryView"
 const StructureNodeView = lazy(() => import("@/components/workspace/views/StructureNodeView").then((module) => ({ default: module.StructureNodeView })));
 const PlotBoard = lazy(() => import("@/components/plot/PlotBoard").then((module) => ({ default: module.PlotBoard })));
 const PlotReadingView = lazy(() => import("@/components/plot/PlotReadingView").then((module) => ({ default: module.PlotReadingView })));
+// Roman : manuscrit continu, suivi de rédaction, dossier éditorial.
+const ManuscriptView = lazy(() => import("@/components/novel/ManuscriptView").then((module) => ({ default: module.ManuscriptView })));
+const ProgressView = lazy(() => import("@/components/novel/ProgressView").then((module) => ({ default: module.ProgressView })));
+const EditorialView = lazy(() => import("@/components/novel/EditorialView").then((module) => ({ default: module.EditorialView })));
 
 interface WorkspaceViewProps {
   /** Identifiant de l'onglet à afficher. */
@@ -135,6 +140,25 @@ function WorkspaceContent({
   // ---------------------------------------------------------------------------
   // Trame
   // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // Roman (réservé aux projets de roman ; l'onglet se ferme sinon)
+  // ---------------------------------------------------------------------------
+  if (NOVEL_FEATURES.has(tabId) && project.type !== "novel") {
+    return null;
+  }
+
+  if (tabId === "manuscript.read") {
+    return <ManuscriptView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "manuscript.progress") {
+    return <ProgressView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "manuscript.editorial") {
+    return <EditorialView project={project} feature={feature} />;
+  }
+
   if (tabId === "plot.board") {
     return <PlotBoard projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
   }

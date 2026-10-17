@@ -26,6 +26,9 @@
     },
     "settings": {
       "label": "Paramètres du projet"
+    },
+    "manuscript": {
+      "label": "Manuscrit"
     }
   },
   "features": {
@@ -99,6 +102,20 @@
       "reading": {
         "label": "Lecture de l'histoire",
         "description": "L'histoire dans l'ordre du lecteur, avec ses personnages, lieux, chapitres et notes."
+      }
+    },
+    "manuscript": {
+      "read": {
+        "label": "Manuscrit",
+        "description": "Le roman d'un seul tenant, dans l'ordre du plan ; export Word et PDF."
+      },
+      "progress": {
+        "label": "Suivi de rédaction",
+        "description": "Mots, objectifs, états de rédaction et narration, chapitre par chapitre."
+      },
+      "editorial": {
+        "label": "Dossier éditorial",
+        "description": "Pitch, résumé court et résumé long, pour présenter le roman."
       }
     }
   }

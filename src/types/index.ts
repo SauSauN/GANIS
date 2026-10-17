@@ -220,8 +220,49 @@ export interface StructureNode {
    * numérotation est automatique : le numéro est alors calculé.
    */
   number: number | null;
+  /** Mots du texte de l'élément (roman) ; le texte est chargé à la demande. */
+  contentWords: number;
+  /** Objectif de mots (roman) ; `null` : aucun. */
+  wordGoal: number | null;
+  /** État de rédaction (roman) ; `null` : à écrire. */
+  writingStatus: WritingStatus | null;
+  /** Personne grammaticale de la narration (roman). */
+  narrativePerson: NarrativePerson | null;
+  /** Temps verbal de la narration (roman). */
+  narrativeTense: NarrativeTense | null;
   createdAt: string; // RFC 3339, UTC
   updatedAt: string; // RFC 3339, UTC
+}
+
+// ----------------------------------------------------------------------------
+// Roman (outils du romancier)
+// ----------------------------------------------------------------------------
+
+/** États de rédaction d'un chapitre, dans l'ordre du travail. */
+export type WritingStatus = "todo" | "draft" | "revision" | "proofread" | "corrected";
+export const WRITING_STATUSES: WritingStatus[] = ["todo", "draft", "revision", "proofread", "corrected"];
+
+export type NarrativePerson = "first" | "second" | "third";
+export const NARRATIVE_PERSONS: NarrativePerson[] = ["first", "second", "third"];
+
+export type NarrativeTense = "present" | "past" | "future";
+export const NARRATIVE_TENSES: NarrativeTense[] = ["present", "past", "future"];
+
+/** Réglages du romancier pour un élément (tous envoyés à chaque fois). */
+export interface NovelFields {
+  wordGoal: number | null;
+  writingStatus: WritingStatus | null;
+  narrativePerson: NarrativePerson | null;
+  narrativeTense: NarrativeTense | null;
+}
+
+/** Dossier de présentation éditoriale (indépendant du synopsis). */
+export interface Editorial {
+  pitch: string;
+  summaryShort: string;
+  /** Texte libre ; une ligne vide sépare deux paragraphes. */
+  summaryLong: string;
+  updatedAt: string;
 }
 
 /** Rôle d'un personnage dans un élément du découpage. */
@@ -267,6 +308,8 @@ export interface Structure {
    * son numéro ; « Renuméroter » les remet dans l'ordre.
    */
   autoNumbering: boolean;
+  /** Objectif de mots du manuscrit (roman) ; `null` : aucun. */
+  manuscriptGoal: number | null;
   /** Tous les éléments, triés par parent puis par position. */
   nodes: StructureNode[];
 }
@@ -686,7 +729,7 @@ export interface TrashItem {
 export type ActivityAction = "created" | "updated" | "deleted" | "restored" | "versionRestored" | "moved";
 
 /** Type d'élément du journal (ceux de la corbeille, plus le synopsis). */
-export type HistoryKind = TrashKind | "synopsis" | "plot";
+export type HistoryKind = TrashKind | "synopsis" | "plot" | "editorial";
 
 export interface Activity {
   id: string;
@@ -700,7 +743,7 @@ export interface Activity {
 }
 
 /** Éléments qui ont des versions. */
-export type VersionKind = "character" | "location" | "structureNode" | "note" | "synopsis" | "plot";
+export type VersionKind = "character" | "location" | "structureNode" | "note" | "synopsis" | "plot" | "editorial";
 
 export interface Version {
   id: string;

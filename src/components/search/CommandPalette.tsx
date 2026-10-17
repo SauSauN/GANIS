@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { BookOpen, CircleHelp, Keyboard, Loader2, Search, type LucideIcon } from "lucide-react";
 import { SearchResults } from "@/components/search/SearchResults";
 import { Dialog, DialogTitle } from "@/components/ui/dialog";
-import { SETTINGS_MODULE, WORKSPACE_MODULES } from "@/components/workspace/modules";
+import { SETTINGS_MODULE, WORKSPACE_MODULES, type WorkspaceModule } from "@/components/workspace/modules";
 import { runCommand, useCommandStore, type CommandId } from "@/lib/commands";
 import { openSearchHit, SEARCH_ORDER, useProjectSearch } from "@/lib/search";
 import { formatCombo, shortcutOf, useHelpStore, type AppAction } from "@/lib/shortcuts";
@@ -15,6 +15,8 @@ interface CommandPaletteProps {
   onClose: () => void;
   projectId: string;
   onOpenFeature: (featureId: string) => void;
+  /** Modules du projet (selon son type, voir `modulesFor`). */
+  modules?: WorkspaceModule[];
 }
 
 interface PaletteAction {
@@ -32,7 +34,7 @@ const fold = (value: string) => value.normalize("NFD").replace(/\p{Diacritic}/gu
  * Palette de commandes (Ctrl+K) : ouvrir une page du projet, lancer une
  * action, ou trouver un élément en tapant son nom.
  */
-export function CommandPalette({ open, onClose, projectId, onOpenFeature }: CommandPaletteProps) {
+export function CommandPalette({ open, onClose, projectId, onOpenFeature, modules = WORKSPACE_MODULES }: CommandPaletteProps) {
   const { t } = useTranslation(["search", "menus", "modules"]);
   const showHelp = useHelpStore((state) => state.show);
   const owners = useCommandStore((state) => state.owners);
@@ -55,7 +57,7 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature }: Comm
   };
 
   const actions = useMemo<PaletteAction[]>(() => {
-    const pages: PaletteAction[] = [...WORKSPACE_MODULES, SETTINGS_MODULE].flatMap((module) =>
+    const pages: PaletteAction[] = [...modules, SETTINGS_MODULE].flatMap((module) =>
       module.features.map((feature) => ({
         id: `page:${feature.id}`,
         label: feature.label,
@@ -96,7 +98,7 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature }: Comm
 
     return [...commands, ...pages, ...help];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [owners, onOpenFeature, showHelp, t]);
+  }, [owners, onOpenFeature, showHelp, t, modules]);
 
   const q = fold(query.trim());
   const shownActions = q

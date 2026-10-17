@@ -6,6 +6,7 @@ import {
   ListTree,
   MapPin,
   MapPinned,
+  Megaphone,
   Network,
   NotebookText,
   Paperclip,
@@ -39,6 +40,7 @@ const ICONS: Record<HistoryKind, LucideIcon> = {
   placeLink: MapPin,
   synopsis: FileText,
   plot: Waypoints,
+  editorial: Megaphone,
 };
 
 const KINDS = Object.keys(ICONS) as HistoryKind[];
@@ -111,7 +113,7 @@ export function HistoryView({ projectId, feature, onOpenFeature }: HistoryViewPr
   }
 
   const name = (item: Activity) =>
-    item.kind === "synopsis" ? tt("kinds.synopsis") : item.label.trim() || tt(`trash:untitled.${item.kind}`);
+    item.kind === "synopsis" || item.kind === "editorial" ? tt(`kinds.${item.kind}`) : item.label.trim() || tt(`trash:untitled.${item.kind}`);
 
   return (
     <PageShell

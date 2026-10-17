@@ -113,6 +113,14 @@ export function readableFields(kind: VersionKind, row: Row, resolve: (id: string
         { key: "title", label: "versions:fields.title", text: str(row.title) },
         { key: "summary", label: "versions:fields.summary", text: str(row.summary) },
         { key: "number", label: "versions:fields.number", text: row.numbered === 0 ? "—" : str(row.number) },
+        // Roman : texte de la scène (colonne absente des versions anciennes).
+        ...(row.content ? [{ key: "content", label: "versions:fields.text", text: htmlText(row.content) }] : []),
+      ];
+    case "editorial":
+      return [
+        { key: "pitch", label: "versions:fields.pitch", text: str(row.pitch) },
+        { key: "summaryShort", label: "versions:fields.summaryShort", text: str(row.summary_short) },
+        { key: "summaryLong", label: "versions:fields.summaryLong", text: htmlText(row.summary_long) },
       ];
     case "character": {
       const fields = fieldsOf(row.fields);

@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } 
 import { VersionsButton } from "@/components/history/VersionsDialog";
 import { DocumentsCard } from "@/components/documents/DocumentsCard";
 import { SceneEventsCard } from "@/components/plot/SceneEventsCard";
+import { NovelTextCard, NovelWritingCard } from "@/components/novel/NovelSheetCards";
+import type { Editor } from "@tiptap/react";
 import { useTranslation } from "react-i18next";
 import {
   ChevronRight,
@@ -57,6 +59,9 @@ import {
   structureNodeTabId,
 } from "@/lib/structure";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
+import { useNodeDocuments } from "@/lib/documents";
+import { canHoldText, chapterLevel, countWords, isNovelProject, sceneLevel, wordTotals } from "@/lib/novel";
+import { useProjectStore } from "@/stores/projectStore";
 import { cn } from "@/lib/utils";
 import { useProjectCharacters } from "@/stores/characterStore";
 import { useProjectLocations } from "@/stores/locationStore";
@@ -116,6 +121,68 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   const autoNumbering = structure?.autoNumbering ?? false;
 
   // ---------------------------------------------------------------------------
+  // Roman : texte de l'élément (enregistré avec les informations)
+  // ---------------------------------------------------------------------------
+
+  const novel = useProjectStore((state) => isNovelProject(state.projects.find((p) => p.id === projectId)));
+  const applyNode = useStructureStore((state) => state.applyNode);
+  const levelCount = structure?.levels.length ?? 0;
+  const holdsText = novel && node !== null && structure !== null && canHoldText(node, structure.nodes, levelCount);
+  const { documents } = useNodeDocuments(projectId, nodeId);
+  const hasTextDocuments = (documents ?? []).some((d) => /\.(docx|md|markdown|txt)$/i.test(d.name));
+
+  /** Texte enregistré (HTML) ; `null` tant qu'il n'est pas chargé. */
+  const [textHtml, setTextHtml] = useState<string | null>(null);
+  const [textFailed, setTextFailed] = useState(false);
+  /** Texte en cours d'écriture, et compteur de modifications. */
+  const textDraft = useRef<string | null>(null);
+  const [textRevision, setTextRevision] = useState(0);
+  const [textDirty, setTextDirty] = useState(false);
+  const [textWords, setTextWords] = useState(0);
+
+  useEffect(() => {
+    if (!holdsText) return;
+    let cancelled = false;
+    setTextHtml(null);
+    setTextFailed(false);
+    api
+      .getStructureNodeContent(projectId, nodeId)
+      .then((html) => {
+        if (cancelled) return;
+        setTextHtml(html);
+        setTextWords(countWords(html));
+      })
+      .catch(() => !cancelled && setTextFailed(true));
+    return () => {
+      cancelled = true;
+    };
+    // Chargé une fois par élément : un enregistrement ne recharge pas l'éditeur.
+  }, [projectId, nodeId, holdsText]);
+
+  function onTextChange(editor: Editor) {
+    const html = editor.getHTML();
+    textDraft.current = html;
+    setTextWords(countWords(html));
+    setTextDirty(true);
+    setTextRevision((n) => n + 1);
+  }
+
+  async function saveText(): Promise<boolean> {
+    const html = textDraft.current;
+    if (html === null) return true;
+    try {
+      const savedNode = await api.setStructureNodeContent(projectId, nodeId, html);
+      applyNode(projectId, savedNode);
+      // Modifié pendant l'enregistrement : reste à enregistrer.
+      if (textDraft.current === html) setTextDirty(false);
+      return true;
+    } catch (e) {
+      setError(errorText(e));
+      return false;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // Informations (titre, numéro, résumé)
   // ---------------------------------------------------------------------------
 
@@ -155,13 +222,21 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
     }
   }, [base]);
 
-  const dirty = draft !== null && base !== null && !sameDraft(draft, base);
+  const infoDirty = draft !== null && base !== null && !sameDraft(draft, base);
+  const dirty = infoDirty || textDirty;
 
   useEffect(() => {
-    if (dirty) setSaved(false);
-  }, [dirty]);
+    if (infoDirty) setSaved(false);
+  }, [infoDirty]);
 
+  /** Enregistre ce qui a changé : informations et/ou texte (roman). */
   async function save(): Promise<boolean> {
+    const infoOk = infoDirty ? await saveInfo() : true;
+    const textOk = textDirty ? await saveText() : true;
+    return infoOk && textOk;
+  }
+
+  async function saveInfo(): Promise<boolean> {
     if (!draft || !base) return true;
 
     const number = draft.number.trim() === "" ? undefined : Number(draft.number);
@@ -197,12 +272,12 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   useUnsavedChanges({
     dirty,
     save,
-    revision: draft ? JSON.stringify(draft) : null,
+    revision: draft ? `${JSON.stringify(draft)}\u0000${textRevision}` : null,
   });
 
   function onSubmit(event: FormEvent) {
     event.preventDefault();
-    void save();
+    void saveInfo();
   }
 
   async function onDelete() {
@@ -412,6 +487,19 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             SECTIONS
             ================================================================ */}
         <div className="min-w-0 space-y-6">
+          {/* Roman : le texte de la scène d'abord (c'est là qu'on écrit) */}
+          {holdsText && (
+            <NovelTextCard
+              projectId={projectId}
+              initialHtml={textHtml}
+              failed={textFailed}
+              words={textWords}
+              hasDocuments={hasTextDocuments}
+              onChange={onTextChange}
+              onOpenFeature={onOpenFeature}
+            />
+          )}
+
           <InfoCard>
             <form onSubmit={onSubmit} noValidate className="space-y-4">
               <div className="space-y-1.5">
@@ -467,16 +555,16 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
               </div>
 
               <div className="flex min-h-10 flex-wrap items-center gap-4 border-t pt-4">
-                <Button type="submit" disabled={!dirty || saving}>
+                <Button type="submit" disabled={!infoDirty || saving}>
                   {saving ? <Loader2 className="animate-spin" /> : <Save />}
                   {saving ? t("common:actions.saving") : t("common:actions.save")}
                 </Button>
-                {dirty && (
+                {infoDirty && (
                   <Button type="button" variant="ghost" disabled={saving} onClick={() => setDraft(base)}>
                     {t("common:actions.cancel")}
                   </Button>
                 )}
-                {saved && !dirty && (
+                {saved && !infoDirty && (
                   <p role="status" className="text-sm text-success">
                     {t("node.saved")}
                   </p>
@@ -506,6 +594,22 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
               </div>
             </form>
           </InfoCard>
+
+          {novel && (
+            <NovelWritingCard
+              projectId={projectId}
+              node={node}
+              totalWords={
+                (wordTotals(structure.nodes, (n) => n.contentWords).get(node.id) ?? 0) -
+                node.contentWords +
+                (holdsText ? textWords : node.contentWords)
+              }
+              isChapter={node.level === chapterLevel(levelCount)}
+              isScene={holdsText || node.level >= sceneLevel(levelCount)}
+              characters={characters}
+              links={links ? links.characters : null}
+            />
+          )}
 
           <DocumentsCard projectId={projectId} nodeId={nodeId} name={name} nodeOptions={nodeOptions} />
 

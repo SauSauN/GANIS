@@ -26,6 +26,9 @@
     },
     "settings": {
       "label": "Project settings"
+    },
+    "manuscript": {
+      "label": "Manuscript"
     }
   },
   "features": {
@@ -99,6 +102,20 @@
       "reading": {
         "label": "Story reading",
         "description": "The story in reading order, with its characters, locations, chapters and notes."
+      }
+    },
+    "manuscript": {
+      "read": {
+        "label": "Manuscript",
+        "description": "The whole novel in outline order; Word and PDF export."
+      },
+      "progress": {
+        "label": "Writing tracker",
+        "description": "Words, goals, writing states and narration, chapter by chapter."
+      },
+      "editorial": {
+        "label": "Editorial pack",
+        "description": "Pitch, short and long summaries to present the novel."
       }
     }
   }

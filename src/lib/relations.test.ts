@@ -42,6 +42,11 @@ const node = (id: string, parentId: string | null, level: number, position: numb
   position,
   numbered: true,
   number: null,
+  contentWords: 0,
+  wordGoal: null,
+  writingStatus: null,
+  narrativePerson: null,
+  narrativeTense: null,
   createdAt: "2026-10-10T00:00:00Z",
   updatedAt: "2026-10-10T00:00:00Z",
 });

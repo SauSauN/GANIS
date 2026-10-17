@@ -37,6 +37,7 @@ import enUnsaved from "./locales/en/unsaved.json";
 import enUsermenu from "./locales/en/usermenu.json";
 import enViews from "./locales/en/views.json";
 import enWelcome from "./locales/en/welcome.json";
+import enNovel from "./locales/en/novel.json";
 import enWorkspace from "./locales/en/workspace.json";
 import enWorkspaceHome from "./locales/en/workspaceHome.json";
 import frActivitybar from "./locales/fr/activitybar.json";
@@ -75,6 +76,7 @@ import frUnsaved from "./locales/fr/unsaved.json";
 import frUsermenu from "./locales/fr/usermenu.json";
 import frViews from "./locales/fr/views.json";
 import frWelcome from "./locales/fr/welcome.json";
+import frNovel from "./locales/fr/novel.json";
 import frWorkspace from "./locales/fr/workspace.json";
 import frWorkspaceHome from "./locales/fr/workspaceHome.json";
 
@@ -156,6 +158,7 @@ export const resources = {
     usermenu: frUsermenu,
     views: frViews,
     welcome: frWelcome,
+    novel: frNovel,
     workspace: frWorkspace,
     workspaceHome: frWorkspaceHome,
   },
@@ -196,6 +199,7 @@ export const resources = {
     usermenu: enUsermenu,
     views: enViews,
     welcome: enWelcome,
+    novel: enNovel,
     workspace: enWorkspace,
     workspaceHome: enWorkspaceHome,
   },
@@ -284,6 +288,7 @@ void i18n.use(initReactI18next).init({
     "usermenu",
     "views",
     "welcome",
+    "novel",
     "workspace",
     "workspaceHome",
   ],

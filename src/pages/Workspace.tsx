@@ -11,8 +11,10 @@ import { SideBar } from "@/components/layout/SideBar";
 import { StatusBar } from "@/components/layout/StatusBar";
 import {
   HOME_TAB,
+  NOVEL_FEATURES,
   SETTINGS_PREFIX,
   findFeature,
+  modulesFor,
   type ModuleId,
 } from "@/components/workspace/modules";
 import {
@@ -350,6 +352,19 @@ export default function Workspace() {
   });
 
   /**
+   * Outils du romancier : réservés aux projets de roman. Si le type du
+   * projet change (paramètres), leurs onglets se ferment et le module
+   * disparaît de la barre de gauche.
+   */
+  const projectType = project?.type;
+  useEffect(() => {
+    if (!projectType || projectType === "novel") return;
+    for (const tabId of layoutRef.current.tabs.filter((id) => NOVEL_FEATURES.has(id))) forceCloseTab(tabId);
+    setActiveModule((current) => (current === "manuscript" ? "details" : current));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectType]);
+
+  /**
    * Si le projet est inexistant ou a été supprimé,
    * retour au tableau de bord.
    */
@@ -624,6 +639,7 @@ export default function Workspace() {
             ========================================================= */}
         {!isMaximized && (
         <ActivityBar
+          modules={modulesFor(project.type)}
           active={activeModule}
           linked={linkedModule}
           panelOpen={panelOpen}
@@ -750,6 +766,7 @@ export default function Workspace() {
 
       {/* Palette de commandes (Ctrl+K) et choix de création (Ctrl+N) */}
       <CommandPalette
+        modules={modulesFor(project.type)}
         open={paletteOpen}
         onClose={() => setPaletteOpen(false)}
         projectId={project.id}

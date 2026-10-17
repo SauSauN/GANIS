@@ -11,8 +11,11 @@ import "@/components/notes/editor/noteEditor.css";
 
 interface NoteEditorProps {
   projectId: string;
-  /** Document de départ (JSON de l'éditeur) ; `null` : note vide. */
-  initialContent: Record<string, unknown> | null;
+  /**
+   * Document de départ : JSON de l'éditeur (notes) ou HTML (texte d'une
+   * scène) ; `null` : vide.
+   */
+  initialContent: Record<string, unknown> | string | null;
   /** Appelé à chaque modification. */
   onChange: (editor: Editor) => void;
   /** Appelé une fois l'éditeur prêt et rempli. */

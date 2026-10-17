@@ -1,5 +1,7 @@
 import {
   BookOpen,
+  BookOpenText,
+  BookText,
   Columns3,
   FileText,
   History,
@@ -7,6 +9,7 @@ import {
   LayoutGrid,
   List,
   ListTree,
+  Megaphone,
   MapPin,
   MapPinned,
   Network,
@@ -16,6 +19,7 @@ import {
   Search,
   Settings,
   StickyNote,
+  Target,
   Trash2,
   UserPlus,
   UserRound,
@@ -56,6 +60,7 @@ export type ModuleId =
   | "structure"
   | "plot"
   | "notes"
+  | "manuscript"
   | "search"
   | "settings";
 
@@ -102,7 +107,10 @@ type FeatureId =
   | "plot.reading"
   | "notes.create"
   | "notes.list"
-  | "notes.wall";
+  | "notes.wall"
+  | "manuscript.read"
+  | "manuscript.progress"
+  | "manuscript.editorial";
 
 /** Modules qui ont une liste (et donc un message de liste vide). */
 type ListModuleId = "characters" | "locations" | "notes";
@@ -189,6 +197,31 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
   defineModule("search", Search, []),
 ];
 
+/**
+ * Manuscrit : outils du romancier (manuscrit continu, suivi de rédaction,
+ * dossier éditorial). Proposé seulement aux projets de roman (voir
+ * `modulesFor`) ; ses onglets restent reconnus partout pour que la
+ * disposition des onglets reste cohérente.
+ */
+export const NOVEL_MODULE: WorkspaceModule = defineModule("manuscript", BookText, [
+  defineFeature("manuscript.read", BookOpenText),
+  defineFeature("manuscript.progress", Target),
+  defineFeature("manuscript.editorial", Megaphone),
+]);
+
+/** Fonctionnalités réservées aux romans. */
+export const NOVEL_FEATURES = new Set(NOVEL_MODULE.features.map((feature) => feature.id));
+
+/**
+ * Modules de la barre de gauche pour un type de projet : le module
+ * Manuscrit s'ajoute, après la Trame, pour un roman.
+ */
+export function modulesFor(projectType: string | null | undefined): WorkspaceModule[] {
+  if (projectType !== "novel") return WORKSPACE_MODULES;
+  const index = WORKSPACE_MODULES.findIndex((module) => module.id === "plot");
+  return [...WORKSPACE_MODULES.slice(0, index + 1), NOVEL_MODULE, ...WORKSPACE_MODULES.slice(index + 1)];
+}
+
 /** Paramètres du projet : module affiché en bas de la barre de gauche. */
 export const SETTINGS_MODULE: WorkspaceModule = {
   id: "settings",
@@ -211,6 +244,7 @@ export const SETTINGS_MODULE: WorkspaceModule = {
 
 const ALL_MODULES: WorkspaceModule[] = [
   ...WORKSPACE_MODULES,
+  NOVEL_MODULE,
   SETTINGS_MODULE,
 ];
 

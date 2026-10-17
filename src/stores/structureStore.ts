@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { create } from "zustand";
 import { api } from "@/lib/api";
-import type { NodeCharacterRole, NodeLocationRole, Structure, StructureLinks } from "@/types";
+import type { NodeCharacterRole, NodeLocationRole, Structure, StructureLinks, StructureNode } from "@/types";
 
 /*
  * Découpage du projet ouvert, partagé par le plan, l'arborescence du
@@ -32,6 +32,13 @@ interface StructureState {
   unlinkCharacter: (projectId: string, nodeId: string, characterId: string) => Promise<void>;
   linkLocation: (projectId: string, nodeId: string, locationId: string, role: NodeLocationRole) => Promise<void>;
   unlinkLocation: (projectId: string, nodeId: string, locationId: string) => Promise<void>;
+  /**
+   * Remplace un élément par sa version enregistrée (texte d'une scène,
+   * réglages du romancier) sans tout recharger.
+   */
+  applyNode: (projectId: string, node: StructureNode) => void;
+  /** Objectif de mots du manuscrit (roman). */
+  setManuscriptGoal: (projectId: string, goal: number | null) => Promise<void>;
   /** Demande au plan de montrer un élément. */
   focusNode: (nodeId: string) => void;
   /** Demande traitée par le plan. */
@@ -108,6 +115,18 @@ export const useStructureStore = create<StructureState>()((set, get) => ({
   unlinkLocation: async (projectId, nodeId, locationId) => {
     await api.unlinkStructureLocation(projectId, nodeId, locationId);
     await get().fetchLinks(projectId);
+  },
+
+  applyNode: (projectId, node) => {
+    const { structure } = get();
+    if (get().projectId !== projectId || !structure) return;
+    set({ structure: { ...structure, nodes: structure.nodes.map((n) => (n.id === node.id ? node : n)) } });
+  },
+
+  setManuscriptGoal: async (projectId, goal) => {
+    const saved = await api.setManuscriptGoal(projectId, goal);
+    const { structure } = get();
+    if (get().projectId === projectId && structure) set({ structure: { ...structure, manuscriptGoal: saved } });
   },
 
   focusNode: (nodeId) => set({ focus: { nodeId, nonce: Date.now() } }),
