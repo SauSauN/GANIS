@@ -91,6 +91,25 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
     void load();
   }, [load]);
 
+  // Note système ouverte : elle suit la langue du logiciel (titres repris
+  // des fiches), sauf si un texte non enregistré est en cours.
+  const [editorKey, setEditorKey] = useState(0);
+  const languageReload = useRef<(language: string) => void>(() => undefined);
+  languageReload.current = (language) => {
+    if (!note?.system || dirty) return;
+    void api
+      .syncSystemNotes(projectId, language)
+      .catch(() => undefined)
+      .then(load)
+      .then(() => setEditorKey((key) => key + 1));
+  };
+  useEffect(() => {
+    // La nouvelle langue vient de l'évènement : c'est elle qu'on envoie.
+    const onChange = (language: string) => languageReload.current(language);
+    i18n.on("languageChanged", onChange);
+    return () => i18n.off("languageChanged", onChange);
+  }, []);
+
   useEffect(
     () => () => {
       if (statusTimer.current !== null) window.clearTimeout(statusTimer.current);
@@ -292,6 +311,7 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
         </header>
 
         <NoteEditor
+          key={editorKey}
           projectId={projectId}
           onOpenFeature={onOpenFeature}
           initialContent={parseNoteContent(note.content)}

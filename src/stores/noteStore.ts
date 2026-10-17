@@ -39,7 +39,8 @@ interface NoteState {
   /** Dossier choisi pour la prochaine note créée (« Nouvelle note ici »). */
   createFolder: string | null;
 
-  fetchNotes: (projectId: string) => Promise<void>;
+  /** `language` : langue des notes système (par défaut, celle du logiciel). */
+  fetchNotes: (projectId: string, language?: string) => Promise<void>;
   createFolderIn: (projectId: string, parentId: string | null, name: string) => Promise<NoteFolder>;
   renameFolder: (projectId: string, id: string, name: string) => Promise<void>;
   moveFolder: (projectId: string, id: string, parentId: string | null) => Promise<void>;
@@ -107,7 +108,7 @@ export const useNoteStore = create<NoteState>((set, get) => {
     stickiesError: null,
     createFolder: null,
 
-    fetchNotes: async (projectId) => {
+    fetchNotes: async (projectId, language) => {
       const request = ++latestFetch;
       const same = mine(projectId);
 
@@ -126,7 +127,7 @@ export const useNoteStore = create<NoteState>((set, get) => {
 
       try {
         // Notes système : titres dans la langue du logiciel, contenu à jour des fiches.
-        await api.syncSystemNotes(projectId, i18n.language).catch(() => undefined);
+        await api.syncSystemNotes(projectId, language ?? i18n.language).catch(() => undefined);
         const [folders, notes] = await Promise.all([
           api.listNoteFolders(projectId),
           api.listNotes(projectId),
@@ -282,6 +283,13 @@ export const useNoteStore = create<NoteState>((set, get) => {
       });
     },
   };
+});
+
+// Notes système : leurs titres (dossiers, noms des éléments, intertitres)
+// suivent la langue du logiciel ; on les recalcule quand elle change.
+i18n.on("languageChanged", (language: string) => {
+  const { projectId, loaded, fetchNotes } = useNoteStore.getState();
+  if (projectId && loaded) void fetchNotes(projectId, language);
 });
 
 const NO_FOLDERS: NoteFolder[] = [];

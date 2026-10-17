@@ -37,7 +37,9 @@
     "loading": "Loading text…",
     "fromDocuments": "While this text is empty, the manuscript uses this element's text documents (Word, Markdown, text).",
     "openManuscript": "Show in manuscript",
-    "failed": "The text could not be loaded."
+    "failed": "The text could not be loaded.",
+    "expand": "Expand to write",
+    "collapse": "Restore"
   },
   "writing": {
     "title": "Writing",

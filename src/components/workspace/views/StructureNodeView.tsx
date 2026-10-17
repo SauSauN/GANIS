@@ -491,6 +491,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
           {holdsText && (
             <NovelTextCard
               projectId={projectId}
+              label={heading.label}
               initialHtml={textHtml}
               failed={textFailed}
               words={textWords}

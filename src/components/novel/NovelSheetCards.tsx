@@ -1,6 +1,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { BookOpenText, Loader2, PenLine, Target } from "lucide-react";
+import { BookOpenText, Loader2, Maximize2, Minimize2, PenLine, Target } from "lucide-react";
 import type { Editor } from "@tiptap/react";
 import { NoteEditor } from "@/components/notes/editor/NoteEditor";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,8 @@ const fieldClass =
 
 interface NovelTextCardProps {
   projectId: string;
+  /** Nom de l'élément (« Scène 2 »), en tête du mode agrandi. */
+  label: string;
   /** Texte enregistré (HTML) ; `null` pendant le chargement. */
   initialHtml: string | null;
   failed: boolean;
@@ -48,9 +50,28 @@ interface NovelTextCardProps {
  * automatique, question avant de fermer) et repris tel quel dans le
  * manuscrit continu.
  */
-export function NovelTextCard({ projectId, initialHtml, failed, words, hasDocuments, onChange, onOpenFeature }: NovelTextCardProps) {
+export function NovelTextCard({ projectId, label, initialHtml, failed, words, hasDocuments, onChange, onOpenFeature }: NovelTextCardProps) {
   const { t } = useTranslation("novel");
   const [open, setOpen] = useCollapsible("ganis.nodeSheet.novelText.collapsed");
+  // Mode agrandi : le même éditeur (rien n'est rechargé ni perdu) occupe la
+  // fenêtre, page centrée. Échap ou « Réduire » pour revenir.
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => {
+    if (!expanded) return;
+    const onKey = (event: KeyboardEvent) => {
+      // Échap ferme d'abord un menu ouvert (suggestions, orthographe, mention).
+      if (event.key !== "Escape" || document.querySelector('[role="menu"], [role="listbox"], [role="dialog"][aria-modal="true"]:not([data-novel-text])')) return;
+      setExpanded(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [expanded]);
+
+  const expand = () => {
+    if (!open) setOpen(true);
+    setExpanded(true);
+  };
 
   return (
     <CollapsibleCard
@@ -59,7 +80,16 @@ export function NovelTextCard({ projectId, initialHtml, failed, words, hasDocume
       icon={PenLine}
       title={t("text.title")}
       description={t("text.description")}
-      actions={<span className="text-xs tabular-nums text-muted-foreground">{t("words", { count: words })}</span>}
+      actions={
+        <div className="flex items-center gap-1">
+          <span className="text-xs tabular-nums text-muted-foreground">{t("words", { count: words })}</span>
+          {!failed && initialHtml !== null && (
+            <Button variant="ghost" size="icon-sm" title={t("text.expand")} aria-label={t("text.expand")} onClick={expand}>
+              <Maximize2 />
+            </Button>
+          )}
+        </div>
+      }
     >
       {failed ? (
         <p role="alert" className="text-sm text-destructive">
@@ -71,12 +101,39 @@ export function NovelTextCard({ projectId, initialHtml, failed, words, hasDocume
           {t("text.loading")}
         </p>
       ) : (
-        <div className="space-y-3">
-          {hasDocuments && words === 0 && <p className="rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground">{t("text.fromDocuments")}</p>}
-          <div className="novel-scene-text min-h-[18rem] overflow-hidden rounded-lg border bg-background">
-            <NoteEditor projectId={projectId} initialContent={initialHtml || null} onChange={onChange} onOpenFeature={onOpenFeature} />
+        <div
+          className={cn(expanded ? "fixed inset-0 z-40 flex flex-col bg-background" : "space-y-3")}
+          role={expanded ? "dialog" : undefined}
+          aria-modal={expanded || undefined}
+          aria-label={expanded ? label : undefined}
+          data-novel-text=""
+        >
+          {expanded && (
+            <header className="flex shrink-0 items-center gap-3 border-b bg-card/60 px-4 py-2">
+              <PenLine className="size-4 text-muted-foreground" aria-hidden="true" />
+              <p className="min-w-0 truncate font-medium">{label}</p>
+              <span className="text-xs tabular-nums text-muted-foreground">{t("words", { count: words })}</span>
+              <Button className="ml-auto" variant="outline" size="sm" onClick={() => setExpanded(false)}>
+                <Minimize2 />
+                {t("text.collapse")}
+              </Button>
+            </header>
+          )}
+          {hasDocuments && words === 0 && (
+            <p className={cn("rounded-md border border-dashed px-3 py-2 text-xs text-muted-foreground", expanded && "mx-auto mt-4 w-full max-w-[52rem]")}>{t("text.fromDocuments")}</p>
+          )}
+          {/* Mêmes éléments dans les deux modes : l'éditeur n'est pas recréé. */}
+          <div className={cn(expanded && "min-h-0 flex-1 overflow-y-auto px-4 [scrollbar-gutter:stable]")}>
+            <div
+              className={cn(
+                "novel-scene-text overflow-clip rounded-lg border bg-background",
+                expanded ? "novel-scene-text-expanded mx-auto my-6 min-h-[calc(100%-3rem)] max-w-[52rem] border-0 bg-transparent" : "min-h-[18rem]",
+              )}
+            >
+              <NoteEditor projectId={projectId} initialContent={initialHtml || null} onChange={onChange} onOpenFeature={onOpenFeature} />
+            </div>
           </div>
-          <div className="flex justify-end">
+          <div className={cn("flex justify-end", expanded && "hidden")}>
             <Button variant="ghost" size="sm" onClick={() => onOpenFeature("manuscript.read")}>
               <BookOpenText />
               {t("text.openManuscript")}

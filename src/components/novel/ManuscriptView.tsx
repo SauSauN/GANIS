@@ -157,7 +157,7 @@ export function ManuscriptView({ project, feature, onOpenFeature }: ManuscriptVi
         )}
 
         {/* Texte */}
-        <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto">
+        <div ref={scrollRef} className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto [scrollbar-gutter:stable]">
           {empty ? (
             <div className="mx-auto flex max-w-md flex-col items-center px-6 py-20 text-center">
               <BookOpenText className="size-8 text-muted-foreground/60" aria-hidden="true" />
@@ -169,41 +169,53 @@ export function ManuscriptView({ project, feature, onOpenFeature }: ManuscriptVi
               </Button>
             </div>
           ) : (
-            <article className="manuscript mx-auto max-w-[42rem] px-8 py-12">
-              <header className="mb-16 text-center">
-                <p className="manuscript-title">{project.name}</p>
-                {username && <p className="mt-2 text-sm text-muted-foreground">{username}</p>}
-              </header>
-              {manuscript.entries.map((entry) =>
-                entry.kind === "heading" ? (
-                  <h2 key={`h-${entry.node.id}`} data-manuscript={entry.node.id} className={cn("manuscript-heading scroll-mt-6", `depth-${Math.min(entry.depth, 2)}`)}>
-                    {entry.label}
-                  </h2>
-                ) : (
-                  <section key={`t-${entry.node.id}`} data-manuscript={entry.node.id} className="group relative scroll-mt-6">
-                    {entry.breakBefore && (
-                      <p className="manuscript-break" aria-hidden="true">
-                        *&nbsp;&nbsp;*&nbsp;&nbsp;*
-                      </p>
-                    )}
-                    {/* Texte déjà nettoyé (fiche ou document) : rendu tel quel. */}
-                    <div className="manuscript-text" dangerouslySetInnerHTML={{ __html: entry.html }} />
-                    <div className="pointer-events-none absolute top-0 -right-2 translate-x-full opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 max-xl:hidden">
-                      <button
-                        type="button"
-                        onClick={() => onOpenFeature(structureNodeTabId(entry.node.id))}
-                        title={`${t("manuscript.editScene")} — ${labelOf(entry.node)}`}
-                        className="flex items-center gap-1 rounded-md border bg-card px-2 py-1 text-xs text-muted-foreground shadow-sm hover:text-foreground"
-                      >
-                        {entry.source === "documents" ? <FileText className="size-3.5" /> : <PenLine className="size-3.5" />}
-                        {labelOf(entry.node)}
-                      </button>
-                      {entry.source === "documents" && <p className="mt-1 max-w-40 text-[0.65rem] leading-tight text-muted-foreground">{t("manuscript.fromDocuments")}</p>}
-                    </div>
-                  </section>
-                ),
-              )}
-            </article>
+            // Rien ne doit dépasser en largeur (pas de défilement horizontal).
+            <div className="overflow-x-clip">
+              <article className="manuscript mx-auto max-w-[42rem] px-8 py-12">
+                <header className="mb-16 text-center">
+                  <p className="manuscript-title">{project.name}</p>
+                  {username && <p className="mt-2 text-sm text-muted-foreground">{username}</p>}
+                </header>
+                {manuscript.entries.map((entry, index) =>
+                  entry.kind === "heading" ? (
+                    <h2
+                      key={`h-${entry.node.id}`}
+                      data-manuscript={entry.node.id}
+                      className={cn(
+                        "manuscript-heading scroll-mt-6",
+                        `depth-${Math.min(entry.depth, 2)}`,
+                        // Nouveau chapitre (ou partie) après du texte : séparation nette.
+                        manuscript.entries[index - 1]?.kind === "text" && "manuscript-new-section",
+                      )}
+                    >
+                      {entry.label}
+                    </h2>
+                  ) : (
+                    <section key={`t-${entry.node.id}`} data-manuscript={entry.node.id} className="group relative scroll-mt-6">
+                      {entry.breakBefore && (
+                        <p className="manuscript-break" aria-hidden="true">
+                          *&nbsp;&nbsp;*&nbsp;&nbsp;*
+                        </p>
+                      )}
+                      {/* Texte déjà nettoyé (fiche ou document) : rendu tel quel. */}
+                      <div className="manuscript-text" dangerouslySetInnerHTML={{ __html: entry.html }} />
+                      <div className="pointer-events-none absolute top-0 right-0 flex -translate-y-[calc(100%+0.25rem)] flex-col items-end font-sans opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100">
+                        <button
+                          type="button"
+                          onClick={() => onOpenFeature(structureNodeTabId(entry.node.id))}
+                          title={`${t("manuscript.editScene")} — ${labelOf(entry.node)}`}
+                          className="flex items-center gap-1 rounded-md border bg-card px-2 py-1 text-xs text-muted-foreground shadow-sm hover:text-foreground"
+                        >
+                          {entry.source === "documents" ? <FileText className="size-3.5" /> : <PenLine className="size-3.5" />}
+                          {labelOf(entry.node)}
+                        </button>
+                        {entry.source === "documents" && <p className="mt-1 max-w-56 text-right text-[0.65rem] leading-tight text-muted-foreground">{t("manuscript.fromDocuments")}</p>}
+                      </div>
+                    </section>
+                  ),
+                )}
+              </article>
+            </div>
           )}
         </div>
       </div>

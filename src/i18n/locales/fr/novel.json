@@ -37,7 +37,9 @@
     "loading": "Chargement du texte…",
     "fromDocuments": "Tant que ce texte est vide, le manuscrit reprend les documents texte de cet élément (Word, Markdown, texte).",
     "openManuscript": "Voir dans le manuscrit",
-    "failed": "Le texte n'a pas pu être chargé."
+    "failed": "Le texte n'a pas pu être chargé.",
+    "expand": "Agrandir pour écrire",
+    "collapse": "Réduire"
   },
   "writing": {
     "title": "Écriture",

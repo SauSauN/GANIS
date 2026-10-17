@@ -15,6 +15,10 @@ mod state;
 mod services;
 mod commands;
 
+/// Projet de démonstration (roman complet) : `cargo test --lib seed_public_novel -- --ignored --nocapture`.
+#[cfg(test)]
+mod seed_novel;
+
 use error::AppResult;
 use serde::Serialize;
 use state::AppState;

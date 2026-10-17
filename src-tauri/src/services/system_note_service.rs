@@ -27,6 +27,8 @@
 //!   perdu : le texte est dans les fiches).
 
 use crate::error::{AppError, AppResult};
+use crate::models::project::ProjectType;
+use crate::services::structure_service::{self, StructureTemplate};
 use crate::services::{location_service, note_service};
 use crate::utils::{new_id, now_utc};
 use serde::Serialize;
@@ -81,6 +83,7 @@ impl Kind {
 
 /// Titres et noms de dossiers, dans la langue choisie.
 struct Texts {
+    english: bool,
     root: &'static str,
     folder: fn(Kind) -> &'static str,
     field: fn(&str) -> &'static str,
@@ -90,6 +93,7 @@ struct Texts {
 fn texts(language: &str) -> Texts {
     if language.starts_with("en") {
         Texts {
+            english: true,
             root: "System notes",
             folder: |kind| match kind {
                 Kind::Character => "Characters",
@@ -105,6 +109,7 @@ fn texts(language: &str) -> Texts {
         }
     } else {
         Texts {
+            english: false,
             root: "Notes système",
             folder: |kind| match kind {
                 Kind::Character => "Personnages",
@@ -119,6 +124,22 @@ fn texts(language: &str) -> Texts {
             untitled: "Sans nom",
         }
     }
+}
+
+/// Nom (au singulier) d'un niveau du modèle, comme dans `structure.json`.
+fn template_level_name(template: StructureTemplate, index: usize, english: bool) -> &'static str {
+    use StructureTemplate::*;
+    let names: [(&str, &str); 3] = match template {
+        Novel => [("Partie", "Part"), ("Chapitre", "Chapter"), ("Scène", "Scene")],
+        Manga => [("Tome", "Volume"), ("Chapitre", "Chapter"), ("Page", "Page")],
+        Film => [("Acte", "Act"), ("Séquence", "Sequence"), ("Scène", "Scene")],
+        Series => [("Saison", "Season"), ("Épisode", "Episode"), ("Scène", "Scene")],
+        Game => [("Acte", "Act"), ("Quête", "Quest"), ("Mission", "Mission")],
+        Rpg => [("Scénario", "Scenario"), ("Session", "Session"), ("Rencontre", "Encounter")],
+        Generic => [("Partie", "Part"), ("Section", "Section"), ("Élément", "Item")],
+    };
+    let (fr, en) = names[index.min(2)];
+    if english { en } else { fr }
 }
 
 fn locked() -> AppError {
@@ -144,7 +165,7 @@ fn clean_language(language: &str) -> String {
 
 /// Active ou désactive les notes système. Désactiver retire le dossier et
 /// ses notes (leur texte reste dans les fiches).
-pub async fn set_enabled(pool: &SqlitePool, enabled: bool, language: &str) -> AppResult<SystemNotesSettings> {
+pub async fn set_enabled(pool: &SqlitePool, project_type: ProjectType, enabled: bool, language: &str) -> AppResult<SystemNotesSettings> {
     let language = clean_language(language);
     sqlx::query(
         "INSERT INTO system_notes_settings (id, enabled, language, updated_at) VALUES ('default', ?, ?, ?) \
@@ -157,7 +178,7 @@ pub async fn set_enabled(pool: &SqlitePool, enabled: bool, language: &str) -> Ap
     .await?;
 
     if enabled {
-        sync(pool, Some(&language)).await?;
+        sync(pool, project_type, Some(&language)).await?;
     } else {
         remove_all(pool).await?;
     }
@@ -228,7 +249,7 @@ fn field_text(fields: &Map<String, Value>, key: &str) -> String {
     fields.get(key).and_then(Value::as_str).unwrap_or_default().to_owned()
 }
 
-async fn entities(pool: &SqlitePool, kind: Kind) -> AppResult<Vec<Entity>> {
+async fn entities(pool: &SqlitePool, kind: Kind, project_type: ProjectType, t: &Texts) -> AppResult<Vec<Entity>> {
     Ok(match kind {
         Kind::Character => {
             let rows: Vec<(String, String, String, String)> =
@@ -257,11 +278,45 @@ async fn entities(pool: &SqlitePool, kind: Kind) -> AppResult<Vec<Entity>> {
                 .collect()
         }
         Kind::Node => {
-            let rows: Vec<(String, String, String)> =
-                sqlx::query_as("SELECT id, title, summary FROM structure_nodes ORDER BY level, position")
-                    .fetch_all(pool)
-                    .await?;
-            rows.into_iter().map(|(id, name, summary)| Entity { id, name, values: vec![summary] }).collect()
+            // Nom affiché dans le découpage : « Chapitre 3 — Titre », « Scène 2 »,
+            // « Prologue » (nom du niveau traduit, sauf nom personnalisé).
+            let structure = structure_service::get_structure(pool, project_type).await?;
+            let numbers = if structure.auto_numbering {
+                structure_service::compute_numbers(&structure.nodes, &structure.levels)
+            } else {
+                HashMap::new()
+            };
+            let mut nodes: Vec<_> = structure.nodes.iter().collect();
+            nodes.sort_by_key(|node| node.level);
+            nodes
+                .into_iter()
+                .map(|node| {
+                    let index = (node.level.max(0) as usize).min(structure.levels.len().saturating_sub(1));
+                    let level = structure.levels.get(index);
+                    let level_name = level
+                        .and_then(|level| level.one.clone())
+                        .unwrap_or_else(|| template_level_name(structure.template, index, t.english).to_owned());
+                    let numbered = node.numbered && level.is_some_and(|level| level.numbering != structure_service::Numbering::None);
+                    let number = if !numbered {
+                        None
+                    } else if structure.auto_numbering {
+                        numbers.get(&node.id).copied()
+                    } else {
+                        node.number
+                    };
+                    let title = node.title.trim();
+                    let name = match number {
+                        Some(value) => {
+                            let digits = level.map_or(1, |level| level.digits.max(1)) as usize;
+                            let prefix = format!("{level_name} {value:0digits$}");
+                            if title.is_empty() { prefix } else { format!("{prefix} — {title}") }
+                        }
+                        None if title.is_empty() => level_name,
+                        None => title.to_owned(),
+                    };
+                    Entity { id: node.id.clone(), name, values: vec![node.summary.clone()] }
+                })
+                .collect()
         }
     })
 }
@@ -422,15 +477,15 @@ async fn ensure_folder(pool: &SqlitePool, role: &str, parent: Option<&str>, name
 
 /// Met les notes système à jour depuis les fiches (rien si l'option est
 /// désactivée). `language` : langue des titres, si elle a changé.
-pub async fn sync(pool: &SqlitePool, language: Option<&str>) -> AppResult<()> {
+pub async fn sync(pool: &SqlitePool, project_type: ProjectType, language: Option<&str>) -> AppResult<()> {
     if !settings(pool).await?.enabled {
         return Ok(());
     }
     let _guard = SYNC.lock().await;
-    sync_locked(pool, language).await
+    sync_locked(pool, project_type, language).await
 }
 
-async fn sync_locked(pool: &SqlitePool, language: Option<&str>) -> AppResult<()> {
+async fn sync_locked(pool: &SqlitePool, project_type: ProjectType, language: Option<&str>) -> AppResult<()> {
     let mut current = settings(pool).await?;
     if !current.enabled {
         return Ok(());
@@ -476,7 +531,7 @@ async fn sync_locked(pool: &SqlitePool, language: Option<&str>) -> AppResult<()>
 
     for kind in Kind::ALL {
         let folder = &folders[&kind];
-        for entity in entities(pool, kind).await? {
+        for entity in entities(pool, kind, project_type, &t).await? {
             let title: String = if entity.name.trim().is_empty() { t.untitled.to_owned() } else { entity.name.trim().chars().take(200).collect() };
             let content = render(kind, &entity, &t);
             let now = now_utc();
@@ -603,8 +658,42 @@ pub async fn update_note(pool: &SqlitePool, note_id: &str, content: Option<&str>
         sqlx::query("UPDATE notes SET pinned = ? WHERE id = ?").bind(pinned).bind(note_id).execute(pool).await?;
     }
 
-    sync(pool, None).await?;
+    refresh_one(pool, note_id, kind, &entity_id).await?;
     note_service::get_note(pool, note_id).await
+}
+
+/// Recalcule une note système depuis sa fiche (après l'avoir enregistrée
+/// depuis la note). Le titre (nom de l'élément) ne change pas ici : il suit
+/// la fiche à la prochaine lecture des notes.
+async fn refresh_one(pool: &SqlitePool, note_id: &str, kind: Kind, entity_id: &str) -> AppResult<()> {
+    let _guard = SYNC.lock().await;
+    let t = texts(&settings(pool).await?.language);
+    let title: String = sqlx::query_scalar("SELECT title FROM notes WHERE id = ?").bind(note_id).fetch_one(pool).await?;
+    let values: Vec<String> = match kind {
+        Kind::Node => {
+            let summary: Option<String> =
+                sqlx::query_scalar("SELECT summary FROM structure_nodes WHERE id = ?").bind(entity_id).fetch_optional(pool).await?;
+            vec![summary.unwrap_or_default()]
+        }
+        Kind::Character | Kind::Location => {
+            let table = if kind == Kind::Character { "characters" } else { "locations" };
+            let raw: Option<String> = sqlx::query_scalar(&format!("SELECT fields FROM {table} WHERE id = ?"))
+                .bind(entity_id)
+                .fetch_optional(pool)
+                .await?;
+            let fields: Map<String, Value> = raw.and_then(|raw| serde_json::from_str(&raw).ok()).unwrap_or_default();
+            kind.fields().iter().map(|key| field_text(&fields, key)).collect()
+        }
+    };
+    let entity = Entity { id: entity_id.to_owned(), name: title, values };
+    sqlx::query("UPDATE notes SET content = ?, excerpt = ?, updated_at = ? WHERE id = ?")
+        .bind(render(kind, &entity, &t))
+        .bind(excerpt(&entity))
+        .bind(now_utc())
+        .bind(note_id)
+        .execute(pool)
+        .await?;
+    Ok(())
 }
 
 // ----------------------------------------------------------------------------
@@ -651,11 +740,11 @@ mod tests {
         add_character(&pool, "c1", "Aldric", r#"{"description":"Le prince.\nHéritier.","notes":"Revoir"}"#).await;
 
         assert!(!settings(&pool).await.unwrap().enabled);
-        sync(&pool, None).await.unwrap();
+        sync(&pool, ProjectType::Novel, None).await.unwrap();
         let count: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM notes").fetch_one(&pool).await.unwrap();
         assert_eq!(count, 0);
 
-        set_enabled(&pool, true, "fr").await.unwrap();
+        set_enabled(&pool, ProjectType::Novel, true, "fr").await.unwrap();
         let note = system_note_of(&pool, "c1").await;
         assert_eq!(note.title, "Aldric");
         assert_eq!(sections(&note.content), vec!["Le prince.\nHéritier.".to_owned(), "Revoir".to_owned()]);
@@ -670,18 +759,54 @@ mod tests {
 
         // La fiche modifie la note ; un élément supprimé perd sa note.
         sqlx::query("UPDATE characters SET fields = '{\"description\":\"Roi.\"}' WHERE id = 'c1'").execute(&pool).await.unwrap();
-        sync(&pool, Some("en")).await.unwrap();
+        sync(&pool, ProjectType::Novel, Some("en")).await.unwrap();
         let note = system_note_of(&pool, "c1").await;
         assert_eq!(sections(&note.content), vec!["Roi.".to_owned(), String::new()]);
         assert!(note.content.contains("General description"));
         sqlx::query("DELETE FROM characters WHERE id = 'c1'").execute(&pool).await.unwrap();
-        sync(&pool, None).await.unwrap();
+        sync(&pool, ProjectType::Novel, None).await.unwrap();
         let left: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM system_notes").fetch_one(&pool).await.unwrap();
         assert_eq!(left, 0);
 
-        set_enabled(&pool, false, "fr").await.unwrap();
+        set_enabled(&pool, ProjectType::Novel, false, "fr").await.unwrap();
         let folders: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM note_folders").fetch_one(&pool).await.unwrap();
         assert_eq!(folders, 0);
+    }
+
+    #[tokio::test]
+    async fn structure_notes_are_named_like_the_plan_in_each_language() {
+        let pool = pool().await;
+        let chapter = structure_service::create_node(&pool, ProjectType::Novel, None, 1, "Le départ", None).await.unwrap();
+        let scene = structure_service::create_node(&pool, ProjectType::Novel, Some(&chapter.id), 2, "", None).await.unwrap();
+        let prologue = structure_service::create_node(&pool, ProjectType::Novel, None, 1, "Prologue", None).await.unwrap();
+        structure_service::update_node(&pool, &prologue.id, None, None, Some(false), None).await.unwrap();
+
+        set_enabled(&pool, ProjectType::Novel, true, "fr").await.unwrap();
+        assert_eq!(system_note_of(&pool, &chapter.id).await.title, "Chapitre 1 — Le départ");
+        assert_eq!(system_note_of(&pool, &scene.id).await.title, "Scène 1");
+        assert_eq!(system_note_of(&pool, &prologue.id).await.title, "Prologue");
+        let root: String = sqlx::query_scalar("SELECT f.name FROM note_folders f JOIN system_note_folders s ON s.folder_id = f.id WHERE s.role = 'root'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(root, "Notes système");
+
+        sync(&pool, ProjectType::Novel, Some("en-US")).await.unwrap();
+        let note = system_note_of(&pool, &scene.id).await;
+        assert_eq!(note.title, "Scene 1");
+        assert!(note.content.contains("Summary"));
+        assert_eq!(system_note_of(&pool, &chapter.id).await.title, "Chapter 1 — Le départ");
+        let root: String = sqlx::query_scalar("SELECT f.name FROM note_folders f JOIN system_note_folders s ON s.folder_id = f.id WHERE s.role = 'root'")
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(root, "System notes");
+
+        // Enregistrer le texte depuis la note garde le titre et la langue.
+        let edited = note.content.replace(r#""type":"paragraph"}"#, r#""type":"paragraph","content":[{"type":"text","text":"Arrivée"}]}"#);
+        let saved = update_note(&pool, &note.id, Some(&edited), None).await.unwrap();
+        assert_eq!(saved.title, "Scene 1");
+        assert!(saved.content.contains("Summary") && saved.content.contains("Arrivée"));
     }
 
     #[test]
