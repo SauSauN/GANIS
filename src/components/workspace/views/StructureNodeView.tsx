@@ -3,6 +3,8 @@ import { VersionsButton } from "@/components/history/VersionsDialog";
 import { DocumentsCard } from "@/components/documents/DocumentsCard";
 import { SceneEventsCard } from "@/components/plot/SceneEventsCard";
 import { NovelTextCard, NovelWritingCard } from "@/components/novel/NovelSheetCards";
+import { onNovelTextChanged } from "@/lib/novelEvents";
+import { refreshWriting } from "@/stores/writingStore";
 import type { Editor } from "@tiptap/react";
 import { useTranslation } from "react-i18next";
 import {
@@ -140,9 +142,23 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   const [textDirty, setTextDirty] = useState(false);
   const [textWords, setTextWords] = useState(0);
 
+  // Texte modifié ailleurs (rechercher et remplacer) : relu si rien n'est
+  // en cours d'écriture ici.
+  const [textKey, setTextKey] = useState(0);
+  const textDirtyRef = useRef(false);
+  textDirtyRef.current = textDirty;
+  useEffect(
+    () =>
+      onNovelTextChanged(projectId, (ids) => {
+        if (ids.includes(nodeId) && !textDirtyRef.current) setTextKey((key) => key + 1);
+      }),
+    [projectId, nodeId],
+  );
+
   useEffect(() => {
     if (!holdsText) return;
     let cancelled = false;
+    textDraft.current = null;
     setTextHtml(null);
     setTextFailed(false);
     api
@@ -157,7 +173,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
       cancelled = true;
     };
     // Chargé une fois par élément : un enregistrement ne recharge pas l'éditeur.
-  }, [projectId, nodeId, holdsText]);
+  }, [projectId, nodeId, holdsText, textKey]);
 
   function onTextChange(editor: Editor) {
     const html = editor.getHTML();
@@ -173,6 +189,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
     try {
       const savedNode = await api.setStructureNodeContent(projectId, nodeId, html);
       applyNode(projectId, savedNode);
+      refreshWriting(projectId);
       // Modifié pendant l'enregistrement : reste à enregistrer.
       if (textDraft.current === html) setTextDirty(false);
       return true;
@@ -490,6 +507,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
           {/* Roman : le texte de la scène d'abord (c'est là qu'on écrit) */}
           {holdsText && (
             <NovelTextCard
+              key={textKey}
               projectId={projectId}
               label={heading.label}
               initialHtml={textHtml}

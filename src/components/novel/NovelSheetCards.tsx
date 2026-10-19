@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { BookOpenText, Loader2, Maximize2, Minimize2, PenLine, Target } from "lucide-react";
 import type { Editor } from "@tiptap/react";
 import { NoteEditor } from "@/components/notes/editor/NoteEditor";
+import { WritingTodayInline } from "@/components/novel/WritingToday";
 import { Button } from "@/components/ui/button";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import { api } from "@/lib/api";
@@ -113,7 +114,10 @@ export function NovelTextCard({ projectId, label, initialHtml, failed, words, ha
               <PenLine className="size-4 text-muted-foreground" aria-hidden="true" />
               <p className="min-w-0 truncate font-medium">{label}</p>
               <span className="text-xs tabular-nums text-muted-foreground">{t("words", { count: words })}</span>
-              <Button className="ml-auto" variant="outline" size="sm" onClick={() => setExpanded(false)}>
+              <span className="ml-auto max-sm:hidden">
+                <WritingTodayInline />
+              </span>
+              <Button className="sm:ml-3 max-sm:ml-auto" variant="outline" size="sm" onClick={() => setExpanded(false)}>
                 <Minimize2 />
                 {t("text.collapse")}
               </Button>

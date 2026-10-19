@@ -24,12 +24,16 @@
 //! - roman : texte des scènes, objectifs de mots, états de rédaction,
 //!   narration (personne, temps, point de vue), objectif du manuscrit,
 //!   dossier éditorial ; une scène dont le texte vient d'un document ;
+//!   objectif quotidien et mots écrits chaque jour (série en cours) ;
 //! - trame : intrigues parallèles, passé narratif (moments négatifs),
 //!   événements reliés aux scènes, liens de cause à effet, actes, tension,
 //!   étiquettes, mystères et indices, questions, modèle personnalisé ;
 //! - notes : dossiers, notes riches (titres, listes, citation, mentions),
 //!   note épinglée, mur de post-it, notes système ;
 //! - historique, versions nommées, rythme de travail sur deux mois.
+//!
+//! (Rechercher et remplacer et l'import de manuscrit agissent sur ce projet
+//! comme sur tout roman : rien à préparer.)
 //!
 //! ## Lancer
 //!
@@ -830,6 +834,7 @@ async fn seed_public_novel() {
     set(&s3_2, Some(3_000), None, Some("third"), Some("present")).await;
     set(&s4_2, Some(3_000), None, Some("first"), Some("past")).await;
     novel::set_manuscript_goal(pool, Some(90_000)).await.unwrap();
+    novel::set_daily_goal(pool, Some(800)).await.unwrap();
 
     novel::update_editorial(
         pool,
@@ -1008,13 +1013,16 @@ async fn seed_public_novel() {
         let day = today - chrono::Duration::days(offset);
         let weekend = matches!(chrono::Datelike::weekday(&day), chrono::Weekday::Sat | chrono::Weekday::Sun);
         let minutes = if weekend { 95 + (offset * 7) % 60 } else { 25 + (offset * 13) % 50 };
+        // Mots écrits : environ 20 par minute, objectif de 800 souvent atteint.
+        let words = if offset == 0 { 420 } else { minutes * 18 + (offset * 37) % 260 };
         sqlx::query(
-            "INSERT INTO work_days (day, actions, minutes, last_minute) VALUES (?, ?, ?, '') \
-             ON CONFLICT(day) DO UPDATE SET actions = excluded.actions, minutes = excluded.minutes",
+            "INSERT INTO work_days (day, actions, minutes, last_minute, words) VALUES (?, ?, ?, '', ?) \
+             ON CONFLICT(day) DO UPDATE SET actions = excluded.actions, minutes = excluded.minutes, words = excluded.words",
         )
         .bind(day.format("%Y-%m-%d").to_string())
         .bind(minutes / 2 + 3)
         .bind(minutes)
+        .bind(words)
         .execute(pool)
         .await
         .unwrap();

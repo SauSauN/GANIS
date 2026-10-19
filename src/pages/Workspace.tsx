@@ -59,6 +59,7 @@ import { useCharacterStore } from "@/stores/characterStore";
 import { useNoteStore } from "@/stores/noteStore";
 import { useStructureStore } from "@/stores/structureStore";
 import { useProjectStore } from "@/stores/projectStore";
+import { useWritingTracker } from "@/stores/writingStore";
 
 /**
  * Libellé et icône d'un onglet.
@@ -117,6 +118,9 @@ export default function Workspace() {
   const closeProject = useProjectStore(
     (state) => state.closeProject,
   );
+
+  // Roman : mots écrits aujourd'hui et séance (barre d'état, suivi de rédaction).
+  useWritingTracker(projectId ?? "", Boolean(projectId) && project?.type === "novel");
 
   /**
    * Barre de gauche : icônes + noms (vrai) ou icônes seules (faux).

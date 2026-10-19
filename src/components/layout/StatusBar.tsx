@@ -5,6 +5,7 @@ import { api } from "@/lib/api";
 import { resolveSaveState, useSaveStatusStore } from "@/lib/saveStatus";
 import { saveEntries, useUnsavedStore } from "@/lib/unsavedChanges";
 import { cn } from "@/lib/utils";
+import { WritingTodayStatus } from "@/components/novel/WritingToday";
 import type { AppInfo } from "@/types";
 
 /** Heure courte (« 14:32 ») dans la langue de l'interface. */
@@ -60,6 +61,7 @@ export function StatusBar() {
       </div>
 
       <div className="flex items-center gap-3">
+        <WritingTodayStatus />
         <span
           role="status"
           aria-live="polite"

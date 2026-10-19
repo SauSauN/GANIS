@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { BookOpenText, FileText, ListTree, Loader2, PanelLeftClose, PanelLeftOpen, PenLine, RefreshCw } from "lucide-react";
+import { BookOpenText, FileText, ListTree, Loader2, PanelLeftClose, PanelLeftOpen, PenLine, RefreshCw, FileUp } from "lucide-react";
 import { ExportMenu } from "@/components/novel/ExportMenu";
 import { ProgressBar } from "@/components/novel/NovelSheetCards";
 import { useManuscript } from "@/components/novel/useManuscript";
@@ -163,10 +163,16 @@ export function ManuscriptView({ project, feature, onOpenFeature }: ManuscriptVi
               <BookOpenText className="size-8 text-muted-foreground/60" aria-hidden="true" />
               <p className="mt-4 font-medium">{t("manuscript.empty")}</p>
               <p className="mt-1 text-sm text-muted-foreground">{t("manuscript.emptyHint")}</p>
-              <Button className="mt-5" variant="outline" onClick={() => onOpenFeature("structure.plan")}>
-                <ListTree />
-                {t("manuscript.openPlan")}
-              </Button>
+              <div className="mt-5 flex flex-wrap justify-center gap-2">
+                <Button variant="outline" onClick={() => onOpenFeature("structure.plan")}>
+                  <ListTree />
+                  {t("manuscript.openPlan")}
+                </Button>
+                <Button variant="outline" onClick={() => onOpenFeature("manuscript.import")}>
+                  <FileUp />
+                  {t("import.title")}
+                </Button>
+              </div>
             </div>
           ) : (
             // Rien ne doit dépasser en largeur (pas de défilement horizontal).

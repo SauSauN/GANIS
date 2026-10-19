@@ -5,6 +5,7 @@ import { ProgressBar } from "@/components/novel/NovelSheetCards";
 import { useManuscript } from "@/components/novel/useManuscript";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
 import { PageShell } from "@/components/workspace/views/PageShell";
+import { WritingTodayCard } from "@/components/novel/WritingToday";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { api } from "@/lib/api";
 import { fullName } from "@/lib/characters";
@@ -181,6 +182,9 @@ export function ProgressView({ project, feature, onOpenFeature }: ProgressViewPr
             />
           </label>
         </section>
+
+        {/* Aujourd'hui : objectif quotidien, séance, série */}
+        <WritingTodayCard projectId={project.id} />
 
         {/* États des chapitres */}
         <section className="flex flex-wrap items-center gap-2">

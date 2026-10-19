@@ -106,8 +106,15 @@ pub async fn get_content(pool: &SqlitePool, id: &str) -> AppResult<String> {
     content.ok_or_else(node_not_found)
 }
 
-/// Enregistre le texte d'un élément et recalcule son nombre de mots.
+/// Enregistre le texte d'un élément écrit dans GANIS : nombre de mots
+/// recalculé, et différence comptée dans les mots écrits aujourd'hui.
 pub async fn set_content(pool: &SqlitePool, id: &str, content: &str) -> AppResult<StructureNode> {
+    write_content(pool, id, content, true).await
+}
+
+/// Enregistre le texte d'un élément. `count_today` : ajouter la différence
+/// de mots aux mots écrits aujourd'hui (faux pour un import).
+pub(crate) async fn write_content(pool: &SqlitePool, id: &str, content: &str, count_today: bool) -> AppResult<StructureNode> {
     if content.chars().count() > MAX_CONTENT_CHARS {
         return Err(AppError::validation("Le texte de cet élément est trop long.")
             .with_key("novel.contentTooLong")
@@ -115,17 +122,146 @@ pub async fn set_content(pool: &SqlitePool, id: &str, content: &str) -> AppResul
     }
     // Un éditeur vide renvoie « <p></p> » : on enregistre alors un texte vide.
     let content = if plain_text(content).trim().is_empty() { "" } else { content };
-    let result = sqlx::query("UPDATE structure_nodes SET content = ?, content_words = ?, updated_at = ? WHERE id = ?")
+    let words = count_words(content);
+    let before: Option<i64> = sqlx::query_scalar("SELECT content_words FROM structure_nodes WHERE id = ?")
+        .bind(id)
+        .fetch_optional(pool)
+        .await?;
+    let Some(before) = before else { return Err(node_not_found()) };
+    sqlx::query("UPDATE structure_nodes SET content = ?, content_words = ?, updated_at = ? WHERE id = ?")
         .bind(content)
-        .bind(count_words(content))
+        .bind(words)
         .bind(now_utc())
         .bind(id)
         .execute(pool)
         .await?;
-    if result.rows_affected() == 0 {
-        return Err(node_not_found());
+    if count_today && words != before {
+        add_words_today(pool, words - before).await;
     }
     find_node(pool, id).await?.ok_or_else(node_not_found)
+}
+
+// ----------------------------------------------------------------------------
+// Mots écrits par jour
+// ----------------------------------------------------------------------------
+
+/// Jour local au format du calendrier (« 2026-10-18 »).
+fn today() -> chrono::NaiveDate {
+    chrono::Local::now().date_naive()
+}
+
+/// Ajoute `delta` mots (négatif : retirés) aux mots écrits aujourd'hui.
+/// Une erreur ne fait jamais échouer l'enregistrement du texte.
+async fn add_words_today(pool: &SqlitePool, delta: i64) {
+    let result = sqlx::query(
+        "INSERT INTO work_days (day, actions, minutes, last_minute, words) VALUES (?1, 0, 0, '', ?2) \
+         ON CONFLICT(day) DO UPDATE SET words = words + ?2",
+    )
+    .bind(today().format("%Y-%m-%d").to_string())
+    .bind(delta)
+    .execute(pool)
+    .await;
+    if let Err(error) = result {
+        tracing::warn!(%error, "Mots du jour : écriture impossible");
+    }
+}
+
+/// Mots écrits un jour donné.
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct WritingDay {
+    pub day: String,
+    pub words: i64,
+}
+
+/// Écriture au jour le jour : aujourd'hui, objectif, série, et les jours
+/// récents (le plus ancien d'abord).
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WritingStats {
+    pub today: String,
+    pub words_today: i64,
+    pub daily_goal: Option<i64>,
+    /// Jours d'affilée où l'objectif a été atteint (aujourd'hui compris s'il
+    /// l'est déjà ; une journée pas encore atteinte ne casse pas la série).
+    pub streak: i64,
+    /// Meilleure série.
+    pub best_streak: i64,
+    pub days: Vec<WritingDay>,
+}
+
+/// Nombre de jours récents renvoyés (graphique du suivi de rédaction).
+const RECENT_DAYS: i64 = 30;
+
+pub async fn writing_stats(pool: &SqlitePool) -> AppResult<WritingStats> {
+    let goal: Option<i64> = sqlx::query_scalar("SELECT daily_goal FROM structure_settings WHERE id = 'default'")
+        .fetch_optional(pool)
+        .await?
+        .flatten();
+    let rows: Vec<(String, i64)> = sqlx::query_as("SELECT day, words FROM work_days WHERE words <> 0 ORDER BY day")
+        .fetch_all(pool)
+        .await?;
+    Ok(stats_from(today(), goal, &rows))
+}
+
+fn stats_from(today: chrono::NaiveDate, goal: Option<i64>, rows: &[(String, i64)]) -> WritingStats {
+    use std::collections::HashMap;
+    let by_day: HashMap<chrono::NaiveDate, i64> = rows
+        .iter()
+        .filter_map(|(day, words)| chrono::NaiveDate::parse_from_str(day, "%Y-%m-%d").ok().map(|d| (d, *words)))
+        .collect();
+    let words_on = |day: chrono::NaiveDate| by_day.get(&day).copied().unwrap_or(0);
+    let reached = |day: chrono::NaiveDate| goal.is_some_and(|goal| words_on(day) >= goal);
+
+    let mut streak = 0;
+    if goal.is_some() {
+        let mut day = if reached(today) { today } else { today - chrono::Duration::days(1) };
+        while reached(day) {
+            streak += 1;
+            day -= chrono::Duration::days(1);
+        }
+    }
+
+    let mut best_streak = 0;
+    if goal.is_some() {
+        let mut days: Vec<_> = by_day.keys().copied().filter(|&d| reached(d)).collect();
+        days.sort();
+        let mut run = 0;
+        let mut previous: Option<chrono::NaiveDate> = None;
+        for day in days {
+            run = if previous.is_some_and(|p| day - p == chrono::Duration::days(1)) { run + 1 } else { 1 };
+            best_streak = best_streak.max(run);
+            previous = Some(day);
+        }
+    }
+
+    let days = (0..RECENT_DAYS)
+        .rev()
+        .map(|offset| {
+            let day = today - chrono::Duration::days(offset);
+            WritingDay { day: day.format("%Y-%m-%d").to_string(), words: words_on(day) }
+        })
+        .collect();
+
+    WritingStats {
+        today: today.format("%Y-%m-%d").to_string(),
+        words_today: words_on(today),
+        daily_goal: goal,
+        streak,
+        best_streak: best_streak.max(streak),
+        days,
+    }
+}
+
+/// Objectif de mots par jour (`None` ou 0 : aucun).
+pub async fn set_daily_goal(pool: &SqlitePool, value: Option<i64>) -> AppResult<WritingStats> {
+    let value = goal(value)?;
+    sqlx::query("UPDATE structure_settings SET daily_goal = ?, updated_at = ? WHERE id = 'default'")
+        .bind(value)
+        .bind(now_utc())
+        .execute(pool)
+        .await?;
+    writing_stats(pool).await
 }
 
 /// Texte d'un élément, pour l'assemblage du manuscrit.
@@ -293,6 +429,41 @@ pub async fn update_editorial(pool: &SqlitePool, update: EditorialUpdate) -> App
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn writing_streaks_and_recent_days() {
+        let d = |s: &str| chrono::NaiveDate::parse_from_str(s, "%Y-%m-%d").unwrap();
+        let rows: Vec<(String, i64)> = [("2026-10-10", 1200), ("2026-10-11", 1500), ("2026-10-12", 300), ("2026-10-15", 1000), ("2026-10-16", 1100), ("2026-10-17", 1000), ("2026-10-18", 200)]
+            .iter()
+            .map(|(a, b)| (a.to_string(), *b))
+            .collect();
+        // Aujourd'hui pas encore atteint : la série d'hier compte toujours.
+        let s = stats_from(d("2026-10-18"), Some(1000), &rows);
+        assert_eq!((s.words_today, s.streak, s.best_streak), (200, 3, 3));
+        assert_eq!(s.days.len(), 30);
+        assert_eq!(s.days.last().unwrap(), &WritingDay { day: "2026-10-18".into(), words: 200 });
+        // Un jour manqué casse la série.
+        let s = stats_from(d("2026-10-19"), Some(1000), &rows);
+        assert_eq!(s.streak, 0);
+        let s = stats_from(d("2026-10-18"), None, &rows);
+        assert_eq!((s.streak, s.best_streak), (0, 0));
+    }
+
+    #[tokio::test]
+    async fn written_words_are_counted_per_day_except_imports() {
+        use crate::db::migrations::{run_migrations, PROJECT_MIGRATOR};
+        use crate::models::project::ProjectType;
+        use crate::services::structure_service;
+        let pool = sqlx::sqlite::SqlitePoolOptions::new().max_connections(1).connect("sqlite::memory:").await.unwrap();
+        run_migrations(&pool, &PROJECT_MIGRATOR).await.unwrap();
+        let n = structure_service::create_node(&pool, ProjectType::Novel, None, 1, "A", None).await.unwrap();
+        write_content(&pool, &n.id, "<p>un deux trois quatre</p>", false).await.unwrap();
+        assert_eq!(writing_stats(&pool).await.unwrap().words_today, 0);
+        set_content(&pool, &n.id, "<p>un deux trois quatre cinq six</p>").await.unwrap();
+        set_content(&pool, &n.id, "<p>un deux trois quatre cinq</p>").await.unwrap();
+        let stats = set_daily_goal(&pool, Some(1)).await.unwrap();
+        assert_eq!((stats.words_today, stats.daily_goal, stats.streak), (1, Some(1), 1));
+    }
+
     use super::*;
     use crate::db::migrations::{run_migrations, PROJECT_MIGRATOR};
     use sqlx::sqlite::SqlitePoolOptions;

@@ -55,6 +55,13 @@ import type {
   ExternalSync,
   StructureNode,
   Editorial,
+  FindOptions,
+  FindResult,
+  ImportNode,
+  ImportResult,
+  ReplaceResult,
+  ReplaceTarget,
+  WritingStats,
   NovelFields,
   Synopsis,
   ThemeData,
@@ -607,6 +614,23 @@ export const api = {
   /** Objectif de mots du manuscrit (`null` : aucun). */
   setManuscriptGoal: (projectId: string, goal: number | null) =>
     call<number | null>("set_manuscript_goal", { projectId, goal }),
+
+  /** Cherche un texte dans le texte de toutes les scènes. */
+  findInManuscript: (projectId: string, options: FindOptions) =>
+    call<FindResult>("find_in_manuscript", { projectId, options }),
+
+  /** Remplace les occurrences choisies (une version nommée par scène). */
+  replaceInManuscript: (projectId: string, options: FindOptions, replacement: string, targets: ReplaceTarget[], versionName: string) =>
+    call<ReplaceResult>("replace_in_manuscript", { projectId, options, replacement, targets, versionName }),
+
+  /** Mots écrits aujourd'hui, objectif quotidien, série, jours récents. */
+  getWritingStats: (projectId: string) => call<WritingStats>("get_writing_stats", { projectId }),
+
+  /** Objectif de mots par jour (`null` : aucun). */
+  setDailyGoal: (projectId: string, goal: number | null) => call<WritingStats>("set_daily_goal", { projectId, goal }),
+
+  /** Ajoute un manuscrit découpé à la fin du plan. */
+  importManuscript: (projectId: string, plan: ImportNode[]) => call<ImportResult>("import_manuscript", { projectId, plan }),
 
   getEditorial: (projectId: string) => call<Editorial>("get_editorial", { projectId }),
 

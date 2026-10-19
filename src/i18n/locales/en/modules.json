@@ -116,6 +116,14 @@
       "editorial": {
         "label": "Editorial pack",
         "description": "Pitch, short and long summaries to present the novel."
+      },
+      "replace": {
+        "label": "Find and replace",
+        "description": "Fix a name or a word across all the scene text."
+      },
+      "import": {
+        "label": "Import a manuscript",
+        "description": "A Word, Markdown or text file, split into parts, chapters and scenes."
       }
     }
   }

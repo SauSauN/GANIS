@@ -257,6 +257,76 @@ export interface NovelFields {
 }
 
 /** Dossier de présentation éditoriale (indépendant du synopsis). */
+/** Mots écrits un jour donné (texte des scènes, solde net). */
+export interface WritingDay {
+  day: string;
+  words: number;
+}
+
+/** Écriture au jour le jour (roman). */
+export interface WritingStats {
+  /** Jour local (« 2026-10-18 »). */
+  today: string;
+  wordsToday: number;
+  dailyGoal: number | null;
+  /** Jours d'affilée où l'objectif a été atteint. */
+  streak: number;
+  bestStreak: number;
+  /** 30 derniers jours, le plus ancien d'abord. */
+  days: WritingDay[];
+}
+
+/** Recherche dans le texte des scènes. */
+export interface FindOptions {
+  query: string;
+  caseSensitive: boolean;
+  wholeWord: boolean;
+}
+
+export interface FindMatch {
+  nodeId: string;
+  /** Numéro de l'occurrence dans l'élément (ordre du texte). */
+  index: number;
+  before: string;
+  text: string;
+  after: string;
+}
+
+export interface FindResult {
+  matches: FindMatch[];
+  nodes: Array<{ id: string; updatedAt: string; count: number }>;
+  total: number;
+  truncated: boolean;
+}
+
+export interface ReplaceTarget {
+  nodeId: string;
+  updatedAt: string;
+  indices: number[];
+}
+
+export interface ReplaceResult {
+  replaced: number;
+  /** Éléments modifiés et leur texte d'avant (pour annuler). */
+  nodes: Array<{ node: StructureNode; before: string }>;
+}
+
+/** Élément du plan d'un manuscrit importé. */
+export interface ImportNode {
+  level: number;
+  title: string;
+  numbered: boolean;
+  /** Texte (HTML), souvent vide pour une partie ou un chapitre. */
+  content: string;
+  children: ImportNode[];
+}
+
+export interface ImportResult {
+  roots: string[];
+  nodes: number;
+  words: number;
+}
+
 export interface Editorial {
   pitch: string;
   summaryShort: string;

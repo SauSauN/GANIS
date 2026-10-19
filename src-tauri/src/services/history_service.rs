@@ -150,12 +150,14 @@ pub struct WorkDay {
     pub day: String,
     pub actions: i64,
     pub minutes: i64,
+    /// Mots écrits ce jour-là (texte des scènes, solde net ; roman).
+    pub words: i64,
 }
 
 /// Jours de travail d'une année (« 2026 »).
 pub async fn work_days(pool: &SqlitePool, year: i32) -> AppResult<Vec<WorkDay>> {
     Ok(sqlx::query_as::<_, WorkDay>(
-        "SELECT day, actions, minutes FROM work_days WHERE day >= ? AND day <= ? ORDER BY day",
+        "SELECT day, actions, minutes, words FROM work_days WHERE day >= ? AND day <= ? ORDER BY day",
     )
     .bind(format!("{year:04}-01-01"))
     .bind(format!("{year:04}-12-31"))

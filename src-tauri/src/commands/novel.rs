@@ -8,7 +8,11 @@
 use crate::commands::documents::{body, header};
 use crate::error::{AppError, AppResult};
 use crate::services::history_service as history;
-use crate::services::novel_service::{self, Editorial, EditorialUpdate, NodeContent, NovelFields};
+use crate::models::project::ProjectType;
+use crate::services::novel_import_service::{self, ImportNode, ImportResult};
+use crate::services::project_service;
+use crate::services::novel_replace_service::{self, FindOptions, FindResult, ReplaceResult, ReplaceTarget};
+use crate::services::novel_service::{self, Editorial, EditorialUpdate, NodeContent, NovelFields, WritingStats};
 use crate::services::project_storage;
 use crate::services::structure_service::StructureNode;
 use crate::state::AppState;
@@ -19,6 +23,23 @@ use tauri_plugin_dialog::DialogExt;
 
 async fn project_pool(state: &AppState, project_id: &str) -> AppResult<SqlitePool> {
     project_storage::pool_for_request(state, project_id).await
+}
+
+/// Base du projet et type du projet (modèle du découpage par défaut).
+async fn project_pool_and_type(state: &AppState, project_id: &str) -> AppResult<(SqlitePool, ProjectType)> {
+    let viewer = state.viewer().await;
+    let pool = project_storage::pool_for_viewer(state, project_id, &viewer).await?;
+    let project = project_service::find_stored_for_viewer(&state.app_db, project_id, &viewer)
+        .await?
+        .ok_or_else(|| AppError::not_found("Projet non trouvé.").with_key("project.notFound"))?;
+    Ok((pool, project.project_type))
+}
+
+/// Importe un manuscrit déjà découpé par l'interface (ajouté à la fin du plan).
+#[tauri::command(rename_all = "camelCase")]
+pub async fn import_manuscript(state: State<'_, AppState>, project_id: String, plan: Vec<ImportNode>) -> AppResult<ImportResult> {
+    let (pool, project_type) = project_pool_and_type(&state, &project_id).await?;
+    novel_import_service::import(&pool, project_type, &plan).await
 }
 
 /// Texte d'un élément du découpage (HTML de l'éditeur).
@@ -67,6 +88,39 @@ pub async fn set_structure_node_novel(
 #[tauri::command(rename_all = "camelCase")]
 pub async fn set_manuscript_goal(state: State<'_, AppState>, project_id: String, goal: Option<i64>) -> AppResult<Option<i64>> {
     novel_service::set_manuscript_goal(&project_pool(&state, &project_id).await?, goal).await
+}
+
+/// Cherche un texte dans le texte de toutes les scènes.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn find_in_manuscript(state: State<'_, AppState>, project_id: String, options: FindOptions) -> AppResult<FindResult> {
+    novel_replace_service::find(&project_pool(&state, &project_id).await?, &options).await
+}
+
+/// Remplace les occurrences choisies (une version nommée par scène modifiée).
+#[tauri::command(rename_all = "camelCase")]
+pub async fn replace_in_manuscript(
+    state: State<'_, AppState>,
+    project_id: String,
+    options: FindOptions,
+    replacement: String,
+    targets: Vec<ReplaceTarget>,
+    version_name: String,
+) -> AppResult<ReplaceResult> {
+    let pool = project_pool(&state, &project_id).await?;
+    let name: String = version_name.trim().chars().take(200).collect();
+    novel_replace_service::replace(&pool, &options, &replacement, &targets, &name).await
+}
+
+/// Mots écrits aujourd'hui, objectif quotidien, série et jours récents.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn get_writing_stats(state: State<'_, AppState>, project_id: String) -> AppResult<WritingStats> {
+    novel_service::writing_stats(&project_pool(&state, &project_id).await?).await
+}
+
+/// Objectif de mots par jour (`None` ou 0 : aucun).
+#[tauri::command(rename_all = "camelCase")]
+pub async fn set_daily_goal(state: State<'_, AppState>, project_id: String, goal: Option<i64>) -> AppResult<WritingStats> {
+    novel_service::set_daily_goal(&project_pool(&state, &project_id).await?, goal).await
 }
 
 /// Dossier de présentation éditoriale.

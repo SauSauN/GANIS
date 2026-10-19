@@ -116,6 +116,14 @@
       "editorial": {
         "label": "Dossier éditorial",
         "description": "Pitch, résumé court et résumé long, pour présenter le roman."
+      },
+      "replace": {
+        "label": "Rechercher et remplacer",
+        "description": "Corriger un nom ou un mot dans tout le texte des scènes."
+      },
+      "import": {
+        "label": "Importer un manuscrit",
+        "description": "Un fichier Word, Markdown ou texte, découpé en parties, chapitres et scènes."
       }
     }
   }

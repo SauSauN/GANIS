@@ -46,6 +46,8 @@ const PlotReadingView = lazy(() => import("@/components/plot/PlotReadingView").t
 // Roman : manuscrit continu, suivi de rédaction, dossier éditorial.
 const ManuscriptView = lazy(() => import("@/components/novel/ManuscriptView").then((module) => ({ default: module.ManuscriptView })));
 const ProgressView = lazy(() => import("@/components/novel/ProgressView").then((module) => ({ default: module.ProgressView })));
+const ReplaceView = lazy(() => import("@/components/novel/ReplaceView").then((module) => ({ default: module.ReplaceView })));
+const ImportView = lazy(() => import("@/components/novel/ImportView").then((module) => ({ default: module.ImportView })));
 const EditorialView = lazy(() => import("@/components/novel/EditorialView").then((module) => ({ default: module.EditorialView })));
 
 interface WorkspaceViewProps {
@@ -153,6 +155,14 @@ function WorkspaceContent({
 
   if (tabId === "manuscript.progress") {
     return <ProgressView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "manuscript.replace") {
+    return <ReplaceView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "manuscript.import") {
+    return <ImportView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
   if (tabId === "manuscript.editorial") {

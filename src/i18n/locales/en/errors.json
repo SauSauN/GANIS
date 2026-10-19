@@ -317,5 +317,19 @@
     "characters": "Could not load the characters.",
     "locations": "Could not load the locations.",
     "setup": "Could not check the GANIS setup."
+  },
+  "novel": {
+    "contentTooLong": "This text is too long (at most {{max}} characters).",
+    "exportType": "This file type cannot be exported.",
+    "importEmpty": "Nothing to import.",
+    "importTooLarge": "This manuscript has too many items for one import (at most {{max}}).",
+    "invalidGoal": "Invalid word goal.",
+    "invalidPerson": "Invalid narrative person.",
+    "invalidStatus": "Invalid writing status.",
+    "invalidTense": "Invalid narrative tense.",
+    "pitchTooLong": "The pitch is too long (at most {{max}} characters).",
+    "summaryTooLong": "This summary is too long (at most {{max}} characters).",
+    "replaceQuery": "The text to find is empty or too long.",
+    "replaceStale": "The text changed since the search: search again."
   }
 }

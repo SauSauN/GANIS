@@ -26,6 +26,8 @@ import {
   Users,
   Waypoints,
   type LucideIcon,
+  Replace,
+  FileUp,
 } from "lucide-react";
 import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/sections";
 import i18n from "@/i18n";
@@ -110,6 +112,8 @@ type FeatureId =
   | "notes.wall"
   | "manuscript.read"
   | "manuscript.progress"
+  | "manuscript.replace"
+  | "manuscript.import"
   | "manuscript.editorial";
 
 /** Modules qui ont une liste (et donc un message de liste vide). */
@@ -206,6 +210,8 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
 export const NOVEL_MODULE: WorkspaceModule = defineModule("manuscript", BookText, [
   defineFeature("manuscript.read", BookOpenText),
   defineFeature("manuscript.progress", Target),
+  defineFeature("manuscript.replace", Replace),
+  defineFeature("manuscript.import", FileUp),
   defineFeature("manuscript.editorial", Megaphone),
 ]);
 

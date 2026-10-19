@@ -317,5 +317,19 @@
     "characters": "Impossible de charger les personnages.",
     "locations": "Impossible de charger les lieux.",
     "setup": "Impossible de vérifier la configuration de GANIS."
+  },
+  "novel": {
+    "contentTooLong": "Ce texte est trop long ({{max}} caractères au maximum).",
+    "exportType": "Ce type de fichier ne peut pas être exporté.",
+    "importEmpty": "Rien à importer.",
+    "importTooLarge": "Ce manuscrit a trop d'éléments pour un seul import ({{max}} au maximum).",
+    "invalidGoal": "Objectif de mots invalide.",
+    "invalidPerson": "Personne de narration invalide.",
+    "invalidStatus": "État de rédaction invalide.",
+    "invalidTense": "Temps de narration invalide.",
+    "pitchTooLong": "Le pitch est trop long ({{max}} caractères au maximum).",
+    "summaryTooLong": "Ce résumé est trop long ({{max}} caractères au maximum).",
+    "replaceQuery": "Le texte à chercher est vide ou trop long.",
+    "replaceStale": "Le texte a changé depuis la recherche : relancez la recherche."
   }
 }
