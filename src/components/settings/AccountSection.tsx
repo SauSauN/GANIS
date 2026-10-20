@@ -232,7 +232,7 @@ function IdleLockCard() {
             id="idle-lock-delay"
             value={minutes}
             onChange={(e) => setIdleLock(Number(e.target.value) as IdleLockDelay)}
-            className="h-9 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none dark:bg-input/30"
+            className="h-9 w-full rounded-lg border border-input bg-background px-2.5 text-sm text-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
           >
             {IDLE_LOCK_DELAYS.map((value) => (
               <option key={value} value={value}>

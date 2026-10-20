@@ -248,7 +248,8 @@
       "character": "Character",
       "completion": "Profile completion",
       "relations": "Relationships"
-    }
+    },
+    "allRolesOption": "All roles"
   },
   "sidebar": {
     "title": "Characters",

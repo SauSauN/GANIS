@@ -1,4 +1,13 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent as ReactKeyboardEvent, type PointerEvent as ReactPointerEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type PointerEvent as ReactPointerEvent,
+} from "react";
 import { useTranslation } from "react-i18next";
 import {
   Activity,
@@ -43,7 +52,6 @@ import {
   rowAt,
   rowTop,
   slotAt,
-  smoothPath,
   TENSION_W,
 } from "@/components/plot/geometry";
 import { KindIcon } from "@/components/plot/KindIcon";
@@ -68,50 +76,15 @@ import {
   rowsCount,
   STATUS_COLORS,
   visibleLanes,
-  type PlotData,
   type PlotEvent,
   type PlotFilter,
 } from "@/lib/plot";
 import { cn } from "@/lib/utils";
 import { usePlotStore, useProjectPlot } from "@/stores/plotStore";
-
-// v2 : la colonne de tension est désormais cachée par défaut.
-const VIEW_KEY = "ganis.plot.view.v2";
-const PANEL_KEY = "ganis.plot.panel";
-
-const DEFAULT_VIEW: PlotView = {
-  zoom: 1,
-  kinds: { impact: true, influence: true, meeting: true },
-  labels: true,
-  notes: true,
-  tension: false,
-  rowLines: true,
-};
-
-function readView(): PlotView {
-  try {
-    const raw = JSON.parse(localStorage.getItem(VIEW_KEY) ?? "null") as Partial<PlotView> | null;
-    if (!raw || typeof raw !== "object") return DEFAULT_VIEW;
-    return {
-      zoom: typeof raw.zoom === "number" ? clampZoom(raw.zoom) : 1,
-      kinds: { ...DEFAULT_VIEW.kinds, ...(raw.kinds ?? {}) },
-      labels: raw.labels !== false,
-      notes: raw.notes !== false,
-      tension: raw.tension === true,
-      rowLines: raw.rowLines !== false,
-    };
-  } catch {
-    return DEFAULT_VIEW;
-  }
-}
-
-function writeView(view: PlotView) {
-  try {
-    localStorage.setItem(VIEW_KEY, JSON.stringify(view));
-  } catch {
-    // Préférence gardée pour cette séance.
-  }
-}
+import { BoardSvg } from "@/components/plot/BoardSvg";
+import { InlineTitle } from "@/components/plot/InlineTitle";
+import { PANEL_KEY, readView, writeView } from "@/components/plot/plotViewPrefs";
+import { TensionCurve } from "@/components/plot/TensionCurve";
 
 type Drag =
   | { type: "move"; id: string; left: number; top: number; column: number; row: number; moved: boolean }
@@ -1253,204 +1226,5 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
         </div>
       )}
     </main>
-  );
-}
-
-// ----------------------------------------------------------------------------
-// Fond du plateau (grille, actes, trames, tension, liens)
-// ----------------------------------------------------------------------------
-
-interface BoardSvgProps {
-  data: PlotData;
-  m: ReturnType<typeof metrics>;
-  lanes: PlotData["lanes"];
-  rows: number;
-  width: number;
-  height: number;
-  view: PlotView;
-  selection: ReturnType<typeof usePlotStore.getState>["selection"];
-  focus: ReturnType<typeof computeFocus>;
-  geometryOf: (event: PlotEvent) => { cx: number; cy: number; column: number; color: string } | null;
-  dimmed: (event: PlotEvent) => boolean;
-}
-
-function BoardSvg({ data, m, lanes, rows, width, height, view, selection, focus, geometryOf, dimmed }: BoardSvgProps) {
-  const select = usePlotStore((s) => s.select);
-  const acts = Object.keys(data.acts).map(Number).sort((a, b) => a - b);
-  const colors = new Set<string>();
-
-  const linkPaths = data.links.flatMap((link) => {
-    if (!view.kinds[link.kind]) return [];
-    const a = eventOf(data, link.from);
-    const b = eventOf(data, link.to);
-    const ga = a && geometryOf(a);
-    const gb = b && geometryOf(b);
-    if (!a || !b || !ga || !gb) return [];
-    colors.add(ga.color);
-    colors.add(gb.color);
-    const path = linkPath(m, ga, gb);
-    const dim = (focus && !focus.links.has(link.id)) || dimmed(a) || dimmed(b);
-    const selected = selection?.type === "link" && selection.id === link.id;
-    const gradient = !path.sameColumn && path.x1 !== path.x2 && ga.color !== gb.color;
-    return [{ link, path, ga, gb, dim, selected, gradient }];
-  });
-
-  const hex = (c: string) => c.replace("#", "");
-
-  return (
-    <svg className="pointer-events-none absolute top-0 left-0 z-[1] overflow-visible" width={width} height={height} viewBox={`0 0 ${width} ${height}`} aria-hidden="true">
-      <defs>
-        {[...colors].map((c) => (
-          <g key={c}>
-            <marker id={`plot-arr-${hex(c)}`} viewBox="0 0 12 12" refX="10.5" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse" orient="auto">
-              <path d="M1,1.5 L11.5,6 L1,10.5Z" fill={c} />
-            </marker>
-            <marker id={`plot-dot-${hex(c)}`} viewBox="0 0 12 12" refX="6" refY="6" markerWidth="12" markerHeight="12" markerUnits="userSpaceOnUse">
-              <circle cx="6" cy="6" r="4.4" fill={c} />
-            </marker>
-          </g>
-        ))}
-        {linkPaths
-          .filter((l) => l.gradient)
-          .map(({ link, path, ga, gb }) => (
-            <linearGradient key={link.id} id={`plot-g-${link.id}`} gradientUnits="userSpaceOnUse" x1={path.x1} y1={path.y1} x2={path.x2} y2={path.y2}>
-              <stop offset="0" stopColor={ga.color} />
-              <stop offset="1" stopColor={gb.color} />
-            </linearGradient>
-          ))}
-      </defs>
-
-      {/* Passé narratif : zone teintée au-dessus du début de l'histoire */}
-      {m.past > 0 && <rect x={0} y={0} width={width} height={m.past * m.row} className="fill-muted" opacity={0.55} />}
-      {selection?.type === "row" && <rect x={0} y={rowTop(m, selection.id)} width={width} height={m.row} className="fill-foreground" opacity={0.06} />}
-      {acts.map((row, i) =>
-        i % 2 === 1 ? <rect key={`band-${row}`} x={0} y={rowTop(m, row)} width={width} height={((acts[i + 1] ?? rows - m.past) - row) * m.row} className="fill-foreground" opacity={0.045} /> : null,
-      )}
-      {view.rowLines &&
-        Array.from({ length: rows + 1 }, (_, r) => <line key={`grid-${r}`} x1={0} x2={width} y1={r * m.row} y2={r * m.row} className="stroke-border" strokeWidth={1} />)}
-      {acts.map((row) => (
-        <line key={`act-${row}`} x1={0} x2={width} y1={rowTop(m, row)} y2={rowTop(m, row)} className="stroke-foreground" strokeWidth={1.6} opacity={0.5} />
-      ))}
-      {/* Début de l'histoire principale */}
-      {m.past > 0 && <line x1={0} x2={width} y1={m.past * m.row} y2={m.past * m.row} className="stroke-primary" strokeWidth={2} strokeDasharray="6 5" opacity={0.7} />}
-
-      {lanes.map((lane, i) => {
-        const x = i * m.lane + m.lane / 2;
-        const laneRows = data.events.filter((e) => e.laneId === lane.id).map((e) => e.row);
-        return (
-          <g key={lane.id}>
-            {lane.main && <rect x={i * m.lane} y={0} width={m.lane} height={height} fill={lane.color} opacity={0.07} />}
-            <line x1={x} x2={x} y1={0} y2={height} stroke={lane.color} strokeOpacity={0.3} strokeWidth={2} strokeDasharray="1 8" strokeLinecap="round" />
-            {laneRows.length > 0 && (
-              <line
-                x1={x}
-                x2={x}
-                y1={rowTop(m, Math.min(...laneRows)) + m.row / 2}
-                y2={rowTop(m, Math.max(...laneRows)) + m.row / 2}
-                stroke={lane.color}
-                strokeWidth={lane.main ? 7 : 4}
-                strokeLinecap="round"
-                strokeOpacity={0.8}
-              />
-            )}
-          </g>
-        );
-      })}
-
-
-      {linkPaths.map(({ link, path, ga, gb, dim, selected, gradient }) => {
-        const width = link.kind === "impact" ? 3.2 : link.kind === "influence" ? 2.4 : 2.8;
-        const end = link.kind === "meeting" ? `plot-dot-${hex(gb.color)}` : `plot-arr-${hex(gb.color)}`;
-        return (
-          <g key={link.id} className="group/link" opacity={dim ? 0.13 : 1} data-link={link.id}>
-            <path
-              d={path.d}
-              fill="none"
-              stroke="transparent"
-              strokeWidth={16}
-              className="cursor-pointer"
-              style={{ pointerEvents: "stroke" }}
-              onClick={() => select({ type: "link", id: link.id })}
-            />
-            <path
-              d={path.d}
-              fill="none"
-              stroke={gradient ? `url(#plot-g-${link.id})` : ga.color}
-              strokeWidth={selected ? 4.5 : width}
-              strokeDasharray={link.kind === "influence" ? "7 6" : undefined}
-              strokeLinecap="round"
-              markerStart={`url(#plot-dot-${hex(ga.color)})`}
-              markerEnd={`url(#${end})`}
-              className="group-hover/link:[stroke-width:4.5px]"
-            />
-          </g>
-        );
-      })}
-    </svg>
-  );
-}
-
-/** Titre modifié directement sur la carte (double-clic, F2). */
-function InlineTitle({ initial, fontSize, label, onDone }: { initial: string; fontSize: number; label: string; onDone: (value: string | null) => void }) {
-  const [value, setValue] = useState(initial);
-  const done = useRef(false);
-  const finish = (save: boolean) => {
-    if (done.current) return;
-    done.current = true;
-    onDone(save ? value.trim() : null);
-  };
-  return (
-    <textarea
-      autoFocus
-      value={value}
-      aria-label={label}
-      maxLength={200}
-      onFocus={(e) => e.target.select()}
-      onChange={(e) => setValue(e.target.value)}
-      onPointerDown={(e) => e.stopPropagation()}
-      onKeyDown={(e) => {
-        e.stopPropagation();
-        if (e.key === "Enter" && !e.shiftKey) {
-          e.preventDefault();
-          finish(true);
-        } else if (e.key === "Escape") {
-          e.preventDefault();
-          finish(false);
-        }
-      }}
-      onBlur={() => finish(true)}
-      className="h-[2.6em] w-full resize-none rounded border border-[var(--lane)] bg-card px-1 leading-tight font-semibold outline-none"
-      style={{ fontSize }}
-    />
-  );
-}
-
-/** Courbe de tension, moment par moment (0 à gauche, 10 à droite). */
-function TensionCurve({ data, rows, past, rowHeight, width, rowLines }: { data: PlotData; rows: number; past: number; rowHeight: number; width: number; rowLines: boolean }) {
-  // `rows` : lignes affichées, passé narratif compris (`past` lignes en haut).
-  const height = rows * rowHeight;
-  const x0 = 8;
-  const xw = width - 16;
-  const points = Object.keys(data.tension)
-    .map(Number)
-    .filter((r) => r >= -past && r < rows - past)
-    .sort((a, b) => a - b)
-    .map((r) => ({ x: x0 + (data.tension[r] / 10) * xw, y: (r + past) * rowHeight + rowHeight / 2, row: r }));
-  return (
-    <svg className="pointer-events-none absolute inset-0" width={width} height={height} aria-hidden="true">
-      {rowLines && Array.from({ length: rows + 1 }, (_, r) => <line key={r} x1={0} x2={width} y1={r * rowHeight} y2={r * rowHeight} className="stroke-border" strokeWidth={1} />)}
-      {[0, 0.5, 1].map((f) => (
-        <line key={f} x1={x0 + f * xw} x2={x0 + f * xw} y1={0} y2={height} className="stroke-foreground" opacity={0.12} strokeDasharray="3 5" />
-      ))}
-      {points.length > 1 && (
-        <>
-          <path d={`M${x0},${points[0].y} L${points.map((p) => `${p.x},${p.y}`).join(" L")} L${x0},${points[points.length - 1].y} Z`} className="fill-primary" opacity={0.12} />
-          <path d={smoothPath(points)} fill="none" className="stroke-primary" strokeWidth={2.2} strokeLinecap="round" strokeLinejoin="round" />
-        </>
-      )}
-      {points.map((p) => (
-        <circle key={p.row} cx={p.x} cy={p.y} r={4} className="fill-primary" />
-      ))}
-    </svg>
   );
 }

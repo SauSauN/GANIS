@@ -152,6 +152,30 @@
     @apply font-sans;
   }
   /*
+   * Menus déroulants natifs (<select>) : la liste qui s'ouvre est dessinée
+   * par le système. Sans indication, elle reste claire même en mode sombre
+   * (texte clair sur fond blanc, illisible). `color-scheme` lui dit quel
+   * mode utiliser, et les couleurs des options suivent le thème actif,
+   * y compris les thèmes personnalisés (variables --popover).
+   */
+  :root {
+    color-scheme: light;
+  }
+  .dark {
+    color-scheme: dark;
+  }
+  select {
+    color: var(--foreground);
+  }
+  select option,
+  select optgroup {
+    background-color: var(--popover);
+    color: var(--popover-foreground);
+  }
+  select option:disabled {
+    color: var(--muted-foreground);
+  }
+  /*
    * Application de bureau : seules les zones prévues défilent (contenu des
    * pages, panneaux). La fenêtre elle-même ne défile jamais, même si un
    * élément dépasse, et le défilement ne « rebondit » pas.

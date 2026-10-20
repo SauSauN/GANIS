@@ -2,7 +2,7 @@
   "categories": {
     "settlement": {
       "label": "Settlements",
-      "description": "Inhabited, organised places."
+      "description": "Inhabited, organised areas comprising one or more municipalities."
     },
     "political": {
       "label": "Political territories",
@@ -370,7 +370,9 @@
     "manage": "Add your own types",
     "changeTitle": "Change the type of “{{name}}”",
     "changeDescription": "Information already entered is kept, even what no longer applies to the new type.",
-    "change": "Change"
+    "change": "Change",
+    "choose_one": "Choose from {{count}} type…",
+    "choose_other": "Choose from {{count}} types…"
   },
   "create": {
     "save": "Create location",
@@ -427,7 +429,9 @@
       "title": "No locations yet",
       "description": "Start with the largest (a continent, a kingdom), then place the other locations inside.",
       "create": "Create a location"
-    }
+    },
+    "allCategoriesOption": "All categories",
+    "categoryFilter": "Filter by category"
   },
   "sidebar": {
     "title": "Locations",
