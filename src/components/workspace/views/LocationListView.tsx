@@ -414,7 +414,7 @@ function TreeRow({
       <button
         type="button"
         onClick={onOpen}
-        className="flex min-w-0 flex-1 items-center gap-3 py-2 text-left focus-visible:outline-none"
+        className="flex min-w-0 flex-1 items-center gap-3 rounded-md py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <LocationThumb projectId={projectId} location={location} customTypes={customTypes} size="sm" />
         <span className="min-w-0 truncate text-sm font-medium group-hover:text-primary">{location.name}</span>

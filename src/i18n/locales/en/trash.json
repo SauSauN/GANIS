@@ -9,7 +9,8 @@
     "noteFolder": "Note folder",
     "sticky": "Sticky note",
     "relation": "Relationship",
-    "placeLink": "Character – location link"
+    "placeLink": "Character – location link",
+    "mangaPanel": "Manga panel"
   },
   "deleted": {
     "character": "Character “{{name}}” deleted.",
@@ -20,7 +21,8 @@
     "noteFolder": "Folder “{{name}}” deleted.",
     "sticky": "Sticky note “{{name}}” deleted.",
     "relation": "Relationship “{{name}}” deleted.",
-    "placeLink": "Link “{{name}}” deleted."
+    "placeLink": "Link “{{name}}” deleted.",
+    "mangaPanel": "Panel “{{name}}” deleted."
   },
   "restored": {
     "character": "Character “{{name}}” restored.",
@@ -31,7 +33,8 @@
     "noteFolder": "Folder “{{name}}” restored.",
     "sticky": "Sticky note “{{name}}” restored.",
     "relation": "Relationship “{{name}}” restored.",
-    "placeLink": "Link “{{name}}” restored."
+    "placeLink": "Link “{{name}}” restored.",
+    "mangaPanel": "Panel “{{name}}” restored."
   },
   "untitled": {
     "character": "Unnamed character",
@@ -42,7 +45,8 @@
     "noteFolder": "Unnamed folder",
     "sticky": "Empty sticky note",
     "relation": "Relationship",
-    "placeLink": "Link"
+    "placeLink": "Link",
+    "mangaPanel": "Panel without action"
   },
   "view": {
     "description": "Deleted items stay here for 30 days. Restoring one also brings back everything that went with it (images, relationships, sub-items…).",
@@ -59,6 +63,17 @@
     "purgeNamed": "Delete “{{name}}” permanently",
     "purgeTitle": "Delete “{{name}}” permanently?",
     "purgeBody": "It can no longer be restored.",
-    "deletedOn": "deleted {{date}}"
-  }
+    "deletedOn": "deleted {{date}}",
+    "select": "Select “{{name}}”",
+    "restoreSelected": "Restore selection",
+    "purgeSelected": "Delete permanently",
+    "purgeSelectedTitle_one": "Permanently delete {{count}} item?",
+    "purgeSelectedTitle_other": "Permanently delete {{count}} items?"
+  },
+  "restoredMany_one": "{{count}} item restored.",
+  "restoredMany_other": "{{count}} items restored.",
+  "restoreFailedSome_one": "{{count}} item could not be restored: {{reason}}",
+  "restoreFailedSome_other": "{{count}} items could not be restored: {{reason}}",
+  "deletedMany_one": "{{count}} item deleted.",
+  "deletedMany_other": "{{count}} items deleted."
 }

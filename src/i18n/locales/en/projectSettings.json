@@ -10,7 +10,7 @@
     },
     "danger": {
       "label": "Export, duplication and deletion",
-      "description": "Export as .ganix, duplicate or permanently delete the project."
+      "description": "Export as .ganix, duplicate or move the project to the trash."
     },
     "characters": {
       "label": "Characters",
@@ -59,7 +59,7 @@
     "duplicated": "The copy “{{name}}” has been created. You'll find it on the dashboard.",
     "duplicateFailed": "Unable to duplicate the project.",
     "deleteTitle": "Delete project",
-    "deleteDescription": "Deletion is permanent and cannot be undone.",
+    "deleteDescription": "The project goes to the dashboard trash. You can restore it there for 30 days; after that it is permanently deleted.",
     "deleteFailed": "Unable to delete the project.",
     "exportTitle": "Export project",
     "exportDescription": "Downloads the whole project as a “project name.ganix” file, to import from the GANIS dashboard (on this computer or another).",

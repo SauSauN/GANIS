@@ -1,9 +1,10 @@
 import { useEffect } from "react";
 import { create } from "zustand";
 import i18n from "@/i18n";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import { normalizePlot, type PlotData, type PlotSelection } from "@/lib/plot";
 import { toast } from "@/stores/toastStore";
+import { errorText } from "@/lib/errors";
 
 /*
  * Trame du projet ouvert (voir `lib/plot.ts`).
@@ -61,7 +62,7 @@ async function send(projectId: string, data: PlotData) {
   try {
     await api.updatePlot(projectId, JSON.stringify(data));
   } catch (error) {
-    toast({ message: error instanceof ApiError ? error.message : String(error), tone: "error" });
+    toast({ message: errorText(error, "errors:load.plot"), tone: "error" });
     throw error;
   }
 }
@@ -94,7 +95,7 @@ export const usePlotStore = create<PlotState>((set, get) => ({
       set({ data: normalizePlot(raw, mainName()), loading: false });
     } catch (error) {
       if (id !== requestId) return;
-      set({ loading: false, error: error instanceof ApiError ? error.message : String(error) });
+      set({ loading: false, error: errorText(error, "errors:load.plot") });
     }
   },
 

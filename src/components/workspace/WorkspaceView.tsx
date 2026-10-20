@@ -1,11 +1,13 @@
 import { lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
+import { ErrorBoundary } from "@/components/layout/ErrorBoundary";
 import { ProjectSettingsPanel } from "@/components/project-settings/ProjectSettingsPanel";
 import type { ProjectSettingsId } from "@/components/project-settings/sections";
 import {
   HOME_TAB,
   NOVEL_FEATURES,
+  MANGA_FEATURES,
   SETTINGS_PREFIX,
   findFeature,
 } from "@/components/workspace/modules";
@@ -48,6 +50,9 @@ const ManuscriptView = lazy(() => import("@/components/novel/ManuscriptView").th
 const ProgressView = lazy(() => import("@/components/novel/ProgressView").then((module) => ({ default: module.ProgressView })));
 const ReplaceView = lazy(() => import("@/components/novel/ReplaceView").then((module) => ({ default: module.ReplaceView })));
 const ImportView = lazy(() => import("@/components/novel/ImportView").then((module) => ({ default: module.ImportView })));
+const ScriptReadView = lazy(() => import("@/components/manga/ScriptReadView").then((module) => ({ default: module.ScriptReadView })));
+const ScriptProgressView = lazy(() => import("@/components/manga/ScriptProgressView").then((module) => ({ default: module.ScriptProgressView })));
+const ContinuityView = lazy(() => import("@/components/manga/ContinuityView").then((module) => ({ default: module.ContinuityView })));
 const EditorialView = lazy(() => import("@/components/novel/EditorialView").then((module) => ({ default: module.EditorialView })));
 
 interface WorkspaceViewProps {
@@ -76,7 +81,10 @@ export function WorkspaceView(props: WorkspaceViewProps) {
         </main>
       }
     >
-      <WorkspaceContent {...props} />
+      {/* Un onglet qui plante n'emporte pas le reste de l'espace de travail. */}
+      <ErrorBoundary scope="tab">
+        <WorkspaceContent {...props} />
+      </ErrorBoundary>
     </Suspense>
   );
 }
@@ -167,6 +175,25 @@ function WorkspaceContent({
 
   if (tabId === "manuscript.editorial") {
     return <EditorialView project={project} feature={feature} />;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Manga / BD (réservé aux projets de manga ; l'onglet se ferme sinon)
+  // ---------------------------------------------------------------------------
+  if (MANGA_FEATURES.has(tabId) && project.type !== "manga") {
+    return null;
+  }
+
+  if (tabId === "script.read") {
+    return <ScriptReadView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "script.progress") {
+    return <ScriptProgressView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "script.continuity") {
+    return <ContinuityView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
   if (tabId === "plot.board") {

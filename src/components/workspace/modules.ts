@@ -28,6 +28,9 @@ import {
   type LucideIcon,
   Replace,
   FileUp,
+  Clapperboard,
+  ScrollText,
+  Route,
 } from "lucide-react";
 import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/sections";
 import i18n from "@/i18n";
@@ -63,6 +66,7 @@ export type ModuleId =
   | "plot"
   | "notes"
   | "manuscript"
+  | "script"
   | "search"
   | "settings";
 
@@ -114,7 +118,10 @@ type FeatureId =
   | "manuscript.progress"
   | "manuscript.replace"
   | "manuscript.import"
-  | "manuscript.editorial";
+  | "manuscript.editorial"
+  | "script.read"
+  | "script.progress"
+  | "script.continuity";
 
 /** Modules qui ont une liste (et donc un message de liste vide). */
 type ListModuleId = "characters" | "locations" | "notes";
@@ -219,13 +226,28 @@ export const NOVEL_MODULE: WorkspaceModule = defineModule("manuscript", BookText
 export const NOVEL_FEATURES = new Set(NOVEL_MODULE.features.map((feature) => feature.id));
 
 /**
- * Modules de la barre de gauche pour un type de projet : le module
- * Manuscrit s'ajoute, après la Trame, pour un roman.
+ * Scénario : outils du manga / de la BD (lecture et export du scénario,
+ * suivi, continuité). Proposé seulement aux projets de manga.
+ */
+export const MANGA_MODULE: WorkspaceModule = defineModule("script", Clapperboard, [
+  defineFeature("script.read", ScrollText),
+  defineFeature("script.progress", Target),
+  defineFeature("script.continuity", Route),
+]);
+
+/** Fonctionnalités réservées aux mangas / BD. */
+export const MANGA_FEATURES = new Set(MANGA_MODULE.features.map((feature) => feature.id));
+
+/**
+ * Modules de la barre de gauche pour un type de projet : après la Trame,
+ * le module Manuscrit s'ajoute pour un roman, le module Scénario pour un
+ * manga ou une BD.
  */
 export function modulesFor(projectType: string | null | undefined): WorkspaceModule[] {
-  if (projectType !== "novel") return WORKSPACE_MODULES;
+  const extra = projectType === "novel" ? NOVEL_MODULE : projectType === "manga" ? MANGA_MODULE : null;
+  if (!extra) return WORKSPACE_MODULES;
   const index = WORKSPACE_MODULES.findIndex((module) => module.id === "plot");
-  return [...WORKSPACE_MODULES.slice(0, index + 1), NOVEL_MODULE, ...WORKSPACE_MODULES.slice(index + 1)];
+  return [...WORKSPACE_MODULES.slice(0, index + 1), extra, ...WORKSPACE_MODULES.slice(index + 1)];
 }
 
 /** Paramètres du projet : module affiché en bas de la barre de gauche. */
@@ -251,6 +273,7 @@ export const SETTINGS_MODULE: WorkspaceModule = {
 const ALL_MODULES: WorkspaceModule[] = [
   ...WORKSPACE_MODULES,
   NOVEL_MODULE,
+  MANGA_MODULE,
   SETTINGS_MODULE,
 ];
 

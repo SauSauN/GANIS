@@ -25,5 +25,28 @@
     "removeBody": "The image will be deleted from the project. It doesn't go to the trash: to get it back, you'll have to add it again.",
     "removeConfirm": "Remove image"
   },
-  "loading": "Loading…"
+  "loading": "Loading…",
+  "crash": {
+    "title": {
+      "app": "A display problem occurred",
+      "tab": "This tab could not be displayed"
+    },
+    "description": "Your saved data is untouched. Try again; if the problem comes back, reload GANIS (pending changes are saved first).",
+    "retry": "Try again",
+    "reload": "Save and reload GANIS",
+    "reloading": "Reloading…",
+    "details": "Technical details (to report the problem)"
+  },
+  "dialog": {
+    "discardQuestion": "Discard what you typed?",
+    "keepEditing": "Keep editing",
+    "discard": "Discard"
+  },
+  "selection": {
+    "label": "Multiple selection",
+    "all": "Select all",
+    "count_one": "{{count}} item selected",
+    "count_other": "{{count}} items selected",
+    "clear": "Clear selection"
+  }
 }

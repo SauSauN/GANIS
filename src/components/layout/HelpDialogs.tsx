@@ -76,7 +76,7 @@ function GuideDialog({ open, onClose }: { open: boolean; onClose: () => void }) 
   const pointList = Array.isArray(points) ? (points as string[]) : [];
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-xl">
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-xl" guardInput={false}>
       <DialogHeader>
         <p className="text-xs font-medium text-primary">
           {t("guide.progress", { current: step + 1, total: STEPS.length })}
@@ -203,7 +203,7 @@ function ShortcutsDialog({ open, onClose }: { open: boolean; onClose: () => void
   ];
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-6xl">
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-6xl" guardInput={false}>
       <div className="flex items-start justify-between gap-4">
         <DialogHeader>
           <DialogTitle>{t("shortcuts.title")}</DialogTitle>
@@ -261,7 +261,7 @@ function AboutDialog({ open, onClose }: { open: boolean; onClose: () => void }) 
   }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-md">
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-md" guardInput={false}>
       <div className="flex flex-col items-center gap-3 text-center">
         <img src={ganisLogo} alt="" aria-hidden="true" className="size-16 object-contain" />
         <DialogTitle>GANIS</DialogTitle>
@@ -328,7 +328,7 @@ function HelpCenterDialog({ open, onClose }: { open: boolean; onClose: () => voi
   const content = current ? contentOf(current) : null;
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="flex h-[min(46rem,calc(100vh-2rem))] max-w-5xl flex-col p-0">
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="flex h-[min(46rem,calc(100vh-2rem))] max-w-5xl flex-col p-0" guardInput={false}>
       <div className="flex items-start justify-between gap-4 border-b px-6 py-4">
         <div>
           <DialogTitle className="flex items-center gap-2">

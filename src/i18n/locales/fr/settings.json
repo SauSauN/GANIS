@@ -66,6 +66,18 @@
       "currentRequired": "Le mot de passe actuel est requis.",
       "failed": "Impossible de créer une nouvelle clé.",
       "done": "Nouvelle clé de récupération enregistrée."
+    },
+    "delete": {
+      "title": "Supprimer mon compte",
+      "description": "Efface définitivement votre compte, vos projets privés (corbeille comprise) et toutes leurs données. Les projets publics restent.",
+      "exportFirst": "Pensez à exporter d'abord en .ganix les projets que vous voulez garder : après la suppression, rien ne peut être récupéré.",
+      "password": "Mot de passe actuel",
+      "understand": "Je comprends que mon compte et mes projets privés seront supprimés définitivement.",
+      "submit": "Supprimer mon compte",
+      "submitting": "Suppression…",
+      "passwordRequired": "Saisissez votre mot de passe pour confirmer.",
+      "confirmRequired": "Cochez la case pour confirmer.",
+      "failed": "Impossible de supprimer le compte."
     }
   },
   "appearance": {
@@ -200,5 +212,21 @@
       "dot": "Un point à la place de la croix signale un onglet non enregistré.",
       "ask": "Avant de fermer un tel onglet, de quitter la page ou de fermer GANIS, une question vous propose d'enregistrer, de ne pas enregistrer ou d'annuler."
     }
+  },
+  "lock": {
+    "settingTitle": "Verrouillage automatique",
+    "settingDescription": "Après ce délai sans activité, GANIS efface la clé de votre compte de la mémoire et demande votre mot de passe pour reprendre. Vos onglets et saisies restent en place. Réglage propre à cet ordinateur.",
+    "delayLabel": "Verrouiller après",
+    "never": "Jamais",
+    "after_one": "{{count}} minute d'inactivité",
+    "after_other": "{{count}} minutes d'inactivité",
+    "title": "GANIS est verrouillé",
+    "description": "Saisissez le mot de passe de {{name}} pour reprendre.",
+    "password": "Mot de passe",
+    "unlock": "Déverrouiller",
+    "unlocking": "Déverrouillage…",
+    "signOut": "Se déconnecter",
+    "passwordRequired": "Saisissez votre mot de passe.",
+    "failed": "Déverrouillage impossible."
   }
 }

@@ -207,7 +207,11 @@ pub async fn duplicate_project(
     Ok(copy)
 }
 
-/// Supprime un projet accessible, ainsi que ses données.
+/// Place un projet accessible dans la corbeille.
+///
+/// Le projet quitte le tableau de bord mais garde ses données : il peut
+/// être restauré pendant 30 jours (`restore_project`). Ensuite, ou par
+/// « Supprimer définitivement » (`purge_project`), il est effacé.
 #[tauri::command]
 pub async fn delete_project(
     state: State<'_, AppState>,
@@ -215,9 +219,70 @@ pub async fn delete_project(
 ) -> AppResult<()> {
     let viewer = state.viewer().await;
 
-    project_service::delete_for_viewer(&state.app_db, &project_id, &viewer).await?;
+    project_service::trash_for_viewer(&state.app_db, &project_id, &viewer).await?;
+
+    // La base n'est plus ouverte tant que le projet est dans la corbeille.
+    project_storage::close_pool(&state, &project_id).await;
+
+    Ok(())
+}
+
+/// Projets dans la corbeille accessibles au visiteur.
+///
+/// Les projets expirés (plus de 30 jours) sont d'abord effacés.
+#[tauri::command]
+pub async fn list_project_trash(
+    state: State<'_, AppState>,
+) -> AppResult<Vec<Project>> {
+    purge_expired_projects(&state).await;
+
+    let viewer = state.viewer().await;
+
+    project_service::list_trash_for_viewer(&state.app_db, &viewer).await
+}
+
+/// Sort un projet de la corbeille.
+#[tauri::command]
+pub async fn restore_project(
+    state: State<'_, AppState>,
+    project_id: String,
+) -> AppResult<Project> {
+    let viewer = state.viewer().await;
+
+    project_service::restore_for_viewer(&state.app_db, &project_id, &viewer).await
+}
+
+/// Supprime définitivement un projet de la corbeille, avec ses données.
+#[tauri::command]
+pub async fn purge_project(
+    state: State<'_, AppState>,
+    project_id: String,
+) -> AppResult<()> {
+    let viewer = state.viewer().await;
+
+    project_service::purge_for_viewer(&state.app_db, &project_id, &viewer).await?;
 
     project_storage::delete_storage(&state, &project_id).await;
 
     Ok(())
+}
+
+/// Efface les projets restés plus de 30 jours dans la corbeille, et leurs
+/// dossiers. Appelé au démarrage et à l'ouverture de la corbeille ; une
+/// erreur est journalisée sans bloquer l'application.
+pub async fn purge_expired_projects(state: &AppState) {
+    let cutoff = project_service::trash_cutoff(chrono::Utc::now());
+
+    match project_service::purge_expired(&state.app_db, &cutoff).await {
+        Ok(ids) => {
+            for id in &ids {
+                project_storage::delete_storage(state, id).await;
+            }
+
+            if !ids.is_empty() {
+                tracing::info!(count = ids.len(), "Projets expirés supprimés de la corbeille");
+            }
+        }
+        Err(error) => tracing::error!(error = %error, "Purge de la corbeille des projets impossible"),
+    }
 }

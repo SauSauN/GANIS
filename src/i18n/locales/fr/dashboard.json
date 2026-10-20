@@ -10,7 +10,8 @@
   "filters": {
     "all": "Projets actifs",
     "favorites": "Favoris",
-    "archived": "Archivés"
+    "archived": "Archivés",
+    "trash": "Corbeille"
   },
   "recent": "Récemment ouverts",
   "list": {
@@ -18,7 +19,8 @@
       "search": "Résultats de recherche",
       "all": "Tous les projets",
       "favorites": "Favoris",
-      "archived": "Projets archivés"
+      "archived": "Projets archivés",
+      "trash": "Corbeille"
     },
     "collapse": "Fermer la liste des projets",
     "expand": "Afficher la liste des projets",
@@ -41,18 +43,25 @@
       "title": "Aucun projet archivé",
       "description": "Les projets que vous archivez apparaissent ici."
     },
-    "createFirst": "Créer mon premier projet"
+    "createFirst": "Créer mon premier projet",
+    "trash": {
+      "title": "La corbeille est vide",
+      "description": "Les projets supprimés restent ici 30 jours avant d'être effacés définitivement."
+    }
   },
   "errors": {
     "actionFailed": "L'opération a échoué.",
     "openFailed": "Impossible d'ouvrir le projet.",
-    "deleteFailed": "Suppression du projet impossible."
+    "deleteFailed": "Suppression du projet impossible.",
+    "restoreFailed": "Restauration impossible."
   },
   "delete": {
-    "title": "Supprimer ce projet ?",
-    "description": "Le projet « {{name}} » sera supprimé définitivement. Cette action est irréversible.",
-    "confirm": "Supprimer",
-    "deleting": "Suppression…"
+    "title": "Mettre ce projet à la corbeille ?",
+    "description": "Le projet « {{name}} » quitte la liste. Vous pourrez le restaurer depuis la corbeille pendant 30 jours ; ensuite, il sera supprimé définitivement.",
+    "confirm": "Mettre à la corbeille",
+    "deleting": "Suppression…",
+    "done": "« {{name}} » est dans la corbeille.",
+    "undo": "Annuler"
   },
   "guest": {
     "title": "Bienvenue"
@@ -60,5 +69,31 @@
   "space": {
     "private": "Espace privé",
     "public": "Espace public"
+  },
+  "trash": {
+    "intro": "Les projets restent 30 jours dans la corbeille, puis sont supprimés définitivement avec toutes leurs données.",
+    "deletedOn": "Supprimé le {{date}}",
+    "expiresIn_one": "Suppression définitive dans {{count}} jour",
+    "expiresIn_other": "Suppression définitive dans {{count}} jours",
+    "expiresToday": "Suppression définitive aujourd'hui",
+    "select": "Sélectionner « {{name}} »",
+    "restore": "Restaurer",
+    "restoreNamed": "Restaurer « {{name}} »",
+    "restoreSelected": "Restaurer la sélection",
+    "purge": "Supprimer définitivement",
+    "purgeNamed": "Supprimer définitivement « {{name}} »",
+    "purgeSelected": "Supprimer définitivement la sélection",
+    "empty": "Vider la corbeille",
+    "restored_one": "{{count}} projet restauré.",
+    "restored_other": "{{count}} projets restaurés.",
+    "purged_one": "{{count}} projet supprimé définitivement.",
+    "purged_other": "{{count}} projets supprimés définitivement.",
+    "confirm": {
+      "title_one": "Supprimer définitivement ce projet ?",
+      "title_other": "Supprimer définitivement {{count}} projets ?",
+      "description": "Toutes leurs données (fiches, notes, documents, versions) seront effacées. Cette action est irréversible.",
+      "confirm": "Supprimer définitivement"
+    },
+    "loading": "Chargement de la corbeille…"
   }
 }

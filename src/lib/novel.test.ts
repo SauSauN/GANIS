@@ -22,6 +22,7 @@ function node(id: string, parentId: string | null, level: number, position: numb
   return {
     id, parentId, level, title: id, summary: "", position, numbered: true, number: null,
     contentWords: 0, wordGoal: null, writingStatus: null, narrativePerson: null, narrativeTense: null,
+    narrativeGoal: "", pageGoal: null, scriptStatus: null, rhythm: null, pageTurn: false,
     createdAt: date, updatedAt: date, ...extra,
   };
 }

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import "./styles/shadcn-tailwind.css";
 @import "@fontsource-variable/geist";
 
 @custom-variant dark (&:is(.dark *));
@@ -72,9 +72,10 @@
     --muted-foreground: #5D6590;   /* dérivé */
     --accent: #EEEFFD;
     --accent-foreground: #122056;
-    --destructive: #F87171;
-    --success: #34D399;
-    --warning: #FBBF24;
+    /* Couleurs d'état : lisibles en texte (au moins 4,5:1 sur les fonds). */
+    --destructive: #B91C1C;
+    --success: #05704E;
+    --warning: #92400E;
     --border: #E0E2F4;             /* dérivé */
     --input: #E0E2F4;              /* dérivé */
     --ring: #5B65DC;
@@ -112,9 +113,9 @@
     --muted-foreground: #9AA3D6;   /* dérivé */
     --accent: #242A4A;
     --accent-foreground: #EEF0FF;
-    --destructive: #DC2626;
-    --success: #059669;
-    --warning: #D97706;
+    --destructive: #F87171;
+    --success: #34D399;
+    --warning: #FBBF24;
     --border: #2A3157;             /* dérivé */
     --input: #2A3157;              /* dérivé */
     --ring: #7C85F2;

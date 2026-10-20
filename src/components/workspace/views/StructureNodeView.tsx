@@ -3,6 +3,12 @@ import { VersionsButton } from "@/components/history/VersionsDialog";
 import { DocumentsCard } from "@/components/documents/DocumentsCard";
 import { SceneEventsCard } from "@/components/plot/SceneEventsCard";
 import { NovelTextCard, NovelWritingCard } from "@/components/novel/NovelSheetCards";
+import { MangaChapterCard } from "@/components/manga/MangaChapterCard";
+import { PageScriptCard } from "@/components/manga/PageScriptCard";
+import { usePageScript } from "@/components/manga/usePageScript";
+import { isMangaProject, mangaLevels, pagesInOrder } from "@/lib/manga";
+import { notifyMangaScriptChanged } from "@/lib/mangaEvents";
+import { useMangaSettings, useScriptPanelsIf } from "@/stores/mangaStore";
 import { onNovelTextChanged } from "@/lib/novelEvents";
 import { refreshWriting } from "@/stores/writingStore";
 import type { Editor } from "@tiptap/react";
@@ -130,6 +136,14 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   const applyNode = useStructureStore((state) => state.applyNode);
   const levelCount = structure?.levels.length ?? 0;
   const holdsText = novel && node !== null && structure !== null && canHoldText(node, structure.nodes, levelCount);
+  // Manga / BD : une page a ses cases ; un chapitre, son objectif et ses pages.
+  const manga = useProjectStore((state) => isMangaProject(state.projects.find((p) => p.id === projectId)));
+  const mangaLevel = mangaLevels(levelCount);
+  const isMangaPage = manga && node !== null && structure !== null && node.level >= mangaLevel.page;
+  const isMangaChapter = manga && node !== null && structure !== null && node.level === mangaLevel.chapter && mangaLevel.chapter < mangaLevel.page;
+  const script = usePageScript(projectId, nodeId, isMangaPage);
+  const mangaSettings = useMangaSettings(projectId, isMangaPage);
+  const { panels: allPanels } = useScriptPanelsIf(projectId, isMangaChapter);
   const { documents } = useNodeDocuments(projectId, nodeId);
   const hasTextDocuments = (documents ?? []).some((d) => /\.(docx|md|markdown|txt)$/i.test(d.name));
 
@@ -240,17 +254,42 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   }, [base]);
 
   const infoDirty = draft !== null && base !== null && !sameDraft(draft, base);
-  const dirty = infoDirty || textDirty;
+  const dirty = infoDirty || textDirty || script.dirty;
 
   useEffect(() => {
     if (infoDirty) setSaved(false);
   }, [infoDirty]);
 
-  /** Enregistre ce qui a changé : informations et/ou texte (roman). */
+  /** Enregistre ce qui a changé : informations, texte (roman), cases (manga). */
   async function save(): Promise<boolean> {
     const infoOk = infoDirty ? await saveInfo() : true;
     const textOk = textDirty ? await saveText() : true;
-    return infoOk && textOk;
+    const scriptOk = script.dirty ? await saveScript() : true;
+    return infoOk && textOk && scriptOk;
+  }
+
+  async function saveScript(): Promise<boolean> {
+    try {
+      const result = await script.save(node ? headingOf(node).label : "");
+      if (result) applyNode(projectId, result.page);
+      return result !== null;
+    } catch (e) {
+      setError(errorText(e));
+      return false;
+    }
+  }
+
+  /** Déplace une case vers une autre page (la page est d'abord enregistrée). */
+  async function movePanel(index: number, pageId: string) {
+    let panelId = script.draft?.panels[index]?.id;
+    if (script.dirty) {
+      const result = await script.save(node ? headingOf(node).label : "");
+      panelId = result?.panels[index]?.id;
+    }
+    if (!panelId) return;
+    await api.moveMangaPanel(projectId, panelId, pageId);
+    await script.reload();
+    notifyMangaScriptChanged(projectId);
   }
 
   async function saveInfo(): Promise<boolean> {
@@ -289,7 +328,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   useUnsavedChanges({
     dirty,
     save,
-    revision: draft ? `${JSON.stringify(draft)}\u0000${textRevision}` : null,
+    revision: draft ? `${JSON.stringify(draft)}\u0000${textRevision}\u0000${script.signature ?? ""}` : null,
   });
 
   function onSubmit(event: FormEvent) {
@@ -504,6 +543,22 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             SECTIONS
             ================================================================ */}
         <div className="min-w-0 space-y-6">
+          {/* Manga : les cases de la page d'abord (c'est là qu'on écrit) */}
+          {isMangaPage && structure && (
+            <PageScriptCard
+              draft={script.draft}
+              failed={script.failed}
+              onChange={(update) => script.setDraft((current) => (current ? update(current) : current))}
+              characters={characters}
+              locations={locations}
+              settings={mangaSettings}
+              otherPages={pagesInOrder(structure.nodes, levelCount)
+                .filter((entry) => entry.page.id !== nodeId)
+                .map((entry) => ({ id: entry.page.id, label: [entry.chapter ? labelOfNode(entry.chapter.id) : "", labelOfNode(entry.page.id)].filter(Boolean).join(" › ") }))}
+              onMovePanel={movePanel}
+            />
+          )}
+
           {/* Roman : le texte de la scène d'abord (c'est là qu'on écrit) */}
           {holdsText && (
             <NovelTextCard
@@ -613,6 +668,21 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
               </div>
             </form>
           </InfoCard>
+
+          {isMangaChapter && structure && (
+            <MangaChapterCard
+              projectId={projectId}
+              node={node}
+              pages={structure.nodes.filter((n) => n.parentId === node.id && n.level >= mangaLevel.page).length}
+              writtenPages={
+                new Set(
+                  (allPanels ?? [])
+                    .map((p) => p.pageId)
+                    .filter((pageId) => structure.nodes.find((n) => n.id === pageId)?.parentId === node.id),
+                ).size
+              }
+            />
+          )}
 
           {novel && (
             <NovelWritingCard

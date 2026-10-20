@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { useReturnFocus } from "@/lib/useReturnFocus";
 import { BookOpen, CircleHelp, Keyboard, Loader2, Search, type LucideIcon } from "lucide-react";
 import { SearchResults } from "@/components/search/SearchResults";
 import { Dialog, DialogTitle } from "@/components/ui/dialog";
@@ -36,6 +37,7 @@ const fold = (value: string) => value.normalize("NFD").replace(/\p{Diacritic}/gu
  */
 export function CommandPalette({ open, onClose, projectId, onOpenFeature, modules = WORKSPACE_MODULES }: CommandPaletteProps) {
   const { t } = useTranslation(["search", "menus", "modules"]);
+  useReturnFocus(open);
   const showHelp = useHelpStore((state) => state.show);
   const owners = useCommandStore((state) => state.owners);
   const [query, setQuery] = useState("");
@@ -142,7 +144,7 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature, module
   }
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-2xl p-0">
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-2xl p-0" guardInput={false}>
       <DialogTitle className="sr-only">{t("palette.title")}</DialogTitle>
       <div className="flex items-center gap-2 border-b px-4">
         {loading ? <Loader2 className="size-4 animate-spin text-muted-foreground" /> : <Search className="size-4 text-muted-foreground" />}

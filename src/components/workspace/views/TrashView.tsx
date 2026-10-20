@@ -14,13 +14,17 @@ import {
   Trash2,
   UserRound,
   type LucideIcon,
+  LayoutPanelTop,
 } from "lucide-react";
+import { SelectionBar, SelectionCheckbox } from "@/components/common/SelectionBar";
 import { ConfirmDialog } from "@/components/notes/ConfirmDialog";
 import { formatNoteDate } from "@/components/notes/FolderSelect";
 import { Button } from "@/components/ui/button";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { PageShell } from "@/components/workspace/views/PageShell";
-import { restoreFromTrash, trashLabel } from "@/lib/trash";
+import { restoreFromTrash, restoreManyFromTrash, trashLabel } from "@/lib/trash";
+import { useSelection } from "@/lib/useSelection";
+import { cn } from "@/lib/utils";
 import { useTrashStore } from "@/stores/trashStore";
 import type { TrashItem, TrashKind } from "@/types";
 
@@ -36,6 +40,7 @@ const KIND_ICONS: Record<TrashKind, LucideIcon> = {
   sticky: StickyNote,
   relation: Network,
   placeLink: MapPin,
+  mangaPanel: LayoutPanelTop,
 };
 
 interface TrashViewProps {
@@ -61,10 +66,23 @@ export function TrashView({ projectId, feature }: TrashViewProps) {
   const [busy, setBusy] = useState<string | null>(null);
   const [toPurge, setToPurge] = useState<TrashItem | null>(null);
   const [confirmEmpty, setConfirmEmpty] = useState(false);
+  /** Suppression définitive de la sélection, en attente de confirmation. */
+  const [confirmPurgeSelected, setConfirmPurgeSelected] = useState(false);
+  const selection = useSelection(items.map((item) => item.id));
 
   useEffect(() => {
     void fetchTrash(projectId);
   }, [fetchTrash, projectId]);
+
+  async function restoreSelected() {
+    const ids = selection.selected;
+    setBusy("selection");
+    try {
+      selection.drop(await restoreManyFromTrash(projectId, ids));
+    } finally {
+      setBusy(null);
+    }
+  }
 
   async function restore(item: TrashItem) {
     setBusy(item.id);
@@ -106,11 +124,28 @@ export function TrashView({ projectId, feature }: TrashViewProps) {
           {t("view.nothing")}
         </div>
       ) : (
+        <>
+        <SelectionBar selection={selection} disabled={busy !== null} className="mb-3">
+          <Button variant="outline" size="sm" disabled={busy !== null} onClick={() => void restoreSelected()}>
+            <RotateCcw className="mr-1.5 size-3.5" />
+            {busy === "selection" ? t("view.restoring") : t("view.restoreSelected")}
+          </Button>
+          <Button variant="destructive" size="sm" disabled={busy !== null} onClick={() => setConfirmPurgeSelected(true)}>
+            <Trash2 className="mr-1.5 size-3.5" />
+            {t("view.purgeSelected")}
+          </Button>
+        </SelectionBar>
         <ul className="divide-y rounded-xl border bg-card shadow-sm">
           {items.map((item) => {
             const Icon = KIND_ICONS[item.kind] ?? Trash2;
             return (
-              <li key={item.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
+              <li key={item.id} className={cn("flex flex-wrap items-center gap-3 px-4 py-3", selection.isSelected(item.id) && "bg-accent/60")}>
+                <SelectionCheckbox
+                  selection={selection}
+                  id={item.id}
+                  label={t("view.select", { name: trashLabel(item.kind, item.label) })}
+                  disabled={busy !== null}
+                />
                 <span className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-muted">
                   <Icon className="size-4 text-muted-foreground" />
                 </span>
@@ -139,6 +174,7 @@ export function TrashView({ projectId, feature }: TrashViewProps) {
             );
           })}
         </ul>
+        </>
       )}
 
       <ConfirmDialog
@@ -151,6 +187,22 @@ export function TrashView({ projectId, feature }: TrashViewProps) {
           if (!toPurge) return;
           await purge(projectId, toPurge.id);
           setToPurge(null);
+        }}
+      />
+
+      <ConfirmDialog
+        open={confirmPurgeSelected}
+        title={t("view.purgeSelectedTitle", { count: selection.count })}
+        description={t("view.purgeBody")}
+        confirmLabel={t("view.purge")}
+        onCancel={() => setConfirmPurgeSelected(false)}
+        onConfirm={async () => {
+          const ids = selection.selected;
+          for (const id of ids) {
+            await purge(projectId, id);
+          }
+          selection.drop(ids);
+          setConfirmPurgeSelected(false);
         }}
       />
 

@@ -15,7 +15,8 @@
           "Les projets récemment ouverts sont en tête de page.",
           "Étoile : mettez un projet en favori pour le retrouver dans « Favoris ».",
           "Archivez un projet terminé : il quitte la liste principale sans être supprimé.",
-          "La barre de recherche filtre les projets par nom ou description."
+          "La barre de recherche filtre les projets par nom ou description.",
+          "Un projet supprimé va dans la Corbeille du tableau de bord : il peut y être restauré pendant 30 jours, puis il est supprimé définitivement."
         ]
       },
       "spaces": {
@@ -382,6 +383,14 @@
         {
           "q": "Une image refuse de s'ajouter.",
           "a": "GANIS accepte PNG, JPEG, WebP et GIF, jusqu'à la taille indiquée. Réenregistrez l'image en JPEG ou réduisez sa taille."
+        },
+        {
+          "q": "J'ai supprimé un projet par erreur.",
+          "a": "Cliquez sur « Annuler » dans le message qui apparaît, ou ouvrez Corbeille sur le tableau de bord puis « Restaurer ». Un projet reste 30 jours dans la corbeille avant d'être supprimé définitivement."
+        },
+        {
+          "q": "Comment verrouiller GANIS quand je m'absente ?",
+          "a": "Paramètres › Compte › Verrouillage automatique : choisissez un délai. Passé ce délai sans activité, votre mot de passe est demandé pour reprendre ; vos onglets restent ouverts."
         }
       ]
     }

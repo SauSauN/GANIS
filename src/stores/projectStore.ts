@@ -1,3 +1,4 @@
+import i18n from "@/i18n";
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
 import { useCharacterStore } from "@/stores/characterStore";
@@ -69,7 +70,17 @@ interface ProjectState {
     visibility: ProjectVisibility,
   ) => Promise<Project>;
 
+  /** Place un projet dans la corbeille (30 jours). */
   deleteProject: (id: string) => Promise<void>;
+
+  /** Projets dans la corbeille (chargés à la demande). */
+  trash: Project[];
+  trashLoading: boolean;
+  fetchTrash: () => Promise<void>;
+  /** Sort des projets de la corbeille ; retourne ceux restaurés. */
+  restoreProjects: (ids: string[]) => Promise<Project[]>;
+  /** Supprime définitivement des projets de la corbeille. */
+  purgeProjects: (ids: string[]) => Promise<void>;
   /** Confirme l'import d'un `.ganix` vérifié et l'ajoute à la liste. */
   importGanix: (stagingId: string, mode: GanixImportMode) => Promise<GanixImportOutcome>;
 
@@ -91,6 +102,8 @@ const initial: Pick<
   | "query"
   | "loading"
   | "error"
+  | "trash"
+  | "trashLoading"
 > = {
   projects: [],
   currentProjectId: null,
@@ -98,6 +111,8 @@ const initial: Pick<
   query: "",
   loading: false,
   error: null,
+  trash: [],
+  trashLoading: false,
 };
 
 /** Message affichable pour une erreur quelconque. */
@@ -162,7 +177,7 @@ export const useProjectStore =
             loading: false,
             error: messageOf(
               error,
-              "Chargement des projets impossible.",
+              i18n.t("errors:load.projects"),
             ),
           });
         }
@@ -191,7 +206,7 @@ export const useProjectStore =
         } catch (error) {
           return fail(
             error,
-            "Création du projet impossible.",
+            i18n.t("errors:load.createProject"),
           );
         }
       },
@@ -232,7 +247,7 @@ export const useProjectStore =
         } catch (error) {
           return fail(
             error,
-            "Mise à jour du projet impossible.",
+            i18n.t("errors:load.updateProject"),
           );
         }
       },
@@ -256,7 +271,7 @@ export const useProjectStore =
         } catch (error) {
           return fail(
             error,
-            "Duplication du projet impossible.",
+            i18n.t("errors:load.duplicateProject"),
           );
         }
       },
@@ -280,7 +295,7 @@ export const useProjectStore =
         } catch (error) {
           return fail(
             error,
-            "Changement de visibilité impossible.",
+            i18n.t("errors:load.visibility"),
           );
         }
       },
@@ -330,14 +345,62 @@ export const useProjectStore =
                 : state.currentProjectId,
             lastProjectId:
               state.lastProjectId === id ? null : state.lastProjectId,
+            // La corbeille sera relue à sa prochaine ouverture.
+            trash: [],
             loading: false,
             error: null,
           }));
         } catch (error) {
           fail(
             error,
-            "Suppression du projet impossible.",
+            i18n.t("errors:load.deleteProject"),
           );
+        }
+      },
+
+      fetchTrash: async () => {
+        set({ trashLoading: true });
+
+        try {
+          const trash = await api.listProjectTrash();
+          set({ trash, trashLoading: false });
+        } catch (error) {
+          set({ trashLoading: false });
+          throw error;
+        }
+      },
+
+      restoreProjects: async (ids) => {
+        const restored: Project[] = [];
+
+        try {
+          for (const id of ids) {
+            restored.push(await api.restoreProject(id));
+          }
+        } finally {
+          const back = new Set(restored.map((project) => project.id));
+
+          set((state) => ({
+            projects: restored.reduce(upsert, state.projects),
+            trash: state.trash.filter((project) => !back.has(project.id)),
+          }));
+        }
+
+        return restored;
+      },
+
+      purgeProjects: async (ids) => {
+        const purged = new Set<string>();
+
+        try {
+          for (const id of ids) {
+            await api.purgeProject(id);
+            purged.add(id);
+          }
+        } finally {
+          set((state) => ({
+            trash: state.trash.filter((project) => !purged.has(project.id)),
+          }));
         }
       },
 
@@ -356,7 +419,7 @@ export const useProjectStore =
         } catch (error) {
           return fail(
             error,
-            "Ouverture du projet impossible.",
+            i18n.t("errors:load.openProject"),
           );
         }
       },

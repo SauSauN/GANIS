@@ -151,9 +151,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
       setBannerError(
         e instanceof PortraitError
           ? t(`characters:portrait.errors.${e.code}`)
-          : e instanceof Error
-            ? e.message
-            : String(e),
+          : errorText(e),
       );
     } finally {
       setBannerBusy(false);
@@ -446,4 +444,3 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
     </PageShell>
   );
 }
-

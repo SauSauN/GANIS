@@ -38,6 +38,7 @@ import enUsermenu from "./locales/en/usermenu.json";
 import enViews from "./locales/en/views.json";
 import enWelcome from "./locales/en/welcome.json";
 import enNovel from "./locales/en/novel.json";
+import enManga from "./locales/en/manga.json";
 import enWorkspace from "./locales/en/workspace.json";
 import enWorkspaceHome from "./locales/en/workspaceHome.json";
 import frActivitybar from "./locales/fr/activitybar.json";
@@ -77,6 +78,7 @@ import frUsermenu from "./locales/fr/usermenu.json";
 import frViews from "./locales/fr/views.json";
 import frWelcome from "./locales/fr/welcome.json";
 import frNovel from "./locales/fr/novel.json";
+import frManga from "./locales/fr/manga.json";
 import frWorkspace from "./locales/fr/workspace.json";
 import frWorkspaceHome from "./locales/fr/workspaceHome.json";
 
@@ -159,6 +161,7 @@ export const resources = {
     views: frViews,
     welcome: frWelcome,
     novel: frNovel,
+    manga: frManga,
     workspace: frWorkspace,
     workspaceHome: frWorkspaceHome,
   },
@@ -200,6 +203,7 @@ export const resources = {
     views: enViews,
     welcome: enWelcome,
     novel: enNovel,
+    manga: enManga,
     workspace: enWorkspace,
     workspaceHome: enWorkspaceHome,
   },
@@ -232,7 +236,8 @@ function getSavedLanguage(): Language {
 
 function applyLanguage(language: string) {
   // Lecteurs d'écran, césure et correcteur orthographique s'appuient dessus.
-  document.documentElement.lang = language;
+  // (Absent hors navigateur : tests de logique pure.)
+  if (typeof document !== "undefined") document.documentElement.lang = language;
 
   try {
     localStorage.setItem(LANGUAGE_KEY, language);
@@ -289,6 +294,7 @@ void i18n.use(initReactI18next).init({
     "views",
     "welcome",
     "novel",
+    "manga",
     "workspace",
     "workspaceHome",
   ],

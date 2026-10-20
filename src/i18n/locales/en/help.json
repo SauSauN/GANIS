@@ -15,7 +15,8 @@
           "Recently opened projects are at the top of the page.",
           "Star a project to find it under “Favorites”.",
           "Archive a finished project: it leaves the main list without being deleted.",
-          "The search bar filters projects by name or description."
+          "The search bar filters projects by name or description.",
+          "A deleted project goes to the dashboard Trash: it can be restored there for 30 days, then it is permanently deleted."
         ]
       },
       "spaces": {
@@ -382,6 +383,14 @@
         {
           "q": "An image won't add.",
           "a": "GANIS accepts PNG, JPEG, WebP and GIF, up to the size shown. Save the image again as JPEG or make it smaller."
+        },
+        {
+          "q": "I deleted a project by mistake.",
+          "a": "Click “Undo” in the message that appears, or open Trash on the dashboard and choose “Restore”. A project stays in the trash for 30 days before being permanently deleted."
+        },
+        {
+          "q": "How do I lock GANIS when I step away?",
+          "a": "Settings › Account › Automatic lock: choose a delay. After that time without activity, your password is required to resume; your tabs stay open."
         }
       ]
     }

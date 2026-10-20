@@ -49,6 +49,7 @@ import {
   type ProjectStatus,
   type ProjectType,
 } from "@/types";
+import { errorText } from "@/lib/errors";
 
 // Les libellés français de `@/types` ne servent plus qu'à lister les valeurs ;
 // le texte affiché vient de `projects.json` (types.* et statuses.*).
@@ -586,9 +587,7 @@ function DangerSection({ project }: { project: Project }) {
       }
     } catch (e) {
       setExportFeedback(
-        e instanceof Error
-          ? { kind: "error", text: e.message }
-          : { kind: "error", text: t("projects:ganix.export.failed") },
+        { kind: "error", text: errorText(e, "projects:ganix.export.failed") },
       );
     } finally {
       setExporting(false);

@@ -266,6 +266,19 @@ pub struct StructureNode {
     pub narrative_person: Option<String>,
     /// Temps verbal de la narration (roman) : present, past, future.
     pub narrative_tense: Option<String>,
+    /// Objectif narratif d'un chapitre (manga).
+    pub narrative_goal: String,
+    /// Nombre de pages visé pour un chapitre (manga) ; `None` : aucun.
+    pub page_goal: Option<i64>,
+    /// Statut du scénario d'un chapitre (manga) : todo, progress, review,
+    /// final ; `None` : à préparer.
+    pub script_status: Option<String>,
+    /// Fonction narrative d'une page (manga) : action, reveal, pause,
+    /// transition, suspense.
+    pub rhythm: Option<String>,
+    /// Vrai : la révélation de cette page doit tomber après le tourné de
+    /// page (manga).
+    pub page_turn: bool,
     pub created_at: String,
     pub updated_at: String,
 }
@@ -352,7 +365,8 @@ fn check_level(level: i64, count: usize) -> AppResult<()> {
 // ----------------------------------------------------------------------------
 
 const NODE_COLUMNS: &str = "id, parent_id, level, title, summary, position, numbered, number, \
-     content_words, word_goal, writing_status, narrative_person, narrative_tense, created_at, updated_at";
+     content_words, word_goal, writing_status, narrative_person, narrative_tense, \
+     narrative_goal, page_goal, script_status, rhythm, page_turn, created_at, updated_at";
 
 pub(crate) async fn find_node(pool: &SqlitePool, id: &str) -> AppResult<Option<StructureNode>> {
     let sql = format!("SELECT {NODE_COLUMNS} FROM structure_nodes WHERE id = ?");

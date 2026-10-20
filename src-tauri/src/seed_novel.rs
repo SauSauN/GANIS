@@ -83,7 +83,7 @@ const IDENTIFIER: &str = "app.ganis.studio";
 
 /// Dossier de données de GANIS : `GANIS_DATA_DIR`, sinon celui que Tauri
 /// utilise sur ce système.
-fn data_dir() -> PathBuf {
+pub(crate) fn data_dir() -> PathBuf {
     if let Ok(dir) = std::env::var("GANIS_DATA_DIR") {
         return PathBuf::from(dir);
     }
@@ -102,15 +102,15 @@ fn data_dir() -> PathBuf {
 // Petits outils
 // ----------------------------------------------------------------------------
 
-fn s(value: &str) -> String {
+pub(crate) fn s(value: &str) -> String {
     value.to_owned()
 }
 
-fn fields(pairs: &[(&str, &str)]) -> BTreeMap<String, String> {
+pub(crate) fn fields(pairs: &[(&str, &str)]) -> BTreeMap<String, String> {
     pairs.iter().map(|(k, v)| (k.to_string(), v.to_string())).collect()
 }
 
-fn tags(values: &[&str]) -> String {
+pub(crate) fn tags(values: &[&str]) -> String {
     serde_json::to_string(values).unwrap()
 }
 
@@ -137,7 +137,7 @@ fn adler32(data: &[u8]) -> u32 {
 }
 
 /// Image PNG (RVB) d'après une fonction de couleur, compressée « stockée ».
-fn png(width: u32, height: u32, pixel: impl Fn(u32, u32) -> [u8; 3]) -> Vec<u8> {
+pub(crate) fn png(width: u32, height: u32, pixel: impl Fn(u32, u32) -> [u8; 3]) -> Vec<u8> {
     let mut raw = Vec::with_capacity(((width * 3 + 1) * height) as usize);
     for y in 0..height {
         raw.push(0);
@@ -174,7 +174,7 @@ fn png(width: u32, height: u32, pixel: impl Fn(u32, u32) -> [u8; 3]) -> Vec<u8> 
 }
 
 /// Portrait stylisé : fond dégradé, tête et épaules de la couleur donnée.
-fn portrait(background: [u8; 3], figure: [u8; 3]) -> String {
+pub(crate) fn portrait(background: [u8; 3], figure: [u8; 3]) -> String {
     let size = 160;
     let bytes = png(size, size, |x, y| {
         let (fx, fy) = (x as f32, y as f32);
@@ -195,7 +195,7 @@ fn portrait(background: [u8; 3], figure: [u8; 3]) -> String {
 }
 
 /// Paysage stylisé (ciel, horizon, brume) pour les lieux et la galerie.
-fn landscape(sky: [u8; 3], ground: [u8; 3], width: u32, height: u32) -> Vec<u8> {
+pub(crate) fn landscape(sky: [u8; 3], ground: [u8; 3], width: u32, height: u32) -> Vec<u8> {
     png(width, height, |x, y| {
         let horizon = height as f32 * 0.62 + (x as f32 / 11.0).sin() * 6.0;
         if (y as f32) < horizon {
@@ -214,7 +214,7 @@ fn landscape(sky: [u8; 3], ground: [u8; 3], width: u32, height: u32) -> Vec<u8> 
 // --- Document Word minimal (.docx) ------------------------------------------
 
 /// Fichier Word lisible par Word, LibreOffice et l'aperçu de GANIS.
-fn docx(paragraphs: &[&str]) -> Vec<u8> {
+pub(crate) fn docx(paragraphs: &[&str]) -> Vec<u8> {
     let escape = |text: &str| text.replace('&', "&amp;").replace('<', "&lt;").replace('>', "&gt;");
     let body: String = paragraphs
         .iter()
@@ -245,34 +245,34 @@ fn docx(paragraphs: &[&str]) -> Vec<u8> {
 
 // --- Notes (document de l'éditeur, en JSON) ----------------------------------
 
-fn text(value: &str) -> Value {
+pub(crate) fn text(value: &str) -> Value {
     json!({ "type": "text", "text": value })
 }
-fn italic(value: &str) -> Value {
+pub(crate) fn italic(value: &str) -> Value {
     json!({ "type": "text", "text": value, "marks": [{ "type": "italic" }] })
 }
-fn bold(value: &str) -> Value {
+pub(crate) fn bold(value: &str) -> Value {
     json!({ "type": "text", "text": value, "marks": [{ "type": "bold" }] })
 }
-fn mention(kind: &str, id: &str, label: &str) -> Value {
+pub(crate) fn mention(kind: &str, id: &str, label: &str) -> Value {
     json!({ "type": "entityMention", "attrs": { "kind": kind, "id": id, "label": label } })
 }
-fn para(content: Vec<Value>) -> Value {
+pub(crate) fn para(content: Vec<Value>) -> Value {
     json!({ "type": "paragraph", "content": content })
 }
-fn heading(level: u8, value: &str) -> Value {
+pub(crate) fn heading(level: u8, value: &str) -> Value {
     json!({ "type": "heading", "attrs": { "level": level }, "content": [text(value)] })
 }
-fn bullets(items: &[&str]) -> Value {
+pub(crate) fn bullets(items: &[&str]) -> Value {
     json!({ "type": "bulletList", "content": items.iter().map(|i| json!({ "type": "listItem", "content": [para(vec![text(i)])] })).collect::<Vec<_>>() })
 }
-fn numbered(items: &[&str]) -> Value {
+pub(crate) fn numbered(items: &[&str]) -> Value {
     json!({ "type": "orderedList", "content": items.iter().map(|i| json!({ "type": "listItem", "content": [para(vec![text(i)])] })).collect::<Vec<_>>() })
 }
-fn quote(value: &str) -> Value {
+pub(crate) fn quote(value: &str) -> Value {
     json!({ "type": "blockquote", "content": [para(vec![italic(value)])] })
 }
-fn doc(content: Vec<Value>) -> String {
+pub(crate) fn doc(content: Vec<Value>) -> String {
     json!({ "type": "doc", "content": content }).to_string()
 }
 
@@ -281,7 +281,7 @@ fn mention_html(kind: &str, id: &str, label: &str) -> String {
     format!(r#"<span data-mention="" data-kind="{kind}" data-id="{id}" data-label="{label}">{label}</span>"#)
 }
 
-async fn note(pool: &SqlitePool, folder: Option<&str>, title: &str, content: String, excerpt: &str, pinned: bool) -> String {
+pub(crate) async fn note(pool: &SqlitePool, folder: Option<&str>, title: &str, content: String, excerpt: &str, pinned: bool) -> String {
     let created = notes::create_note(pool, folder, title).await.unwrap();
     notes::update_note(
         pool,

@@ -55,6 +55,11 @@ import type {
   ExternalSync,
   StructureNode,
   Editorial,
+  MangaChapterFields,
+  MangaSettings,
+  PageScript,
+  PageScriptInput,
+  Panel,
   FindOptions,
   FindResult,
   ImportNode,
@@ -246,21 +251,27 @@ function normalize(e: unknown): ApiError {
 
     console.error("Erreur Tauri :", e);
 
-    return new ApiError("INTERNAL", e);
+    return unexpected();
   }
 
   if (e instanceof Error) {
     console.error("Erreur Tauri :", e);
 
-    return new ApiError("INTERNAL", e.message);
+    return unexpected();
   }
 
   console.error("Erreur Tauri inconnue :", e);
 
-  return new ApiError(
-    "INTERNAL",
-    "Une erreur inattendue est survenue.",
-  );
+  return unexpected();
+}
+
+/**
+ * Erreur sans message exploitable (texte brut de Tauri, exception) : le
+ * détail technique reste dans la console, l'utilisateur lit un message
+ * clair dans sa langue.
+ */
+function unexpected(): ApiError {
+  return new ApiError("INTERNAL", i18n.t("errors:unexpected"));
 }
 
 /**
@@ -446,6 +457,13 @@ export const api = {
     newPassword: string;
   }) => call<void>("change_password", { input }),
 
+  /**
+   * Supprime le compte connecté (mot de passe demandé), avec ses projets
+   * privés. La session est fermée.
+   */
+  deleteAccount: (password: string) =>
+    call<void>("delete_account", { input: { password } }),
+
   // Commande de diagnostic désactivée côté Rust (mise en commentaire
   // dans src-tauri/src/lib.rs). À décommenter en même temps qu'elle.
   // /**
@@ -527,10 +545,27 @@ export const api = {
     call<Project>("duplicate_project", { projectId }),
 
   /**
-   * Supprime définitivement un projet.
+   * Place un projet dans la corbeille (restaurable pendant 30 jours).
    */
   deleteProject: (projectId: string) =>
     call<void>("delete_project", { projectId }),
+
+  /**
+   * Projets dans la corbeille (les projets expirés sont d'abord effacés).
+   */
+  listProjectTrash: () => call<Project[]>("list_project_trash"),
+
+  /**
+   * Sort un projet de la corbeille.
+   */
+  restoreProject: (projectId: string) =>
+    call<Project>("restore_project", { projectId }),
+
+  /**
+   * Supprime définitivement un projet de la corbeille.
+   */
+  purgeProject: (projectId: string) =>
+    call<void>("purge_project", { projectId }),
 
   // -------------------------------------------------------------------------
   // Format .ganix
@@ -631,6 +666,31 @@ export const api = {
 
   /** Ajoute un manuscrit découpé à la fin du plan. */
   importManuscript: (projectId: string, plan: ImportNode[]) => call<ImportResult>("import_manuscript", { projectId, plan }),
+
+  // --------------------------------------------------------------------------
+  // Manga / BD : scénario par page et par case
+  // --------------------------------------------------------------------------
+
+  /** Scénario d'une page : fonction narrative et cases. */
+  getPageScript: (projectId: string, pageId: string) => call<PageScript>("get_page_script", { projectId, pageId }),
+
+  /** Enregistre le scénario d'une page d'un bloc (cases retirées : corbeille). */
+  savePageScript: (projectId: string, pageId: string, input: PageScriptInput) =>
+    call<PageScript>("save_page_script", { projectId, pageId, input }),
+
+  /** Toutes les cases du projet. */
+  getScriptPanels: (projectId: string) => call<Panel[]>("get_script_panels", { projectId }),
+
+  /** Déplace une case à la fin d'une autre page. */
+  moveMangaPanel: (projectId: string, panelId: string, pageId: string) => call<void>("move_manga_panel", { projectId, panelId, pageId }),
+
+  /** Objectif narratif, pages visées et statut d'un chapitre. */
+  setMangaChapter: (projectId: string, nodeId: string, fields: MangaChapterFields) =>
+    call<StructureNode>("set_manga_chapter", { projectId, nodeId, fields }),
+
+  getMangaSettings: (projectId: string) => call<MangaSettings>("get_manga_settings", { projectId }),
+
+  setMangaSettings: (projectId: string, settings: MangaSettings) => call<MangaSettings>("set_manga_settings", { projectId, settings }),
 
   getEditorial: (projectId: string) => call<Editorial>("get_editorial", { projectId }),
 

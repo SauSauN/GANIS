@@ -18,6 +18,7 @@ import {
   Trash2,
   Upload,
 } from "lucide-react";
+import { SelectionBar, SelectionCheckbox } from "@/components/common/SelectionBar";
 import { ActionMenu, type MenuItem } from "@/components/documents/ActionMenu";
 import { DocumentIcon } from "@/components/documents/DocumentIcon";
 import { DocumentVersionsDialog } from "@/components/documents/DocumentVersionsDialog";
@@ -42,7 +43,8 @@ import {
   useDocumentStore,
   useNodeDocuments,
 } from "@/lib/documents";
-import { announceDeletion } from "@/lib/trash";
+import { announceDeletion, announceDeletions } from "@/lib/trash";
+import { useSelection } from "@/lib/useSelection";
 import { cn } from "@/lib/utils";
 import { toast } from "@/stores/toastStore";
 import type { StructureDocument } from "@/types";
@@ -89,6 +91,7 @@ export function DocumentsCard({ projectId, nodeId, name, nodeOptions }: Document
   const listRef = useRef<HTMLUListElement>(null);
 
   const list = documents ?? [];
+  const selection = useSelection(list.map((document) => document.id));
   const pages = readingPages(list);
   const openHere = list.filter((document) => external[document.id]);
 
@@ -198,6 +201,48 @@ export function DocumentsCard({ projectId, nodeId, name, nodeOptions }: Document
       removeDocument(projectId, document.id);
       announceDeletion(projectId, trashId, "document", document.name);
     });
+
+  /** Sélection multiple : documents mis à la corbeille ensemble (un seul « Annuler »). */
+  async function removeSelected() {
+    const chosen = list.filter((document) => selection.isSelected(document.id));
+    const trashIds: string[] = [];
+    setBusy(t("selection.deleting", { count: chosen.length }));
+    try {
+      for (const document of chosen) {
+        if (external[document.id]) await finishExternal(projectId, document.id);
+        trashIds.push(await api.deleteStructureDocument(projectId, document.id));
+        removeDocument(projectId, document.id);
+      }
+    } catch (error) {
+      toast({ message: errorText(error), tone: "error" });
+    } finally {
+      announceDeletions(projectId, trashIds);
+      selection.clear();
+      setBusy(null);
+    }
+  }
+
+  /** Sélection multiple : documents déplacés vers un autre élément du découpage. */
+  async function moveSelected(target: string) {
+    const chosen = list.filter((document) => selection.isSelected(document.id));
+    let moved = 0;
+    setBusy(t("selection.moving", { count: chosen.length }));
+    try {
+      for (const document of chosen) {
+        const updated = await api.moveStructureDocument(projectId, document.id, target);
+        removeDocument(projectId, document.id);
+        upsert(projectId, updated);
+        moved++;
+      }
+      const label = nodeOptions.find((option) => option.id === target)?.label ?? "";
+      toast({ message: t("selection.moved", { count: moved, target: label }), tone: "success" });
+    } catch (error) {
+      toast({ message: errorText(error), tone: "error" });
+    } finally {
+      selection.clear();
+      setBusy(null);
+    }
+  }
 
   const saveAs = (document: StructureDocument) =>
     run(async () => {
@@ -370,6 +415,34 @@ export function DocumentsCard({ projectId, nodeId, name, nodeOptions }: Document
                 </div>
               )}
 
+              {list.length > 1 && (
+                <SelectionBar selection={selection} disabled={busy !== null}>
+                  {nodeOptions.length > 1 && (
+                    <select
+                      aria-label={t("selection.moveTo")}
+                      value=""
+                      disabled={busy !== null}
+                      onChange={(event) => event.target.value && void moveSelected(event.target.value)}
+                      className={cn(fieldClass, "h-8 w-52")}
+                    >
+                      <option value="">{t("selection.moveTo")}</option>
+                      {nodeOptions
+                        .filter((option) => option.id !== nodeId)
+                        .map((option) => (
+                          <option key={option.id} value={option.id}>
+                            {"  ".repeat(option.depth)}
+                            {option.label}
+                          </option>
+                        ))}
+                    </select>
+                  )}
+                  <Button size="sm" variant="destructive" disabled={busy !== null} onClick={() => void removeSelected()}>
+                    <Trash2 />
+                    {t("selection.delete")}
+                  </Button>
+                </SelectionBar>
+              )}
+
               <ul ref={listRef} className="divide-y rounded-lg border" aria-label={t("title")}>
                 {list.map((document, index) => (
                   <li
@@ -379,8 +452,19 @@ export function DocumentsCard({ projectId, nodeId, name, nodeOptions }: Document
                     onKeyDown={(event) => onRowKeyDown(event, document, index)}
                     onDoubleClick={() => setViewing(document.id)}
                     aria-label={document.name}
-                    className="group flex items-center gap-3 px-3 py-2 outline-none focus-visible:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
+                    className={cn(
+                      "group flex items-center gap-3 px-3 py-2 outline-none focus-visible:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
+                      selection.isSelected(document.id) && "bg-accent/60",
+                    )}
                   >
+                    {list.length > 1 && (
+                      <SelectionCheckbox
+                        selection={selection}
+                        id={document.id}
+                        label={t("selection.select", { name: document.name })}
+                        disabled={busy !== null}
+                      />
+                    )}
                     <DocumentIcon document={document} />
                     <div className="min-w-0 flex-1">
                       {renaming?.id === document.id ? (

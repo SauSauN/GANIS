@@ -1,6 +1,7 @@
-import type { MouseEvent } from "react";
+import { useEffect, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useMatch } from "react-router-dom";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Activity, Blocks, LogIn, Moon, Settings, Sun, Undo2 } from "lucide-react";
 import ganisLogo from "@/assets/ganis-logo.png";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
@@ -8,6 +9,7 @@ import { MenuBar } from "@/components/layout/MenuBar";
 import { useGuardedNavigate } from "@/components/layout/UnsavedChangesGuard";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { WindowControls } from "@/components/layout/WindowControls";
+import { isTauri } from "@/lib/api";
 import { applyTheme, useResolvedTheme, type Theme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
@@ -57,6 +59,14 @@ export function TitleBar() {
   );
   const showBackToProject = Boolean(inApp && lastProject && !projectId);
 
+  // Titre de la fenêtre (barre des tâches, Alt+Tab) : le projet ouvert.
+  useEffect(() => {
+    const title = projectName ? `${projectName} — GANIS` : "GANIS";
+
+    document.title = title;
+    if (isTauri()) void getCurrentWindow().setTitle(title).catch(() => {});
+  }, [projectName]);
+
   const theme = useResolvedTheme();
 
   /**
@@ -82,13 +92,14 @@ export function TitleBar() {
       {/* ------------------------------------------------------------------ */}
 
       <div
-        className="flex items-center gap-1"
+        className="flex shrink-0 items-center gap-1"
         onMouseDown={stopDrag}
       >
         <button
           type="button"
           title={t("home")}
-          aria-label={t("home")}
+          // Le nom accessible commence par le texte visible (WCAG 2.5.3).
+          aria-label={`GANIS – ${t("home")}`}
           onClick={() => navigate(inApp ? "/dashboard" : "/")}
           className="flex h-7 items-center gap-2 rounded px-2 font-semibold hover:bg-secondary"
         >
@@ -126,7 +137,7 @@ export function TitleBar() {
       {/* ------------------------------------------------------------------ */}
 
       <div
-        className="flex items-center gap-1 pr-2"
+        className="flex shrink-0 items-center gap-1 pr-2"
         onMouseDown={stopDrag}
       >
         {/* Langue de l'interface avant connexion (accueil, connexion,

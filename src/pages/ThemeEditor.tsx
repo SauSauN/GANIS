@@ -101,6 +101,7 @@ import { usePackageStore } from "@/stores/packageStore";
 import { RELATION_COLORS, RELATION_TYPES } from "@/lib/relations";
 
 import type { RelationType, ThemeData, ThemePalette } from "@/types";
+import { errorText } from "@/lib/errors";
 
 type Mode = "light" | "dark";
 
@@ -608,7 +609,7 @@ function ThemeForm({
 
     } catch (e) {
 
-      setError(e instanceof Error ? e.message : t("editor.failed"));
+      setError(errorText(e, "packages:editor.failed"));
 
       setSaving(false);
 

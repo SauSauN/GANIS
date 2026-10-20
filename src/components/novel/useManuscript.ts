@@ -14,6 +14,7 @@ import {
 } from "@/lib/novel";
 import { sanitizeHtml } from "@/lib/sanitizeHtml";
 import type { StructureDocument, StructureNode } from "@/types";
+import { errorText } from "@/lib/errors";
 
 /** Documents dont le texte peut servir de texte de scène. */
 const TEXT_EXTENSIONS = new Set(["docx", "md", "markdown", "txt"]);
@@ -89,7 +90,7 @@ export function useManuscript(projectId: string, labelOf: (node: StructureNode) 
       .then((rows) => {
         if (!cancelled) setSheet(new Map(rows.map((row) => [row.id, sanitizeHtml(row.content)])));
       })
-      .catch((e: unknown) => !cancelled && setError(e instanceof Error ? e.message : String(e)))
+      .catch((e: unknown) => !cancelled && setError(errorText(e, "errors:load.manuscript")))
       .finally(() => !cancelled && setLoaded(true));
     return () => {
       cancelled = true;
@@ -120,7 +121,7 @@ export function useManuscript(projectId: string, labelOf: (node: StructureNode) 
       }
       if (run.current === id) setDocs(out);
     })()
-      .catch((e: unknown) => run.current === id && setError(e instanceof Error ? e.message : String(e)))
+      .catch((e: unknown) => run.current === id && setError(errorText(e, "errors:load.manuscript")))
       .finally(() => run.current === id && setLoading(false));
     // Les documents ne changent pas avec le texte des fiches.
     // eslint-disable-next-line react-hooks/exhaustive-deps

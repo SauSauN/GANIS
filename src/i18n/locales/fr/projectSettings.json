@@ -10,7 +10,7 @@
     },
     "danger": {
       "label": "Export, duplication et suppression",
-      "description": "Exporter en .ganix, dupliquer ou supprimer définitivement le projet."
+      "description": "Exporter en .ganix, dupliquer ou mettre le projet à la corbeille."
     },
     "characters": {
       "label": "Personnages",
@@ -59,7 +59,7 @@
     "duplicated": "La copie « {{name}} » a été créée. Retrouvez-la sur le tableau de bord.",
     "duplicateFailed": "Impossible de dupliquer le projet.",
     "deleteTitle": "Supprimer le projet",
-    "deleteDescription": "La suppression est définitive et ne peut pas être annulée.",
+    "deleteDescription": "Le projet va dans la corbeille du tableau de bord. Vous pouvez l'y restaurer pendant 30 jours ; ensuite, il est supprimé définitivement.",
     "deleteFailed": "Impossible de supprimer le projet.",
     "exportTitle": "Exporter le projet",
     "exportDescription": "Télécharge tout le projet dans un fichier « nom du projet.ganix », à importer depuis le tableau de bord de GANIS (sur cet ordinateur ou un autre).",

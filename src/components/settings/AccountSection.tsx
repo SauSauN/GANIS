@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { CalendarDays, Mail, ShieldCheck, User as UserIcon } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { CalendarDays, Mail, ShieldCheck, Trash2, User as UserIcon } from "lucide-react";
 import { RecoveryKeyPanel } from "@/components/auth/RecoveryKeyPanel";
 import {
   cardClass,
@@ -19,11 +20,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
+import { cn } from "@/lib/utils";
 import {
   checkEmail,
   checkPassword,
   type ValidationIssue,
 } from "@/lib/validators";
+import { IDLE_LOCK_DELAYS, setIdleLock, useIdleLock, type IdleLockDelay } from "@/lib/preferences";
 import { RECOVERY_KEY_ENABLED } from "@/lib/recoveryKey";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -37,7 +40,10 @@ type AccountMessage =
   | "account.password.failed"
   | "account.recovery.currentRequired"
   | "account.recovery.failed"
-  | "account.recovery.done";
+  | "account.recovery.done"
+  | "account.delete.passwordRequired"
+  | "account.delete.confirmRequired"
+  | "account.delete.failed";
 
 /**
  * Retour affiché sous un formulaire.
@@ -194,6 +200,135 @@ function RecoveryKeyCard({ username }: { username: string }) {
             {saving
               ? t("account.recovery.submitting")
               : t("account.recovery.submit")}
+          </Button>
+        </CardFooter>
+      </form>
+    </Card>
+  );
+}
+
+/**
+ * Verrouillage automatique : après le délai choisi sans aucun geste, la
+ * clé du compte est effacée de la mémoire et le mot de passe est demandé
+ * pour reprendre (voir `IdleLock`). Réglage propre à cet ordinateur.
+ */
+function IdleLockCard() {
+  const { t } = useTranslation("settings");
+  const minutes = useIdleLock();
+
+  return (
+    <Card className={cardClass}>
+      <CardHeader className={cardHeaderClass}>
+        <CardTitle>{t("lock.settingTitle")}</CardTitle>
+
+        <CardDescription>{t("lock.settingDescription")}</CardDescription>
+      </CardHeader>
+
+      <CardContent className="px-6 py-6">
+        <div className="max-w-xs space-y-2">
+          <Label htmlFor="idle-lock-delay">{t("lock.delayLabel")}</Label>
+
+          <select
+            id="idle-lock-delay"
+            value={minutes}
+            onChange={(e) => setIdleLock(Number(e.target.value) as IdleLockDelay)}
+            className="h-9 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none dark:bg-input/30"
+          >
+            {IDLE_LOCK_DELAYS.map((value) => (
+              <option key={value} value={value}>
+                {value === 0 ? t("lock.never") : t("lock.after", { count: value })}
+              </option>
+            ))}
+          </select>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+/**
+ * Suppression du compte : le mot de passe est redemandé et la case « Je
+ * comprends » doit être cochée. Le compte et ses projets privés (corbeille
+ * comprise) sont effacés définitivement ; les projets publics restent.
+ */
+function DeleteAccountCard() {
+  const { t } = useTranslation(["settings", "common"]);
+  const navigate = useNavigate();
+  const deleteAccount = useAuthStore((state) => state.deleteAccount);
+
+  const [password, setPassword] = useState("");
+  const [understood, setUnderstood] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setFeedback(null);
+
+    if (!password) {
+      setFeedback({ kind: "error", key: "account.delete.passwordRequired" });
+      return;
+    }
+
+    if (!understood) {
+      setFeedback({ kind: "error", key: "account.delete.confirmRequired" });
+      return;
+    }
+
+    setBusy(true);
+
+    try {
+      await deleteAccount(password);
+      navigate("/", { replace: true });
+    } catch (e) {
+      setFeedback(failure(e, "account.delete.failed"));
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card className={cn(cardClass, "border-destructive/40")}>
+      <form onSubmit={handleSubmit} noValidate>
+        <CardHeader className={cn(cardHeaderClass, "border-destructive/20")}>
+          <CardTitle className="text-destructive">{t("account.delete.title")}</CardTitle>
+
+          <CardDescription>{t("account.delete.description")}</CardDescription>
+        </CardHeader>
+
+        <CardContent className="space-y-6 px-6 py-6">
+          <p className="rounded-md border border-warning/30 bg-warning/5 px-3 py-2 text-sm text-muted-foreground">
+            {t("account.delete.exportFirst")}
+          </p>
+
+          <div className="max-w-md space-y-2">
+            <Label htmlFor="delete-account-password">{t("account.delete.password")}</Label>
+
+            <Input
+              id="delete-account-password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </div>
+
+          <label className="flex items-start gap-2 text-sm">
+            <input
+              type="checkbox"
+              className="mt-0.5 size-4 shrink-0 accent-primary"
+              checked={understood}
+              onChange={(e) => setUnderstood(e.target.checked)}
+            />
+            {t("account.delete.understand")}
+          </label>
+
+          <FeedbackMessage feedback={feedback} />
+        </CardContent>
+
+        <CardFooter className={cardFooterClass}>
+          <Button type="submit" variant="destructive" disabled={busy}>
+            <Trash2 className="mr-2 h-4 w-4" />
+            {busy ? t("account.delete.submitting") : t("account.delete.submit")}
           </Button>
         </CardFooter>
       </form>
@@ -447,6 +582,18 @@ export function AccountSection() {
 
       {/* Désactivée pour l'instant : voir RECOVERY_KEY_ENABLED. */}
       {RECOVERY_KEY_ENABLED && <RecoveryKeyCard username={user.username} />}
+
+      {/* ==================================================================
+          VERROUILLAGE AUTOMATIQUE
+          ================================================================== */}
+
+      <IdleLockCard />
+
+      {/* ==================================================================
+          SUPPRESSION DU COMPTE
+          ================================================================== */}
+
+      <DeleteAccountCard />
     </div>
   );
 }

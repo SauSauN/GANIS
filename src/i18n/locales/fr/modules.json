@@ -29,6 +29,9 @@
     },
     "manuscript": {
       "label": "Manuscrit"
+    },
+    "script": {
+      "label": "Scénario"
     }
   },
   "features": {
@@ -124,6 +127,20 @@
       "import": {
         "label": "Importer un manuscrit",
         "description": "Un fichier Word, Markdown ou texte, découpé en parties, chapitres et scènes."
+      }
+    },
+    "script": {
+      "read": {
+        "label": "Scénario",
+        "description": "Le scénario page par page et case par case ; export pour le dessinateur."
+      },
+      "progress": {
+        "label": "Suivi du scénario",
+        "description": "Pages prévues et écrites, statuts, volume de texte."
+      },
+      "continuity": {
+        "label": "Continuité",
+        "description": "Où apparaît chaque personnage, et dans quel état, case par case."
       }
     }
   }

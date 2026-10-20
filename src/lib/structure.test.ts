@@ -33,7 +33,7 @@ function node(
   clock += 1;
   const date = `2026-10-09T10:00:${String(clock).padStart(2, "0")}Z`;
 
-  return { id, parentId, level, title: "", summary: "", position, numbered: true, number: null, contentWords: 0, wordGoal: null, writingStatus: null, narrativePerson: null, narrativeTense: null, createdAt: date, updatedAt: date, ...extra };
+  return { id, parentId, level, title: "", summary: "", position, numbered: true, number: null, contentWords: 0, wordGoal: null, writingStatus: null, narrativePerson: null, narrativeTense: null, narrativeGoal: "", pageGoal: null, scriptStatus: null, rhythm: null, pageTurn: false, createdAt: date, updatedAt: date, ...extra };
 }
 
 function level(one: string, numbering: StructureNumbering, start = 1, digits = 1): ResolvedLevel {

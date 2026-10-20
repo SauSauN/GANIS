@@ -13,11 +13,55 @@ use crate::error::{AppError, AppResult};
 use crate::services::{ganix_service, project_service, project_storage};
 use crate::state::AppState;
 use std::path::PathBuf;
-use tauri::State;
+use std::sync::Mutex;
+use tauri::{Emitter, State};
 use tauri_plugin_dialog::DialogExt;
 
 const FILTER_NAME: &str = "Projet GANIS";
 const EXTENSION: &str = "ganix";
+
+/// Événement d'avancement envoyé à l'interface (barre de progression).
+const PROGRESS_EVENT: &str = "ganix-progress";
+
+#[derive(Clone, serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ProgressEvent {
+    /// « export » ou « import ».
+    operation: &'static str,
+    /// Étape en cours ; `None` : opération terminée (réussie ou non).
+    stage: Option<ganix_service::Stage>,
+    done: u64,
+    total: u64,
+}
+
+/// Transmet l'avancement à l'interface, au plus une fois par pour cent et
+/// par étape (pas un événement par ligne).
+fn progress_reporter(
+    app: tauri::AppHandle,
+    operation: &'static str,
+) -> impl Fn(ganix_service::Progress) + Send + Sync {
+    let last = Mutex::new(None::<(ganix_service::Stage, u64)>);
+
+    move |progress: ganix_service::Progress| {
+        let percent = if progress.total == 0 { 0 } else { progress.done * 100 / progress.total };
+        let mut last = last.lock().unwrap_or_else(|e| e.into_inner());
+
+        if *last == Some((progress.stage, percent)) {
+            return;
+        }
+        *last = Some((progress.stage, percent));
+
+        let _ = app.emit(
+            PROGRESS_EVENT,
+            ProgressEvent { operation, stage: Some(progress.stage), done: progress.done, total: progress.total },
+        );
+    }
+}
+
+/// Fin d'une opération : l'interface masque la barre.
+fn progress_done(app: &tauri::AppHandle, operation: &'static str) {
+    let _ = app.emit(PROGRESS_EVENT, ProgressEvent { operation, stage: None, done: 0, total: 0 });
+}
 
 fn dialog_title(title: &str) -> String {
     title.chars().take(100).collect()
@@ -85,8 +129,17 @@ pub async fn export_project(
 
     let pool = project_storage::pool_for_viewer(&state, &project_id, &viewer).await?;
 
-    ganix_service::write_ganix(&pool, &project, &target, &ganix_service::work_dir(&state.data_dir))
-        .await?;
+    let report = progress_reporter(app.clone(), "export");
+    let written = ganix_service::write_ganix_reporting(
+        &pool,
+        &project,
+        &target,
+        &ganix_service::work_dir(&state.data_dir),
+        &report,
+    )
+    .await;
+    progress_done(&app, "export");
+    written?;
 
     tracing::info!("Projet exporté au format .ganix");
 
@@ -120,9 +173,13 @@ pub async fn inspect_ganix(
         return Ok(None);
     };
 
-    ganix_service::stage_import(&state.data_dir, &state.app_db, &user.id, &source)
-        .await
-        .map(Some)
+    let report = progress_reporter(app.clone(), "import");
+    let staged =
+        ganix_service::stage_import_reporting(&state.data_dir, &state.app_db, &user.id, &source, &report)
+            .await;
+    progress_done(&app, "import");
+
+    staged.map(Some)
 }
 
 /// Ajoute au compte le projet en attente. `mode` ne sert que si

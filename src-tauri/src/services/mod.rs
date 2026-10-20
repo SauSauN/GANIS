@@ -14,6 +14,7 @@ pub mod keyring_service;
 pub mod location_service;
 pub mod login_throttle;
 pub mod note_service;
+pub mod manga_service;
 pub mod novel_import_service;
 pub mod novel_replace_service;
 pub mod novel_service;

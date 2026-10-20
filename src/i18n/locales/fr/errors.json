@@ -104,7 +104,8 @@
     "deleteSelf": "Vous ne pouvez pas supprimer votre propre compte.",
     "lastAdminRole": "Impossible de retirer le rôle du dernier administrateur.",
     "lastAdminDelete": "Impossible de supprimer le dernier administrateur.",
-    "adminKeepsDeveloper": "Un administrateur conserve toujours les outils de développement."
+    "adminKeepsDeveloper": "Un administrateur conserve toujours les outils de développement.",
+    "lastAdminLeaving": "Le dernier administrateur ne peut pas supprimer son compte tant que d'autres comptes existent."
   },
   "package": {
     "notFound": "Package introuvable.",
@@ -316,7 +317,21 @@
     "saveSynopsis": "Impossible d'enregistrer le synopsis.",
     "characters": "Impossible de charger les personnages.",
     "locations": "Impossible de charger les lieux.",
-    "setup": "Impossible de vérifier la configuration de GANIS."
+    "setup": "Impossible de vérifier la configuration de GANIS.",
+    "projects": "Impossible de charger les projets.",
+    "createProject": "Impossible de créer le projet.",
+    "updateProject": "Impossible de mettre à jour le projet.",
+    "duplicateProject": "Impossible de dupliquer le projet.",
+    "visibility": "Impossible de changer la visibilité du projet.",
+    "deleteProject": "Impossible de supprimer le projet.",
+    "openProject": "Impossible d'ouvrir le projet.",
+    "plot": "Impossible de charger ou d'enregistrer la trame.",
+    "structure": "Impossible de charger le découpage.",
+    "trash": "Impossible de charger la corbeille.",
+    "manga": "Impossible de charger les données du manga.",
+    "placeLinks": "Impossible de charger les liens entre personnages et lieux.",
+    "search": "La recherche a échoué.",
+    "manuscript": "Impossible d'assembler le manuscrit."
   },
   "novel": {
     "contentTooLong": "Ce texte est trop long ({{max}} caractères au maximum).",
@@ -331,5 +346,19 @@
     "summaryTooLong": "Ce résumé est trop long ({{max}} caractères au maximum).",
     "replaceQuery": "Le texte à chercher est vide ou trop long.",
     "replaceStale": "Le texte a changé depuis la recherche : relancez la recherche."
+  },
+  "manga": {
+    "tooManyPanels": "Trop de cases sur cette page ({{max}} au maximum).",
+    "tooManyTexts": "Trop de textes dans une case ({{max}} au maximum).",
+    "fieldTooLong": "Un texte est trop long ({{max}} caractères au maximum).",
+    "invalidRhythm": "Fonction narrative invalide.",
+    "invalidTextKind": "Type de texte invalide.",
+    "invalidFraming": "Cadrage invalide.",
+    "invalidStatus": "Statut invalide.",
+    "invalidPageGoal": "Nombre de pages invalide ({{max}} au maximum).",
+    "invalidThreshold": "Seuil invalide.",
+    "unknownCharacter": "Un personnage de cette page n'existe plus.",
+    "unknownLocation": "Le lieu choisi n'existe plus.",
+    "panelNotFound": "Cette case n'existe plus."
   }
 }

@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, CircleAlert, CircleDot, HardDrive, Loader2, Save, WifiOff, X } from "lucide-react";
+import { Check, CircleAlert, CircleDot, HardDrive, Info, Loader2, Save, WifiOff, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { api } from "@/lib/api";
 import { resolveSaveState, useSaveStatusStore } from "@/lib/saveStatus";
 import { saveEntries, useUnsavedStore } from "@/lib/unsavedChanges";
@@ -26,6 +34,8 @@ export function StatusBar() {
   const { t, i18n } = useTranslation("statusbar");
   const [info, setInfo] = useState<AppInfo | null>(null);
   const [savingAll, setSavingAll] = useState(false);
+  /** Fenêtre du détail de l'échec d'enregistrement. */
+  const [detailsOpen, setDetailsOpen] = useState(false);
 
   const pending = useSaveStatusStore((state) => state.pending);
   const lastSavedAt = useSaveStatusStore((state) => state.lastSavedAt);
@@ -83,6 +93,18 @@ export function StatusBar() {
               : t(state === "saving" ? "save.saving" : state === "error" ? "save.error" : "save.idle")}
         </span>
 
+        {/* Détail de l'échec : au clic (et au clavier), pas seulement au survol. */}
+        {state === "error" && lastError && (
+          <button
+            type="button"
+            onClick={() => setDetailsOpen(true)}
+            className="-my-1 flex h-6 items-center gap-1 rounded px-2 font-medium text-foreground hover:bg-secondary"
+          >
+            <Info className="h-3 w-3" />
+            {t("save.details")}
+          </button>
+        )}
+
         {state === "error" && (
           <button
             type="button"
@@ -110,6 +132,28 @@ export function StatusBar() {
 
         {info && <span>v{info.version}</span>}
       </div>
+
+      <Dialog open={detailsOpen && lastError !== null} onOpenChange={setDetailsOpen}>
+        <DialogHeader>
+          <DialogTitle>{t("save.detailsTitle")}</DialogTitle>
+          <DialogDescription>{t("save.detailsDescription")}</DialogDescription>
+        </DialogHeader>
+        <p role="alert" className="mt-4 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm whitespace-pre-line text-destructive">
+          {lastError}
+        </p>
+        <DialogFooter className="mt-6 gap-2">
+          <Button
+            variant="ghost"
+            onClick={() => {
+              dismissError();
+              setDetailsOpen(false);
+            }}
+          >
+            {t("save.dismiss")}
+          </Button>
+          <Button onClick={() => setDetailsOpen(false)}>{t("save.close")}</Button>
+        </DialogFooter>
+      </Dialog>
     </footer>
   );
 }

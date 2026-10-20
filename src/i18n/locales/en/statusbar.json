@@ -10,6 +10,10 @@
     "unsaved_other": "{{count}} unsaved changes",
     "saveAll": "Save all",
     "saveAllHint": "Save all changes (Ctrl+Alt+S)",
-    "dismiss": "Hide the error"
+    "dismiss": "Hide the error",
+    "details": "Details",
+    "detailsTitle": "Save failed",
+    "detailsDescription": "The last change could not be saved. It is still shown; you can try again (Ctrl+S) once the problem is fixed.",
+    "close": "Close"
   }
 }

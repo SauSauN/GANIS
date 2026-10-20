@@ -823,15 +823,15 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
             {lanes.map((lane, index) => {
               const dragging = drag?.type === "lane" && drag.id === lane.id;
               return (
+                // En-tête de piste : un groupe (pas un bouton) qui contient le
+                // bouton de sélection (toute la surface) et le bouton « + ».
                 <div
                   key={lane.id}
-                  role="button"
-                  tabIndex={0}
-                  aria-pressed={selectedLane === lane.id}
+                  role="group"
+                  aria-label={t("board.laneAria", { name: lane.name, index: index + 1 })}
                   onPointerDown={(e) => !(e.target as Element).closest("[data-add]") && startLaneDrag(e, lane.id)}
-                  onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), select({ type: "lane", id: lane.id }))}
                   className={cn(
-                    "group relative flex shrink-0 cursor-pointer flex-col justify-center border-r border-border/60 pr-10 pl-6 select-none hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-inset",
+                    "group relative flex shrink-0 cursor-pointer flex-col justify-center border-r border-border/60 pr-10 pl-6 select-none hover:bg-muted/50 has-[[data-select]:focus-visible]:ring-2 has-[[data-select]:focus-visible]:ring-ring has-[[data-select]:focus-visible]:ring-inset",
                     lane.main && "bg-[color-mix(in_oklch,var(--lane)_10%,transparent)]",
                     selectedLane === lane.id && "shadow-[inset_0_-3px_0_var(--lane)]",
                     dragging && "z-40 cursor-grabbing bg-card opacity-95 shadow-lg",
@@ -843,14 +843,24 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                     transform: dragging ? `translateX(${drag.dx}px)` : undefined,
                   }}
                   title={`${lane.main ? t("board.mainLane") : lane.characterId && links.characterName(lane.characterId) ? t("board.characterLane", { name: links.characterName(lane.characterId) }) : t("board.parallelLane")} · ${t("board.dragLane")}`}
-                  aria-label={t("board.laneAria", { name: lane.name, index: index + 1 })}
                 >
+                  {/* Clavier : sélectionne la piste. À la souris, le clic est
+                      géré par le glisser (un clic sans déplacement sélectionne). */}
+                  <button
+                    type="button"
+                    data-select
+                    aria-pressed={selectedLane === lane.id}
+                    aria-label={t("board.laneAria", { name: lane.name, index: index + 1 })}
+                    onClick={(e) => e.detail === 0 && select({ type: "lane", id: lane.id })}
+                    className="absolute inset-0 outline-none"
+                  />
                   <span className="absolute top-1/2 left-2 h-5 w-2.5 -translate-y-1/2 cursor-grab opacity-40 group-hover:opacity-90" aria-hidden="true" style={{ background: "radial-gradient(circle, currentColor 1.2px, transparent 1.6px) 0 0 / 5px 6px" }} />
                   <span className={cn("truncate font-semibold", lane.main ? "text-[0.95rem]" : "text-sm")}>{lane.name || t("untitled")}</span>
                   <button
                     type="button"
                     data-add
                     onClick={() => addEvent(projectId, lane.id)}
+                    style={{ zIndex: 1 }}
                     aria-label={t("board.addTo", { name: lane.name })}
                     title={t("board.addTo", { name: lane.name })}
                     className="absolute top-1/2 right-2 flex size-6 -translate-y-1/2 items-center justify-center rounded-full border bg-card text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100 hover:border-[var(--lane)] hover:text-[var(--lane)] focus-visible:opacity-100"
@@ -970,9 +980,11 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                   <div
                     key={event.id}
                     data-event={event.id}
-                    role="button"
-                    tabIndex={0}
-                    aria-pressed={selected}
+                    // Pendant la modification du titre, la carte contient un
+                    // champ : elle cesse alors d'être un bouton.
+                    role={editing === event.id ? "group" : "button"}
+                    tabIndex={editing === event.id ? undefined : 0}
+                    aria-pressed={editing === event.id ? undefined : selected}
                     aria-label={t("board.eventAria", { title: event.title || t("untitled"), lane: lane.name, moment: momentNumber(event.row), status: t(`status.${event.status}`) })}
                     title={event.note || undefined}
                     onPointerDown={(e) => {

@@ -16,6 +16,7 @@ import {
   UserRound,
   Waypoints,
   type LucideIcon,
+  LayoutPanelTop,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
@@ -38,6 +39,7 @@ const ICONS: Record<HistoryKind, LucideIcon> = {
   sticky: StickyNote,
   relation: Network,
   placeLink: MapPin,
+  mangaPanel: LayoutPanelTop,
   synopsis: FileText,
   plot: Waypoints,
   editorial: Megaphone,

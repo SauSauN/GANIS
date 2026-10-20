@@ -14,9 +14,11 @@ import {
   Plus,
   Search,
   Star,
+  Trash2,
 } from "lucide-react";
 import { GanixImportDialog } from "@/components/projects/GanixImportDialog";
 import { ProjectCard } from "@/components/projects/ProjectCard";
+import { ProjectTrashList } from "@/components/projects/ProjectTrashList";
 import {
   ProjectFormDialog,
   type ProjectFormValues,
@@ -40,6 +42,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
+import { errorText } from "@/lib/errors";
 import { projectsInSpace, spaceOf } from "@/lib/projectSpace";
 import { showGuideOnce } from "@/lib/shortcuts";
 import { cn } from "@/lib/utils";
@@ -53,7 +56,7 @@ import type {
   Project,
 } from "@/types";
 
-type Filter = "all" | "favorites" | "archived";
+type Filter = "all" | "favorites" | "archived" | "trash";
 
 const RECENT_LIMIT = 3;
 
@@ -97,6 +100,10 @@ export default function Dashboard() {
   const openProject = useProjectStore((state) => state.openProject);
   const importGanix = useProjectStore((state) => state.importGanix);
   const setVisibility = useProjectStore((state) => state.setVisibility);
+  const trash = useProjectStore((state) => state.trash);
+  const trashLoading = useProjectStore((state) => state.trashLoading);
+  const fetchTrash = useProjectStore((state) => state.fetchTrash);
+  const restoreProjects = useProjectStore((state) => state.restoreProjects);
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
@@ -131,6 +138,18 @@ export default function Dashboard() {
     // La liste dépend de la connexion (projets privés du compte).
   }, [fetchProjects, user?.id]);
 
+  // Corbeille : relue à l'arrivée, au changement de compte et quand elle
+  // est affichée (un projet vient peut-être d'y être placé).
+  useEffect(() => {
+    fetchTrash().catch((e) => setActionError(errorText(e, "dashboard:errors.actionFailed")));
+  }, [fetchTrash, user?.id, filter]);
+
+  /** Corbeille de l'espace courant. */
+  const scopedTrash = useMemo(
+    () => projectsInSpace(trash, space),
+    [trash, space],
+  );
+
   /** Projets de l'espace courant (jamais de mélange public / privé). */
   const scoped = useMemo(
     () => projectsInSpace(projects, space),
@@ -158,7 +177,7 @@ export default function Dashboard() {
       .catch((e) =>
         toast({
           tone: "error",
-          message: e instanceof Error ? e.message : t("errors.actionFailed"),
+          message: errorText(e, "dashboard:errors.actionFailed"),
         }),
       );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -170,15 +189,17 @@ export default function Dashboard() {
       favorites: scoped.filter((p) => p.isFavorite && !p.isArchived)
         .length,
       archived: scoped.filter((p) => p.isArchived).length,
+      trash: scopedTrash.length,
     }),
-    [scoped],
+    [scoped, scopedTrash],
   );
 
   const visible = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return scoped
+    return (filter === "trash" ? scopedTrash : scoped)
       .filter((project) => {
+        if (filter === "trash") return true;
         if (filter === "archived") return project.isArchived;
         if (filter === "favorites") {
           return project.isFavorite && !project.isArchived;
@@ -191,8 +212,12 @@ export default function Dashboard() {
           project.name.toLowerCase().includes(query) ||
           project.description.toLowerCase().includes(query),
       )
-      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
-  }, [scoped, filter, search]);
+      .sort((a, b) =>
+        filter === "trash"
+          ? (b.deletedAt ?? "").localeCompare(a.deletedAt ?? "")
+          : b.updatedAt.localeCompare(a.updatedAt),
+      );
+  }, [scoped, scopedTrash, filter, search]);
 
   const recent = useMemo(
     () =>
@@ -225,9 +250,7 @@ export default function Dashboard() {
     try {
       await task();
     } catch (e) {
-      setActionError(
-        e instanceof Error ? e.message : t("errors.actionFailed"),
-      );
+      setActionError(errorText(e, "dashboard:errors.actionFailed"));
     } finally {
       setBusyId(null);
     }
@@ -240,11 +263,7 @@ export default function Dashboard() {
       await openProject(project.id);
       navigate(`/workspace/${project.id}`);
     } catch (e) {
-      setActionError(
-        e instanceof Error
-          ? e.message
-          : t("errors.openFailed"),
-      );
+      setActionError(errorText(e, "dashboard:errors.openFailed"));
     }
   }
 
@@ -279,9 +298,7 @@ export default function Dashboard() {
       );
       setPreview(result);
     } catch (e) {
-      setActionError(
-        e instanceof Error ? e.message : t("projects:ganix.import.failed"),
-      );
+      setActionError(errorText(e, "projects:ganix.import.failed"));
     } finally {
       setInspecting(false);
     }
@@ -375,14 +392,25 @@ export default function Dashboard() {
     setActionError(null);
 
     try {
-      await deleteProject(deleting.id);
+      const removed = deleting;
+      await deleteProject(removed.id);
       setDeleting(null);
+      toast({
+        tone: "success",
+        message: t("delete.done", { name: removed.name }),
+        action: {
+          label: t("delete.undo"),
+          run: async () => {
+            try {
+              await restoreProjects([removed.id]);
+            } catch (error) {
+              toast({ tone: "error", message: errorText(error, "dashboard:errors.restoreFailed") });
+            }
+          },
+        },
+      });
     } catch (e) {
-      setActionError(
-        e instanceof Error
-          ? e.message
-          : t("errors.deleteFailed"),
-      );
+      setActionError(errorText(e, "dashboard:errors.deleteFailed"));
       setDeleting(null);
     } finally {
       setDeletingBusy(false);
@@ -446,10 +474,16 @@ export default function Dashboard() {
       count: counts.archived,
       icon: Archive,
     },
+    {
+      id: "trash",
+      label: t("filters.trash"),
+      count: counts.trash,
+      icon: Trash2,
+    },
   ];
 
   /** Ce que montre la liste : une recherche prime sur le filtre choisi. */
-  const listMode = searching ? "search" : filter;
+  const listMode = searching && filter !== "trash" ? "search" : filter;
 
   const listTitle = t(`list.title.${listMode}`);
   const emptyTitle = t(`empty.${listMode}.title`);
@@ -551,7 +585,7 @@ export default function Dashboard() {
           )}
 
           {/* Filtres avec compteurs */}
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {filters.map(({ id, label, count, icon: Icon }) => (
               <button
                 key={id}
@@ -634,7 +668,13 @@ export default function Dashboard() {
               )}
             </h2>
 
-            {listVisible && (
+            {listVisible && filter === "trash" && (
+              <div id="projects-list">
+                <ProjectTrashList projects={visible} loading={trashLoading} />
+              </div>
+            )}
+
+            {listVisible && filter !== "trash" && (
               <div id="projects-list">
                 {loading && projects.length === 0 ? (
                   <p className="text-sm text-muted-foreground">

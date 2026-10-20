@@ -799,3 +799,111 @@ async fn public_project_can_become_private_and_back() {
 
     assert_eq!(read_text_as_viewer(&env, &id).await.as_deref(), Some("Contenu conservé"));
 }
+#[tokio::test]
+async fn deleted_project_goes_to_trash_then_can_be_restored_or_purged() {
+    let env = env().await;
+    register_alice(&env).await;
+
+    login(&env, "alice", "motdepasse1").await;
+    let kept = create_project_with_text(&env, "À restaurer", "Texte gardé").await;
+    let gone = create_project_with_text(&env, "À effacer", "Texte effacé").await;
+    let viewer = env.state.viewer().await;
+    let db = &env.state.app_db;
+
+    // Corbeille : le projet quitte la liste, ses données restent.
+    project_service::trash_for_viewer(db, &kept, &viewer).await.unwrap();
+    project_service::trash_for_viewer(db, &gone, &viewer).await.unwrap();
+    assert!(project_service::list_for_viewer(db, &viewer).await.unwrap().is_empty());
+    assert!(project_service::find_for_viewer(db, &kept, &viewer).await.unwrap().is_none());
+
+    let trash = project_service::list_trash_for_viewer(db, &viewer).await.unwrap();
+    assert_eq!(trash.len(), 2);
+    assert!(trash.iter().all(|p| p.deleted_at.is_some()));
+    assert!(db_path(&env, &kept).exists());
+
+    // Restauration : de retour, données intactes.
+    let restored = project_service::restore_for_viewer(db, &kept, &viewer).await.unwrap();
+    assert_eq!(restored.name, "À restaurer");
+    assert!(restored.deleted_at.is_none());
+    env.state.close_project_pools().await;
+    assert_eq!(read_text(&env, &kept).await, "Texte gardé");
+
+    // Un projet actif ne peut pas être effacé directement.
+    assert!(project_service::purge_for_viewer(db, &kept, &viewer).await.is_err());
+
+    // Suppression définitive : la ligne et le dossier disparaissent.
+    project_service::purge_for_viewer(db, &gone, &viewer).await.unwrap();
+    project_storage::delete_storage(&env.state, &gone).await;
+    assert!(project_service::list_trash_for_viewer(db, &viewer).await.unwrap().is_empty());
+    assert!(!db_path(&env, &gone).exists());
+
+    // Un invité ne voit pas la corbeille d'Alice.
+    project_service::trash_for_viewer(db, &kept, &viewer).await.unwrap();
+    auth_service::logout_user(&env.state).await.unwrap();
+    let guest = env.state.viewer().await;
+    assert!(project_service::list_trash_for_viewer(db, &guest).await.unwrap().is_empty());
+    assert!(project_service::restore_for_viewer(db, &kept, &guest).await.is_err());
+}
+
+#[tokio::test]
+async fn projects_older_than_thirty_days_in_trash_are_purged() {
+    let env = env().await;
+    let public_id = create_public_project_with_text(&env, "Ancien", "Vieux texte").await;
+    let recent_id = create_public_project_with_text(&env, "Récent", "Texte récent").await;
+    let guest = env.state.viewer().await;
+    let db = &env.state.app_db;
+
+    project_service::trash_for_viewer(db, &public_id, &guest).await.unwrap();
+    project_service::trash_for_viewer(db, &recent_id, &guest).await.unwrap();
+
+    // Le premier a été supprimé il y a 31 jours.
+    let old = (chrono::Utc::now() - chrono::Duration::days(31))
+        .to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
+    sqlx::query("UPDATE projects SET deleted_at = ? WHERE id = ?")
+        .bind(&old)
+        .bind(&public_id)
+        .execute(db)
+        .await
+        .unwrap();
+
+    crate::commands::projects::purge_expired_projects(&env.state).await;
+
+    let trash = project_service::list_trash_for_viewer(db, &guest).await.unwrap();
+    assert_eq!(trash.len(), 1);
+    assert_eq!(trash[0].id, recent_id);
+    assert!(!db_path(&env, &public_id).exists());
+}
+
+#[tokio::test]
+async fn user_can_delete_own_account_with_projects_but_not_the_last_admin() {
+    let env = env().await;
+    register_alice(&env).await;
+
+    // L'administrateur, seul administrateur alors qu'Alice existe : refusé.
+    login(&env, "admin", "admin1234").await;
+    assert!(auth_service::delete_own_account(&env.state, "admin1234").await.is_err());
+    auth_service::logout_user(&env.state).await.unwrap();
+
+    login(&env, "alice", "motdepasse1").await;
+    let kept = create_project_with_text(&env, "Projet d'Alice", "Texte").await;
+    let trashed = create_project_with_text(&env, "Dans la corbeille", "Texte").await;
+    let viewer = env.state.viewer().await;
+    project_service::trash_for_viewer(&env.state.app_db, &trashed, &viewer).await.unwrap();
+
+    // Mauvais mot de passe : rien n'est supprimé.
+    assert!(auth_service::delete_own_account(&env.state, "mauvais1").await.is_err());
+    assert!(env.state.current_user().await.is_some());
+
+    let ids = auth_service::delete_own_account(&env.state, "motdepasse1").await.unwrap();
+    assert_eq!(ids.len(), 2);
+    assert!(ids.contains(&kept) && ids.contains(&trashed));
+    assert!(env.state.current_user().await.is_none());
+
+    for id in &ids {
+        project_storage::delete_storage(&env.state, id).await;
+        assert!(!db_path(&env, id).exists());
+    }
+
+    // Le compte n'existe plus : connexion impossible.
+    assert!(auth_service::login_user(&env.state, "alice", "motdepasse1").await.is_err());
+}

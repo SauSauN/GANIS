@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowLeftRight, ArrowRight, BookOpen, Copy, ExternalLink, ListTree, MapPin, NotebookPen, Palette, Plus, Trash2, X } from "lucide-react";
-import { addEvent, deleteEvent, deleteLane, deleteLink, duplicateEvent, duplicateLane, moveEvent } from "@/components/plot/actions";
+import { addEvent, createLink, deleteEvent, deleteLane, deleteLink, duplicateEvent, duplicateLane, moveEvent } from "@/components/plot/actions";
 import { KindIcon } from "@/components/plot/KindIcon";
 import { area, Field, Fold, Head, input, useMutate, type PlotPanelProps } from "@/components/plot/panelParts";
 import { Button } from "@/components/ui/button";
@@ -52,6 +52,105 @@ export function PlotPanel(props: PlotPanelProps) {
   }
   if (selection?.type === "row") return <RowPanel {...props} row={selection.id} />;
   return null;
+}
+
+// Liens d'un événement (alternative au glisser de la pastille)
+// ----------------------------------------------------------------------------
+
+/**
+ * Liens d'un événement vers les autres, et une commande « Relier à… » /
+ * « Relier depuis… » : sur le plateau, un lien se tire avec la pastille ;
+ * ici, il se crée en choisissant l'autre événement dans une liste,
+ * utilisable au clavier et sans glisser (WCAG 2.1.1, 2.5.7).
+ * Le lien créé est sélectionné : son type et son libellé se règlent
+ * ensuite dans ce panneau.
+ */
+function EventLinks({ projectId, data, event }: Pick<PlotPanelProps, "projectId" | "data"> & { event: PlotEvent }) {
+  const { t } = useTranslation("plot");
+  const select = usePlotStore((s) => s.select);
+
+  const outgoing = data.links.filter((l) => l.from === event.id);
+  const incoming = data.links.filter((l) => l.to === event.id);
+  const titleOf = (id: string) => eventOf(data, id)?.title || t("untitled");
+
+  // Autres événements, groupés par trame, dans l'ordre du récit.
+  const groups = visibleLanes(data)
+    .map((lane) => ({
+      lane,
+      events: data.events
+        .filter((e) => e.laneId === lane.id && e.id !== event.id)
+        .sort((a, b) => a.row - b.row),
+    }))
+    .filter((group) => group.events.length > 0);
+
+  function options(exclude: Set<string>) {
+    return groups.map(({ lane, events }) => (
+      <optgroup key={lane.id} label={lane.name}>
+        {events
+          .filter((e) => !exclude.has(e.id))
+          .map((e) => (
+            <option key={e.id} value={e.id}>
+              {t("board.moment", { number: momentNumber(e.row) })} · {e.title || t("untitled")}
+            </option>
+          ))}
+      </optgroup>
+    ));
+  }
+
+  const linkRow = (link: PlotLink, other: string, direction: "to" | "from") => (
+    <li key={link.id}>
+      <button
+        type="button"
+        onClick={() => select({ type: "link", id: link.id })}
+        className="flex w-full min-w-0 items-center gap-1.5 rounded px-1 py-0.5 text-left text-sm hover:bg-muted"
+        title={t("event.links.open")}
+      >
+        {direction === "to" ? (
+          <ArrowRight className="size-3.5 shrink-0 text-muted-foreground" aria-label={t("event.links.toAria")} />
+        ) : (
+          <ArrowLeft className="size-3.5 shrink-0 text-muted-foreground" aria-label={t("event.links.fromAria")} />
+        )}
+        <span className="truncate">{titleOf(other)}</span>
+        {link.label && <span className="truncate text-xs text-muted-foreground">· {link.label}</span>}
+      </button>
+    </li>
+  );
+
+  if (groups.length === 0 && outgoing.length === 0 && incoming.length === 0) return null;
+
+  return (
+    <div className="mb-3">
+      <span className="mb-1 block text-xs font-semibold text-muted-foreground">{t("event.links.title")}</span>
+      {(outgoing.length > 0 || incoming.length > 0) && (
+        <ul className="mb-1.5 space-y-0.5">
+          {outgoing.map((l) => linkRow(l, l.to, "to"))}
+          {incoming.map((l) => linkRow(l, l.from, "from"))}
+        </ul>
+      )}
+      {groups.length > 0 && (
+        <div className="grid gap-1.5">
+          <select
+            aria-label={t("event.links.linkTo")}
+            value=""
+            onChange={(e) => e.target.value && createLink(projectId, event.id, e.target.value)}
+            className={input}
+          >
+            <option value="">{t("event.links.linkTo")}</option>
+            {options(new Set(outgoing.map((l) => l.to)))}
+          </select>
+          <select
+            aria-label={t("event.links.linkFrom")}
+            value=""
+            onChange={(e) => e.target.value && createLink(projectId, e.target.value, event.id)}
+            className={input}
+          >
+            <option value="">{t("event.links.linkFrom")}</option>
+            {options(new Set(incoming.map((l) => l.from)))}
+          </select>
+        </div>
+      )}
+    </div>
+  );
 }
 
 // Événement
@@ -127,6 +226,9 @@ function EventPanel({ projectId, data, links, onOpenFeature, event }: PlotPanelP
       <Field label={t("event.note")}>
         <textarea rows={3} value={event.note} placeholder={t("event.notePlaceholder")} onChange={(e) => set("note", e.target.value, `ev:${event.id}:note`)} className={area} />
       </Field>
+
+      {/* Liens avec les autres événements : au clavier comme à la souris. */}
+      <EventLinks projectId={projectId} data={data} event={event} />
 
       {/* Liens avec le reste du projet */}
       <Fold title={t("event.project")} summary={projectSummary} defaultOpen>

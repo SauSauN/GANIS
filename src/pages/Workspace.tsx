@@ -12,6 +12,7 @@ import { StatusBar } from "@/components/layout/StatusBar";
 import {
   HOME_TAB,
   NOVEL_FEATURES,
+  MANGA_FEATURES,
   SETTINGS_PREFIX,
   findFeature,
   modulesFor,
@@ -27,6 +28,7 @@ import { CommandPalette } from "@/components/search/CommandPalette";
 
 import i18n from "@/i18n";
 import { cn } from "@/lib/utils";
+import { useMediaQuery } from "@/lib/useMediaQuery";
 import {
   setRailExpanded,
   useRailExpanded,
@@ -60,6 +62,7 @@ import { useNoteStore } from "@/stores/noteStore";
 import { useStructureStore } from "@/stores/structureStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useWritingTracker } from "@/stores/writingStore";
+import { errorText } from "@/lib/errors";
 
 /**
  * Libellé et icône d'un onglet.
@@ -88,6 +91,9 @@ const NEW_TARGETS: Partial<Record<ModuleId, string>> = {
   structure: "structure.plan",
   notes: "notes.create",
 };
+
+/** En dessous : barre de gauche en icônes, panneau du milieu par-dessus. */
+const NARROW_QUERY = "(max-width: 899px)";
 
 export default function Workspace() {
   const { t } = useTranslation(["workspace", "unsaved", "menus", "projects"]);
@@ -153,6 +159,17 @@ export default function Workspace() {
    */
   const [panelOpen, setPanelOpen] =
     useState(true);
+
+  /**
+   * Fenêtre étroite (petite fenêtre, ou zoom à 200 %) : la barre de gauche
+   * passe en icônes et le panneau du milieu se ferme, puis s'ouvre par-dessus
+   * la zone centrale au lieu de la réduire. Le texte garde ainsi sa place.
+   * Revenue à une largeur normale, la disposition habituelle revient.
+   */
+  const narrow = useMediaQuery(NARROW_QUERY);
+  useEffect(() => {
+    setPanelOpen(!narrow);
+  }, [narrow]);
 
   /**
    * Onglet agrandi (double-clic sur un onglet) : le contenu occupe tout
@@ -362,9 +379,13 @@ export default function Workspace() {
    */
   const projectType = project?.type;
   useEffect(() => {
-    if (!projectType || projectType === "novel") return;
-    for (const tabId of layoutRef.current.tabs.filter((id) => NOVEL_FEATURES.has(id))) forceCloseTab(tabId);
-    setActiveModule((current) => (current === "manuscript" ? "details" : current));
+    if (!projectType) return;
+    // Outils du manga / de la BD : même règle.
+    const reserved = (id: string) => (projectType !== "novel" && NOVEL_FEATURES.has(id)) || (projectType !== "manga" && MANGA_FEATURES.has(id));
+    for (const tabId of layoutRef.current.tabs.filter(reserved)) forceCloseTab(tabId);
+    setActiveModule((current) =>
+      (current === "manuscript" && projectType !== "novel") || (current === "script" && projectType !== "manga") ? "details" : current,
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectType]);
 
@@ -560,7 +581,7 @@ export default function Workspace() {
         });
       }
     } catch (e) {
-      toast({ message: e instanceof Error ? e.message : t("projects:ganix.export.failed"), tone: "error" });
+      toast({ message: errorText(e, "projects:ganix.export.failed"), tone: "error" });
     }
   }
 
@@ -637,7 +658,7 @@ export default function Workspace() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-background">
-      <div className="flex min-h-0 flex-1">
+      <div className="relative flex min-h-0 flex-1">
         {/* =========================================================
             BARRE DE GAUCHE (modules)
             ========================================================= */}
@@ -647,8 +668,8 @@ export default function Workspace() {
           active={activeModule}
           linked={linkedModule}
           panelOpen={panelOpen}
-          expanded={railExpanded}
-          onToggleExpanded={() =>
+          expanded={railExpanded && !narrow}
+          onToggleExpanded={narrow ? undefined : () =>
             setRailExpanded(!railExpanded)
           }
           onSelect={selectModule}
@@ -664,14 +685,22 @@ export default function Workspace() {
             précédente.
             ========================================================= */}
         {panelOpen && !isMaximized && (
-          <SideBar
-            module={activeModule}
-            projectId={project.id}
-            projectName={project.name}
-            activeTab={activeTab}
-            onOpenFeature={openFeature}
-            onClose={() => setPanelOpen(false)}
-          />
+          <div
+            className={narrow ? "absolute inset-y-0 left-12 z-40 flex shadow-xl" : "contents"}
+            onKeyDown={narrow ? (event) => event.key === "Escape" && setPanelOpen(false) : undefined}
+          >
+            <SideBar
+              module={activeModule}
+              projectId={project.id}
+              projectName={project.name}
+              activeTab={activeTab}
+              onOpenFeature={(id) => {
+                openFeature(id);
+                if (narrow) setPanelOpen(false);
+              }}
+              onClose={() => setPanelOpen(false)}
+            />
+          </div>
         )}
 
         {/* =========================================================

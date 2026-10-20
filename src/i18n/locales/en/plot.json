@@ -209,7 +209,15 @@
     "addAlsoNode": "Add another scene…",
     "alsoNodesNeedMain": "Choose “Told in” first",
     "removeAlsoNode": "Remove “{{name}}”",
-    "momentHint": "1, 2, 3…: the main story. −1, −2…: the narrative past, before the story begins."
+    "momentHint": "1, 2, 3…: the main story. −1, −2…: the narrative past, before the story begins.",
+    "links": {
+      "title": "Links with other events",
+      "linkTo": "Link to…",
+      "linkFrom": "Link from…",
+      "open": "Show this link",
+      "toAria": "to",
+      "fromAria": "from"
+    }
   },
   "link": {
     "from": "From",

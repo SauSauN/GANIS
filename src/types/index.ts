@@ -86,6 +86,8 @@ export interface Project {
   lastOpenedAt?: string | null; // RFC 3339, UTC
   /** Projet public (sans connexion) ou privé (lié au compte connecté). */
   visibility: ProjectVisibility;
+  /** Date de mise à la corbeille ; `null` pour un projet actif. */
+  deletedAt?: string | null; // RFC 3339, UTC
 }
 
 // ----------------------------------------------------------------------------
@@ -230,8 +232,108 @@ export interface StructureNode {
   narrativePerson: NarrativePerson | null;
   /** Temps verbal de la narration (roman). */
   narrativeTense: NarrativeTense | null;
+  /** Objectif narratif d'un chapitre (manga). */
+  narrativeGoal: string;
+  /** Nombre de pages visé pour un chapitre (manga) ; `null` : aucun. */
+  pageGoal: number | null;
+  /** Statut du scénario d'un chapitre (manga) ; `null` : à préparer. */
+  scriptStatus: ScriptStatus | null;
+  /** Fonction narrative d'une page (manga). */
+  rhythm: Rhythm | null;
+  /** Vrai : révélation après le tourné de page (manga). */
+  pageTurn: boolean;
   createdAt: string; // RFC 3339, UTC
   updatedAt: string; // RFC 3339, UTC
+}
+
+// ----------------------------------------------------------------------------
+// Manga / BD : scénario par page et par case (voir `manga_service.rs`)
+// ----------------------------------------------------------------------------
+
+export const SCRIPT_STATUSES = ["todo", "progress", "review", "final"] as const;
+export type ScriptStatus = (typeof SCRIPT_STATUSES)[number];
+
+export const RHYTHMS = ["action", "reveal", "pause", "transition", "suspense"] as const;
+export type Rhythm = (typeof RHYTHMS)[number];
+
+export const PANEL_TEXT_KINDS = ["dialogue", "thought", "narration", "sfx", "sign"] as const;
+export type PanelTextKind = (typeof PANEL_TEXT_KINDS)[number];
+
+export const FRAMINGS = [
+  "extremeWide",
+  "wide",
+  "full",
+  "american",
+  "medium",
+  "closeUp",
+  "extremeCloseUp",
+  "insert",
+  "overShoulder",
+  "highAngle",
+  "lowAngle",
+  "pov",
+] as const;
+export type Framing = (typeof FRAMINGS)[number];
+
+export interface PanelCharacter {
+  characterId: string;
+  /** État utile à la continuité : blessure, objet, tenue, information connue. */
+  state: string;
+}
+
+export interface PanelText {
+  id: string;
+  kind: PanelTextKind;
+  /** Locuteur (dialogue, pensée). */
+  characterId: string | null;
+  content: string;
+}
+
+export interface Panel {
+  id: string;
+  pageId: string;
+  position: number;
+  action: string;
+  framing: Framing | "";
+  setting: string;
+  artistNotes: string;
+  rhythm: Rhythm | null;
+  locationId: string | null;
+  moment: string;
+  continuity: string;
+  characters: PanelCharacter[];
+  texts: PanelText[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PageScript {
+  page: StructureNode;
+  panels: Panel[];
+}
+
+/** Scénario d'une page envoyé à l'enregistrement (`id` absent : nouveau). */
+export interface PageScriptInput {
+  rhythm: Rhythm | null;
+  pageTurn: boolean;
+  pageLabel: string;
+  panels: Array<
+    Omit<Panel, "id" | "pageId" | "position" | "texts" | "createdAt" | "updatedAt"> & {
+      id?: string;
+      texts: Array<Omit<PanelText, "id"> & { id?: string }>;
+    }
+  >;
+}
+
+export interface MangaSettings {
+  panelWordsMax: number | null;
+  pageWordsMax: number | null;
+}
+
+export interface MangaChapterFields {
+  narrativeGoal: string;
+  pageGoal: number | null;
+  scriptStatus: ScriptStatus | null;
 }
 
 // ----------------------------------------------------------------------------
@@ -781,7 +883,8 @@ export type TrashKind =
   | "noteFolder"
   | "sticky"
   | "relation"
-  | "placeLink";
+  | "placeLink"
+  | "mangaPanel";
 
 export interface TrashItem {
   id: string;

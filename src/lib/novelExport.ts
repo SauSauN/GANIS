@@ -21,7 +21,7 @@ export interface ExportRun {
 
 export type ExportBlock =
   | { type: "heading"; level: 1 | 2 | 3; text: string; pageBreakBefore?: boolean }
-  | { type: "paragraph"; runs: ExportRun[]; indent?: boolean }
+  | { type: "paragraph"; runs: ExportRun[]; indent?: boolean; /** Retrait à gauche (scénario) : 1, 2… */ inset?: number }
   /** Séparateur de scène (* * *). */
   | { type: "sceneBreak" };
 
@@ -31,6 +31,12 @@ export interface ExportDocument {
   subtitle: string[];
   /** Page de titre séparée (manuscrit) ou titre en tête (pitch, résumé). */
   titlePage: boolean;
+  /**
+   * Mise en page : « manuscrit » (par défaut : titres centrés, paragraphes
+   * justifiés) ou « scénario » (tout aligné à gauche, titres compacts,
+   * retraits pour les champs et les textes des cases).
+   */
+  layout?: "manuscript" | "script";
   blocks: ExportBlock[];
 }
 
@@ -98,9 +104,14 @@ export function htmlToBlocks(html: string, indent = true): ExportBlock[] {
 /** Texte brut d'un document (pour l'export .txt). */
 export function documentToText(document: ExportDocument): string {
   const lines: string[] = [document.title, ...document.subtitle, ""];
+  const script = document.layout === "script";
   for (const block of document.blocks) {
-    if (block.type === "heading") lines.push("", block.text.toUpperCase(), "");
-    else if (block.type === "sceneBreak") lines.push("", "* * *", "");
+    if (block.type === "heading") {
+      if (!script || block.level === 1) lines.push("", block.text.toUpperCase(), script ? "=".repeat(Math.min(60, block.text.length)) : "", "");
+      else if (block.level === 2) lines.push("", block.text, "-".repeat(Math.min(60, block.text.length)));
+      else lines.push("", block.text);
+    } else if (block.type === "sceneBreak") lines.push("", "* * *", "");
+    else if (script) lines.push("    ".repeat(block.inset ?? 0) + block.runs.map((run) => run.text).join(""));
     else lines.push(block.runs.map((run) => run.text).join(""), "");
   }
   return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim() + "\n";
@@ -135,8 +146,27 @@ export async function documentToDocx(document: ExportDocument): Promise<Uint8Arr
     for (const line of document.subtitle) children.push(new Paragraph({ children: [new TextRun({ text: line, italics: true })] }));
   }
 
+  const script = document.layout === "script";
+
   document.blocks.forEach((block, index) => {
-    if (block.type === "heading") {
+    if (block.type === "heading" && script) {
+      children.push(
+        new Paragraph({
+          heading: block.level === 1 ? HeadingLevel.HEADING_1 : block.level === 2 ? HeadingLevel.HEADING_2 : HeadingLevel.HEADING_3,
+          keepNext: true,
+          spacing: { before: block.level === 1 ? 240 : block.level === 2 ? 360 : 200, after: 100 },
+          children: [...(block.pageBreakBefore ? [new PageBreak()] : []), new TextRun({ text: block.text })],
+        }),
+      );
+    } else if (block.type === "paragraph" && script) {
+      children.push(
+        new Paragraph({
+          indent: block.inset ? { left: 567 * block.inset } : undefined,
+          spacing: { line: 276, after: 80 },
+          children: runsOf(block.runs),
+        }),
+      );
+    } else if (block.type === "heading") {
       const breakBefore = block.pageBreakBefore || (document.titlePage && index === 0);
       children.push(
         new Paragraph({
@@ -211,8 +241,23 @@ export async function documentToPdf(document: ExportDocument): Promise<Uint8Arra
     content.push({ text: "", margin: [0, 0, 0, 10] });
   }
 
+  const script = document.layout === "script";
+
   document.blocks.forEach((block, index) => {
-    if (block.type === "heading") {
+    if (block.type === "heading" && script) {
+      content.push({
+        text: block.text,
+        style: `s${block.level}`,
+        pageBreak: block.pageBreakBefore ? "before" : undefined,
+        headlineLevel: block.level,
+      });
+    } else if (block.type === "paragraph" && script) {
+      content.push({
+        text: block.runs.map((run) => ({ text: run.text, bold: run.bold, italics: run.italics, decoration: run.underline ? "underline" : undefined })),
+        lineHeight: 1.2,
+        margin: [24 * (block.inset ?? 0), 0, 0, 4],
+      });
+    } else if (block.type === "heading") {
       const breakBefore = block.pageBreakBefore || (document.titlePage && index === 0);
       content.push({
         text: block.text,
@@ -243,6 +288,9 @@ export async function documentToPdf(document: ExportDocument): Promise<Uint8Arra
       h1: { fontSize: 20, bold: true, alignment: "center", margin: [0, 120, 0, 30] },
       h2: { fontSize: 16, bold: true, alignment: "center", margin: [0, 60, 0, 24] },
       h3: { fontSize: 13, bold: true, alignment: "center", margin: [0, 24, 0, 12] },
+      s1: { fontSize: 18, bold: true, margin: [0, 6, 0, 8] },
+      s2: { fontSize: 14, bold: true, margin: [0, 16, 0, 4] },
+      s3: { fontSize: 11.5, bold: true, margin: [0, 10, 0, 3] },
     },
     footer: (current: number, total: number) =>
       document.titlePage && current === 1 ? null : { text: `${current} / ${total}`, alignment: "center", fontSize: 9, margin: [0, 20, 0, 0] },

@@ -1,5 +1,7 @@
 import * as React from "react";
+import { useTranslation } from "react-i18next";
 import { cn } from "@/lib/utils";
+import { useReturnFocus } from "@/lib/useReturnFocus";
 
 interface DialogProps {
   open: boolean;
@@ -7,6 +9,12 @@ interface DialogProps {
   children: React.ReactNode;
   /** Classes du panneau (ex. largeur plus grande que `max-w-lg`). */
   className?: string;
+  /**
+   * Vrai (par défaut) : si quelque chose a été saisi dans la fenêtre, un
+   * clic à côté ou Échap demandent d'abord confirmation au lieu de tout
+   * perdre. Les boutons de la fenêtre (« Annuler »…) ferment sans question.
+   */
+  guardInput?: boolean;
 }
 
 /** Identifiants du titre et de la description, pour `aria-labelledby`. */
@@ -14,6 +22,15 @@ const DialogIdsContext = React.createContext<{
   titleId: string;
   descriptionId: string;
 } | null>(null);
+
+/** Champ où l'on tape du texte (zone, champ texte, éditeur). */
+function isTextEntry(target: EventTarget): boolean {
+  if (target instanceof HTMLTextAreaElement) return true;
+  if (target instanceof HTMLInputElement) {
+    return ["text", "search", "email", "url", "tel", "password", "number", ""].includes(target.type);
+  }
+  return target instanceof HTMLElement && target.isContentEditable;
+}
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -23,21 +40,56 @@ const FOCUSABLE =
  * - `role="dialog"` + `aria-modal`, nommée par son `DialogTitle` ;
  * - le focus entre dans la fenêtre à l'ouverture, y reste (Tab / Maj+Tab)
  *   et revient à l'élément d'origine à la fermeture ;
- * - Échap ou un clic sur le fond ferment la fenêtre.
+ * - Échap ou un clic sur le fond ferment la fenêtre ; si une saisie a été
+ *   faite, une confirmation est demandée d'abord (`guardInput`).
  */
-function Dialog({ open, onOpenChange, children, className }: DialogProps) {
+function Dialog({ open, onOpenChange, children, className, guardInput = true }: DialogProps) {
+  const { t } = useTranslation("common");
   const panelRef = React.useRef<HTMLDivElement>(null);
+  /** Une saisie a eu lieu depuis l'ouverture. */
+  const typed = React.useRef(false);
+  /** Question « Abandonner la saisie ? » affichée. */
+  const [confirming, setConfirming] = React.useState(false);
+  const keepRef = React.useRef<HTMLButtonElement>(null);
   const titleId = React.useId();
   const descriptionId = React.useId();
 
-  // Toujours la dernière fonction, sans relancer l'effet à chaque rendu.
-  const onOpenChangeRef = React.useRef(onOpenChange);
-  onOpenChangeRef.current = onOpenChange;
+  useReturnFocus(open);
+
+  // Nouvelle ouverture : rien n'a encore été saisi.
+  React.useEffect(() => {
+    if (open) {
+      typed.current = false;
+      setConfirming(false);
+    }
+  }, [open]);
+
+  React.useEffect(() => {
+    if (confirming) keepRef.current?.focus();
+  }, [confirming]);
+
+  /**
+   * Fermeture « implicite » (fond, Échap) : protégée si l'on a saisi.
+   * Échap pendant la question revient simplement à la saisie.
+   */
+  const requestCloseRef = React.useRef(() => {});
+  requestCloseRef.current = () => {
+    if (confirming) {
+      setConfirming(false);
+      return;
+    }
+
+    if (guardInput && typed.current) {
+      setConfirming(true);
+      return;
+    }
+
+    onOpenChange(false);
+  };
 
   React.useEffect(() => {
     if (!open) return;
 
-    const previous = document.activeElement as HTMLElement | null;
     const panel = panelRef.current;
 
     const focusables = () =>
@@ -45,13 +97,15 @@ function Dialog({ open, onOpenChange, children, className }: DialogProps) {
         ? Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE))
         : [];
 
-    // Premier champ ou bouton, sinon la fenêtre elle-même.
-    (focusables()[0] ?? panel)?.focus();
+    // Premier champ ou bouton (sauf si un champ a déjà le focus), sinon la
+    // fenêtre elle-même.
+    if (!panel?.contains(document.activeElement)) (focusables()[0] ?? panel)?.focus();
 
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        e.stopPropagation();
-        onOpenChangeRef.current(false);
+        // Une seule fenêtre (la plus récente) traite Échap.
+        e.stopImmediatePropagation();
+        requestCloseRef.current();
         return;
       }
 
@@ -82,7 +136,6 @@ function Dialog({ open, onOpenChange, children, className }: DialogProps) {
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
-      previous?.focus?.();
     };
   }, [open]);
 
@@ -91,7 +144,7 @@ function Dialog({ open, onOpenChange, children, className }: DialogProps) {
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm"
-      onClick={() => onOpenChange(false)}
+      onClick={() => requestCloseRef.current()}
     >
       <div
         ref={panelRef}
@@ -105,7 +158,40 @@ function Dialog({ open, onOpenChange, children, className }: DialogProps) {
           className,
         )}
         onClick={(e) => e.stopPropagation()}
+        onInput={(e) => {
+          // Seule une saisie de texte compte (pas une case cochée).
+          if (isTextEntry(e.target)) typed.current = true;
+        }}
       >
+        {confirming && (
+          <div
+            role="alertdialog"
+            aria-labelledby={`${titleId}-discard`}
+            className="mb-4 flex flex-wrap items-center gap-2 rounded-md border border-warning/40 bg-warning/10 px-3 py-2 text-sm"
+          >
+            <span id={`${titleId}-discard`} className="flex-1 font-medium">
+              {t("dialog.discardQuestion")}
+            </span>
+            <button
+              ref={keepRef}
+              type="button"
+              onClick={() => setConfirming(false)}
+              className="h-7 rounded-md border bg-background px-2.5 text-sm font-medium hover:bg-muted"
+            >
+              {t("dialog.keepEditing")}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setConfirming(false);
+                onOpenChange(false);
+              }}
+              className="h-7 rounded-md bg-destructive/10 px-2.5 text-sm font-medium text-destructive hover:bg-destructive/20"
+            >
+              {t("dialog.discard")}
+            </button>
+          </div>
+        )}
         <DialogIdsContext.Provider value={{ titleId, descriptionId }}>
           {children}
         </DialogIdsContext.Provider>

@@ -19,6 +19,10 @@ mod commands;
 #[cfg(test)]
 mod seed_novel;
 
+/// Projet de démonstration (manga complet) : `cargo test --lib seed_public_manga -- --ignored --nocapture`.
+#[cfg(test)]
+mod seed_manga;
+
 use error::AppResult;
 use serde::Serialize;
 use state::AppState;
@@ -87,6 +91,10 @@ pub fn run() {
 
             let state = AppState::new(app_db, data_dir);
 
+            // Projets restés plus de 30 jours dans la corbeille : supprimés
+            // définitivement.
+            tauri::async_runtime::block_on(commands::projects::purge_expired_projects(&state));
+
             app.manage(state);
 
             tracing::info!("Base de données applicative initialisée");
@@ -109,6 +117,7 @@ pub fn run() {
             //commands::users::delete_user,
             commands::users::update_profile,
             commands::users::change_password,
+            commands::users::delete_account,
             commands::projects::create_project,
             commands::projects::list_projects,
             commands::projects::get_project,
@@ -117,6 +126,9 @@ pub fn run() {
             commands::projects::set_project_visibility,
             commands::projects::duplicate_project,
             commands::projects::delete_project,
+            commands::projects::list_project_trash,
+            commands::projects::restore_project,
+            commands::projects::purge_project,
             commands::ganix::export_project,
             commands::ganix::inspect_ganix,
             commands::ganix::confirm_ganix_import,
@@ -134,6 +146,13 @@ pub fn run() {
             commands::novel::set_daily_goal,
             commands::novel::import_manuscript,
             commands::novel::get_editorial,
+            commands::manga::get_page_script,
+            commands::manga::save_page_script,
+            commands::manga::get_script_panels,
+            commands::manga::move_manga_panel,
+            commands::manga::set_manga_chapter,
+            commands::manga::get_manga_settings,
+            commands::manga::set_manga_settings,
             commands::novel::update_editorial,
             commands::novel::save_export_file,
             commands::characters::get_character_settings,

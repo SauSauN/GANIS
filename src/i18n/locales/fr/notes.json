@@ -137,7 +137,15 @@
     "newNote": "Nouvelle note",
     "newFolder": "Nouveau dossier",
     "noExcerpt": "Note vide",
-    "pinned": "Épinglée"
+    "pinned": "Épinglée",
+    "select": "Sélectionner « {{name}} »",
+    "moveTo": "Déplacer vers…",
+    "moved_one": "{{count}} note déplacée.",
+    "moved_other": "{{count}} notes déplacées.",
+    "deleteSelected": "Supprimer",
+    "deleteSelectedTitle_one": "Supprimer {{count}} note ?",
+    "deleteSelectedTitle_other": "Supprimer {{count}} notes ?",
+    "deleteSelectedBody": "Elles vont dans la corbeille du projet, d'où vous pourrez les restaurer pendant 30 jours."
   },
   "create": {
     "card": "Nouvelle note",

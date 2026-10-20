@@ -44,9 +44,11 @@ Tout reste sur l'ordinateur de l'utilisateur. GANIS fonctionne **sans connexion 
 - **Changer la visibilité** : paramètres du projet → « Statut et organisation » → « Visibilité ».
   - Public → privé : immédiat si on est connecté ; sinon une connexion est demandée sur place, puis le projet devient privé. Si la connexion passe par la création d'un compte ou l'assistant, le changement est appliqué à l'arrivée sur le tableau de bord.
   - Privé → public : confirmation explicite (« Annuler » / « Rendre public »).
-- **Comptes locaux** : un administrateur est créé au premier compte (assistant de configuration), puis d'autres comptes peuvent s'inscrire. Il existe trois rôles : `admin`, `developer` et `user`.
+- **Comptes locaux** : un administrateur est créé au premier compte (assistant de configuration), puis d'autres comptes peuvent s'inscrire. Il existe trois rôles : `admin`, `developer` et `user`. Chacun peut supprimer son compte (Paramètres › Compte, mot de passe demandé) : le compte et ses projets privés sont effacés ; le dernier administrateur ne peut pas partir tant que d'autres comptes existent.
+- **Verrouillage automatique** (facultatif, Paramètres › Compte) : après 5 à 60 minutes sans activité, la clé du compte est effacée de la mémoire et le mot de passe est demandé pour reprendre, onglets et saisies conservés.
 - **Clé de récupération** : elle est remise à la création du compte et permet de retrouver l'accès en cas de mot de passe oublié. Elle peut être régénérée depuis les paramètres.
 - **Tableau de bord** : création, duplication, suppression et favoris de projets.
+  - **Corbeille des projets** : un projet supprimé y reste 30 jours (restauration, ou suppression définitive) ; passé ce délai, il est effacé au démarrage. Sélection multiple pour restaurer ou supprimer plusieurs projets.
   - Types de projet : manga, roman, film, série, jeu, JDR, personnalisé.
   - Statuts : en préparation, en cours, en pause, terminé.
 - **Calendrier de travail** : il retrace le rythme d'écriture à partir de l'activité réelle sur les projets.
@@ -97,7 +99,8 @@ Les modèles de découpage proposés sont les suivants :
 - **Journal d'activité** : il est conservé 90 jours.
 - **Versions automatiques** : une version est prise au début de chaque séance de modification, au plus une toutes les 10 minutes et 50 par élément. Les versions manuelles sont aussi possibles. Restaurer une version garde d'abord l'état actuel.
 - **Corbeille** : les éléments supprimés sont restaurés avec tout ce qui en dépendait (images, relations, liens).
-- **Garde des modifications non enregistrées** : l'application pose la question avant de quitter ou de fermer un onglet modifié.
+- **Garde des modifications non enregistrées** : l'application pose la question avant de quitter ou de fermer un onglet modifié. Une fenêtre où l'on a saisi du texte ne se ferme plus d'un clic à côté : « Abandonner ce que vous avez saisi ? » est demandé d'abord.
+- **Écran de secours** : une erreur d'affichage remplace l'onglet (ou l'application) par un message clair, avec « Réessayer » et « Enregistrer et recharger GANIS ».
 
 ### Personnalisation
 

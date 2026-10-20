@@ -25,5 +25,28 @@
     "removeBody": "L'image sera supprimée du projet. Elle ne va pas dans la corbeille : pour la retrouver, il faudra l'ajouter de nouveau.",
     "removeConfirm": "Retirer l'image"
   },
-  "loading": "Chargement…"
+  "loading": "Chargement…",
+  "crash": {
+    "title": {
+      "app": "Un problème d'affichage est survenu",
+      "tab": "Cet onglet n'a pas pu s'afficher"
+    },
+    "description": "Vos données enregistrées ne sont pas touchées. Réessayez ; si le problème revient, rechargez GANIS (les modifications en attente sont enregistrées d'abord).",
+    "retry": "Réessayer",
+    "reload": "Enregistrer et recharger GANIS",
+    "reloading": "Rechargement…",
+    "details": "Détail technique (pour signaler le problème)"
+  },
+  "dialog": {
+    "discardQuestion": "Abandonner ce que vous avez saisi ?",
+    "keepEditing": "Continuer la saisie",
+    "discard": "Abandonner"
+  },
+  "selection": {
+    "label": "Sélection multiple",
+    "all": "Tout sélectionner",
+    "count_one": "{{count}} élément sélectionné",
+    "count_other": "{{count}} éléments sélectionnés",
+    "clear": "Désélectionner"
+  }
 }

@@ -119,9 +119,11 @@ export function paletteToVars(palette: ThemePalette): Record<string, string> {
     "--muted-foreground": p.mutedForeground,
     "--accent": p.secondary,
     "--accent-foreground": p.foreground,
-    "--destructive": p.destructive,
-    "--success": p.success,
-    "--warning": p.warning,
+    // Couleurs d'état : aussi utilisées pour du texte (messages d'erreur,
+    // « Enregistré », alertes), donc rendues lisibles sur les fonds du thème.
+    "--destructive": readableOn(p.destructive, [p.background, p.card, p.secondary]),
+    "--success": readableOn(p.success, [p.background, p.card, p.secondary]),
+    "--warning": readableOn(p.warning, [p.background, p.card, p.secondary]),
     "--border": p.border,
     "--input": p.border,
     "--ring": p.primary,
@@ -182,9 +184,9 @@ export const BUILTIN_THEMES: BuiltinTheme[] = [
         secondary: "#EEEFFD",
         mutedForeground: "#5D6590",
         border: "#E0E2F4",
-        destructive: "#F87171",
-        success: "#34D399",
-        warning: "#FBBF24",
+        destructive: "#B91C1C",
+        success: "#05704E",
+        warning: "#92400E",
       },
       dark: {
         background: "#0D1020",
@@ -196,9 +198,9 @@ export const BUILTIN_THEMES: BuiltinTheme[] = [
         secondary: "#242A4A",
         mutedForeground: "#9AA3D6",
         border: "#2A3157",
-        destructive: "#DC2626",
-        success: "#059669",
-        warning: "#D97706",
+        destructive: "#F87171",
+        success: "#34D399",
+        warning: "#FBBF24",
       },
     },
   },
@@ -531,3 +533,58 @@ export function contrastRatio(a: string, b: string): number | null {
 
 /** Contraste minimal recommandé pour le texte courant (WCAG AA). */
 export const MIN_TEXT_CONTRAST = 4.5;
+
+function hexToHsl(hex: string): [number, number, number] {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return [0, 0, l];
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  const h = max === r ? (g - b) / d + (g < b ? 6 : 0) : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return [h / 6, s, l];
+}
+
+function hslToHex([h, s, l]: [number, number, number]): string {
+  const hue = (p: number, q: number, t: number) => {
+    const u = t < 0 ? t + 1 : t > 1 ? t - 1 : t;
+    if (u < 1 / 6) return p + (q - p) * 6 * u;
+    if (u < 1 / 2) return q;
+    if (u < 2 / 3) return p + (q - p) * (2 / 3 - u) * 6;
+    return p;
+  };
+  const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+  const p = 2 * l - q;
+  const channels = s === 0 ? [l, l, l] : [hue(p, q, h + 1 / 3), hue(p, q, h), hue(p, q, h - 1 / 3)];
+  return `#${channels.map((c) => Math.round(c * 255).toString(16).padStart(2, "0")).join("").toUpperCase()}`;
+}
+
+/** Mélange de `color` (proportion `amount`) sur `background`, comme `bg-x/15`. */
+function tint(color: string, background: string, amount: number): string {
+  const channel = (hex: string, i: number) => parseInt(hex.slice(i, i + 2), 16);
+  return `#${[1, 3, 5]
+    .map((i) => Math.round(channel(color, i) * amount + channel(background, i) * (1 - amount)).toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+/**
+ * Couleur ajustée (assombrie sur fond clair, éclaircie sur fond sombre, même
+ * teinte) jusqu'à un contraste d'au moins `target` avec chacun des fonds et
+ * avec sa propre teinte légère (fond d'un message d'erreur). Couleur
+ * inchangée si elle suffit déjà ou n'est pas valide.
+ */
+export function readableOn(color: string, backgrounds: string[], target = MIN_TEXT_CONTRAST): string {
+  const fonds = backgrounds.filter(isHexColor);
+  if (!isHexColor(color) || fonds.length === 0) return color;
+  const surface = fonds[Math.min(1, fonds.length - 1)];
+  const darkSurface = luminance(surface) < 0.2;
+  const worst = (c: string) => Math.min(...[...fonds, tint(c, surface, 0.15)].map((b) => contrastRatio(c, b) ?? 21));
+  let [h, s, l] = hexToHsl(color);
+  let current = color.toUpperCase();
+  for (let step = 0; step < 100 && worst(current) < target; step++) {
+    l = darkSurface ? Math.min(1, l + 0.01) : Math.max(0, l - 0.01);
+    current = hslToHex([h, s, l]);
+  }
+  return current;
+}

@@ -20,6 +20,7 @@ import { useProjectStore } from "@/stores/projectStore";
 import { useSetupStore } from "@/stores/setupStore";
 import { toast } from "@/stores/toastStore";
 import type { Project } from "@/types";
+import { errorText } from "@/lib/errors";
 
 interface VisibilityCardProps {
   project: Project;
@@ -73,7 +74,7 @@ export function VisibilityCard({
         ),
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("visibility.failed"));
+      setError(errorText(e, "projectSettings:visibility.failed"));
     } finally {
       setBusy(false);
       setConfirmOpen(false);
@@ -260,7 +261,7 @@ function SignInToMakePrivate({
     } catch (e) {
       // Connecté, mais le changement a échoué : le message reste affiché,
       // le bouton « Rendre privé » de la carte permet de réessayer.
-      setLocalError(e instanceof Error ? e.message : t("visibility.failed"));
+      setLocalError(errorText(e, "projectSettings:visibility.failed"));
       setBusy(false);
     }
   }

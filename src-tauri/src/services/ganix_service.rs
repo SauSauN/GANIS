@@ -87,6 +87,40 @@ use std::fs::File;
 use std::io::{BufReader, BufWriter, Read, Write};
 use std::path::{Path, PathBuf};
 
+// ----------------------------------------------------------------------------
+// Avancement (barre de progression de l'interface)
+// ----------------------------------------------------------------------------
+
+/// Étape d'un export ou d'un import.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub enum Stage {
+    /// Export : lecture des données du projet (lignes).
+    Data,
+    /// Export : écriture des images et documents dans l'archive ;
+    /// import : extraction et contrôle des fichiers.
+    Files,
+    /// Relecture et contrôle de l'archive écrite (sans total).
+    Verify,
+    /// Import : reconstruction de la base (lignes).
+    Build,
+}
+
+/// Avancement : `done` sur `total` (total 0 : étape sans mesure).
+#[derive(Debug, Clone, Copy, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Progress {
+    pub stage: Stage,
+    pub done: u64,
+    pub total: u64,
+}
+
+/// Reçoit l'avancement (la commande le transmet à l'interface).
+pub type Reporter<'a> = &'a (dyn Fn(Progress) + Send + Sync);
+
+/// Avancement ignoré (sauvegardes internes, tests).
+pub fn no_progress(_: Progress) {}
+
 /// Version de la structure de l'archive (§23.1).
 pub const FORMAT_VERSION: u32 = 1;
 
@@ -889,9 +923,20 @@ pub async fn write_ganix(
     target: &Path,
     work_dir: &Path,
 ) -> AppResult<()> {
+    write_ganix_reporting(source, project, target, work_dir, &no_progress).await
+}
+
+/// Comme `write_ganix`, en signalant l'avancement à `report`.
+pub async fn write_ganix_reporting(
+    source: &SqlitePool,
+    project: &Project,
+    target: &Path,
+    work_dir: &Path,
+    report: Reporter<'_>,
+) -> AppResult<()> {
     std::fs::create_dir_all(work_dir).map_err(|e| io_error("Dossier de travail", e))?;
 
-    let result = write_ganix_inner(source, project, target, work_dir).await;
+    let result = write_ganix_inner(source, project, target, work_dir, report).await;
 
     let _ = std::fs::remove_dir_all(work_dir);
 
@@ -979,7 +1024,12 @@ fn write_value<W: Write>(
 
 /// Écrit `project.xml` depuis la base du projet, dans une seule transaction
 /// de lecture (instantané cohérent).
-async fn write_data(source: &SqlitePool, data_path: &Path, work_dir: &Path) -> AppResult<DataExport> {
+async fn write_data(
+    source: &SqlitePool,
+    data_path: &Path,
+    work_dir: &Path,
+    report: Reporter<'_>,
+) -> AppResult<DataExport> {
     std::fs::create_dir_all(work_dir.join(STAGED_ASSETS)).map_err(|e| io_error("Dossier de travail", e))?;
 
     let mut tx = source.begin().await?;
@@ -994,6 +1044,13 @@ async fn write_data(source: &SqlitePool, data_path: &Path, work_dir: &Path) -> A
         assets: BTreeMap::new(),
         assets_bytes: 0,
     };
+
+    // Nombre total de lignes, pour la barre de progression.
+    let mut total_rows: u64 = 0;
+    for table in tables.keys() {
+        total_rows += count(&mut tx, table).await.max(0) as u64;
+    }
+    report(Progress { stage: Stage::Data, done: 0, total: total_rows });
 
     let file = File::create(data_path).map_err(|e| io_error("Création de project.xml", e))?;
     let mut writer = Writer::new_with_indent(BufWriter::new(file), b' ', 2);
@@ -1035,6 +1092,7 @@ async fn write_data(source: &SqlitePool, data_path: &Path, work_dir: &Path) -> A
                     .write_event(Event::End(BytesEnd::new("row")))
                     .map_err(xml_error)?;
                 export.rows += 1;
+                report(Progress { stage: Stage::Data, done: export.rows, total: total_rows.max(export.rows) });
             }
         }
 
@@ -1064,10 +1122,11 @@ async fn write_ganix_inner(
     project: &Project,
     target: &Path,
     work_dir: &Path,
+    report: Reporter<'_>,
 ) -> AppResult<()> {
     // 1-3. Données en XML, images à part.
     let data_path = work_dir.join(DATA);
-    let export = write_data(source, &data_path, work_dir).await?;
+    let export = write_data(source, &data_path, work_dir, report).await?;
 
     // 4. Empreintes.
     let data_size = std::fs::metadata(&data_path).map_err(|e| io_error("Taille", e))?.len();
@@ -1137,10 +1196,14 @@ async fn write_ganix_inner(
         let mut data = BufReader::new(File::open(&data_path).map_err(write_err)?);
         std::io::copy(&mut data, &mut zip).map_err(write_err)?;
 
-        for (name, path) in &export.assets {
+        let files = export.assets.len() as u64;
+        report(Progress { stage: Stage::Files, done: 0, total: files });
+
+        for (index, (name, path)) in export.assets.iter().enumerate() {
             zip.start_file(name.as_str(), stored).map_err(zip_err)?;
             let mut image = BufReader::new(File::open(path).map_err(write_err)?);
             std::io::copy(&mut image, &mut zip).map_err(write_err)?;
+            report(Progress { stage: Stage::Files, done: index as u64 + 1, total: files });
         }
 
         let writer = zip.finish().map_err(zip_err)?;
@@ -1152,6 +1215,7 @@ async fn write_ganix_inner(
     }
 
     // 7. Relecture : mêmes contrôles qu'à l'import (niveaux 1 et 2).
+    report(Progress { stage: Stage::Verify, done: 0, total: 0 });
     verify_archive(&part)?;
 
     // 8. Renommage seulement si tout est bon.
@@ -1530,8 +1594,11 @@ async fn load_data(
     tables: &BTreeMap<String, Vec<String>>,
     assets: &BTreeMap<String, PathBuf>,
     schema_version: i64,
+    total_rows: u64,
+    report: Reporter<'_>,
 ) -> AppResult<()> {
     let file = File::open(data_path).map_err(|e| io_error("project.xml en attente", e))?;
+    let mut inserted: u64 = 0;
     let mut reader = Reader::from_reader(BufReader::new(file));
     reader_config(&mut reader);
 
@@ -1584,6 +1651,8 @@ async fn load_data(
 
         if let Some((table, row)) = pending {
             insert_row(conn, &table, row).await?;
+            inserted += 1;
+            report(Progress { stage: Stage::Build, done: inserted, total: total_rows.max(inserted) });
         }
     }
 
@@ -1598,9 +1667,14 @@ async fn load_data(
 /// schéma créé par les migrations de GANIS jusqu'à la version du fichier,
 /// tables vidées, lignes insérées, puis intégrité et clés étrangères
 /// contrôlées. Retourne les statistiques de l'aperçu.
-async fn build_database(dir: &Path, manifest: &Manifest, assets: &BTreeMap<String, PathBuf>) -> AppResult<Counts> {
+async fn build_database(
+    dir: &Path,
+    manifest: &Manifest,
+    assets: &BTreeMap<String, PathBuf>,
+    report: Reporter<'_>,
+) -> AppResult<Counts> {
     let pool = open_plain(&dir.join(STAGED_DB)).await?;
-    let result = build_database_inner(&pool, dir, manifest, assets).await;
+    let result = build_database_inner(&pool, dir, manifest, assets, report).await;
     pool.close().await;
     result
 }
@@ -1610,6 +1684,7 @@ async fn build_database_inner(
     dir: &Path,
     manifest: &Manifest,
     assets: &BTreeMap<String, PathBuf>,
+    report: Reporter<'_>,
 ) -> AppResult<Counts> {
     run_migrations(pool, &migrator_up_to(manifest.schema_version)).await?;
 
@@ -1624,7 +1699,9 @@ async fn build_database_inner(
             .await?;
     }
 
-    load_data(&mut tx, &dir.join(DATA), &tables, assets, manifest.schema_version).await?;
+    let total_rows = manifest.content.data.rows;
+    report(Progress { stage: Stage::Build, done: 0, total: total_rows });
+    load_data(&mut tx, &dir.join(DATA), &tables, assets, manifest.schema_version, total_rows, report).await?;
     tx.commit().await?;
 
     let mut conn = pool.acquire().await?;
@@ -1740,17 +1817,29 @@ pub fn clean_leftovers(data_dir: &Path) {
 
 /// Étapes 1 à 9 : contrôle le fichier et l'extrait dans une zone d'attente
 /// propre à l'utilisateur. Rien n'est encore ajouté à son compte.
+#[cfg(test)]
 pub async fn stage_import(
     data_dir: &Path,
     app_db: &SqlitePool,
     owner_id: &str,
     source: &Path,
 ) -> AppResult<ImportPreview> {
+    stage_import_reporting(data_dir, app_db, owner_id, source, &no_progress).await
+}
+
+/// Comme `stage_import`, en signalant l'avancement à `report`.
+pub async fn stage_import_reporting(
+    data_dir: &Path,
+    app_db: &SqlitePool,
+    owner_id: &str,
+    source: &Path,
+    report: Reporter<'_>,
+) -> AppResult<ImportPreview> {
     let staging_id = new_id();
     let dir = staging_dir(data_dir, &staging_id)?;
     std::fs::create_dir_all(&dir).map_err(|e| io_error("Zone d'attente", e))?;
 
-    let result = stage_import_inner(&dir, app_db, owner_id, source, &staging_id).await;
+    let result = stage_import_inner(&dir, app_db, owner_id, source, &staging_id, report).await;
 
     if result.is_err() {
         let _ = std::fs::remove_dir_all(&dir);
@@ -1761,7 +1850,12 @@ pub async fn stage_import(
 
 /// Étapes 2 à 11, sans rien rattacher au compte : contrôle de l'archive,
 /// extraction, images, reconstruction de la base dans `dir`.
+#[cfg(test)]
 async fn stage_files(dir: &Path, source: &Path) -> AppResult<(Manifest, Counts)> {
+    stage_files_reporting(dir, source, &no_progress).await
+}
+
+async fn stage_files_reporting(dir: &Path, source: &Path, report: Reporter<'_>) -> AppResult<(Manifest, Counts)> {
     let mut archive = open_archive(source)?;
     let index = read_index(&mut archive)?;
 
@@ -1773,6 +1867,13 @@ async fn stage_files(dir: &Path, source: &Path) -> AppResult<(Manifest, Counts)>
     let assets_dir = dir.join(STAGED_ASSETS);
     std::fs::create_dir_all(&assets_dir).map_err(|e| io_error("Zone d'attente", e))?;
     let mut assets = BTreeMap::new();
+    let files = index
+        .checksums
+        .files
+        .keys()
+        .filter(|name| parse_asset_name(name).is_some())
+        .count() as u64;
+    report(Progress { stage: Stage::Files, done: 0, total: files });
 
     for (name, hash) in &index.checksums.files {
         let Some((_, extension)) = parse_asset_name(name) else {
@@ -1794,10 +1895,11 @@ async fn stage_files(dir: &Path, source: &Path) -> AppResult<(Manifest, Counts)>
         }
 
         assets.insert(name.clone(), path);
+        report(Progress { stage: Stage::Files, done: assets.len() as u64, total: files });
     }
 
     // 9-11. Base reconstruite par GANIS à partir des données XML.
-    let counts = build_database(dir, &index.manifest, &assets).await?;
+    let counts = build_database(dir, &index.manifest, &assets, report).await?;
 
     // Les fichiers extraits ne servent plus : seule la base reconstruite reste.
     let _ = std::fs::remove_file(&data_path);
@@ -1812,9 +1914,10 @@ async fn stage_import_inner(
     owner_id: &str,
     source: &Path,
     staging_id: &str,
+    report: Reporter<'_>,
 ) -> AppResult<ImportPreview> {
     let size_bytes = std::fs::metadata(source).map_err(unreadable)?.len();
-    let (manifest, counts) = stage_files(dir, source).await?;
+    let (manifest, counts) = stage_files_reporting(dir, source, report).await?;
 
     // Zone d'attente rattachée à l'utilisateur (personne d'autre ne peut la confirmer).
     std::fs::write(dir.join("owner"), owner_id).map_err(|e| io_error("Zone d'attente", e))?;
@@ -2229,6 +2332,7 @@ mod tests {
             description_sealed: None,
             wrapped_key: None,
             visibility: Default::default(),
+            deleted_at: None,
             public_key: None,
         }
     }
@@ -2622,6 +2726,40 @@ mod tests {
             assert!(result.contains(expected), "cas {i} : {result}");
         }
 
+        std::fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[tokio::test]
+    async fn export_and_import_report_their_progress() {
+        let dir = temp_dir("progress");
+        let source = encrypted_project(&dir.join("source")).await;
+        let target = dir.join("P.ganix");
+        let seen = std::sync::Mutex::new(Vec::<Progress>::new());
+        let record = |p: Progress| seen.lock().unwrap().push(p);
+
+        write_ganix_reporting(&source, &project("P"), &target, &dir.join("work"), &record)
+            .await
+            .unwrap();
+
+        {
+            let seen = seen.lock().unwrap();
+            let data: Vec<_> = seen.iter().filter(|p| p.stage == Stage::Data).collect();
+            let last = data.last().unwrap();
+            assert!(last.total > 0 && last.done == last.total);
+            assert!(seen.iter().any(|p| p.stage == Stage::Files && p.done == 1 && p.total == 1));
+            assert_eq!(seen.last().unwrap().stage, Stage::Verify);
+        }
+
+        seen.lock().unwrap().clear();
+        let staging = temp_dir("progress-staging");
+        stage_files_reporting(&staging, &target, &record).await.unwrap();
+
+        let seen = seen.lock().unwrap();
+        let build: Vec<_> = seen.iter().filter(|p| p.stage == Stage::Build).collect();
+        let last = build.last().unwrap();
+        assert!(last.total > 0 && last.done == last.total);
+
+        std::fs::remove_dir_all(staging).unwrap();
         std::fs::remove_dir_all(dir).unwrap();
     }
 }

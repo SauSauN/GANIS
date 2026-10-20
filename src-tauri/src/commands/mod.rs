@@ -12,6 +12,7 @@ pub mod ganix;
 pub mod history;
 pub mod locations;
 pub mod notes;
+pub mod manga;
 pub mod novel;
 pub mod packages;
 pub mod plot;

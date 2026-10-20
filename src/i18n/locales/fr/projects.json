@@ -96,6 +96,21 @@
       "done": "Projet « {{name}} » importé.",
       "replaced": "Projet « {{name}} » remplacé. Sauvegarde de l'ancienne version : {{file}} (dossier « sauvegardes » de GANIS).",
       "encryptionNoteReplace": "Les données reçues seront chiffrées avec la clé de votre projet."
+    },
+    "progress": {
+      "export": "Export du projet en .ganix",
+      "import": "Vérification du fichier .ganix",
+      "stage": {
+        "data": "Lecture des données du projet",
+        "files": "Images et documents",
+        "verify": "Contrôle du fichier écrit",
+        "build": "Reconstruction du projet"
+      },
+      "count": {
+        "data": "{{done}} / {{total}} éléments",
+        "files": "{{done}} / {{total}} fichiers",
+        "build": "{{done}} / {{total}} éléments"
+      }
     }
   },
   "visibility": {

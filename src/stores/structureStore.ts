@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { create } from "zustand";
 import { api } from "@/lib/api";
 import type { NodeCharacterRole, NodeLocationRole, Structure, StructureLinks, StructureNode } from "@/types";
+import { errorText } from "@/lib/errors";
 
 /*
  * Découpage du projet ouvert, partagé par le plan, l'arborescence du
@@ -82,7 +83,7 @@ export const useStructureStore = create<StructureState>()((set, get) => ({
         return structure;
       })
       .catch((e: unknown) => {
-        set({ projectId, error: e instanceof Error ? e.message : String(e) });
+        set({ projectId, error: errorText(e, "errors:load.structure") });
         return null;
       })
       .finally(() => inflight.delete(projectId));

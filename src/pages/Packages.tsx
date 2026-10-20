@@ -37,6 +37,7 @@ import { canDevelop } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { usePackageStore } from "@/stores/packageStore";
+import { errorText } from "@/lib/errors";
 
 type ViewId = "installed" | "discover" | "import";
 
@@ -251,7 +252,7 @@ function InstalledView() {
     } catch (e) {
       setNotice({
         kind: "error",
-        text: e instanceof Error ? e.message : t("delete.failed"),
+        text: errorText(e, "packages:delete.failed"),
       });
       setToDelete(null);
     } finally {
@@ -345,7 +346,7 @@ function InstalledView() {
           {loadError ? (
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4">
               <p role="alert" className="flex-1 text-sm text-destructive">
-                {loadError instanceof Error ? loadError.message : t("mine.loadFailed")}
+                {errorText(loadError, "packages:mine.loadFailed")}
               </p>
               <Button size="sm" variant="outline" onClick={() => void reload()}>
                 {t("mine.retry")}

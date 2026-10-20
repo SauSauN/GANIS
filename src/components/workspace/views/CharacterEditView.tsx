@@ -158,9 +158,7 @@ export function CharacterEditView({
       setPortraitError(
         e instanceof PortraitError
           ? t(`portrait.errors.${e.code}`)
-          : e instanceof Error
-            ? e.message
-            : String(e),
+          : errorText(e),
       );
     } finally {
       setPortraitBusy(false);

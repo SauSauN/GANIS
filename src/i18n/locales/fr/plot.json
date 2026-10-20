@@ -209,7 +209,15 @@
     "addAlsoNode": "Ajouter une autre scène…",
     "alsoNodesNeedMain": "Choisissez d’abord « Raconté dans »",
     "removeAlsoNode": "Retirer « {{name}} »",
-    "momentHint": "1, 2, 3… : l'histoire principale. −1, −2… : le passé narratif, avant le début de l'histoire."
+    "momentHint": "1, 2, 3… : l'histoire principale. −1, −2… : le passé narratif, avant le début de l'histoire.",
+    "links": {
+      "title": "Liens avec d'autres événements",
+      "linkTo": "Relier à…",
+      "linkFrom": "Relier depuis…",
+      "open": "Afficher ce lien",
+      "toAria": "vers",
+      "fromAria": "depuis"
+    }
   },
   "link": {
     "from": "Part de",

@@ -104,7 +104,8 @@
     "deleteSelf": "You cannot delete your own account.",
     "lastAdminRole": "Cannot remove the role of the last administrator.",
     "lastAdminDelete": "Cannot delete the last administrator.",
-    "adminKeepsDeveloper": "An administrator always keeps the development tools."
+    "adminKeepsDeveloper": "An administrator always keeps the development tools.",
+    "lastAdminLeaving": "The last administrator cannot delete their account while other accounts exist."
   },
   "package": {
     "notFound": "Package not found.",
@@ -316,7 +317,21 @@
     "saveSynopsis": "Could not save the synopsis.",
     "characters": "Could not load the characters.",
     "locations": "Could not load the locations.",
-    "setup": "Could not check the GANIS setup."
+    "setup": "Could not check the GANIS setup.",
+    "projects": "Unable to load projects.",
+    "createProject": "Unable to create the project.",
+    "updateProject": "Unable to update the project.",
+    "duplicateProject": "Unable to duplicate the project.",
+    "visibility": "Unable to change the project's visibility.",
+    "deleteProject": "Unable to delete the project.",
+    "openProject": "Unable to open the project.",
+    "plot": "Unable to load or save the plot.",
+    "structure": "Unable to load the structure.",
+    "trash": "Unable to load the trash.",
+    "manga": "Unable to load the manga data.",
+    "placeLinks": "Unable to load character–location links.",
+    "search": "Search failed.",
+    "manuscript": "Unable to assemble the manuscript."
   },
   "novel": {
     "contentTooLong": "This text is too long (at most {{max}} characters).",
@@ -331,5 +346,19 @@
     "summaryTooLong": "This summary is too long (at most {{max}} characters).",
     "replaceQuery": "The text to find is empty or too long.",
     "replaceStale": "The text changed since the search: search again."
+  },
+  "manga": {
+    "tooManyPanels": "Too many panels on this page (at most {{max}}).",
+    "tooManyTexts": "Too many texts in a panel (at most {{max}}).",
+    "fieldTooLong": "A text is too long (at most {{max}} characters).",
+    "invalidRhythm": "Invalid page function.",
+    "invalidTextKind": "Invalid text type.",
+    "invalidFraming": "Invalid framing.",
+    "invalidStatus": "Invalid status.",
+    "invalidPageGoal": "Invalid page count (at most {{max}}).",
+    "invalidThreshold": "Invalid threshold.",
+    "unknownCharacter": "A character on this page no longer exists.",
+    "unknownLocation": "The chosen location no longer exists.",
+    "panelNotFound": "This panel no longer exists."
   }
 }

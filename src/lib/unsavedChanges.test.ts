@@ -62,8 +62,8 @@ describe("enregistrement groupé", () => {
 });
 
 describe("préférence d'enregistrement automatique", () => {
-  it("désactivé par défaut, 3 s", () => {
-    expect(getAutoSave()).toEqual({ enabled: false, delay: 3 });
+  it("activé par défaut, 3 s", () => {
+    expect(getAutoSave()).toEqual({ enabled: true, delay: 3 });
   });
 
   it("mémorise le choix et ignore un délai inconnu", () => {

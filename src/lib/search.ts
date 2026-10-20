@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import { characterTabId } from "@/lib/characters";
 import { locationTabId } from "@/lib/locations";
 import { noteTabId } from "@/lib/notes";
 import { structureNodeTabId } from "@/lib/structure";
 import { usePlotStore } from "@/stores/plotStore";
 import type { HistoryKind, SearchHit } from "@/types";
+import { errorText } from "@/lib/errors";
 
 /** Onglet qui montre un élément (fiche, note…). `null` : pas d'onglet propre. */
 export function itemTabId(kind: HistoryKind | SearchHit["kind"], id: string): string | null {
@@ -79,7 +80,7 @@ export function useProjectSearch(projectId: string, query: string) {
           }
         })
         .catch((cause) => {
-          if (!cancelled) setError(cause instanceof ApiError ? cause.message : String(cause));
+          if (!cancelled) setError(errorText(cause, "errors:load.search"));
         })
         .finally(() => {
           if (!cancelled) setLoading(false);

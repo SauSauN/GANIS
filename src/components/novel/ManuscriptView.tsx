@@ -205,7 +205,7 @@ export function ManuscriptView({ project, feature, onOpenFeature }: ManuscriptVi
                       )}
                       {/* Texte déjà nettoyé (fiche ou document) : rendu tel quel. */}
                       <div className="manuscript-text" dangerouslySetInnerHTML={{ __html: entry.html }} />
-                      <div className="pointer-events-none absolute top-0 right-0 flex -translate-y-[calc(100%+0.25rem)] flex-col items-end font-sans opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100">
+                      <div className="pointer-events-none absolute top-0 right-0 flex -translate-y-[calc(100%+0.25rem)] flex-col items-end font-sans opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
                         <button
                           type="button"
                           onClick={() => onOpenFeature(structureNodeTabId(entry.node.id))}

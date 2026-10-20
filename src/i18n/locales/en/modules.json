@@ -29,6 +29,9 @@
     },
     "manuscript": {
       "label": "Manuscript"
+    },
+    "script": {
+      "label": "Script"
     }
   },
   "features": {
@@ -124,6 +127,20 @@
       "import": {
         "label": "Import a manuscript",
         "description": "A Word, Markdown or text file, split into parts, chapters and scenes."
+      }
+    },
+    "script": {
+      "read": {
+        "label": "Script",
+        "description": "The script page by page and panel by panel; export for the artist."
+      },
+      "progress": {
+        "label": "Script progress",
+        "description": "Planned and written pages, statuses, text volume."
+      },
+      "continuity": {
+        "label": "Continuity",
+        "description": "Where each character appears, and in what state, panel by panel."
       }
     }
   }

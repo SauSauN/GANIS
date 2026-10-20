@@ -570,7 +570,7 @@ function CharacterTable({
               tabIndex={0}
               onClick={() => onOpen(character.id)}
               onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onOpen(character.id))}
-              className="cursor-pointer border-b last:border-0 hover:bg-muted/40 focus-visible:bg-muted/60 focus-visible:outline-none"
+              className="cursor-pointer border-b last:border-0 hover:bg-muted/40 focus-visible:bg-muted/60 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
             >
               <td className="px-5 py-3">
                 <span className="flex items-center gap-3">

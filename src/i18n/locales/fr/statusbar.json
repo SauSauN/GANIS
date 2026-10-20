@@ -10,6 +10,10 @@
     "unsaved_other": "{{count}} modifications non enregistrées",
     "saveAll": "Tout enregistrer",
     "saveAllHint": "Enregistrer toutes les modifications (Ctrl+Alt+S)",
-    "dismiss": "Masquer l'erreur"
+    "dismiss": "Masquer l'erreur",
+    "details": "Détails",
+    "detailsTitle": "Échec de l'enregistrement",
+    "detailsDescription": "La dernière modification n'a pas pu être enregistrée. Elle reste affichée ; vous pouvez réessayer (Ctrl+S) une fois le problème réglé.",
+    "close": "Fermer"
   }
 }
