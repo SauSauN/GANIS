@@ -1,4 +1,6 @@
 import type { Editor } from "@tiptap/core";
+import { readText as readNativeClipboard } from "@tauri-apps/plugin-clipboard-manager";
+import { isTauri } from "@/lib/api";
 
 /*
  * Menu Édition : annuler, rétablir, couper, copier, coller, tout
@@ -42,6 +44,11 @@ function target(): HTMLElement | null {
   if (isEditable(active)) return active;
   if (lastEditable && lastEditable.isConnected) return lastEditable;
   return null;
+}
+
+/** Vrai s'il existe un champ où appliquer une action d'édition. */
+export function hasEditTarget(): boolean {
+  return target() !== null;
 }
 
 /** Éditeur de note (TipTap) qui contient l'élément, s'il y en a un. */
@@ -97,7 +104,24 @@ export async function runEditAction(action: EditAction): Promise<boolean> {
   }
 }
 
+/**
+ * Texte du presse-papiers.
+ *
+ * Dans l'application, la WebView refuse `navigator.clipboard.readText()`
+ * (pas de geste « coller » du système) : le texte est lu par le
+ * presse-papiers natif (extension officielle de Tauri, permission
+ * `clipboard-manager:allow-read-text`). Dans un navigateur de
+ * développement, l'API du navigateur sert de secours.
+ */
 async function readClipboard(): Promise<string | null> {
+  if (isTauri()) {
+    try {
+      return await readNativeClipboard();
+    } catch {
+      /* presse-papiers vide ou sans texte : essai suivant */
+    }
+  }
+
   try {
     return await navigator.clipboard.readText();
   } catch {

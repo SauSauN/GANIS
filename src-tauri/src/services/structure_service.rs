@@ -254,6 +254,31 @@ pub struct StructureNode {
     pub numbered: bool,
     /// Numéro enregistré (mode non automatique). Ignoré en mode automatique.
     pub number: Option<i64>,
+    /// Nombre de mots du texte de l'élément (voir `novel_service`) ; le
+    /// texte lui-même n'est chargé qu'à la demande.
+    pub content_words: i64,
+    /// Objectif de mots (roman) ; `None` : aucun.
+    pub word_goal: Option<i64>,
+    /// État de rédaction (roman) : todo, draft, revision, proofread,
+    /// corrected ; `None` : à écrire.
+    pub writing_status: Option<String>,
+    /// Personne grammaticale de la narration (roman) : first, second, third.
+    pub narrative_person: Option<String>,
+    /// Temps verbal de la narration (roman) : present, past, future.
+    pub narrative_tense: Option<String>,
+    /// Objectif narratif d'un chapitre (manga).
+    pub narrative_goal: String,
+    /// Nombre de pages visé pour un chapitre (manga) ; `None` : aucun.
+    pub page_goal: Option<i64>,
+    /// Statut du scénario d'un chapitre (manga) : todo, progress, review,
+    /// final ; `None` : à préparer.
+    pub script_status: Option<String>,
+    /// Fonction narrative d'une page (manga) : action, reveal, pause,
+    /// transition, suspense.
+    pub rhythm: Option<String>,
+    /// Vrai : la révélation de cette page doit tomber après le tourné de
+    /// page (manga).
+    pub page_turn: bool,
     pub created_at: String,
     pub updated_at: String,
 }
@@ -274,6 +299,8 @@ pub struct Structure {
     /// Vrai : les numéros suivent l'ordre du plan. Faux (par défaut) :
     /// chaque élément garde son numéro (`StructureNode::number`).
     pub auto_numbering: bool,
+    /// Objectif de mots du manuscrit entier (roman) ; `None` : aucun.
+    pub manuscript_goal: Option<i64>,
     /// Tous les éléments, triés par parent puis par position. L'interface
     /// reconstruit l'arbre.
     pub nodes: Vec<StructureNode>,
@@ -337,10 +364,11 @@ fn check_level(level: i64, count: usize) -> AppResult<()> {
 // Lecture
 // ----------------------------------------------------------------------------
 
-const NODE_COLUMNS: &str =
-    "id, parent_id, level, title, summary, position, numbered, number, created_at, updated_at";
+const NODE_COLUMNS: &str = "id, parent_id, level, title, summary, position, numbered, number, \
+     content_words, word_goal, writing_status, narrative_person, narrative_tense, \
+     narrative_goal, page_goal, script_status, rhythm, page_turn, created_at, updated_at";
 
-async fn find_node(pool: &SqlitePool, id: &str) -> AppResult<Option<StructureNode>> {
+pub(crate) async fn find_node(pool: &SqlitePool, id: &str) -> AppResult<Option<StructureNode>> {
     let sql = format!("SELECT {NODE_COLUMNS} FROM structure_nodes WHERE id = ?");
 
     Ok(sqlx::query_as::<_, StructureNode>(&sql)
@@ -610,6 +638,7 @@ pub async fn get_structure(pool: &SqlitePool, project_type: ProjectType) -> AppR
         levels_custom,
         levels,
         auto_numbering: auto,
+        manuscript_goal: crate::services::novel_service::manuscript_goal(pool).await?,
         nodes: all_nodes(pool).await?,
     })
 }
@@ -813,9 +842,11 @@ pub async fn set_levels(
             .await?;
 
         if used > 0 {
-            return Err(AppError::validation(format!(
-                "Ce niveau contient encore {used} élément(s)."
-            ))
+            return Err(AppError::validation(if used == 1 {
+                "Ce niveau contient encore 1 élément.".to_owned()
+            } else {
+                format!("Ce niveau contient encore {used} éléments.")
+            })
             .with_key("structure.levelInUse")
             .with_param("count", used));
         }

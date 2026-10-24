@@ -51,7 +51,10 @@ export function SideBarPlot({ projectId, activeTab, onOpenFeature }: SideBarPlot
               </li>
             );
           })}
-          <li className="px-2 pt-2 text-xs text-muted-foreground">{t("sidebar.summary", { events: data.events.length, links: data.links.length })}</li>
+          <li className="px-2 pt-2 text-xs text-muted-foreground">{t("sidebar.summary", {
+            events: t("sidebar.summaryEvents", { count: data.events.length }),
+            links: t("sidebar.summaryLinks", { count: data.links.length }),
+          })}</li>
         </ul>
       )}
     </section>

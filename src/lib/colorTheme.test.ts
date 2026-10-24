@@ -11,6 +11,7 @@ import {
   isHexColor,
   isThemeData,
   paletteToVars,
+  readableOn,
   resetColorTheme,
   setActiveColorTheme,
   themeToCss,
@@ -148,5 +149,27 @@ describe("contraste", () => {
     expect(contrastRatio("#000000", "#FFFFFF")).toBeCloseTo(21, 0);
     expect(contrastRatio("#777777", "#777777")).toBeCloseTo(1, 5);
     expect(contrastRatio("nope", "#FFFFFF")).toBeNull();
+  });
+});
+describe("couleurs d'état lisibles", () => {
+  it("chaque thème intégré donne des couleurs d'état à 4,5:1 au moins sur ses fonds", () => {
+    for (const theme of BUILTIN_THEMES) {
+      for (const mode of ["light", "dark"] as const) {
+        const p = theme.theme[mode];
+        const vars = paletteToVars(p);
+        for (const key of ["--destructive", "--success", "--warning"]) {
+          for (const bg of [p.background, p.card, p.secondary]) {
+            expect(contrastRatio(vars[key], bg), `${theme.id} ${mode} ${key} sur ${bg}`).toBeGreaterThanOrEqual(4.5);
+          }
+        }
+      }
+    }
+  });
+
+  it("une couleur trop pâle d'un thème personnalisé est ajustée sans changer de teinte", () => {
+    const fixed = readableOn("#FBBF24", ["#FAFAFD", "#FFFFFF", "#EEEFFD"]);
+    expect(contrastRatio(fixed, "#FFFFFF")).toBeGreaterThanOrEqual(4.5);
+    expect(readableOn("#B91C1C", ["#FFFFFF"])).toBe("#B91C1C");
+    expect(contrastRatio(readableOn("#DC2626", ["#0D1020", "#151A30", "#242A4A"]), "#151A30")).toBeGreaterThanOrEqual(4.5);
   });
 });

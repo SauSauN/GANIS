@@ -128,5 +128,16 @@
     "enter": "Entrée",
     "delete": "Suppr",
     "escape": "Échap"
+  },
+  "selection": {
+    "select": "Sélectionner « {{name}} »",
+    "moveTo": "Déplacer vers…",
+    "delete": "Supprimer",
+    "deleting_one": "Suppression de {{count}} document…",
+    "deleting_other": "Suppression de {{count}} documents…",
+    "moving_one": "Déplacement de {{count}} document…",
+    "moving_other": "Déplacement de {{count}} documents…",
+    "moved_one": "{{count}} document déplacé vers « {{target}} ».",
+    "moved_other": "{{count}} documents déplacés vers « {{target}} »."
   }
 }

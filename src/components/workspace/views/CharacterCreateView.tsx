@@ -22,7 +22,6 @@ import {
 } from "@/components/workspace/views/PageShell";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import {
-  CHARACTER_SETTINGS_TAB,
   MAX_NAME_LENGTH,
   characterTabId,
   emptyDraft,
@@ -37,6 +36,7 @@ import { api } from "@/lib/api";
 import { useCharacterStore, useProjectCharacters } from "@/stores/characterStore";
 import type { CharacterDetailLevel } from "@/types";
 import { errorText } from "@/lib/errors";
+import { notifyError } from "@/lib/notify";
 
 interface CharacterCreateViewProps {
   projectId: string;
@@ -74,7 +74,10 @@ export function CharacterCreateView({ projectId, feature, onOpenFeature }: Chara
   const [portraitError, setPortraitError] = useState<string | null>(null);
   const [gallery, setGallery] = useState<PendingImage[]>([]);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "character:create");
+  };
 
   // Premier personnage : niveau à choisir.
   const [pickedLevel, setPickedLevel] = useState<CharacterDetailLevel>("basic");
@@ -225,11 +228,6 @@ export function CharacterCreateView({ projectId, feature, onOpenFeature }: Chara
               {t("levels.continue")}
             </Button>
 
-            {error && (
-              <p role="alert" className="text-sm text-destructive">
-                {error}
-              </p>
-            )}
           </CardFooter>
         </Card>
       </PageShell>
@@ -241,21 +239,7 @@ export function CharacterCreateView({ projectId, feature, onOpenFeature }: Chara
   // ---------------------------------------------------------------------------
 
   return (
-    <PageShell
-      title={feature.label}
-      description={
-        <>
-          {t("levels.current", { level: t(`levels.${detailLevel}.label`) })}{" "}
-          <button
-            type="button"
-            onClick={() => onOpenFeature(CHARACTER_SETTINGS_TAB)}
-            className="text-primary underline-offset-4 hover:underline"
-          >
-            {t("levels.change")}
-          </button>
-        </>
-      }
-    >
+    <PageShell title={feature.label}>
       <form onSubmit={onSubmit} noValidate>
         <CharacterSheet
           projectId={projectId}
@@ -296,11 +280,6 @@ export function CharacterCreateView({ projectId, feature, onOpenFeature }: Chara
                 </Button>
               )}
 
-              {error && (
-                <p role="alert" className="text-sm text-destructive">
-                  {error}
-                </p>
-              )}
             </div>
           }
         />

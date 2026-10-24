@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import type { GanixCounts, GanixImportMode, GanixPreview } from "@/types";
+import { errorText } from "@/lib/errors";
 
 const DATE_LOCALES = { fr, en: enUS } as const;
 
@@ -81,7 +82,7 @@ export function GanixImportDialog({ preview, onConfirm, onCancel }: GanixImportD
     try {
       await onConfirm(preview?.alreadyOwned ? mode : "copy");
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("ganix.import.failed"));
+      setError(errorText(e, "projects:ganix.import.failed"));
       setBusy(false);
     }
   }

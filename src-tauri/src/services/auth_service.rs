@@ -540,6 +540,56 @@ async fn set_password(
 }
 
 // ----------------------------------------------------------------------------
+// Suppression de son propre compte
+// ----------------------------------------------------------------------------
+
+/// Supprime le compte connecté, après vérification de son mot de passe.
+///
+/// Le compte, ses verrous de clé, ses sessions et ses projets privés (y
+/// compris ceux de la corbeille) sont effacés ; la session est fermée.
+/// Retourne les identifiants des projets supprimés : l'appelant efface
+/// leurs dossiers. Les projets publics ne sont pas touchés.
+///
+/// Le dernier administrateur ne peut pas partir tant que d'autres comptes
+/// existent : ils n'auraient plus personne pour les gérer.
+pub async fn delete_own_account(state: &AppState, password: &str) -> AppResult<Vec<String>> {
+    let (session_user, _account_key) = state.require_session().await?;
+
+    let user = user_service::find_by_id(&state.app_db, &session_user.id)
+        .await?
+        .ok_or_else(AppError::unauthorized)?;
+
+    if !verify_password_off_thread(password, &user.password_hash).await? {
+        return Err(current_password_wrong());
+    }
+
+    if user.role == Role::Admin && user_service::count_admins(&state.app_db).await? <= 1 {
+        let accounts: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM users")
+            .fetch_one(&state.app_db)
+            .await
+            .map_err(|e| AppError::database(e).with_detail("Comptage des comptes"))?;
+
+        if accounts > 1 {
+            return Err(AppError::validation(
+                "Le dernier administrateur ne peut pas supprimer son compte tant que d'autres comptes existent.",
+            )
+            .with_key("user.lastAdminLeaving"));
+        }
+    }
+
+    let project_ids =
+        crate::services::project_service::list_project_ids_for_user(&state.app_db, &user.id).await?;
+
+    session_service::delete_user_sessions(&state.app_db, &user.id).await?;
+    user_service::delete_by_id(&state.app_db, &user.id).await?;
+    state.close_session().await;
+
+    tracing::info!(projects = project_ids.len(), "Compte supprimé par son titulaire");
+
+    Ok(project_ids)
+}
+
+// ----------------------------------------------------------------------------
 // Connexion / déconnexion
 // ----------------------------------------------------------------------------
 

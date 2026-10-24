@@ -41,12 +41,19 @@ const MAX_DESCRIPTION_CHARS: usize = 5000;
 /// Colonnes lues pour construire un `Project`.
 const COLUMNS: &str = "id, name, description, project_type, status, \
     is_favorite, is_archived, created_at, updated_at, last_opened_at, \
-    name_sealed, description_sealed, wrapped_key, visibility, public_key";
+    name_sealed, description_sealed, wrapped_key, visibility, public_key, deleted_at";
 
-/// Condition d'accès d'un visiteur à un projet : public, ou appartenant au
-/// compte connecté. Le paramètre vaut NULL pour un invité (aucun projet
-/// privé ne correspond alors).
-const VIEWER_ACCESS: &str = "(visibility = 'public' OR owner_id = ?)";
+/// Condition d'accès d'un visiteur à un projet actif : public, ou
+/// appartenant au compte connecté. Le paramètre vaut NULL pour un invité
+/// (aucun projet privé ne correspond alors). Un projet dans la corbeille
+/// n'est plus accessible (voir `TRASH_ACCESS`).
+const VIEWER_ACCESS: &str = "(deleted_at IS NULL AND (visibility = 'public' OR owner_id = ?))";
+
+/// Même condition, pour un projet dans la corbeille.
+const TRASH_ACCESS: &str = "(deleted_at IS NOT NULL AND (visibility = 'public' OR owner_id = ?))";
+
+/// Durée de conservation d'un projet dans la corbeille, en jours.
+pub const PROJECT_TRASH_DAYS: i64 = 30;
 
 /// Suffixe ajouté au nom d'un projet dupliqué.
 const COPY_SUFFIX: &str = " (copie)";
@@ -651,7 +658,7 @@ pub async fn find_for_viewer(
 /// au plus ancien : projets publics, et projets privés du compte connecté.
 pub async fn list_for_viewer(pool: &SqlitePool, viewer: &Viewer) -> AppResult<Vec<Project>> {
     let sql = format!(
-        "SELECT {COLUMNS} FROM projects WHERE visibility = 'public' OR owner_id = ? \
+        "SELECT {COLUMNS} FROM projects WHERE {VIEWER_ACCESS} \
          ORDER BY updated_at DESC"
     );
 
@@ -912,10 +919,196 @@ pub async fn delete_for_viewer(pool: &SqlitePool, project_id: &str, viewer: &Vie
     Ok(())
 }
 
+// ----------------------------------------------------------------------------
+// Corbeille des projets
+// ----------------------------------------------------------------------------
+//
+// « Supprimer » place le projet dans la corbeille (`deleted_at`) : il quitte
+// le tableau de bord mais garde sa base et sa clé. Il peut être restauré
+// pendant `PROJECT_TRASH_DAYS` jours. Ensuite, ou sur demande, la ligne est
+// effacée avec sa clé (`purge_*`) et l'appelant supprime le dossier du
+// projet (`project_storage::delete_storage`) : c'est alors définitif.
+
+/// Place un projet accessible au visiteur dans la corbeille.
+pub async fn trash_for_viewer(pool: &SqlitePool, project_id: &str, viewer: &Viewer) -> AppResult<()> {
+    let sql = format!("UPDATE projects SET deleted_at = ? WHERE id = ? AND {VIEWER_ACCESS}");
+
+    let result = sqlx::query(&sql)
+        .bind(crate::utils::now_utc())
+        .bind(project_id)
+        .bind(viewer.user_id())
+        .execute(pool)
+        .await
+        .map_err(|e| {
+            AppError::database(&e).with_detail(format!("Échec de la mise à la corbeille du projet : {e}"))
+        })?;
+
+    if result.rows_affected() == 0 {
+        return Err(project_not_found());
+    }
+
+    Ok(())
+}
+
+/// Projets dans la corbeille accessibles au visiteur (déchiffrés), du plus
+/// récemment supprimé au plus ancien.
+pub async fn list_trash_for_viewer(pool: &SqlitePool, viewer: &Viewer) -> AppResult<Vec<Project>> {
+    let sql = format!(
+        "SELECT {COLUMNS} FROM projects WHERE {TRASH_ACCESS} ORDER BY deleted_at DESC"
+    );
+
+    let stored = sqlx::query_as::<_, Project>(&sql)
+        .bind(viewer.user_id())
+        .fetch_all(pool)
+        .await
+        .map_err(|e| {
+            AppError::database(&e).with_detail(format!("Échec de la liste de la corbeille : {e}"))
+        })?;
+
+    let mut projects = Vec::with_capacity(stored.len());
+
+    for project in stored {
+        let id = project.id.clone();
+
+        match reveal_for_viewer(project, viewer) {
+            Ok(project) => projects.push(project),
+            Err(error) => tracing::error!(
+                project = %id,
+                error = %error,
+                "Projet illisible écarté de la corbeille"
+            ),
+        }
+    }
+
+    Ok(projects)
+}
+
+/// Sort un projet de la corbeille.
+pub async fn restore_for_viewer(
+    pool: &SqlitePool,
+    project_id: &str,
+    viewer: &Viewer,
+) -> AppResult<Project> {
+    let sql = format!(
+        "UPDATE projects SET deleted_at = NULL, updated_at = ? WHERE id = ? AND {TRASH_ACCESS}"
+    );
+
+    let result = sqlx::query(&sql)
+        .bind(crate::utils::now_utc())
+        .bind(project_id)
+        .bind(viewer.user_id())
+        .execute(pool)
+        .await
+        .map_err(|e| {
+            AppError::database(&e).with_detail(format!("Échec de la restauration du projet : {e}"))
+        })?;
+
+    if result.rows_affected() == 0 {
+        return Err(project_not_found());
+    }
+
+    find_for_viewer(pool, project_id, viewer)
+        .await?
+        .ok_or_else(project_not_found)
+}
+
+/// Saisie de confirmation : le nom du projet, retapé (espaces de début et
+/// de fin et majuscules ignorés). Un nom vide ne confirme jamais rien.
+pub fn name_confirmed(name: &str, typed: Option<&str>) -> bool {
+    let expected = name.trim().to_lowercase();
+
+    !expected.is_empty() && typed.is_some_and(|typed| typed.trim().to_lowercase() == expected)
+}
+
+/// Efface définitivement un projet de la corbeille (sa clé disparaît avec
+/// la ligne). L'appelant supprime ensuite son dossier.
+///
+/// Un projet **public** est partagé par toutes les personnes qui utilisent
+/// GANIS sur cet ordinateur : son effacement doit avoir été confirmé
+/// explicitement (`confirm_public`, posé par l'interface après la saisie
+/// de confirmation), sans quoi il est refusé.
+pub async fn purge_for_viewer(
+    pool: &SqlitePool,
+    project_id: &str,
+    viewer: &Viewer,
+    confirm_public: bool,
+) -> AppResult<()> {
+    let visibility: Option<String> = sqlx::query_scalar(&format!(
+        "SELECT visibility FROM projects WHERE id = ? AND {TRASH_ACCESS}"
+    ))
+    .bind(project_id)
+    .bind(viewer.user_id())
+    .fetch_optional(pool)
+    .await
+    .map_err(|e| {
+        AppError::database(&e).with_detail(format!("Échec de la recherche du projet : {e}"))
+    })?;
+
+    let Some(visibility) = visibility else {
+        return Err(project_not_found());
+    };
+
+    if visibility == "public" && !confirm_public {
+        return Err(AppError::validation(
+            "Ce projet public est partagé avec les autres personnes qui utilisent cet ordinateur : confirmez sa suppression définitive.",
+        )
+        .with_key("project.purgePublicConfirm"));
+    }
+
+    let sql = format!("DELETE FROM projects WHERE id = ? AND {TRASH_ACCESS}");
+
+    let result = sqlx::query(&sql)
+        .bind(project_id)
+        .bind(viewer.user_id())
+        .execute(pool)
+        .await
+        .map_err(|e| {
+            AppError::database(&e).with_detail(format!("Échec de la suppression du projet : {e}"))
+        })?;
+
+    if result.rows_affected() == 0 {
+        return Err(project_not_found());
+    }
+
+    Ok(())
+}
+
+/// Date limite de conservation : un projet mis à la corbeille avant elle
+/// est expiré.
+pub fn trash_cutoff(now: chrono::DateTime<chrono::Utc>) -> String {
+    (now - chrono::Duration::days(PROJECT_TRASH_DAYS))
+        .to_rfc3339_opts(chrono::SecondsFormat::Secs, true)
+}
+
+/// Efface les projets restés plus de `PROJECT_TRASH_DAYS` jours dans la
+/// corbeille, quel que soit leur propriétaire. Retourne leurs identifiants,
+/// pour que l'appelant supprime leurs dossiers.
+pub async fn purge_expired(pool: &SqlitePool, cutoff: &str) -> AppResult<Vec<String>> {
+    let ids: Vec<String> = sqlx::query_scalar(
+        "SELECT id FROM projects WHERE deleted_at IS NOT NULL AND deleted_at < ?",
+    )
+    .bind(cutoff)
+    .fetch_all(pool)
+    .await
+    .map_err(|e| AppError::database(&e).with_detail(format!("Corbeille des projets : {e}")))?;
+
+    for id in &ids {
+        sqlx::query("DELETE FROM projects WHERE id = ? AND deleted_at IS NOT NULL")
+            .bind(id)
+            .execute(pool)
+            .await
+            .map_err(|e| AppError::database(&e).with_detail(format!("Corbeille des projets : {e}")))?;
+    }
+
+    Ok(ids)
+}
+
 /// Change la visibilité d'un projet. Réservé à un compte connecté.
 ///
 /// - Public → privé : le projet est rattaché au compte ; son nom et sa
 ///   description sont chiffrés et sa clé est enfermée par la clé du compte.
+///   Il disparaît de l'espace public pour les autres : `confirm_name` doit
+///   reprendre son nom (voir [`name_confirmed`]).
 /// - Privé → public (projet du compte uniquement) : le projet n'appartient
 ///   plus à personne ; nom, description et clé sont gardés en clair.
 ///
@@ -928,6 +1121,7 @@ pub async fn set_visibility(
     owner_id: &str,
     account_key: &SecretKey,
     target: ProjectVisibility,
+    confirm_name: Option<&str>,
 ) -> AppResult<Project> {
     let viewer = Viewer::Account {
         user_id: owner_id.to_owned(),
@@ -940,6 +1134,16 @@ pub async fn set_visibility(
 
     if current.visibility == target {
         return reveal_for_viewer(current, &viewer);
+    }
+
+    // Public → privé : le projet quitte l'espace partagé et n'est plus
+    // ouvrable que par ce compte. Les autres personnes de cet ordinateur le
+    // perdent : le nom du projet doit avoir été retapé pour confirmer.
+    if target == ProjectVisibility::Private && !name_confirmed(&current.name, confirm_name) {
+        return Err(AppError::validation(
+            "Pour rendre ce projet privé, retapez son nom : il ne sera plus accessible aux autres personnes qui utilisent cet ordinateur.",
+        )
+        .with_key("project.makePrivateConfirm"));
     }
 
     let now = crate::utils::now_utc();
@@ -1006,4 +1210,42 @@ pub async fn set_visibility(
     find_for_viewer(pool, project_id, &viewer)
         .await?
         .ok_or_else(project_not_found)
+}
+// ----------------------------------------------------------------------------
+// Projets d'exemple (voir `demo_service`)
+// ----------------------------------------------------------------------------
+
+/// Projet actif créé à partir de l'exemple `demo_id` dans l'espace du
+/// visiteur : l'espace public pour un invité, ses projets privés pour un
+/// compte. Un projet à la corbeille ne compte plus.
+pub async fn find_demo_for_viewer(pool: &SqlitePool, demo_id: &str, viewer: &Viewer) -> AppResult<Option<String>> {
+    let query = match viewer.user_id() {
+        Some(user_id) => sqlx::query_scalar(
+            "SELECT id FROM projects WHERE demo_id = ? AND deleted_at IS NULL AND owner_id = ? \
+             ORDER BY created_at LIMIT 1",
+        )
+        .bind(demo_id)
+        .bind(user_id.to_owned()),
+        None => sqlx::query_scalar(
+            "SELECT id FROM projects WHERE demo_id = ? AND deleted_at IS NULL AND visibility = 'public' \
+             ORDER BY created_at LIMIT 1",
+        )
+        .bind(demo_id)
+        .bind(None::<String>),
+    };
+    query
+        .fetch_optional(pool)
+        .await
+        .map_err(|e| AppError::database(&e).with_detail(format!("Échec de la recherche d'un projet d'exemple : {e}")))
+}
+
+/// Marque un projet comme créé à partir d'un exemple.
+pub async fn set_demo_id(pool: &SqlitePool, project_id: &str, demo_id: &str) -> AppResult<()> {
+    sqlx::query("UPDATE projects SET demo_id = ? WHERE id = ?")
+        .bind(demo_id)
+        .bind(project_id)
+        .execute(pool)
+        .await
+        .map_err(|e| AppError::database(&e).with_detail(format!("Échec du marquage du projet d'exemple : {e}")))?;
+    Ok(())
 }

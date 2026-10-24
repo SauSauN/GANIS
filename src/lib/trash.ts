@@ -1,5 +1,5 @@
 import i18n from "@/i18n";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import { useCharacterStore } from "@/stores/characterStore";
 import { useLocationStore } from "@/stores/locationStore";
 import { useNoteStore } from "@/stores/noteStore";
@@ -8,9 +8,13 @@ import { useRelationStore } from "@/stores/relationStore";
 import { useStructureStore } from "@/stores/structureStore";
 import { toast, useToastStore } from "@/stores/toastStore";
 import { useTrashStore } from "@/stores/trashStore";
+import { useWorldLinkStore } from "@/stores/worldLinkStore";
+import { useWorldStore } from "@/stores/worldStore";
 import { fullName } from "@/lib/characters";
 import { useDocumentStore } from "@/lib/documents";
-import type { CharacterLocation, Relation, TrashKind } from "@/types";
+import { notifyMangaScriptChanged } from "@/lib/mangaEvents";
+import type { CharacterLocation, Relation, TrashKind, WorldLink, WorldLinkKind } from "@/types";
+import { errorText } from "@/lib/errors";
 
 /*
  * Corbeille : « Annuler » juste après une suppression, et restauration.
@@ -49,6 +53,23 @@ export function placeLinkLabel(projectId: string, link: CharacterLocation | unde
   return `${characterName(projectId, link.characterId)} – ${place?.name ?? "?"}`;
 }
 
+/** Nom d'un élément quelconque (lien du monde). */
+function elementName(projectId: string, kind: WorldLinkKind, id: string): string {
+  if (kind === "character") return characterName(projectId, id);
+  if (kind === "location") {
+    const store = useLocationStore.getState();
+    return (store.projectId === projectId ? store.locations.find((item) => item.id === id)?.name : undefined) ?? "?";
+  }
+  const slice = useWorldStore.getState()[kind];
+  return (slice.projectId === projectId ? slice.entries.find((item) => item.id === id)?.name : undefined) ?? "?";
+}
+
+/** « Aldric – Excalibur » pour un lien entre éléments. */
+export function worldLinkLabel(projectId: string, link: WorldLink | undefined): string {
+  if (!link) return "";
+  return `${elementName(projectId, link.sourceKind, link.sourceId)} – ${elementName(projectId, link.targetKind, link.targetId)}`;
+}
+
 /** Dernière suppression annulable avec Ctrl+Z (tant que son message est affiché). */
 let lastUndo: { toastId: number; run: () => Promise<void> } | null = null;
 
@@ -64,6 +85,29 @@ export function announceDeletion(projectId: string, trashId: string, kind: Trash
 
   const toastId = toast({
     message: t(`trash:deleted.${kind}`, { name: trashLabel(kind, label) }),
+    action: { label: t("trash:undo"), run },
+  });
+
+  lastUndo = { toastId, run };
+}
+
+/**
+ * Suppression de plusieurs éléments à la fois (sélection multiple) : un seul
+ * message « N éléments supprimés — Annuler », qui les restaure tous.
+ */
+export function announceDeletions(projectId: string, trashIds: string[]) {
+  if (trashIds.length === 0) return;
+
+  useTrashStore.getState().invalidate(projectId);
+
+  const run = async () => {
+    useToastStore.getState().dismiss(toastId);
+    lastUndo = null;
+    await restoreManyFromTrash(projectId, trashIds);
+  };
+
+  const toastId = toast({
+    message: t("trash:deletedMany", { count: trashIds.length }),
     action: { label: t("trash:undo"), run },
   });
 
@@ -112,6 +156,25 @@ async function refreshAfterRestore(projectId: string, kind: TrashKind) {
     tasks.push(structure.fetchStructure(projectId), structure.fetchLinks(projectId));
   }
 
+  // Objets, faune et flore, et leurs liens. Un personnage restauré peut
+  // redevenir un animal (faune) ; un personnage ou un lieu restauré
+  // ramène ses liens avec des objets et des espèces.
+  const world = useWorldStore.getState();
+  if (world.item.projectId === projectId && ["item", "structureNode"].includes(kind)) {
+    tasks.push(world.fetchEntries(projectId, "item"));
+  }
+  if (world.species.projectId === projectId && ["species", "character", "structureNode"].includes(kind)) {
+    tasks.push(world.fetchEntries(projectId, "species"));
+  }
+
+  const worldLinks = useWorldLinkStore.getState();
+  if (
+    worldLinks.projectId === projectId &&
+    ["character", "location", "item", "species", "worldLink", "structureNode"].includes(kind)
+  ) {
+    tasks.push(worldLinks.fetchLinks(projectId));
+  }
+
   // Documents (et ceux d'un élément du découpage restauré).
   if (kind === "document" || kind === "structureNode") useDocumentStore.getState().invalidate(projectId);
 
@@ -121,10 +184,55 @@ async function refreshAfterRestore(projectId: string, kind: TrashKind) {
     if (kind === "sticky") tasks.push(notes.fetchStickies(projectId));
   }
 
+  // Scénario de manga : les pages ouvertes et les vues du scénario se relisent.
+  if (kind === "mangaPanel" || kind === "structureNode" || kind === "character" || kind === "location") notifyMangaScriptChanged(projectId);
+
   await Promise.allSettled(tasks);
 }
 
 /** Restaure un élément de la corbeille ; affiche le résultat. */
+/**
+ * Restaure plusieurs éléments de la corbeille (sélection multiple). Chaque
+ * module concerné est relu une seule fois ; un seul message résume le tout.
+ * Retourne les identifiants restaurés.
+ */
+export async function restoreManyFromTrash(projectId: string, trashIds: string[]): Promise<string[]> {
+  const restored: string[] = [];
+  const kinds = new Set<TrashKind>();
+  let failure: unknown = null;
+
+  for (const trashId of trashIds) {
+    try {
+      const item = await api.restoreTrash(projectId, trashId);
+      useTrashStore.getState().remove(projectId, trashId);
+      kinds.add(item.kind);
+      restored.push(trashId);
+    } catch (error) {
+      failure ??= error;
+    }
+  }
+
+  for (const kind of kinds) {
+    await refreshAfterRestore(projectId, kind);
+  }
+
+  if (restored.length > 0) {
+    toast({ message: t("trash:restoredMany", { count: restored.length }), tone: "success" });
+  }
+
+  if (failure) {
+    toast({
+      message: t("trash:restoreFailedSome", { count: trashIds.length - restored.length, reason: errorText(failure) }),
+      tone: "error",
+    });
+    // Un échec peut venir d'un élément déjà restauré avec un autre : la
+    // liste est relue.
+    void useTrashStore.getState().fetchTrash(projectId);
+  }
+
+  return restored;
+}
+
 export async function restoreFromTrash(projectId: string, trashId: string): Promise<boolean> {
   try {
     const item = await api.restoreTrash(projectId, trashId);
@@ -133,7 +241,7 @@ export async function restoreFromTrash(projectId: string, trashId: string): Prom
     toast({ message: t(`trash:restored.${item.kind}`, { name: trashLabel(item.kind, item.label) }), tone: "success" });
     return true;
   } catch (error) {
-    toast({ message: error instanceof ApiError ? error.message : String(error), tone: "error" });
+    toast({ message: errorText(error), tone: "error" });
     return false;
   }
 }

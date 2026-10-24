@@ -86,6 +86,8 @@ export interface Project {
   lastOpenedAt?: string | null; // RFC 3339, UTC
   /** Projet public (sans connexion) ou privé (lié au compte connecté). */
   visibility: ProjectVisibility;
+  /** Date de mise à la corbeille ; `null` pour un projet actif. */
+  deletedAt?: string | null; // RFC 3339, UTC
 }
 
 // ----------------------------------------------------------------------------
@@ -220,8 +222,219 @@ export interface StructureNode {
    * numérotation est automatique : le numéro est alors calculé.
    */
   number: number | null;
+  /** Mots du texte de l'élément (roman) ; le texte est chargé à la demande. */
+  contentWords: number;
+  /** Objectif de mots (roman) ; `null` : aucun. */
+  wordGoal: number | null;
+  /** État de rédaction (roman) ; `null` : à écrire. */
+  writingStatus: WritingStatus | null;
+  /** Personne grammaticale de la narration (roman). */
+  narrativePerson: NarrativePerson | null;
+  /** Temps verbal de la narration (roman). */
+  narrativeTense: NarrativeTense | null;
+  /** Objectif narratif d'un chapitre (manga). */
+  narrativeGoal: string;
+  /** Nombre de pages visé pour un chapitre (manga) ; `null` : aucun. */
+  pageGoal: number | null;
+  /** Statut du scénario d'un chapitre (manga) ; `null` : à préparer. */
+  scriptStatus: ScriptStatus | null;
+  /** Fonction narrative d'une page (manga). */
+  rhythm: Rhythm | null;
+  /** Vrai : révélation après le tourné de page (manga). */
+  pageTurn: boolean;
   createdAt: string; // RFC 3339, UTC
   updatedAt: string; // RFC 3339, UTC
+}
+
+// ----------------------------------------------------------------------------
+// Manga / BD : scénario par page et par case (voir `manga_service.rs`)
+// ----------------------------------------------------------------------------
+
+export const SCRIPT_STATUSES = ["todo", "progress", "review", "final"] as const;
+export type ScriptStatus = (typeof SCRIPT_STATUSES)[number];
+
+export const RHYTHMS = ["action", "reveal", "pause", "transition", "suspense"] as const;
+export type Rhythm = (typeof RHYTHMS)[number];
+
+export const PANEL_TEXT_KINDS = ["dialogue", "thought", "narration", "sfx", "sign"] as const;
+export type PanelTextKind = (typeof PANEL_TEXT_KINDS)[number];
+
+export const FRAMINGS = [
+  "extremeWide",
+  "wide",
+  "full",
+  "american",
+  "medium",
+  "closeUp",
+  "extremeCloseUp",
+  "insert",
+  "overShoulder",
+  "highAngle",
+  "lowAngle",
+  "pov",
+] as const;
+export type Framing = (typeof FRAMINGS)[number];
+
+export interface PanelCharacter {
+  characterId: string;
+  /** État utile à la continuité : blessure, objet, tenue, information connue. */
+  state: string;
+}
+
+export interface PanelText {
+  id: string;
+  kind: PanelTextKind;
+  /** Locuteur (dialogue, pensée). */
+  characterId: string | null;
+  content: string;
+}
+
+export interface Panel {
+  id: string;
+  pageId: string;
+  position: number;
+  action: string;
+  framing: Framing | "";
+  setting: string;
+  artistNotes: string;
+  rhythm: Rhythm | null;
+  locationId: string | null;
+  moment: string;
+  continuity: string;
+  characters: PanelCharacter[];
+  texts: PanelText[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PageScript {
+  page: StructureNode;
+  panels: Panel[];
+}
+
+/** Scénario d'une page envoyé à l'enregistrement (`id` absent : nouveau). */
+export interface PageScriptInput {
+  rhythm: Rhythm | null;
+  pageTurn: boolean;
+  pageLabel: string;
+  panels: Array<
+    Omit<Panel, "id" | "pageId" | "position" | "texts" | "createdAt" | "updatedAt"> & {
+      id?: string;
+      texts: Array<Omit<PanelText, "id"> & { id?: string }>;
+    }
+  >;
+}
+
+export interface MangaSettings {
+  panelWordsMax: number | null;
+  pageWordsMax: number | null;
+}
+
+export interface MangaChapterFields {
+  narrativeGoal: string;
+  pageGoal: number | null;
+  scriptStatus: ScriptStatus | null;
+}
+
+// ----------------------------------------------------------------------------
+// Roman (outils du romancier)
+// ----------------------------------------------------------------------------
+
+/** États de rédaction d'un chapitre, dans l'ordre du travail. */
+export type WritingStatus = "todo" | "draft" | "revision" | "proofread" | "corrected";
+export const WRITING_STATUSES: WritingStatus[] = ["todo", "draft", "revision", "proofread", "corrected"];
+
+export type NarrativePerson = "first" | "second" | "third";
+export const NARRATIVE_PERSONS: NarrativePerson[] = ["first", "second", "third"];
+
+export type NarrativeTense = "present" | "past" | "future";
+export const NARRATIVE_TENSES: NarrativeTense[] = ["present", "past", "future"];
+
+/** Réglages du romancier pour un élément (tous envoyés à chaque fois). */
+export interface NovelFields {
+  wordGoal: number | null;
+  writingStatus: WritingStatus | null;
+  narrativePerson: NarrativePerson | null;
+  narrativeTense: NarrativeTense | null;
+}
+
+/** Dossier de présentation éditoriale (indépendant du synopsis). */
+/** Mots écrits un jour donné (texte des scènes, solde net). */
+export interface WritingDay {
+  day: string;
+  words: number;
+}
+
+/** Écriture au jour le jour (roman). */
+export interface WritingStats {
+  /** Jour local (« 2026-10-18 »). */
+  today: string;
+  wordsToday: number;
+  dailyGoal: number | null;
+  /** Jours d'affilée où l'objectif a été atteint. */
+  streak: number;
+  bestStreak: number;
+  /** 30 derniers jours, le plus ancien d'abord. */
+  days: WritingDay[];
+}
+
+/** Recherche dans le texte des scènes. */
+export interface FindOptions {
+  query: string;
+  caseSensitive: boolean;
+  wholeWord: boolean;
+}
+
+export interface FindMatch {
+  nodeId: string;
+  /** Numéro de l'occurrence dans l'élément (ordre du texte). */
+  index: number;
+  before: string;
+  text: string;
+  after: string;
+}
+
+export interface FindResult {
+  matches: FindMatch[];
+  nodes: Array<{ id: string; updatedAt: string; count: number }>;
+  total: number;
+  truncated: boolean;
+}
+
+export interface ReplaceTarget {
+  nodeId: string;
+  updatedAt: string;
+  indices: number[];
+}
+
+export interface ReplaceResult {
+  replaced: number;
+  /** Éléments modifiés et leur texte d'avant (pour annuler). */
+  nodes: Array<{ node: StructureNode; before: string }>;
+}
+
+/** Élément du plan d'un manuscrit importé. */
+export interface ImportNode {
+  level: number;
+  title: string;
+  numbered: boolean;
+  /** Texte (HTML), souvent vide pour une partie ou un chapitre. */
+  content: string;
+  children: ImportNode[];
+}
+
+export interface ImportResult {
+  roots: string[];
+  nodes: number;
+  words: number;
+}
+
+export interface Editorial {
+  pitch: string;
+  summaryShort: string;
+  /** Texte libre ; une ligne vide sépare deux paragraphes. */
+  summaryLong: string;
+  updatedAt: string;
 }
 
 /** Rôle d'un personnage dans un élément du découpage. */
@@ -267,6 +480,8 @@ export interface Structure {
    * son numéro ; « Renuméroter » les remet dans l'ordre.
    */
   autoNumbering: boolean;
+  /** Objectif de mots du manuscrit (roman) ; `null` : aucun. */
+  manuscriptGoal: number | null;
   /** Tous les éléments, triés par parent puis par position. */
   nodes: StructureNode[];
 }
@@ -414,6 +629,85 @@ export interface LocationImage {
   caption: string | null;
   createdAt: string;
 }
+
+// ----------------------------------------------------------------------------
+// Objets, faune et flore (voir `world_service.rs`, `lib/world.ts`)
+// ----------------------------------------------------------------------------
+
+/** Module : objets (`item`) ou faune et flore (`species`). */
+export type WorldModule = "item" | "species";
+
+/** Faune et flore : une espèce entière, ou un animal / une plante précis. */
+export type SpeciesNature = "species" | "individual";
+
+/** Objet ou espèce (correspond à `WorldEntry` en Rust ; les images sont à part). */
+export interface WorldEntry {
+  id: string;
+  name: string;
+  /** Type par défaut (`sword`, `car`, `mammal`…) ou ajouté par l'auteur (`custom-…`). */
+  type: string;
+  /** Faune et flore seulement ; `null` pour un objet. */
+  nature: SpeciesNature | null;
+  /** Objet qui le contient ; espèce d'un animal précis. `null` : tout en haut. */
+  parentId: string | null;
+  /** Faune et flore : fiche de personnage de cet animal (`null` : aucune). */
+  characterId: string | null;
+  status: string;
+  fields: Record<string, string>;
+  portraitUpdatedAt: string | null;
+  galleryCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorldEntryInput {
+  name: string;
+  type: string;
+  nature: SpeciesNature | null;
+  parentId: string | null;
+  status: string;
+  fields: Record<string, string>;
+}
+
+/** Réglages d'un module pour le projet. */
+export interface WorldSettings {
+  /** Module affiché dans la barre de gauche (désactivé par défaut). */
+  enabled: boolean;
+  /** Catégories choisies par l'auteur (ordre du catalogue). */
+  categories: string[];
+  detailLevel: CharacterDetailLevel | null;
+  customTypes: CustomLocationType[];
+  lists: Partial<Record<"status", string[]>>;
+}
+
+/** Image de la galerie d'un objet ou d'une espèce, sans son contenu. */
+export interface WorldImage {
+  id: string;
+  caption: string | null;
+  createdAt: string;
+}
+
+/** Sorte d'élément reliée par un lien du monde. */
+export type WorldLinkKind = "character" | "location" | "item" | "species";
+
+/** Lien entre deux éléments, dont au moins un objet ou une espèce. */
+export interface WorldLink {
+  id: string;
+  sourceKind: WorldLinkKind;
+  sourceId: string;
+  targetKind: WorldLinkKind;
+  targetId: string;
+  /** `owns`, `livesIn`… (voir `worldLinkCatalog.json`). */
+  type: string;
+  label: string;
+  description: string;
+  sinceNode: string | null;
+  untilNode: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type WorldLinkInput = Omit<WorldLink, "id" | "createdAt" | "updatedAt">;
 
 // ----------------------------------------------------------------------------
 // Relations entre personnages
@@ -668,7 +962,11 @@ export type TrashKind =
   | "noteFolder"
   | "sticky"
   | "relation"
-  | "placeLink";
+  | "placeLink"
+  | "mangaPanel"
+  | "item"
+  | "species"
+  | "worldLink";
 
 export interface TrashItem {
   id: string;
@@ -686,7 +984,7 @@ export interface TrashItem {
 export type ActivityAction = "created" | "updated" | "deleted" | "restored" | "versionRestored" | "moved";
 
 /** Type d'élément du journal (ceux de la corbeille, plus le synopsis). */
-export type HistoryKind = TrashKind | "synopsis" | "plot";
+export type HistoryKind = TrashKind | "synopsis" | "plot" | "editorial";
 
 export interface Activity {
   id: string;
@@ -700,7 +998,7 @@ export interface Activity {
 }
 
 /** Éléments qui ont des versions. */
-export type VersionKind = "character" | "location" | "structureNode" | "note" | "synopsis" | "plot";
+export type VersionKind = "character" | "location" | "item" | "species" | "structureNode" | "note" | "synopsis" | "plot" | "editorial";
 
 export interface Version {
   id: string;
@@ -729,7 +1027,7 @@ export interface WorkCalendar {
 }
 
 /** `document` : l'identifiant est celui de l'élément du découpage qui le contient. */
-export type SearchKind = "character" | "location" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky";
+export type SearchKind = "character" | "location" | "item" | "species" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky";
 
 export interface SearchHit {
   kind: SearchKind;

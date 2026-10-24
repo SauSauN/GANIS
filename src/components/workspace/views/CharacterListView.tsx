@@ -106,9 +106,9 @@ function completion(character: Character, level: CharacterDetailLevel): number {
 /**
  * Liste des personnages.
  *
- * - Chiffres clés par rôle (cliquables pour filtrer).
- * - Recherche (nom, alias, profession, origine, description), filtre par
- *   statut, tri (nom, récents, fiche la plus remplie, rôle).
+ * - Recherche (nom, alias, profession, origine, description), filtres par
+ *   rôle et par statut (menus déroulants, avec le nombre de personnages),
+ *   tri (nom, récents, fiche la plus remplie, rôle).
  * - Deux affichages : grandes cartes ou tableau compact.
  */
 export function CharacterListView({ projectId, feature, onOpenFeature }: CharacterListViewProps) {
@@ -152,7 +152,6 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
     return [...known.filter((v) => used.includes(v)), ...used.filter((v) => !known.includes(v))];
   };
   const roles = ordered("role", [...new Set(characters.map((c) => c.role))]);
-  const statuses = ordered("status", [...new Set(characters.map((c) => c.status))]);
 
   const visible = useMemo(() => {
     const roleOrder = listValues(lists, "role");
@@ -230,26 +229,8 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
 
   return (
     <PageShell title={feature.label} description={t("list.count", { count: characters.length })} actions={createButton}>
-      {/* Chiffres clés : un bloc par rôle, cliquable pour filtrer */}
-      <div className="mb-5 flex flex-wrap gap-2" role="group" aria-label={t("fields.role")}>
-        <StatTile
-          label={t("list.allRoles")}
-          value={characters.length}
-          active={role === null}
-          onClick={() => setRole(null)}
-        />
-        {roles.map((value) => (
-          <StatTile
-            key={value}
-            label={listLabel("role", value)}
-            value={characters.filter((c) => c.role === value).length}
-            active={role === value}
-            onClick={() => setRole(role === value ? null : value)}
-          />
-        ))}
-      </div>
-
-      {/* Recherche, statut, tri, affichage */}
+      {/* Recherche, rôle, statut, tri, affichage. Rôles et statuts en menus
+          déroulants : leur nombre peut grandir sans encombrer la barre. */}
       <div className="mb-6 flex flex-wrap items-center gap-3">
         <div className="relative min-w-60 flex-1">
           <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -264,16 +245,21 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
         </div>
 
         <select
-          aria-label={t("fields.status")}
-          value={status}
-          onChange={(e) => setStatus(e.target.value)}
-          className={cn(fieldClass, "h-10 w-44")}
+          aria-label={t("fields.role")}
+          value={role ?? ""}
+          onChange={(e) => setRole(e.target.value || null)}
+          className={cn(fieldClass, "h-10 w-52")}
         >
-          <option value="">{t("list.allStatuses")}</option>
-          {statuses.map((value) => (
-            <option key={value} value={value}>{listLabel("status", value)}</option>
+          <option value="">
+            {t("list.allRolesOption")} ({characters.length})
+          </option>
+          {roles.map((value) => (
+            <option key={value} value={value}>
+              {listLabel("role", value)} ({characters.filter((c) => c.role === value).length})
+            </option>
           ))}
         </select>
+
 
         <label className="relative">
           <span className="sr-only">{t("list.sortLabel")}</span>
@@ -359,45 +345,6 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
         />
       )}
     </PageShell>
-  );
-}
-
-// ----------------------------------------------------------------------------
-// Chiffre clé
-// ----------------------------------------------------------------------------
-
-function StatTile({
-  label,
-  value,
-  active,
-  onClick,
-}: {
-  label: string;
-  value: number;
-  active: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={cn(
-        "inline-flex h-10 items-center gap-2.5 rounded-full border px-4 text-sm transition-colors",
-        "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-        active ? "border-primary bg-primary text-primary-foreground" : "bg-card hover:bg-muted/60",
-      )}
-    >
-      <span className="font-medium">{label}</span>
-      <span
-        className={cn(
-          "min-w-6 rounded-full px-1.5 text-center text-xs font-semibold tabular-nums",
-          active ? "bg-primary-foreground/20" : "bg-muted text-muted-foreground",
-        )}
-      >
-        {value}
-      </span>
-    </button>
   );
 }
 
@@ -570,7 +517,7 @@ function CharacterTable({
               tabIndex={0}
               onClick={() => onOpen(character.id)}
               onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), onOpen(character.id))}
-              className="cursor-pointer border-b last:border-0 hover:bg-muted/40 focus-visible:bg-muted/60 focus-visible:outline-none"
+              className="cursor-pointer border-b last:border-0 hover:bg-muted/40 focus-visible:bg-muted/60 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring"
             >
               <td className="px-5 py-3">
                 <span className="flex items-center gap-3">

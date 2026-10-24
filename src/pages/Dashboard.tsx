@@ -10,13 +10,18 @@ import {
   FileUp,
   FolderOpen,
   Globe,
+  Info,
   Lock,
   Plus,
   Search,
   Star,
+  Trash2,
 } from "lucide-react";
 import { GanixImportDialog } from "@/components/projects/GanixImportDialog";
 import { ProjectCard } from "@/components/projects/ProjectCard";
+import { ProjectTrashList } from "@/components/projects/ProjectTrashList";
+import { SpaceInfoDialog } from "@/components/projects/SpaceInfoDialog";
+import { useSetupStore } from "@/stores/setupStore";
 import {
   ProjectFormDialog,
   type ProjectFormValues,
@@ -40,6 +45,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
+import { errorText } from "@/lib/errors";
 import { projectsInSpace, spaceOf } from "@/lib/projectSpace";
 import { showGuideOnce } from "@/lib/shortcuts";
 import { cn } from "@/lib/utils";
@@ -47,13 +53,14 @@ import { useAuthStore } from "@/stores/authStore";
 import { usePendingVisibility } from "@/stores/pendingVisibilityStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { toast } from "@/stores/toastStore";
+import { notifyError, notifyInfo } from "@/lib/notify";
 import type {
   GanixImportMode,
   GanixPreview,
   Project,
 } from "@/types";
 
-type Filter = "all" | "favorites" | "archived";
+type Filter = "all" | "favorites" | "archived" | "trash";
 
 const RECENT_LIMIT = 3;
 
@@ -78,6 +85,7 @@ const RECENT_LIMIT = 3;
  */
 export default function Dashboard() {
   const navigate = useNavigate();
+  const needsSetup = useSetupStore((state) => state.needsSetup);
   const { t } = useTranslation(["dashboard", "projects", "common", "menus"]);
 
   const user = useAuthStore((state) => state.user);
@@ -97,6 +105,10 @@ export default function Dashboard() {
   const openProject = useProjectStore((state) => state.openProject);
   const importGanix = useProjectStore((state) => state.importGanix);
   const setVisibility = useProjectStore((state) => state.setVisibility);
+  const trash = useProjectStore((state) => state.trash);
+  const trashLoading = useProjectStore((state) => state.trashLoading);
+  const fetchTrash = useProjectStore((state) => state.fetchTrash);
+  const restoreProjects = useProjectStore((state) => state.restoreProjects);
 
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Filter>("all");
@@ -107,15 +119,23 @@ export default function Dashboard() {
    * sur une des cartes de filtre, la déplie.
    */
   const [listOpen, setListOpen] = useState(false);
+  /** Explication de l'espace courant (badge « Espace public / privé »). */
+  const [spaceInfoOpen, setSpaceInfoOpen] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Project | null>(null);
   const [deleting, setDeleting] = useState<Project | null>(null);
   const [deletingBusy, setDeletingBusy] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
+  // Retours d'action (erreurs, export, import) : en notification, pas dans
+  // la page, pour que rien ne bouge.
+  const setActionError = (message: string | null) => {
+    if (message) notifyError(message, "dashboard");
+  };
   /** Message de réussite (export, import). */
-  const [notice, setNotice] = useState<string | null>(null);
+  const setNotice = (message: string | null) => {
+    if (message) notifyInfo(message, "dashboard");
+  };
 
   /** Import .ganix : vérification en cours, puis aperçu à confirmer. */
   const [inspecting, setInspecting] = useState(false);
@@ -131,6 +151,18 @@ export default function Dashboard() {
     // La liste dépend de la connexion (projets privés du compte).
   }, [fetchProjects, user?.id]);
 
+  // Corbeille : relue à l'arrivée, au changement de compte et quand elle
+  // est affichée (un projet vient peut-être d'y être placé).
+  useEffect(() => {
+    fetchTrash().catch((e) => setActionError(errorText(e, "dashboard:errors.actionFailed")));
+  }, [fetchTrash, user?.id, filter]);
+
+  /** Corbeille de l'espace courant. */
+  const scopedTrash = useMemo(
+    () => projectsInSpace(trash, space),
+    [trash, space],
+  );
+
   /** Projets de l'espace courant (jamais de mélange public / privé). */
   const scoped = useMemo(
     () => projectsInSpace(projects, space),
@@ -145,10 +177,10 @@ export default function Dashboard() {
   useEffect(() => {
     if (!signedIn) return;
 
-    const projectId = usePendingVisibility.getState().take();
-    if (!projectId) return;
+    const pendingVisibility = usePendingVisibility.getState().take();
+    if (!pendingVisibility) return;
 
-    setVisibility(projectId, "private")
+    setVisibility(pendingVisibility.projectId, "private", pendingVisibility.confirmName)
       .then((project) =>
         toast({
           tone: "success",
@@ -158,7 +190,7 @@ export default function Dashboard() {
       .catch((e) =>
         toast({
           tone: "error",
-          message: e instanceof Error ? e.message : t("errors.actionFailed"),
+          message: errorText(e, "dashboard:errors.actionFailed"),
         }),
       );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -170,15 +202,17 @@ export default function Dashboard() {
       favorites: scoped.filter((p) => p.isFavorite && !p.isArchived)
         .length,
       archived: scoped.filter((p) => p.isArchived).length,
+      trash: scopedTrash.length,
     }),
-    [scoped],
+    [scoped, scopedTrash],
   );
 
   const visible = useMemo(() => {
     const query = search.trim().toLowerCase();
 
-    return scoped
+    return (filter === "trash" ? scopedTrash : scoped)
       .filter((project) => {
+        if (filter === "trash") return true;
         if (filter === "archived") return project.isArchived;
         if (filter === "favorites") {
           return project.isFavorite && !project.isArchived;
@@ -191,8 +225,12 @@ export default function Dashboard() {
           project.name.toLowerCase().includes(query) ||
           project.description.toLowerCase().includes(query),
       )
-      .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
-  }, [scoped, filter, search]);
+      .sort((a, b) =>
+        filter === "trash"
+          ? (b.deletedAt ?? "").localeCompare(a.deletedAt ?? "")
+          : b.updatedAt.localeCompare(a.updatedAt),
+      );
+  }, [scoped, scopedTrash, filter, search]);
 
   const recent = useMemo(
     () =>
@@ -225,9 +263,7 @@ export default function Dashboard() {
     try {
       await task();
     } catch (e) {
-      setActionError(
-        e instanceof Error ? e.message : t("errors.actionFailed"),
-      );
+      setActionError(errorText(e, "dashboard:errors.actionFailed"));
     } finally {
       setBusyId(null);
     }
@@ -240,11 +276,7 @@ export default function Dashboard() {
       await openProject(project.id);
       navigate(`/workspace/${project.id}`);
     } catch (e) {
-      setActionError(
-        e instanceof Error
-          ? e.message
-          : t("errors.openFailed"),
-      );
+      setActionError(errorText(e, "dashboard:errors.openFailed"));
     }
   }
 
@@ -279,9 +311,7 @@ export default function Dashboard() {
       );
       setPreview(result);
     } catch (e) {
-      setActionError(
-        e instanceof Error ? e.message : t("projects:ganix.import.failed"),
-      );
+      setActionError(errorText(e, "projects:ganix.import.failed"));
     } finally {
       setInspecting(false);
     }
@@ -375,14 +405,25 @@ export default function Dashboard() {
     setActionError(null);
 
     try {
-      await deleteProject(deleting.id);
+      const removed = deleting;
+      await deleteProject(removed.id);
       setDeleting(null);
+      toast({
+        tone: "success",
+        message: t("delete.done", { name: removed.name }),
+        action: {
+          label: t("delete.undo"),
+          run: async () => {
+            try {
+              await restoreProjects([removed.id]);
+            } catch (error) {
+              toast({ tone: "error", message: errorText(error, "dashboard:errors.restoreFailed") });
+            }
+          },
+        },
+      });
     } catch (e) {
-      setActionError(
-        e instanceof Error
-          ? e.message
-          : t("errors.deleteFailed"),
-      );
+      setActionError(errorText(e, "dashboard:errors.deleteFailed"));
       setDeleting(null);
     } finally {
       setDeletingBusy(false);
@@ -446,10 +487,16 @@ export default function Dashboard() {
       count: counts.archived,
       icon: Archive,
     },
+    {
+      id: "trash",
+      label: t("filters.trash"),
+      count: counts.trash,
+      icon: Trash2,
+    },
   ];
 
   /** Ce que montre la liste : une recherche prime sur le filtre choisi. */
-  const listMode = searching ? "search" : filter;
+  const listMode = searching && filter !== "trash" ? "search" : filter;
 
   const listTitle = t(`list.title.${listMode}`);
   const emptyTitle = t(`empty.${listMode}.title`);
@@ -474,21 +521,37 @@ export default function Dashboard() {
                     : t("guest.title")}
                 </h1>
 
-                {/* Espace courant : privé (connecté) ou public */}
-                <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                {/* Espace courant : privé (connecté) ou public. Le badge
+                    ouvre une petite fenêtre qui explique ce que l'espace
+                    protège ou non. */}
+                <button
+                  type="button"
+                  aria-haspopup="dialog"
+                  onClick={() => setSpaceInfoOpen(true)}
+                  title={t("space.explain")}
+                  className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                >
                   {space === "private" ? (
-                    <Lock className="h-3 w-3" />
+                    <Lock className="h-3 w-3" aria-hidden="true" />
                   ) : (
-                    <Globe className="h-3 w-3" />
+                    <Globe className="h-3 w-3" aria-hidden="true" />
                   )}
                   {t(`space.${space}`)}
-                </span>
+                  <Info className="h-3 w-3" aria-hidden="true" />
+                </button>
               </div>
               {signedIn && (
                 <p className="text-sm text-muted-foreground">
                   {t("subtitle")}
                 </p>
               )}
+              <SpaceInfoDialog
+                open={spaceInfoOpen}
+                space={space}
+                mode="info"
+                onClose={() => setSpaceInfoOpen(false)}
+                onSignIn={() => navigate(needsSetup ? "/setup" : "/login")}
+              />
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -525,33 +588,18 @@ export default function Dashboard() {
           </div>
 
           {/* Erreurs */}
-          {(error || actionError) && (
+          {error && (
             <div
               role="alert"
               className="mt-6 rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
             >
-              {actionError ?? error}
+              {error}
             </div>
           )}
 
-          {notice && !actionError && (
-            <div
-              role="status"
-              className="mt-6 flex items-start justify-between gap-4 rounded-md border border-success/30 bg-success/5 px-4 py-3 text-sm text-success"
-            >
-              <span className="whitespace-pre-line">{notice}</span>
-              <button
-                type="button"
-                className="shrink-0 text-xs underline-offset-2 hover:underline"
-                onClick={() => setNotice(null)}
-              >
-                {t("common:actions.close")}
-              </button>
-            </div>
-          )}
 
           {/* Filtres avec compteurs */}
-          <div className="mt-6 grid gap-4 sm:grid-cols-3">
+          <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {filters.map(({ id, label, count, icon: Icon }) => (
               <button
                 key={id}
@@ -634,7 +682,13 @@ export default function Dashboard() {
               )}
             </h2>
 
-            {listVisible && (
+            {listVisible && filter === "trash" && (
+              <div id="projects-list">
+                <ProjectTrashList projects={visible} loading={trashLoading} />
+              </div>
+            )}
+
+            {listVisible && filter !== "trash" && (
               <div id="projects-list">
                 {loading && projects.length === 0 ? (
                   <p className="text-sm text-muted-foreground">
@@ -677,6 +731,7 @@ export default function Dashboard() {
               </div>
             )}
           </section>
+
         </div>
       </main>
 

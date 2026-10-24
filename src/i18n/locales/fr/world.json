@@ -1,0 +1,811 @@
+{
+  "tab": {
+    "fallback": "Fiche"
+  },
+  "type": {
+    "unknown": "Type supprimé",
+    "custom": "Ajouté par vous"
+  },
+  "natures": {
+    "title": "Nature",
+    "all": "Espèces et individus",
+    "species": {
+      "label": "Une espèce",
+      "description": "Toute une espèce ou une variété : les loups gris, la rose de lune."
+    },
+    "individual": {
+      "label": "Un animal ou une plante précis",
+      "description": "Un individu qui a son nom : Éclair, le cheval du héros ; le vieux chêne du village."
+    }
+  },
+  "form": {
+    "name": "Nom",
+    "type": "Type",
+    "status": "Statut",
+    "none": "Non précisé",
+    "deleted": "(supprimé)"
+  },
+  "image": {
+    "choose": "Ajouter une image",
+    "remove": "Retirer l'image",
+    "drop": "Déposez l'image ici"
+  },
+  "picker": {
+    "search": "Chercher un type…",
+    "noResult": "Aucun type ne correspond.",
+    "manage": "Catégories et types personnalisés",
+    "change": "Changer",
+    "changeTitle": "Changer le type de « {{name}} »",
+    "changeDescription": "Les informations déjà saisies sont gardées, même celles qui ne s'appliquent plus au nouveau type.",
+    "choose_one": "Choisir parmi {{count}} type…",
+    "choose_other": "Choisir parmi {{count}} types…"
+  },
+  "parent": {
+    "item": {
+      "label": "Rangé dans / fait partie de",
+      "none": "Rangé nulle part",
+      "empty": "Nulle part",
+      "hint": "L'objet qui le contient ou dont il est une pièce : une lettre dans un coffre, un moteur dans un vaisseau."
+    },
+    "individual": {
+      "label": "Espèce",
+      "none": "Espèce non précisée",
+      "empty": "Espèce non précisée",
+      "hint": "L'espèce à laquelle appartient cet animal ou cette plante (créez d'abord l'espèce)."
+    },
+    "species": {
+      "label": "Fait partie de",
+      "none": "Tout en haut",
+      "empty": "Rien (tout en haut)",
+      "hint": "Un groupe plus large, si vous en avez un : les loups gris dans les canidés."
+    }
+  },
+  "sections": {
+    "identity": {
+      "title": "Identité"
+    },
+    "category": {
+      "description": "Les informations propres à cette catégorie."
+    },
+    "type": {
+      "title": "Spécificités : {{type}}",
+      "description": "Ce qui distingue ce type."
+    },
+    "story": {
+      "title": "Histoire et notes"
+    },
+    "gallery": {
+      "title": "Images"
+    },
+    "hidden": {
+      "title": "Informations gardées",
+      "description": "Ces champs ne s'appliquent pas à ce type (ou à cette nature) et sont masqués. Ils ne sont pas effacés : ils réapparaîtront si vous revenez en arrière.",
+      "list": "Champs masqués : {{fields}}."
+    },
+    "hiddenByLevel": {
+      "title": "Champs masqués par le niveau de détail",
+      "description": "Remplis, mais masqués par le niveau de détail choisi : {{fields}}. Changez le niveau dans les paramètres du projet pour les voir."
+    }
+  },
+  "list": {
+    "search": "Rechercher par nom…",
+    "categoryFilter": "Filtrer par catégorie",
+    "allCategories": "Toutes les catégories",
+    "loading": "Chargement…",
+    "retry": "Réessayer",
+    "noResult": "Aucune fiche ne correspond à votre recherche.",
+    "expand": "Déplier",
+    "collapse": "Replier"
+  },
+  "sidebar": {
+    "loading": "Chargement…",
+    "otherCategory": "Autres",
+    "collapseCategory": "Replier la catégorie",
+    "expandCategory": "Déplier la catégorie"
+  },
+  "disabled": {
+    "open": "Ouvrir les paramètres"
+  },
+  "create": {
+    "saving": "Création…",
+    "reset": "Tout effacer",
+    "imagesFailed": "La fiche est créée, mais une image n'a pas pu être ajoutée : {{message}}"
+  },
+  "levels": {
+    "continue": "Continuer"
+  },
+  "edit": {
+    "loading": "Chargement de la fiche…",
+    "saved": "Enregistré",
+    "delete": "Supprimer",
+    "deleteTitle": "Supprimer « {{name}} » ?",
+    "deleteDescription": "La fiche, ses images et ses liens iront dans la corbeille (30 jours).",
+    "deleteChildrenUp_one": "La fiche qui lui est rattachée sera déplacée dans « {{parent}} ».",
+    "deleteChildrenUp_other": "Les {{count}} fiches qui lui sont rattachées seront déplacées dans « {{parent}} ».",
+    "deleteChildrenTop_one": "La fiche qui lui est rattachée remontera tout en haut.",
+    "deleteChildrenTop_other": "Les {{count}} fiches qui lui sont rattachées remonteront tout en haut.",
+    "deleteKeepsCharacter": "Sa fiche de personnage est gardée.",
+    "deleteConfirm": "Supprimer",
+    "notFound": {
+      "title": "Fiche introuvable",
+      "description": "Elle a peut-être été supprimée.",
+      "close": "Fermer l'onglet"
+    }
+  },
+  "errors": {
+    "nameRequired": "Le nom est requis.",
+    "nameTooLong": "Le nom dépasse {{max}} caractères."
+  },
+  "settings": {
+    "categories": {
+      "title": "Catégories utilisées",
+      "lastOne": "Gardez au moins une catégorie (ou désactivez le module)."
+    },
+    "level": {
+      "title": "Niveau de détail des fiches",
+      "description": "S'applique à toutes les fiches de ce module. Les champs déjà remplis ne sont jamais effacés."
+    },
+    "types": {
+      "title": "Types personnalisés",
+      "empty": "Aucun type ajouté pour l'instant.",
+      "name": "Nom du type",
+      "category": "Catégorie",
+      "add": "Ajouter",
+      "remove": "Retirer « {{name}} »"
+    },
+    "statuses": {
+      "title": "Statuts",
+      "description": "Valeurs proposées pour le statut d'une fiche.",
+      "add": "Ajouter",
+      "placeholder": "Nouveau statut",
+      "reset": "Valeurs par défaut",
+      "remove": "Retirer « {{value}} »"
+    }
+  },
+  "animalCharacter": {
+    "title": "Personnage",
+    "description": "Cet animal est-il aussi un personnage de l'histoire ?",
+    "linked": "Cet animal est aussi un personnage : relations, scènes et psychologie sont sur sa fiche de personnage.",
+    "open": "Fiche personnage",
+    "unlink": "Retirer le lien",
+    "unlinkHint": "Redevient un animal tout court ; la fiche de personnage est gardée.",
+    "notLinked": "Pour l'instant, c'est un animal tout court. S'il agit dans l'histoire (il a des relations, il apparaît dans des scènes), faites-en aussi un personnage.",
+    "create": "Créer sa fiche de personnage",
+    "pickLabel": "ou l'associer à un personnage existant",
+    "noFree": "Aucun personnage disponible",
+    "link": "Associer",
+    "badge": "Aussi un personnage"
+  },
+  "characterAnimal": {
+    "title": "Animal",
+    "description": "Ce personnage est-il un animal (ou une plante) de la faune et flore ?",
+    "none": "Si ce personnage est un animal, associez-le à sa fiche (un animal précis de la faune et flore).",
+    "pickLabel": "Animal ou plante précis",
+    "noFree": "Aucun animal précis disponible"
+  },
+  "links": {
+    "title": "Liens avec des objets et des espèces",
+    "description": {
+      "character": "Ce qu'il possède, utilise, a fabriqué ou recherche ; ses compagnons et montures.",
+      "location": "Les objets qui s'y trouvent, les animaux et les plantes qui y vivent.",
+      "item": "À qui il appartient, où il se trouve, de quoi il est fait, à quoi il est lié.",
+      "species": "Où il vit, de quoi il se nourrit, à qui il appartient, ce qu'on en fait."
+    },
+    "add": "Lier un élément",
+    "edit": "Modifier le lien",
+    "empty": "Aucun lien pour l'instant.",
+    "periodBoth": "de {{since}} à {{until}}",
+    "periodFrom": "à partir de {{since}}",
+    "periodUntil": "jusqu'à {{until}}",
+    "kinds": {
+      "character": "Personnage",
+      "location": "Lieu",
+      "item": "Objet",
+      "species": "Faune et flore"
+    },
+    "types": {
+      "owns": {
+        "forward": "possède",
+        "backward": "appartient à"
+      },
+      "uses": {
+        "forward": "utilise",
+        "backward": "utilisé par"
+      },
+      "made": {
+        "forward": "a fabriqué",
+        "backward": "fabriqué par"
+      },
+      "seeks": {
+        "forward": "recherche",
+        "backward": "recherché par"
+      },
+      "companion": {
+        "forward": "compagnon / monture",
+        "backward": "compagnon de"
+      },
+      "locatedIn": {
+        "forward": "se trouve à",
+        "backward": "abrite"
+      },
+      "livesIn": {
+        "forward": "vit à / pousse à",
+        "backward": "habitat de"
+      },
+      "partOf": {
+        "forward": "fait partie de",
+        "backward": "comprend"
+      },
+      "madeFrom": {
+        "forward": "fait à partir de",
+        "backward": "sert à fabriquer"
+      },
+      "eats": {
+        "forward": "se nourrit de",
+        "backward": "nourrit"
+      },
+      "protects": {
+        "forward": "protège",
+        "backward": "protégé par"
+      },
+      "related": {
+        "forward": "lié à",
+        "backward": "lié à"
+      },
+      "other": {
+        "forward": "autre lien avec",
+        "backward": "autre lien avec"
+      }
+    },
+    "dialog": {
+      "newTitle": "Nouveau lien",
+      "editTitle": "Modifier le lien",
+      "description": "Reliez cette fiche à un autre élément du projet. Le lien apparaît sur les deux fiches.",
+      "kind": "Avec",
+      "element": "Élément",
+      "choose": "Choisir…",
+      "noneOfKind": "Aucun élément de cette sorte",
+      "noKinds": "Activez les objets ou la faune et la flore dans les paramètres du projet pour créer des liens.",
+      "type": "Nature du lien",
+      "label": "Précision (facultatif)",
+      "labelPlaceholder": "Ex. Héritée de son père",
+      "text": "Description (facultatif)",
+      "textPlaceholder": "Ce qu'il faut savoir sur ce lien…",
+      "since": "À partir de",
+      "until": "Jusqu'à",
+      "delete": "Supprimer",
+      "cancel": "Annuler",
+      "save": "Enregistrer",
+      "create": "Créer le lien"
+    }
+  },
+  "item": {
+    "categories": {
+      "weapon": {
+        "label": "Armes",
+        "description": "Épées, arcs, armes à feu, explosifs…"
+      },
+      "armor": {
+        "label": "Armures et protections",
+        "description": "Armures, boucliers, casques…"
+      },
+      "clothing": {
+        "label": "Vêtements et accessoires",
+        "description": "Chapeaux, capes, bijoux, sacs, masques…"
+      },
+      "vehicle": {
+        "label": "Véhicules",
+        "description": "Voitures, navires, trains, avions, vaisseaux…"
+      },
+      "tech": {
+        "label": "Technologie et appareils",
+        "description": "Téléphones, ordinateurs, robots, gadgets…"
+      },
+      "magic": {
+        "label": "Magie et artefacts",
+        "description": "Baguettes, grimoires, amulettes, potions, reliques…"
+      },
+      "document": {
+        "label": "Documents et écrits",
+        "description": "Lettres, livres, cartes, contrats, journaux…"
+      },
+      "tool": {
+        "label": "Outils et objets du quotidien",
+        "description": "Clés, outils, coffres, instruments, lampes…"
+      },
+      "treasure": {
+        "label": "Trésors et valeurs",
+        "description": "Pièces, pierres précieuses, couronnes, trophées…"
+      },
+      "consumable": {
+        "label": "Nourriture et substances",
+        "description": "Repas, boissons, remèdes, poisons, ingrédients…"
+      }
+    },
+    "types": {
+      "sword": "Épée",
+      "dagger": "Dague / couteau",
+      "axe": "Hache",
+      "spear": "Lance",
+      "bow": "Arc",
+      "crossbow": "Arbalète",
+      "pistol": "Pistolet",
+      "rifle": "Fusil",
+      "explosive": "Explosif",
+      "armor": "Armure",
+      "shield": "Bouclier",
+      "helmet": "Casque",
+      "hat": "Chapeau",
+      "cloak": "Cape / manteau",
+      "outfit": "Tenue",
+      "shoes": "Chaussures",
+      "jewel": "Bijou",
+      "ring": "Bague",
+      "bag": "Sac",
+      "mask": "Masque",
+      "car": "Voiture",
+      "motorcycle": "Moto",
+      "bicycle": "Vélo",
+      "cart": "Charrette",
+      "carriage": "Carrosse / calèche",
+      "boat": "Bateau",
+      "ship": "Navire",
+      "train": "Train",
+      "plane": "Avion",
+      "airship": "Dirigeable",
+      "spaceship": "Vaisseau spatial",
+      "phone": "Téléphone",
+      "computer": "Ordinateur",
+      "watch": "Montre",
+      "camera": "Appareil photo / caméra",
+      "radio": "Radio",
+      "robot": "Robot",
+      "gadget": "Gadget",
+      "artifact": "Artefact",
+      "wand": "Baguette",
+      "magicStaff": "Bâton de mage",
+      "grimoire": "Grimoire",
+      "amulet": "Amulette / talisman",
+      "crystal": "Cristal",
+      "potion": "Potion",
+      "relic": "Relique",
+      "letter": "Lettre",
+      "book": "Livre",
+      "map": "Carte",
+      "scroll": "Parchemin",
+      "contract": "Contrat / acte",
+      "diary": "Journal intime",
+      "photo": "Photographie",
+      "key": "Clé",
+      "tool": "Outil",
+      "container": "Coffre / boîte",
+      "instrument": "Instrument de musique",
+      "lamp": "Lampe / lanterne",
+      "toy": "Jouet",
+      "coins": "Pièces / argent",
+      "gem": "Pierre précieuse",
+      "crown": "Couronne",
+      "trophy": "Trophée",
+      "food": "Nourriture",
+      "drink": "Boisson",
+      "medicine": "Remède / médicament",
+      "poison": "Poison",
+      "ingredient": "Ingrédient"
+    },
+    "statuses": {
+      "intact": "Intact",
+      "worn": "Usé",
+      "damaged": "Abîmé",
+      "broken": "Cassé",
+      "lost": "Perdu",
+      "stolen": "Volé",
+      "hidden": "Caché",
+      "destroyed": "Détruit",
+      "unknown": "Inconnu"
+    },
+    "fields": {
+      "colorPalette": "Palette de couleurs",
+      "aliases": "Autres noms",
+      "description": "Description",
+      "firstAppearance": "Première apparition",
+      "creator": "Création / fabrication",
+      "origin": "Origine / provenance",
+      "value": "Valeur",
+      "rarity": "Rareté",
+      "history": "Histoire",
+      "notes": "Notes de l'auteur",
+      "material": "Matériau",
+      "weight": "Poids",
+      "size": "Taille / dimensions",
+      "damage": "Puissance / dégâts",
+      "range": "Portée",
+      "protection": "Protection",
+      "colors": "Couleurs",
+      "style": "Style",
+      "model": "Marque / modèle",
+      "speed": "Vitesse",
+      "capacity": "Places / capacité",
+      "propulsion": "Énergie / propulsion",
+      "autonomy": "Autonomie",
+      "energy": "Alimentation / batterie",
+      "features": "Fonctions / équipements",
+      "powers": "Pouvoirs",
+      "activation": "Comment l'activer",
+      "limits": "Limites / prix à payer",
+      "curse": "Malédiction",
+      "author": "Auteur",
+      "writtenOn": "Date de rédaction",
+      "language": "Langue",
+      "content": "Contenu / texte",
+      "use": "Usage",
+      "effects": "Effets",
+      "ingredients": "Ingrédients",
+      "duration": "Durée de l'effet",
+      "ammunition": "Munitions",
+      "trigger": "Déclenchement",
+      "registration": "Immatriculation / nom de bord",
+      "crew": "Équipage",
+      "armament": "Armement",
+      "phoneNumber": "Numéro",
+      "password": "Code / mot de passe",
+      "storedContent": "Contenu enregistré (messages, fichiers, photos…)",
+      "spells": "Sorts contenus",
+      "recipe": "Recette / préparation",
+      "recipient": "Destinataire",
+      "opens": "Ce qu'elle ouvre",
+      "contents": "Contenu",
+      "symptoms": "Symptômes",
+      "antidote": "Antidote"
+    },
+    "placeholders": {
+      "aliases": "Ex. La Lame du Roi",
+      "creator": "Ex. Les forgerons d'Aval",
+      "value": "Ex. Inestimable, 300 pièces d'or",
+      "damage": "Ex. Tranche l'acier",
+      "speed": "Ex. 120 km/h",
+      "capacity": "Ex. 4 places",
+      "model": "Ex. Coccinelle 1963",
+      "storedContent": "Ex. Trois appels manqués de Marc, une photo floue du quai…",
+      "powers": "Ce que l'objet permet de faire…",
+      "limits": "Ce qu'il coûte de s'en servir…",
+      "opens": "Ex. La porte de la crypte",
+      "recipient": "Ex. Mira, à Valona",
+      "description": "À quoi il ressemble, ce qu'on remarque en premier…",
+      "origin": "Où et comment il a été fabriqué ou trouvé…",
+      "history": "Ses anciens propriétaires, ce qui lui est arrivé…",
+      "notes": "Idées, questions en suspens…",
+      "material": "Ex. Acier, bois de chêne, soie",
+      "weight": "Ex. 1,2 kg",
+      "size": "Ex. 4 m de long",
+      "range": "Ex. 200 m",
+      "protection": "Ex. Arrête les flèches, pas les balles",
+      "colors": "Ex. Bleu nuit et argent",
+      "style": "Ex. Élégant, militaire, usé",
+      "propulsion": "Ex. Essence, vapeur, voiles, magie",
+      "autonomy": "Ex. 400 km, trois jours de mer",
+      "energy": "Ex. Batterie, cristal de mana",
+      "features": "Ajouter une fonction…",
+      "activation": "Ex. Prononcer son nom à voix haute",
+      "curse": "Ce qui arrive à celui qui s'en sert…",
+      "author": "Ex. Le roi Aldric",
+      "writtenOn": "Ex. Au printemps de l'an 312",
+      "language": "Ex. Vieil elfique",
+      "content": "Ce qui est écrit dessus ou dedans…",
+      "use": "Ex. Ouvrir les serrures anciennes",
+      "effects": "Ce qui se passe quand on le consomme…",
+      "ingredients": "Ajouter un ingrédient…",
+      "duration": "Ex. Une heure",
+      "ammunition": "Ex. Flèches à pointe d'argent",
+      "trigger": "Ex. Mèche, minuterie, sort",
+      "registration": "Ex. AB-123-CD, La Sirène d'Aval",
+      "crew": "Ex. 40 marins",
+      "armament": "Canons, tourelles, défenses…",
+      "phoneNumber": "Ex. 06 12 34 56 78",
+      "password": "Ex. 1987",
+      "spells": "Les sorts qu'il contient…",
+      "recipe": "Comment le préparer…",
+      "contents": "Ce qu'il contient…",
+      "symptoms": "Ce que ressent la victime…",
+      "antidote": "Ex. Racine de mandragore"
+    },
+    "options": {
+      "rarity": {
+        "common": "Courant",
+        "uncommon": "Peu courant",
+        "rare": "Rare",
+        "unique": "Unique",
+        "legendary": "Légendaire"
+      }
+    },
+    "profile": {
+      "new": "Nouvel objet",
+      "contains_one": "Contient {{count}} objet",
+      "contains_other": "Contient {{count}} objets"
+    },
+    "sections": {
+      "identity": "Ce qui permet de reconnaître l'objet.",
+      "story": "D'où il vient, son passé, et vos notes d'auteur.",
+      "gallery": "Jusqu'à 30 images : photos, croquis, références."
+    },
+    "form": {
+      "namePlaceholder": "Ex. Excalibur, La Coccinelle, le téléphone de Marc"
+    },
+    "picker": {
+      "title": "Quel genre d'objet ?",
+      "description": "Choisissez un type : la fiche s'adapte (un véhicule n'a pas les mêmes informations qu'une potion)."
+    },
+    "create": {
+      "save": "Créer l'objet",
+      "inside": "Sera rangé dans « {{name}} »."
+    },
+    "list": {
+      "create": "Créer un objet",
+      "emptyTitle": "Aucun objet pour l'instant",
+      "emptyDescription": "Armes, véhicules, téléphones, objets magiques… Créez ceux qui comptent dans votre histoire.",
+      "count_one": "{{count}} objet",
+      "count_other": "{{count}} objets",
+      "addInside": "Ranger un objet dans « {{name}} »"
+    },
+    "children": {
+      "title": "Contenu",
+      "description": "Les objets rangés dans « {{name}} » ou qui en font partie.",
+      "add": "Ajouter un objet ici",
+      "empty": "Rien n'est rangé ici."
+    },
+    "sidebar": {
+      "title": "Objets",
+      "empty": "Aucun objet."
+    },
+    "disabled": {
+      "title": "Le module Objets est désactivé",
+      "description": "Vos objets sont gardés. Réactivez le module dans les paramètres du projet pour les retrouver."
+    },
+    "settings": {
+      "title": "Objets",
+      "description": "Les objets de votre histoire : armes, véhicules, vêtements, téléphones, objets magiques…",
+      "enable": "Activer les objets",
+      "enabledHint": "Le module « Objets » est dans la barre de gauche.",
+      "disabledHint": "Activez-le pour l'ajouter à la barre de gauche.",
+      "kept_one": "{{count}} objet est gardé et réapparaîtra si vous réactivez le module.",
+      "kept_other": "{{count}} objets sont gardés et réapparaîtront si vous réactivez le module.",
+      "categories": "Ne gardez que ce dont votre histoire a besoin : les autres catégories ne seront pas proposées.",
+      "types": "Ajoutez vos propres types (Hoverboard, Épée runique…). Chacun est rangé dans une catégorie et en reçoit les champs.",
+      "typePlaceholder": "Ex. Hoverboard"
+    },
+    "levels": {
+      "title": "Niveau de détail des fiches d'objets",
+      "firstTime": "Choisissez le niveau de détail des fiches d'objets de ce projet. Il s'applique à tous les objets et se change dans les paramètres du projet.",
+      "basic": {
+        "label": "Basique",
+        "theme": "L'essentiel",
+        "goal": "Nommer et décrire l'objet",
+        "count": "7 champs"
+      },
+      "intermediate": {
+        "label": "Moyen",
+        "theme": "Les caractéristiques",
+        "goal": "Rareté, valeur, origine de fabrication et champs de la catégorie (portée, vitesse, pouvoirs…)",
+        "count": "+ 8 à 12 champs"
+      },
+      "advanced": {
+        "label": "Avancé",
+        "theme": "La profondeur",
+        "goal": "Détails propres au type, origine et histoire",
+        "count": "+ 2 à 5 champs"
+      }
+    }
+  },
+  "species": {
+    "categories": {
+      "fauna": {
+        "label": "Faune",
+        "description": "Animaux réels ou imaginaires : mammifères, oiseaux, dragons…"
+      },
+      "flora": {
+        "label": "Flore",
+        "description": "Arbres, fleurs, herbes, champignons, plantes magiques…"
+      }
+    },
+    "types": {
+      "mammal": "Mammifère",
+      "bird": "Oiseau",
+      "reptile": "Reptile",
+      "amphibian": "Amphibien",
+      "fish": "Poisson",
+      "insect": "Insecte / arachnide",
+      "fantasticCreature": "Créature fantastique",
+      "dragon": "Dragon",
+      "tree": "Arbre",
+      "shrub": "Arbuste",
+      "flower": "Fleur",
+      "herb": "Herbe / plante aromatique",
+      "mushroom": "Champignon",
+      "aquaticPlant": "Plante aquatique",
+      "crop": "Culture / céréale",
+      "magicPlant": "Plante magique"
+    },
+    "statuses": {
+      "common": "Commun",
+      "rare": "Rare",
+      "endangered": "Menacé",
+      "extinct": "Éteint",
+      "legendary": "Légendaire",
+      "alive": "Vivant",
+      "dead": "Mort",
+      "missing": "Disparu",
+      "unknown": "Inconnu"
+    },
+    "fields": {
+      "colorPalette": "Palette de couleurs",
+      "aliases": "Autres noms",
+      "scientificName": "Nom savant",
+      "age": "Âge",
+      "markings": "Signes distinctifs",
+      "description": "Description",
+      "firstAppearance": "Première apparition",
+      "habitat": "Habitat",
+      "legends": "Légendes et croyances",
+      "notes": "Notes de l'auteur",
+      "size": "Taille / poids",
+      "lifespan": "Espérance de vie",
+      "diet": "Régime alimentaire",
+      "temperament": "Tempérament",
+      "dangerLevel": "Dangerosité",
+      "domestication": "Domestication",
+      "behavior": "Comportement",
+      "abilities": "Capacités",
+      "height": "Taille / hauteur",
+      "season": "Floraison / saison",
+      "toxicity": "Toxicité",
+      "edible": "Comestible",
+      "properties": "Propriétés",
+      "uses": "Usages",
+      "cultivation": "Culture",
+      "venom": "Venin",
+      "intelligence": "Intelligence / langage",
+      "element": "Élément / souffle",
+      "magicPowers": "Pouvoirs magiques",
+      "wood": "Bois",
+      "harvest": "Récolte"
+    },
+    "placeholders": {
+      "aliases": "Ex. Loup des neiges",
+      "scientificName": "Ex. Canis lupus",
+      "age": "Ex. 7 ans",
+      "markings": "Ex. Une tache blanche sur le front",
+      "size": "Ex. 1,5 m au garrot, 400 kg",
+      "season": "Ex. Fleurit à la pleine lune",
+      "abilities": "Ajouter une capacité…",
+      "uses": "Ajouter un usage…",
+      "description": "À quoi il ressemble, ce qu'on remarque en premier…",
+      "habitat": "Où il vit ou pousse : forêts, montagnes, marais…",
+      "legends": "Ce qu'on raconte à son sujet…",
+      "notes": "Idées, questions en suspens…",
+      "lifespan": "Ex. 15 ans",
+      "behavior": "Comment il se comporte, seul ou en groupe…",
+      "height": "Ex. 30 cm, jusqu'à 40 m",
+      "properties": "Ce qu'il fait au corps ou à l'esprit…",
+      "cultivation": "Ex. Ne pousse qu'à l'ombre",
+      "venom": "Ex. Paralysant en quelques minutes",
+      "intelligence": "Ex. Comprend la langue commune",
+      "element": "Ex. Feu, glace",
+      "magicPowers": "Ce qu'il sait faire de surnaturel…",
+      "wood": "Ex. Dur et clair, prisé des archers",
+      "harvest": "Ex. À la fin de l'été"
+    },
+    "options": {
+      "diet": {
+        "herbivore": "Herbivore",
+        "carnivore": "Carnivore",
+        "omnivore": "Omnivore",
+        "other": "Autre"
+      },
+      "temperament": {
+        "docile": "Docile",
+        "wary": "Méfiant",
+        "aggressive": "Agressif",
+        "unpredictable": "Imprévisible"
+      },
+      "dangerLevel": {
+        "none": "Inoffensif",
+        "low": "Faible",
+        "medium": "Moyenne",
+        "high": "Élevée",
+        "deadly": "Mortelle"
+      },
+      "domestication": {
+        "wild": "Sauvage",
+        "tamable": "Apprivoisable",
+        "domestic": "Domestique"
+      },
+      "toxicity": {
+        "none": "Aucune",
+        "mild": "Légère",
+        "toxic": "Toxique",
+        "deadly": "Mortelle"
+      },
+      "edible": {
+        "yes": "Oui",
+        "partly": "En partie",
+        "no": "Non"
+      }
+    },
+    "profile": {
+      "new": "Nouvelle fiche",
+      "contains_one": "{{count}} fiche rattachée",
+      "contains_other": "{{count}} fiches rattachées"
+    },
+    "sections": {
+      "identity": "Ce qui permet de reconnaître l'espèce, l'animal ou la plante.",
+      "story": "Où il vit, ce qu'on en raconte, et vos notes d'auteur.",
+      "gallery": "Jusqu'à 30 images : illustrations, photos, références."
+    },
+    "form": {
+      "namePlaceholder": "Ex. Loup gris, Éclair, Rose de lune"
+    },
+    "picker": {
+      "title": "Animal ou plante ?",
+      "description": "Choisissez un type : la fiche s'adapte (un dragon n'a pas les mêmes informations qu'une fleur)."
+    },
+    "create": {
+      "save": "Créer la fiche",
+      "inside": "Sera rattaché à « {{name}} »."
+    },
+    "list": {
+      "create": "Créer une fiche",
+      "emptyTitle": "Aucun animal ni aucune plante pour l'instant",
+      "emptyDescription": "Créez d'abord les espèces (les loups gris, la rose de lune), puis les animaux et les plantes précis de votre histoire.",
+      "count_one": "{{count}} fiche",
+      "count_other": "{{count}} fiches",
+      "addInside": "Ajouter un individu à « {{name}} »"
+    },
+    "children": {
+      "title": "Individus et sous-groupes",
+      "description": "Les animaux et plantes précis (ou les groupes) rattachés à « {{name}} ».",
+      "add": "Ajouter un individu",
+      "empty": "Aucune fiche n'est rattachée à cette espèce."
+    },
+    "sidebar": {
+      "title": "Faune et flore",
+      "empty": "Aucune fiche."
+    },
+    "disabled": {
+      "title": "Le module Faune et flore est désactivé",
+      "description": "Vos fiches sont gardées. Réactivez le module dans les paramètres du projet pour les retrouver."
+    },
+    "settings": {
+      "title": "Faune et flore",
+      "description": "Les animaux et les plantes de votre univers : des espèces entières, et des individus qui peuvent aussi être des personnages.",
+      "enable": "Activer la faune et la flore",
+      "enabledHint": "Le module « Faune et flore » est dans la barre de gauche.",
+      "disabledHint": "Activez-le pour l'ajouter à la barre de gauche.",
+      "kept_one": "{{count}} fiche est gardée et réapparaîtra si vous réactivez le module.",
+      "kept_other": "{{count}} fiches sont gardées et réapparaîtront si vous réactivez le module.",
+      "categories": "Faune, flore, ou les deux : seules les catégories cochées sont proposées.",
+      "types": "Ajoutez vos propres types (Griffon, Arbre-esprit…). Chacun est rangé dans la faune ou la flore et en reçoit les champs.",
+      "typePlaceholder": "Ex. Griffon"
+    },
+    "levels": {
+      "title": "Niveau de détail des fiches de faune et flore",
+      "firstTime": "Choisissez le niveau de détail des fiches de faune et flore de ce projet. Il s'applique à toutes les fiches et se change dans les paramètres du projet.",
+      "basic": {
+        "label": "Basique",
+        "theme": "L'essentiel",
+        "goal": "Nommer et décrire l'animal ou la plante",
+        "count": "8 champs"
+      },
+      "intermediate": {
+        "label": "Moyen",
+        "theme": "Les caractéristiques",
+        "goal": "Taille, régime, dangerosité, propriétés, usages…",
+        "count": "+ 9 à 12 champs"
+      },
+      "advanced": {
+        "label": "Avancé",
+        "theme": "La profondeur",
+        "goal": "Détails propres au type, habitat et légendes",
+        "count": "+ 2 à 5 champs"
+      }
+    }
+  }
+}

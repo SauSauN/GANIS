@@ -21,23 +21,7 @@ import { LIST_KEYS, listValues } from "@/lib/characters";
 import { useCharacterStore, useProjectCharacters } from "@/stores/characterStore";
 import type { CharacterDetailLevel, CharacterListKey } from "@/types";
 import { errorText } from "@/lib/errors";
-
-type Feedback = "saved" | "failed" | null;
-
-function FeedbackLine({ feedback }: { feedback: Feedback }) {
-  const { t } = useTranslation("projectSettings");
-
-  if (!feedback) return null;
-
-  return (
-    <p
-      role={feedback === "failed" ? "alert" : "status"}
-      className={feedback === "failed" ? "text-sm text-destructive" : "text-sm text-success"}
-    >
-      {t(`characters.${feedback}`)}
-    </p>
-  );
-}
+import { notifyError, notifySaved } from "@/lib/notify";
 
 /**
  * Paramètres du projet › Personnages : niveau de détail de toutes les
@@ -52,18 +36,16 @@ export function CharacterSettingsSection({ projectId }: { projectId: string }) {
   const [busy, setBusy] = useState(false);
   /** Choix en cours d'enregistrement (affiché tout de suite). */
   const [pending, setPending] = useState<CharacterDetailLevel | null>(null);
-  const [feedback, setFeedback] = useState<Feedback>(null);
 
   async function choose(level: CharacterDetailLevel) {
     setBusy(true);
     setPending(level);
-    setFeedback(null);
 
     try {
       await setDetailLevel(projectId, level);
-      setFeedback("saved");
+      notifySaved(t("characters.saved"), "settings:characters");
     } catch {
-      setFeedback("failed");
+      notifyError(t("characters.failed"), "settings:characters");
     } finally {
       setBusy(false);
       setPending(null);
@@ -84,7 +66,6 @@ export function CharacterSettingsSection({ projectId }: { projectId: string }) {
             onChange={(level) => void choose(level)}
             disabled={!loaded || busy}
           />
-          <FeedbackLine feedback={feedback} />
         </CardContent>
       </Card>
 
@@ -121,7 +102,10 @@ function ListEditor({
 
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "settings:characters");
+  };
 
   const values = listValues(lists, list);
   const customized = lists[list] !== undefined;
@@ -213,7 +197,6 @@ function ListEditor({
         </Button>
       </div>
 
-      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }

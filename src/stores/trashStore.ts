@@ -1,6 +1,7 @@
 import { create } from "zustand";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import type { TrashItem } from "@/types";
+import { errorText } from "@/lib/errors";
 
 /*
  * Contenu de la corbeille du projet ouvert. Relu à l'ouverture de la vue
@@ -42,7 +43,7 @@ export const useTrashStore = create<TrashState>((set, get) => ({
       set({ items, loaded: true, loading: false });
     } catch (error) {
       if (request !== latest) return;
-      set({ loading: false, error: error instanceof ApiError ? error.message : String(error) });
+      set({ loading: false, error: errorText(error, "errors:load.trash") });
     }
   },
 

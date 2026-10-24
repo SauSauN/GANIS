@@ -10,6 +10,24 @@
     "close": "Fermer"
   },
   "startup": "Démarrage de GANIS…",
+  "doubleClick": {
+    "openSheet": "Double-cliquez pour ouvrir la fiche",
+    "openItem": "Double-cliquez pour ouvrir",
+    "renameLane": "Double-cliquez pour renommer la piste"
+  },
+  "keys": {
+    "ctrl": "Ctrl",
+    "alt": "Alt",
+    "shift": "Maj",
+    "escape": "Échap",
+    "tab": "Tab",
+    "pageDown": "PgSuiv",
+    "pageUp": "PgPréc",
+    "delete": "Suppr",
+    "backspace": "Retour arrière",
+    "enter": "Entrée",
+    "space": "Espace"
+  },
   "validation": {
     "usernameTooShort": "Le nom d'utilisateur doit contenir au moins 3 caractères.",
     "usernameTooLong": "Le nom d'utilisateur ne doit pas dépasser 50 caractères.",
@@ -25,5 +43,52 @@
     "removeBody": "L'image sera supprimée du projet. Elle ne va pas dans la corbeille : pour la retrouver, il faudra l'ajouter de nouveau.",
     "removeConfirm": "Retirer l'image"
   },
-  "loading": "Chargement…"
+  "loading": "Chargement…",
+  "crash": {
+    "title": {
+      "app": "Un problème d'affichage est survenu",
+      "tab": "Cet onglet n'a pas pu s'afficher"
+    },
+    "description": "Vos données enregistrées ne sont pas touchées. Réessayez ; si le problème revient, rechargez GANIS (les modifications en attente sont enregistrées d'abord).",
+    "retry": "Réessayer",
+    "reload": "Enregistrer et recharger GANIS",
+    "reloading": "Rechargement…",
+    "details": "Détail technique (pour signaler le problème)"
+  },
+  "dialog": {
+    "discardQuestion": "Abandonner ce que vous avez saisi ?",
+    "keepEditing": "Continuer la saisie",
+    "discard": "Abandonner"
+  },
+  "selection": {
+    "label": "Sélection multiple",
+    "all": "Tout sélectionner",
+    "count_one": "{{count}} élément sélectionné",
+    "count_other": "{{count}} éléments sélectionnés",
+    "clear": "Désélectionner"
+  },
+  "placeholders": {
+    "username": "Votre nom d'utilisateur",
+    "chooseUsername": "Ex. nelly_auteure (3 caractères minimum)",
+    "password": "Votre mot de passe",
+    "currentPassword": "Votre mot de passe actuel",
+    "newPassword": "8 caractères minimum",
+    "confirmPassword": "Retapez le même mot de passe",
+    "email": "Ex. nom@exemple.fr",
+    "projectName": "Ex. La Rose de lune",
+    "projectDescription": "En quelques lignes, de quoi parle votre histoire…",
+    "number": "Ex. 3",
+    "startNumber": "Ex. 1",
+    "levelName": "Ex. Chapitre",
+    "hexColor": "Ex. #8B5CF6",
+    "recoveryGroup": "Les caractères du groupe demandé",
+    "find": "Mot ou expression à chercher…",
+    "replaceWith": "Nouveau texte (vide : le supprimer)",
+    "eventTitle": "Titre de l'événement",
+    "laneName": "Nom de la trame",
+    "rows": "Ex. 12",
+    "moment": "Ex. 4",
+    "documentName": "Nouveau nom du document",
+    "documentText": "Écrivez ici…"
+  }
 }

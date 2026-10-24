@@ -1,8 +1,9 @@
 import { useEffect } from "react";
 import { create } from "zustand";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import { announceDeletion, placeLinkLabel } from "@/lib/trash";
 import type { CharacterLocation, CharacterLocationInput } from "@/types";
+import { errorText } from "@/lib/errors";
 
 /*
  * Liens personnage ↔ lieu du projet ouvert. Comme les autres stores du
@@ -61,7 +62,7 @@ export const usePlaceLinkStore = create<PlaceLinkState>((set, get) => {
         if (request !== latestFetch) return;
         set({
           loading: false,
-          error: error instanceof ApiError ? error.message : String(error),
+          error: errorText(error, "errors:load.placeLinks"),
         });
       }
     },

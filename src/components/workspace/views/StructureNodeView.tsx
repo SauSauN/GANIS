@@ -2,6 +2,16 @@ import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } 
 import { VersionsButton } from "@/components/history/VersionsDialog";
 import { DocumentsCard } from "@/components/documents/DocumentsCard";
 import { SceneEventsCard } from "@/components/plot/SceneEventsCard";
+import { NovelTextCard, NovelWritingCard } from "@/components/novel/NovelSheetCards";
+import { MangaChapterCard } from "@/components/manga/MangaChapterCard";
+import { PageScriptCard } from "@/components/manga/PageScriptCard";
+import { usePageScript } from "@/components/manga/usePageScript";
+import { isMangaProject, mangaLevels, pagesInOrder } from "@/lib/manga";
+import { notifyMangaScriptChanged } from "@/lib/mangaEvents";
+import { useMangaSettings, useScriptPanelsIf } from "@/stores/mangaStore";
+import { onNovelTextChanged } from "@/lib/novelEvents";
+import { refreshWriting } from "@/stores/writingStore";
+import type { Editor } from "@tiptap/react";
 import { useTranslation } from "react-i18next";
 import {
   ChevronRight,
@@ -57,6 +67,10 @@ import {
   structureNodeTabId,
 } from "@/lib/structure";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
+import { notifyError, notifySaved } from "@/lib/notify";
+import { useNodeDocuments } from "@/lib/documents";
+import { canHoldText, chapterLevel, countWords, isNovelProject, sceneLevel, wordTotals } from "@/lib/novel";
+import { useProjectStore } from "@/stores/projectStore";
 import { cn } from "@/lib/utils";
 import { useProjectCharacters } from "@/stores/characterStore";
 import { useProjectLocations } from "@/stores/locationStore";
@@ -116,6 +130,91 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   const autoNumbering = structure?.autoNumbering ?? false;
 
   // ---------------------------------------------------------------------------
+  // Roman : texte de l'élément (enregistré avec les informations)
+  // ---------------------------------------------------------------------------
+
+  const novel = useProjectStore((state) => isNovelProject(state.projects.find((p) => p.id === projectId)));
+  const applyNode = useStructureStore((state) => state.applyNode);
+  const levelCount = structure?.levels.length ?? 0;
+  const holdsText = novel && node !== null && structure !== null && canHoldText(node, structure.nodes, levelCount);
+  // Manga / BD : une page a ses cases ; un chapitre, son objectif et ses pages.
+  const manga = useProjectStore((state) => isMangaProject(state.projects.find((p) => p.id === projectId)));
+  const mangaLevel = mangaLevels(levelCount);
+  const isMangaPage = manga && node !== null && structure !== null && node.level >= mangaLevel.page;
+  const isMangaChapter = manga && node !== null && structure !== null && node.level === mangaLevel.chapter && mangaLevel.chapter < mangaLevel.page;
+  const script = usePageScript(projectId, nodeId, isMangaPage);
+  const mangaSettings = useMangaSettings(projectId, isMangaPage);
+  const { panels: allPanels } = useScriptPanelsIf(projectId, isMangaChapter);
+  const { documents } = useNodeDocuments(projectId, nodeId);
+  const hasTextDocuments = (documents ?? []).some((d) => /\.(docx|md|markdown|txt)$/i.test(d.name));
+
+  /** Texte enregistré (HTML) ; `null` tant qu'il n'est pas chargé. */
+  const [textHtml, setTextHtml] = useState<string | null>(null);
+  const [textFailed, setTextFailed] = useState(false);
+  /** Texte en cours d'écriture, et compteur de modifications. */
+  const textDraft = useRef<string | null>(null);
+  const [textRevision, setTextRevision] = useState(0);
+  const [textDirty, setTextDirty] = useState(false);
+  const [textWords, setTextWords] = useState(0);
+
+  // Texte modifié ailleurs (rechercher et remplacer) : relu si rien n'est
+  // en cours d'écriture ici.
+  const [textKey, setTextKey] = useState(0);
+  const textDirtyRef = useRef(false);
+  textDirtyRef.current = textDirty;
+  useEffect(
+    () =>
+      onNovelTextChanged(projectId, (ids) => {
+        if (ids.includes(nodeId) && !textDirtyRef.current) setTextKey((key) => key + 1);
+      }),
+    [projectId, nodeId],
+  );
+
+  useEffect(() => {
+    if (!holdsText) return;
+    let cancelled = false;
+    textDraft.current = null;
+    setTextHtml(null);
+    setTextFailed(false);
+    api
+      .getStructureNodeContent(projectId, nodeId)
+      .then((html) => {
+        if (cancelled) return;
+        setTextHtml(html);
+        setTextWords(countWords(html));
+      })
+      .catch(() => !cancelled && setTextFailed(true));
+    return () => {
+      cancelled = true;
+    };
+    // Chargé une fois par élément : un enregistrement ne recharge pas l'éditeur.
+  }, [projectId, nodeId, holdsText, textKey]);
+
+  function onTextChange(editor: Editor) {
+    const html = editor.getHTML();
+    textDraft.current = html;
+    setTextWords(countWords(html));
+    setTextDirty(true);
+    setTextRevision((n) => n + 1);
+  }
+
+  async function saveText(): Promise<boolean> {
+    const html = textDraft.current;
+    if (html === null) return true;
+    try {
+      const savedNode = await api.setStructureNodeContent(projectId, nodeId, html);
+      applyNode(projectId, savedNode);
+      refreshWriting(projectId);
+      // Modifié pendant l'enregistrement : reste à enregistrer.
+      if (textDraft.current === html) setTextDirty(false);
+      return true;
+    } catch (e) {
+      setError(errorText(e));
+      return false;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // Informations (titre, numéro, résumé)
   // ---------------------------------------------------------------------------
 
@@ -132,9 +231,16 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
 
   const [draft, setDraft] = useState<Draft | null>(null);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [linkError, setLinkError] = useState<string | null>(null);
+  /**
+   * Retours d'enregistrement et erreurs : en notification, pas dans la
+   * page (l'écran ne bouge pas quand un message apparaît).
+   */
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, `node:${nodeId}`);
+  };
+  const setLinkError = (message: string | null) => {
+    if (message) notifyError(message, `node-links:${nodeId}`);
+  };
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -155,13 +261,42 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
     }
   }, [base]);
 
-  const dirty = draft !== null && base !== null && !sameDraft(draft, base);
+  const infoDirty = draft !== null && base !== null && !sameDraft(draft, base);
+  const dirty = infoDirty || textDirty || script.dirty;
 
-  useEffect(() => {
-    if (dirty) setSaved(false);
-  }, [dirty]);
-
+  /** Enregistre ce qui a changé : informations, texte (roman), cases (manga). */
   async function save(): Promise<boolean> {
+    const infoOk = infoDirty ? await saveInfo() : true;
+    const textOk = textDirty ? await saveText() : true;
+    const scriptOk = script.dirty ? await saveScript() : true;
+    return infoOk && textOk && scriptOk;
+  }
+
+  async function saveScript(): Promise<boolean> {
+    try {
+      const result = await script.save(node ? headingOf(node).label : "");
+      if (result) applyNode(projectId, result.page);
+      return result !== null;
+    } catch (e) {
+      setError(errorText(e));
+      return false;
+    }
+  }
+
+  /** Déplace une case vers une autre page (la page est d'abord enregistrée). */
+  async function movePanel(index: number, pageId: string) {
+    let panelId = script.draft?.panels[index]?.id;
+    if (script.dirty) {
+      const result = await script.save(node ? headingOf(node).label : "");
+      panelId = result?.panels[index]?.id;
+    }
+    if (!panelId) return;
+    await api.moveMangaPanel(projectId, panelId, pageId);
+    await script.reload();
+    notifyMangaScriptChanged(projectId);
+  }
+
+  async function saveInfo(): Promise<boolean> {
     if (!draft || !base) return true;
 
     const number = draft.number.trim() === "" ? undefined : Number(draft.number);
@@ -184,7 +319,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
       const fresh = next?.nodes.find((item) => item.id === nodeId);
       // Le brouillon repart de l'élément enregistré (numéro recalculé…).
       setDraft(null);
-      if (fresh) setSaved(true);
+      if (fresh) notifySaved(t("node.saved"), `node:${nodeId}`);
       return true;
     } catch (e) {
       setError(errorText(e));
@@ -197,12 +332,12 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   useUnsavedChanges({
     dirty,
     save,
-    revision: draft ? JSON.stringify(draft) : null,
+    revision: draft ? `${JSON.stringify(draft)}\u0000${textRevision}\u0000${script.signature ?? ""}` : null,
   });
 
   function onSubmit(event: FormEvent) {
     event.preventDefault();
-    void save();
+    void saveInfo();
   }
 
   async function onDelete() {
@@ -412,6 +547,37 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             SECTIONS
             ================================================================ */}
         <div className="min-w-0 space-y-6">
+          {/* Manga : les cases de la page d'abord (c'est là qu'on écrit) */}
+          {isMangaPage && structure && (
+            <PageScriptCard
+              draft={script.draft}
+              failed={script.failed}
+              onChange={(update) => script.setDraft((current) => (current ? update(current) : current))}
+              characters={characters}
+              locations={locations}
+              settings={mangaSettings}
+              otherPages={pagesInOrder(structure.nodes, levelCount)
+                .filter((entry) => entry.page.id !== nodeId)
+                .map((entry) => ({ id: entry.page.id, label: [entry.chapter ? labelOfNode(entry.chapter.id) : "", labelOfNode(entry.page.id)].filter(Boolean).join(" › ") }))}
+              onMovePanel={movePanel}
+            />
+          )}
+
+          {/* Roman : le texte de la scène d'abord (c'est là qu'on écrit) */}
+          {holdsText && (
+            <NovelTextCard
+              key={textKey}
+              projectId={projectId}
+              label={heading.label}
+              initialHtml={textHtml}
+              failed={textFailed}
+              words={textWords}
+              hasDocuments={hasTextDocuments}
+              onChange={onTextChange}
+              onOpenFeature={onOpenFeature}
+            />
+          )}
+
           <InfoCard>
             <form onSubmit={onSubmit} noValidate className="space-y-4">
               <div className="space-y-1.5">
@@ -431,6 +597,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
                     <Label htmlFor={`node-profile-number-${node.id}`}>{t("plan.edit.number")}</Label>
                     <Input
                       id={`node-profile-number-${node.id}`}
+                      placeholder={t("common:placeholders.number")}
                       type="number"
                       min={0}
                       max={MAX_NUMBER}
@@ -467,24 +634,14 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
               </div>
 
               <div className="flex min-h-10 flex-wrap items-center gap-4 border-t pt-4">
-                <Button type="submit" disabled={!dirty || saving}>
+                <Button type="submit" disabled={!infoDirty || saving}>
                   {saving ? <Loader2 className="animate-spin" /> : <Save />}
-                  {saving ? t("common:actions.saving") : t("common:actions.save")}
+                  {t("common:actions.save")}
                 </Button>
-                {dirty && (
+                {infoDirty && (
                   <Button type="button" variant="ghost" disabled={saving} onClick={() => setDraft(base)}>
                     {t("common:actions.cancel")}
                   </Button>
-                )}
-                {saved && !dirty && (
-                  <p role="status" className="text-sm text-success">
-                    {t("node.saved")}
-                  </p>
-                )}
-                {error && (
-                  <p role="alert" className="text-sm text-destructive">
-                    {error}
-                  </p>
                 )}
                 <VersionsButton
                   className="ml-auto"
@@ -506,6 +663,37 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
               </div>
             </form>
           </InfoCard>
+
+          {isMangaChapter && structure && (
+            <MangaChapterCard
+              projectId={projectId}
+              node={node}
+              pages={structure.nodes.filter((n) => n.parentId === node.id && n.level >= mangaLevel.page).length}
+              writtenPages={
+                new Set(
+                  (allPanels ?? [])
+                    .map((p) => p.pageId)
+                    .filter((pageId) => structure.nodes.find((n) => n.id === pageId)?.parentId === node.id),
+                ).size
+              }
+            />
+          )}
+
+          {novel && (
+            <NovelWritingCard
+              projectId={projectId}
+              node={node}
+              totalWords={
+                (wordTotals(structure.nodes, (n) => n.contentWords).get(node.id) ?? 0) -
+                node.contentWords +
+                (holdsText ? textWords : node.contentWords)
+              }
+              isChapter={node.level === chapterLevel(levelCount)}
+              isScene={holdsText || node.level >= sceneLevel(levelCount)}
+              characters={characters}
+              links={links ? links.characters : null}
+            />
+          )}
 
           <DocumentsCard projectId={projectId} nodeId={nodeId} name={name} nodeOptions={nodeOptions} />
 
@@ -541,7 +729,6 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             onOpenFeature={onOpenFeature}
             onLink={(id, role) => runLink(() => linkCharacter(projectId, nodeId, id, role as NodeCharacterRole))}
             onUnlink={(id) => runLink(() => unlinkCharacter(projectId, nodeId, id))}
-            error={linkError}
           />
 
           <LinkSection
@@ -590,7 +777,6 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             onOpenFeature={onOpenFeature}
             onLink={(id, role) => runLink(() => linkLocation(projectId, nodeId, id, role as NodeLocationRole))}
             onUnlink={(id) => runLink(() => unlinkLocation(projectId, nodeId, id))}
-            error={linkError}
           />
 
           <ChildrenCard
@@ -677,7 +863,6 @@ interface LinkSectionProps {
   onOpenFeature: (featureId: string) => void;
   onLink: (id: string, role: string) => Promise<void>;
   onUnlink: (id: string) => Promise<void>;
-  error: string | null;
 }
 
 /**
@@ -702,7 +887,6 @@ function LinkSection({
   onOpenFeature,
   onLink,
   onUnlink,
-  error,
 }: LinkSectionProps) {
   const { t } = useTranslation("structure");
   const [open, setOpen] = useCollapsible(storageKey);
@@ -915,11 +1099,6 @@ function LinkSection({
             </div>
           )}
 
-          {error && (
-            <p role="alert" className="text-sm text-destructive">
-              {error}
-            </p>
-          )}
         </>
       )}
     </CollapsibleCard>

@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
+import { useReturnFocus } from "@/lib/useReturnFocus";
 import { KindIcon } from "@/components/plot/KindIcon";
 import type { PlotLinks } from "@/components/plot/usePlotLinks";
 import { fieldClass } from "@/components/workspace/views/PageShell";
@@ -36,6 +37,7 @@ interface PlotViewMenuProps {
  */
 export function PlotViewMenu({ projectId, data, links, view, onView, filter, onFilter, anchor, onClose }: PlotViewMenuProps) {
   const { t } = useTranslation("plot");
+  useReturnFocus(true);
   const ref = useRef<HTMLDivElement>(null);
   const [position, setPosition] = useState<{ top: number; right: number } | null>(null);
   const mutate = usePlotStore((s) => s.mutate);

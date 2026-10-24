@@ -5,6 +5,7 @@ import { api, ApiError } from "@/lib/api";
 import { announceDeletion } from "@/lib/trash";
 import { useCharacterStore } from "@/stores/characterStore";
 import { usePlaceLinkStore } from "@/stores/placeLinkStore";
+import { useWorldLinkStore } from "@/stores/worldLinkStore";
 import type {
   CharacterDetailLevel,
   CustomLocationType,
@@ -153,6 +154,7 @@ export const useLocationStore = create<LocationState>((set, get) => {
       // Rust a supprimé ses liens avec des personnages, et remplacé
       // l'« Origine » qui le désignait par son nom : relue.
       usePlaceLinkStore.getState().forget(projectId, "location", id);
+      useWorldLinkStore.getState().forget(projectId, id);
 
       const characters = useCharacterStore.getState();
       if (characters.projectId === projectId && characters.loaded) {

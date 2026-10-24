@@ -11,6 +11,7 @@ import { cardClass, cardContentClass, cardHeaderClass, PageShell } from "@/compo
 import { MAX_NOTE_TITLE, noteTabId } from "@/lib/notes";
 import { useNoteStore, useProjectNotes } from "@/stores/noteStore";
 import { errorText } from "@/lib/errors";
+import { notifyError } from "@/lib/notify";
 
 interface NoteCreateViewProps {
   projectId: string;
@@ -29,7 +30,10 @@ export function NoteCreateView({ projectId, feature, onOpenFeature }: NoteCreate
   const [title, setTitle] = useState("");
   const [folderId, setFolderId] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "note:create");
+  };
 
   // « Nouvelle note » depuis un dossier de la liste : dossier prérempli.
   useEffect(() => {
@@ -84,11 +88,6 @@ export function NoteCreateView({ projectId, feature, onOpenFeature }: NoteCreate
               <FolderSelect id="note-create-folder" folders={folders} value={folderId} onChange={setFolderId} />
             </div>
 
-            {error && (
-              <p role="alert" className="text-sm text-destructive sm:col-span-2">
-                {error}
-              </p>
-            )}
 
             <div className="sm:col-span-2">
               <Button type="submit" disabled={busy}>

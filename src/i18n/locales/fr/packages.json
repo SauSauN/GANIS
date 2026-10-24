@@ -12,10 +12,6 @@
       "label": "Installés",
       "description": "Thèmes disponibles sur cet appareil : prêts à l'emploi, sans téléchargement."
     },
-    "discover": {
-      "label": "Découvrir",
-      "description": "Le catalogue des packages partagés par la communauté."
-    },
     "import": {
       "label": "Importer",
       "description": "Installer un package depuis un fichier .ganixpkg, sans connexion."
@@ -97,11 +93,6 @@
     "confirm": "Supprimer",
     "cancel": "Annuler",
     "failed": "Impossible de supprimer le thème."
-  },
-  "discover": {
-    "title": "Le partage arrive bientôt",
-    "text": "Vous pourrez bientôt parcourir et télécharger les thèmes partagés par d'autres créateurs. En attendant, les thèmes système et vos créations sont déjà disponibles, sans téléchargement.",
-    "toInstalled": "Voir les thèmes installés"
   },
   "import": {
     "title": "Import de fichiers .ganixpkg",

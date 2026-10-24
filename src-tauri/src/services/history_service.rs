@@ -28,18 +28,22 @@ const SESSION_MINUTES: i64 = 10;
 const MAX_AUTO_VERSIONS: i64 = 50;
 const MAX_NAME_CHARS: usize = 100;
 
-/// Colonnes jamais remplacées par une restauration.
-const KEPT_COLUMNS: [&str; 2] = ["id", "created_at"];
+/// Colonnes jamais remplacées par une restauration. `character_id` (faune
+/// et flore) : le lien avec une fiche de personnage se gère à part.
+const KEPT_COLUMNS: [&str; 3] = ["id", "created_at", "character_id"];
 
 /// Table d'un type d'élément versionné.
 fn table_of(kind: &str) -> AppResult<&'static str> {
     match kind {
         "character" => Ok("characters"),
         "location" => Ok("locations"),
+        "item" => Ok("items"),
+        "species" => Ok("species"),
         "structureNode" => Ok("structure_nodes"),
         "note" => Ok("notes"),
         "synopsis" => Ok("synopsis"),
         "plot" => Ok("plot"),
+        "editorial" => Ok("editorial"),
         _ => Err(AppError::validation("Type d'élément sans versions.").with_key("history.unknownKind")),
     }
 }
@@ -149,12 +153,14 @@ pub struct WorkDay {
     pub day: String,
     pub actions: i64,
     pub minutes: i64,
+    /// Mots écrits ce jour-là (texte des scènes, solde net ; roman).
+    pub words: i64,
 }
 
 /// Jours de travail d'une année (« 2026 »).
 pub async fn work_days(pool: &SqlitePool, year: i32) -> AppResult<Vec<WorkDay>> {
     Ok(sqlx::query_as::<_, WorkDay>(
-        "SELECT day, actions, minutes FROM work_days WHERE day >= ? AND day <= ? ORDER BY day",
+        "SELECT day, actions, minutes, words FROM work_days WHERE day >= ? AND day <= ? ORDER BY day",
     )
     .bind(format!("{year:04}-01-01"))
     .bind(format!("{year:04}-12-31"))

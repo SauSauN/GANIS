@@ -26,6 +26,20 @@
     },
     "settings": {
       "label": "Project settings"
+    },
+    "manuscript": {
+      "label": "Manuscript"
+    },
+    "script": {
+      "label": "Script"
+    },
+    "items": {
+      "label": "Objects",
+      "empty": "No objects yet."
+    },
+    "species": {
+      "label": "Fauna and flora",
+      "empty": "No animals or plants yet."
     }
   },
   "features": {
@@ -67,6 +81,10 @@
       "plan": {
         "label": "Story outline",
         "description": "How your story is divided, adapted to the project type."
+      },
+      "read": {
+        "label": "Full reading",
+        "description": "The whole story in one piece, compiled in outline order."
       }
     },
     "notes": {
@@ -99,6 +117,62 @@
       "reading": {
         "label": "Story reading",
         "description": "The story in reading order, with its characters, locations, chapters and notes."
+      }
+    },
+    "manuscript": {
+      "read": {
+        "label": "Manuscript",
+        "description": "The whole novel in outline order; Word and PDF export."
+      },
+      "progress": {
+        "label": "Writing tracker",
+        "description": "Words, goals, writing states and narration, chapter by chapter."
+      },
+      "editorial": {
+        "label": "Editorial pack",
+        "description": "Pitch, short and long summaries to present the novel."
+      },
+      "replace": {
+        "label": "Find and replace",
+        "description": "Fix a name or a word across all the scene text."
+      },
+      "import": {
+        "label": "Import a manuscript",
+        "description": "A Word, Markdown or text file, split into parts, chapters and scenes."
+      }
+    },
+    "script": {
+      "read": {
+        "label": "Story reading",
+        "description": "The story chapter by chapter: what each chapter is about and what its pages show."
+      },
+      "progress": {
+        "label": "Script progress",
+        "description": "Planned and written pages, statuses, text volume."
+      },
+      "continuity": {
+        "label": "Continuity",
+        "description": "Where each character appears, and in what state, panel by panel."
+      }
+    },
+    "items": {
+      "create": {
+        "label": "Create an object",
+        "description": "Weapon, vehicle, hat, phone… an entry suited to each type."
+      },
+      "list": {
+        "label": "Object list",
+        "description": "All the objects in your story, stored inside one another."
+      }
+    },
+    "species": {
+      "create": {
+        "label": "Create an entry",
+        "description": "A species, or a specific animal or plant (which can also be a character)."
+      },
+      "list": {
+        "label": "Fauna and flora list",
+        "description": "The species of your world and their individuals."
       }
     }
   }

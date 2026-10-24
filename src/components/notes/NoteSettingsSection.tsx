@@ -6,6 +6,7 @@ import { cardClass, cardContentClass, cardHeaderClass } from "@/components/works
 import { api } from "@/lib/api";
 import { useNoteStore } from "@/stores/noteStore";
 import { errorText } from "@/lib/errors";
+import { notifyError, notifyInfo } from "@/lib/notify";
 
 /**
  * Paramètres du projet › Notes : l'option « notes système » (désactivée par
@@ -18,7 +19,6 @@ export function NoteSettingsSection({ projectId }: { projectId: string }) {
   const fetchNotes = useNoteStore((s) => s.fetchNotes);
   const [enabled, setEnabled] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
-  const [feedback, setFeedback] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
 
   useEffect(() => {
     let alive = true;
@@ -33,14 +33,13 @@ export function NoteSettingsSection({ projectId }: { projectId: string }) {
 
   async function toggle(next: boolean) {
     setBusy(true);
-    setFeedback(null);
     try {
       const saved = await api.setSystemNotes(projectId, next, i18n.language);
       setEnabled(saved.enabled);
-      setFeedback({ tone: "ok", text: saved.enabled ? t("notes.enabledDone") : t("notes.disabledDone") });
+      notifyInfo(saved.enabled ? t("notes.enabledDone") : t("notes.disabledDone"), "settings:notes");
       void fetchNotes(projectId);
     } catch (error) {
-      setFeedback({ tone: "error", text: errorText(error) });
+      notifyError(errorText(error), "settings:notes");
     } finally {
       setBusy(false);
     }
@@ -76,11 +75,6 @@ export function NoteSettingsSection({ projectId }: { projectId: string }) {
             <li>{t("notes.rule2")}</li>
             <li>{t("notes.rule3")}</li>
           </ul>
-          {feedback && (
-            <p role={feedback.tone === "error" ? "alert" : "status"} className={feedback.tone === "error" ? "text-sm text-destructive" : "text-sm text-success"}>
-              {feedback.text}
-            </p>
-          )}
         </CardContent>
       </Card>
     </div>

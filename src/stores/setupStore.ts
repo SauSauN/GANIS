@@ -1,6 +1,6 @@
-import i18n from "@/i18n";
 import { create } from "zustand";
 import { api, isTauri } from "@/lib/api";
+import { errorText } from "@/lib/errors";
 
 /*
  * État de la configuration initiale (§37.9).
@@ -49,9 +49,7 @@ export const useSetupStore = create<SetupState>((set) => ({
       set({
         needsSetup: null,
         error:
-          e instanceof Error
-            ? e.message
-            : i18n.t("errors:load.setup"),
+          errorText(e, "errors:load.setup"),
       });
     }
   },

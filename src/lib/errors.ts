@@ -1,5 +1,6 @@
 import i18n from "@/i18n";
 import { ApiError } from "@/lib/api";
+import { recordError } from "@/lib/problemReport";
 
 /*
  * Message d'erreur à montrer à l'utilisateur, dans sa langue.
@@ -11,5 +12,6 @@ import { ApiError } from "@/lib/api";
 export function errorText(error: unknown, fallbackKey = "errors:unexpected"): string {
   if (error instanceof ApiError) return error.message;
   console.error(error);
+  recordError(error);
   return (i18n.t as unknown as (key: string) => string)(fallbackKey);
 }

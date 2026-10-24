@@ -1,21 +1,34 @@
 import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { Menu } from "lucide-react";
 import { useGuardedNavigate } from "@/components/layout/UnsavedChangesGuard";
 import { isTauri } from "@/lib/api";
 import { runCommand, useCommand, useDashboardIntent, type CommandId } from "@/lib/commands";
-import { runEditAction, type EditAction } from "@/lib/editCommands";
+import { hasEditTarget, runEditAction, type EditAction } from "@/lib/editCommands";
+import {
+  PANEL_IMAGE_DEFAULT,
+  PANEL_IMAGE_MAX,
+  PANEL_IMAGE_MIN,
+  PANEL_IMAGE_STEP,
+  setPanelImageSize,
+  usePanelImageSize,
+} from "@/lib/preferences";
 import { formatCombo, shortcutOf, useHelpStore, type AppAction } from "@/lib/shortcuts";
+import { useKeyLabels } from "@/lib/keyLabels";
 import { applyTheme, useResolvedTheme } from "@/lib/theme";
 import { undoLastDeletion } from "@/lib/trash";
+import { useMediaQuery } from "@/lib/useMediaQuery";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { toast } from "@/stores/toastStore";
 
-type MenuId = "file" | "edit" | "view" | "project" | "help";
+/** `all` : fenêtre étroite (ou zoom fort), tous les menus dans un seul. */
+type MenuId = "file" | "edit" | "view" | "project" | "help" | "all";
 
 type Entry =
   | { kind: "separator" }
+  | { kind: "heading"; label: string }
   | { kind: "item"; id: string; label: string; shortcut?: string; disabled?: boolean; onSelect: () => void };
 
 const SEPARATOR: Entry = { kind: "separator" };
@@ -28,17 +41,21 @@ const SEPARATOR: Entry = { kind: "separator" };
  *   de menu, ↑ ↓ parcourent les choix, Entrée valide, Échap ferme ;
  * - les actions sont celles des raccourcis (voir `commands.ts`) : une
  *   action indisponible ici est grisée.
+ * Fenêtre étroite (ou zoom à 200 %) : un seul bouton regroupe tous les menus,
+ * pour que la barre de titre et ses boutons de fenêtre tiennent à l'écran.
  */
 export function MenuBar() {
   const { t } = useTranslation("menus");
   const navigate = useGuardedNavigate();
   const theme = useResolvedTheme();
+  const panelImageSize = usePanelImageSize();
   const showHelp = useHelpStore((state) => state.show);
   const requestIntent = useDashboardIntent((state) => state.request);
   // Sans connexion : ni import (les projets importés sont privés), ni
   // paramètres généraux.
   const signedIn = useAuthStore((state) => state.user !== null);
 
+  const wide = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = useState<MenuId | null>(null);
   const [active, setActive] = useState(-1);
   const barRef = useRef<HTMLDivElement>(null);
@@ -47,10 +64,10 @@ export function MenuBar() {
   /** Le menu a été ouvert au clavier : le premier choix prend le clavier. */
   const openedByKeyboard = useRef(false);
 
-  const shift = t("shift");
+  const keyLabels = useKeyLabels();
   const keys = (action: AppAction) => {
     const combo = shortcutOf(action);
-    return combo ? formatCombo(combo, shift) : undefined;
+    return combo ? formatCombo(combo, keyLabels) : undefined;
   };
 
   // Commandes proposées par l'écran affiché.
@@ -70,6 +87,7 @@ export function MenuBar() {
     openProjectSettings: useCommand("openProjectSettings"),
     openTrash: useCommand("openTrash"),
     openHistory: useCommand("openHistory"),
+    readStory: useCommand("readStory"),
     palette: useCommand("palette"),
   };
 
@@ -91,12 +109,14 @@ export function MenuBar() {
       void runEditAction(action).then((done) => {
         if (done) return;
         if (action === "undo" && undoLastDeletion()) return;
-        toast({ message: action === "paste" ? t("edit.pasteBlocked") : t("edit.nothing") });
+        // Coller dans un champ, sans texte à coller : on le dit ; sans
+        // champ, la consigne générale (placer d'abord le curseur).
+        toast({ message: action === "paste" && hasEditTarget() ? t("edit.pasteEmpty") : t("edit.nothing") });
       });
     },
   });
 
-  const menus: Record<MenuId, Entry[]> = {
+  const menus: Record<Exclude<MenuId, "all">, Entry[]> = {
     file: [
       command("new", t("file.new"), "new"),
       SEPARATOR,
@@ -159,6 +179,29 @@ export function MenuBar() {
       command("nextTab", t("view.nextTab"), "nextTab"),
       command("previousTab", t("view.previousTab"), "previousTab"),
       SEPARATOR,
+      // Images du panneau du milieu (aussi dans Paramètres › Apparence).
+      {
+        kind: "item",
+        id: "panelImagesLarger",
+        label: t("view.panelImagesLarger"),
+        disabled: panelImageSize >= PANEL_IMAGE_MAX,
+        onSelect: () => setPanelImageSize(panelImageSize + PANEL_IMAGE_STEP),
+      },
+      {
+        kind: "item",
+        id: "panelImagesSmaller",
+        label: t("view.panelImagesSmaller"),
+        disabled: panelImageSize <= PANEL_IMAGE_MIN,
+        onSelect: () => setPanelImageSize(panelImageSize - PANEL_IMAGE_STEP),
+      },
+      {
+        kind: "item",
+        id: "panelImagesReset",
+        label: t("view.panelImagesReset"),
+        disabled: panelImageSize === PANEL_IMAGE_DEFAULT,
+        onSelect: () => setPanelImageSize(PANEL_IMAGE_DEFAULT),
+      },
+      SEPARATOR,
       {
         kind: "item",
         id: "theme",
@@ -170,6 +213,8 @@ export function MenuBar() {
       command("openHome", t("project.home")),
       command("openSynopsis", t("project.synopsis")),
       command("openProjectSettings", t("project.settings")),
+      SEPARATOR,
+      command("readStory", t("project.read"), "readStory"),
       SEPARATOR,
       command("openHistory", t("project.history")),
       command("openTrash", t("project.trash")),
@@ -186,12 +231,30 @@ export function MenuBar() {
         onSelect: () => showHelp("shortcuts"),
       },
       SEPARATOR,
+      { kind: "item", id: "whatsNew", label: t("help.whatsNew"), onSelect: () => showHelp("whatsNew") },
+      { kind: "item", id: "report", label: t("help.report"), onSelect: () => showHelp("report") },
+      SEPARATOR,
       { kind: "item", id: "about", label: t("help.about"), onSelect: () => showHelp("about") },
     ],
   };
 
-  const order: MenuId[] = ["file", "edit", "view", "project", "help"];
-  const entries = open ? menus[open] : [];
+  const sections: Array<Exclude<MenuId, "all">> = ["file", "edit", "view", "project", "help"];
+  const order: MenuId[] = wide ? sections : ["all"];
+  const entriesOf = (id: MenuId): Entry[] => {
+    if (id !== "all") return menus[id];
+    const seen = new Set<string>();
+    return sections.flatMap((section, index) => [
+      ...(index > 0 ? [SEPARATOR] : []),
+      { kind: "heading" as const, label: t(`menus.${section}`) },
+      ...menus[section].filter((entry) => {
+        if (entry.kind !== "item") return true;
+        if (seen.has(entry.id)) return false;
+        seen.add(entry.id);
+        return true;
+      }),
+    ]);
+  };
+  const entries = open ? entriesOf(open) : [];
   const enabledIndexes = entries
     .map((entry, index) => (entry.kind === "item" && !entry.disabled ? index : -1))
     .filter((index) => index >= 0);
@@ -213,7 +276,7 @@ export function MenuBar() {
       altAlone = event.key === "Alt" && !event.ctrlKey && !event.shiftKey && !event.metaKey;
       if (event.key === "F10" && !event.shiftKey && !event.ctrlKey) {
         event.preventDefault();
-        buttonRefs.current.file?.focus();
+        (buttonRefs.current.file ?? buttonRefs.current.all)?.focus();
       }
     };
     const onKeyUp = (event: KeyboardEvent) => {
@@ -224,7 +287,7 @@ export function MenuBar() {
           setOpen(null);
           (document.activeElement as HTMLElement).blur();
         } else {
-          buttonRefs.current.file?.focus();
+          (buttonRefs.current.file ?? buttonRefs.current.all)?.focus();
         }
       }
       altAlone = false;
@@ -261,6 +324,12 @@ export function MenuBar() {
     if (helpOpen) setOpen(null);
   }, [helpOpen]);
 
+  // Passage de la barre complète au bouton unique : le menu ouvert se ferme.
+  useEffect(() => {
+    setOpen(null);
+    setActive(-1);
+  }, [wide]);
+
   // Le choix actif prend le clavier quand le menu a été ouvert au clavier.
   useEffect(() => {
     if (open && openedByKeyboard.current && active >= 0) itemRefs.current[active]?.focus();
@@ -269,7 +338,7 @@ export function MenuBar() {
   function openMenu(id: MenuId, byKeyboard: boolean) {
     openedByKeyboard.current = byKeyboard;
     setOpen(id);
-    const first = menus[id].findIndex((entry) => entry.kind === "item" && !entry.disabled);
+    const first = entriesOf(id).findIndex((entry) => entry.kind === "item" && !entry.disabled);
     setActive(byKeyboard ? first : -1);
   }
 
@@ -359,7 +428,7 @@ export function MenuBar() {
   }
 
   return (
-    <div ref={barRef} role="menubar" aria-label={t("label")} className="hidden items-center md:flex">
+    <div ref={barRef} role="menubar" aria-label={t("label")} className="flex shrink-0 items-center">
       {order.map((id) => (
         <div key={id} className="relative">
           <button
@@ -370,28 +439,37 @@ export function MenuBar() {
             role="menuitem"
             aria-haspopup="menu"
             aria-expanded={open === id}
+            aria-label={id === "all" ? t("label") : undefined}
+            title={id === "all" ? t("label") : undefined}
             // Le champ en cours garde le clavier (menu Édition).
             onMouseDown={(event) => event.preventDefault()}
             onClick={() => (open === id ? close(false) : openMenu(id, false))}
             onMouseEnter={() => open && open !== id && openMenu(id, false)}
             onKeyDown={(event) => onButtonKeyDown(event, id)}
             className={cn(
-              "h-7 rounded px-2.5 text-foreground/80 outline-none hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring",
+              "flex h-7 items-center rounded px-2.5 text-foreground/80 outline-none hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring",
               open === id && "bg-secondary text-foreground",
             )}
           >
-            {t(`menus.${id}`)}
+            {id === "all" ? <Menu className="h-4 w-4" aria-hidden="true" /> : t(`menus.${id}`)}
           </button>
 
           {open === id && (
             <div
               role="menu"
-              aria-label={t(`menus.${id}`)}
-              className="absolute top-full left-0 z-[70] mt-1 min-w-64 rounded-lg border bg-popover p-1 text-popover-foreground shadow-xl"
+              aria-label={id === "all" ? t("label") : t(`menus.${id}`)}
+              className={cn(
+                "absolute top-full left-0 z-[70] mt-1 min-w-64 rounded-lg border bg-popover p-1 text-popover-foreground shadow-xl",
+                id === "all" && "max-h-[calc(100vh-3rem)] overflow-y-auto",
+              )}
             >
               {entries.map((entry, index) =>
                 entry.kind === "separator" ? (
                   <div key={`sep-${index}`} role="separator" className="my-1 h-px bg-border" />
+                ) : entry.kind === "heading" ? (
+                  <div key={`head-${index}`} role="presentation" className="px-2.5 pt-1.5 pb-0.5 text-xs font-semibold text-muted-foreground">
+                    {entry.label}
+                  </div>
                 ) : (
                   <button
                     key={entry.id}

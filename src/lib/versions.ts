@@ -113,6 +113,14 @@ export function readableFields(kind: VersionKind, row: Row, resolve: (id: string
         { key: "title", label: "versions:fields.title", text: str(row.title) },
         { key: "summary", label: "versions:fields.summary", text: str(row.summary) },
         { key: "number", label: "versions:fields.number", text: row.numbered === 0 ? "—" : str(row.number) },
+        // Roman : texte de la scène (colonne absente des versions anciennes).
+        ...(row.content ? [{ key: "content", label: "versions:fields.text", text: htmlText(row.content) }] : []),
+      ];
+    case "editorial":
+      return [
+        { key: "pitch", label: "versions:fields.pitch", text: str(row.pitch) },
+        { key: "summaryShort", label: "versions:fields.summaryShort", text: str(row.summary_short) },
+        { key: "summaryLong", label: "versions:fields.summaryLong", text: htmlText(row.summary_long) },
       ];
     case "character": {
       const fields = fieldsOf(row.fields);
@@ -125,6 +133,22 @@ export function readableFields(kind: VersionKind, row: Row, resolve: (id: string
           key: `fields.${key}`,
           label: `characters:fields.${key}`,
           text: value.split(", ").map(named).join(", "),
+        })),
+      ];
+    }
+    case "item":
+    case "species": {
+      const fields = fieldsOf(row.fields);
+      return [
+        { key: "name", label: "versions:fields.name", text: str(row.name) },
+        { key: "type", label: "versions:fields.type", text: str(row.type) },
+        ...(row.nature ? [{ key: "nature", label: "world:natures.title", text: str(row.nature) }] : []),
+        { key: "status", label: "versions:fields.status", text: str(row.status) },
+        { key: "parent", label: "versions:fields.parent", text: row.parent_id ? named(str(row.parent_id)) : "" },
+        ...Object.entries(fields).map(([key, value]) => ({
+          key: `fields.${key}`,
+          label: `world:${kind}.fields.${key}`,
+          text: value,
         })),
       ];
     }

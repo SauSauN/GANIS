@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Blocks, Check, Info, Monitor, Moon, Sun, type LucideIcon } from "lucide-react";
+import { Blocks, Check, Info, MapPin, Minus, Monitor, Moon, Package, Plus, RotateCcw, Sun, type LucideIcon } from "lucide-react";
 import { ThemeSwatch } from "@/components/packages/ThemeSwatch";
 import { useInstalledThemes } from "@/components/packages/useInstalledThemes";
 import { cardClass, cardHeaderClass } from "@/components/settings/styles";
@@ -15,8 +15,14 @@ import { Button } from "@/components/ui/button";
 import { setActiveColorTheme, useActiveColorThemeId } from "@/lib/colorTheme";
 import { cn } from "@/lib/utils";
 import {
+  PANEL_IMAGE_DEFAULT,
+  PANEL_IMAGE_MAX,
+  PANEL_IMAGE_MIN,
+  PANEL_IMAGE_STEP,
   TEXT_SIZES,
+  setPanelImageSize,
   setTextSize,
+  usePanelImageSize,
   useTextSize,
   type TextSize,
 } from "@/lib/preferences";
@@ -200,6 +206,12 @@ export function AppearanceSection() {
       </Card>
 
       {/* ==================================================================
+          IMAGES DU PANNEAU DU MILIEU
+          ================================================================== */}
+
+      <PanelImageCard />
+
+      {/* ==================================================================
           NOTE
           ================================================================== */}
 
@@ -277,6 +289,108 @@ function ColorThemeCard() {
           <Blocks />
           {t("appearance.colorTheme.manage")}
         </Button>
+      </CardContent>
+    </Card>
+  );
+}
+/**
+ * Taille des images du panneau du milieu (listes des personnages, lieux,
+ * objets, faune et flore) : un seul réglage pour toutes, borné.
+ */
+function PanelImageCard() {
+  const { t } = useTranslation("settings");
+  const size = usePanelImageSize();
+  const rows = [
+    { key: "character", label: t("appearance.panelImage.sample.character") },
+    { key: "location", label: t("appearance.panelImage.sample.location"), icon: MapPin },
+    { key: "item", label: t("appearance.panelImage.sample.item"), icon: Package },
+  ];
+
+  return (
+    <Card className={cardClass}>
+      <CardHeader className={cardHeaderClass}>
+        <CardTitle>{t("appearance.panelImage.title")}</CardTitle>
+
+        <CardDescription>{t("appearance.panelImage.description")}</CardDescription>
+      </CardHeader>
+
+      <CardContent className="grid gap-6 px-6 py-6 sm:grid-cols-[1fr_14rem]">
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-sm"
+              aria-label={t("appearance.panelImage.smaller")}
+              title={t("appearance.panelImage.smaller")}
+              disabled={size <= PANEL_IMAGE_MIN}
+              onClick={() => setPanelImageSize(size - PANEL_IMAGE_STEP)}
+            >
+              <Minus />
+            </Button>
+            <input
+              type="range"
+              min={PANEL_IMAGE_MIN}
+              max={PANEL_IMAGE_MAX}
+              step={PANEL_IMAGE_STEP}
+              value={size}
+              onChange={(e) => setPanelImageSize(Number(e.target.value))}
+              aria-label={t("appearance.panelImage.title")}
+              aria-valuetext={t("appearance.panelImage.value", { size })}
+              className="h-2 flex-1 cursor-pointer accent-primary"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              size="icon-sm"
+              aria-label={t("appearance.panelImage.larger")}
+              title={t("appearance.panelImage.larger")}
+              disabled={size >= PANEL_IMAGE_MAX}
+              onClick={() => setPanelImageSize(size + PANEL_IMAGE_STEP)}
+            >
+              <Plus />
+            </Button>
+          </div>
+
+          <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+            <span className="text-muted-foreground">
+              {t("appearance.panelImage.value", { size })}
+              {" · "}
+              {t("appearance.panelImage.range", { min: PANEL_IMAGE_MIN, max: PANEL_IMAGE_MAX })}
+            </span>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              disabled={size === PANEL_IMAGE_DEFAULT}
+              onClick={() => setPanelImageSize(PANEL_IMAGE_DEFAULT)}
+            >
+              <RotateCcw />
+              {t("appearance.panelImage.reset")}
+            </Button>
+          </div>
+        </div>
+
+        {/* Aperçu : trois lignes comme dans le panneau du milieu. */}
+        <div className="rounded-lg border bg-sidebar p-2" aria-hidden="true">
+          <p className="mb-1 px-2 text-[0.7rem] font-semibold tracking-wide text-muted-foreground uppercase">
+            {t("appearance.preview.title")}
+          </p>
+          {rows.map(({ key, label, icon: Icon }) => (
+            <div key={key} className="flex items-center gap-2 rounded-md px-2 py-1 text-sm">
+              {Icon ? (
+                <span className="flex size-(--panel-thumb) shrink-0 items-center justify-center rounded-md bg-primary/70 text-white">
+                  <Icon className="size-[calc(var(--panel-thumb)*0.6)]" />
+                </span>
+              ) : (
+                <span className="inline-flex size-(--panel-thumb) shrink-0 items-center justify-center rounded-full bg-primary text-[length:calc(var(--panel-thumb)*0.4)] font-semibold text-white">
+                  AB
+                </span>
+              )}
+              <span className="truncate">{label}</span>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );

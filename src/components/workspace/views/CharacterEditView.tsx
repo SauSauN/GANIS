@@ -21,6 +21,7 @@ import { CharacterSheet } from "@/components/characters/CharacterForm";
 import { CharacterGallery } from "@/components/characters/fields/GalleryField";
 import { CharacterRelationsCard } from "@/components/relations/CharacterRelationsCard";
 import { PlaceLinksCard } from "@/components/locations/PlaceLinksCard";
+import { WorldExtras } from "@/components/world/WorldExtras";
 import { StoryLinksCard } from "@/components/structure/StoryLinksCard";
 import { PlotInStoryCard } from "@/components/plot/PlotInStoryCard";
 import {
@@ -47,6 +48,7 @@ import {
   useProjectCharacters,
 } from "@/stores/characterStore";
 import { errorText } from "@/lib/errors";
+import { notifyError, notifySaved } from "@/lib/notify";
 
 interface CharacterEditViewProps {
   projectId: string;
@@ -88,8 +90,6 @@ export function CharacterEditView({
   const [draft, setDraft] = useState<CharacterDraft | null>(null);
   const [showNameError, setShowNameError] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<"saved" | null>(null);
-  const [saveError, setSaveError] = useState<string | null>(null);
   const [portraitBusy, setPortraitBusy] = useState(false);
   const [portraitError, setPortraitError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -107,11 +107,6 @@ export function CharacterEditView({
     }
   }, [base]);
 
-  // « Enregistré » disparaît dès la modification suivante.
-  useEffect(() => {
-    if (dirty) setSaveStatus(null);
-  }, [dirty]);
-
   const nameProblem = draft ? nameError(draft.firstName, draft.lastName) : null;
 
   async function save(): Promise<boolean> {
@@ -123,7 +118,6 @@ export function CharacterEditView({
     }
 
     setSaving(true);
-    setSaveError(null);
 
     try {
       // Le brouillon n'est pas remplacé par la version enregistrée (espaces
@@ -131,10 +125,10 @@ export function CharacterEditView({
       // disparaîtrait sous le curseur. Les deux sont égaux pour `sameDraft`.
       await updateCharacter(projectId, characterId, toInput(draft));
       setShowNameError(false);
-      setSaveStatus("saved");
+      notifySaved(t("edit.saved"), `character:${characterId}`);
       return true;
     } catch (e) {
-      setSaveError(errorText(e));
+      notifyError(errorText(e), `character:${characterId}`);
       return false;
     } finally {
       setSaving(false);
@@ -158,9 +152,7 @@ export function CharacterEditView({
       setPortraitError(
         e instanceof PortraitError
           ? t(`portrait.errors.${e.code}`)
-          : e instanceof Error
-            ? e.message
-            : String(e),
+          : errorText(e),
       );
     } finally {
       setPortraitBusy(false);
@@ -291,6 +283,7 @@ export function CharacterEditView({
               id={character.id}
               onOpenFeature={onOpenFeature}
             />
+            <WorldExtras projectId={projectId} kind="character" id={character.id} onOpenFeature={onOpenFeature} />
             <StoryLinksCard
               projectId={projectId}
               side="character"
@@ -302,7 +295,7 @@ export function CharacterEditView({
             <div className="flex min-h-10 flex-wrap items-center gap-4">
               <Button type="submit" disabled={!dirty || saving}>
                 {saving ? <Loader2 className="animate-spin" /> : <Save />}
-                {saving ? t("common:actions.saving") : t("common:actions.save")}
+                {t("common:actions.save")}
               </Button>
 
               {dirty && (
@@ -313,23 +306,10 @@ export function CharacterEditView({
                   onClick={() => {
                     setDraft(base);
                     setShowNameError(false);
-                    setSaveError(null);
                   }}
                 >
                   {t("common:actions.cancel")}
                 </Button>
-              )}
-
-              {saveStatus === "saved" && !dirty && (
-                <p role="status" className="text-sm text-success">
-                  {t("edit.saved")}
-                </p>
-              )}
-
-              {saveError && (
-                <p role="alert" className="text-sm text-destructive">
-                  {saveError}
-                </p>
               )}
 
               <VersionsButton

@@ -44,9 +44,11 @@ Tout reste sur l'ordinateur de l'utilisateur. GANIS fonctionne **sans connexion 
 - **Changer la visibilité** : paramètres du projet → « Statut et organisation » → « Visibilité ».
   - Public → privé : immédiat si on est connecté ; sinon une connexion est demandée sur place, puis le projet devient privé. Si la connexion passe par la création d'un compte ou l'assistant, le changement est appliqué à l'arrivée sur le tableau de bord.
   - Privé → public : confirmation explicite (« Annuler » / « Rendre public »).
-- **Comptes locaux** : un administrateur est créé au premier compte (assistant de configuration), puis d'autres comptes peuvent s'inscrire. Il existe trois rôles : `admin`, `developer` et `user`.
+- **Comptes locaux** : un administrateur est créé au premier compte (assistant de configuration), puis d'autres comptes peuvent s'inscrire. Il existe trois rôles : `admin`, `developer` et `user`. Chacun peut supprimer son compte (Paramètres › Compte, mot de passe demandé) : le compte et ses projets privés sont effacés ; le dernier administrateur ne peut pas partir tant que d'autres comptes existent.
+- **Verrouillage automatique** (facultatif, Paramètres › Compte) : après 5 à 60 minutes sans activité, la clé du compte est effacée de la mémoire et le mot de passe est demandé pour reprendre, onglets et saisies conservés.
 - **Clé de récupération** : elle est remise à la création du compte et permet de retrouver l'accès en cas de mot de passe oublié. Elle peut être régénérée depuis les paramètres.
 - **Tableau de bord** : création, duplication, suppression et favoris de projets.
+  - **Corbeille des projets** : un projet supprimé y reste 30 jours (restauration, ou suppression définitive) ; passé ce délai, il est effacé au démarrage. Sélection multiple pour restaurer ou supprimer plusieurs projets.
   - Types de projet : manga, roman, film, série, jeu, JDR, personnalisé.
   - Statuts : en préparation, en cours, en pause, terminé.
 - **Calendrier de travail** : il retrace le rythme d'écriture à partir de l'activité réelle sur les projets.
@@ -67,6 +69,14 @@ L'espace de travail reprend le modèle d'un éditeur de code : une barre d'activ
 | **Documents** | Fichiers rangés dans le découpage (PDF, Word, images, textes, sons, vidéos, pages de manga…), lecture intégrée, modification dans l'application associée avec reprise automatique, 20 versions par document |
 | **Recherche** | Recherche globale insensible à la casse et aux accents, palette de commandes (`Ctrl+K`) |
 | **Paramètres** | Réglages propres au projet (personnages, lieux, découpage, trame, notes) |
+
+**Outils du romancier (projets de type Roman uniquement)** : un module **Manuscrit** apparaît dans la barre de gauche, et les fiches du découpage gagnent deux cartes.
+- **Texte** (fiche d'une scène, ou d'un chapitre sans scène) : le texte s'écrit dans l'éditeur de GANIS, s'enregistre avec la fiche (Ctrl+S, enregistrement automatique, versions) et son nombre de mots est recalculé par Rust.
+- **Écriture** : objectif de mots (scène, chapitre, partie), état de rédaction des chapitres (À écrire, Premier jet, En révision, Relu, Corrigé — distinct du statut du projet), point de vue (personnage lié avec le rôle « Point de vue »), personne et temps de la narration. Ces réglages ne modifient jamais le texte.
+- **Manuscrit** : le roman d'un seul tenant, assemblé à la demande dans l'ordre du plan (aucune copie : déplacer une scène la déplace ici). Le texte d'une scène est celui de sa fiche ; à défaut, celui de ses documents texte (Word, Markdown, texte). Export Word, PDF ou texte (page de titre, chapitres sur une nouvelle page, numéros de page).
+- **Suivi de rédaction** : mots et objectifs du manuscrit, des parties, chapitres et scènes ; filtre par état de rédaction ; scènes dont la personne ou le temps diffère du reste du roman signalées.
+- **Dossier éditorial** : pitch en une phrase, résumé court, résumé long, indépendants du synopsis (qui peut servir de point de départ), versionnés et exportables séparément (Word, PDF, texte).
+Données : migration `023_novel.sql` (colonnes de `structure_nodes`, objectif dans `structure_settings`, table `editorial`), `services/novel_service.rs`, `commands/novel.rs`, `src/lib/novel.ts`, `src/lib/novelExport.ts`, `src/components/novel/*`.
 
 **Agrandir un onglet** : un double-clic sur un onglet affiche son contenu sur toute la surface de l'espace de travail (la barre des modules et le panneau du milieu sont masqués) ; un nouveau double-clic, ou le bouton à droite de la barre d'onglets, rétablit la disposition. Le contenu de l'onglet garde son état.
 
@@ -89,7 +99,8 @@ Les modèles de découpage proposés sont les suivants :
 - **Journal d'activité** : il est conservé 90 jours.
 - **Versions automatiques** : une version est prise au début de chaque séance de modification, au plus une toutes les 10 minutes et 50 par élément. Les versions manuelles sont aussi possibles. Restaurer une version garde d'abord l'état actuel.
 - **Corbeille** : les éléments supprimés sont restaurés avec tout ce qui en dépendait (images, relations, liens).
-- **Garde des modifications non enregistrées** : l'application pose la question avant de quitter ou de fermer un onglet modifié.
+- **Garde des modifications non enregistrées** : l'application pose la question avant de quitter ou de fermer un onglet modifié. Une fenêtre où l'on a saisi du texte ne se ferme plus d'un clic à côté : « Abandonner ce que vous avez saisi ? » est demandé d'abord.
+- **Écran de secours** : une erreur d'affichage remplace l'onglet (ou l'application) par un message clair, avec « Réessayer » et « Enregistrer et recharger GANIS ».
 
 ### Personnalisation
 

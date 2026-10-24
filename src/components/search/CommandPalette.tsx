@@ -1,12 +1,24 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { BookOpen, CircleHelp, Keyboard, Loader2, Search, type LucideIcon } from "lucide-react";
+import { useReturnFocus } from "@/lib/useReturnFocus";
+import {
+  BookOpen,
+  Bug,
+  CircleHelp,
+  Info,
+  Keyboard,
+  Loader2,
+  type LucideIcon,
+  Search,
+  Sparkles,
+} from "lucide-react";
 import { SearchResults } from "@/components/search/SearchResults";
 import { Dialog, DialogTitle } from "@/components/ui/dialog";
-import { SETTINGS_MODULE, WORKSPACE_MODULES } from "@/components/workspace/modules";
+import { SETTINGS_MODULE, WORKSPACE_MODULES, type WorkspaceModule } from "@/components/workspace/modules";
 import { runCommand, useCommandStore, type CommandId } from "@/lib/commands";
 import { openSearchHit, SEARCH_ORDER, useProjectSearch } from "@/lib/search";
 import { formatCombo, shortcutOf, useHelpStore, type AppAction } from "@/lib/shortcuts";
+import { useKeyLabels } from "@/lib/keyLabels";
 import { cn } from "@/lib/utils";
 import type { SearchHit } from "@/types";
 
@@ -15,6 +27,8 @@ interface CommandPaletteProps {
   onClose: () => void;
   projectId: string;
   onOpenFeature: (featureId: string) => void;
+  /** Modules du projet (selon son type, voir `modulesFor`). */
+  modules?: WorkspaceModule[];
 }
 
 interface PaletteAction {
@@ -32,8 +46,9 @@ const fold = (value: string) => value.normalize("NFD").replace(/\p{Diacritic}/gu
  * Palette de commandes (Ctrl+K) : ouvrir une page du projet, lancer une
  * action, ou trouver un élément en tapant son nom.
  */
-export function CommandPalette({ open, onClose, projectId, onOpenFeature }: CommandPaletteProps) {
+export function CommandPalette({ open, onClose, projectId, onOpenFeature, modules = WORKSPACE_MODULES }: CommandPaletteProps) {
   const { t } = useTranslation(["search", "menus", "modules"]);
+  useReturnFocus(open);
   const showHelp = useHelpStore((state) => state.show);
   const owners = useCommandStore((state) => state.owners);
   const [query, setQuery] = useState("");
@@ -48,14 +63,14 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature }: Comm
     }
   }, [open]);
 
-  const shift = t("menus:shift");
+  const keyLabels = useKeyLabels();
   const keys = (action: AppAction) => {
     const combo = shortcutOf(action);
-    return combo ? formatCombo(combo, shift) : undefined;
+    return combo ? formatCombo(combo, keyLabels) : undefined;
   };
 
   const actions = useMemo<PaletteAction[]>(() => {
-    const pages: PaletteAction[] = [...WORKSPACE_MODULES, SETTINGS_MODULE].flatMap((module) =>
+    const pages: PaletteAction[] = [...modules, SETTINGS_MODULE].flatMap((module) =>
       module.features.map((feature) => ({
         id: `page:${feature.id}`,
         label: feature.label,
@@ -76,6 +91,7 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature }: Comm
         ["saveAll", t("menus:file.saveAll")],
         ["closeTab", t("menus:file.closeTab")],
         ["exportProject", t("menus:file.export")],
+        ["readStory", t("menus:project.read")],
       ] as Array<[CommandId, string]>
     )
       .filter(([id]) => available(id))
@@ -91,12 +107,15 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature }: Comm
     const help: PaletteAction[] = [
       { id: "help:center", label: t("menus:help.center"), group: t("menus:menus.help"), icon: BookOpen, shortcut: "F1", run: () => showHelp("center") },
       { id: "help:guide", label: t("menus:help.guide"), group: t("menus:menus.help"), icon: CircleHelp, run: () => showHelp("guide") },
+      { id: "help:about", label: t("menus:help.about"), group: t("menus:menus.help"), icon: Info, run: () => showHelp("about") },
+      { id: "help:whatsNew", label: t("menus:help.whatsNew"), group: t("menus:menus.help"), icon: Sparkles, run: () => showHelp("whatsNew") },
+      { id: "help:report", label: t("menus:help.report"), group: t("menus:menus.help"), icon: Bug, run: () => showHelp("report") },
       { id: "help:shortcuts", label: t("menus:help.shortcuts"), group: t("menus:menus.help"), icon: Keyboard, shortcut: keys("shortcuts"), run: () => showHelp("shortcuts") },
     ];
 
     return [...commands, ...pages, ...help];
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [owners, onOpenFeature, showHelp, t]);
+  }, [owners, onOpenFeature, showHelp, t, modules]);
 
   const q = fold(query.trim());
   const shownActions = q
@@ -140,7 +159,7 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature }: Comm
   }
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-2xl p-0">
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-2xl p-0" guardInput={false}>
       <DialogTitle className="sr-only">{t("palette.title")}</DialogTitle>
       <div className="flex items-center gap-2 border-b px-4">
         {loading ? <Loader2 className="size-4 animate-spin text-muted-foreground" /> : <Search className="size-4 text-muted-foreground" />}

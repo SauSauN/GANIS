@@ -37,6 +37,7 @@ import {
 import { api } from "@/lib/api";
 import { canDevelop } from "@/lib/roles";
 import { useAuthStore } from "@/stores/authStore";
+import { errorText } from "@/lib/errors";
 
 /** Types de packages à venir (§20.2), affichés comme « Bientôt ». */
 const UPCOMING: { id: "iconPack" | "list" | "template" | "plugin"; icon: LucideIcon }[] = [
@@ -93,7 +94,7 @@ function BecomeDeveloper() {
       // Le rôle change : la section affiche aussitôt les outils.
       setUser(updated);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("developer.become.failed"));
+      setError(errorText(e, "settings:developer.become.failed"));
       setConfirming(false);
     } finally {
       setBusy(false);
@@ -273,7 +274,7 @@ function LeaveDeveloper() {
       // créations sont masquées et un thème créé n'est plus appliqué.
       setUser(updated);
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("developer.leave.failed"));
+      setError(errorText(e, "settings:developer.leave.failed"));
       setConfirming(false);
       setBusy(false);
     }

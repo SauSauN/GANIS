@@ -14,12 +14,14 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { TypedConfirmation, confirmationMatches } from "@/components/common/TypedConfirmation";
 import { useAuthStore } from "@/stores/authStore";
 import { usePendingVisibility } from "@/stores/pendingVisibilityStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useSetupStore } from "@/stores/setupStore";
 import { toast } from "@/stores/toastStore";
 import type { Project } from "@/types";
+import { errorText } from "@/lib/errors";
 
 interface VisibilityCardProps {
   project: Project;
@@ -31,9 +33,11 @@ interface VisibilityCardProps {
 /**
  * Visibilité du projet (paramètres → « Statut et organisation »).
  *
- * - Public → privé : connecté, le changement est immédiat ; sans
- *   connexion, une connexion est demandée d'abord, puis le projet est
- *   rendu privé dans la foulée.
+ * - Public → privé : le projet quittera l'espace public, partagé par les
+ *   personnes qui utilisent cet ordinateur. Confirmation renforcée : le
+ *   nom du projet doit être retapé (Rust le vérifie aussi). Ensuite,
+ *   connecté, le changement est immédiat ; sans connexion, une connexion
+ *   est demandée, puis le projet est rendu privé dans la foulée.
  * - Privé → public : confirmation explicite (« Annuler » / « Rendre
  *   public ») ; rien ne change si on annule.
  *
@@ -51,18 +55,23 @@ export function VisibilityCard({
 
   const [busy, setBusy] = useState(false);
   const [confirmOpen, setConfirmOpen] = useState(false);
+  /** Confirmation renforcée public → privé, et nom retapé. */
+  const [privateOpen, setPrivateOpen] = useState(false);
+  const [typedName, setTypedName] = useState("");
+  /** Nom confirmé, transmis à la connexion quand elle est nécessaire. */
+  const [confirmedName, setConfirmedName] = useState("");
   const [signInOpen, setSignInOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isPublic = project.visibility === "public";
   const Icon = isPublic ? Globe : Lock;
 
-  async function apply(target: Project["visibility"]) {
+  async function apply(target: Project["visibility"], confirmName?: string) {
     setBusy(true);
     setError(null);
 
     try {
-      const updated = await setVisibility(project.id, target);
+      const updated = await setVisibility(project.id, target, confirmName);
       toast({
         tone: "success",
         message: t(
@@ -73,19 +82,33 @@ export function VisibilityCard({
         ),
       });
     } catch (e) {
-      setError(e instanceof Error ? e.message : t("visibility.failed"));
+      setError(errorText(e, "projectSettings:visibility.failed"));
     } finally {
       setBusy(false);
       setConfirmOpen(false);
+      setPrivateOpen(false);
     }
   }
 
   function handleClick() {
     if (!isPublic) {
       setConfirmOpen(true);
-    } else if (signedIn) {
-      void apply("private");
     } else {
+      setTypedName("");
+      setPrivateOpen(true);
+    }
+  }
+
+  const nameConfirmed = confirmationMatches(project.name, typedName);
+
+  function confirmMakePrivate() {
+    if (!nameConfirmed) return;
+
+    if (signedIn) {
+      void apply("private", typedName);
+    } else {
+      setConfirmedName(typedName);
+      setPrivateOpen(false);
       setSignInOpen(true);
     }
   }
@@ -159,9 +182,55 @@ export function VisibilityCard({
         </DialogContent>
       </Dialog>
 
+      {/* Confirmation renforcée : public → privé */}
+      <Dialog
+        open={privateOpen}
+        guardInput={false}
+        onOpenChange={(open) => {
+          if (!busy) setPrivateOpen(open);
+        }}
+      >
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            confirmMakePrivate();
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>{t("visibility.privateConfirm.title")}</DialogTitle>
+            <DialogDescription>
+              {t("visibility.privateConfirm.description")}
+            </DialogDescription>
+          </DialogHeader>
+
+          <TypedConfirmation
+            label={t("visibility.privateConfirm.typeName", { name: project.name })}
+            value={typedName}
+            onChange={setTypedName}
+            disabled={busy}
+          />
+
+          <DialogFooter className="mt-6 gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              disabled={busy}
+              onClick={() => setPrivateOpen(false)}
+            >
+              {t("common:actions.cancel")}
+            </Button>
+            <Button type="submit" disabled={busy || !nameConfirmed}>
+              <Lock className="mr-2 h-4 w-4" />
+              {t("visibility.makePrivate")}
+            </Button>
+          </DialogFooter>
+        </form>
+      </Dialog>
+
       {/* Sans connexion : public → privé demande de se connecter */}
       <SignInToMakePrivate
         project={project}
+        confirmName={confirmedName}
         open={signInOpen}
         onOpenChange={setSignInOpen}
       />
@@ -175,10 +244,13 @@ export function VisibilityCard({
 
 function SignInToMakePrivate({
   project,
+  confirmName,
   open,
   onOpenChange,
 }: {
   project: Project;
+  /** Nom du projet retapé dans la confirmation renforcée. */
+  confirmName: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -211,7 +283,7 @@ function SignInToMakePrivate({
    * privé à l'arrivée du compte.
    */
   function continueElsewhere(path: string) {
-    requestPending(project.id);
+    requestPending(project.id, confirmName);
     onOpenChange(false);
     navigate(path);
   }
@@ -250,7 +322,7 @@ function SignInToMakePrivate({
     }
 
     try {
-      const updated = await setVisibility(project.id, "private");
+      const updated = await setVisibility(project.id, "private", confirmName);
       toast({
         tone: "success",
         message: t("projects:visibility.madePrivate", { name: updated.name }),
@@ -260,7 +332,7 @@ function SignInToMakePrivate({
     } catch (e) {
       // Connecté, mais le changement a échoué : le message reste affiché,
       // le bouton « Rendre privé » de la carte permet de réessayer.
-      setLocalError(e instanceof Error ? e.message : t("visibility.failed"));
+      setLocalError(errorText(e, "projectSettings:visibility.failed"));
       setBusy(false);
     }
   }
@@ -290,6 +362,7 @@ function SignInToMakePrivate({
               <Label htmlFor="visibility-username">{t("login:username")}</Label>
               <Input
                 id="visibility-username"
+                placeholder={t("common:placeholders.username")}
                 autoComplete="username"
                 autoFocus
                 value={username}
@@ -301,6 +374,7 @@ function SignInToMakePrivate({
               <Label htmlFor="visibility-password">{t("login:password")}</Label>
               <Input
                 id="visibility-password"
+                placeholder={t("common:placeholders.password")}
                 type="password"
                 autoComplete="current-password"
                 value={password}

@@ -1,7 +1,9 @@
-import { useTranslation } from "react-i18next";
 import { Navigate, useNavigate } from "react-router-dom";
 import { LogIn } from "lucide-react";
 import ganisLogo from "@/assets/ganis-logo.png";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { SpaceInfoDialog, showPublicInfoOnStart } from "@/components/projects/SpaceInfoDialog";
 import { Button } from "@/components/ui/button";
 import { StoryMap } from "@/components/welcome/StoryMap";
 import { useAuthStore } from "@/stores/authStore";
@@ -12,6 +14,9 @@ import { useSetupStore } from "@/stores/setupStore";
  *
  * - « Commencer » : sans compte, ouvre le tableau de bord de l'espace
  *   public (le guide de démarrage s'y affiche à la première visite).
+ *   Avant, une petite fenêtre dit que cet espace est partagé et non
+ *   chiffré (« Continuer sans compte » / « Se connecter ») ; elle peut
+ *   être désactivée, et se rouvre depuis le badge du tableau de bord.
  * - « Se connecter » : espace privé du compte.
  *
  * À droite, un plateau de trame en miniature (`StoryMap`) donne le ton :
@@ -29,9 +34,16 @@ export default function Welcome() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  const handleStart = () => {
+  const [infoOpen, setInfoOpen] = useState(false);
+
+  const enterPublicSpace = () => {
     startGuest();
     navigate("/dashboard");
+  };
+
+  const handleStart = () => {
+    if (showPublicInfoOnStart()) setInfoOpen(true);
+    else enterPublicSpace();
   };
 
   /** Aucun compte encore : la connexion passe par l'assistant. */
@@ -95,6 +107,15 @@ export default function Welcome() {
             </Button>
           </div>
         </section>
+
+        <SpaceInfoDialog
+          open={infoOpen}
+          space="public"
+          mode="start"
+          onClose={() => setInfoOpen(false)}
+          onContinue={enterPublicSpace}
+          onSignIn={handleSignIn}
+        />
 
         {/* Plateau de trame en miniature */}
         <div className="relative -mx-4 sm:mx-0">

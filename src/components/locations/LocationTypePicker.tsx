@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import {
   CATEGORY_ICONS,
   categoryTint,
-  typeIcon,
 } from "@/components/locations/locationStyle";
 import type { LocationLabels } from "@/components/locations/useLocationLabels";
 import {
@@ -31,9 +30,9 @@ function normalize(text: string): string {
 }
 
 /**
- * Choix du type d'un lieu : les six catégories, chacune avec ses types
- * (par défaut puis ceux ajoutés par l'auteur). Une recherche filtre les
- * types par leur nom.
+ * Choix du type d'un lieu : les six catégories, chacune avec un menu
+ * déroulant de ses types (par défaut puis ceux ajoutés par l'auteur).
+ * Une recherche filtre les types par leur nom (et les catégories vides).
  */
 export function LocationTypePicker({
   value,
@@ -110,32 +109,29 @@ export function LocationTypePicker({
                   </div>
                 </div>
 
-                <div className="flex flex-wrap gap-1.5">
-                  {types.map((item) => {
-                    const Icon = typeIcon(item.id, category);
-                    const selected = item.id === value;
-
-                    return (
-                      <button
-                        key={item.id}
-                        type="button"
-                        disabled={disabled}
-                        aria-pressed={selected}
-                        title={item.customName ? t("type.custom") : undefined}
-                        onClick={() => onSelect(item.id)}
-                        className={cn(
-                          "inline-flex items-center gap-1.5 rounded-md border px-2 py-1 text-xs font-medium transition-colors",
-                          "hover:border-primary/60 hover:bg-primary/5 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-                          selected && "border-primary bg-primary text-primary-foreground hover:bg-primary",
-                          item.customName && !selected && "border-dashed",
-                        )}
-                      >
-                        <Icon className="size-3.5" aria-hidden="true" />
-                        {labels.type(item.id)}
-                      </button>
-                    );
-                  })}
-                </div>
+                {/* Types en menu déroulant : une catégorie peut en compter
+                    beaucoup (surtout avec les types ajoutés par l'auteur). */}
+                <select
+                  aria-label={labels.category(category)}
+                  disabled={disabled}
+                  value={types.some((item) => item.id === value) ? value : ""}
+                  onChange={(e) => e.target.value && onSelect(e.target.value)}
+                  className={cn(
+                    "h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none",
+                    "focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+                    types.some((item) => item.id === value) && "border-primary",
+                  )}
+                >
+                  <option value="" disabled>
+                    {t("picker.choose", { count: types.length })}
+                  </option>
+                  {types.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {labels.type(item.id)}
+                      {item.customName ? ` — ${t("type.custom")}` : ""}
+                    </option>
+                  ))}
+                </select>
               </section>
             );
           })}

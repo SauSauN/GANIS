@@ -351,6 +351,15 @@ fn is_date(value: &str) -> bool {
     chrono::NaiveDate::parse_from_str(value, "%Y-%m-%d").is_ok()
 }
 
+/// Palette de couleurs (tableau JSON de « #rrggbb ») : nettoyée, ou `None`
+/// si elle est illisible ou trop longue. Partagée avec les lieux, les
+/// objets et la faune et flore (cadre de leur image).
+pub fn clean_palette(value: &str) -> Option<Vec<String>> {
+    let colors: Vec<String> = serde_json::from_str(value).ok()?;
+    let colors: Vec<String> = colors.iter().map(|c| c.trim().to_lowercase()).collect();
+    (colors.len() <= MAX_COLORS && colors.iter().all(|c| is_color(c))).then_some(colors)
+}
+
 /// Couleur « #rrggbb ».
 fn is_color(value: &str) -> bool {
     value.len() == 7
@@ -747,6 +756,9 @@ pub async fn delete_character(pool: &SqlitePool, id: &str) -> AppResult<String> 
             snapshot.restore_json("locations", &location, "fields", &path, id, None);
         }
     }
+
+    // Liens avec des objets et des espèces : supprimés avec lui (corbeille).
+    crate::services::world_link_service::detach(&mut tx, &mut snapshot, id).await?;
 
     let result = sqlx::query("DELETE FROM characters WHERE id = ?")
         .bind(id)

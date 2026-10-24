@@ -51,6 +51,7 @@ import {
   type LocationDraft,
   type LocationField,
 } from "@/lib/locations";
+import { parseList } from "@/lib/characters";
 import { cn } from "@/lib/utils";
 import type { Location, LocationSettings } from "@/types";
 
@@ -169,7 +170,7 @@ function GallerySection({ children }: { children: ReactNode }) {
   );
 }
 
-const WIDE_KINDS = new Set(["longText", "tags"]);
+const WIDE_KINDS = new Set(["longText", "tags", "colors"]);
 
 /**
  * Fiche d'un lieu : carte de présentation à gauche (image, nom, type,
@@ -255,6 +256,7 @@ export function LocationSheet({
             busy={banner.busy}
             error={banner.error}
             disabled={disabled}
+            ringColors={parseList(draft.fields.colorPalette)}
             onPick={banner.onPick}
             onRemove={banner.onRemove}
           />

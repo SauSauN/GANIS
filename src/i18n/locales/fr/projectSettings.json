@@ -10,7 +10,7 @@
     },
     "danger": {
       "label": "Export, duplication et suppression",
-      "description": "Exporter en .ganix, dupliquer ou supprimer définitivement le projet."
+      "description": "Exporter en .ganix, dupliquer ou mettre le projet à la corbeille."
     },
     "characters": {
       "label": "Personnages",
@@ -31,6 +31,14 @@
     "notes": {
       "label": "Notes",
       "description": "Notes système : les descriptions des fiches, modifiables depuis les notes."
+    },
+    "items": {
+      "label": "Objets",
+      "description": "Module facultatif : activez-le, choisissez vos catégories (armes, véhicules, magie…) et vos types."
+    },
+    "species": {
+      "label": "Faune et flore",
+      "description": "Module facultatif : activez-le et choisissez faune, flore ou les deux."
     }
   },
   "info": {
@@ -59,7 +67,7 @@
     "duplicated": "La copie « {{name}} » a été créée. Retrouvez-la sur le tableau de bord.",
     "duplicateFailed": "Impossible de dupliquer le projet.",
     "deleteTitle": "Supprimer le projet",
-    "deleteDescription": "La suppression est définitive et ne peut pas être annulée.",
+    "deleteDescription": "Le projet va dans la corbeille du tableau de bord. Vous pouvez l'y restaurer pendant 30 jours ; ensuite, il est supprimé définitivement.",
     "deleteFailed": "Impossible de supprimer le projet.",
     "exportTitle": "Exporter le projet",
     "exportDescription": "Télécharge tout le projet dans un fichier « nom du projet.ganix », à importer depuis le tableau de bord de GANIS (sur cet ordinateur ou un autre).",
@@ -96,7 +104,12 @@
     "makePublic": "Rendre public",
     "makePrivate": "Rendre privé",
     "confirmTitle": "Rendre ce projet public ?",
-    "confirmDescription": "Il quittera votre espace privé et pourra être ouvert sans connexion par toute personne utilisant GANIS sur cet ordinateur.",
+    "confirmDescription": "Il quittera votre espace privé et ne sera plus chiffré : toute personne utilisant GANIS sur cet ordinateur pourra l'ouvrir sans connexion, le modifier ou le supprimer.",
+    "privateConfirm": {
+      "title": "Retirer ce projet de l'espace public ?",
+      "description": "Il sera chiffré et lié à votre compte. Les autres personnes qui utilisent GANIS sur cet ordinateur ne pourront plus l'ouvrir.",
+      "typeName": "Pour confirmer, retapez le nom du projet : {{name}}"
+    },
     "failed": "Changement de visibilité impossible.",
     "signIn": {
       "title": "Connexion requise",

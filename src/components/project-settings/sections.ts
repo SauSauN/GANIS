@@ -1,9 +1,19 @@
-import { Info, ListChecks, ListTree, MapPin, NotebookPen, TriangleAlert, Users, Waypoints, type LucideIcon } from "lucide-react";
+import { Info, ListChecks, ListTree, MapPin, NotebookPen, Package, PawPrint, TriangleAlert, Users, Waypoints, type LucideIcon } from "lucide-react";
 
 import i18n from "@/i18n";
 
 /** Sections des paramètres d'un projet. */
-export type ProjectSettingsId = "info" | "status" | "characters" | "locations" | "structure" | "plot" | "notes" | "danger";
+export type ProjectSettingsId =
+  | "info"
+  | "status"
+  | "characters"
+  | "locations"
+  | "items"
+  | "species"
+  | "structure"
+  | "plot"
+  | "notes"
+  | "danger";
 
 export interface ProjectSettingsSection {
   id: ProjectSettingsId;
@@ -41,6 +51,9 @@ export const PROJECT_SETTINGS_SECTIONS: ProjectSettingsSection[] = [
   section("status", ListChecks),
   section("characters", Users),
   section("locations", MapPin),
+  // Modules facultatifs : on les active ici (désactivés par défaut).
+  section("items", Package),
+  section("species", PawPrint),
   section("structure", ListTree),
   section("plot", Waypoints),
   section("notes", NotebookPen),

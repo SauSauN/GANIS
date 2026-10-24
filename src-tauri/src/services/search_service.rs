@@ -1,5 +1,5 @@
-//! Recherche globale dans un projet : personnages, lieux, éléments du
-//! découpage, notes (titre et contenu), dossiers de notes et post-it.
+//! Recherche globale dans un projet : personnages, lieux, objets, faune et
+//! flore (modules activés), éléments du découpage, notes (titre et contenu), dossiers de notes et post-it.
 //!
 //! La recherche ne tient compte ni de la casse ni des accents (« chateau »
 //! trouve « Château »). Tous les mots tapés doivent apparaître (dans
@@ -19,7 +19,7 @@ const SNIPPET_CHARS: usize = 140;
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SearchHit {
-    /// character, location, structureNode, document (id : celui de
+    /// character, location, item, species, structureNode, document (id : celui de
     /// l'élément du découpage), note, noteFolder, sticky.
     pub kind: String,
     pub id: String,
@@ -175,13 +175,32 @@ pub async fn search(pool: &SqlitePool, query: &str) -> AppResult<Vec<SearchHit>>
         body: fields_text(&fields),
     }));
 
-    let rows: Vec<(String, String, String)> =
-        sqlx::query_as("SELECT id, title, summary FROM structure_nodes").fetch_all(pool).await?;
-    candidates.extend(rows.into_iter().map(|(id, title, summary)| Candidate {
+    // Objets, faune et flore : seulement si le module est activé.
+    for (kind, sql) in [
+        ("item", "SELECT id, name, fields FROM items WHERE (SELECT enabled FROM item_settings WHERE id = 'default') = 1"),
+        ("species", "SELECT id, name, fields FROM species WHERE (SELECT enabled FROM species_settings WHERE id = 'default') = 1"),
+    ] {
+        let rows: Vec<(String, String, String)> = sqlx::query_as(sql).fetch_all(pool).await?;
+        candidates.extend(rows.into_iter().map(|(id, name, fields)| Candidate {
+            kind,
+            id,
+            title: name,
+            body: fields_text(&fields),
+        }));
+    }
+
+    // Résumé, puis texte de l'élément (scène d'un roman), en texte brut.
+    let rows: Vec<(String, String, String, String)> =
+        sqlx::query_as("SELECT id, title, summary, content FROM structure_nodes").fetch_all(pool).await?;
+    candidates.extend(rows.into_iter().map(|(id, title, summary, content)| Candidate {
         kind: "structureNode",
         id,
         title,
-        body: summary,
+        body: if content.is_empty() {
+            summary
+        } else {
+            format!("{summary}\n{}", crate::services::novel_service::plain_text(&content))
+        },
     }));
 
     let rows: Vec<(String, String, String)> =

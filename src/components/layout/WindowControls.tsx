@@ -57,7 +57,7 @@ export function WindowControls() {
   const maximizeLabel = maximized ? t("window.restore") : t("window.maximize");
 
   return (
-    <div className="flex h-full items-stretch">
+    <div className="flex h-full shrink-0 items-stretch">
       <button
         type="button"
         aria-label={t("window.minimize")}

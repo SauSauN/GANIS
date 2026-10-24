@@ -1,10 +1,12 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { VersionsButton } from "@/components/history/VersionsDialog";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
+import { notifyError, notifySaved } from "@/lib/notify";
+import { errorText } from "@/lib/errors";
 import { useTranslation } from "react-i18next";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Plus, RefreshCw, Save, X } from "lucide-react";
+import { Loader2, Plus, RefreshCw, Save, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,7 +27,6 @@ import type { WorkspaceFeature } from "@/components/workspace/modules";
 const MAX_TAGS = 20;
 const MAX_TAG_LENGTH = 50;
 
-type SaveStatus = "idle" | "saved" | "error";
 
 /** Dernière version enregistrée (ou chargée) : sert à repérer les modifications. */
 interface Baseline {
@@ -189,8 +190,6 @@ export function SynopsisEditView({
   const [subgenres, setSubgenres] = useState<string[]>([]);
   const [tone, setTone] = useState<string[]>([]);
 
-  const [saveStatus, setSaveStatus] =
-    useState<SaveStatus>("idle");
 
   /** Texte actuel de l'éditeur (HTML), mis à jour à chaque frappe. */
   const [contentHtml, setContentHtml] = useState("");
@@ -209,7 +208,6 @@ export function SynopsisEditView({
   /**
    * Minuterie du message « Synopsis enregistré ».
    */
-  const statusTimer = useRef<number | null>(null);
 
   const editor = useEditor({
     extensions: [
@@ -271,18 +269,6 @@ export function SynopsisEditView({
   }, [synopsis, editor, projectId]);
 
   // -------------------------------------------------------------------------
-  // Nettoyage de la minuterie
-  // -------------------------------------------------------------------------
-
-  useEffect(() => {
-    return () => {
-      if (statusTimer.current !== null) {
-        window.clearTimeout(statusTimer.current);
-      }
-    };
-  }, []);
-
-  // -------------------------------------------------------------------------
   // Enregistrement
   // -------------------------------------------------------------------------
 
@@ -304,8 +290,6 @@ export function SynopsisEditView({
     if (!editor || !synopsis) {
       return false;
     }
-
-    setSaveStatus("idle");
 
     const content = editor.getHTML();
 
@@ -331,19 +315,12 @@ export function SynopsisEditView({
         tone: saved.tone,
       });
 
-      setSaveStatus("saved");
-
-      if (statusTimer.current !== null) {
-        window.clearTimeout(statusTimer.current);
-      }
-
-      statusTimer.current = window.setTimeout(() => {
-        setSaveStatus("idle");
-      }, 3000);
+      // Confirmation en notification : l'écran ne bouge pas.
+      notifySaved(t("saved"), `synopsis:${projectId}`);
 
       return true;
-    } catch {
-      setSaveStatus("error");
+    } catch (error) {
+      notifyError(`${t("saveFailed")} ${errorText(error)}`, `synopsis:${projectId}`);
       return false;
     }
   }
@@ -504,30 +481,11 @@ export function SynopsisEditView({
             onClick={() => void handleSave()}
             disabled={saving || loading || !synopsis}
           >
-            <Save className="mr-2 h-4 w-4" />
+            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="mr-2 h-4 w-4" aria-hidden="true" />}
 
-            {saving
-              ? t("common:actions.saving")
-              : t("common:actions.save")}
+            {t("common:actions.save")}
           </Button>
 
-          {saveStatus === "saved" && (
-            <p
-              role="status"
-              className="text-sm text-success"
-            >
-              {t("saved")}
-            </p>
-          )}
-
-          {saveStatus === "error" && (
-            <p
-              role="alert"
-              className="text-sm text-destructive"
-            >
-              {t("saveFailed")}
-            </p>
-          )}
 
           <VersionsButton
             className="ml-auto"

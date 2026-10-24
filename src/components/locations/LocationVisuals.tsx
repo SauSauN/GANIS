@@ -1,5 +1,6 @@
 import { useRef, useState, type DragEvent } from "react";
 import { useConfirmImageRemoval } from "@/components/common/useConfirmImageRemoval";
+import { PaletteFrame } from "@/components/common/PaletteFrame";
 import { useTranslation } from "react-i18next";
 import { ImagePlus, Loader2, Trash2 } from "lucide-react";
 import {
@@ -54,11 +55,13 @@ export function TypeBadge({
 
 const THUMB_SIZES = {
   xs: "size-5 rounded",
+  /** Panneau du milieu : même taille que les personnages, réglée dans Paramètres › Apparence. */
+  panel: "size-(--panel-thumb) rounded-md",
   sm: "size-8 rounded-md",
   md: "size-11 rounded-lg",
 } as const;
 
-const THUMB_ICONS = { xs: "size-3", sm: "size-4", md: "size-5" } as const;
+const THUMB_ICONS = { xs: "size-3", panel: "size-[calc(var(--panel-thumb)*0.6)]", sm: "size-4", md: "size-5" } as const;
 
 /** Vignette carrée : l'image du lieu, ou l'icône de son type sur sa teinte. */
 export function LocationThumb({
@@ -108,6 +111,8 @@ interface BannerPickerProps {
   busy?: boolean;
   error?: string | null;
   disabled?: boolean;
+  /** Palette du lieu : un cadre de ces couleurs entoure l'image. */
+  ringColors?: string[];
   onPick: (file: File) => void;
   onRemove: () => void;
 }
@@ -124,6 +129,7 @@ export function BannerPicker({
   busy = false,
   error,
   disabled = false,
+  ringColors = [],
   onPick,
   onRemove,
 }: BannerPickerProps) {
@@ -165,6 +171,7 @@ export function BannerPicker({
 
   return (
     <div className="w-full space-y-2">
+      <PaletteFrame colors={ringColors}>
       <button
         type="button"
         disabled={locked}
@@ -175,7 +182,7 @@ export function BannerPicker({
         title={dragOver ? t("image.drop") : actionLabel}
         aria-label={actionLabel}
         className={cn(
-          "group relative flex aspect-[16/10] w-full items-center justify-center overflow-hidden rounded-lg text-white transition-shadow",
+          "group relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg text-white transition-shadow",
           "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
           dragOver && "ring-4 ring-primary ring-offset-2 ring-offset-background",
         )}
@@ -186,7 +193,7 @@ export function BannerPicker({
         ) : (
           <Icon
             className={cn(
-              "size-12 opacity-90 drop-shadow transition-opacity",
+              "size-14 opacity-90 drop-shadow transition-opacity",
               !locked && "group-hover:opacity-0 group-focus-visible:opacity-0",
             )}
             aria-hidden="true"
@@ -215,6 +222,7 @@ export function BannerPicker({
           </span>
         )}
       </button>
+      </PaletteFrame>
 
       <input
         ref={inputRef}

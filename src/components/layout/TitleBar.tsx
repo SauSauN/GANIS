@@ -1,13 +1,18 @@
-import type { MouseEvent } from "react";
+import { useEffect, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useMatch } from "react-router-dom";
-import { Activity, Blocks, LogIn, Moon, Settings, Sun, Undo2 } from "lucide-react";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { Activity, Blocks, LogIn, Moon, Play, Settings, Square, Sun, Undo2 } from "lucide-react";
 import ganisLogo from "@/assets/ganis-logo.png";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { MenuBar } from "@/components/layout/MenuBar";
 import { useGuardedNavigate } from "@/components/layout/UnsavedChangesGuard";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { WindowControls } from "@/components/layout/WindowControls";
+import { isTauri } from "@/lib/api";
+import { runCommand, useCommand } from "@/lib/commands";
+import { formatCombo, shortcutOf } from "@/lib/shortcuts";
+import { useKeyLabels } from "@/lib/keyLabels";
 import { applyTheme, useResolvedTheme, type Theme } from "@/lib/theme";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
@@ -30,7 +35,7 @@ const iconButton =
 export function TitleBar() {
   // Demande d'abord quoi faire des modifications non enregistrées.
   const navigate = useGuardedNavigate();
-  const { t } = useTranslation("titlebar");
+  const { t } = useTranslation(["titlebar", "menus"]);
 
   const user = useAuthStore((s) => s.user);
   const guest = useAuthStore((s) => s.guest);
@@ -57,7 +62,24 @@ export function TitleBar() {
   );
   const showBackToProject = Boolean(inApp && lastProject && !projectId);
 
+  // Titre de la fenêtre (barre des tâches, Alt+Tab) : le projet ouvert.
+  useEffect(() => {
+    const title = projectName ? `${projectName} — GANIS` : "GANIS";
+
+    document.title = title;
+    if (isTauri()) void getCurrentWindow().setTitle(title).catch(() => {});
+  }, [projectName]);
+
   const theme = useResolvedTheme();
+
+  // Bouton ▶ : lecture complète du projet ouvert (commande de l'espace de
+  // travail, voir `readStory` dans `Workspace.tsx`).
+  const readStory = useCommand("readStory");
+  const reading = Boolean(readStory?.active);
+  const keyLabels = useKeyLabels();
+  const readCombo = shortcutOf("readStory");
+  const readLabel = reading ? t("reading.stop") : t("reading.play");
+  const readTitle = readCombo ? `${readLabel} (${formatCombo(readCombo, keyLabels)})` : readLabel;
 
   /**
    * Change le thème clair/sombre.
@@ -82,13 +104,14 @@ export function TitleBar() {
       {/* ------------------------------------------------------------------ */}
 
       <div
-        className="flex items-center gap-1"
+        className="flex shrink-0 items-center gap-1"
         onMouseDown={stopDrag}
       >
         <button
           type="button"
           title={t("home")}
-          aria-label={t("home")}
+          // Le nom accessible commence par le texte visible (WCAG 2.5.3).
+          aria-label={`GANIS – ${t("home")}`}
           onClick={() => navigate(inApp ? "/dashboard" : "/")}
           className="flex h-7 items-center gap-2 rounded px-2 font-semibold hover:bg-secondary"
         >
@@ -126,13 +149,29 @@ export function TitleBar() {
       {/* ------------------------------------------------------------------ */}
 
       <div
-        className="flex items-center gap-1 pr-2"
+        className="flex shrink-0 items-center gap-1 pr-2"
         onMouseDown={stopDrag}
       >
         {/* Langue de l'interface avant connexion (accueil, connexion,
             inscription, configuration). Une fois connecté, elle se change
             dans le menu du compte. */}
         {!user && <LanguageSwitcher className="mr-1" />}
+
+        {/* Lecture complète du projet ouvert (▶), même forme que les
+            autres icônes ; enfoncé pendant la lecture. */}
+        {projectId && readStory && (
+          <button
+            type="button"
+            onClick={() => runCommand("readStory")}
+            disabled={readStory.disabled}
+            aria-label={readLabel}
+            aria-pressed={reading}
+            title={readTitle}
+            className={cn(iconButton, "disabled:pointer-events-none disabled:opacity-50", reading && "bg-secondary text-foreground")}
+          >
+            {reading ? <Square className="h-4 w-4" /> : <Play className="h-4 w-4" />}
+          </button>
+        )}
 
         {showBackToProject && lastProject && (
           <button

@@ -173,3 +173,25 @@ pub async fn change_password(
     auth_service::change_password(&state, &input.current_password, &input.new_password)
         .await
 }
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct DeleteAccountInput {
+    pub password: String,
+}
+
+/// Supprime le compte connecté (mot de passe demandé), ses projets privés
+/// et leurs données. La session est fermée.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn delete_account(
+    state: State<'_, AppState>,
+    input: DeleteAccountInput,
+) -> AppResult<()> {
+    let project_ids = auth_service::delete_own_account(&state, &input.password).await?;
+
+    for project_id in project_ids {
+        project_storage::delete_storage(&state, &project_id).await;
+    }
+
+    Ok(())
+}

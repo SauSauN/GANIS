@@ -26,6 +26,20 @@
     },
     "settings": {
       "label": "Paramètres du projet"
+    },
+    "manuscript": {
+      "label": "Manuscrit"
+    },
+    "script": {
+      "label": "Scénario"
+    },
+    "items": {
+      "label": "Objets",
+      "empty": "Aucun objet pour l'instant."
+    },
+    "species": {
+      "label": "Faune et flore",
+      "empty": "Aucun animal ni aucune plante pour l'instant."
     }
   },
   "features": {
@@ -67,6 +81,10 @@
       "plan": {
         "label": "Plan du récit",
         "description": "Le découpage de votre histoire, adapté au type de projet."
+      },
+      "read": {
+        "label": "Lecture complète",
+        "description": "Toute l'histoire d'un seul tenant, compilée dans l'ordre du découpage."
       }
     },
     "notes": {
@@ -99,6 +117,62 @@
       "reading": {
         "label": "Lecture de l'histoire",
         "description": "L'histoire dans l'ordre du lecteur, avec ses personnages, lieux, chapitres et notes."
+      }
+    },
+    "manuscript": {
+      "read": {
+        "label": "Manuscrit",
+        "description": "Le roman d'un seul tenant, dans l'ordre du plan ; export Word et PDF."
+      },
+      "progress": {
+        "label": "Suivi de rédaction",
+        "description": "Mots, objectifs, états de rédaction et narration, chapitre par chapitre."
+      },
+      "editorial": {
+        "label": "Dossier éditorial",
+        "description": "Pitch, résumé court et résumé long, pour présenter le roman."
+      },
+      "replace": {
+        "label": "Rechercher et remplacer",
+        "description": "Corriger un nom ou un mot dans tout le texte des scènes."
+      },
+      "import": {
+        "label": "Importer un manuscrit",
+        "description": "Un fichier Word, Markdown ou texte, découpé en parties, chapitres et scènes."
+      }
+    },
+    "script": {
+      "read": {
+        "label": "Lecture de l'histoire",
+        "description": "L'histoire chapitre par chapitre : l'explication de chaque chapitre et ce que montrent ses pages."
+      },
+      "progress": {
+        "label": "Suivi du scénario",
+        "description": "Pages prévues et écrites, statuts, volume de texte."
+      },
+      "continuity": {
+        "label": "Continuité",
+        "description": "Où apparaît chaque personnage, et dans quel état, case par case."
+      }
+    },
+    "items": {
+      "create": {
+        "label": "Créer un objet",
+        "description": "Arme, véhicule, chapeau, téléphone… une fiche adaptée à chaque type."
+      },
+      "list": {
+        "label": "Liste des objets",
+        "description": "Tous les objets de votre histoire, rangés les uns dans les autres."
+      }
+    },
+    "species": {
+      "create": {
+        "label": "Créer une fiche",
+        "description": "Une espèce, ou un animal ou une plante précis (qui peut aussi être un personnage)."
+      },
+      "list": {
+        "label": "Liste de la faune et flore",
+        "description": "Les espèces de votre univers et leurs individus."
       }
     }
   }

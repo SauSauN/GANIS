@@ -83,7 +83,7 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
               <button
                 type="button"
                 onClick={() => setZoomed(item)}
-                className="block size-full focus-visible:outline-none"
+                className="block size-full rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
                 aria-label={t("gallery.open")}
               >
                 <img src={item.url} alt="" className="size-full object-cover" draggable={false} />

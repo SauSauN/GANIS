@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 import { useProjectStructureData } from "@/stores/structureStore";
 import type { Project, StructureTemplateId } from "@/types";
 import { errorText } from "@/lib/errors";
+import { notifyError, notifySaved } from "@/lib/notify";
 
 /**
  * Paramètres du projet › Découpage : modèle de départ, puis noms et
@@ -28,21 +29,22 @@ export function StructureSettingsSection({ project }: { project: Project }) {
   const { t } = useTranslation(["structure", "common"]);
   // Découpage partagé : le plan et l'arborescence voient chaque réglage.
   const { structure, error: loadError, reload: load } = useProjectStructureData(project.id);
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "settings:structure");
+  };
   const [busy, setBusy] = useState(false);
-  const [autoSaved, setAutoSaved] = useState(false);
 
   const { levels } = useStructureLabels(structure);
 
   async function changeAutoNumbering(enabled: boolean) {
     setBusy(true);
     setError(null);
-    setAutoSaved(false);
 
     try {
       await api.setStructureAutoNumbering(project.id, enabled);
       await load();
-      setAutoSaved(true);
+      notifySaved(t("numbering.saved"), "settings:structure");
     } catch (e) {
       setError(errorText(e));
     } finally {
@@ -97,11 +99,6 @@ export function StructureSettingsSection({ project }: { project: Project }) {
             showHint={false}
             onChange={(template) => void changeTemplate(template)}
           />
-          {error && (
-            <p role="alert" className="mt-3 text-sm text-destructive">
-              {error}
-            </p>
-          )}
         </CardContent>
       </Card>
 
@@ -127,11 +124,6 @@ export function StructureSettingsSection({ project }: { project: Project }) {
               labelledBy="structure-auto-numbering"
             />
           </div>
-          {autoSaved && (
-            <p role="status" className="mt-3 text-sm text-success">
-              {t("numbering.saved")}
-            </p>
-          )}
         </CardContent>
       </Card>
 

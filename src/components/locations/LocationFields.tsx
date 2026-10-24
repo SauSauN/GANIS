@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ReferenceField, TagsField } from "@/components/characters/fields/SpecialFields";
+import { ColorsField, ReferenceField, TagsField } from "@/components/characters/fields/SpecialFields";
 import type { LocationLabels } from "@/components/locations/useLocationLabels";
 import { fieldClass } from "@/components/workspace/views/PageShell";
 import { fullName } from "@/lib/characters";
@@ -208,6 +208,9 @@ export function LocationFieldInput({
       return (
         <ReferenceField id={id} projectId={projectId} value={value} onChange={onChange} disabled={disabled} />
       );
+
+    case "colors":
+      return <ColorsField id={id} value={value} onChange={onChange} disabled={disabled} />;
 
     case "location": {
       const others = locations.filter((location) => location.id !== selfId);

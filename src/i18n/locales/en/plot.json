@@ -209,7 +209,15 @@
     "addAlsoNode": "Add another scene…",
     "alsoNodesNeedMain": "Choose “Told in” first",
     "removeAlsoNode": "Remove “{{name}}”",
-    "momentHint": "1, 2, 3…: the main story. −1, −2…: the narrative past, before the story begins."
+    "momentHint": "1, 2, 3…: the main story. −1, −2…: the narrative past, before the story begins.",
+    "links": {
+      "title": "Links with other events",
+      "linkTo": "Link to…",
+      "linkFrom": "Link from…",
+      "open": "Show this link",
+      "toAria": "to",
+      "fromAria": "from"
+    }
   },
   "link": {
     "from": "From",
@@ -227,7 +235,6 @@
     "name": "Plot name",
     "colorInSettings": "Change the colour (project settings)",
     "character": "Character's plot",
-    "characterHint": "Optional: the plot follows this character (their name shows at the top of the column).",
     "count_one": "{{count}} event in this plot.",
     "count_other": "{{count}} events in this plot.",
     "left": "Left",
@@ -248,12 +255,9 @@
     "actPlaceholder": "e.g. Act II: the descent",
     "tension": "Tension: {{value}} out of 10",
     "tensionNone": "Tension: not set",
-    "tensionHint": "0: dead calm, 10: breathless. You can also click in the Tension column.",
     "tensionClear": "Clear the tension",
     "count_one": "{{count}} event at this moment.",
     "count_other": "{{count}} events at this moment.",
-    "empty": "This moment is empty.",
-    "simultaneous": "Everything on the same row happens at the same time, in different plots.",
     "insertBefore": "Insert a moment before",
     "insertAfter": "Insert a moment after",
     "delete": "Delete this moment",
@@ -497,7 +501,11 @@
   "sidebar": {
     "title": "Plots",
     "hidden": "Plot hidden on the board",
-    "summary": "{{events}} event(s), {{links}} link(s)"
+    "summary": "{{events}}, {{links}}",
+    "summaryEvents_one": "{{count}} event",
+    "summaryEvents_other": "{{count}} events",
+    "summaryLinks_one": "{{count}} link",
+    "summaryLinks_other": "{{count}} links"
   },
   "inStory": {
     "title": "In the plot",

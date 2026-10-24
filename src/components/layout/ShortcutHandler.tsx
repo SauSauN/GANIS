@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { runCommand } from "@/lib/commands";
+import { isBrowserShortcut } from "@/lib/nativeGuards";
 import { isEditable, trackEditableFocus } from "@/lib/editCommands";
 import { findShortcut, useHelpStore } from "@/lib/shortcuts";
 import { undoLastDeletion } from "@/lib/trash";
@@ -21,7 +22,9 @@ export function ShortcutHandler() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.defaultPrevented || event.isComposing) return;
+      // Les raccourcis du navigateur neutralisés (F5…) ont déjà
+      // `defaultPrevented` (voir `nativeGuards`) : GANIS les reçoit quand même.
+      if ((event.defaultPrevented && !isBrowserShortcut(event, true)) || event.isComposing) return;
 
       const ctrl = event.ctrlKey || event.metaKey;
 

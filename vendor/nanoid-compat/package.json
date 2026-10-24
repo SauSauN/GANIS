@@ -1,0 +1,9 @@
+{
+  "name": "nanoid-compat",
+  "version": "2.2.0",
+  "private": true,
+  "description": "Remplace nanoid 2 (failles GHSA-28wg, GHSA-2v37, GHSA-xwg4) pour hunspell-asm : même usage, nanoid(taille), générateur sûr et taille vérifiée.",
+  "license": "MIT",
+  "main": "index.js",
+  "browser": "index.js"
+}

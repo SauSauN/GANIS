@@ -6,6 +6,7 @@
 pub mod auth_service;
 pub mod character_location_service;
 pub mod character_service;
+pub mod demo_service;
 pub mod diagnostics_service;
 pub mod document_service;
 pub mod ganix_service;
@@ -14,6 +15,10 @@ pub mod keyring_service;
 pub mod location_service;
 pub mod login_throttle;
 pub mod note_service;
+pub mod manga_service;
+pub mod novel_import_service;
+pub mod novel_replace_service;
+pub mod novel_service;
 pub mod plot_service;
 pub mod package_service;
 pub mod project_service;
@@ -27,6 +32,8 @@ pub mod synopsis_service;
 pub mod system_note_service;
 pub mod trash_service;
 pub mod user_service;
+pub mod world_link_service;
+pub mod world_service;
 
 #[cfg(test)]
 mod encryption_tests;
