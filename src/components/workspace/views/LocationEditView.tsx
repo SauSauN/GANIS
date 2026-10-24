@@ -20,6 +20,7 @@ import {
 import { LocationGallery } from "@/components/locations/LocationGallery";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import { PlaceLinksCard } from "@/components/locations/PlaceLinksCard";
+import { WorldExtras } from "@/components/world/WorldExtras";
 import { StoryLinksCard } from "@/components/structure/StoryLinksCard";
 import { PlotInStoryCard } from "@/components/plot/PlotInStoryCard";
 import { LocationSheet } from "@/components/locations/LocationSheet";
@@ -51,6 +52,7 @@ import {
   useProjectLocations,
 } from "@/stores/locationStore";
 import { errorText } from "@/lib/errors";
+import { notifyError, notifySaved } from "@/lib/notify";
 
 interface LocationEditViewProps {
   projectId: string;
@@ -86,8 +88,6 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
   const [draft, setDraft] = useState<LocationDraft | null>(null);
   const [showNameError, setShowNameError] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<"saved" | null>(null);
-  const [saveError, setSaveError] = useState<string | null>(null);
   const [bannerBusy, setBannerBusy] = useState(false);
   const [bannerError, setBannerError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -104,10 +104,6 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
     }
   }, [base]);
 
-  useEffect(() => {
-    if (dirty) setSaveStatus(null);
-  }, [dirty]);
-
   const nameProblem = draft ? locationNameError(draft.name) : null;
 
   async function save(): Promise<boolean> {
@@ -119,15 +115,14 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
     }
 
     setSaving(true);
-    setSaveError(null);
 
     try {
       await updateLocation(projectId, locationId, toLocationInput(draft));
       setShowNameError(false);
-      setSaveStatus("saved");
+      notifySaved(t("edit.saved"), `location:${locationId}`);
       return true;
     } catch (e) {
-      setSaveError(errorText(e));
+      notifyError(errorText(e), `location:${locationId}`);
       return false;
     } finally {
       setSaving(false);
@@ -151,9 +146,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
       setBannerError(
         e instanceof PortraitError
           ? t(`characters:portrait.errors.${e.code}`)
-          : e instanceof Error
-            ? e.message
-            : String(e),
+          : errorText(e),
       );
     } finally {
       setBannerBusy(false);
@@ -338,6 +331,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
                 id={location.id}
                 onOpenFeature={onOpenFeature}
               />
+              <WorldExtras projectId={projectId} kind="location" id={location.id} onOpenFeature={onOpenFeature} />
               <StoryLinksCard
                 projectId={projectId}
                 side="location"
@@ -355,7 +349,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
             <div className="flex min-h-10 flex-wrap items-center gap-4">
               <Button type="submit" disabled={!dirty || saving}>
                 {saving ? <Loader2 className="animate-spin" /> : <Save />}
-                {saving ? t("common:actions.saving") : t("common:actions.save")}
+                {t("common:actions.save")}
               </Button>
 
               {dirty && (
@@ -366,23 +360,10 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
                   onClick={() => {
                     setDraft(base);
                     setShowNameError(false);
-                    setSaveError(null);
                   }}
                 >
                   {t("common:actions.cancel")}
                 </Button>
-              )}
-
-              {saveStatus === "saved" && !dirty && (
-                <p role="status" className="text-sm text-success">
-                  {t("edit.saved")}
-                </p>
-              )}
-
-              {saveError && (
-                <p role="alert" className="text-sm text-destructive">
-                  {saveError}
-                </p>
               )}
 
               <VersionsButton
@@ -446,4 +427,3 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
     </PageShell>
   );
 }
-

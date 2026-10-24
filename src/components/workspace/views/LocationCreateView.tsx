@@ -26,6 +26,7 @@ import { useUnsavedChanges } from "@/lib/unsavedChanges";
 import { useLocationStore, useProjectLocations } from "@/stores/locationStore";
 import type { CharacterDetailLevel } from "@/types";
 import { errorText } from "@/lib/errors";
+import { notifyError } from "@/lib/notify";
 
 interface LocationCreateViewProps {
   projectId: string;
@@ -63,7 +64,10 @@ export function LocationCreateView({ projectId, feature, onOpenFeature }: Locati
   const [bannerError, setBannerError] = useState<string | null>(null);
   const [gallery, setGallery] = useState<PendingImage[]>([]);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "location:create");
+  };
   const setDetailLevel = useLocationStore((state) => state.setDetailLevel);
   const [pickedLevel, setPickedLevel] = useState<CharacterDetailLevel>("basic");
   const [levelSaving, setLevelSaving] = useState(false);
@@ -225,11 +229,6 @@ export function LocationCreateView({ projectId, feature, onOpenFeature }: Locati
               {levelSaving && <Loader2 className="animate-spin" />}
               {t("levels.continue")}
             </Button>
-            {error && (
-              <p role="alert" className="text-sm text-destructive">
-                {error}
-              </p>
-            )}
           </CardFooter>
         </Card>
       </PageShell>
@@ -318,11 +317,6 @@ export function LocationCreateView({ projectId, feature, onOpenFeature }: Locati
                 </Button>
               )}
 
-              {error && (
-                <p role="alert" className="text-sm text-destructive">
-                  {error}
-                </p>
-              )}
             </div>
           }
         />

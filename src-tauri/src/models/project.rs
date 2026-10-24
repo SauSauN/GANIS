@@ -213,6 +213,14 @@ pub struct Project {
     #[sqlx(default)]
     pub visibility: ProjectVisibility,
 
+    /// Colonne SQL : `deleted_at`
+    /// Nom JSON/frontend : `deletedAt`
+    ///
+    /// Date de mise à la corbeille ; `None` pour un projet actif.
+    #[serde(rename = "deletedAt")]
+    #[sqlx(default)]
+    pub deleted_at: Option<String>,
+
     // ------------------------------------------------------------------
     // Chiffrement (jamais envoyé à l'interface)
     // ------------------------------------------------------------------

@@ -61,7 +61,7 @@ fn decode_component(value: &str) -> Option<String> {
     String::from_utf8(out).ok()
 }
 
-fn header(request: &Request<'_>, name: &str) -> AppResult<String> {
+pub(crate) fn header(request: &Request<'_>, name: &str) -> AppResult<String> {
     request
         .headers()
         .get(name)
@@ -70,7 +70,7 @@ fn header(request: &Request<'_>, name: &str) -> AppResult<String> {
         .ok_or_else(|| AppError::validation(format!("En-tête manquant : {name}")))
 }
 
-fn body(request: &Request<'_>) -> AppResult<Vec<u8>> {
+pub(crate) fn body(request: &Request<'_>) -> AppResult<Vec<u8>> {
     match request.body() {
         InvokeBody::Raw(bytes) => Ok(bytes.clone()),
         _ => Err(AppError::validation("Contenu du fichier manquant.")),

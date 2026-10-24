@@ -1,6 +1,5 @@
 {
   "greeting": "Hello, {{name}}",
-  "defaultName": "creator",
   "subtitle": "Welcome to your narrative design studio.",
   "newProject": "New project",
   "search": {
@@ -10,7 +9,8 @@
   "filters": {
     "all": "Active projects",
     "favorites": "Favorites",
-    "archived": "Archived"
+    "archived": "Archived",
+    "trash": "Trash"
   },
   "recent": "Recently opened",
   "list": {
@@ -18,7 +18,8 @@
       "search": "Search results",
       "all": "All projects",
       "favorites": "Favorites",
-      "archived": "Archived projects"
+      "archived": "Archived projects",
+      "trash": "Trash"
     },
     "collapse": "Hide the project list",
     "expand": "Show the project list",
@@ -41,24 +42,87 @@
       "title": "No archived projects",
       "description": "Projects you archive will appear here."
     },
-    "createFirst": "Create my first project"
+    "createFirst": "Create my first project",
+    "trash": {
+      "title": "The trash is empty",
+      "description": "Deleted projects stay here for 30 days before being permanently erased."
+    }
   },
   "errors": {
     "actionFailed": "The operation failed.",
     "openFailed": "Unable to open the project.",
-    "deleteFailed": "Unable to delete the project."
+    "deleteFailed": "Unable to delete the project.",
+    "restoreFailed": "Could not restore."
   },
   "delete": {
-    "title": "Delete this project?",
-    "description": "The project “{{name}}” will be permanently deleted. This action cannot be undone.",
-    "confirm": "Delete",
-    "deleting": "Deleting…"
+    "title": "Move this project to the trash?",
+    "description": "“{{name}}” will leave the list. You can restore it from the trash for 30 days; after that it will be permanently deleted.",
+    "confirm": "Move to trash",
+    "deleting": "Deleting…",
+    "done": "“{{name}}” is in the trash.",
+    "undo": "Undo"
   },
   "guest": {
     "title": "Welcome"
   },
   "space": {
     "private": "Private space",
-    "public": "Public space"
+    "public": "Public space",
+    "explain": "What this space protects",
+    "info": {
+      "public": {
+        "title": "Public space",
+        "text": "Without an account, your projects go to the public space:",
+        "points": [
+          "Projects in the public space are not encrypted.",
+          "Anyone who uses GANIS on this computer can open, edit or delete them.",
+          "To protect a project: sign in, then make it private (project settings)."
+        ]
+      },
+      "private": {
+        "title": "Private space",
+        "text": "Your projects are protected by your account:",
+        "points": [
+          "They are encrypted and only open with your account.",
+          "Without your password they cannot be read: export a .ganix backup regularly (File › Export)."
+        ]
+      },
+      "continue": "Continue without an account",
+      "signIn": "Sign in",
+      "understood": "Got it",
+      "dontShowOnStart": "Don't show this when clicking “Get started” (still available from the “Public space” badge)"
+    }
+  },
+  "trash": {
+    "intro": "Projects stay in the trash for 30 days, then are permanently deleted with all their data.",
+    "deletedOn": "Deleted on {{date}}",
+    "expiresIn_one": "Permanently deleted in {{count}} day",
+    "expiresIn_other": "Permanently deleted in {{count}} days",
+    "expiresToday": "Permanently deleted today",
+    "select": "Select “{{name}}”",
+    "restore": "Restore",
+    "restoreNamed": "Restore “{{name}}”",
+    "restoreSelected": "Restore selection",
+    "purge": "Delete permanently",
+    "purgeNamed": "Permanently delete “{{name}}”",
+    "purgeSelected": "Permanently delete selection",
+    "empty": "Empty trash",
+    "restored_one": "{{count}} project restored.",
+    "restored_other": "{{count}} projects restored.",
+    "purged_one": "{{count}} project permanently deleted.",
+    "purged_other": "{{count}} projects permanently deleted.",
+    "confirm": {
+      "title_one": "Permanently delete this project?",
+      "title_other": "Permanently delete {{count}} projects?",
+      "description_one": "All its data (sheets, notes, documents, versions) will be erased. This cannot be undone.",
+      "description_other": "All their data (sheets, notes, documents, versions) will be erased. This cannot be undone.",
+      "confirm": "Delete permanently",
+      "publicWarning_one": "This project is public: it is shared with everyone who uses GANIS on this computer, and they will lose it too.",
+      "publicWarning_other": "These projects are public: they are shared with everyone who uses GANIS on this computer, and they will lose them too.",
+      "typeName": "To confirm, type the project name again: {{name}}",
+      "typeWord": "To confirm, type {{word}}",
+      "word": "DELETE"
+    },
+    "loading": "Loading trash…"
   }
 }

@@ -73,6 +73,12 @@ interface AuthState {
 
   logout: () => Promise<void>;
 
+  /**
+   * Supprime le compte connecté et ses projets privés (mot de passe
+   * demandé), puis remet l'interface à zéro comme une déconnexion.
+   */
+  deleteAccount: (password: string) => Promise<void>;
+
   clearError: () => void;
 
   /**
@@ -107,6 +113,21 @@ function syncThemesWithRole(user: User | null) {
   } else if (!findBuiltinTheme(getActiveColorThemeId())) {
     resetColorTheme();
   }
+}
+
+/** Interface remise à zéro après une déconnexion ou une suppression de compte. */
+function resetSession(set: (state: Partial<AuthState>) => void) {
+  useProjectStore.getState().reset();
+  usePackageStore.getState().reset();
+  // Les onglets ouverts sont oubliés (les épinglés restent).
+  clearOpenTabs();
+
+  set({
+    user: null,
+    guest: false,
+    error: null,
+    pendingRecoveryKey: null,
+  });
 }
 
 const messageOf = (e: unknown): string =>
@@ -198,17 +219,15 @@ export const useAuthStore = create<AuthState>((set) => ({
        */
     }
 
-    useProjectStore.getState().reset();
-    usePackageStore.getState().reset();
-    // Les onglets ouverts sont oubliés (les épinglés restent).
-    clearOpenTabs();
+    resetSession(set);
+  },
 
-    set({
-      user: null,
-      guest: false,
-      error: null,
-      pendingRecoveryKey: null,
-    });
+  deleteAccount: async (password) => {
+    // Une erreur (mot de passe faux…) est rendue à l'appelant : rien n'a
+    // été supprimé et la session reste ouverte.
+    await api.deleteAccount(password);
+
+    resetSession(set);
   },
 
   clearError: () => {

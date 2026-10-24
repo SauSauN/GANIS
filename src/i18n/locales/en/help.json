@@ -15,22 +15,24 @@
           "Recently opened projects are at the top of the page.",
           "Star a project to find it under “Favorites”.",
           "Archive a finished project: it leaves the main list without being deleted.",
-          "The search bar filters projects by name or description."
+          "The search bar filters projects by name or description.",
+          "A deleted project goes to the dashboard Trash: it can be restored there for 30 days, then it is permanently deleted."
         ]
       },
       "spaces": {
         "title": "Public space, private space",
         "text": "“Get started” opens the public space, without an account. Once signed in, you are in your private space. The two never mix.",
         "points": [
-          "Created without an account, a project is public: anyone using GANIS on this computer can open it.",
+          "Created without an account, a project is public: it is not encrypted, and anyone using GANIS on this computer can open, edit or delete it.",
           "Created while signed in, a project is private: encrypted and only visible from your account.",
           "To change it: project settings › Status and organization › Visibility.",
-          "Making a public project private requires signing in; making a private project public asks for confirmation."
+          "Making a public project private requires signing in and typing its name again: it then disappears from the public space for everyone else. Making a private project public asks for confirmation: it is no longer encrypted.",
+          "Permanently deleting a public project (trash) requires typing its name again, because the other people on this computer lose it too."
         ]
       },
       "layout": {
         "title": "The workspace",
-        "text": "On the left, the module bar: Details, Characters, Locations, Structure, Plot, Notes and Search. The middle panel lists the module's features and items; each opens in a tab.",
+        "text": "On the left, the module bar: Details, Characters, Locations, Structure, Plot, Notes and Search. The middle panel lists the module's features and items; each opens in a tab. Objects and Fauna and flora are added when you turn them on in the project settings.",
         "points": [
           "Click a module again to collapse its panel.",
           "Right-click a tab to pin it, or close the others, those on the left or on the right.",
@@ -54,7 +56,8 @@
           "Characters › Create a character, or Ctrl+N in the module.",
           "The level of detail of the sheets is set in the project settings.",
           "Add a portrait and an image gallery to each sheet.",
-          "Each sheet opens in its own tab, named after the character."
+          "Each sheet opens in its own tab, named after the character.",
+          "Colour palette: its colours frame the character's portrait."
         ]
       },
       "locations": {
@@ -63,7 +66,18 @@
         "points": [
           "Locations › Create a location, then pick its type.",
           "Place a location inside another to build your world's geography.",
-          "Add your own location types and statuses in the project settings."
+          "Add your own location types and statuses in the project settings.",
+          "Colour palette: as for characters, its colours frame the location's image."
+        ]
+      },
+      "world": {
+        "title": "Objects, fauna and flora",
+        "text": "Two optional modules for the objects in your story (weapons, vehicles, phones, magic items…) and the animals and plants of your world. They stay hidden until you turn them on.",
+        "points": [
+          "Project settings › Objects (or Fauna and flora): turn the module on, then keep only the categories you need.",
+          "An object can be stored in another (a key in a chest); a specific animal sits under its species.",
+          "A specific animal can also become a character: its character sheet is linked to it.",
+          "“Link an element” connects objects, species, characters and locations: “owns”, “lives in”, “part of”…"
         ]
       },
       "relations": {
@@ -167,7 +181,6 @@
   "shortcuts": {
     "title": "Keyboard shortcuts",
     "description": "GANIS shortcuts. Editor shortcuts work inside a note.",
-    "shift": "Shift",
     "groups": {
       "general": "General",
       "tabs": "Tabs",
@@ -183,7 +196,8 @@
       "guide": "Getting started",
       "shortcuts": "Keyboard shortcuts",
       "palette": "Palette: pages, actions, search",
-      "center": "GANIS Help"
+      "center": "GANIS Help",
+      "readStory": "Read the whole story / exit reading"
     },
     "reference": {
       "undoDeletion": "Undo the last deletion (outside a field)",
@@ -212,7 +226,63 @@
   "about": {
     "tagline": "The workshop for writers and screenwriters.",
     "version": "Version {{version}}",
-    "offline": "GANIS works fully offline: your projects stay on this computer, encrypted."
+    "offline": "GANIS works fully offline: your projects stay on this computer. Private projects are encrypted; public projects are not.",
+    "description": "One place to build a story: characters, places, outline, plot, notes and documents, all linked, up to the readable version (▶ button).",
+    "types": "Project types",
+    "privacy": "Your data",
+    "credits": "Credits",
+    "dictionaries": "Spelling dictionaries: French, Grammalecte (Olivier R., MPL 2.0); English, SCOWL (wordlist.sourceforge.net).",
+    "openHelp": "GANIS help"
+  },
+  "whatsNew": {
+    "title": "What's new",
+    "description": "What changed in GANIS, version by version.",
+    "version": "Version {{version}}",
+    "releases": {
+      "v0_1_0": {
+        "title": "Clarity and safety",
+        "items": [
+          "A small window explains the public space (shared on this computer, not encrypted) when you click “Get started”; the “Public space” badge reopens it.",
+          "Making a public project private, or permanently deleting a public project, requires typing its name again.",
+          "The status bar no longer shows “Saved” after a hidden failure: “Last save failed” until the next successful save.",
+          "Key names follow the interface language (Shift / Maj, Esc / Échap…).",
+          "Messages use real singular and plural forms.",
+          "Edit › Paste works from the menu.",
+          "New: Help › Report a problem, to copy useful technical information.",
+        "Save messages (success or failure) appear as notifications at the bottom of the screen: the page no longer moves.",
+        "Double-click: on a row of the outline, progress or history, and in the reading table of contents, it opens the sheet; on a plot lane header, it renames the lane."
+        ]
+      }
+    }
+  },
+  "report": {
+    "title": "Report a problem",
+    "description": "GANIS works offline: nothing is sent automatically. Describe the problem, copy the information, then paste it into your message.",
+    "whatLabel": "What were you doing when the problem happened? (optional)",
+    "whatPlaceholder": "E.g. I moved a scene on the plot board, then the error message appeared.",
+    "previewLabel": "Information that will be copied",
+    "privacy": "No project content and no account name: only the version, system, display settings and latest error messages. Read the text before sending it.",
+    "howToSend": "Paste this text into your message (email, form, ticket) to the person or service who supports you with GANIS. A screenshot helps too.",
+    "copy": "Copy the information",
+    "copied": "Information copied: paste it into your message.",
+    "copyFailed": "Copying failed: select the text above and copy it with Ctrl+C.",
+    "reportTitle": "GANIS problem report",
+    "fields": {
+      "description": "Description",
+      "version": "Version",
+      "system": "System",
+      "language": "Language",
+      "session": "Session",
+      "signedIn": "signed-in account",
+      "guest": "public space (no account)",
+      "display": "Display",
+      "lastSaveError": "Last save failure",
+      "recentErrors": "Latest error messages",
+      "none": "none",
+      "unknown": "unknown",
+      "notGiven": "not given",
+      "colon": ":"
+    }
   },
   "center": {
     "title": "GANIS Help",
@@ -250,7 +320,8 @@
           "The sheet has three detail levels (essential, intermediate, advanced), chosen for the whole project in the settings.",
           "Main image and reference gallery: drop images straight onto the sheet.",
           "Relationships: family, friends, rivals… The relationship graph shows everyone at a glance; characters can be moved freely.",
-          "Locations: where the character lives, works, grew up — optionally with the part of the story concerned."
+          "Locations: where the character lives, works, grew up — optionally with the part of the story concerned.",
+          "Colour palette: its colours frame the character's portrait."
         ]
       },
       "locations": {
@@ -259,7 +330,19 @@
         "items": [
           "A location's type (city, forest, palace…) decides its sheet fields. You can create your own types in the settings.",
           "The module panel shows locations as a tree; “Add a location in…” creates one inside another.",
-          "Each sheet has a banner, a gallery and the list of linked characters."
+          "Each sheet has a banner, a gallery and the list of linked characters.",
+          "Colour palette: as for characters, its colours frame the location's image."
+        ]
+      },
+      "world": {
+        "title": "Objects, fauna and flora",
+        "intro": "Optional modules, turned on in the project settings, built like locations.",
+        "items": [
+          "Turn on Objects or Fauna and flora in Project settings: the module appears in the left bar. Turning it off deletes nothing.",
+          "Choose the categories you need (weapons, vehicles, magic…; fauna, flora): only those are offered when creating. You can also add your own types.",
+          "Fauna and flora: an entry is either a whole species, or a specific animal or plant, placed under its species.",
+          "A specific animal can also be a character: “Create its character sheet” or link it to an existing character. The character sheet shows it in return.",
+          "The “Links with objects and species” card connects these entries to characters, locations and each other, with a story period if needed (an object that changes hands)."
         ]
       },
       "structure": {
@@ -270,8 +353,19 @@
           "Numbers are computed for you; an item can be left out of the numbering (prologue, interlude).",
           "Automatic numbering (renumbering on every move) is turned on in the project settings, as is each level's colour.",
           "An item's sheet shows its summary, its characters (point of view, present…) and its locations.",
-          "Documents: in an item's sheet, keep its files (manga pages, PDFs, Word files, images, sounds…) with “Add files” or by drag and drop. They are encrypted with the project and exported in the .ganix.",
+          "Documents: in an item's sheet, keep its files (manga pages, PDFs, Word files, images, sounds…) with “Add files” or by drag and drop. They are stored in the project (encrypted if the project is private) and exported in the .ganix.",
           "Click a document to read it in GANIS; “Read the pages” chains a chapter's images. “Edit in its application” opens it in Word, Acrobat, Clip Studio…: every save comes back, the previous content stays in the versions."
+        ]
+      },
+      "reading": {
+        "title": "Full reading (▶)",
+        "intro": "The ▶ button, on the right of the title bar, “runs” the project: the whole story is compiled in outline order and shown on its own, full screen.",
+        "items": [
+          "Novel: the continuous manuscript, chapter after chapter.",
+          "Manga / comic: the story chapter by chapter, like a novel: what each chapter is about (its summary), then what its pages show, one after the other. Panel details (framing, balloons, sound effects…) stay in the page sheets.",
+          "Film, series, video game, role-playing game, custom project: each outline item with its summary, its text or documents, or failing that the plot events attached to it.",
+          "F5 does the same. Press again (or the ■ button) to return to the editing layout.",
+          "The reading updates itself: moving a scene in the outline moves it in the reading. It exports to Word, PDF or text."
         ]
       },
       "plot": {
@@ -320,7 +414,7 @@
         "title": "Projects, files and security",
         "intro": "Your projects stay on this computer.",
         "items": [
-          "Each project is encrypted: without your password, its data can't be read.",
+          "Each private project is encrypted: without your password, its data can't be read. Public projects (created without an account) are not encrypted and can be opened by anyone who uses GANIS on this computer.",
           "Export as .ganix (File › Export) makes a full copy of the project, to keep as a backup or open on another computer. Note: this file is not encrypted.",
           "Import a .ganix (File › Import) adds the project, or replaces the existing one (a backup is made first).",
           "GANIS works fully offline."
@@ -331,8 +425,20 @@
         "intro": "Two levels of settings.",
         "items": [
           "Project settings (bottom of the left bar): information, statuses, character detail level, location types, structure and colours.",
+          "Objects, Fauna and flora: turn these optional modules on and choose their categories.",
           "General settings (gear at the top): account, password, recovery key, language, theme, autosave.",
           "Packages: colour themes for the whole app."
+        ]
+      },
+      "about": {
+        "title": "About GANIS",
+        "intro": "GANIS is the workshop for authors and screenwriters: one place to build a story, from the first idea to a readable version.",
+        "items": [
+          "For every kind of story: novel, manga / comic, film, series, video game, role-playing game, or a custom project with your own outline.",
+          "Characters, places, relations, outline, plot, notes and documents stay linked: what changes in one place shows everywhere.",
+          "Offline: GANIS relies on no online service. Your projects stay on this computer (private projects encrypted with your account, public projects unencrypted); a project travels elsewhere as a .ganix file.",
+          "Spell checking: Hunspell dictionaries for French (Grammalecte, MPL 2.0 licence) and English (SCOWL, wordlist.sourceforge.net).",
+          "Version, information and credits: Help menu › About GANIS."
         ]
       }
     },
@@ -382,6 +488,26 @@
         {
           "q": "An image won't add.",
           "a": "GANIS accepts PNG, JPEG, WebP and GIF, up to the size shown. Save the image again as JPEG or make it smaller."
+        },
+        {
+          "q": "I deleted a project by mistake.",
+          "a": "Click “Undo” in the message that appears, or open Trash on the dashboard and choose “Restore”. A project stays in the trash for 30 days before being permanently deleted."
+        },
+        {
+          "q": "How do I lock GANIS when I step away?",
+          "a": "Settings › Account › Automatic lock: choose a delay. After that time without activity, your password is required to resume; your tabs stay open."
+        },
+        {
+          "q": "I can't find objects or fauna and flora.",
+          "a": "These modules are hidden by default. Open Project settings › Objects (or Fauna and flora) and turn them on: they appear in the left bar, under Locations."
+        },
+        {
+          "q": "My animal talks and has relationships: character or animal?",
+          "a": "Both. Create it in Fauna and flora as “a specific animal or plant”, then click “Create its character sheet”. The two entries are linked."
+        },
+        {
+          "q": "How do I frame an entry's image with colours?",
+          "a": "Add colours in the entry's “Colour palette” field (character, location, object, fauna and flora): a frame of those colours surrounds its image."
         }
       ]
     }

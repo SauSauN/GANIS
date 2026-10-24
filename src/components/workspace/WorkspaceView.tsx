@@ -1,11 +1,15 @@
 import { lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { Loader2 } from "lucide-react";
+import { ErrorBoundary } from "@/components/layout/ErrorBoundary";
 import { ProjectSettingsPanel } from "@/components/project-settings/ProjectSettingsPanel";
 import type { ProjectSettingsId } from "@/components/project-settings/sections";
 import {
   HOME_TAB,
+  NOVEL_FEATURES,
+  MANGA_FEATURES,
   SETTINGS_PREFIX,
+  featureAvailable,
   findFeature,
 } from "@/components/workspace/modules";
 import { CharacterCreateView } from "@/components/workspace/views/CharacterCreateView";
@@ -15,6 +19,9 @@ import { LocationCreateView } from "@/components/workspace/views/LocationCreateV
 import { LocationEditView } from "@/components/workspace/views/LocationEditView";
 import { LocationListView } from "@/components/workspace/views/LocationListView";
 import { NoteCreateView } from "@/components/workspace/views/NoteCreateView";
+import { WorldCreateView } from "@/components/workspace/views/WorldCreateView";
+import { WorldEditView } from "@/components/workspace/views/WorldEditView";
+import { WorldListView } from "@/components/workspace/views/WorldListView";
 import { NotesListView } from "@/components/workspace/views/NotesListView";
 import { TrashView } from "@/components/workspace/views/TrashView";
 import {
@@ -27,6 +34,7 @@ import { WorkspaceHome } from "@/components/workspace/WorkspaceHome";
 import { characterIdOfTab } from "@/lib/characters";
 import { locationIdOfTab } from "@/lib/locations";
 import { noteIdOfTab } from "@/lib/notes";
+import { worldEntryOfTab } from "@/lib/world";
 import { structureNodeIdOfTab } from "@/lib/structure";
 import type { Project } from "@/types";
 
@@ -42,6 +50,16 @@ const HistoryView = lazy(() => import("@/components/workspace/views/HistoryView"
 const StructureNodeView = lazy(() => import("@/components/workspace/views/StructureNodeView").then((module) => ({ default: module.StructureNodeView })));
 const PlotBoard = lazy(() => import("@/components/plot/PlotBoard").then((module) => ({ default: module.PlotBoard })));
 const PlotReadingView = lazy(() => import("@/components/plot/PlotReadingView").then((module) => ({ default: module.PlotReadingView })));
+// Roman : manuscrit continu, suivi de rédaction, dossier éditorial.
+const ManuscriptView = lazy(() => import("@/components/novel/ManuscriptView").then((module) => ({ default: module.ManuscriptView })));
+const ProgressView = lazy(() => import("@/components/novel/ProgressView").then((module) => ({ default: module.ProgressView })));
+const ReplaceView = lazy(() => import("@/components/novel/ReplaceView").then((module) => ({ default: module.ReplaceView })));
+const ImportView = lazy(() => import("@/components/novel/ImportView").then((module) => ({ default: module.ImportView })));
+const ScriptProgressView = lazy(() => import("@/components/manga/ScriptProgressView").then((module) => ({ default: module.ScriptProgressView })));
+const ContinuityView = lazy(() => import("@/components/manga/ContinuityView").then((module) => ({ default: module.ContinuityView })));
+// Lecture complète (film, série, jeu vidéo, JDR, projet libre).
+const StoryReadView = lazy(() => import("@/components/structure/StoryReadView").then((module) => ({ default: module.StoryReadView })));
+const EditorialView = lazy(() => import("@/components/novel/EditorialView").then((module) => ({ default: module.EditorialView })));
 
 interface WorkspaceViewProps {
   /** Identifiant de l'onglet à afficher. */
@@ -69,7 +87,10 @@ export function WorkspaceView(props: WorkspaceViewProps) {
         </main>
       }
     >
-      <WorkspaceContent {...props} />
+      {/* Un onglet qui plante n'emporte pas le reste de l'espace de travail. */}
+      <ErrorBoundary scope="tab">
+        <WorkspaceContent {...props} />
+      </ErrorBoundary>
     </Suspense>
   );
 }
@@ -135,6 +156,53 @@ function WorkspaceContent({
   // ---------------------------------------------------------------------------
   // Trame
   // ---------------------------------------------------------------------------
+  // ---------------------------------------------------------------------------
+  // Roman (réservé aux projets de roman ; l'onglet se ferme sinon)
+  // ---------------------------------------------------------------------------
+  if (NOVEL_FEATURES.has(tabId) && project.type !== "novel") {
+    return null;
+  }
+
+  if (tabId === "manuscript.read") {
+    return <ManuscriptView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "manuscript.progress") {
+    return <ProgressView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "manuscript.replace") {
+    return <ReplaceView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "manuscript.import") {
+    return <ImportView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "manuscript.editorial") {
+    return <EditorialView project={project} feature={feature} />;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Manga / BD (réservé aux projets de manga ; l'onglet se ferme sinon)
+  // ---------------------------------------------------------------------------
+  if (MANGA_FEATURES.has(tabId) && project.type !== "manga") {
+    return null;
+  }
+
+  if (tabId === "script.read") {
+    // Lecture de l'histoire chapitre par chapitre (voir `StoryReadView`).
+    return <StoryReadView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "script.progress") {
+    return <ScriptProgressView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "script.continuity") {
+    return <ContinuityView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
   if (tabId === "plot.board") {
     return <PlotBoard projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
   }
@@ -143,6 +211,11 @@ function WorkspaceContent({
     return <PlotReadingView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
+
+  if (tabId === "structure.read") {
+    if (!featureAvailable(tabId, project.type)) return null;
+    return <StoryReadView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
 
   if (tabId === "structure.plan") {
     return <StructurePlanView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
@@ -210,6 +283,51 @@ function WorkspaceContent({
 
   if (tabId === "locations.list") {
     return <LocationListView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Objets, faune et flore (modules facultatifs)
+  // ---------------------------------------------------------------------------
+  const worldEntry = worldEntryOfTab(tabId);
+
+  if (worldEntry) {
+    return (
+      <WorldEditView
+        // Une autre fiche dans le même onglet : formulaire neuf.
+        key={tabId}
+        projectId={project.id}
+        module={worldEntry.module}
+        entryId={worldEntry.id}
+        onClose={() => onCloseTab(tabId)}
+        onOpenFeature={onOpenFeature}
+      />
+    );
+  }
+
+  if (tabId === "items.create" || tabId === "species.create") {
+    const worldModule = tabId === "items.create" ? "item" : "species";
+    return (
+      <WorldCreateView
+        key={worldModule}
+        projectId={project.id}
+        module={worldModule}
+        feature={feature}
+        onOpenFeature={onOpenFeature}
+      />
+    );
+  }
+
+  if (tabId === "items.list" || tabId === "species.list") {
+    const worldModule = tabId === "items.list" ? "item" : "species";
+    return (
+      <WorldListView
+        key={worldModule}
+        projectId={project.id}
+        module={worldModule}
+        feature={feature}
+        onOpenFeature={onOpenFeature}
+      />
+    );
   }
 
   // ---------------------------------------------------------------------------

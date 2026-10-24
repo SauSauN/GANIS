@@ -92,7 +92,7 @@ export function SideBarLocations({ projectId, activeTab, onOpenFeature }: SideBa
                     projectId={projectId}
                     location={location}
                     customTypes={settings.customTypes}
-                    size="xs"
+                    size="panel"
                   />
                   <span className="flex-1 truncate text-left">{location.name}</span>
                 </button>

@@ -14,7 +14,9 @@
     "plotEvent": "Trame",
     "note": "Notes",
     "noteFolder": "Dossiers",
-    "sticky": "Post-it"
+    "sticky": "Post-it",
+    "item": "Objets",
+    "species": "Faune et flore"
   },
   "untitled": {
     "character": "Personnage sans nom",
@@ -24,7 +26,9 @@
     "note": "Note sans titre",
     "noteFolder": "Dossier",
     "sticky": "Post-it",
-    "plotEvent": "Événement sans titre"
+    "plotEvent": "Événement sans titre",
+    "item": "Objet sans nom",
+    "species": "Fiche sans nom"
   },
   "palette": {
     "title": "Palette de commandes",

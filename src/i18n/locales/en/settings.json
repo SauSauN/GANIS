@@ -66,6 +66,18 @@
       "currentRequired": "Current password is required.",
       "failed": "Could not create a new key.",
       "done": "New recovery key saved."
+    },
+    "delete": {
+      "title": "Delete my account",
+      "description": "Permanently erases your account, your private projects (trash included) and all their data. Public projects remain.",
+      "exportFirst": "Export the projects you want to keep as .ganix first: nothing can be recovered after deletion.",
+      "password": "Current password",
+      "understand": "I understand that my account and private projects will be permanently deleted.",
+      "submit": "Delete my account",
+      "submitting": "Deleting…",
+      "passwordRequired": "Enter your password to confirm.",
+      "confirmRequired": "Tick the box to confirm.",
+      "failed": "Unable to delete the account."
     }
   },
   "appearance": {
@@ -117,6 +129,20 @@
       "title": "Color theme",
       "description": "Palette used in both light and dark modes.",
       "manage": "Manage packages"
+    },
+    "panelImage": {
+      "title": "Middle panel images",
+      "description": "Size of the images in the character, location, object, fauna and flora lists. The same setting applies to all of them.",
+      "smaller": "Smaller images",
+      "larger": "Larger images",
+      "value": "{{size}} px",
+      "range": "from {{min}} to {{max}} px",
+      "reset": "Default size",
+      "sample": {
+        "character": "Character",
+        "location": "Location",
+        "item": "Object"
+      }
     }
   },
   "developer": {
@@ -200,5 +226,21 @@
       "dot": "A dot instead of the close button marks an unsaved tab.",
       "ask": "Before closing such a tab, leaving the page or closing GANIS, you're asked whether to save, not save, or cancel."
     }
+  },
+  "lock": {
+    "settingTitle": "Automatic lock",
+    "settingDescription": "After this period without activity, GANIS erases your account key from memory and asks for your password to resume. Your tabs and unsaved input stay in place. Setting for this computer only.",
+    "delayLabel": "Lock after",
+    "never": "Never",
+    "after_one": "{{count}} minute of inactivity",
+    "after_other": "{{count}} minutes of inactivity",
+    "title": "GANIS is locked",
+    "description": "Enter the password for {{name}} to resume.",
+    "password": "Password",
+    "unlock": "Unlock",
+    "unlocking": "Unlocking…",
+    "signOut": "Sign out",
+    "passwordRequired": "Enter your password.",
+    "failed": "Unable to unlock."
   }
 }

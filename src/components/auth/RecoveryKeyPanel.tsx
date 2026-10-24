@@ -42,7 +42,7 @@ export function RecoveryKeyPanel({
   context,
   onConfirmed,
 }: RecoveryKeyPanelProps) {
-  const { t, i18n } = useTranslation("recovery");
+  const { t, i18n } = useTranslation(["recovery", "common"]);
 
   const groups = splitRecoveryKey(recoveryKey);
 
@@ -175,6 +175,7 @@ export function RecoveryKeyPanel({
         <Input
           id="recovery-check"
           autoComplete="off"
+          placeholder={t("common:placeholders.recoveryGroup")}
           spellCheck={false}
           maxLength={12}
           className="max-w-40 font-mono uppercase tracking-widest"

@@ -40,9 +40,7 @@ export function LocationGallery({ label, projectId, locationId, disabled }: Loca
   const imageError = (e: unknown) =>
     e instanceof PortraitError
       ? t(`portrait.errors.${e.code}`)
-      : e instanceof Error
-        ? e.message
-        : String(e);
+      : errorText(e);
 
   useEffect(() => {
     let cancelled = false;

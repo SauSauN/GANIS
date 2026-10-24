@@ -15,22 +15,24 @@
           "Les projets récemment ouverts sont en tête de page.",
           "Étoile : mettez un projet en favori pour le retrouver dans « Favoris ».",
           "Archivez un projet terminé : il quitte la liste principale sans être supprimé.",
-          "La barre de recherche filtre les projets par nom ou description."
+          "La barre de recherche filtre les projets par nom ou description.",
+          "Un projet supprimé va dans la Corbeille du tableau de bord : il peut y être restauré pendant 30 jours, puis il est supprimé définitivement."
         ]
       },
       "spaces": {
         "title": "Espace public, espace privé",
         "text": "« Commencer » ouvre l'espace public, sans compte. Une fois connecté, vous êtes dans votre espace privé. Les deux ne se mélangent jamais.",
         "points": [
-          "Créé sans compte, un projet est public : toute personne utilisant GANIS sur cet ordinateur peut l'ouvrir.",
+          "Créé sans compte, un projet est public : il n'est pas chiffré, et toute personne utilisant GANIS sur cet ordinateur peut l'ouvrir, le modifier ou le supprimer.",
           "Créé une fois connecté, un projet est privé : chiffré et visible seulement depuis votre compte.",
           "Pour changer : paramètres du projet › Statut et organisation › Visibilité.",
-          "Rendre privé un projet public demande de se connecter ; rendre public un projet privé demande une confirmation."
+          "Rendre privé un projet public demande de se connecter et de retaper son nom : il disparaît alors de l'espace public pour les autres. Rendre public un projet privé demande une confirmation : il n'est plus chiffré.",
+          "Supprimer définitivement un projet public (corbeille) demande de retaper son nom, car les autres personnes de cet ordinateur le perdent aussi."
         ]
       },
       "layout": {
         "title": "L'espace de travail",
-        "text": "À gauche, la barre des modules : Détails, Personnages, Lieux, Découpage, Trame, Notes et Recherche. Le panneau du milieu liste les fonctions et les éléments du module ; chacun s'ouvre dans un onglet.",
+        "text": "À gauche, la barre des modules : Détails, Personnages, Lieux, Découpage, Trame, Notes et Recherche. Le panneau du milieu liste les fonctions et les éléments du module ; chacun s'ouvre dans un onglet. Objets et Faune et flore s'ajoutent quand vous les activez dans les paramètres du projet.",
         "points": [
           "Cliquez à nouveau sur un module pour replier son panneau.",
           "Clic droit sur un onglet : l'épingler, fermer les autres, ceux de gauche ou de droite.",
@@ -54,7 +56,8 @@
           "Personnages › Créer un personnage, ou Ctrl+N dans le module.",
           "Le niveau de détail des fiches se règle dans les paramètres du projet.",
           "Ajoutez un portrait et une galerie d'images à chaque fiche.",
-          "Chaque fiche s'ouvre dans son propre onglet, au nom du personnage."
+          "Chaque fiche s'ouvre dans son propre onglet, au nom du personnage.",
+          "Palette de couleurs : ses couleurs encadrent le portrait du personnage."
         ]
       },
       "locations": {
@@ -63,7 +66,18 @@
         "points": [
           "Lieux › Créer un lieu, puis choisissez son type.",
           "Placez un lieu dans un autre pour bâtir la géographie de votre monde.",
-          "Ajoutez vos propres types de lieux et statuts dans les paramètres du projet."
+          "Ajoutez vos propres types de lieux et statuts dans les paramètres du projet.",
+          "Palette de couleurs : comme pour les personnages, ses couleurs encadrent l'image du lieu."
+        ]
+      },
+      "world": {
+        "title": "Objets, faune et flore",
+        "text": "Deux modules facultatifs pour les objets de votre histoire (armes, véhicules, téléphones, objets magiques…) et les animaux et plantes de votre univers. Ils sont masqués tant que vous ne les activez pas.",
+        "points": [
+          "Paramètres du projet › Objets (ou Faune et flore) : activez le module, puis gardez seulement les catégories utiles.",
+          "Un objet peut être rangé dans un autre (une clé dans un coffre) ; un animal précis se range sous son espèce.",
+          "Un animal précis peut aussi devenir un personnage : sa fiche de personnage lui est reliée.",
+          "« Lier un élément » relie objets, espèces, personnages et lieux : « possède », « vit à », « fait partie de »…"
         ]
       },
       "relations": {
@@ -167,7 +181,6 @@
   "shortcuts": {
     "title": "Raccourcis clavier",
     "description": "Les raccourcis de GANIS. Ceux de l'éditeur s'utilisent dans une note.",
-    "shift": "Maj",
     "groups": {
       "general": "Général",
       "tabs": "Onglets",
@@ -183,7 +196,8 @@
       "guide": "Guide de démarrage",
       "shortcuts": "Raccourcis clavier",
       "palette": "Palette : pages, actions, recherche",
-      "center": "Aide de GANIS"
+      "center": "Aide de GANIS",
+      "readStory": "Lire toute l'histoire / quitter la lecture"
     },
     "reference": {
       "undoDeletion": "Annuler la dernière suppression (hors d'un champ)",
@@ -212,7 +226,63 @@
   "about": {
     "tagline": "L'atelier des auteurs et des scénaristes.",
     "version": "Version {{version}}",
-    "offline": "GANIS fonctionne entièrement hors ligne : vos projets restent sur cet ordinateur, chiffrés."
+    "offline": "GANIS fonctionne entièrement hors ligne : vos projets restent sur cet ordinateur. Les projets privés sont chiffrés ; les projets publics ne le sont pas.",
+    "description": "Un seul endroit pour construire une histoire : personnages, lieux, découpage, trame, notes et documents, liés entre eux, jusqu'à la version lisible (bouton ▶).",
+    "types": "Types de projets",
+    "privacy": "Vos données",
+    "credits": "Crédits",
+    "dictionaries": "Dictionnaires orthographiques : français, Grammalecte (Olivier R., MPL 2.0) ; anglais, SCOWL (wordlist.sourceforge.net).",
+    "openHelp": "Aide de GANIS"
+  },
+  "whatsNew": {
+    "title": "Nouveautés",
+    "description": "Ce qui a changé dans GANIS, version par version.",
+    "version": "Version {{version}}",
+    "releases": {
+      "v0_1_0": {
+        "title": "Clarté et sécurité",
+        "items": [
+          "Une petite fenêtre explique l'espace public (partagé sur cet ordinateur, non chiffré) au clic sur « Commencer » ; le badge « Espace public » la rouvre.",
+          "Rendre privé un projet public, ou supprimer définitivement un projet public, demande de retaper son nom.",
+          "La barre d'état n'affiche plus « Enregistré » après un échec masqué : « Dernier enregistrement en échec » jusqu'au prochain enregistrement réussi.",
+          "Les noms des touches suivent la langue de l'interface (Maj / Shift, Échap / Esc…).",
+          "Les messages distinguent vraiment le singulier et le pluriel.",
+          "Édition › Coller fonctionne depuis le menu.",
+          "Nouveau : Aide › Signaler un problème, pour copier les informations techniques utiles.",
+        "Les messages d'enregistrement (réussite ou échec) s'affichent en notification en bas de l'écran : la page ne bouge plus.",
+        "Double-clic : sur une ligne du plan, de l'avancement ou de l'historique, et dans le sommaire de lecture, il ouvre la fiche ; sur l'en-tête d'une piste de la trame, il la renomme."
+        ]
+      }
+    }
+  },
+  "report": {
+    "title": "Signaler un problème",
+    "description": "GANIS est hors ligne : rien n'est envoyé automatiquement. Décrivez le problème, copiez les informations, puis collez-les dans votre message.",
+    "whatLabel": "Que faisiez-vous quand le problème est arrivé ? (facultatif)",
+    "whatPlaceholder": "Ex. J'ai déplacé une scène sur la trame, puis le message d'erreur est apparu.",
+    "previewLabel": "Informations qui seront copiées",
+    "privacy": "Aucun contenu de vos projets, ni votre nom de compte : seulement la version, le système, les réglages d'affichage et les derniers messages d'erreur. Relisez le texte avant de l'envoyer.",
+    "howToSend": "Collez ce texte dans votre message (e-mail, formulaire, ticket) à la personne ou au service qui vous accompagne pour GANIS. Une capture d'écran aide aussi.",
+    "copy": "Copier les informations",
+    "copied": "Informations copiées : collez-les dans votre message.",
+    "copyFailed": "La copie a échoué : sélectionnez le texte ci-dessus et copiez-le avec Ctrl+C.",
+    "reportTitle": "Signalement GANIS",
+    "fields": {
+      "description": "Description",
+      "version": "Version",
+      "system": "Système",
+      "language": "Langue",
+      "session": "Session",
+      "signedIn": "compte connecté",
+      "guest": "espace public (sans compte)",
+      "display": "Affichage",
+      "lastSaveError": "Dernier échec d'enregistrement",
+      "recentErrors": "Derniers messages d'erreur",
+      "none": "aucun",
+      "unknown": "inconnue",
+      "notGiven": "non renseignée",
+      "colon": " :"
+    }
   },
   "center": {
     "title": "Aide de GANIS",
@@ -250,7 +320,8 @@
           "La fiche a trois niveaux de détail (essentiel, intermédiaire, avancé), choisis pour tout le projet dans les paramètres.",
           "Image principale et galerie de références : glissez des images directement sur la fiche.",
           "Relations : liens familiaux, amicaux, rivalités… Le graphe des relations montre tout le monde d'un coup d'œil ; les personnages s'y déplacent librement.",
-          "Lieux : où le personnage vit, travaille, a grandi — avec, si vous le souhaitez, la période du récit concernée."
+          "Lieux : où le personnage vit, travaille, a grandi — avec, si vous le souhaitez, la période du récit concernée.",
+          "Palette de couleurs : ses couleurs encadrent le portrait du personnage."
         ]
       },
       "locations": {
@@ -259,7 +330,19 @@
         "items": [
           "Le type d'un lieu (ville, forêt, palais…) choisit les champs de sa fiche. Vous pouvez créer vos propres types dans les paramètres.",
           "Le panneau du module montre les lieux en arbre ; « Ajouter un lieu dans… » crée un lieu à l'intérieur d'un autre.",
-          "Chaque fiche a une bannière, une galerie et la liste des personnages liés."
+          "Chaque fiche a une bannière, une galerie et la liste des personnages liés.",
+          "Palette de couleurs : comme pour les personnages, ses couleurs encadrent l'image du lieu."
+        ]
+      },
+      "world": {
+        "title": "Objets, faune et flore",
+        "intro": "Des modules facultatifs, activés dans les paramètres du projet, construits comme les lieux.",
+        "items": [
+          "Activez Objets ou Faune et flore dans Paramètres du projet : le module apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
+          "Choisissez les catégories utiles (armes, véhicules, magie… ; faune, flore) : seules celles-ci sont proposées à la création. Vous pouvez aussi ajouter vos propres types.",
+          "Faune et flore : une fiche est soit une espèce entière, soit un animal ou une plante précis, rangé sous son espèce.",
+          "Un animal précis peut aussi être un personnage : « Créer sa fiche de personnage » ou l'associer à un personnage existant. La fiche du personnage le montre en retour.",
+          "La carte « Liens avec des objets et des espèces » relie ces fiches aux personnages, aux lieux et entre elles, avec une période du récit si besoin (un objet qui change de main)."
         ]
       },
       "structure": {
@@ -270,8 +353,19 @@
           "Les numéros se calculent seuls ; vous pouvez sortir un élément de la numérotation (prologue, interlude).",
           "La numérotation automatique (renumérotation à chaque déplacement) s'active dans les paramètres du projet, tout comme la couleur de chaque niveau.",
           "La fiche d'un élément montre son résumé, ses personnages (point de vue, présents…) et ses lieux.",
-          "Documents : dans la fiche d'un élément, rangez ses fichiers (pages de manga, PDF, Word, images, sons…) avec « Ajouter des fichiers » ou par glisser-déposer. Ils sont chiffrés avec le projet et exportés dans le .ganix.",
+          "Documents : dans la fiche d'un élément, rangez ses fichiers (pages de manga, PDF, Word, images, sons…) avec « Ajouter des fichiers » ou par glisser-déposer. Ils sont rangés dans le projet (chiffrés si le projet est privé) et exportés dans le .ganix.",
           "Cliquez sur un document pour le lire dans GANIS ; « Lire les pages » enchaîne les images d'un chapitre. « Modifier dans l'application » l'ouvre dans Word, Acrobat, Clip Studio… : chaque enregistrement est repris, l'ancien contenu reste dans les versions."
+        ]
+      },
+      "reading": {
+        "title": "Lecture complète (▶)",
+        "intro": "Le bouton ▶, à droite de la barre de titre, « lance » le projet : toute l'histoire est compilée dans l'ordre du découpage et s'affiche seule, sur tout l'espace.",
+        "items": [
+          "Roman : le manuscrit continu, chapitre après chapitre.",
+          "Manga / BD : l'histoire chapitre par chapitre, à l'image du roman : l'explication de chaque chapitre (son résumé), puis ce que montrent ses pages, à la suite. Les détails des cases (cadrage, bulles, onomatopées…) restent dans les fiches des pages.",
+          "Film, série, jeu vidéo, jeu de rôle, projet personnalisé : chaque élément du plan avec son résumé, son texte ou ses documents, ou à défaut les événements de la trame qui s'y rattachent.",
+          "F5 fait la même chose. Un second appui (ou le bouton ■) rend la disposition d'édition.",
+          "La lecture se met à jour d'elle-même : déplacer une scène dans le plan la déplace dans la lecture. Elle s'exporte en Word, PDF ou texte."
         ]
       },
       "plot": {
@@ -320,7 +414,7 @@
         "title": "Projets, fichiers et sécurité",
         "intro": "Vos projets restent sur cet ordinateur.",
         "items": [
-          "Chaque projet est chiffré : sans votre mot de passe, ses données sont illisibles.",
+          "Chaque projet privé est chiffré : sans votre mot de passe, ses données sont illisibles. Les projets publics (créés sans compte) ne sont pas chiffrés et sont accessibles à toute personne qui utilise GANIS sur cet ordinateur.",
           "Exporter en .ganix (Fichier › Exporter) crée une copie complète du projet, à garder en sauvegarde ou à ouvrir sur un autre ordinateur. Attention : ce fichier n'est pas chiffré.",
           "Importer un .ganix (Fichier › Importer) ajoute le projet, ou remplace celui qui existe (une sauvegarde est faite avant).",
           "GANIS fonctionne entièrement hors ligne."
@@ -331,8 +425,20 @@
         "intro": "Deux niveaux de réglages.",
         "items": [
           "Paramètres du projet (en bas de la barre de gauche) : informations, statuts, niveau de détail des personnages, types de lieux, découpage et couleurs.",
+          "Objets, Faune et flore : activer ces modules facultatifs et choisir leurs catégories.",
           "Paramètres généraux (roue dentée en haut) : compte, mot de passe, clé de récupération, langue, thème, enregistrement automatique.",
           "Packages : des thèmes de couleurs pour toute l'application."
+        ]
+      },
+      "about": {
+        "title": "À propos de GANIS",
+        "intro": "GANIS est l'atelier des auteurs et des scénaristes : un seul endroit pour construire une histoire, de l'idée à la version lisible.",
+        "items": [
+          "Pour tous les récits : roman, manga / BD, film, série, jeu vidéo, jeu de rôle, ou un projet personnalisé avec votre propre découpage.",
+          "Personnages, lieux, relations, découpage, trame, notes et documents restent liés entre eux : ce qui change à un endroit se retrouve partout.",
+          "Hors ligne : GANIS ne dépend d'aucun service en ligne. Vos projets restent sur cet ordinateur (les projets privés chiffrés avec votre compte, les projets publics en clair) ; un projet s'emporte ailleurs au format .ganix.",
+          "Correction orthographique : dictionnaires Hunspell français (Grammalecte, licence MPL 2.0) et anglais (SCOWL, wordlist.sourceforge.net).",
+          "Version, informations et crédits : menu Aide › À propos de GANIS."
         ]
       }
     },
@@ -382,6 +488,26 @@
         {
           "q": "Une image refuse de s'ajouter.",
           "a": "GANIS accepte PNG, JPEG, WebP et GIF, jusqu'à la taille indiquée. Réenregistrez l'image en JPEG ou réduisez sa taille."
+        },
+        {
+          "q": "J'ai supprimé un projet par erreur.",
+          "a": "Cliquez sur « Annuler » dans le message qui apparaît, ou ouvrez Corbeille sur le tableau de bord puis « Restaurer ». Un projet reste 30 jours dans la corbeille avant d'être supprimé définitivement."
+        },
+        {
+          "q": "Comment verrouiller GANIS quand je m'absente ?",
+          "a": "Paramètres › Compte › Verrouillage automatique : choisissez un délai. Passé ce délai sans activité, votre mot de passe est demandé pour reprendre ; vos onglets restent ouverts."
+        },
+        {
+          "q": "Je ne trouve pas les objets ni la faune et flore.",
+          "a": "Ces modules sont masqués par défaut. Ouvrez Paramètres du projet › Objets (ou Faune et flore) et activez-les : ils apparaissent dans la barre de gauche, sous Lieux."
+        },
+        {
+          "q": "Mon animal parle et a des relations : personnage ou animal ?",
+          "a": "Les deux. Créez-le dans Faune et flore comme « un animal ou une plante précis », puis cliquez sur « Créer sa fiche de personnage ». Les deux fiches sont reliées."
+        },
+        {
+          "q": "Comment encadrer l'image d'une fiche de couleurs ?",
+          "a": "Ajoutez des couleurs dans le champ « Palette de couleurs » de la fiche (personnage, lieu, objet, faune et flore) : un cadre de ces couleurs entoure son image."
         }
       ]
     }

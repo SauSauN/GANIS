@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { create } from "zustand";
 import i18n from "@/i18n";
 import { api, ApiError } from "@/lib/api";
-import { announceDeletion } from "@/lib/trash";
+import { announceDeletion, announceDeletions } from "@/lib/trash";
 import { folderAndDescendants } from "@/lib/notes";
 import type {
   Note,
@@ -39,7 +39,8 @@ interface NoteState {
   /** Dossier choisi pour la prochaine note créée (« Nouvelle note ici »). */
   createFolder: string | null;
 
-  fetchNotes: (projectId: string) => Promise<void>;
+  /** `language` : langue des notes système (par défaut, celle du logiciel). */
+  fetchNotes: (projectId: string, language?: string) => Promise<void>;
   createFolderIn: (projectId: string, parentId: string | null, name: string) => Promise<NoteFolder>;
   renameFolder: (projectId: string, id: string, name: string) => Promise<void>;
   moveFolder: (projectId: string, id: string, parentId: string | null) => Promise<void>;
@@ -49,6 +50,10 @@ interface NoteState {
   updateNote: (projectId: string, id: string, input: NoteUpdate) => Promise<Note>;
   moveNote: (projectId: string, id: string, folderId: string | null) => Promise<void>;
   deleteNote: (projectId: string, id: string) => Promise<void>;
+  /** Supprime plusieurs notes (un seul message, un seul « Annuler »). */
+  deleteNotes: (projectId: string, ids: string[]) => Promise<void>;
+  /** Déplace plusieurs notes dans un dossier (`null` : racine). */
+  moveNotes: (projectId: string, ids: string[], folderId: string | null) => Promise<void>;
 
   fetchStickies: (projectId: string) => Promise<void>;
   createSticky: (projectId: string, color: StickyColor, x: number, y: number) => Promise<StickyNote>;
@@ -107,7 +112,7 @@ export const useNoteStore = create<NoteState>((set, get) => {
     stickiesError: null,
     createFolder: null,
 
-    fetchNotes: async (projectId) => {
+    fetchNotes: async (projectId, language) => {
       const request = ++latestFetch;
       const same = mine(projectId);
 
@@ -126,7 +131,7 @@ export const useNoteStore = create<NoteState>((set, get) => {
 
       try {
         // Notes système : titres dans la langue du logiciel, contenu à jour des fiches.
-        await api.syncSystemNotes(projectId, i18n.language).catch(() => undefined);
+        await api.syncSystemNotes(projectId, language ?? i18n.language).catch(() => undefined);
         const [folders, notes] = await Promise.all([
           api.listNoteFolders(projectId),
           api.listNotes(projectId),
@@ -192,6 +197,27 @@ export const useNoteStore = create<NoteState>((set, get) => {
       const trashId = await api.deleteNote(projectId, id);
       announceDeletion(projectId, trashId, "note", before?.title ?? "");
       if (mine(projectId)) set({ notes: get().notes.filter((note) => note.id !== id) });
+    },
+
+    deleteNotes: async (projectId, ids) => {
+      const trashIds: string[] = [];
+      const removed = new Set<string>();
+
+      try {
+        for (const id of ids) {
+          trashIds.push(await api.deleteNote(projectId, id));
+          removed.add(id);
+        }
+      } finally {
+        announceDeletions(projectId, trashIds);
+        if (mine(projectId)) set({ notes: get().notes.filter((note) => !removed.has(note.id)) });
+      }
+    },
+
+    moveNotes: async (projectId, ids, folderId) => {
+      for (const id of ids) {
+        upsertNote(projectId, await api.moveNote(projectId, id, folderId));
+      }
     },
 
     fetchStickies: async (projectId) => {
@@ -282,6 +308,13 @@ export const useNoteStore = create<NoteState>((set, get) => {
       });
     },
   };
+});
+
+// Notes système : leurs titres (dossiers, noms des éléments, intertitres)
+// suivent la langue du logiciel ; on les recalcule quand elle change.
+i18n.on("languageChanged", (language: string) => {
+  const { projectId, loaded, fetchNotes } = useNoteStore.getState();
+  if (projectId && loaded) void fetchNotes(projectId, language);
 });
 
 const NO_FOLDERS: NoteFolder[] = [];

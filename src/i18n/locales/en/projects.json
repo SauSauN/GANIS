@@ -96,6 +96,21 @@
       "done": "Project “{{name}}” imported.",
       "replaced": "Project “{{name}}” replaced. Backup of the previous version: {{file}} (GANIS “sauvegardes” folder).",
       "encryptionNoteReplace": "The received data will be encrypted with your project's key."
+    },
+    "progress": {
+      "export": "Exporting project as .ganix",
+      "import": "Checking the .ganix file",
+      "stage": {
+        "data": "Reading project data",
+        "files": "Images and documents",
+        "verify": "Checking the written file",
+        "build": "Rebuilding the project"
+      },
+      "count": {
+        "data": "{{done}} / {{total}} items",
+        "files": "{{done}} / {{total}} files",
+        "build": "{{done}} / {{total}} items"
+      }
     }
   },
   "visibility": {

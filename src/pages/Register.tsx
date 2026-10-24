@@ -101,17 +101,17 @@ export default function Register() {
           <CardContent className="mt-4 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username">{t("username")}</Label>
-              <Input id="username" autoComplete="username" value={username}
+              <Input id="username" placeholder={t("common:placeholders.chooseUsername")} autoComplete="username" value={username}
                 onChange={(e) => setUsername(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">{t("email")}</Label>
-              <Input id="email" type="email" autoComplete="email" value={email}
+              <Input id="email" placeholder={t("common:placeholders.email")} type="email" autoComplete="email" value={email}
                 onChange={(e) => setEmail(e.target.value)} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">{t("password")}</Label>
-              <Input id="password" type="password" autoComplete="new-password" value={password}
+              <Input id="password" placeholder={t("common:placeholders.newPassword")} type="password" autoComplete="new-password" value={password}
                 onChange={(e) => setPassword(e.target.value)} />
               {!RECOVERY_KEY_ENABLED && (
                 <p className="text-xs text-muted-foreground">{t("passwordWarning")}</p>
@@ -119,7 +119,7 @@ export default function Register() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm">{t("confirm")}</Label>
-              <Input id="confirm" type="password" autoComplete="new-password" value={confirm}
+              <Input id="confirm" placeholder={t("common:placeholders.confirmPassword")} type="password" autoComplete="new-password" value={confirm}
                 onChange={(e) => setConfirm(e.target.value)} />
             </div>
 

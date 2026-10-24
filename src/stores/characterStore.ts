@@ -6,6 +6,8 @@ import { announceDeletion } from "@/lib/trash";
 import { fullName } from "@/lib/characters";
 import { useLocationStore } from "@/stores/locationStore";
 import { usePlaceLinkStore } from "@/stores/placeLinkStore";
+import { useWorldLinkStore } from "@/stores/worldLinkStore";
+import { useWorldStore } from "@/stores/worldStore";
 import { useRelationStore } from "@/stores/relationStore";
 import type {
   Character,
@@ -194,6 +196,10 @@ export const useCharacterStore = create<CharacterState>((set, get) => {
       // les champs de lieux qui le désignaient (« Dirigeant ») : relus.
       useRelationStore.getState().forgetCharacter(projectId, id);
       usePlaceLinkStore.getState().forget(projectId, "character", id);
+      // Ses liens avec des objets et des espèces aussi ; l'animal qu'il
+      // était redevient un animal tout court.
+      useWorldLinkStore.getState().forget(projectId, id);
+      useWorldStore.getState().forgetCharacter(projectId, id);
 
       const locations = useLocationStore.getState();
       if (locations.projectId === projectId && locations.loaded) {

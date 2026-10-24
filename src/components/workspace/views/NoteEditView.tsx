@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { VersionsButton } from "@/components/history/VersionsDialog";
 import { useTranslation } from "react-i18next";
 import type { Editor } from "@tiptap/react";
-import { FolderLock, Pin, PinOff, RefreshCw, Save, Trash2 } from "lucide-react";
+import { FolderLock, Pin, PinOff, RefreshCw, Trash2 } from "lucide-react";
 import { ConfirmDialog } from "@/components/notes/ConfirmDialog";
 import { FolderSelect, formatNoteDate } from "@/components/notes/FolderSelect";
 import { NoteEditor } from "@/components/notes/editor/NoteEditor";
@@ -16,6 +16,8 @@ import { useNoteStore, useProjectNotes } from "@/stores/noteStore";
 import { useStructureStore } from "@/stores/structureStore";
 import type { Note } from "@/types";
 import { errorText } from "@/lib/errors";
+import { notifyError, notifySaved } from "@/lib/notify";
+import { SaveButton } from "@/components/common/SaveButton";
 
 interface NoteEditViewProps {
   projectId: string;
@@ -26,7 +28,6 @@ interface NoteEditViewProps {
   onOpenFeature?: (featureId: string) => void;
 }
 
-type SaveStatus = "idle" | "saved" | "error";
 
 /**
  * Une note ouverte dans son onglet : titre, dossier, épingle et éditeur.
@@ -62,14 +63,11 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
   const [savedVersion, setSavedVersion] = useState(0);
 
   const [saving, setSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
-  const [actionError, setActionError] = useState<string | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const editorRef = useRef<Editor | null>(null);
   const versionRef = useRef(0);
   const inFlight = useRef<Promise<boolean> | null>(null);
-  const statusTimer = useRef<number | null>(null);
 
   // --- Chargement --------------------------------------------------------------
 
@@ -91,12 +89,25 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
     void load();
   }, [load]);
 
-  useEffect(
-    () => () => {
-      if (statusTimer.current !== null) window.clearTimeout(statusTimer.current);
-    },
-    [],
-  );
+  // Note système ouverte : elle suit la langue du logiciel (titres repris
+  // des fiches), sauf si un texte non enregistré est en cours.
+  const [editorKey, setEditorKey] = useState(0);
+  const languageReload = useRef<(language: string) => void>(() => undefined);
+  languageReload.current = (language) => {
+    if (!note?.system || dirty) return;
+    void api
+      .syncSystemNotes(projectId, language)
+      .catch(() => undefined)
+      .then(load)
+      .then(() => setEditorKey((key) => key + 1));
+  };
+  useEffect(() => {
+    // La nouvelle langue vient de l'évènement : c'est elle qu'on envoie.
+    const onChange = (language: string) => languageReload.current(language);
+    i18n.on("languageChanged", onChange);
+    return () => i18n.off("languageChanged", onChange);
+  }, []);
+
 
   // --- Enregistrement ----------------------------------------------------------
 
@@ -118,7 +129,6 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
     const version = versionRef.current;
     const sentTitle = title;
     setSaving(true);
-    setSaveStatus("idle");
 
     try {
       const saved = await updateNote(projectId, noteId, {
@@ -132,13 +142,11 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
       // Ce qui a été tapé pendant l'enregistrement reste « non enregistré ».
       setSavedTitle(sentTitle);
       setSavedVersion(version);
-      setSaveStatus("saved");
-      if (statusTimer.current !== null) window.clearTimeout(statusTimer.current);
-      statusTimer.current = window.setTimeout(() => setSaveStatus("idle"), 2500);
+      // Confirmation en notification : l'écran ne bouge pas.
+      notifySaved(t("edit.saved"), `note:${noteId}`);
       return true;
     } catch (error) {
-      setActionError(errorText(error));
-      setSaveStatus("error");
+      notifyError(`${t("edit.saveFailed")} ${errorText(error)}`, `note:${noteId}`);
       return false;
     } finally {
       setSaving(false);
@@ -160,23 +168,21 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
 
   async function togglePin() {
     if (!note) return;
-    setActionError(null);
     try {
       const saved = await updateNote(projectId, noteId, { pinned: !note.pinned });
       setNote((current) => (current ? { ...current, pinned: saved.pinned } : current));
     } catch (error) {
-      setActionError(errorText(error));
+      notifyError(errorText(error), `note:${noteId}`);
     }
   }
 
   async function changeFolder(folderId: string | null) {
     if (!note) return;
-    setActionError(null);
     try {
       await moveNote(projectId, noteId, folderId);
       setNote((current) => (current ? { ...current, folderId } : current));
     } catch (error) {
-      setActionError(errorText(error));
+      notifyError(errorText(error), `note:${noteId}`);
     }
   }
 
@@ -252,20 +258,7 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
             </span>
 
             <div className="ml-auto flex items-center gap-2">
-              {saveStatus === "saved" && (
-                <span role="status" className="text-xs text-success">
-                  {t("edit.saved")}
-                </span>
-              )}
-              {saveStatus === "error" && (
-                <span role="alert" className="text-xs text-destructive">
-                  {t("edit.saveFailed")}
-                </span>
-              )}
-              <Button size="sm" onClick={() => void save()} disabled={saving || !dirty}>
-                <Save className="mr-1.5 size-4" />
-                {saving ? t("common:actions.saving") : t("common:actions.save")}
-              </Button>
+              <SaveButton saving={saving} disabled={!dirty} onClick={() => void save()} />
               {!note.system && (
                 <>
                   <VersionsButton projectId={projectId} kind="note" itemId={noteId} name={note.title || t("untitled")} />
@@ -284,14 +277,10 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
             </div>
           </div>
 
-          {actionError && (
-            <p role="alert" className="text-sm text-destructive">
-              {actionError}
-            </p>
-          )}
         </header>
 
         <NoteEditor
+          key={editorKey}
           projectId={projectId}
           onOpenFeature={onOpenFeature}
           initialContent={parseNoteContent(note.content)}

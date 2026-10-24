@@ -12,8 +12,10 @@ const ICONS: Record<CharacterDetailLevel, LucideIcon> = {
 };
 
 interface LevelPickerProps {
-  /** Textes des niveaux : fiches de personnages (par défaut) ou de lieux. */
-  namespace?: "characters" | "locations";
+  /** Textes des niveaux : fiches de personnages (par défaut), de lieux, ou objets / faune et flore. */
+  namespace?: "characters" | "locations" | "world";
+  /** Objets, faune et flore : `item.` ou `species.` devant les clés de `world.json`. */
+  prefix?: string;
   value: CharacterDetailLevel | null;
   onChange: (level: CharacterDetailLevel) => void;
   disabled?: boolean;
@@ -24,9 +26,9 @@ interface LevelPickerProps {
  * (+ l'apparence), Avancé (+ la personnalité). Les niveaux couverts par le
  * choix sont mis en évidence.
  */
-export function LevelPicker({ namespace = "characters", value, onChange, disabled }: LevelPickerProps) {
+export function LevelPicker({ namespace = "characters", prefix = "", value, onChange, disabled }: LevelPickerProps) {
   const { t: typed } = useTranslation(namespace);
-  const t = typed as unknown as (key: string) => string;
+  const t = (key: string) => (typed as unknown as (key: string) => string)(`${prefix}${key}`);
   const name = useId();
   const selectedIndex = value ? DETAIL_LEVELS.indexOf(value) : -1;
 
@@ -63,7 +65,7 @@ export function LevelPicker({ namespace = "characters", value, onChange, disable
               />
               <span className="text-sm font-medium">{t(`levels.${level}.label`)}</span>
               <span className="ml-auto text-xs text-muted-foreground">
-                {namespace === "locations" ? t(`levels.${level}.count`) : index === 0 ? t("levels.count") : t("levels.countMore")}
+                {namespace !== "characters" ? t(`levels.${level}.count`) : index === 0 ? t("levels.count") : t("levels.countMore")}
               </span>
             </span>
 

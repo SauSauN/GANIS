@@ -24,6 +24,7 @@ import { cn } from "@/lib/utils";
 import { useLocationStore, useProjectLocations } from "@/stores/locationStore";
 import type { CharacterDetailLevel } from "@/types";
 import { errorText } from "@/lib/errors";
+import { notifyError, notifySaved } from "@/lib/notify";
 
 /**
  * Paramètres du projet › Lieux : types ajoutés par l'auteur (chacun dans
@@ -39,21 +40,22 @@ export function LocationSettingsSection({ projectId }: { projectId: string }) {
   const [name, setName] = useState("");
   const [category, setCategory] = useState<LocationCategory>("built");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "settings:locations");
+  };
 
   const types = settings.customTypes;
   const setDetailLevel = useLocationStore((state) => state.setDetailLevel);
   const [levelPending, setLevelPending] = useState<CharacterDetailLevel | null>(null);
-  const [levelFeedback, setLevelFeedback] = useState<"saved" | "failed" | null>(null);
 
   async function chooseLevel(level: CharacterDetailLevel) {
     setLevelPending(level);
-    setLevelFeedback(null);
     try {
       await setDetailLevel(projectId, level);
-      setLevelFeedback("saved");
+      notifySaved(t("settings.level.saved"), "settings:locations");
     } catch {
-      setLevelFeedback("failed");
+      notifyError(t("settings.level.failed"), "settings:locations");
     } finally {
       setLevelPending(null);
     }
@@ -98,11 +100,6 @@ export function LocationSettingsSection({ projectId }: { projectId: string }) {
             onChange={(level) => void chooseLevel(level)}
             disabled={!loaded || levelPending !== null}
           />
-          {levelFeedback && (
-            <p role={levelFeedback === "failed" ? "alert" : "status"} className={levelFeedback === "failed" ? "text-sm text-destructive" : "text-sm text-success"}>
-              {t(`settings.level.${levelFeedback}`)}
-            </p>
-          )}
         </CardContent>
       </Card>
 
@@ -186,11 +183,6 @@ export function LocationSettingsSection({ projectId }: { projectId: string }) {
             </Button>
           </div>
 
-          {error && (
-            <p role="alert" className="text-sm text-destructive">
-              {error}
-            </p>
-          )}
         </CardContent>
       </Card>
 
@@ -208,7 +200,10 @@ function StatusListCard({ projectId }: { projectId: string }) {
 
   const [draft, setDraft] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "settings:locations");
+  };
 
   const values = statusValues(settings.lists);
   const customized = settings.lists.status !== undefined;
@@ -298,7 +293,6 @@ function StatusListCard({ projectId }: { projectId: string }) {
           </Button>
         </div>
 
-        {error && <p className="text-xs text-destructive">{error}</p>}
       </CardContent>
     </Card>
   );

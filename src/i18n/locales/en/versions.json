@@ -29,7 +29,11 @@
     "type": "Type",
     "status": "Status",
     "parent": "Located in",
-    "plot": "Plot"
+    "plot": "Plot",
+    "text": "Text",
+    "pitch": "Pitch",
+    "summaryShort": "Short summary",
+    "summaryLong": "Long summary"
   },
   "deleteConfirm": "Delete for good?"
 }

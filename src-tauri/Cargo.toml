@@ -23,6 +23,9 @@ tauri = { version = "2", features = [] }
 tauri-plugin-opener = "2"
 # Fenêtre « Enregistrer sous » (fichier de la clé de récupération).
 tauri-plugin-dialog = "2"
+# Presse-papiers natif : « Édition › Coller » du menu (la WebView refuse
+# la lecture du presse-papiers par l'API du navigateur).
+tauri-plugin-clipboard-manager = "2"
 
 # --- Sérialisation ---
 serde = { version = "1", features = ["derive"] }

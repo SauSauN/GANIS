@@ -137,7 +137,15 @@
     "newNote": "New note",
     "newFolder": "New folder",
     "noExcerpt": "Empty note",
-    "pinned": "Pinned"
+    "pinned": "Pinned",
+    "select": "Select “{{name}}”",
+    "moveTo": "Move to…",
+    "moved_one": "{{count}} note moved.",
+    "moved_other": "{{count}} notes moved.",
+    "deleteSelected": "Delete",
+    "deleteSelectedTitle_one": "Delete {{count}} note?",
+    "deleteSelectedTitle_other": "Delete {{count}} notes?",
+    "deleteSelectedBody": "They go to the project trash, where you can restore them for 30 days."
   },
   "create": {
     "card": "New note",

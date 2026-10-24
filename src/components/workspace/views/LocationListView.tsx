@@ -15,14 +15,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  CATEGORY_ICONS,
   categoryBackdrop,
-  categoryTint,
   typeIcon,
 } from "@/components/locations/locationStyle";
 import { LocationThumb, TypeBadge } from "@/components/locations/LocationVisuals";
 import { useLocationLabels, type LocationLabels } from "@/components/locations/useLocationLabels";
-import { PageShell } from "@/components/workspace/views/PageShell";
+import { PageShell, fieldClass } from "@/components/workspace/views/PageShell";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import {
   DEFAULT_STATUS,
@@ -231,6 +229,24 @@ export function LocationListView({ projectId, feature, onOpenFeature }: Location
           />
         </div>
 
+        {/* Filtre par catégorie : menu déroulant (avec le nombre de lieux),
+            pour ne pas aligner un bouton par catégorie. */}
+        <select
+          aria-label={t("list.categoryFilter")}
+          value={category ?? ""}
+          onChange={(e) => setCategory((e.target.value || null) as LocationCategory | null)}
+          className={cn(fieldClass, "h-9 w-56")}
+        >
+          <option value="">
+            {t("list.allCategoriesOption")} ({locations.length})
+          </option>
+          {LOCATION_CATEGORIES.filter((item) => counts[item]).map((item) => (
+            <option key={item} value={item}>
+              {labels.category(item)} ({counts[item] ?? 0})
+            </option>
+          ))}
+        </select>
+
         {layout === "tree" && !filtering && parents.length > 0 && (
           <Button
             variant="ghost"
@@ -266,26 +282,6 @@ export function LocationListView({ projectId, feature, onOpenFeature }: Location
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Filtre par catégorie */}
-      <div className="mb-6 flex flex-wrap gap-1.5">
-        <CategoryChip
-          active={category === null}
-          label={t("list.allCategories")}
-          count={locations.length}
-          onClick={() => setCategory(null)}
-        />
-        {LOCATION_CATEGORIES.filter((item) => counts[item]).map((item) => (
-          <CategoryChip
-            key={item}
-            category={item}
-            active={category === item}
-            label={labels.category(item)}
-            count={counts[item] ?? 0}
-            onClick={() => setCategory(category === item ? null : item)}
-          />
-        ))}
       </div>
 
       {matching.length === 0 ? (
@@ -329,40 +325,6 @@ export function LocationListView({ projectId, feature, onOpenFeature }: Location
 // ----------------------------------------------------------------------------
 // Éléments
 // ----------------------------------------------------------------------------
-
-function CategoryChip({
-  category,
-  active,
-  label,
-  count,
-  onClick,
-}: {
-  category?: LocationCategory;
-  active: boolean;
-  label: string;
-  count: number;
-  onClick: () => void;
-}) {
-  const Icon = category ? CATEGORY_ICONS[category] : null;
-
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={cn(
-        "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors",
-        active ? "border-transparent" : "text-muted-foreground hover:text-foreground",
-        active && !category && "bg-foreground text-background",
-      )}
-      style={active && category ? categoryTint(category) : undefined}
-    >
-      {Icon && <Icon className="size-3.5" aria-hidden="true" />}
-      {label}
-      <span className="tabular-nums opacity-70">{count}</span>
-    </button>
-  );
-}
 
 function TreeRow({
   node,
@@ -414,7 +376,7 @@ function TreeRow({
       <button
         type="button"
         onClick={onOpen}
-        className="flex min-w-0 flex-1 items-center gap-3 py-2 text-left focus-visible:outline-none"
+        className="flex min-w-0 flex-1 items-center gap-3 rounded-md py-2 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
         <LocationThumb projectId={projectId} location={location} customTypes={customTypes} size="sm" />
         <span className="min-w-0 truncate text-sm font-medium group-hover:text-primary">{location.name}</span>

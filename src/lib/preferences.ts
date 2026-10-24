@@ -191,14 +191,17 @@ export const AUTO_SAVE_DELAYS = [1, 3, 10, 30] as const;
 export type AutoSaveDelay = (typeof AUTO_SAVE_DELAYS)[number];
 
 export interface AutoSaveSettings {
-  /** Désactivé par défaut : l'utilisateur enregistre lui-même. */
+  /**
+   * Activé par défaut : un plantage ou une coupure ne fait perdre que les
+   * dernières secondes. Le choix de l'utilisateur, une fois fait, est gardé.
+   */
   enabled: boolean;
   delay: AutoSaveDelay;
 }
 
 const AUTO_SAVE_KEY = "ganis-auto-save";
 const AUTO_SAVE_EVENT = "ganis:auto-save-change";
-const DEFAULT_AUTO_SAVE: AutoSaveSettings = { enabled: false, delay: 3 };
+const DEFAULT_AUTO_SAVE: AutoSaveSettings = { enabled: true, delay: 3 };
 
 function isAutoSaveDelay(value: unknown): value is AutoSaveDelay {
   return AUTO_SAVE_DELAYS.includes(value as AutoSaveDelay);
@@ -232,7 +235,7 @@ export function getAutoSave(): AutoSaveSettings {
       const { enabled, delay } = parsed as Record<string, unknown>;
 
       autoSaveCache = {
-        enabled: enabled === true,
+        enabled: typeof enabled === "boolean" ? enabled : DEFAULT_AUTO_SAVE.enabled,
         delay: isAutoSaveDelay(delay) ? delay : DEFAULT_AUTO_SAVE.delay,
       };
     }
@@ -259,4 +262,109 @@ export function setAutoSave(changes: Partial<AutoSaveSettings>) {
 /** Réglage d'enregistrement automatique, mis à jour dès qu'il change. */
 export function useAutoSave(): AutoSaveSettings {
   return useSyncExternalStore(subscribeTo(AUTO_SAVE_EVENT), getAutoSave);
+}
+// ----------------------------------------------------------------------------
+// Verrouillage après une période d'inactivité
+// ----------------------------------------------------------------------------
+
+/** Délais proposés (minutes) ; 0 = jamais. */
+export const IDLE_LOCK_DELAYS = [0, 5, 15, 30, 60] as const;
+
+export type IdleLockDelay = (typeof IDLE_LOCK_DELAYS)[number];
+
+const IDLE_LOCK_KEY = "ganis-idle-lock";
+const IDLE_LOCK_EVENT = "ganis:idle-lock-change";
+
+function isIdleLockDelay(value: number): value is IdleLockDelay {
+  return (IDLE_LOCK_DELAYS as readonly number[]).includes(value);
+}
+
+/** Délai avant verrouillage (minutes), 0 si désactivé (par défaut). */
+export function getIdleLock(): IdleLockDelay {
+  try {
+    const saved = Number(localStorage.getItem(IDLE_LOCK_KEY));
+
+    if (isIdleLockDelay(saved)) {
+      return saved;
+    }
+  } catch {
+    /* stockage indisponible : désactivé */
+  }
+
+  return 0;
+}
+
+/** Enregistre le délai avant verrouillage. */
+export function setIdleLock(minutes: IdleLockDelay) {
+  try {
+    localStorage.setItem(IDLE_LOCK_KEY, String(minutes));
+  } catch {
+    /* ignoré */
+  }
+
+  window.dispatchEvent(new Event(IDLE_LOCK_EVENT));
+}
+
+/** Délai avant verrouillage, mis à jour dès qu'il change. */
+export function useIdleLock(): IdleLockDelay {
+  return useSyncExternalStore(subscribeTo(IDLE_LOCK_EVENT), getIdleLock);
+}
+// ----------------------------------------------------------------------------
+// Taille des images du panneau du milieu (personnages, lieux, objets, faune)
+// ----------------------------------------------------------------------------
+
+/** Bornes et pas du réglage, en pixels (à la taille de texte normale). */
+export const PANEL_IMAGE_MIN = 16;
+export const PANEL_IMAGE_MAX = 48;
+export const PANEL_IMAGE_STEP = 4;
+export const PANEL_IMAGE_DEFAULT = 24;
+
+const PANEL_IMAGE_KEY = "ganis-panel-image-size";
+const PANEL_IMAGE_EVENT = "ganis:panel-image-change";
+
+/** Taille ramenée dans les bornes, sur un multiple du pas. */
+export function clampPanelImageSize(size: number): number {
+  if (!Number.isFinite(size)) return PANEL_IMAGE_DEFAULT;
+  const stepped = Math.round(size / PANEL_IMAGE_STEP) * PANEL_IMAGE_STEP;
+  return Math.min(PANEL_IMAGE_MAX, Math.max(PANEL_IMAGE_MIN, stepped));
+}
+
+export function getPanelImageSize(): number {
+  try {
+    const saved = localStorage.getItem(PANEL_IMAGE_KEY);
+    if (saved !== null) return clampPanelImageSize(Number(saved));
+  } catch {
+    /* stockage indisponible : taille par défaut */
+  }
+  return PANEL_IMAGE_DEFAULT;
+}
+
+/**
+ * Applique la taille : variable CSS `--panel-thumb`, en rem pour suivre la
+ * taille du texte. Toutes les vignettes du panneau du milieu la lisent.
+ */
+function paintPanelImageSize(size: number) {
+  document.documentElement.style.setProperty("--panel-thumb", `${size / 16}rem`);
+}
+
+/** Applique la taille enregistrée au démarrage, avant le premier rendu. */
+export function initPanelImageSize() {
+  paintPanelImageSize(getPanelImageSize());
+}
+
+/** Enregistre la taille des images du panneau et l'applique aussitôt. */
+export function setPanelImageSize(size: number) {
+  const clamped = clampPanelImageSize(size);
+  try {
+    localStorage.setItem(PANEL_IMAGE_KEY, String(clamped));
+  } catch {
+    /* ignoré */
+  }
+  paintPanelImageSize(clamped);
+  window.dispatchEvent(new Event(PANEL_IMAGE_EVENT));
+}
+
+/** Taille courante des images du panneau, mise à jour dès qu'elle change. */
+export function usePanelImageSize(): number {
+  return useSyncExternalStore(subscribeTo(PANEL_IMAGE_EVENT), getPanelImageSize);
 }

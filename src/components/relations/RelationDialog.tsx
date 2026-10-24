@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
+import { useReturnFocus } from "@/lib/useReturnFocus";
 import { ArrowLeftRight, ArrowRight, ChevronDown, Loader2, Repeat, Trash2, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -116,6 +117,7 @@ export function RelationDialog({
   fullscreen = false,
 }: RelationDialogProps) {
   const { t } = useTranslation(["relations", "common"]);
+  useReturnFocus(open);
   const story = useStory(projectId);
   const createRelation = useRelationStore((state) => state.createRelation);
   const updateRelation = useRelationStore((state) => state.updateRelation);

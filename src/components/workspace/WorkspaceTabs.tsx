@@ -189,6 +189,8 @@ interface SortableTabProps {
   /** Onglet actif affiché agrandi. */
   maximized: boolean;
   onToggleMaximize: (id: string) => void;
+  /** Seul onglet atteint par Tab (les flèches passent aux autres). */
+  focusable: boolean;
 }
 
 function SortableTab({
@@ -203,6 +205,7 @@ function SortableTab({
   keepFocus,
   maximized,
   onToggleMaximize,
+  focusable,
 }: SortableTabProps) {
   const { t } = useTranslation(["tabs", "unsaved"]);
   const { setNodeRef, transform, transition, isDragging, listeners } =
@@ -219,7 +222,6 @@ function SortableTab({
   };
 
   const tabButtonId = `tab-${tab.id}`;
-  const pinButtonId = `tab-pin-${tab.id}`;
 
   function onKeyDown(event: KeyboardEvent<HTMLButtonElement>) {
     if (
@@ -230,6 +232,28 @@ function SortableTab({
 
       keepFocus(tabButtonId);
       onShift(tab.id, event.key === "ArrowLeft" ? -1 : 1);
+      return;
+    }
+
+    // Motif « onglets » : ← → Début Fin passent d'un onglet à l'autre,
+    // Entrée l'ouvre, Suppr le ferme (s'il n'est pas épinglé).
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    const list = event.currentTarget.closest('[role="tablist"]');
+    const all = Array.from(list?.querySelectorAll<HTMLElement>('[role="tab"]') ?? []);
+    const index = all.indexOf(event.currentTarget);
+    let target: HTMLElement | undefined;
+    if (event.key === "ArrowRight") target = all[(index + 1) % all.length];
+    else if (event.key === "ArrowLeft") target = all[(index - 1 + all.length) % all.length];
+    else if (event.key === "Home") target = all[0];
+    else if (event.key === "End") target = all[all.length - 1];
+    else if (event.key === "Delete" && !tab.pinned) {
+      event.preventDefault();
+      onClose(tab.id);
+      return;
+    }
+    if (target) {
+      event.preventDefault();
+      target.focus();
     }
   }
 
@@ -259,6 +283,7 @@ function SortableTab({
       style={style}
       onContextMenu={onContextMenu}
       data-pinned={tab.pinned ? "true" : undefined}
+      role="presentation"
       className={cn(
         tabClass(active, tab.pinned),
         lastPinned && "border-r border-r-border",
@@ -271,7 +296,8 @@ function SortableTab({
         role="tab"
         aria-selected={active}
         aria-haspopup="menu"
-        aria-keyshortcuts="Alt+ArrowLeft Alt+ArrowRight Shift+F10"
+        aria-keyshortcuts="Alt+ArrowLeft Alt+ArrowRight Delete Shift+F10"
+        tabIndex={focusable ? 0 : -1}
         aria-label={
           tab.dirty
             ? t("unsaved:tab.unsavedNamed", { name: tab.label })
@@ -299,9 +325,13 @@ function SortableTab({
         )}
       </button>
 
+      {/* Épingler et fermer : à la souris. Au clavier et pour les lecteurs
+          d'écran, le menu de l'onglet (Maj+F10) et Suppr font la même chose,
+          et la liste d'onglets ne contient que des onglets. */}
       <button
-        id={pinButtonId}
         type="button"
+        tabIndex={-1}
+        aria-hidden="true"
         aria-label={
           tab.pinned
             ? t("tab.unpinNamed", { name: tab.label })
@@ -309,13 +339,13 @@ function SortableTab({
         }
         title={tab.pinned ? t("tab.unpin") : t("tab.pin")}
         onClick={() => {
-          keepFocus(pinButtonId);
+          keepFocus(tabButtonId);
           onTogglePin(tab.id);
         }}
         className={cn(
           "flex h-6 w-6 shrink-0 items-center justify-center rounded hover:bg-secondary",
           !tab.pinned &&
-            "opacity-0 focus-visible:opacity-100 group-focus-within:opacity-100 group-hover:opacity-100",
+            "opacity-0 group-focus-within:opacity-100 group-hover:opacity-100",
         )}
       >
         {/* Épinglé et non enregistré : le point remplace l'épingle,
@@ -339,6 +369,8 @@ function SortableTab({
       {!tab.pinned && (
         <button
           type="button"
+          tabIndex={-1}
+          aria-hidden="true"
           aria-label={t("tab.closeNamed", { name: tab.label })}
           title={
             tab.dirty
@@ -844,6 +876,10 @@ export function WorkspaceTabs({
                   }}
                   maximized={maximized && activeTab === tab.id}
                   onToggleMaximize={onToggleMaximize}
+                  focusable={
+                    activeTab === tab.id ||
+                    (offset === 0 && !visible.some((item) => item.id === activeTab))
+                  }
                 />
               );
             })}

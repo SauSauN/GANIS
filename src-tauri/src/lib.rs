@@ -15,6 +15,10 @@ mod state;
 mod services;
 mod commands;
 
+/// Projets d'exemple en ligne de commande (`npm run seed:roman` / `seed:manga`).
+#[cfg(test)]
+mod seed_demo;
+
 use error::AppResult;
 use serde::Serialize;
 use state::AppState;
@@ -43,6 +47,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
         .setup(|app| {
             // -----------------------------------------------------------------
             // 1. Journalisation
@@ -83,6 +88,10 @@ pub fn run() {
 
             let state = AppState::new(app_db, data_dir);
 
+            // Projets restés plus de 30 jours dans la corbeille : supprimés
+            // définitivement.
+            tauri::async_runtime::block_on(commands::projects::purge_expired_projects(&state));
+
             app.manage(state);
 
             tracing::info!("Base de données applicative initialisée");
@@ -105,20 +114,46 @@ pub fn run() {
             //commands::users::delete_user,
             commands::users::update_profile,
             commands::users::change_password,
+            commands::users::delete_account,
             commands::projects::create_project,
             commands::projects::list_projects,
+            commands::demo::list_demo_projects,
+            commands::demo::create_demo_project,
             commands::projects::get_project,
             commands::projects::open_project,
             commands::projects::update_project,
             commands::projects::set_project_visibility,
             commands::projects::duplicate_project,
             commands::projects::delete_project,
+            commands::projects::list_project_trash,
+            commands::projects::restore_project,
+            commands::projects::purge_project,
             commands::ganix::export_project,
             commands::ganix::inspect_ganix,
             commands::ganix::confirm_ganix_import,
             commands::ganix::cancel_ganix_import,
             commands::synopsis::get_synopsis,
             commands::synopsis::update_synopsis,
+            commands::novel::get_structure_node_content,
+            commands::novel::set_structure_node_content,
+            commands::novel::get_manuscript_contents,
+            commands::novel::set_structure_node_novel,
+            commands::novel::set_manuscript_goal,
+            commands::novel::find_in_manuscript,
+            commands::novel::replace_in_manuscript,
+            commands::novel::get_writing_stats,
+            commands::novel::set_daily_goal,
+            commands::novel::import_manuscript,
+            commands::novel::get_editorial,
+            commands::manga::get_page_script,
+            commands::manga::save_page_script,
+            commands::manga::get_script_panels,
+            commands::manga::move_manga_panel,
+            commands::manga::set_manga_chapter,
+            commands::manga::get_manga_settings,
+            commands::manga::set_manga_settings,
+            commands::novel::update_editorial,
+            commands::novel::save_export_file,
             commands::characters::get_character_settings,
             commands::characters::set_character_detail_level,
             commands::characters::set_character_list,
@@ -153,6 +188,30 @@ pub fn run() {
             commands::locations::add_location_gallery_image,
             commands::locations::set_location_gallery_caption,
             commands::locations::delete_location_gallery_image,
+            commands::world::get_world_settings,
+            commands::world::set_world_enabled,
+            commands::world::set_world_categories,
+            commands::world::set_world_detail_level,
+            commands::world::set_world_custom_types,
+            commands::world::set_world_list,
+            commands::world::list_world_entries,
+            commands::world::create_world_entry,
+            commands::world::update_world_entry,
+            commands::world::delete_world_entry,
+            commands::world::set_species_character,
+            commands::world::create_species_character,
+            commands::world::get_world_entry_portrait,
+            commands::world::set_world_entry_portrait,
+            commands::world::remove_world_entry_portrait,
+            commands::world::list_world_entry_gallery,
+            commands::world::get_world_entry_gallery_image,
+            commands::world::add_world_entry_gallery_image,
+            commands::world::set_world_entry_gallery_caption,
+            commands::world::delete_world_entry_gallery_image,
+            commands::world::list_world_links,
+            commands::world::create_world_link,
+            commands::world::update_world_link,
+            commands::world::delete_world_link,
             commands::history::list_activity,
             commands::history::list_versions,
             commands::history::create_version,

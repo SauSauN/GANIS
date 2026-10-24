@@ -132,7 +132,7 @@ export default function Recover() {
             <div className="space-y-2">
               <Label htmlFor="recover-username">{t("forgot.username")}</Label>
               <Input
-                id="recover-username"
+                id="recover-username" placeholder={t("common:placeholders.username")}
                 autoComplete="username"
                 autoFocus
                 value={username}
@@ -159,7 +159,7 @@ export default function Recover() {
             <div className="space-y-2">
               <Label htmlFor="recover-password">{t("forgot.newPassword")}</Label>
               <Input
-                id="recover-password"
+                id="recover-password" placeholder={t("common:placeholders.newPassword")}
                 type="password"
                 autoComplete="new-password"
                 value={password}
@@ -170,7 +170,7 @@ export default function Recover() {
             <div className="space-y-2">
               <Label htmlFor="recover-confirm">{t("forgot.confirm")}</Label>
               <Input
-                id="recover-confirm"
+                id="recover-confirm" placeholder={t("common:placeholders.confirmPassword")}
                 type="password"
                 autoComplete="new-password"
                 value={confirm}

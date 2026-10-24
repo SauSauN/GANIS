@@ -1,6 +1,5 @@
 {
   "label": "Menus",
-  "shift": "Maj",
   "menus": {
     "file": "Fichier",
     "edit": "Édition",
@@ -36,7 +35,7 @@
     "selectAll": "Tout sélectionner",
     "trash": "Corbeille…",
     "nothing": "Rien à annuler ici : placez d'abord le curseur dans un champ.",
-    "pasteBlocked": "Le presse-papiers n'est pas accessible depuis le menu : utilisez Ctrl+V.",
+    "pasteEmpty": "Rien à coller : le presse-papiers ne contient pas de texte.",
     "search": "Rechercher…",
     "history": "Historique…"
   },
@@ -50,7 +49,10 @@
     "nextTab": "Onglet suivant",
     "previousTab": "Onglet précédent",
     "darkTheme": "Thème sombre",
-    "lightTheme": "Thème clair"
+    "lightTheme": "Thème clair",
+    "panelImagesLarger": "Agrandir les images du panneau",
+    "panelImagesSmaller": "Réduire les images du panneau",
+    "panelImagesReset": "Images du panneau : taille par défaut"
   },
   "project": {
     "home": "Accueil du projet",
@@ -58,12 +60,15 @@
     "settings": "Paramètres du projet",
     "trash": "Corbeille",
     "export": "Exporter en .ganix…",
-    "history": "Historique"
+    "history": "Historique",
+    "read": "Lire l'histoire"
   },
   "help": {
     "guide": "Guide de démarrage",
     "shortcuts": "Raccourcis clavier",
     "about": "À propos de GANIS",
+    "whatsNew": "Nouveautés",
+    "report": "Signaler un problème…",
     "center": "Aide de GANIS"
   },
   "create": {
@@ -73,6 +78,8 @@
     "location": "Un lieu",
     "structure": "Un élément du découpage",
     "note": "Une note",
-    "sticky": "Un post-it"
+    "sticky": "Un post-it",
+    "item": "Un objet",
+    "species": "Un animal ou une plante"
   }
 }

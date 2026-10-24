@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
-  Compass,
   FileUp,
   Library,
   Plus,
@@ -37,13 +36,13 @@ import { canDevelop } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { usePackageStore } from "@/stores/packageStore";
+import { errorText } from "@/lib/errors";
 
-type ViewId = "installed" | "discover" | "import";
+type ViewId = "installed" | "import";
 
 /** Vues du gestionnaire (§20.3), dans l'ordre du menu. */
 const VIEWS: { id: ViewId; icon: LucideIcon; soon?: boolean }[] = [
   { id: "installed", icon: Library },
-  { id: "discover", icon: Compass, soon: true },
   { id: "import", icon: FileUp, soon: true },
 ];
 
@@ -178,21 +177,6 @@ export default function Packages() {
             </header>
 
             {view === "installed" && <InstalledView />}
-            {view === "discover" && (
-              <ComingSoon
-                icon={Compass}
-                title={t("discover.title")}
-                text={t("discover.text")}
-                action={
-                  <Button
-                    variant="outline"
-                    onClick={() => setParams({ view: "installed" }, { replace: true })}
-                  >
-                    {t("discover.toInstalled")}
-                  </Button>
-                }
-              />
-            )}
             {view === "import" && <ImportView />}
           </div>
         </main>
@@ -251,7 +235,7 @@ function InstalledView() {
     } catch (e) {
       setNotice({
         kind: "error",
-        text: e instanceof Error ? e.message : t("delete.failed"),
+        text: errorText(e, "packages:delete.failed"),
       });
       setToDelete(null);
     } finally {
@@ -345,7 +329,7 @@ function InstalledView() {
           {loadError ? (
             <div className="flex flex-wrap items-center gap-3 rounded-xl border border-destructive/40 bg-destructive/5 p-4">
               <p role="alert" className="flex-1 text-sm text-destructive">
-                {loadError instanceof Error ? loadError.message : t("mine.loadFailed")}
+                {errorText(loadError, "packages:mine.loadFailed")}
               </p>
               <Button size="sm" variant="outline" onClick={() => void reload()}>
                 {t("mine.retry")}

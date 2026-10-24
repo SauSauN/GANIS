@@ -15,6 +15,7 @@ import { cn } from "@/lib/utils";
 import { useNoteStore, useProjectStickies } from "@/stores/noteStore";
 import type { StickyColor, StickyNote } from "@/types";
 import { errorText } from "@/lib/errors";
+import { notifyError } from "@/lib/notify";
 
 interface StickyWallViewProps {
   projectId: string;
@@ -233,7 +234,10 @@ export function StickyWallView({ projectId, feature }: StickyWallViewProps) {
   const raiseSticky = useNoteStore((state) => state.raiseSticky);
   const deleteSticky = useNoteStore((state) => state.deleteSticky);
 
-  const [message, setMessage] = useState<string | null>(null);
+  // Erreurs d'action en notification : le mur ne bouge pas.
+  const setMessage = (text: string | null) => {
+    if (text) notifyError(text, "stickies");
+  };
   const wallRef = useRef<HTMLDivElement>(null);
 
   const report = (cause: unknown) => setMessage(errorText(cause));
@@ -282,9 +286,9 @@ export function StickyWallView({ projectId, feature }: StickyWallViewProps) {
         )}
       </div>
 
-      {(message || error) && (
+      {error && (
         <div role="alert" className="flex items-center gap-3 border-b bg-destructive/5 px-4 py-2 text-sm text-destructive">
-          <span className="flex-1">{message ?? error}</span>
+          <span className="flex-1">{error}</span>
           {error && !loaded && (
             <Button variant="outline" size="sm" onClick={() => void reload()}>
               <RefreshCw className="mr-1.5 size-3.5" />

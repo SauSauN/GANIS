@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { api, ApiError } from "@/lib/api";
+import { api } from "@/lib/api";
 import { characterTabId } from "@/lib/characters";
 import { locationTabId } from "@/lib/locations";
 import { noteTabId } from "@/lib/notes";
 import { structureNodeTabId } from "@/lib/structure";
+import { worldTabId } from "@/lib/world";
 import { usePlotStore } from "@/stores/plotStore";
 import type { HistoryKind, SearchHit } from "@/types";
+import { errorText } from "@/lib/errors";
 
 /** Onglet qui montre un élément (fiche, note…). `null` : pas d'onglet propre. */
 export function itemTabId(kind: HistoryKind | SearchHit["kind"], id: string): string | null {
@@ -14,6 +16,10 @@ export function itemTabId(kind: HistoryKind | SearchHit["kind"], id: string): st
       return characterTabId(id);
     case "location":
       return locationTabId(id);
+    case "item":
+      return worldTabId("item", id);
+    case "species":
+      return worldTabId("species", id);
     case "structureNode":
     // Document : `id` est celui de l'élément du découpage qui le contient.
     case "document":
@@ -29,6 +35,8 @@ export function itemTabId(kind: HistoryKind | SearchHit["kind"], id: string): st
     case "plot":
     case "plotEvent":
       return "plot.board";
+    case "editorial":
+      return "manuscript.editorial";
     default:
       return null;
   }
@@ -45,7 +53,7 @@ export function openSearchHit(hit: SearchHit, onOpenFeature: (featureId: string)
 }
 
 /** Ordre des groupes de résultats. */
-export const SEARCH_ORDER: SearchHit["kind"][] = ["character", "location", "structureNode", "document", "plotEvent", "note", "noteFolder", "sticky"];
+export const SEARCH_ORDER: SearchHit["kind"][] = ["character", "location", "item", "species", "structureNode", "document", "plotEvent", "note", "noteFolder", "sticky"];
 
 /**
  * Résultats de recherche dans le projet, relus 200 ms après la dernière
@@ -77,7 +85,7 @@ export function useProjectSearch(projectId: string, query: string) {
           }
         })
         .catch((cause) => {
-          if (!cancelled) setError(cause instanceof ApiError ? cause.message : String(cause));
+          if (!cancelled) setError(errorText(cause, "errors:load.search"));
         })
         .finally(() => {
           if (!cancelled) setLoading(false);

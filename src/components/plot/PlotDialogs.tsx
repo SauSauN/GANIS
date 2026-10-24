@@ -14,7 +14,7 @@ import { toast } from "@/stores/toastStore";
 
 /** Modèles de structure : place les actes et étapes sur les moments (ou rien du tout). */
 export function PlotTemplatesDialog({ open, projectId, data, onClose }: { open: boolean; projectId: string; data: PlotData; onClose: () => void }) {
-  const { t: typed } = useTranslation("plot");
+  const { t: typed } = useTranslation(["plot", "common"]);
   const t = typed as unknown as (key: string, options?: Record<string, unknown>) => string;
   const mutate = usePlotStore((s) => s.mutate);
   const [rows, setRows] = useState(rowsCount(data));
@@ -86,7 +86,7 @@ export function PlotTemplatesDialog({ open, projectId, data, onClose }: { open: 
       <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
         <label className="flex items-center gap-2">
           {t("templates.rows")}
-          <input type="number" min={4} value={rows} onChange={(e) => setRows(Math.max(4, Number.parseInt(e.target.value, 10) || 4))} className={cn(fieldClass, "h-8 w-20")} />
+          <input type="number" min={4} value={rows} placeholder={t("common:placeholders.rows")} onChange={(e) => setRows(Math.max(4, Number.parseInt(e.target.value, 10) || 4))} className={cn(fieldClass, "h-8 w-20")} />
         </label>
         <label className="flex items-center gap-2">
           <input type="checkbox" className="size-4 accent-primary" checked={replace} onChange={(e) => setReplace(e.target.checked)} />
@@ -197,7 +197,7 @@ export function PlotTemplatesDialog({ open, projectId, data, onClose }: { open: 
 }
 
 export function PlotStructureImportDialog({ open, projectId, data, links, onClose }: { open: boolean; projectId: string; data: PlotData; links: PlotLinks; onClose: () => void }) {
-  const { t } = useTranslation("plot");
+  const { t } = useTranslation(["plot", "common"]);
   const { levels } = useProjectStructure(projectId);
   const mutate = usePlotStore((s) => s.mutate);
   const [level, setLevel] = useState(1);

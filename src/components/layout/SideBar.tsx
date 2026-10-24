@@ -8,11 +8,13 @@ import {
 import { useTranslation } from "react-i18next";
 import { SideBarCharacters } from "@/components/characters/SideBarCharacters";
 import { SideBarLocations } from "@/components/locations/SideBarLocations";
+import { SideBarWorld } from "@/components/world/SideBarWorld";
 import { SideBarNotes } from "@/components/notes/SideBarNotes";
 import { SideBarSearch } from "@/components/search/SideBarSearch";
 import { SideBarStructure } from "@/components/structure/SideBarStructure";
 import { SideBarPlot } from "@/components/plot/SideBarPlot";
 import {
+  featureAvailable,
   getModule,
   type ModuleId,
 } from "@/components/workspace/modules";
@@ -26,6 +28,7 @@ import {
   usePanelWidth,
 } from "@/lib/preferences";
 import { cn } from "@/lib/utils";
+import { useProjectStore } from "@/stores/projectStore";
 
 interface SideBarProps {
   /** Module dont on affiche les fonctionnalités. */
@@ -75,6 +78,7 @@ export function SideBar({
 }: SideBarProps) {
   const { t } = useTranslation("sidebar");
   const module = getModule(moduleId);
+  const projectType = useProjectStore((s) => s.projects.find((p) => p.id === projectId)?.type);
   const savedWidth = usePanelWidth();
 
   /** Largeur demandée pendant un glisser (`null` hors glisser). */
@@ -192,7 +196,7 @@ export function SideBar({
           <SideBarSearch projectId={projectId} onOpenFeature={onOpenFeature} />
         ) : (
           <ul className="px-2">
-            {module.features.map(({ id, label, icon: Icon }) => (
+            {module.features.filter((feature) => featureAvailable(feature.id, projectType)).map(({ id, label, icon: Icon }) => (
               <li key={id}>
                 <button
                   type="button"
@@ -224,6 +228,16 @@ export function SideBar({
         {module.id === "locations" && (
           <SideBarLocations
             projectId={projectId}
+            activeTab={activeTab}
+            onOpenFeature={onOpenFeature}
+          />
+        )}
+
+        {/* Objets, faune et flore (modules facultatifs), en arborescence. */}
+        {(module.id === "items" || module.id === "species") && (
+          <SideBarWorld
+            projectId={projectId}
+            module={module.id === "items" ? "item" : "species"}
             activeTab={activeTab}
             onOpenFeature={onOpenFeature}
           />

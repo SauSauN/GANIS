@@ -205,6 +205,7 @@ export default function Setup() {
               <Label htmlFor="setup-password">{t("password.label")}</Label>
               <Input
                 id="setup-password"
+                placeholder={t("common:placeholders.newPassword")}
                 type="password"
                 autoComplete="new-password"
                 value={password}
@@ -220,6 +221,7 @@ export default function Setup() {
               <Label htmlFor="setup-confirm">{t("confirm")}</Label>
               <Input
                 id="setup-confirm"
+                placeholder={t("common:placeholders.confirmPassword")}
                 type="password"
                 autoComplete="new-password"
                 value={confirm}

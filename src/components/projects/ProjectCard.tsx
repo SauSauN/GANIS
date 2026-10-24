@@ -1,4 +1,4 @@
-import type { KeyboardEvent, MouseEvent } from "react";
+import type { MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { format } from "date-fns";
 import { enUS, fr } from "date-fns/locale";
@@ -81,26 +81,13 @@ export function ProjectCard({
     };
   }
 
-  function onKeyDown(event: KeyboardEvent<HTMLDivElement>) {
-    if (event.target !== event.currentTarget) {
-      return;
-    }
-
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onOpen(project);
-    }
-  }
-
+  // La carte n'est pas elle-même un bouton (elle contient des boutons) :
+  // le titre est le bouton « Ouvrir », étendu à toute la carte, et les
+  // actions passent au-dessus.
   return (
     <Card
-      role="button"
-      tabIndex={0}
-      aria-label={t("card.open", { name: project.name })}
-      onClick={() => onOpen(project)}
-      onKeyDown={onKeyDown}
       className={cn(
-        "cursor-pointer transition-colors hover:bg-accent/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+        "relative cursor-pointer transition-colors hover:bg-accent/50",
         project.isArchived && "opacity-70",
         busy && "pointer-events-none opacity-50",
       )}
@@ -111,7 +98,7 @@ export function ProjectCard({
             <FileText className="h-5 w-5" />
           </div>
 
-          <div className="flex items-center gap-0.5">
+          <div className="relative z-10 flex items-center gap-0.5">
             <Button
               type="button"
               variant="ghost"
@@ -194,7 +181,15 @@ export function ProjectCard({
         </div>
 
         <CardTitle className="mt-2 truncate">
-          {project.name}
+          <button
+            type="button"
+            data-card-open
+            title={t("card.open", { name: project.name })}
+            onClick={() => onOpen(project)}
+            className="max-w-full truncate text-left outline-none after:absolute after:inset-0 after:rounded-xl after:content-[''] focus-visible:after:ring-2 focus-visible:after:ring-ring focus-visible:after:ring-inset"
+          >
+            {project.name}
+          </button>
         </CardTitle>
 
         <CardDescription className="line-clamp-2">

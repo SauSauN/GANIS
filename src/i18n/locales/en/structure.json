@@ -309,5 +309,24 @@
     "useDefault": "Default color",
     "inSettings": "Level colors are set in the project settings and apply to all their elements.",
     "openSettings": "Choose colors"
+  },
+  "reading": {
+    "loading": "Compiling the story…",
+    "toc": "Contents",
+    "summary_one": "{{count}} outline item",
+    "summary_other": "{{count}} outline items",
+    "minutes": "about {{minutes}} min read",
+    "unplaced_one": "{{count}} plot event isn't attached to any outline item: it's left out.",
+    "unplaced_other": "{{count}} plot events aren't attached to any outline item: they're left out.",
+    "loadingDocuments": "Reading documents…",
+    "refresh": "Refresh",
+    "export": "Export",
+    "dialogTitle": "Export the full reading",
+    "empty": "Nothing to read yet.",
+    "emptyHint": "Give outline items a summary or a text, file a Word or text document in them, or attach plot events to them.",
+    "openPlan": "Open the outline",
+    "openPlot": "Open the plot",
+    "edit": "Edit",
+    "fromDocuments": "Text taken from the item's documents"
   }
 }

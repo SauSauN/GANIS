@@ -128,5 +128,16 @@
     "enter": "Enter",
     "delete": "Del",
     "escape": "Esc"
+  },
+  "selection": {
+    "select": "Select “{{name}}”",
+    "moveTo": "Move to…",
+    "delete": "Delete",
+    "deleting_one": "Deleting {{count}} document…",
+    "deleting_other": "Deleting {{count}} documents…",
+    "moving_one": "Moving {{count}} document…",
+    "moving_other": "Moving {{count}} documents…",
+    "moved_one": "{{count}} document moved to “{{target}}”.",
+    "moved_other": "{{count}} documents moved to “{{target}}”."
   }
 }

@@ -2,7 +2,7 @@
   "categories": {
     "settlement": {
       "label": "Agglomérations",
-      "description": "Des lieux habités et organisés."
+      "description": "Des lieux habités et organisés, regroupant une ville."
     },
     "political": {
       "label": "Territoires politiques",
@@ -89,6 +89,7 @@
     "unknown": "Inconnu"
   },
   "fields": {
+    "colorPalette": "Palette de couleurs",
     "aliases": "Autres noms",
     "description": "Description générale",
     "firstAppearance": "Première apparition",
@@ -370,7 +371,9 @@
     "manage": "Ajouter vos propres types",
     "changeTitle": "Changer le type de « {{name}} »",
     "changeDescription": "Les informations déjà saisies sont gardées, même celles qui ne s'appliquent plus au nouveau type.",
-    "change": "Changer"
+    "change": "Changer",
+    "choose_one": "Choisir parmi {{count}} type…",
+    "choose_other": "Choisir parmi {{count}} types…"
   },
   "create": {
     "save": "Créer le lieu",
@@ -427,7 +430,9 @@
       "title": "Aucun lieu pour l'instant",
       "description": "Commencez par le plus vaste (un continent, un royaume), puis placez les autres lieux à l'intérieur.",
       "create": "Créer un lieu"
-    }
+    },
+    "allCategoriesOption": "Toutes les catégories",
+    "categoryFilter": "Filtrer par catégorie"
   },
   "sidebar": {
     "title": "Lieux",
@@ -485,10 +490,10 @@
       "works": "Travaille",
       "frequents": "Fréquente",
       "guards": "Garde / protège",
-      "imprisoned": "Emprisonné(e)",
+      "imprisoned": "Captivité",
       "hides": "Se cache",
-      "exiled": "Exilé(e)",
-      "died": "Mort(e)",
+      "exiled": "Exil",
+      "died": "Décès",
       "other": "Autre"
     },
     "dialog": {
@@ -531,7 +536,7 @@
       "label": "Basique",
       "theme": "L'essentiel",
       "goal": "Situer et décrire le lieu",
-      "count": "6 champs"
+      "count": "7 champs"
     },
     "intermediate": {
       "label": "Moyen",

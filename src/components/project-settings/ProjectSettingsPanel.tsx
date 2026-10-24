@@ -1,10 +1,11 @@
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Archive,
   ArchiveRestore,
   Copy,
   Download,
+  Loader2,
   Star,
   Trash2,
 } from "lucide-react";
@@ -30,6 +31,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CharacterSettingsSection } from "@/components/characters/CharacterSettingsSection";
 import { LocationSettingsSection } from "@/components/locations/LocationSettingsSection";
+import { WorldSettingsSection } from "@/components/world/WorldSettingsSection";
 import { StructureSettingsSection } from "@/components/structure/StructureSettingsSection";
 import { PlotSettingsSection } from "@/components/plot/PlotSettingsSection";
 import { NoteSettingsSection } from "@/components/notes/NoteSettingsSection";
@@ -41,6 +43,7 @@ import { VisibilityCard } from "@/components/project-settings/VisibilityCard";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
+import { notifyError, notifySaved } from "@/lib/notify";
 import { useProjectStore } from "@/stores/projectStore";
 import {
   PROJECT_STATUS_LABELS,
@@ -49,6 +52,7 @@ import {
   type ProjectStatus,
   type ProjectType,
 } from "@/types";
+import { errorText } from "@/lib/errors";
 
 // Les libellés français de `@/types` ne servent plus qu'à lister les valeurs ;
 // le texte affiché vient de `projects.json` (types.* et statuses.*).
@@ -105,45 +109,49 @@ type Feedback =
 const failure = (e: unknown, key: PanelMessage): Feedback =>
   e instanceof Error ? { kind: "error", text: e.message } : { kind: "error", key };
 
+/**
+ * Retour d'une action (enregistré, copié, exporté, erreur) : affiché en
+ * notification, pas dans la page, pour que rien ne bouge. Le composant ne
+ * dessine rien ; il annonce chaque nouveau retour.
+ */
 function FeedbackMessage({
   feedback,
 }: {
   feedback: Feedback | null;
 }) {
-  const { t } = useTranslation(["projectSettings", "projects"]);
+  const { t } = useTranslation(["projectSettings", "projects", "common"]);
 
-  if (!feedback) {
-    return null;
-  }
+  useEffect(() => {
+    if (!feedback) {
+      return;
+    }
 
-  const text =
-    "key" in feedback
-      ? t(feedback.key)
-      : "formKey" in feedback
-        ? t(`projects:form.errors.${feedback.formKey}`, {
-            max:
-              feedback.formKey === "descriptionTooLong"
-                ? MAX_DESCRIPTION_LENGTH
-                : MAX_NAME_LENGTH,
-          })
-        : "copied" in feedback
-          ? t("danger.duplicated", { name: feedback.copied })
-          : "exported" in feedback
-            ? t("projects:ganix.export.done", { file: feedback.exported })
-            : feedback.text;
+    const text =
+      "key" in feedback
+        ? t(feedback.key)
+        : "formKey" in feedback
+          ? t(`projects:form.errors.${feedback.formKey}`, {
+              max:
+                feedback.formKey === "descriptionTooLong"
+                  ? MAX_DESCRIPTION_LENGTH
+                  : MAX_NAME_LENGTH,
+            })
+          : "copied" in feedback
+            ? t("danger.duplicated", { name: feedback.copied })
+            : "exported" in feedback
+              ? t("projects:ganix.export.done", { file: feedback.exported })
+              : feedback.text;
 
-  return (
-    <p
-      role={feedback.kind === "error" ? "alert" : "status"}
-      className={
-        feedback.kind === "error"
-          ? "text-sm text-destructive"
-          : "text-sm text-success"
-      }
-    >
-      {text}
-    </p>
-  );
+    if (feedback.kind === "error") {
+      notifyError(text, "project-settings");
+    } else {
+      notifySaved(text, "project-settings");
+    }
+    // Un nouveau retour = un nouvel objet : annoncé une fois.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [feedback]);
+
+  return null;
 }
 
 interface ProjectSettingsPanelProps {
@@ -163,7 +171,7 @@ export function ProjectSettingsPanel({
 }: ProjectSettingsPanelProps) {
   // Abonne le panneau aux changements de langue : le titre et la
   // description de la section (lus via `meta`) sont alors relus.
-  useTranslation("projectSettings");
+  useTranslation(["projectSettings", "common"]);
 
   const meta =
     PROJECT_SETTINGS_SECTIONS.find(
@@ -208,6 +216,10 @@ export function ProjectSettingsPanel({
         {section === "locations" && (
           <LocationSettingsSection projectId={project.id} />
         )}
+
+        {section === "items" && <WorldSettingsSection projectId={project.id} module="item" />}
+
+        {section === "species" && <WorldSettingsSection projectId={project.id} module="species" />}
 
         {section === "structure" && (
           <StructureSettingsSection project={project} />
@@ -331,6 +343,7 @@ function InfoSection({ project }: { project: Project }) {
 
             <Input
               id="settings-project-name"
+              placeholder={t("common:placeholders.projectName")}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -344,6 +357,7 @@ function InfoSection({ project }: { project: Project }) {
 
             <textarea
               id="settings-project-description"
+              placeholder={t("common:placeholders.projectDescription")}
               rows={5}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -383,9 +397,8 @@ function InfoSection({ project }: { project: Project }) {
             type="submit"
             disabled={saving || unchanged}
           >
-            {saving
-              ? t("common:actions.saving")
-              : t("common:actions.save")}
+            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
+            {t("common:actions.save")}
           </Button>
         </CardFooter>
       </form>
@@ -398,7 +411,7 @@ function InfoSection({ project }: { project: Project }) {
 // ----------------------------------------------------------------------------
 
 function StatusSection({ project }: { project: Project }) {
-  const { t } = useTranslation(["projectSettings", "projects"]);
+  const { t } = useTranslation(["projectSettings", "projects", "common"]);
   const updateProject = useProjectStore(
     (state) => state.updateProject,
   );
@@ -528,11 +541,7 @@ function StatusSection({ project }: { project: Project }) {
         cardHeaderClass={cardHeaderClass}
       />
 
-      {error && (
-        <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3">
-          <FeedbackMessage feedback={error} />
-        </div>
-      )}
+      <FeedbackMessage feedback={error} />
     </div>
   );
 }
@@ -586,9 +595,7 @@ function DangerSection({ project }: { project: Project }) {
       }
     } catch (e) {
       setExportFeedback(
-        e instanceof Error
-          ? { kind: "error", text: e.message }
-          : { kind: "error", text: t("projects:ganix.export.failed") },
+        { kind: "error", text: errorText(e, "projects:ganix.export.failed") },
       );
     } finally {
       setExporting(false);

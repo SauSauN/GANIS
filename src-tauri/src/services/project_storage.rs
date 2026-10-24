@@ -574,6 +574,16 @@ pub async fn duplicate_storage(
     }
 }
 
+/// Ferme la connexion ouverte à la base d'un projet (projet mis à la
+/// corbeille). Les fichiers restent en place.
+pub async fn close_pool(state: &AppState, project_id: &str) {
+    let cached = state.project_pools.lock().await.remove(project_id);
+
+    if let Some(pool) = cached {
+        pool.close().await;
+    }
+}
+
 /// Supprime le stockage d'un projet : ferme sa connexion puis efface
 /// son dossier (et un éventuel reste de l'ancien dossier temporaire).
 ///

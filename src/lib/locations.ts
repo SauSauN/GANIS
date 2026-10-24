@@ -109,7 +109,8 @@ export type LocationFieldKind =
   | "choice"
   | "reference"
   | "location"
-  | "character";
+  | "character"
+  | "colors";
 
 export interface LocationField {
   key: string;
@@ -144,7 +145,7 @@ export const LOCATION_FIELDS: LocationField[] = (catalog.fields as CatalogField[
 const FIELD_KEYS = new Set(LOCATION_FIELDS.map((field) => field.key));
 
 /** Champs communs à tous les lieux, rangés en deux groupes de la fiche. */
-export const IDENTITY_FIELDS = ["aliases", "firstAppearance", "description"];
+export const IDENTITY_FIELDS = ["colorPalette", "aliases", "firstAppearance", "description"];
 export const STORY_FIELDS = ["history", "notes"];
 
 // ----------------------------------------------------------------------------
@@ -161,7 +162,8 @@ export const STORY_FIELDS = ["history", "notes"];
 export function levelParts(level: CharacterDetailLevel | null) {
   const rank = level === "basic" ? 0 : level === "intermediate" ? 1 : 2;
   return {
-    identity: rank === 0 ? ["description"] : IDENTITY_FIELDS,
+    // La palette (cadre de l'image) est proposée à tous les niveaux.
+    identity: rank === 0 ? ["colorPalette", "description"] : IDENTITY_FIELDS,
     story: rank < 2 ? ["notes"] : STORY_FIELDS,
     category: rank >= 1,
     type: rank >= 2,

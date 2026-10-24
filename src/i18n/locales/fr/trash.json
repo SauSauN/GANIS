@@ -9,7 +9,11 @@
     "noteFolder": "Dossier de notes",
     "sticky": "Post-it",
     "relation": "Relation",
-    "placeLink": "Lien personnage – lieu"
+    "placeLink": "Lien personnage – lieu",
+    "mangaPanel": "Case de manga",
+    "item": "Objet",
+    "species": "Faune et flore",
+    "worldLink": "Lien entre éléments"
   },
   "deleted": {
     "character": "Personnage « {{name}} » supprimé.",
@@ -20,7 +24,11 @@
     "noteFolder": "Dossier « {{name}} » supprimé.",
     "sticky": "Post-it « {{name}} » supprimé.",
     "relation": "Relation « {{name}} » supprimée.",
-    "placeLink": "Lien « {{name}} » supprimé."
+    "placeLink": "Lien « {{name}} » supprimé.",
+    "mangaPanel": "Case « {{name}} » supprimée.",
+    "item": "Objet « {{name}} » supprimé.",
+    "species": "« {{name}} » supprimé de la faune et flore.",
+    "worldLink": "Lien « {{name}} » supprimé."
   },
   "restored": {
     "character": "Personnage « {{name}} » restauré.",
@@ -31,7 +39,11 @@
     "noteFolder": "Dossier « {{name}} » restauré.",
     "sticky": "Post-it « {{name}} » restauré.",
     "relation": "Relation « {{name}} » restaurée.",
-    "placeLink": "Lien « {{name}} » restauré."
+    "placeLink": "Lien « {{name}} » restauré.",
+    "mangaPanel": "Case « {{name}} » restaurée.",
+    "item": "Objet « {{name}} » restauré.",
+    "species": "« {{name}} » restauré dans la faune et flore.",
+    "worldLink": "Lien « {{name}} » restauré."
   },
   "untitled": {
     "character": "Personnage sans nom",
@@ -42,7 +54,11 @@
     "noteFolder": "Dossier sans nom",
     "sticky": "Post-it vide",
     "relation": "Relation",
-    "placeLink": "Lien"
+    "placeLink": "Lien",
+    "mangaPanel": "Case sans action",
+    "item": "Objet sans nom",
+    "species": "Fiche sans nom",
+    "worldLink": "Lien"
   },
   "view": {
     "description": "Les éléments supprimés restent ici 30 jours. En les restaurant, tout ce qui avait disparu avec eux revient aussi (images, relations, sous-éléments…).",
@@ -59,6 +75,17 @@
     "purgeNamed": "Supprimer définitivement « {{name}} »",
     "purgeTitle": "Supprimer définitivement « {{name}} » ?",
     "purgeBody": "Il ne pourra plus être restauré.",
-    "deletedOn": "supprimé le {{date}}"
-  }
+    "deletedOn": "supprimé le {{date}}",
+    "select": "Sélectionner « {{name}} »",
+    "restoreSelected": "Restaurer la sélection",
+    "purgeSelected": "Supprimer définitivement",
+    "purgeSelectedTitle_one": "Supprimer définitivement {{count}} élément ?",
+    "purgeSelectedTitle_other": "Supprimer définitivement {{count}} éléments ?"
+  },
+  "restoredMany_one": "{{count}} élément restauré.",
+  "restoredMany_other": "{{count}} éléments restaurés.",
+  "restoreFailedSome_one": "{{count}} élément n'a pas pu être restauré : {{reason}}",
+  "restoreFailedSome_other": "{{count}} éléments n'ont pas pu être restaurés : {{reason}}",
+  "deletedMany_one": "{{count}} élément supprimé.",
+  "deletedMany_other": "{{count}} éléments supprimés."
 }

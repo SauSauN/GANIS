@@ -12,7 +12,9 @@ import { StatusBar } from "@/components/layout/StatusBar";
 import {
   HOME_TAB,
   SETTINGS_PREFIX,
+  featureAvailable,
   findFeature,
+  modulesFor,
   type ModuleId,
 } from "@/components/workspace/modules";
 import {
@@ -25,6 +27,7 @@ import { CommandPalette } from "@/components/search/CommandPalette";
 
 import i18n from "@/i18n";
 import { cn } from "@/lib/utils";
+import { useMediaQuery } from "@/lib/useMediaQuery";
 import {
   setRailExpanded,
   useRailExpanded,
@@ -54,9 +57,13 @@ import { useRegisterCommands } from "@/lib/commands";
 import { toast } from "@/stores/toastStore";
 import { useReloadStore } from "@/stores/reloadStore";
 import { useCharacterStore } from "@/stores/characterStore";
+import { useEnabledWorldModules, useWorldStore } from "@/stores/worldStore";
 import { useNoteStore } from "@/stores/noteStore";
 import { useStructureStore } from "@/stores/structureStore";
 import { useProjectStore } from "@/stores/projectStore";
+import { useWritingTracker } from "@/stores/writingStore";
+import { errorText } from "@/lib/errors";
+import { READING_FEATURES, readingFeatureFor } from "@/lib/storyReading";
 
 /**
  * Libellé et icône d'un onglet.
@@ -84,10 +91,15 @@ const NEW_TARGETS: Partial<Record<ModuleId, string>> = {
   locations: "locations.create",
   structure: "structure.plan",
   notes: "notes.create",
+  items: "items.create",
+  species: "species.create",
 };
 
+/** En dessous : barre de gauche en icônes, panneau du milieu par-dessus. */
+const NARROW_QUERY = "(max-width: 899px)";
+
 export default function Workspace() {
-  const { t } = useTranslation(["workspace", "unsaved", "menus", "projects"]);
+  const { t } = useTranslation(["workspace", "unsaved", "menus", "projects", "titlebar"]);
 
   const { projectId } = useParams<{
     projectId: string;
@@ -115,6 +127,9 @@ export default function Workspace() {
   const closeProject = useProjectStore(
     (state) => state.closeProject,
   );
+
+  // Roman : mots écrits aujourd'hui et séance (barre d'état, suivi de rédaction).
+  useWritingTracker(projectId ?? "", Boolean(projectId) && project?.type === "novel");
 
   /**
    * Barre de gauche : icônes + noms (vrai) ou icônes seules (faux).
@@ -147,6 +162,17 @@ export default function Workspace() {
    */
   const [panelOpen, setPanelOpen] =
     useState(true);
+
+  /**
+   * Fenêtre étroite (petite fenêtre, ou zoom à 200 %) : la barre de gauche
+   * passe en icônes et le panneau du milieu se ferme, puis s'ouvre par-dessus
+   * la zone centrale au lieu de la réduire. Le texte garde ainsi sa place.
+   * Revenue à une largeur normale, la disposition habituelle revient.
+   */
+  const narrow = useMediaQuery(NARROW_QUERY);
+  useEffect(() => {
+    setPanelOpen(!narrow);
+  }, [narrow]);
 
   /**
    * Onglet agrandi (double-clic sur un onglet) : le contenu occupe tout
@@ -210,6 +236,23 @@ export default function Workspace() {
 
   /** Et des notes (le titre de la note). */
   useNoteStore((state) => state.notes);
+
+  /** Et des objets, de la faune et de la flore (nom de la fiche). */
+  useWorldStore((state) => state.item.entries);
+  useWorldStore((state) => state.species.entries);
+
+  /**
+   * Objets, faune et flore : modules facultatifs, dans la barre de gauche
+   * seulement s'ils sont activés (Paramètres du projet). Désactivés pendant
+   * qu'on les parcourt : retour aux détails du projet.
+   */
+  const worldModules = useEnabledWorldModules(projectId ?? "");
+  useEffect(() => {
+    if (!worldModules.loaded) return;
+    setActiveModule((current) =>
+      (current === "items" && !worldModules.item) || (current === "species" && !worldModules.species) ? "details" : current,
+    );
+  }, [worldModules.loaded, worldModules.item, worldModules.species]);
 
   /** Onglets avec des modifications non enregistrées (point ● sur l'onglet). */
   const unsavedEntries = useUnsavedStore((state) => state.entries);
@@ -299,6 +342,8 @@ export default function Workspace() {
    * qu'au moment où la commande est exécutée.
    */
   const activeDirty = activeTab !== null && activeTab in unsavedEntries;
+  /** Lecture complète en cours : son onglet est affiché seul (bouton ▶ enfoncé). */
+  const reading = maximized && activeTab !== null && READING_FEATURES.has(activeTab);
   const createTarget = NEW_TARGETS[activeModule] ?? null;
 
   useRegisterCommands({
@@ -347,7 +392,42 @@ export default function Workspace() {
     openProjectSettings: { run: () => openFeature(`${SETTINGS_PREFIX}info`) },
     openTrash: { run: () => openFeature("trash") },
     exportProject: { disabled: !project, run: () => void exportCurrentProject() },
+    // Bouton ▶ (barre de titre) et F5 : « lance » le projet. L'histoire est
+    // compilée dans l'ordre du découpage (manuscrit pour un roman, scénario
+    // pour un manga, lecture complète sinon) et s'affiche seule, en plein
+    // espace. Un second appui rend la disposition d'édition.
+    readStory: {
+      disabled: !project,
+      active: reading,
+      label: reading ? t("titlebar:reading.stop") : t("titlebar:reading.play"),
+      run: () => {
+        if (reading) {
+          setMaximized(false);
+          return;
+        }
+        if (!project) return;
+        openFeature(readingFeatureFor(project.type));
+        setMaximized(true);
+      },
+    },
   });
+
+  /**
+   * Outils du romancier : réservés aux projets de roman. Si le type du
+   * projet change (paramètres), leurs onglets se ferment et le module
+   * disparaît de la barre de gauche.
+   */
+  const projectType = project?.type;
+  useEffect(() => {
+    if (!projectType) return;
+    // Outils du manga / de la BD : même règle.
+    const reserved = (id: string) => !featureAvailable(id, projectType);
+    for (const tabId of layoutRef.current.tabs.filter(reserved)) forceCloseTab(tabId);
+    setActiveModule((current) =>
+      (current === "manuscript" && projectType !== "novel") || (current === "script" && projectType !== "manga") ? "details" : current,
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [projectType]);
 
   /**
    * Si le projet est inexistant ou a été supprimé,
@@ -541,7 +621,7 @@ export default function Workspace() {
         });
       }
     } catch (e) {
-      toast({ message: e instanceof Error ? e.message : t("projects:ganix.export.failed"), tone: "error" });
+      toast({ message: errorText(e, "projects:ganix.export.failed"), tone: "error" });
     }
   }
 
@@ -618,17 +698,18 @@ export default function Workspace() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-background">
-      <div className="flex min-h-0 flex-1">
+      <div className="relative flex min-h-0 flex-1">
         {/* =========================================================
             BARRE DE GAUCHE (modules)
             ========================================================= */}
         {!isMaximized && (
         <ActivityBar
+          modules={modulesFor(project.type, worldModules)}
           active={activeModule}
           linked={linkedModule}
           panelOpen={panelOpen}
-          expanded={railExpanded}
-          onToggleExpanded={() =>
+          expanded={railExpanded && !narrow}
+          onToggleExpanded={narrow ? undefined : () =>
             setRailExpanded(!railExpanded)
           }
           onSelect={selectModule}
@@ -644,14 +725,22 @@ export default function Workspace() {
             précédente.
             ========================================================= */}
         {panelOpen && !isMaximized && (
-          <SideBar
-            module={activeModule}
-            projectId={project.id}
-            projectName={project.name}
-            activeTab={activeTab}
-            onOpenFeature={openFeature}
-            onClose={() => setPanelOpen(false)}
-          />
+          <div
+            className={narrow ? "absolute inset-y-0 left-12 z-40 flex shadow-xl" : "contents"}
+            onKeyDown={narrow ? (event) => event.key === "Escape" && setPanelOpen(false) : undefined}
+          >
+            <SideBar
+              module={activeModule}
+              projectId={project.id}
+              projectName={project.name}
+              activeTab={activeTab}
+              onOpenFeature={(id) => {
+                openFeature(id);
+                if (narrow) setPanelOpen(false);
+              }}
+              onClose={() => setPanelOpen(false)}
+            />
+          </div>
         )}
 
         {/* =========================================================
@@ -750,12 +839,13 @@ export default function Workspace() {
 
       {/* Palette de commandes (Ctrl+K) et choix de création (Ctrl+N) */}
       <CommandPalette
+        modules={modulesFor(project.type, worldModules)}
         open={paletteOpen}
         onClose={() => setPaletteOpen(false)}
         projectId={project.id}
         onOpenFeature={openFeature}
       />
-      <CreateChooser open={chooserOpen} onClose={() => setChooserOpen(false)} onOpenFeature={openFeature} />
+      <CreateChooser world={worldModules} open={chooserOpen} onClose={() => setChooserOpen(false)} onOpenFeature={openFeature} />
 
       {/* Documents ouverts dans une autre application : modifications reprises */}
       <ExternalDocumentsWatcher projectId={project.id} />

@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { ListTree, MapPin, NotebookText, StickyNote, UserPlus, type LucideIcon } from "lucide-react";
+import { ListTree, MapPin, NotebookText, Package, PawPrint, StickyNote, UserPlus, type LucideIcon } from "lucide-react";
 import { Dialog, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const CHOICES: Array<{ id: string; feature: string; icon: LucideIcon; key: string }> = [
@@ -10,7 +10,15 @@ const CHOICES: Array<{ id: string; feature: string; icon: LucideIcon; key: strin
   { id: "sticky", feature: "notes.wall", icon: StickyNote, key: "5" },
 ];
 
+/** Modules facultatifs : proposés seulement s'ils sont activés. */
+const WORLD_CHOICES = {
+  item: { id: "item", feature: "items.create", icon: Package, key: "6" },
+  species: { id: "species", feature: "species.create", icon: PawPrint, key: "7" },
+};
+
 interface CreateChooserProps {
+  /** Objets, faune et flore activés pour le projet. */
+  world?: { item?: boolean; species?: boolean };
   open: boolean;
   onClose: () => void;
   onOpenFeature: (featureId: string) => void;
@@ -18,9 +26,14 @@ interface CreateChooserProps {
 
 /**
  * « Que voulez-vous créer ? » : Ctrl+N dans un module sans création propre
- * (Détails, Recherche, paramètres). Touches 1 à 5 pour choisir au clavier.
+ * (Détails, Recherche, paramètres). Touches 1 à 7 pour choisir au clavier.
  */
-export function CreateChooser({ open, onClose, onOpenFeature }: CreateChooserProps) {
+export function CreateChooser({ world = {}, open, onClose, onOpenFeature }: CreateChooserProps) {
+  const choices = [
+    ...CHOICES,
+    ...(world.item ? [WORLD_CHOICES.item] : []),
+    ...(world.species ? [WORLD_CHOICES.species] : []),
+  ];
   const { t } = useTranslation("menus");
   const tt = t as unknown as (key: string) => string;
 
@@ -33,7 +46,7 @@ export function CreateChooser({ open, onClose, onOpenFeature }: CreateChooserPro
     <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-md">
       <div
         onKeyDown={(event) => {
-          const choice = CHOICES.find((item) => item.key === event.key);
+          const choice = choices.find((item) => item.key === event.key);
           if (choice) {
             event.preventDefault();
             choose(choice.feature);
@@ -45,7 +58,7 @@ export function CreateChooser({ open, onClose, onOpenFeature }: CreateChooserPro
           <DialogDescription>{t("create.description")}</DialogDescription>
         </DialogHeader>
         <ul className="mt-4 space-y-1">
-          {CHOICES.map((choice) => {
+          {choices.map((choice) => {
             const Icon = choice.icon;
             return (
               <li key={choice.id}>

@@ -2,7 +2,7 @@
   "categories": {
     "settlement": {
       "label": "Settlements",
-      "description": "Inhabited, organised places."
+      "description": "Inhabited, organised areas comprising one or more municipalities."
     },
     "political": {
       "label": "Political territories",
@@ -89,6 +89,7 @@
     "unknown": "Unknown"
   },
   "fields": {
+    "colorPalette": "Colour palette",
     "aliases": "Other names",
     "description": "General description",
     "firstAppearance": "First appearance",
@@ -370,7 +371,9 @@
     "manage": "Add your own types",
     "changeTitle": "Change the type of “{{name}}”",
     "changeDescription": "Information already entered is kept, even what no longer applies to the new type.",
-    "change": "Change"
+    "change": "Change",
+    "choose_one": "Choose from {{count}} type…",
+    "choose_other": "Choose from {{count}} types…"
   },
   "create": {
     "save": "Create location",
@@ -427,7 +430,9 @@
       "title": "No locations yet",
       "description": "Start with the largest (a continent, a kingdom), then place the other locations inside.",
       "create": "Create a location"
-    }
+    },
+    "allCategoriesOption": "All categories",
+    "categoryFilter": "Filter by category"
   },
   "sidebar": {
     "title": "Locations",
@@ -485,10 +490,10 @@
       "works": "Works",
       "frequents": "Frequents",
       "guards": "Guards / protects",
-      "imprisoned": "Imprisoned",
+      "imprisoned": "Captivity",
       "hides": "Hides",
-      "exiled": "Exiled",
-      "died": "Died",
+      "exiled": "Exile",
+      "died": "Death",
       "other": "Other"
     },
     "dialog": {
@@ -531,7 +536,7 @@
       "label": "Basic",
       "theme": "The essentials",
       "goal": "Place and describe the location",
-      "count": "6 fields"
+      "count": "7 fields"
     },
     "intermediate": {
       "label": "Intermediate",

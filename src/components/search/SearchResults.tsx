@@ -4,7 +4,9 @@ import {
   ListTree,
   MapPinned,
   NotebookText,
+  Package,
   Paperclip,
+  PawPrint,
   StickyNote,
   UserRound,
   Waypoints,
@@ -17,6 +19,8 @@ import type { SearchHit } from "@/types";
 export const SEARCH_ICONS: Record<SearchHit["kind"], LucideIcon> = {
   character: UserRound,
   location: MapPinned,
+  item: Package,
+  species: PawPrint,
   structureNode: ListTree,
   document: Paperclip,
   plotEvent: Waypoints,

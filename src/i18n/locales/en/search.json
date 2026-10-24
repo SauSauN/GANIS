@@ -14,7 +14,9 @@
     "plotEvent": "Plot",
     "note": "Notes",
     "noteFolder": "Folders",
-    "sticky": "Sticky notes"
+    "sticky": "Sticky notes",
+    "item": "Objects",
+    "species": "Fauna and flora"
   },
   "untitled": {
     "character": "Unnamed character",
@@ -24,7 +26,9 @@
     "note": "Untitled note",
     "noteFolder": "Folder",
     "sticky": "Sticky note",
-    "plotEvent": "Untitled event"
+    "plotEvent": "Untitled event",
+    "item": "Unnamed object",
+    "species": "Unnamed entry"
   },
   "palette": {
     "title": "Command palette",

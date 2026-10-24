@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-@import "shadcn/tailwind.css";
+@import "./styles/shadcn-tailwind.css";
 @import "@fontsource-variable/geist";
 
 @custom-variant dark (&:is(.dark *));
@@ -58,6 +58,8 @@
  * Les valeurs marquées (dérivé) ne figurent pas dans ta table : ajustables.
  */
 :root {
+    /* Images du panneau du milieu (Paramètres › Apparence). */
+    --panel-thumb: 1.5rem;
     --background: #FAFAFD;
     --foreground: #122056;
     --card: #FFFFFF;
@@ -72,9 +74,10 @@
     --muted-foreground: #5D6590;   /* dérivé */
     --accent: #EEEFFD;
     --accent-foreground: #122056;
-    --destructive: #F87171;
-    --success: #34D399;
-    --warning: #FBBF24;
+    /* Couleurs d'état : lisibles en texte (au moins 4,5:1 sur les fonds). */
+    --destructive: #B91C1C;
+    --success: #05704E;
+    --warning: #92400E;
     --border: #E0E2F4;             /* dérivé */
     --input: #E0E2F4;              /* dérivé */
     --ring: #5B65DC;
@@ -112,9 +115,9 @@
     --muted-foreground: #9AA3D6;   /* dérivé */
     --accent: #242A4A;
     --accent-foreground: #EEF0FF;
-    --destructive: #DC2626;
-    --success: #059669;
-    --warning: #D97706;
+    --destructive: #F87171;
+    --success: #34D399;
+    --warning: #FBBF24;
     --border: #2A3157;             /* dérivé */
     --input: #2A3157;              /* dérivé */
     --ring: #7C85F2;
@@ -149,6 +152,30 @@
   }
   html {
     @apply font-sans;
+  }
+  /*
+   * Menus déroulants natifs (<select>) : la liste qui s'ouvre est dessinée
+   * par le système. Sans indication, elle reste claire même en mode sombre
+   * (texte clair sur fond blanc, illisible). `color-scheme` lui dit quel
+   * mode utiliser, et les couleurs des options suivent le thème actif,
+   * y compris les thèmes personnalisés (variables --popover).
+   */
+  :root {
+    color-scheme: light;
+  }
+  .dark {
+    color-scheme: dark;
+  }
+  select {
+    color: var(--foreground);
+  }
+  select option,
+  select optgroup {
+    background-color: var(--popover);
+    color: var(--popover-foreground);
+  }
+  select option:disabled {
+    color: var(--muted-foreground);
   }
   /*
    * Application de bureau : seules les zones prévues défilent (contenu des
