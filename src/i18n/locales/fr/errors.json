@@ -88,7 +88,9 @@
     "nameEmpty": "Le nom du projet ne peut pas être vide.",
     "nameTooLong": "Le nom du projet ne peut pas dépasser 200 caractères.",
     "descriptionTooLong": "La description du projet ne peut pas dépasser 5000 caractères.",
-    "dataMissing": "Les données de ce projet sont introuvables."
+    "dataMissing": "Les données de ce projet sont introuvables.",
+    "purgePublicConfirm": "Ce projet public est partagé avec les autres personnes qui utilisent cet ordinateur : confirmez sa suppression définitive.",
+    "makePrivateConfirm": "Pour rendre ce projet privé, retapez son nom : il ne sera plus accessible aux autres personnes qui utilisent cet ordinateur."
   },
   "synopsis": {
     "tooManyTags": "{{field}} : {{max}} éléments au maximum.",
@@ -132,7 +134,8 @@
     "levelNameEmpty": "Chaque niveau doit avoir un nom.",
     "levelNameTooLong": "Le nom d'un niveau ne peut pas dépasser {{max}} caractères.",
     "levelCount": "Le découpage compte de 1 à {{max}} niveaux.",
-    "levelInUse": "Ce niveau contient encore {{count}} élément(s) : déplacez-les ou supprimez-les d'abord.",
+    "levelInUse_one": "Ce niveau contient encore {{count}} élément : déplacez-le ou supprimez-le d'abord.",
+    "levelInUse_other": "Ce niveau contient encore {{count}} éléments : déplacez-les ou supprimez-les d'abord.",
     "levelsReordered": "L'ordre des niveaux existants ne peut pas changer.",
     "invalidNumbering": "Numérotation invalide.",
     "invalidNumber": "Le numéro doit être compris entre 0 et {{max}}.",
@@ -178,7 +181,8 @@
     "typeNameRequired": "Indiquez le nom du type.",
     "invalidCategory": "Catégorie inconnue.",
     "typeDuplicate": "Le type « {{name}} » existe déjà.",
-    "typeInUse": "Le type « {{name}} » est encore utilisé par {{count}} lieu(x) : changez d'abord leur type.",
+    "typeInUse_one": "Le type « {{name}} » est encore utilisé par {{count}} lieu : changez d'abord son type.",
+    "typeInUse_other": "Le type « {{name}} » est encore utilisé par {{count}} lieux : changez d'abord leur type.",
     "tooManyTypes": "{{max}} types personnalisés au maximum.",
     "invalidList": "Liste inconnue.",
     "listTooLong": "Une liste ne peut pas contenir plus de {{max}} valeurs.",
@@ -331,7 +335,9 @@
     "manga": "Impossible de charger les données du manga.",
     "placeLinks": "Impossible de charger les liens entre personnages et lieux.",
     "search": "La recherche a échoué.",
-    "manuscript": "Impossible d'assembler le manuscrit."
+    "manuscript": "Impossible d'assembler le manuscrit.",
+    "world": "Impossible de charger les objets ou la faune et flore.",
+    "worldLinks": "Impossible de charger les liens entre éléments."
   },
   "novel": {
     "contentTooLong": "Ce texte est trop long ({{max}} caractères au maximum).",
@@ -360,5 +366,49 @@
     "unknownCharacter": "Un personnage de cette page n'existe plus.",
     "unknownLocation": "Le lieu choisi n'existe plus.",
     "panelNotFound": "Cette case n'existe plus."
+  },
+  "world": {
+    "notFound": "Fiche introuvable.",
+    "imageNotFound": "Image introuvable.",
+    "fieldTooLong": "Un champ dépasse {{max}} caractères.",
+    "invalidValue": "Valeur invalide.",
+    "tooManyTags": "{{max}} étiquettes au maximum.",
+    "nameRequired": "Indiquez un nom.",
+    "nameTooLong": "Le nom ne peut pas dépasser {{max}} caractères.",
+    "invalidType": "Type inconnu.",
+    "invalidNature": "Nature inconnue.",
+    "parentNotFound": "L'élément parent est introuvable.",
+    "parentNotSpecies": "Un animal ou une plante précis ne peut rien regrouper : choisissez une espèce.",
+    "parentCycle": "Un élément ne peut pas être placé dans lui-même ni dans un élément qu’il contient.",
+    "invalidCategory": "Catégorie inconnue.",
+    "noCategory": "Gardez au moins une catégorie (ou désactivez le module).",
+    "invalidLevel": "Niveau de détail inconnu.",
+    "tooManyTypes": "{{max}} types personnalisés au maximum.",
+    "typeNameRequired": "Indiquez le nom du type.",
+    "typeDuplicate": "Deux types portent le nom « {{name}} ».",
+    "typeInUse_one": "Le type « {{name}} » est encore utilisé par {{count}} fiche : changez d'abord son type.",
+    "typeInUse_other": "Le type « {{name}} » est encore utilisé par {{count}} fiches : changez d'abord leur type.",
+    "invalidList": "Liste inconnue.",
+    "listTooLong": "{{max}} valeurs au maximum.",
+    "galleryFull": "La galerie est pleine ({{max}} images).",
+    "speciesOnly": "Réservé à la faune et à la flore.",
+    "characterNeedsIndividual": "Seul un animal ou une plante précis peut être un personnage, pas une espèce entière.",
+    "characterTaken": "Ce personnage est déjà l’animal « {{name}} ».",
+    "alreadyCharacter": "Cet animal a déjà une fiche de personnage.",
+    "unlinkCharacterFirst": "Cet animal est aussi un personnage : retirez d’abord ce lien pour en faire une espèce.",
+    "speciesHasMembers_one": "{{count}} fiche appartient à cette espèce : elle ne peut pas devenir un individu.",
+    "speciesHasMembers_other": "{{count}} fiches appartiennent à cette espèce : elle ne peut pas devenir un individu."
+  },
+  "worldLink": {
+    "notFound": "Lien introuvable.",
+    "invalidKinds": "Ce lien ne relie pas deux éléments compatibles.",
+    "self": "Un élément ne peut pas être lié à lui-même.",
+    "invalidType": "Nature de lien inconnue.",
+    "endNotFound": "Un des deux éléments est introuvable.",
+    "labelTooLong": "La précision ne peut pas dépasser {{max}} caractères.",
+    "descriptionTooLong": "La description ne peut pas dépasser {{max}} caractères."
+  },
+  "demo": {
+    "unknown": "Ce projet d'exemple n'existe pas."
   }
 }

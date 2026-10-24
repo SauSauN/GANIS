@@ -6,8 +6,9 @@ import "@/i18n";
 import App from "./App";
 import { initColorTheme } from "@/lib/colorTheme";
 import { initNativeGuards } from "@/lib/nativeGuards";
-import { initTextSize } from "@/lib/preferences";
+import { initPanelImageSize, initTextSize } from "@/lib/preferences";
 import { initAutoHideScrollbars } from "@/lib/scrollbars";
+import { initErrorLog } from "@/lib/problemReport";
 import { initTheme } from "@/lib/theme";
 import "./index.css";
 
@@ -16,6 +17,10 @@ import "./index.css";
 initTheme();
 initColorTheme();
 initTextSize();
+initPanelImageSize();
+
+// Derniers messages d'erreur, pour « Aide › Signaler un problème ».
+initErrorLog();
 
 // Les barres de défilement n'apparaissent que pendant un défilement.
 initAutoHideScrollbars();

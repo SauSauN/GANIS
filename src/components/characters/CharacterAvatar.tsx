@@ -4,15 +4,19 @@ import { cn } from "@/lib/utils";
 import { usePortraitUrl } from "@/stores/characterStore";
 import type { Character } from "@/types";
 
-export type AvatarSize = "xs" | "sm" | "md" | "lg" | "xl" | "2xl";
+export type AvatarSize = "xs" | "panel" | "sm" | "md" | "lg" | "xl" | "2xl" | "fill";
 
 const SIZES: Record<AvatarSize, string> = {
   xs: "size-6 text-[0.6rem]",
+  /** Panneau du milieu : taille réglée dans Paramètres › Apparence (`--panel-thumb`). */
+  panel: "size-(--panel-thumb) text-[length:calc(var(--panel-thumb)*0.4)]",
   sm: "size-8 text-xs",
   md: "size-12 text-base",
   lg: "size-16 text-xl",
   xl: "size-24 text-3xl",
   "2xl": "size-36 text-5xl",
+  /** Remplit son cadre (image de la carte de profil). */
+  fill: "size-full text-6xl",
 };
 
 interface AvatarFaceProps {
@@ -22,6 +26,8 @@ interface AvatarFaceProps {
   /** Photo (`data:` ou `blob:`) ; `null` : initiales. */
   url: string | null;
   size?: AvatarSize;
+  /** Coins arrondis au lieu d'un cercle (cadre de la carte de profil). */
+  square?: boolean;
   className?: string;
 }
 
@@ -29,11 +35,12 @@ interface AvatarFaceProps {
  * Avatar d'un personnage : sa photo, ou à défaut ses initiales sur une
  * couleur propre au personnage.
  */
-export function AvatarFace({ colorKey, name, url, size = "md", className }: AvatarFaceProps) {
+export function AvatarFace({ colorKey, name, url, size = "md", square = false, className }: AvatarFaceProps) {
   const { t } = useTranslation("characters");
 
   const shape = cn(
-    "shrink-0 overflow-hidden rounded-full ring-1 ring-border",
+    "shrink-0 overflow-hidden ring-1 ring-border",
+    square ? "rounded-lg" : "rounded-full",
     SIZES[size],
     className,
   );

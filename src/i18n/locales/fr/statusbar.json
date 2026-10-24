@@ -5,6 +5,7 @@
     "idle": "Prêt",
     "saving": "Enregistrement…",
     "error": "Échec de l'enregistrement",
+    "failed": "Dernier enregistrement en échec",
     "savedAt": "Enregistré à {{time}}",
     "unsaved_one": "{{count}} modification non enregistrée",
     "unsaved_other": "{{count}} modifications non enregistrées",

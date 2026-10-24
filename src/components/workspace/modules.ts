@@ -11,6 +11,8 @@ import {
   ListTree,
   Megaphone,
   MapPin,
+  Package,
+  PawPrint,
   MapPinned,
   Network,
   NotebookText,
@@ -29,19 +31,22 @@ import {
   Replace,
   FileUp,
   Clapperboard,
-  ScrollText,
   Route,
+  Play,
 } from "lucide-react";
 import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/sections";
 import i18n from "@/i18n";
 import { characterIdOfTab, fullName } from "@/lib/characters";
 import { locationIdOfTab } from "@/lib/locations";
+import { worldEntryOfTab } from "@/lib/world";
 import { noteIdOfTab } from "@/lib/notes";
 import { nodeHeading, numberNodes, resolveLevels, structureNodeIdOfTab } from "@/lib/structure";
 import { useCharacterStore } from "@/stores/characterStore";
 import { useLocationStore } from "@/stores/locationStore";
 import { useNoteStore } from "@/stores/noteStore";
 import { useStructureStore } from "@/stores/structureStore";
+import { useWorldStore } from "@/stores/worldStore";
+import type { WorldModule } from "@/types";
 
 /**
  * Registre des modules de l'espace de travail.
@@ -62,6 +67,8 @@ export type ModuleId =
   | "details"
   | "characters"
   | "locations"
+  | "items"
+  | "species"
   | "structure"
   | "plot"
   | "notes"
@@ -108,7 +115,12 @@ type FeatureId =
   | "characters.relations"
   | "locations.create"
   | "locations.list"
+  | "items.create"
+  | "items.list"
+  | "species.create"
+  | "species.list"
   | "structure.plan"
+  | "structure.read"
   | "plot.board"
   | "plot.reading"
   | "notes.create"
@@ -124,7 +136,7 @@ type FeatureId =
   | "script.continuity";
 
 /** Modules qui ont une liste (et donc un message de liste vide). */
-type ListModuleId = "characters" | "locations" | "notes";
+type ListModuleId = "characters" | "locations" | "items" | "species" | "notes";
 
 /** Fonctionnalité dont le libellé et la description suivent la langue. */
 function defineFeature(id: FeatureId, icon: LucideIcon): WorkspaceFeature {
@@ -191,8 +203,13 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
   ]),
   // Découpage du récit : ses niveaux (parties, chapitres, scènes ; actes,
   // séquences… ) dépendent du type de projet. Voir `lib/structure.ts`.
+  // « Lecture complète » : l'histoire compilée dans l'ordre du découpage
+  // (bouton ▶ de la barre de titre). Le roman et le manga ont la leur
+  // (manuscrit, scénario) : elle ne leur est pas proposée, voir
+  // `featureAvailable`.
   defineModule("structure", ListTree, [
     defineFeature("structure.plan", ListTree),
+    defineFeature("structure.read", Play),
   ]),
   // Trame : plateau vertical des intrigues parallèles, lecture de
   // l'histoire et analyse. Voir `lib/plot.ts`.
@@ -230,7 +247,7 @@ export const NOVEL_FEATURES = new Set(NOVEL_MODULE.features.map((feature) => fea
  * suivi, continuité). Proposé seulement aux projets de manga.
  */
 export const MANGA_MODULE: WorkspaceModule = defineModule("script", Clapperboard, [
-  defineFeature("script.read", ScrollText),
+  defineFeature("script.read", BookOpenText),
   defineFeature("script.progress", Target),
   defineFeature("script.continuity", Route),
 ]);
@@ -239,15 +256,65 @@ export const MANGA_MODULE: WorkspaceModule = defineModule("script", Clapperboard
 export const MANGA_FEATURES = new Set(MANGA_MODULE.features.map((feature) => feature.id));
 
 /**
+ * Objets, faune et flore : modules facultatifs, masqués tant que l'auteur ne
+ * les a pas activés dans Paramètres du projet (voir `modulesFor`). Leurs
+ * onglets restent reconnus partout ; ouverts alors que le module est
+ * désactivé, ils le disent (rien n'est supprimé).
+ */
+export const ITEMS_MODULE: WorkspaceModule = defineListModule("items", Package, [
+  defineFeature("items.create", Plus),
+  defineFeature("items.list", List),
+]);
+
+export const SPECIES_MODULE: WorkspaceModule = defineListModule("species", PawPrint, [
+  defineFeature("species.create", Plus),
+  defineFeature("species.list", List),
+]);
+
+/** Module de la barre de gauche de chaque module du monde. */
+export const WORLD_WORKSPACE_MODULES: Record<WorldModule, WorkspaceModule> = {
+  item: ITEMS_MODULE,
+  species: SPECIES_MODULE,
+};
+
+/** Modules facultatifs activés pour le projet. */
+export type EnabledWorldModules = Partial<Record<WorldModule, boolean>>;
+
+/**
  * Modules de la barre de gauche pour un type de projet : après la Trame,
  * le module Manuscrit s'ajoute pour un roman, le module Scénario pour un
  * manga ou une BD.
  */
-export function modulesFor(projectType: string | null | undefined): WorkspaceModule[] {
+export function modulesFor(
+  projectType: string | null | undefined,
+  world: EnabledWorldModules = {},
+): WorkspaceModule[] {
+  // Objets puis Faune et flore, juste après les Lieux, s'ils sont activés.
+  const worldModules = (["item", "species"] as const)
+    .filter((module) => world[module])
+    .map((module) => WORLD_WORKSPACE_MODULES[module]);
+  const after = WORKSPACE_MODULES.findIndex((module) => module.id === "locations");
+  const base = [...WORKSPACE_MODULES.slice(0, after + 1), ...worldModules, ...WORKSPACE_MODULES.slice(after + 1)];
+
   const extra = projectType === "novel" ? NOVEL_MODULE : projectType === "manga" ? MANGA_MODULE : null;
-  if (!extra) return WORKSPACE_MODULES;
-  const index = WORKSPACE_MODULES.findIndex((module) => module.id === "plot");
-  return [...WORKSPACE_MODULES.slice(0, index + 1), extra, ...WORKSPACE_MODULES.slice(index + 1)];
+  if (!extra) return base;
+  const index = base.findIndex((module) => module.id === "plot");
+  return [...base.slice(0, index + 1), extra, ...base.slice(index + 1)];
+}
+
+/** Lecture complète des types sans module dédié (film, série, jeu vidéo…). */
+export const STORY_READ_FEATURE = "structure.read";
+
+/**
+ * La fonctionnalité est-elle proposée à ce type de projet ? Les outils du
+ * roman et du manga leur sont réservés ; la lecture complète générique ne
+ * l'est pas à eux (ils lisent leur histoire dans le Manuscrit / Scénario).
+ */
+export function featureAvailable(featureId: string, projectType: string | null | undefined): boolean {
+  if (NOVEL_FEATURES.has(featureId)) return projectType === "novel";
+  if (MANGA_FEATURES.has(featureId)) return projectType === "manga";
+  if (featureId === STORY_READ_FEATURE) return projectType !== "novel" && projectType !== "manga";
+  return true;
 }
 
 /** Paramètres du projet : module affiché en bas de la barre de gauche. */
@@ -272,6 +339,8 @@ export const SETTINGS_MODULE: WorkspaceModule = {
 
 const ALL_MODULES: WorkspaceModule[] = [
   ...WORKSPACE_MODULES,
+  ITEMS_MODULE,
+  SPECIES_MODULE,
   NOVEL_MODULE,
   MANGA_MODULE,
   SETTINGS_MODULE,
@@ -320,6 +389,24 @@ function locationFeature(tabId: string, locationId: string): WorkspaceFeature {
     },
     get description() {
       return i18n.t("modules:features.locations.list.description");
+    },
+  };
+}
+
+/**
+ * Fiche d'un objet ou d'une espèce (onglet `item:<id>`, `species:<id>`) :
+ * fonctionnalité du module, dont le libellé est le nom de la fiche.
+ */
+function worldFeature(tabId: string, module: WorldModule, entryId: string): WorkspaceFeature {
+  return {
+    id: tabId,
+    icon: module === "item" ? Package : PawPrint,
+    get label() {
+      const entry = useWorldStore.getState()[module].entries.find((item) => item.id === entryId);
+      return entry?.name || i18n.t("world:tab.fallback");
+    },
+    get description() {
+      return i18n.t(`modules:features.${module === "item" ? "items" : "species"}.list.description`);
     },
   };
 }
@@ -391,6 +478,15 @@ export function findFeature(
     return {
       module: getModule("locations"),
       feature: locationFeature(featureId, locationId),
+    };
+  }
+
+  const worldEntry = worldEntryOfTab(featureId);
+
+  if (worldEntry) {
+    return {
+      module: WORLD_WORKSPACE_MODULES[worldEntry.module],
+      feature: worldFeature(featureId, worldEntry.module, worldEntry.id),
     };
   }
 

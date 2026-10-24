@@ -10,7 +10,10 @@
     "sticky": "Sticky note",
     "relation": "Relationship",
     "placeLink": "Character – location link",
-    "mangaPanel": "Manga panel"
+    "mangaPanel": "Manga panel",
+    "item": "Object",
+    "species": "Fauna and flora",
+    "worldLink": "Link between elements"
   },
   "deleted": {
     "character": "Character “{{name}}” deleted.",
@@ -22,7 +25,10 @@
     "sticky": "Sticky note “{{name}}” deleted.",
     "relation": "Relationship “{{name}}” deleted.",
     "placeLink": "Link “{{name}}” deleted.",
-    "mangaPanel": "Panel “{{name}}” deleted."
+    "mangaPanel": "Panel “{{name}}” deleted.",
+    "item": "Object “{{name}}” deleted.",
+    "species": "“{{name}}” deleted from fauna and flora.",
+    "worldLink": "Link “{{name}}” deleted."
   },
   "restored": {
     "character": "Character “{{name}}” restored.",
@@ -34,7 +40,10 @@
     "sticky": "Sticky note “{{name}}” restored.",
     "relation": "Relationship “{{name}}” restored.",
     "placeLink": "Link “{{name}}” restored.",
-    "mangaPanel": "Panel “{{name}}” restored."
+    "mangaPanel": "Panel “{{name}}” restored.",
+    "item": "Object “{{name}}” restored.",
+    "species": "“{{name}}” restored to fauna and flora.",
+    "worldLink": "Link “{{name}}” restored."
   },
   "untitled": {
     "character": "Unnamed character",
@@ -46,7 +55,10 @@
     "sticky": "Empty sticky note",
     "relation": "Relationship",
     "placeLink": "Link",
-    "mangaPanel": "Panel without action"
+    "mangaPanel": "Panel without action",
+    "item": "Unnamed object",
+    "species": "Unnamed entry",
+    "worldLink": "Link"
   },
   "view": {
     "description": "Deleted items stay here for 30 days. Restoring one also brings back everything that went with it (images, relationships, sub-items…).",

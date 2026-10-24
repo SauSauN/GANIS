@@ -41,6 +41,8 @@ export const SHORTCUTS: Shortcut[] = [
   },
   { action: "palette", combos: [{ ctrl: true, key: "k" }], inFields: true },
   { action: "center", combos: [{ key: "f1" }], inFields: true },
+  // F5 : « lancer » le projet, comme le bouton ▶ de la barre de titre.
+  { action: "readStory", combos: [{ key: "f5" }], inFields: true },
   { action: "shortcuts", combos: [{ ctrl: true, key: "/" }, { ctrl: true, key: ":" }], inFields: true },
 ];
 
@@ -60,13 +62,45 @@ export function findShortcut(event: KeyboardEvent): Shortcut | undefined {
   return SHORTCUTS.find((shortcut) => shortcut.combos.some((combo) => matches(combo, event)));
 }
 
-/** Texte d'un raccourci (« Ctrl+Maj+S »). `shiftLabel` : « Maj » ou « Shift ». */
-export function formatCombo(combo: KeyCombo, shiftLabel: string): string {
+/**
+ * Noms des touches dans la langue de l'interface (`common.json` › `keys`),
+ * par exemple « Maj », « Échap », « PgSuiv » en français, « Shift », « Esc »,
+ * « PgDn » en anglais. Voir `useKeyLabels` (`keyLabels.ts`).
+ */
+export interface KeyLabels {
+  ctrl: string;
+  alt: string;
+  shift: string;
+  escape: string;
+  tab: string;
+  pageDown: string;
+  pageUp: string;
+  delete: string;
+  backspace: string;
+  enter: string;
+  space: string;
+}
+
+/** Texte d'un raccourci (« Ctrl+Maj+S », « Ctrl+Shift+S »). */
+export function formatCombo(combo: KeyCombo, labels: KeyLabels): string {
   const parts: string[] = [];
-  if (combo.ctrl) parts.push("Ctrl");
-  if (combo.alt) parts.push("Alt");
-  if (combo.shift) parts.push(shiftLabel);
-  const named: Record<string, string> = { tab: "Tab", pagedown: "PgSuiv", pageup: "PgPréc" };
+  if (combo.ctrl) parts.push(labels.ctrl);
+  if (combo.alt) parts.push(labels.alt);
+  if (combo.shift) parts.push(labels.shift);
+  const named: Record<string, string> = {
+    tab: labels.tab,
+    pagedown: labels.pageDown,
+    pageup: labels.pageUp,
+    escape: labels.escape,
+    delete: labels.delete,
+    backspace: labels.backspace,
+    enter: labels.enter,
+    " ": labels.space,
+    arrowleft: "←",
+    arrowright: "→",
+    arrowup: "↑",
+    arrowdown: "↓",
+  };
   parts.push(named[combo.key] ?? combo.key.toUpperCase());
   return parts.join("+");
 }
@@ -76,36 +110,53 @@ export function shortcutOf(action: AppAction): KeyCombo | undefined {
   return SHORTCUTS.find((shortcut) => shortcut.action === action)?.combos[0];
 }
 
-/** Raccourcis listés pour information (gérés par l'éditeur ou les composants). */
-export const REFERENCE: Array<{ group: "general" | "tabs" | "editor"; id: string; keys: string[] }> = [
-  { group: "general", id: "undoDeletion", keys: ["Ctrl+Z"] },
-  { group: "general", id: "escape", keys: ["Échap"] },
-  { group: "general", id: "quit", keys: ["Alt+F4"] },
-  { group: "tabs", id: "moveTab", keys: ["Alt+←", "Alt+→"] },
-  { group: "tabs", id: "tabMenu", keys: ["Maj+F10"] },
-  { group: "editor", id: "undo", keys: ["Ctrl+Z"] },
-  { group: "editor", id: "redo", keys: ["Ctrl+Y", "Ctrl+Maj+Z"] },
-  { group: "editor", id: "bold", keys: ["Ctrl+B"] },
-  { group: "editor", id: "italic", keys: ["Ctrl+I"] },
-  { group: "editor", id: "underline", keys: ["Ctrl+U"] },
-  { group: "editor", id: "strike", keys: ["Ctrl+Maj+S"] },
-  { group: "editor", id: "highlight", keys: ["Ctrl+Maj+H"] },
-  { group: "editor", id: "code", keys: ["Ctrl+E"] },
-  { group: "editor", id: "headings", keys: ["Ctrl+Alt+1", "Ctrl+Alt+2", "Ctrl+Alt+3"] },
-  { group: "editor", id: "paragraph", keys: ["Ctrl+Alt+0"] },
-  { group: "editor", id: "orderedList", keys: ["Ctrl+Maj+7"] },
-  { group: "editor", id: "bulletList", keys: ["Ctrl+Maj+8"] },
-  { group: "editor", id: "taskList", keys: ["Ctrl+Maj+9"] },
-  { group: "editor", id: "quote", keys: ["Ctrl+Maj+B"] },
-  { group: "editor", id: "align", keys: ["Ctrl+Maj+L", "Ctrl+Maj+E", "Ctrl+Maj+R", "Ctrl+Maj+J"] },
-  { group: "editor", id: "indent", keys: ["Tab", "Maj+Tab"] },
+/**
+ * Raccourcis listés pour information (gérés par l'éditeur ou les
+ * composants). Décrits comme des combinaisons, pas comme du texte : leurs
+ * noms de touches suivent la langue de l'interface (`formatCombo`).
+ */
+export const REFERENCE: Array<{ group: "general" | "tabs" | "editor"; id: string; keys: KeyCombo[] }> = [
+  { group: "general", id: "undoDeletion", keys: [{ ctrl: true, key: "z" }] },
+  { group: "general", id: "escape", keys: [{ key: "escape" }] },
+  { group: "general", id: "quit", keys: [{ alt: true, key: "f4" }] },
+  { group: "tabs", id: "moveTab", keys: [{ alt: true, key: "arrowleft" }, { alt: true, key: "arrowright" }] },
+  { group: "tabs", id: "tabMenu", keys: [{ shift: true, key: "f10" }] },
+  { group: "editor", id: "undo", keys: [{ ctrl: true, key: "z" }] },
+  { group: "editor", id: "redo", keys: [{ ctrl: true, key: "y" }, { ctrl: true, shift: true, key: "z" }] },
+  { group: "editor", id: "bold", keys: [{ ctrl: true, key: "b" }] },
+  { group: "editor", id: "italic", keys: [{ ctrl: true, key: "i" }] },
+  { group: "editor", id: "underline", keys: [{ ctrl: true, key: "u" }] },
+  { group: "editor", id: "strike", keys: [{ ctrl: true, shift: true, key: "s" }] },
+  { group: "editor", id: "highlight", keys: [{ ctrl: true, shift: true, key: "h" }] },
+  { group: "editor", id: "code", keys: [{ ctrl: true, key: "e" }] },
+  {
+    group: "editor",
+    id: "headings",
+    keys: [{ ctrl: true, alt: true, key: "1" }, { ctrl: true, alt: true, key: "2" }, { ctrl: true, alt: true, key: "3" }],
+  },
+  { group: "editor", id: "paragraph", keys: [{ ctrl: true, alt: true, key: "0" }] },
+  { group: "editor", id: "orderedList", keys: [{ ctrl: true, shift: true, key: "7" }] },
+  { group: "editor", id: "bulletList", keys: [{ ctrl: true, shift: true, key: "8" }] },
+  { group: "editor", id: "taskList", keys: [{ ctrl: true, shift: true, key: "9" }] },
+  { group: "editor", id: "quote", keys: [{ ctrl: true, shift: true, key: "b" }] },
+  {
+    group: "editor",
+    id: "align",
+    keys: [
+      { ctrl: true, shift: true, key: "l" },
+      { ctrl: true, shift: true, key: "e" },
+      { ctrl: true, shift: true, key: "r" },
+      { ctrl: true, shift: true, key: "j" },
+    ],
+  },
+  { group: "editor", id: "indent", keys: [{ key: "tab" }, { shift: true, key: "tab" }] },
 ];
 
 // ----------------------------------------------------------------------------
 // Fenêtres d'aide
 // ----------------------------------------------------------------------------
 
-export type HelpDialog = "guide" | "shortcuts" | "about" | "center";
+export type HelpDialog = "guide" | "shortcuts" | "about" | "center" | "whatsNew" | "report";
 
 interface HelpState {
   open: HelpDialog | null;

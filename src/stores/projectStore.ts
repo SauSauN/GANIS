@@ -4,6 +4,8 @@ import { api, ApiError } from "@/lib/api";
 import { useCharacterStore } from "@/stores/characterStore";
 import { useLocationStore } from "@/stores/locationStore";
 import { usePlaceLinkStore } from "@/stores/placeLinkStore";
+import { useWorldLinkStore } from "@/stores/worldLinkStore";
+import { useWorldStore } from "@/stores/worldStore";
 import { useRelationStore } from "@/stores/relationStore";
 import { usePlotStore } from "@/stores/plotStore";
 import { useNoteStore } from "@/stores/noteStore";
@@ -64,10 +66,14 @@ interface ProjectState {
 
   duplicateProject: (id: string) => Promise<Project>;
 
-  /** Rend un projet privé ou public (connexion nécessaire). */
+  /**
+   * Rend un projet privé ou public (connexion nécessaire). Public → privé :
+   * `confirmName` reprend le nom du projet, retapé par l'utilisateur.
+   */
   setVisibility: (
     id: string,
     visibility: ProjectVisibility,
+    confirmName?: string,
   ) => Promise<Project>;
 
   /** Place un projet dans la corbeille (30 jours). */
@@ -79,8 +85,11 @@ interface ProjectState {
   fetchTrash: () => Promise<void>;
   /** Sort des projets de la corbeille ; retourne ceux restaurés. */
   restoreProjects: (ids: string[]) => Promise<Project[]>;
-  /** Supprime définitivement des projets de la corbeille. */
-  purgeProjects: (ids: string[]) => Promise<void>;
+  /**
+   * Supprime définitivement des projets de la corbeille. `confirmPublic` :
+   * la suppression de projets publics a été confirmée par une saisie.
+   */
+  purgeProjects: (ids: string[], confirmPublic?: boolean) => Promise<void>;
   /** Confirme l'import d'un `.ganix` vérifié et l'ajoute à la liste. */
   importGanix: (stagingId: string, mode: GanixImportMode) => Promise<GanixImportOutcome>;
 
@@ -276,14 +285,14 @@ export const useProjectStore =
         }
       },
 
-      setVisibility: async (id, visibility) => {
+      setVisibility: async (id, visibility, confirmName) => {
         set({
           loading: true,
           error: null,
         });
 
         try {
-          const project = await api.setProjectVisibility(id, visibility);
+          const project = await api.setProjectVisibility(id, visibility, confirmName);
 
           set((state) => ({
             projects: upsert(state.projects, project),
@@ -311,6 +320,8 @@ export const useProjectStore =
           useRelationStore.getState().reset();
           useLocationStore.getState().reset();
           usePlaceLinkStore.getState().reset();
+          useWorldStore.getState().reset();
+          useWorldLinkStore.getState().reset();
           useStructureStore.getState().reset();
           useNoteStore.getState().reset();
           usePlotStore.getState().reset();
@@ -389,12 +400,12 @@ export const useProjectStore =
         return restored;
       },
 
-      purgeProjects: async (ids) => {
+      purgeProjects: async (ids, confirmPublic = false) => {
         const purged = new Set<string>();
 
         try {
           for (const id of ids) {
-            await api.purgeProject(id);
+            await api.purgeProject(id, confirmPublic);
             purged.add(id);
           }
         } finally {
@@ -431,6 +442,8 @@ export const useProjectStore =
         useRelationStore.getState().reset();
         useLocationStore.getState().reset();
         usePlaceLinkStore.getState().reset();
+        useWorldStore.getState().reset();
+        useWorldLinkStore.getState().reset();
         useStructureStore.getState().reset();
         useNoteStore.getState().reset();
         usePlotStore.getState().reset();
@@ -451,6 +464,8 @@ export const useProjectStore =
         useRelationStore.getState().reset();
         useLocationStore.getState().reset();
         usePlaceLinkStore.getState().reset();
+        useWorldStore.getState().reset();
+        useWorldLinkStore.getState().reset();
         useStructureStore.getState().reset();
         useNoteStore.getState().reset();
         usePlotStore.getState().reset();

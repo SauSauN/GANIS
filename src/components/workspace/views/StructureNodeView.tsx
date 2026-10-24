@@ -67,6 +67,7 @@ import {
   structureNodeTabId,
 } from "@/lib/structure";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
+import { notifyError, notifySaved } from "@/lib/notify";
 import { useNodeDocuments } from "@/lib/documents";
 import { canHoldText, chapterLevel, countWords, isNovelProject, sceneLevel, wordTotals } from "@/lib/novel";
 import { useProjectStore } from "@/stores/projectStore";
@@ -230,9 +231,16 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
 
   const [draft, setDraft] = useState<Draft | null>(null);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [linkError, setLinkError] = useState<string | null>(null);
+  /**
+   * Retours d'enregistrement et erreurs : en notification, pas dans la
+   * page (l'écran ne bouge pas quand un message apparaît).
+   */
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, `node:${nodeId}`);
+  };
+  const setLinkError = (message: string | null) => {
+    if (message) notifyError(message, `node-links:${nodeId}`);
+  };
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -255,10 +263,6 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
 
   const infoDirty = draft !== null && base !== null && !sameDraft(draft, base);
   const dirty = infoDirty || textDirty || script.dirty;
-
-  useEffect(() => {
-    if (infoDirty) setSaved(false);
-  }, [infoDirty]);
 
   /** Enregistre ce qui a changé : informations, texte (roman), cases (manga). */
   async function save(): Promise<boolean> {
@@ -315,7 +319,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
       const fresh = next?.nodes.find((item) => item.id === nodeId);
       // Le brouillon repart de l'élément enregistré (numéro recalculé…).
       setDraft(null);
-      if (fresh) setSaved(true);
+      if (fresh) notifySaved(t("node.saved"), `node:${nodeId}`);
       return true;
     } catch (e) {
       setError(errorText(e));
@@ -593,6 +597,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
                     <Label htmlFor={`node-profile-number-${node.id}`}>{t("plan.edit.number")}</Label>
                     <Input
                       id={`node-profile-number-${node.id}`}
+                      placeholder={t("common:placeholders.number")}
                       type="number"
                       min={0}
                       max={MAX_NUMBER}
@@ -631,22 +636,12 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
               <div className="flex min-h-10 flex-wrap items-center gap-4 border-t pt-4">
                 <Button type="submit" disabled={!infoDirty || saving}>
                   {saving ? <Loader2 className="animate-spin" /> : <Save />}
-                  {saving ? t("common:actions.saving") : t("common:actions.save")}
+                  {t("common:actions.save")}
                 </Button>
                 {infoDirty && (
                   <Button type="button" variant="ghost" disabled={saving} onClick={() => setDraft(base)}>
                     {t("common:actions.cancel")}
                   </Button>
-                )}
-                {saved && !infoDirty && (
-                  <p role="status" className="text-sm text-success">
-                    {t("node.saved")}
-                  </p>
-                )}
-                {error && (
-                  <p role="alert" className="text-sm text-destructive">
-                    {error}
-                  </p>
                 )}
                 <VersionsButton
                   className="ml-auto"
@@ -734,7 +729,6 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             onOpenFeature={onOpenFeature}
             onLink={(id, role) => runLink(() => linkCharacter(projectId, nodeId, id, role as NodeCharacterRole))}
             onUnlink={(id) => runLink(() => unlinkCharacter(projectId, nodeId, id))}
-            error={linkError}
           />
 
           <LinkSection
@@ -783,7 +777,6 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             onOpenFeature={onOpenFeature}
             onLink={(id, role) => runLink(() => linkLocation(projectId, nodeId, id, role as NodeLocationRole))}
             onUnlink={(id) => runLink(() => unlinkLocation(projectId, nodeId, id))}
-            error={linkError}
           />
 
           <ChildrenCard
@@ -870,7 +863,6 @@ interface LinkSectionProps {
   onOpenFeature: (featureId: string) => void;
   onLink: (id: string, role: string) => Promise<void>;
   onUnlink: (id: string) => Promise<void>;
-  error: string | null;
 }
 
 /**
@@ -895,7 +887,6 @@ function LinkSection({
   onOpenFeature,
   onLink,
   onUnlink,
-  error,
 }: LinkSectionProps) {
   const { t } = useTranslation("structure");
   const [open, setOpen] = useCollapsible(storageKey);
@@ -1108,11 +1099,6 @@ function LinkSection({
             </div>
           )}
 
-          {error && (
-            <p role="alert" className="text-sm text-destructive">
-              {error}
-            </p>
-          )}
         </>
       )}
     </CollapsibleCard>

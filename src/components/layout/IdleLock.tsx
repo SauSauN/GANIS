@@ -33,7 +33,7 @@ const CHECK_EVERY = 15_000;
  * « Se déconnecter » ramène à l'accueil.
  */
 export function IdleLock() {
-  const { t } = useTranslation("settings");
+  const { t } = useTranslation(["settings", "common"]);
   const navigate = useNavigate();
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
@@ -184,6 +184,7 @@ export function IdleLock() {
             ref={inputRef}
             id="idle-lock-password"
             type="password"
+            placeholder={t("common:placeholders.password")}
             autoComplete="current-password"
             value={password}
             aria-invalid={error ? true : undefined}

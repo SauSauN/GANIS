@@ -5,8 +5,17 @@ import { Menu } from "lucide-react";
 import { useGuardedNavigate } from "@/components/layout/UnsavedChangesGuard";
 import { isTauri } from "@/lib/api";
 import { runCommand, useCommand, useDashboardIntent, type CommandId } from "@/lib/commands";
-import { runEditAction, type EditAction } from "@/lib/editCommands";
+import { hasEditTarget, runEditAction, type EditAction } from "@/lib/editCommands";
+import {
+  PANEL_IMAGE_DEFAULT,
+  PANEL_IMAGE_MAX,
+  PANEL_IMAGE_MIN,
+  PANEL_IMAGE_STEP,
+  setPanelImageSize,
+  usePanelImageSize,
+} from "@/lib/preferences";
 import { formatCombo, shortcutOf, useHelpStore, type AppAction } from "@/lib/shortcuts";
+import { useKeyLabels } from "@/lib/keyLabels";
 import { applyTheme, useResolvedTheme } from "@/lib/theme";
 import { undoLastDeletion } from "@/lib/trash";
 import { useMediaQuery } from "@/lib/useMediaQuery";
@@ -39,6 +48,7 @@ export function MenuBar() {
   const { t } = useTranslation("menus");
   const navigate = useGuardedNavigate();
   const theme = useResolvedTheme();
+  const panelImageSize = usePanelImageSize();
   const showHelp = useHelpStore((state) => state.show);
   const requestIntent = useDashboardIntent((state) => state.request);
   // Sans connexion : ni import (les projets importés sont privés), ni
@@ -54,10 +64,10 @@ export function MenuBar() {
   /** Le menu a été ouvert au clavier : le premier choix prend le clavier. */
   const openedByKeyboard = useRef(false);
 
-  const shift = t("shift");
+  const keyLabels = useKeyLabels();
   const keys = (action: AppAction) => {
     const combo = shortcutOf(action);
-    return combo ? formatCombo(combo, shift) : undefined;
+    return combo ? formatCombo(combo, keyLabels) : undefined;
   };
 
   // Commandes proposées par l'écran affiché.
@@ -77,6 +87,7 @@ export function MenuBar() {
     openProjectSettings: useCommand("openProjectSettings"),
     openTrash: useCommand("openTrash"),
     openHistory: useCommand("openHistory"),
+    readStory: useCommand("readStory"),
     palette: useCommand("palette"),
   };
 
@@ -98,7 +109,9 @@ export function MenuBar() {
       void runEditAction(action).then((done) => {
         if (done) return;
         if (action === "undo" && undoLastDeletion()) return;
-        toast({ message: action === "paste" ? t("edit.pasteBlocked") : t("edit.nothing") });
+        // Coller dans un champ, sans texte à coller : on le dit ; sans
+        // champ, la consigne générale (placer d'abord le curseur).
+        toast({ message: action === "paste" && hasEditTarget() ? t("edit.pasteEmpty") : t("edit.nothing") });
       });
     },
   });
@@ -166,6 +179,29 @@ export function MenuBar() {
       command("nextTab", t("view.nextTab"), "nextTab"),
       command("previousTab", t("view.previousTab"), "previousTab"),
       SEPARATOR,
+      // Images du panneau du milieu (aussi dans Paramètres › Apparence).
+      {
+        kind: "item",
+        id: "panelImagesLarger",
+        label: t("view.panelImagesLarger"),
+        disabled: panelImageSize >= PANEL_IMAGE_MAX,
+        onSelect: () => setPanelImageSize(panelImageSize + PANEL_IMAGE_STEP),
+      },
+      {
+        kind: "item",
+        id: "panelImagesSmaller",
+        label: t("view.panelImagesSmaller"),
+        disabled: panelImageSize <= PANEL_IMAGE_MIN,
+        onSelect: () => setPanelImageSize(panelImageSize - PANEL_IMAGE_STEP),
+      },
+      {
+        kind: "item",
+        id: "panelImagesReset",
+        label: t("view.panelImagesReset"),
+        disabled: panelImageSize === PANEL_IMAGE_DEFAULT,
+        onSelect: () => setPanelImageSize(PANEL_IMAGE_DEFAULT),
+      },
+      SEPARATOR,
       {
         kind: "item",
         id: "theme",
@@ -177,6 +213,8 @@ export function MenuBar() {
       command("openHome", t("project.home")),
       command("openSynopsis", t("project.synopsis")),
       command("openProjectSettings", t("project.settings")),
+      SEPARATOR,
+      command("readStory", t("project.read"), "readStory"),
       SEPARATOR,
       command("openHistory", t("project.history")),
       command("openTrash", t("project.trash")),
@@ -192,6 +230,9 @@ export function MenuBar() {
         shortcut: keys("shortcuts"),
         onSelect: () => showHelp("shortcuts"),
       },
+      SEPARATOR,
+      { kind: "item", id: "whatsNew", label: t("help.whatsNew"), onSelect: () => showHelp("whatsNew") },
+      { kind: "item", id: "report", label: t("help.report"), onSelect: () => showHelp("report") },
       SEPARATOR,
       { kind: "item", id: "about", label: t("help.about"), onSelect: () => showHelp("about") },
     ],

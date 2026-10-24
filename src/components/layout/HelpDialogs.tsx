@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   BookOpen,
+  Bug,
   Check,
   ChevronLeft,
   ChevronRight,
+  Copy,
   Download,
   FolderKanban,
   Globe,
@@ -12,11 +14,13 @@ import {
   LayoutPanelLeft,
   ListTree,
   MapPin,
+  Package,
   Network,
   Palette,
   PenLine,
   Save,
   Search,
+  Sparkles,
   StickyNote,
   Trash2,
   Users,
@@ -27,8 +31,14 @@ import {
 import ganisLogo from "@/assets/ganis-logo.png";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { api } from "@/lib/api";
-import { formatCombo, REFERENCE, SHORTCUTS, useHelpStore, type AppAction } from "@/lib/shortcuts";
+import { writeText as writeNativeClipboard } from "@tauri-apps/plugin-clipboard-manager";
+import { api, isTauri } from "@/lib/api";
+import { buildReport } from "@/lib/problemReport";
+import { RELEASES, releaseId, shouldShowWhatsNew } from "@/lib/releaseNotes";
+import { useSaveStatusStore } from "@/lib/saveStatus";
+import { useAuthStore } from "@/stores/authStore";
+import { formatCombo, REFERENCE, SHORTCUTS, useHelpStore, type AppAction, type KeyCombo } from "@/lib/shortcuts";
+import { useKeyLabels } from "@/lib/keyLabels";
 import { cn } from "@/lib/utils";
 
 // ----------------------------------------------------------------------------
@@ -46,6 +56,7 @@ const STEPS: Array<{ id: string; icon: LucideIcon }> = [
   { id: "synopsis", icon: PenLine },
   { id: "characters", icon: Users },
   { id: "locations", icon: MapPin },
+  { id: "world", icon: Package },
   { id: "relations", icon: Network },
   { id: "structure", icon: ListTree },
   { id: "plot", icon: Waypoints },
@@ -169,12 +180,13 @@ function Keys({ keys }: { keys: string[] }) {
 function ShortcutsDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation(["help", "common"]);
   const tt = t as unknown as (key: string) => string;
-  const shift = t("shortcuts.shift");
+  const keyLabels = useKeyLabels();
+  const format = (combos: KeyCombo[]) => combos.map((combo) => formatCombo(combo, keyLabels));
 
   const commands: Array<{ action: AppAction; keys: string[] }> = SHORTCUTS.map((shortcut) => ({
     action: shortcut.action,
     // « Ctrl+: » (claviers AZERTY) fait la même chose que « Ctrl+/ » : pas répété.
-    keys: shortcut.combos.filter((combo) => combo.key !== ":").map((combo) => formatCombo(combo, shift)),
+    keys: format(shortcut.combos.filter((combo) => combo.key !== ":")),
   }));
 
   const groups: Array<{ id: "general" | "tabs" | "editor"; rows: Array<{ label: string; keys: string[] }> }> = [
@@ -184,7 +196,7 @@ function ShortcutsDialog({ open, onClose }: { open: boolean; onClose: () => void
         ...commands
           .filter((c) => !["closeTab", "nextTab", "previousTab"].includes(c.action))
           .map((c) => ({ label: tt(`shortcuts.actions.${c.action}`), keys: c.keys })),
-        ...REFERENCE.filter((r) => r.group === "general").map((r) => ({ label: tt(`shortcuts.reference.${r.id}`), keys: r.keys })),
+        ...REFERENCE.filter((r) => r.group === "general").map((r) => ({ label: tt(`shortcuts.reference.${r.id}`), keys: format(r.keys) })),
       ],
     },
     {
@@ -193,12 +205,12 @@ function ShortcutsDialog({ open, onClose }: { open: boolean; onClose: () => void
         ...commands
           .filter((c) => ["closeTab", "nextTab", "previousTab"].includes(c.action))
           .map((c) => ({ label: tt(`shortcuts.actions.${c.action}`), keys: c.keys })),
-        ...REFERENCE.filter((r) => r.group === "tabs").map((r) => ({ label: tt(`shortcuts.reference.${r.id}`), keys: r.keys })),
+        ...REFERENCE.filter((r) => r.group === "tabs").map((r) => ({ label: tt(`shortcuts.reference.${r.id}`), keys: format(r.keys) })),
       ],
     },
     {
       id: "editor",
-      rows: REFERENCE.filter((r) => r.group === "editor").map((r) => ({ label: tt(`shortcuts.reference.${r.id}`), keys: r.keys })),
+      rows: REFERENCE.filter((r) => r.group === "editor").map((r) => ({ label: tt(`shortcuts.reference.${r.id}`), keys: format(r.keys) })),
     },
   ];
 
@@ -249,7 +261,8 @@ function ShortcutsDialog({ open, onClose }: { open: boolean; onClose: () => void
 // ----------------------------------------------------------------------------
 
 function AboutDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
-  const { t } = useTranslation(["help", "common"]);
+  const { t } = useTranslation(["help", "common", "projects"]);
+  const show = useHelpStore((state) => state.show);
   const [version, setVersion] = useState<string | null>(null);
 
   useEffect(() => {
@@ -261,27 +274,56 @@ function AboutDialog({ open, onClose }: { open: boolean; onClose: () => void }) 
   }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-md" guardInput={false}>
-      <div className="flex flex-col items-center gap-3 text-center">
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-lg" guardInput={false}>
+      <div className="flex flex-col items-center gap-2 text-center">
         <img src={ganisLogo} alt="" aria-hidden="true" className="size-16 object-contain" />
         <DialogTitle>GANIS</DialogTitle>
         <DialogDescription>{t("about.tagline")}</DialogDescription>
-        {version && <p className="text-sm">{t("about.version", { version })}</p>}
-        <p className="text-xs leading-5 text-muted-foreground">{t("about.offline")}</p>
+        {version && <p className="rounded-full bg-muted px-2.5 py-0.5 text-xs tabular-nums">{t("about.version", { version })}</p>}
       </div>
+
+      <p className="mt-5 text-sm leading-6">{t("about.description")}</p>
+
+      <div className="mt-5 space-y-4 text-sm">
+        <section>
+          <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("about.types")}</h3>
+          <ul className="mt-2 flex flex-wrap gap-1.5">
+            {ABOUT_TYPES.map((type) => (
+              <li key={type} className="rounded-full border px-2.5 py-0.5 text-xs">
+                {t(`projects:types.${type}`)}
+              </li>
+            ))}
+          </ul>
+        </section>
+        <section>
+          <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("about.privacy")}</h3>
+          <p className="mt-1 leading-6 text-muted-foreground">{t("about.offline")}</p>
+        </section>
+        <section>
+          <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("about.credits")}</h3>
+          <p className="mt-1 text-xs leading-5 text-muted-foreground">{t("about.dictionaries")}</p>
+        </section>
+      </div>
+
       <DialogFooter className="mt-6">
+        <Button variant="outline" onClick={() => show("center")}>
+          <BookOpen className="mr-1.5 size-4" />
+          {t("about.openHelp")}
+        </Button>
         <Button onClick={onClose}>{t("common:actions.close")}</Button>
       </DialogFooter>
     </Dialog>
   );
 }
 
+/** Types de projets présentés dans « À propos ». */
+const ABOUT_TYPES = ["novel", "manga", "film", "series", "game", "rpg", "custom"] as const;
 
 // ----------------------------------------------------------------------------
 // Aide intégrée (une rubrique par module + questions fréquentes)
 // ----------------------------------------------------------------------------
 
-const CENTER_SECTIONS = ["workspace", "details", "characters", "locations", "structure", "plot", "notes", "search", "history", "files", "settings", "faq"] as const;
+const CENTER_SECTIONS = ["workspace", "details", "characters", "locations", "world", "structure", "reading", "plot", "notes", "search", "history", "files", "settings", "about", "faq"] as const;
 type CenterSection = (typeof CENTER_SECTIONS)[number];
 
 interface SectionContent {
@@ -426,10 +468,208 @@ function HelpCenterDialog({ open, onClose }: { open: boolean; onClose: () => voi
   );
 }
 
-/** Fenêtres du menu Aide (guide, raccourcis, à propos). */
+// ----------------------------------------------------------------------------
+// Nouveautés
+// ----------------------------------------------------------------------------
+
+function WhatsNewDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t } = useTranslation(["help", "common"]);
+  const tr = t as unknown as (key: string, options?: Record<string, unknown>) => unknown;
+
+  return (
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-xl" guardInput={false}>
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          <Sparkles className="size-5 text-primary" aria-hidden="true" />
+          {t("whatsNew.title")}
+        </DialogTitle>
+        <DialogDescription>{t("whatsNew.description")}</DialogDescription>
+      </DialogHeader>
+
+      <div className="mt-5 space-y-5">
+        {RELEASES.map((version) => {
+          const id = releaseId(version);
+          const items = tr(`whatsNew.releases.${id}.items`, { returnObjects: true });
+          const list = Array.isArray(items) ? (items as string[]) : [];
+
+          return (
+            <section key={version}>
+              <h3 className="text-sm font-semibold">
+                {t("whatsNew.version", { version })}
+                {" — "}
+                {tr(`whatsNew.releases.${id}.title`) as string}
+              </h3>
+              <ul className="mt-2 space-y-1.5">
+                {list.map((item) => (
+                  <li key={item} className="flex gap-2 text-sm leading-6">
+                    <Check className="mt-1 size-4 shrink-0 text-primary" aria-hidden="true" />
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          );
+        })}
+      </div>
+
+      <DialogFooter className="mt-6">
+        <Button onClick={onClose}>{t("common:actions.close")}</Button>
+      </DialogFooter>
+    </Dialog>
+  );
+}
+
+// ----------------------------------------------------------------------------
+// Signaler un problème
+// ----------------------------------------------------------------------------
+
+/** Copie un texte : presse-papiers natif dans l'application, sinon celui du navigateur. */
+async function copyText(text: string): Promise<boolean> {
+  if (isTauri()) {
+    try {
+      await writeNativeClipboard(text);
+      return true;
+    } catch {
+      /* essai suivant */
+    }
+  }
+
+  try {
+    await navigator.clipboard.writeText(text);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function ReportDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const { t, i18n } = useTranslation(["help", "common"]);
+  const signedIn = useAuthStore((state) => state.user !== null);
+  const lastSaveError = useSaveStatusStore((state) => state.lastError);
+  const [version, setVersion] = useState<string | null>(null);
+  const [description, setDescription] = useState("");
+  const [copied, setCopied] = useState<"done" | "failed" | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setCopied(null);
+    api
+      .appInfo()
+      .then((info) => setVersion(info.version))
+      .catch(() => setVersion(null));
+  }, [open]);
+
+  const report = buildReport({
+    version,
+    language: i18n.language,
+    signedIn,
+    lastSaveError,
+    description,
+    labels: {
+      title: t("report.reportTitle"),
+      description: t("report.fields.description"),
+      version: t("report.fields.version"),
+      system: t("report.fields.system"),
+      language: t("report.fields.language"),
+      session: t("report.fields.session"),
+      signedIn: t("report.fields.signedIn"),
+      guest: t("report.fields.guest"),
+      display: t("report.fields.display"),
+      lastSaveError: t("report.fields.lastSaveError"),
+      recentErrors: t("report.fields.recentErrors"),
+      none: t("report.fields.none"),
+      unknown: t("report.fields.unknown"),
+      notGiven: t("report.fields.notGiven"),
+      colon: t("report.fields.colon"),
+    },
+  });
+
+  async function copy() {
+    setCopied((await copyText(report)) ? "done" : "failed");
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-2xl">
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          <Bug className="size-5 text-primary" aria-hidden="true" />
+          {t("report.title")}
+        </DialogTitle>
+        <DialogDescription>{t("report.description")}</DialogDescription>
+      </DialogHeader>
+
+      <div className="mt-5 space-y-4">
+        <div className="space-y-2">
+          <label htmlFor="report-description" className="block text-sm font-medium">
+            {t("report.whatLabel")}
+          </label>
+          <textarea
+            id="report-description"
+            value={description}
+            onChange={(event) => {
+              setDescription(event.target.value);
+              setCopied(null);
+            }}
+            placeholder={t("report.whatPlaceholder")}
+            rows={3}
+            className="w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm leading-6 outline-none focus:ring-2 focus:ring-ring"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="report-preview" className="block text-sm font-medium">
+            {t("report.previewLabel")}
+          </label>
+          <textarea
+            id="report-preview"
+            readOnly
+            value={report}
+            rows={10}
+            aria-describedby="report-privacy"
+            className="w-full resize-y rounded-md border border-input bg-muted/40 px-3 py-2 font-mono text-xs leading-5 outline-none focus:ring-2 focus:ring-ring"
+          />
+          <p id="report-privacy" className="text-xs text-muted-foreground">
+            {t("report.privacy")}
+          </p>
+        </div>
+
+        <p className="text-sm text-muted-foreground">{t("report.howToSend")}</p>
+
+        {copied && (
+          <p role="status" className={cn("text-sm", copied === "done" ? "text-success" : "text-destructive")}>
+            {copied === "done" ? t("report.copied") : t("report.copyFailed")}
+          </p>
+        )}
+      </div>
+
+      <DialogFooter className="mt-6 gap-2">
+        <Button variant="ghost" onClick={onClose}>
+          {t("common:actions.close")}
+        </Button>
+        <Button onClick={() => void copy()}>
+          <Copy className="mr-1.5 size-4" aria-hidden="true" />
+          {t("report.copy")}
+        </Button>
+      </DialogFooter>
+    </Dialog>
+  );
+}
+
+/** Fenêtres du menu Aide (guide, raccourcis, à propos, nouveautés, signalement). */
 export function HelpDialogs() {
   const open = useHelpStore((state) => state.open);
   const close = useHelpStore((state) => state.close);
+  const show = useHelpStore((state) => state.show);
+
+  // Après une mise à jour : les nouveautés s'ouvrent seules, une fois.
+  useEffect(() => {
+    api
+      .appInfo()
+      .then((info) => {
+        if (shouldShowWhatsNew(info.version) && useHelpStore.getState().open === null) show("whatsNew");
+      })
+      .catch(() => {});
+  }, [show]);
 
   return (
     <>
@@ -437,6 +677,8 @@ export function HelpDialogs() {
       <ShortcutsDialog open={open === "shortcuts"} onClose={close} />
       <AboutDialog open={open === "about"} onClose={close} />
       <HelpCenterDialog open={open === "center"} onClose={close} />
+      <WhatsNewDialog open={open === "whatsNew"} onClose={close} />
+      <ReportDialog open={open === "report"} onClose={close} />
     </>
   );
 }

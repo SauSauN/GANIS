@@ -13,7 +13,7 @@ type LoginIssue = "usernameRequired" | "passwordRequired";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { t } = useTranslation("login");
+  const { t } = useTranslation(["login", "common"]);
   const { login, loading, error, clearError } = useAuthStore();
   const user = useAuthStore((state) => state.user);
   const pendingRecoveryKey = useAuthStore((state) => state.pendingRecoveryKey);
@@ -91,7 +91,7 @@ export default function Login() {
           <CardContent className="mt-4 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username">{t("username")}</Label>
-              <Input id="username" autoComplete="username" value={username}
+              <Input id="username" placeholder={t("common:placeholders.username")} autoComplete="username" value={username}
                 onChange={(e) => setUsername(e.target.value)} />
             </div>
             <div className="space-y-2">
@@ -106,7 +106,7 @@ export default function Login() {
                   </Link>
                 )}
               </div>
-              <Input id="password" type="password" autoComplete="current-password" value={password}
+              <Input id="password" placeholder={t("common:placeholders.password")} type="password" autoComplete="current-password" value={password}
                 onChange={(e) => setPassword(e.target.value)} />
             </div>
 

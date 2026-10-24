@@ -1,6 +1,7 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { notifyError, notifySaved } from "@/lib/notify";
 import { CalendarDays, Mail, ShieldCheck, Trash2, User as UserIcon } from "lucide-react";
 import { RecoveryKeyPanel } from "@/components/auth/RecoveryKeyPanel";
 import {
@@ -61,32 +62,36 @@ type Feedback =
 const failure = (e: unknown, key: AccountMessage): Feedback =>
   e instanceof Error ? { kind: "error", text: e.message } : { kind: "error", key };
 
+/**
+ * Retour d'une action du compte : en notification, pas dans la page, pour
+ * que rien ne bouge. Le composant ne dessine rien ; il annonce chaque
+ * nouveau retour.
+ */
 function FeedbackMessage({ feedback }: { feedback: Feedback | null }) {
   const { t } = useTranslation(["settings", "common"]);
 
-  if (!feedback) {
-    return null;
-  }
+  useEffect(() => {
+    if (!feedback) {
+      return;
+    }
 
-  const message =
-    "key" in feedback
-      ? t(feedback.key)
-      : "issue" in feedback
-        ? t(`common:validation.${feedback.issue}`)
-        : feedback.text;
+    const message =
+      "key" in feedback
+        ? t(feedback.key)
+        : "issue" in feedback
+          ? t(`common:validation.${feedback.issue}`)
+          : feedback.text;
 
-  return (
-    <p
-      role={feedback.kind === "error" ? "alert" : "status"}
-      className={
-        feedback.kind === "error"
-          ? "text-sm text-destructive"
-          : "text-sm text-success"
-      }
-    >
-      {message}
-    </p>
-  );
+    if (feedback.kind === "error") {
+      notifyError(message, "account");
+    } else {
+      notifySaved(message, "account");
+    }
+    // Un nouveau retour = un nouvel objet : annoncé une fois.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [feedback]);
+
+  return null;
 }
 
 /** Une information du compte, avec son icône : posée directement sur la carte, sans cadre. */
@@ -185,6 +190,7 @@ function RecoveryKeyCard({ username }: { username: string }) {
 
             <Input
               id="recovery-current-password"
+              placeholder={t("common:placeholders.currentPassword")}
               type="password"
               autoComplete="current-password"
               value={currentPassword}
@@ -213,7 +219,7 @@ function RecoveryKeyCard({ username }: { username: string }) {
  * pour reprendre (voir `IdleLock`). Réglage propre à cet ordinateur.
  */
 function IdleLockCard() {
-  const { t } = useTranslation("settings");
+  const { t } = useTranslation(["settings", "common"]);
   const minutes = useIdleLock();
 
   return (
@@ -305,6 +311,7 @@ function DeleteAccountCard() {
 
             <Input
               id="delete-account-password"
+              placeholder={t("common:placeholders.password")}
               type="password"
               autoComplete="current-password"
               value={password}
@@ -490,6 +497,7 @@ export function AccountSection() {
 
               <Input
                 id="profile-email"
+                placeholder={t("common:placeholders.email")}
                 type="email"
                 autoComplete="email"
                 value={email}
@@ -502,7 +510,7 @@ export function AccountSection() {
 
           <CardFooter className={cardFooterClass}>
             <Button type="submit" disabled={emailSaving}>
-              {emailSaving ? t("common:actions.saving") : t("common:actions.save")}
+              {t("common:actions.save")}
             </Button>
           </CardFooter>
         </form>
@@ -528,6 +536,7 @@ export function AccountSection() {
 
               <Input
                 id="current-password"
+                placeholder={t("common:placeholders.currentPassword")}
                 type="password"
                 autoComplete="current-password"
                 value={currentPassword}
@@ -541,6 +550,7 @@ export function AccountSection() {
 
                 <Input
                   id="new-password"
+                  placeholder={t("common:placeholders.newPassword")}
                   type="password"
                   autoComplete="new-password"
                   value={newPassword}
@@ -555,6 +565,7 @@ export function AccountSection() {
 
                 <Input
                   id="confirm-password"
+                  placeholder={t("common:placeholders.confirmPassword")}
                   type="password"
                   autoComplete="new-password"
                   value={confirmPassword}

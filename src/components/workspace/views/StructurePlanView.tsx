@@ -55,6 +55,8 @@ import { cn } from "@/lib/utils";
 import { useProjectPlot } from "@/stores/plotStore";
 import type { Project, StructureNode, StructureTemplateId } from "@/types";
 import { errorText } from "@/lib/errors";
+import { notifyError } from "@/lib/notify";
+import { doubleClickHint, onRowDoubleClick } from "@/lib/doubleClick";
 
 const fieldClass =
   "w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
@@ -117,7 +119,10 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
   const focus = useStructureStore((state) => state.focus);
   const clearFocus = useStructureStore((state) => state.clearFocus);
 
-  const [actionError, setActionError] = useState<string | null>(null);
+  // Erreurs d'action en notification : le plan ne bouge pas.
+  const setActionError = (message: string | null) => {
+    if (message) notifyError(message, "structure:plan");
+  };
   const [busy, setBusy] = useState(false);
 
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set());
@@ -500,11 +505,6 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
         </span>
       </div>
 
-      {actionError && (
-        <p role="alert" className="text-sm text-destructive">
-          {actionError}
-        </p>
-      )}
 
       {/* =====================================================================
           PLAN
@@ -535,6 +535,10 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
                 aria-selected={editing}
               >
                 <div
+                  // Double-clic sur la ligne : ouvre la fiche de l'élément
+                  // (le clic sur le titre, lui, le renomme).
+                  onDoubleClick={onOpenFeature ? onRowDoubleClick(() => onOpenFeature(structureNodeTabId(node.id))) : undefined}
+                  title={onOpenFeature ? doubleClickHint("openSheet") : undefined}
                   className={cn(
                     "group flex min-h-10 items-center gap-2 pr-2 transition-colors duration-700",
                     editing && "bg-muted/40",
@@ -695,6 +699,7 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
                           <Label htmlFor={`node-number-${node.id}`}>{t("plan.edit.number")}</Label>
                           <Input
                             id={`node-number-${node.id}`}
+                            placeholder={t("common:placeholders.number")}
                             type="number"
                             min={0}
                             max={MAX_NUMBER}

@@ -1,0 +1,811 @@
+{
+  "tab": {
+    "fallback": "Entry"
+  },
+  "type": {
+    "unknown": "Deleted type",
+    "custom": "Added by you"
+  },
+  "natures": {
+    "title": "Nature",
+    "all": "Species and individuals",
+    "species": {
+      "label": "A species",
+      "description": "A whole species or variety: grey wolves, moon roses."
+    },
+    "individual": {
+      "label": "A specific animal or plant",
+      "description": "An individual with a name: Lightning, the hero's horse; the village's old oak."
+    }
+  },
+  "form": {
+    "name": "Name",
+    "type": "Type",
+    "status": "Status",
+    "none": "Not specified",
+    "deleted": "(deleted)"
+  },
+  "image": {
+    "choose": "Add an image",
+    "remove": "Remove the image",
+    "drop": "Drop the image here"
+  },
+  "picker": {
+    "search": "Search for a type…",
+    "noResult": "No type matches.",
+    "manage": "Categories and custom types",
+    "change": "Change",
+    "changeTitle": "Change the type of “{{name}}”",
+    "changeDescription": "Information already entered is kept, even what no longer applies to the new type.",
+    "choose_one": "Choose from {{count}} type…",
+    "choose_other": "Choose from {{count}} types…"
+  },
+  "parent": {
+    "item": {
+      "label": "Stored in / part of",
+      "none": "Not stored anywhere",
+      "empty": "Nowhere",
+      "hint": "The object that holds it or that it belongs to: a letter in a chest, an engine in a ship."
+    },
+    "individual": {
+      "label": "Species",
+      "none": "Species not specified",
+      "empty": "Species not specified",
+      "hint": "The species this animal or plant belongs to (create the species first)."
+    },
+    "species": {
+      "label": "Part of",
+      "none": "At the top",
+      "empty": "Nothing (at the top)",
+      "hint": "A wider group, if you have one: grey wolves within canines."
+    }
+  },
+  "sections": {
+    "identity": {
+      "title": "Identity"
+    },
+    "category": {
+      "description": "Information specific to this category."
+    },
+    "type": {
+      "title": "Specifics: {{type}}",
+      "description": "What sets this type apart."
+    },
+    "story": {
+      "title": "History and notes"
+    },
+    "gallery": {
+      "title": "Images"
+    },
+    "hidden": {
+      "title": "Information kept",
+      "description": "These fields don't apply to this type (or nature) and are hidden. They aren't erased: they'll come back if you switch back.",
+      "list": "Hidden fields: {{fields}}."
+    },
+    "hiddenByLevel": {
+      "title": "Fields hidden by the detail level",
+      "description": "Filled in, but hidden by the chosen detail level: {{fields}}. Change the level in the project settings to see them."
+    }
+  },
+  "list": {
+    "search": "Search by name…",
+    "categoryFilter": "Filter by category",
+    "allCategories": "All categories",
+    "loading": "Loading…",
+    "retry": "Retry",
+    "noResult": "No entry matches your search.",
+    "expand": "Expand",
+    "collapse": "Collapse"
+  },
+  "sidebar": {
+    "loading": "Loading…",
+    "otherCategory": "Other",
+    "collapseCategory": "Collapse category",
+    "expandCategory": "Expand category"
+  },
+  "disabled": {
+    "open": "Open the settings"
+  },
+  "create": {
+    "saving": "Creating…",
+    "reset": "Clear everything",
+    "imagesFailed": "The entry was created, but an image couldn't be added: {{message}}"
+  },
+  "levels": {
+    "continue": "Continue"
+  },
+  "edit": {
+    "loading": "Loading the entry…",
+    "saved": "Saved",
+    "delete": "Delete",
+    "deleteTitle": "Delete “{{name}}”?",
+    "deleteDescription": "The entry, its images and its links will go to the trash (30 days).",
+    "deleteChildrenUp_one": "The entry attached to it will move into “{{parent}}”.",
+    "deleteChildrenUp_other": "The {{count}} entries attached to it will move into “{{parent}}”.",
+    "deleteChildrenTop_one": "The entry attached to it will move to the top.",
+    "deleteChildrenTop_other": "The {{count}} entries attached to it will move to the top.",
+    "deleteKeepsCharacter": "Its character sheet is kept.",
+    "deleteConfirm": "Delete",
+    "notFound": {
+      "title": "Entry not found",
+      "description": "It may have been deleted.",
+      "close": "Close the tab"
+    }
+  },
+  "errors": {
+    "nameRequired": "The name is required.",
+    "nameTooLong": "The name is longer than {{max}} characters."
+  },
+  "settings": {
+    "categories": {
+      "title": "Categories in use",
+      "lastOne": "Keep at least one category (or turn the module off)."
+    },
+    "level": {
+      "title": "Detail level of entries",
+      "description": "Applies to every entry in this module. Fields already filled in are never erased."
+    },
+    "types": {
+      "title": "Custom types",
+      "empty": "No type added yet.",
+      "name": "Type name",
+      "category": "Category",
+      "add": "Add",
+      "remove": "Remove “{{name}}”"
+    },
+    "statuses": {
+      "title": "Statuses",
+      "description": "Values offered for an entry's status.",
+      "add": "Add",
+      "placeholder": "New status",
+      "reset": "Default values",
+      "remove": "Remove “{{value}}”"
+    }
+  },
+  "animalCharacter": {
+    "title": "Character",
+    "description": "Is this animal also a character in the story?",
+    "linked": "This animal is also a character: relationships, scenes and psychology live on its character sheet.",
+    "open": "Character sheet",
+    "unlink": "Remove the link",
+    "unlinkHint": "Becomes just an animal again; the character sheet is kept.",
+    "notLinked": "For now, it's just an animal. If it acts in the story (it has relationships, it appears in scenes), make it a character too.",
+    "create": "Create its character sheet",
+    "pickLabel": "or link it to an existing character",
+    "noFree": "No character available",
+    "link": "Link",
+    "badge": "Also a character"
+  },
+  "characterAnimal": {
+    "title": "Animal",
+    "description": "Is this character an animal (or a plant) from the fauna and flora?",
+    "none": "If this character is an animal, link it to its entry (a specific animal from the fauna and flora).",
+    "pickLabel": "Specific animal or plant",
+    "noFree": "No specific animal available"
+  },
+  "links": {
+    "title": "Links with objects and species",
+    "description": {
+      "character": "What they own, use, made or seek; their companions and mounts.",
+      "location": "The objects found there, the animals and plants that live there.",
+      "item": "Who owns it, where it is, what it's made of, what it's tied to.",
+      "species": "Where it lives, what it eats, who owns it, what it's used for."
+    },
+    "add": "Link an element",
+    "edit": "Edit the link",
+    "empty": "No link yet.",
+    "periodBoth": "from {{since}} to {{until}}",
+    "periodFrom": "from {{since}}",
+    "periodUntil": "until {{until}}",
+    "kinds": {
+      "character": "Character",
+      "location": "Location",
+      "item": "Object",
+      "species": "Fauna and flora"
+    },
+    "types": {
+      "owns": {
+        "forward": "owns",
+        "backward": "belongs to"
+      },
+      "uses": {
+        "forward": "uses",
+        "backward": "used by"
+      },
+      "made": {
+        "forward": "made",
+        "backward": "made by"
+      },
+      "seeks": {
+        "forward": "seeks",
+        "backward": "sought by"
+      },
+      "companion": {
+        "forward": "companion / mount",
+        "backward": "companion of"
+      },
+      "locatedIn": {
+        "forward": "is found in",
+        "backward": "holds"
+      },
+      "livesIn": {
+        "forward": "lives / grows in",
+        "backward": "home of"
+      },
+      "partOf": {
+        "forward": "part of",
+        "backward": "includes"
+      },
+      "madeFrom": {
+        "forward": "made from",
+        "backward": "used to make"
+      },
+      "eats": {
+        "forward": "feeds on",
+        "backward": "feeds"
+      },
+      "protects": {
+        "forward": "protects",
+        "backward": "protected by"
+      },
+      "related": {
+        "forward": "related to",
+        "backward": "related to"
+      },
+      "other": {
+        "forward": "other link with",
+        "backward": "other link with"
+      }
+    },
+    "dialog": {
+      "newTitle": "New link",
+      "editTitle": "Edit the link",
+      "description": "Link this entry to another element of the project. The link shows on both entries.",
+      "kind": "With",
+      "element": "Element",
+      "choose": "Choose…",
+      "noneOfKind": "No element of this kind",
+      "noKinds": "Turn on objects or fauna and flora in the project settings to create links.",
+      "type": "Kind of link",
+      "label": "Detail (optional)",
+      "labelPlaceholder": "E.g. Inherited from his father",
+      "text": "Description (optional)",
+      "textPlaceholder": "What to know about this link…",
+      "since": "From",
+      "until": "Until",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "save": "Save",
+      "create": "Create the link"
+    }
+  },
+  "item": {
+    "categories": {
+      "weapon": {
+        "label": "Weapons",
+        "description": "Swords, bows, firearms, explosives…"
+      },
+      "armor": {
+        "label": "Armor and protection",
+        "description": "Armor, shields, helmets…"
+      },
+      "clothing": {
+        "label": "Clothing and accessories",
+        "description": "Hats, cloaks, jewelry, bags, masks…"
+      },
+      "vehicle": {
+        "label": "Vehicles",
+        "description": "Cars, ships, trains, planes, spaceships…"
+      },
+      "tech": {
+        "label": "Technology and devices",
+        "description": "Phones, computers, robots, gadgets…"
+      },
+      "magic": {
+        "label": "Magic and artifacts",
+        "description": "Wands, grimoires, amulets, potions, relics…"
+      },
+      "document": {
+        "label": "Documents and writings",
+        "description": "Letters, books, maps, contracts, diaries…"
+      },
+      "tool": {
+        "label": "Tools and everyday objects",
+        "description": "Keys, tools, chests, instruments, lamps…"
+      },
+      "treasure": {
+        "label": "Treasures and valuables",
+        "description": "Coins, gems, crowns, trophies…"
+      },
+      "consumable": {
+        "label": "Food and substances",
+        "description": "Meals, drinks, remedies, poisons, ingredients…"
+      }
+    },
+    "types": {
+      "sword": "Sword",
+      "dagger": "Dagger / knife",
+      "axe": "Axe",
+      "spear": "Spear",
+      "bow": "Bow",
+      "crossbow": "Crossbow",
+      "pistol": "Pistol",
+      "rifle": "Rifle",
+      "explosive": "Explosive",
+      "armor": "Armor",
+      "shield": "Shield",
+      "helmet": "Helmet",
+      "hat": "Hat",
+      "cloak": "Cloak / coat",
+      "outfit": "Outfit",
+      "shoes": "Shoes",
+      "jewel": "Jewel",
+      "ring": "Ring",
+      "bag": "Bag",
+      "mask": "Mask",
+      "car": "Car",
+      "motorcycle": "Motorcycle",
+      "bicycle": "Bicycle",
+      "cart": "Cart",
+      "carriage": "Carriage",
+      "boat": "Boat",
+      "ship": "Ship",
+      "train": "Train",
+      "plane": "Plane",
+      "airship": "Airship",
+      "spaceship": "Spaceship",
+      "phone": "Phone",
+      "computer": "Computer",
+      "watch": "Watch",
+      "camera": "Camera",
+      "radio": "Radio",
+      "robot": "Robot",
+      "gadget": "Gadget",
+      "artifact": "Artifact",
+      "wand": "Wand",
+      "magicStaff": "Wizard's staff",
+      "grimoire": "Grimoire",
+      "amulet": "Amulet / talisman",
+      "crystal": "Crystal",
+      "potion": "Potion",
+      "relic": "Relic",
+      "letter": "Letter",
+      "book": "Book",
+      "map": "Map",
+      "scroll": "Scroll",
+      "contract": "Contract / deed",
+      "diary": "Diary",
+      "photo": "Photograph",
+      "key": "Key",
+      "tool": "Tool",
+      "container": "Chest / box",
+      "instrument": "Musical instrument",
+      "lamp": "Lamp / lantern",
+      "toy": "Toy",
+      "coins": "Coins / money",
+      "gem": "Gem",
+      "crown": "Crown",
+      "trophy": "Trophy",
+      "food": "Food",
+      "drink": "Drink",
+      "medicine": "Remedy / medicine",
+      "poison": "Poison",
+      "ingredient": "Ingredient"
+    },
+    "statuses": {
+      "intact": "Intact",
+      "worn": "Worn",
+      "damaged": "Damaged",
+      "broken": "Broken",
+      "lost": "Lost",
+      "stolen": "Stolen",
+      "hidden": "Hidden",
+      "destroyed": "Destroyed",
+      "unknown": "Unknown"
+    },
+    "fields": {
+      "colorPalette": "Colour palette",
+      "aliases": "Other names",
+      "description": "Description",
+      "firstAppearance": "First appearance",
+      "creator": "Made by",
+      "origin": "Origin / provenance",
+      "value": "Value",
+      "rarity": "Rarity",
+      "history": "History",
+      "notes": "Author's notes",
+      "material": "Material",
+      "weight": "Weight",
+      "size": "Size / dimensions",
+      "damage": "Power / damage",
+      "range": "Range",
+      "protection": "Protection",
+      "colors": "Colors",
+      "style": "Style",
+      "model": "Make / model",
+      "speed": "Speed",
+      "capacity": "Seats / capacity",
+      "propulsion": "Power source / propulsion",
+      "autonomy": "Range (autonomy)",
+      "energy": "Power supply / battery",
+      "features": "Functions / equipment",
+      "powers": "Powers",
+      "activation": "How to activate it",
+      "limits": "Limits / price to pay",
+      "curse": "Curse",
+      "author": "Author",
+      "writtenOn": "Written on",
+      "language": "Language",
+      "content": "Content / text",
+      "use": "Use",
+      "effects": "Effects",
+      "ingredients": "Ingredients",
+      "duration": "Effect duration",
+      "ammunition": "Ammunition",
+      "trigger": "Trigger",
+      "registration": "Registration / ship's name",
+      "crew": "Crew",
+      "armament": "Armament",
+      "phoneNumber": "Number",
+      "password": "Code / password",
+      "storedContent": "Stored content (messages, files, photos…)",
+      "spells": "Spells inside",
+      "recipe": "Recipe / preparation",
+      "recipient": "Recipient",
+      "opens": "What it opens",
+      "contents": "Contents",
+      "symptoms": "Symptoms",
+      "antidote": "Antidote"
+    },
+    "placeholders": {
+      "aliases": "E.g. The King's Blade",
+      "creator": "E.g. The smiths of Aval",
+      "value": "E.g. Priceless, 300 gold coins",
+      "damage": "E.g. Cuts through steel",
+      "speed": "E.g. 75 mph",
+      "capacity": "E.g. 4 seats",
+      "model": "E.g. 1963 Beetle",
+      "storedContent": "E.g. Three missed calls from Mark, a blurry photo of the dock…",
+      "powers": "What the object lets you do…",
+      "limits": "What it costs to use it…",
+      "opens": "E.g. The crypt door",
+      "recipient": "E.g. Mira, in Valona",
+      "description": "What it looks like, what you notice first…",
+      "origin": "Where and how it was made or found…",
+      "history": "Its former owners, what happened to it…",
+      "notes": "Ideas, open questions…",
+      "material": "E.g. Steel, oak, silk",
+      "weight": "E.g. 2.5 lb",
+      "size": "E.g. 13 ft long",
+      "range": "E.g. 200 yards",
+      "protection": "E.g. Stops arrows, not bullets",
+      "colors": "E.g. Navy and silver",
+      "style": "E.g. Elegant, military, worn",
+      "propulsion": "E.g. Gasoline, steam, sails, magic",
+      "autonomy": "E.g. 250 miles, three days at sea",
+      "energy": "E.g. Battery, mana crystal",
+      "features": "Add a function…",
+      "activation": "E.g. Speak its name aloud",
+      "curse": "What happens to whoever uses it…",
+      "author": "E.g. King Aldric",
+      "writtenOn": "E.g. In the spring of year 312",
+      "language": "E.g. Old Elvish",
+      "content": "What is written on or in it…",
+      "use": "E.g. Opening ancient locks",
+      "effects": "What happens when it's consumed…",
+      "ingredients": "Add an ingredient…",
+      "duration": "E.g. One hour",
+      "ammunition": "E.g. Silver-tipped arrows",
+      "trigger": "E.g. Fuse, timer, spell",
+      "registration": "E.g. AB-123-CD, The Aval Mermaid",
+      "crew": "E.g. 40 sailors",
+      "armament": "Cannons, turrets, defenses…",
+      "phoneNumber": "E.g. 555-0123",
+      "password": "E.g. 1987",
+      "spells": "The spells it holds…",
+      "recipe": "How to prepare it…",
+      "contents": "What it holds…",
+      "symptoms": "What the victim feels…",
+      "antidote": "E.g. Mandrake root"
+    },
+    "options": {
+      "rarity": {
+        "common": "Common",
+        "uncommon": "Uncommon",
+        "rare": "Rare",
+        "unique": "Unique",
+        "legendary": "Legendary"
+      }
+    },
+    "profile": {
+      "new": "New object",
+      "contains_one": "Holds {{count}} object",
+      "contains_other": "Holds {{count}} objects"
+    },
+    "sections": {
+      "identity": "What makes the object recognizable.",
+      "story": "Where it comes from, its past, and your author's notes.",
+      "gallery": "Up to 30 images: photos, sketches, references."
+    },
+    "form": {
+      "namePlaceholder": "E.g. Excalibur, Herbie, Mark's phone"
+    },
+    "picker": {
+      "title": "What kind of object?",
+      "description": "Choose a type: the entry adapts (a vehicle doesn't have the same information as a potion)."
+    },
+    "create": {
+      "save": "Create the object",
+      "inside": "Will be stored in “{{name}}”."
+    },
+    "list": {
+      "create": "Create an object",
+      "emptyTitle": "No objects yet",
+      "emptyDescription": "Weapons, vehicles, phones, magic items… Create the ones that matter in your story.",
+      "count_one": "{{count}} object",
+      "count_other": "{{count}} objects",
+      "addInside": "Store an object in “{{name}}”"
+    },
+    "children": {
+      "title": "Contents",
+      "description": "The objects stored in “{{name}}” or that are part of it.",
+      "add": "Add an object here",
+      "empty": "Nothing is stored here."
+    },
+    "sidebar": {
+      "title": "Objects",
+      "empty": "No objects."
+    },
+    "disabled": {
+      "title": "The Objects module is turned off",
+      "description": "Your objects are kept. Turn the module back on in the project settings to find them again."
+    },
+    "settings": {
+      "title": "Objects",
+      "description": "The objects in your story: weapons, vehicles, clothing, phones, magic items…",
+      "enable": "Turn on objects",
+      "enabledHint": "The “Objects” module is in the left bar.",
+      "disabledHint": "Turn it on to add it to the left bar.",
+      "kept_one": "{{count}} object is kept and will come back if you turn the module on again.",
+      "kept_other": "{{count}} objects are kept and will come back if you turn the module on again.",
+      "categories": "Keep only what your story needs: the other categories won't be offered.",
+      "types": "Add your own types (Hoverboard, Runic sword…). Each belongs to a category and gets its fields.",
+      "typePlaceholder": "E.g. Hoverboard"
+    },
+    "levels": {
+      "title": "Detail level of object entries",
+      "firstTime": "Choose the detail level of object entries in this project. It applies to every object and can be changed in the project settings.",
+      "basic": {
+        "label": "Basic",
+        "theme": "The essentials",
+        "goal": "Name and describe the object",
+        "count": "7 fields"
+      },
+      "intermediate": {
+        "label": "Medium",
+        "theme": "The characteristics",
+        "goal": "Rarity, value, maker and category fields (range, speed, powers…)",
+        "count": "+ 8 to 12 fields"
+      },
+      "advanced": {
+        "label": "Advanced",
+        "theme": "The depth",
+        "goal": "Type-specific details, origin and history",
+        "count": "+ 2 to 5 fields"
+      }
+    }
+  },
+  "species": {
+    "categories": {
+      "fauna": {
+        "label": "Fauna",
+        "description": "Real or imaginary animals: mammals, birds, dragons…"
+      },
+      "flora": {
+        "label": "Flora",
+        "description": "Trees, flowers, herbs, mushrooms, magic plants…"
+      }
+    },
+    "types": {
+      "mammal": "Mammal",
+      "bird": "Bird",
+      "reptile": "Reptile",
+      "amphibian": "Amphibian",
+      "fish": "Fish",
+      "insect": "Insect / arachnid",
+      "fantasticCreature": "Fantastic creature",
+      "dragon": "Dragon",
+      "tree": "Tree",
+      "shrub": "Shrub",
+      "flower": "Flower",
+      "herb": "Herb",
+      "mushroom": "Mushroom",
+      "aquaticPlant": "Aquatic plant",
+      "crop": "Crop / grain",
+      "magicPlant": "Magic plant"
+    },
+    "statuses": {
+      "common": "Common",
+      "rare": "Rare",
+      "endangered": "Endangered",
+      "extinct": "Extinct",
+      "legendary": "Legendary",
+      "alive": "Alive",
+      "dead": "Dead",
+      "missing": "Missing",
+      "unknown": "Unknown"
+    },
+    "fields": {
+      "colorPalette": "Colour palette",
+      "aliases": "Other names",
+      "scientificName": "Scientific name",
+      "age": "Age",
+      "markings": "Distinctive marks",
+      "description": "Description",
+      "firstAppearance": "First appearance",
+      "habitat": "Habitat",
+      "legends": "Legends and beliefs",
+      "notes": "Author's notes",
+      "size": "Size / weight",
+      "lifespan": "Lifespan",
+      "diet": "Diet",
+      "temperament": "Temperament",
+      "dangerLevel": "Danger",
+      "domestication": "Domestication",
+      "behavior": "Behavior",
+      "abilities": "Abilities",
+      "height": "Height",
+      "season": "Blooming / season",
+      "toxicity": "Toxicity",
+      "edible": "Edible",
+      "properties": "Properties",
+      "uses": "Uses",
+      "cultivation": "Cultivation",
+      "venom": "Venom",
+      "intelligence": "Intelligence / language",
+      "element": "Element / breath",
+      "magicPowers": "Magic powers",
+      "wood": "Wood",
+      "harvest": "Harvest"
+    },
+    "placeholders": {
+      "aliases": "E.g. Snow wolf",
+      "scientificName": "E.g. Canis lupus",
+      "age": "E.g. 7 years old",
+      "markings": "E.g. A white spot on the forehead",
+      "size": "E.g. 5 ft at the withers, 900 lb",
+      "season": "E.g. Blooms at full moon",
+      "abilities": "Add an ability…",
+      "uses": "Add a use…",
+      "description": "What it looks like, what you notice first…",
+      "habitat": "Where it lives or grows: forests, mountains, marshes…",
+      "legends": "What people tell about it…",
+      "notes": "Ideas, open questions…",
+      "lifespan": "E.g. 15 years",
+      "behavior": "How it behaves, alone or in groups…",
+      "height": "E.g. 1 ft, up to 130 ft",
+      "properties": "What it does to body or mind…",
+      "cultivation": "E.g. Only grows in shade",
+      "venom": "E.g. Paralyzes within minutes",
+      "intelligence": "E.g. Understands the common tongue",
+      "element": "E.g. Fire, ice",
+      "magicPowers": "What supernatural things it can do…",
+      "wood": "E.g. Hard and pale, prized by archers",
+      "harvest": "E.g. At the end of summer"
+    },
+    "options": {
+      "diet": {
+        "herbivore": "Herbivore",
+        "carnivore": "Carnivore",
+        "omnivore": "Omnivore",
+        "other": "Other"
+      },
+      "temperament": {
+        "docile": "Docile",
+        "wary": "Wary",
+        "aggressive": "Aggressive",
+        "unpredictable": "Unpredictable"
+      },
+      "dangerLevel": {
+        "none": "Harmless",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "deadly": "Deadly"
+      },
+      "domestication": {
+        "wild": "Wild",
+        "tamable": "Tamable",
+        "domestic": "Domestic"
+      },
+      "toxicity": {
+        "none": "None",
+        "mild": "Mild",
+        "toxic": "Toxic",
+        "deadly": "Deadly"
+      },
+      "edible": {
+        "yes": "Yes",
+        "partly": "Partly",
+        "no": "No"
+      }
+    },
+    "profile": {
+      "new": "New entry",
+      "contains_one": "{{count}} entry attached",
+      "contains_other": "{{count}} entries attached"
+    },
+    "sections": {
+      "identity": "What makes the species, animal or plant recognizable.",
+      "story": "Where it lives, what is told about it, and your author's notes.",
+      "gallery": "Up to 30 images: illustrations, photos, references."
+    },
+    "form": {
+      "namePlaceholder": "E.g. Grey wolf, Lightning, Moon rose"
+    },
+    "picker": {
+      "title": "Animal or plant?",
+      "description": "Choose a type: the entry adapts (a dragon doesn't have the same information as a flower)."
+    },
+    "create": {
+      "save": "Create the entry",
+      "inside": "Will be attached to “{{name}}”."
+    },
+    "list": {
+      "create": "Create an entry",
+      "emptyTitle": "No animals or plants yet",
+      "emptyDescription": "Create the species first (grey wolves, moon roses), then the specific animals and plants of your story.",
+      "count_one": "{{count}} entry",
+      "count_other": "{{count}} entries",
+      "addInside": "Add an individual to “{{name}}”"
+    },
+    "children": {
+      "title": "Individuals and subgroups",
+      "description": "The specific animals and plants (or groups) attached to “{{name}}”.",
+      "add": "Add an individual",
+      "empty": "No entry is attached to this species."
+    },
+    "sidebar": {
+      "title": "Fauna and flora",
+      "empty": "No entries."
+    },
+    "disabled": {
+      "title": "The Fauna and flora module is turned off",
+      "description": "Your entries are kept. Turn the module back on in the project settings to find them again."
+    },
+    "settings": {
+      "title": "Fauna and flora",
+      "description": "The animals and plants of your world: whole species, and individuals that can also be characters.",
+      "enable": "Turn on fauna and flora",
+      "enabledHint": "The “Fauna and flora” module is in the left bar.",
+      "disabledHint": "Turn it on to add it to the left bar.",
+      "kept_one": "{{count}} entry is kept and will come back if you turn the module on again.",
+      "kept_other": "{{count}} entries are kept and will come back if you turn the module on again.",
+      "categories": "Fauna, flora, or both: only the checked categories are offered.",
+      "types": "Add your own types (Griffin, Spirit tree…). Each belongs to fauna or flora and gets its fields.",
+      "typePlaceholder": "E.g. Griffin"
+    },
+    "levels": {
+      "title": "Detail level of fauna and flora entries",
+      "firstTime": "Choose the detail level of fauna and flora entries in this project. It applies to every entry and can be changed in the project settings.",
+      "basic": {
+        "label": "Basic",
+        "theme": "The essentials",
+        "goal": "Name and describe the animal or plant",
+        "count": "8 fields"
+      },
+      "intermediate": {
+        "label": "Medium",
+        "theme": "The characteristics",
+        "goal": "Size, diet, danger, properties, uses…",
+        "count": "+ 9 to 12 fields"
+      },
+      "advanced": {
+        "label": "Advanced",
+        "theme": "The depth",
+        "goal": "Type-specific details, habitat and legends",
+        "count": "+ 2 to 5 fields"
+      }
+    }
+  }
+}

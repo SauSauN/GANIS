@@ -6,6 +6,7 @@ import { documentsApi } from "./documents";
 import { charactersApi } from "./characters";
 import { locationsApi } from "./locations";
 import { packagesApi } from "./packages";
+import { worldApi } from "./world";
 
 export { ApiError, isTauri, translateApiError } from "./client";
 
@@ -21,4 +22,5 @@ export const api = {
   ...charactersApi,
   ...locationsApi,
   ...packagesApi,
+  ...worldApi,
 };

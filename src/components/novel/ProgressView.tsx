@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { doubleClickHint, onRowDoubleClick } from "@/lib/doubleClick";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle, ChevronDown, ChevronRight, Loader2 } from "lucide-react";
 import { ProgressBar } from "@/components/novel/NovelSheetCards";
@@ -10,6 +11,7 @@ import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { api } from "@/lib/api";
 import { fullName } from "@/lib/characters";
 import { errorText } from "@/lib/errors";
+import { notifyError } from "@/lib/notify";
 import { chapterLevel, goalPercent, narrationReport, sceneLevel, STATUS_COLORS, statusOf } from "@/lib/novel";
 import { buildStructureTree, structureNodeTabId, type StructureTreeNode } from "@/lib/structure";
 import { cn } from "@/lib/utils";
@@ -43,7 +45,10 @@ export function ProgressView({ project, feature, onOpenFeature }: ProgressViewPr
 
   const [filter, setFilter] = useState<WritingStatus | "all">("all");
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "novel:progress");
+  };
   const [goalDraft, setGoalDraft] = useState("");
 
   const goal = structure?.manuscriptGoal ?? null;
@@ -217,11 +222,6 @@ export function ProgressView({ project, feature, onOpenFeature }: ProgressViewPr
           )}
         </p>
 
-        {error && (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
-        )}
 
         {/* Tableau */}
         {chapterNodes.length === 0 && nodes.length === 0 ? (
@@ -247,7 +247,13 @@ export function ProgressView({ project, feature, onOpenFeature }: ProgressViewPr
                   const isScene = node.level >= scenes && !node.children.length;
                   const pov = isScene ? povOf(node.id) : null;
                   return (
-                    <tr key={node.id} className={cn("border-b last:border-0 hover:bg-muted/30", node.level < chapters && "bg-muted/20 font-medium")}>
+                    <tr
+                      key={node.id}
+                      // Double-clic sur la ligne : ouvre la fiche (statut et objectif restent modifiables à côté).
+                      onDoubleClick={onRowDoubleClick(() => onOpenFeature(structureNodeTabId(node.id)))}
+                      title={doubleClickHint("openSheet")}
+                      className={cn("border-b last:border-0 hover:bg-muted/30", node.level < chapters && "bg-muted/20 font-medium")}
+                    >
                       <td className="px-4 py-1.5">
                         <div className="flex items-center gap-1" style={{ paddingLeft: `${depth * 1.1}rem` }}>
                           {node.children.length > 0 ? (

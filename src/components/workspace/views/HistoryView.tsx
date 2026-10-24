@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { doubleClickHint, onRowDoubleClick } from "@/lib/doubleClick";
 import { useTranslation } from "react-i18next";
 import {
   FileText,
@@ -17,6 +18,9 @@ import {
   Waypoints,
   type LucideIcon,
   LayoutPanelTop,
+  Package,
+  PawPrint,
+  Link2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
@@ -39,6 +43,9 @@ const ICONS: Record<HistoryKind, LucideIcon> = {
   sticky: StickyNote,
   relation: Network,
   placeLink: MapPin,
+  item: Package,
+  species: PawPrint,
+  worldLink: Link2,
   mangaPanel: LayoutPanelTop,
   synopsis: FileText,
   plot: Waypoints,
@@ -166,7 +173,13 @@ export function HistoryView({ projectId, feature, onOpenFeature }: HistoryViewPr
                   const target = item.kind === "document" ? item.detail : item.itemId;
                   const tab = item.action === "deleted" || !target ? null : itemTabId(item.kind, target);
                   return (
-                    <li key={item.id} className="flex items-center gap-3 px-4 py-2.5">
+                    <li
+                      key={item.id}
+                      // Double-clic sur l'entrée : ouvre l'élément, s'il existe encore.
+                      onDoubleClick={tab ? onRowDoubleClick(() => onOpenFeature(tab)) : undefined}
+                      title={tab ? doubleClickHint("openItem") : undefined}
+                      className="flex items-center gap-3 px-4 py-2.5"
+                    >
                       <span className="w-12 shrink-0 text-xs tabular-nums text-muted-foreground">{timeOf(item.at, i18n.language)}</span>
                       <Icon className="size-4 shrink-0 text-muted-foreground" />
                       <p className="min-w-0 flex-1 text-sm">

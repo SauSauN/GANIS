@@ -842,9 +842,11 @@ pub async fn set_levels(
             .await?;
 
         if used > 0 {
-            return Err(AppError::validation(format!(
-                "Ce niveau contient encore {used} élément(s)."
-            ))
+            return Err(AppError::validation(if used == 1 {
+                "Ce niveau contient encore 1 élément.".to_owned()
+            } else {
+                format!("Ce niveau contient encore {used} éléments.")
+            })
             .with_key("structure.levelInUse")
             .with_param("count", used));
         }

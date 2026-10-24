@@ -152,7 +152,6 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
     return [...known.filter((v) => used.includes(v)), ...used.filter((v) => !known.includes(v))];
   };
   const roles = ordered("role", [...new Set(characters.map((c) => c.role))]);
-  const statuses = ordered("status", [...new Set(characters.map((c) => c.status))]);
 
   const visible = useMemo(() => {
     const roleOrder = listValues(lists, "role");

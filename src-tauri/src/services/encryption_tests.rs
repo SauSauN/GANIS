@@ -776,8 +776,25 @@ async fn public_project_can_become_private_and_back() {
     let (user, key) = env.state.require_session().await.unwrap();
 
     // Public → privé : rattaché à Alice, nom chiffré, données intactes.
+    // Sans le nom retapé, rien ne change : le projet reste public.
+    let refused = project_service::set_visibility(
+        &env.state.app_db, &id, &user.id, &key, ProjectVisibility::Private, None,
+    )
+    .await;
+    assert!(refused.is_err());
+    let refused = project_service::set_visibility(
+        &env.state.app_db, &id, &user.id, &key, ProjectVisibility::Private, Some("autre nom"),
+    )
+    .await;
+    assert!(refused.is_err());
+    assert!(project_service::find_for_viewer(&env.state.app_db, &id, &env.state.viewer().await)
+        .await
+        .unwrap()
+        .unwrap()
+        .is_public());
+
     let private = project_service::set_visibility(
-        &env.state.app_db, &id, &user.id, &key, ProjectVisibility::Private,
+        &env.state.app_db, &id, &user.id, &key, ProjectVisibility::Private, Some("  à ADOPTER "),
     )
     .await
     .unwrap();
@@ -792,7 +809,7 @@ async fn public_project_can_become_private_and_back() {
     // Privé → public : de nouveau ouvrable sans connexion.
     login(&env, "alice", "motdepasse1").await;
     let (user, key) = env.state.require_session().await.unwrap();
-    project_service::set_visibility(&env.state.app_db, &id, &user.id, &key, ProjectVisibility::Public)
+    project_service::set_visibility(&env.state.app_db, &id, &user.id, &key, ProjectVisibility::Public, None)
         .await
         .unwrap();
     auth_service::logout_user(&env.state).await.unwrap();
@@ -829,10 +846,10 @@ async fn deleted_project_goes_to_trash_then_can_be_restored_or_purged() {
     assert_eq!(read_text(&env, &kept).await, "Texte gardé");
 
     // Un projet actif ne peut pas être effacé directement.
-    assert!(project_service::purge_for_viewer(db, &kept, &viewer).await.is_err());
+    assert!(project_service::purge_for_viewer(db, &kept, &viewer, false).await.is_err());
 
     // Suppression définitive : la ligne et le dossier disparaissent.
-    project_service::purge_for_viewer(db, &gone, &viewer).await.unwrap();
+    project_service::purge_for_viewer(db, &gone, &viewer, false).await.unwrap();
     project_storage::delete_storage(&env.state, &gone).await;
     assert!(project_service::list_trash_for_viewer(db, &viewer).await.unwrap().is_empty());
     assert!(!db_path(&env, &gone).exists());
@@ -843,6 +860,33 @@ async fn deleted_project_goes_to_trash_then_can_be_restored_or_purged() {
     let guest = env.state.viewer().await;
     assert!(project_service::list_trash_for_viewer(db, &guest).await.unwrap().is_empty());
     assert!(project_service::restore_for_viewer(db, &kept, &guest).await.is_err());
+}
+
+#[tokio::test]
+async fn public_project_purge_needs_explicit_confirmation() {
+    let env = env().await;
+    let id = create_public_project_with_text(&env, "Partagé", "Texte commun").await;
+    let guest = env.state.viewer().await;
+    let db = &env.state.app_db;
+
+    project_service::trash_for_viewer(db, &id, &guest).await.unwrap();
+
+    // Sans confirmation : refusé, le projet reste dans la corbeille.
+    let refused = project_service::purge_for_viewer(db, &id, &guest, false).await;
+    assert!(refused.is_err());
+    assert_eq!(project_service::list_trash_for_viewer(db, &guest).await.unwrap().len(), 1);
+
+    // Confirmé : effacé.
+    project_service::purge_for_viewer(db, &id, &guest, true).await.unwrap();
+    assert!(project_service::list_trash_for_viewer(db, &guest).await.unwrap().is_empty());
+}
+
+#[test]
+fn project_name_confirmation_ignores_case_and_outer_spaces() {
+    assert!(project_service::name_confirmed("La Rose de lune", Some("  la rose DE LUNE ")));
+    assert!(!project_service::name_confirmed("La Rose de lune", Some("La Rose")));
+    assert!(!project_service::name_confirmed("La Rose de lune", None));
+    assert!(!project_service::name_confirmed("   ", Some("")));
 }
 
 #[tokio::test]

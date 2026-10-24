@@ -58,6 +58,8 @@
  * Les valeurs marquées (dérivé) ne figurent pas dans ta table : ajustables.
  */
 :root {
+    /* Images du panneau du milieu (Paramètres › Apparence). */
+    --panel-thumb: 1.5rem;
     --background: #FAFAFD;
     --foreground: #122056;
     --card: #FFFFFF;

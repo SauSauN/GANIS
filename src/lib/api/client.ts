@@ -1,5 +1,6 @@
 import { invoke, type InvokeArgs, type InvokeOptions } from "@tauri-apps/api/core";
 import i18n from "@/i18n";
+import { recordError } from "@/lib/problemReport";
 import { isWriteCommand, useSaveStatusStore } from "@/lib/saveStatus";
 import type { ApiErrorPayload, ErrorCode } from "@/types";
 
@@ -30,7 +31,9 @@ export function translateApiError(error: ApiError): string {
 }
 
 function translateMessage(error: ApiError): string {
-  if (error.key && i18n.exists(`errors:${error.key}`)) {
+  // `params` passé à `exists` : une clé au pluriel (`_one` / `_other`)
+  // n'existe qu'avec son `count`.
+  if (error.key && i18n.exists(`errors:${error.key}`, { ...error.params })) {
     const params: Record<string, unknown> = { ...error.params };
 
     // Nom de champ (ex. `genres`) : traduit lui aussi.
@@ -227,6 +230,9 @@ export async function call<T>(
   } catch (e) {
     const error = normalize(e);
     if (writes) status.fail(error.message);
+    // Pour « Signaler un problème » : la commande et le code seulement, pas
+    // le message (il peut citer un nom de fiche ou de fichier).
+    recordError(`${command}: ${error.code}${error.key ? ` (${error.key})` : ""}`);
     throw error;
   }
 }

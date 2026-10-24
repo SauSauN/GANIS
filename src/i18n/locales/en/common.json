@@ -10,6 +10,24 @@
     "close": "Close"
   },
   "startup": "Starting GANIS…",
+  "doubleClick": {
+    "openSheet": "Double-click to open the sheet",
+    "openItem": "Double-click to open",
+    "renameLane": "Double-click to rename the lane"
+  },
+  "keys": {
+    "ctrl": "Ctrl",
+    "alt": "Alt",
+    "shift": "Shift",
+    "escape": "Esc",
+    "tab": "Tab",
+    "pageDown": "PgDn",
+    "pageUp": "PgUp",
+    "delete": "Del",
+    "backspace": "Backspace",
+    "enter": "Enter",
+    "space": "Space"
+  },
   "validation": {
     "usernameTooShort": "Username must be at least 3 characters long.",
     "usernameTooLong": "Username must not exceed 50 characters.",
@@ -48,5 +66,29 @@
     "count_one": "{{count}} item selected",
     "count_other": "{{count}} items selected",
     "clear": "Clear selection"
+  },
+  "placeholders": {
+    "username": "Your username",
+    "chooseUsername": "E.g. nelly_writer (at least 3 characters)",
+    "password": "Your password",
+    "currentPassword": "Your current password",
+    "newPassword": "At least 8 characters",
+    "confirmPassword": "Type the same password again",
+    "email": "E.g. name@example.com",
+    "projectName": "E.g. The Moon Rose",
+    "projectDescription": "In a few lines, what is your story about…",
+    "number": "E.g. 3",
+    "startNumber": "E.g. 1",
+    "levelName": "E.g. Chapter",
+    "hexColor": "E.g. #8B5CF6",
+    "recoveryGroup": "The characters of the requested group",
+    "find": "Word or phrase to find…",
+    "replaceWith": "New text (empty: delete it)",
+    "eventTitle": "Event title",
+    "laneName": "Plotline name",
+    "rows": "E.g. 12",
+    "moment": "E.g. 4",
+    "documentName": "New document name",
+    "documentText": "Write here…"
   }
 }

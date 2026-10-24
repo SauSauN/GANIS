@@ -180,7 +180,7 @@ describe("niveau de détail des fiches de lieux", () => {
     const intermediate = levelFieldKeys("city", "settlement", "intermediate");
     const advanced = levelFieldKeys("port", "settlement", "advanced");
 
-    expect([...basic].sort()).toEqual(["description", "notes"]);
+    expect([...basic].sort()).toEqual(["colorPalette", "description", "notes"]);
     expect(intermediate.has("aliases")).toBe(true);
     expect(intermediate.has("population")).toBe(true);
     expect(intermediate.has("history")).toBe(false);

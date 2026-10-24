@@ -15,13 +15,9 @@ mod state;
 mod services;
 mod commands;
 
-/// Projet de démonstration (roman complet) : `cargo test --lib seed_public_novel -- --ignored --nocapture`.
+/// Projets d'exemple en ligne de commande (`npm run seed:roman` / `seed:manga`).
 #[cfg(test)]
-mod seed_novel;
-
-/// Projet de démonstration (manga complet) : `cargo test --lib seed_public_manga -- --ignored --nocapture`.
-#[cfg(test)]
-mod seed_manga;
+mod seed_demo;
 
 use error::AppResult;
 use serde::Serialize;
@@ -51,6 +47,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
         .setup(|app| {
             // -----------------------------------------------------------------
             // 1. Journalisation
@@ -120,6 +117,8 @@ pub fn run() {
             commands::users::delete_account,
             commands::projects::create_project,
             commands::projects::list_projects,
+            commands::demo::list_demo_projects,
+            commands::demo::create_demo_project,
             commands::projects::get_project,
             commands::projects::open_project,
             commands::projects::update_project,
@@ -189,6 +188,30 @@ pub fn run() {
             commands::locations::add_location_gallery_image,
             commands::locations::set_location_gallery_caption,
             commands::locations::delete_location_gallery_image,
+            commands::world::get_world_settings,
+            commands::world::set_world_enabled,
+            commands::world::set_world_categories,
+            commands::world::set_world_detail_level,
+            commands::world::set_world_custom_types,
+            commands::world::set_world_list,
+            commands::world::list_world_entries,
+            commands::world::create_world_entry,
+            commands::world::update_world_entry,
+            commands::world::delete_world_entry,
+            commands::world::set_species_character,
+            commands::world::create_species_character,
+            commands::world::get_world_entry_portrait,
+            commands::world::set_world_entry_portrait,
+            commands::world::remove_world_entry_portrait,
+            commands::world::list_world_entry_gallery,
+            commands::world::get_world_entry_gallery_image,
+            commands::world::add_world_entry_gallery_image,
+            commands::world::set_world_entry_gallery_caption,
+            commands::world::delete_world_entry_gallery_image,
+            commands::world::list_world_links,
+            commands::world::create_world_link,
+            commands::world::update_world_link,
+            commands::world::delete_world_link,
             commands::history::list_activity,
             commands::history::list_versions,
             commands::history::create_version,

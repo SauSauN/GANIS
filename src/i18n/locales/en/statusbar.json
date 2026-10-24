@@ -5,6 +5,7 @@
     "idle": "Ready",
     "saving": "Saving…",
     "error": "Save failed",
+    "failed": "Last save failed",
     "savedAt": "Saved at {{time}}",
     "unsaved_one": "{{count}} unsaved change",
     "unsaved_other": "{{count}} unsaved changes",

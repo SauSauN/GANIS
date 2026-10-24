@@ -25,7 +25,7 @@ export function ColorField({
   showError: boolean;
   onChange: (value: string) => void;
 }) {
-  const { t } = useTranslation("packages");
+  const { t } = useTranslation(["packages", "common"]);
   const valid = isHexColor(value);
   const error = showError && !valid;
 
@@ -48,6 +48,7 @@ export function ColorField({
           id={id}
           value={value}
           maxLength={7}
+          placeholder={t("common:placeholders.hexColor")}
           spellCheck={false}
           autoComplete="off"
           onChange={(e) => {
@@ -93,7 +94,7 @@ export function CollapsibleCard({
   footer?: ReactNode;
   children: ReactNode;
 }) {
-  const { t } = useTranslation("packages");
+  const { t } = useTranslation(["packages", "common"]);
   const contentId = `theme-section-${id}`;
 
   return (
@@ -140,7 +141,7 @@ export function CollapsibleCard({
 }
 
 export function ContrastRow({ label, ratio }: { label: string; ratio: number | null }) {
-  const { t, i18n } = useTranslation("packages");
+  const { t, i18n } = useTranslation(["packages", "common"]);
   if (ratio === null) {
     return null;
   }

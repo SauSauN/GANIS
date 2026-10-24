@@ -252,7 +252,7 @@ export function CharacterSheet({
                   id={id}
                   value={value}
                   onChange={change}
-                  placeholder={t("placeholders.tags")}
+                  placeholder={placeholder ?? t("placeholders.tags")}
                   disabled={disabled}
                 />
               );
@@ -376,12 +376,12 @@ export function CharacterSheet({
   }
 
   return (
-    <div className="grid items-start gap-8 lg:grid-cols-[16rem_minmax(0,1fr)]">
+    <div className="grid items-start gap-8 lg:grid-cols-[17rem_minmax(0,1fr)]">
       {/* ================================================================
           CARTE DE PROFIL
           ================================================================ */}
       <Card className={cn(cardClass, "lg:sticky lg:top-0")}>
-        <CardContent className="flex flex-col items-center gap-4 px-6 py-6 text-center">
+        <CardContent className="flex flex-col items-center gap-4 px-5 py-5 text-center">
           <PortraitPicker
             colorKey={portrait.colorKey}
             name={name}
@@ -389,7 +389,7 @@ export function CharacterSheet({
             busy={portrait.busy}
             error={portrait.error}
             disabled={disabled}
-            size="2xl"
+            frame
             ringColors={palette}
             onPick={portrait.onPick}
             onRemove={portrait.onRemove}
@@ -444,7 +444,7 @@ export function CharacterSheet({
           SECTIONS PAR NIVEAU
           ================================================================ */}
       <div className="min-w-0 space-y-8">
-        {levels.map((item, index) => {
+        {levels.map((item) => {
           const Icon = LEVEL_ICONS[item];
           const progress = levelProgress(draft, item, images);
           const open = !collapsed.has(item);
@@ -467,7 +467,6 @@ export function CharacterSheet({
 
                   <span className="min-w-0 flex-1">
                     <CardTitle>
-                      <span className="mr-2 text-muted-foreground">{index + 1}.</span>
                       {t(`levels.${item}.theme`)}
                     </CardTitle>
                     <CardDescription>{t(`levels.${item}.goal`)}</CardDescription>

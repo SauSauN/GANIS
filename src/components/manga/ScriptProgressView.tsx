@@ -8,6 +8,7 @@ import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { PageShell } from "@/components/workspace/views/PageShell";
 import { api } from "@/lib/api";
 import { errorText } from "@/lib/errors";
+import { notifyError } from "@/lib/notify";
 import { mangaLevels, pagesInOrder, pageStats, pageVolume, panelsByPage, panelVolume, textStats } from "@/lib/manga";
 import { goalPercent } from "@/lib/novel";
 import { structureNodeTabId } from "@/lib/structure";
@@ -42,7 +43,10 @@ export function ScriptProgressView({ project, feature, onOpenFeature }: ScriptPr
   const settings = useMangaSettings(project.id);
   const saveSettings = useMangaStore((s) => s.saveSettings);
   const applyNode = useStructureStore((s) => s.applyNode);
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "manga:progress");
+  };
   const [panelMax, setPanelMax] = useState("");
   const [pageMax, setPageMax] = useState("");
 
@@ -160,11 +164,6 @@ export function ScriptProgressView({ project, feature, onOpenFeature }: ScriptPr
           </div>
         </section>
 
-        {error && (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
-        )}
 
         {/* Chapitres */}
         {rows.length === 0 ? (

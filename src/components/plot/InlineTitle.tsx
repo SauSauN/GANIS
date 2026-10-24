@@ -14,6 +14,7 @@ export function InlineTitle({ initial, fontSize, label, onDone }: { initial: str
       autoFocus
       value={value}
       aria-label={label}
+      placeholder={label}
       maxLength={200}
       onFocus={(e) => e.target.select()}
       onChange={(e) => setValue(e.target.value)}

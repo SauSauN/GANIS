@@ -631,6 +631,85 @@ export interface LocationImage {
 }
 
 // ----------------------------------------------------------------------------
+// Objets, faune et flore (voir `world_service.rs`, `lib/world.ts`)
+// ----------------------------------------------------------------------------
+
+/** Module : objets (`item`) ou faune et flore (`species`). */
+export type WorldModule = "item" | "species";
+
+/** Faune et flore : une espèce entière, ou un animal / une plante précis. */
+export type SpeciesNature = "species" | "individual";
+
+/** Objet ou espèce (correspond à `WorldEntry` en Rust ; les images sont à part). */
+export interface WorldEntry {
+  id: string;
+  name: string;
+  /** Type par défaut (`sword`, `car`, `mammal`…) ou ajouté par l'auteur (`custom-…`). */
+  type: string;
+  /** Faune et flore seulement ; `null` pour un objet. */
+  nature: SpeciesNature | null;
+  /** Objet qui le contient ; espèce d'un animal précis. `null` : tout en haut. */
+  parentId: string | null;
+  /** Faune et flore : fiche de personnage de cet animal (`null` : aucune). */
+  characterId: string | null;
+  status: string;
+  fields: Record<string, string>;
+  portraitUpdatedAt: string | null;
+  galleryCount: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface WorldEntryInput {
+  name: string;
+  type: string;
+  nature: SpeciesNature | null;
+  parentId: string | null;
+  status: string;
+  fields: Record<string, string>;
+}
+
+/** Réglages d'un module pour le projet. */
+export interface WorldSettings {
+  /** Module affiché dans la barre de gauche (désactivé par défaut). */
+  enabled: boolean;
+  /** Catégories choisies par l'auteur (ordre du catalogue). */
+  categories: string[];
+  detailLevel: CharacterDetailLevel | null;
+  customTypes: CustomLocationType[];
+  lists: Partial<Record<"status", string[]>>;
+}
+
+/** Image de la galerie d'un objet ou d'une espèce, sans son contenu. */
+export interface WorldImage {
+  id: string;
+  caption: string | null;
+  createdAt: string;
+}
+
+/** Sorte d'élément reliée par un lien du monde. */
+export type WorldLinkKind = "character" | "location" | "item" | "species";
+
+/** Lien entre deux éléments, dont au moins un objet ou une espèce. */
+export interface WorldLink {
+  id: string;
+  sourceKind: WorldLinkKind;
+  sourceId: string;
+  targetKind: WorldLinkKind;
+  targetId: string;
+  /** `owns`, `livesIn`… (voir `worldLinkCatalog.json`). */
+  type: string;
+  label: string;
+  description: string;
+  sinceNode: string | null;
+  untilNode: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type WorldLinkInput = Omit<WorldLink, "id" | "createdAt" | "updatedAt">;
+
+// ----------------------------------------------------------------------------
 // Relations entre personnages
 // ----------------------------------------------------------------------------
 
@@ -884,7 +963,10 @@ export type TrashKind =
   | "sticky"
   | "relation"
   | "placeLink"
-  | "mangaPanel";
+  | "mangaPanel"
+  | "item"
+  | "species"
+  | "worldLink";
 
 export interface TrashItem {
   id: string;
@@ -916,7 +998,7 @@ export interface Activity {
 }
 
 /** Éléments qui ont des versions. */
-export type VersionKind = "character" | "location" | "structureNode" | "note" | "synopsis" | "plot" | "editorial";
+export type VersionKind = "character" | "location" | "item" | "species" | "structureNode" | "note" | "synopsis" | "plot" | "editorial";
 
 export interface Version {
   id: string;
@@ -945,7 +1027,7 @@ export interface WorkCalendar {
 }
 
 /** `document` : l'identifiant est celui de l'élément du découpage qui le contient. */
-export type SearchKind = "character" | "location" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky";
+export type SearchKind = "character" | "location" | "item" | "species" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky";
 
 export interface SearchHit {
   kind: SearchKind;

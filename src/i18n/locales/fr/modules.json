@@ -32,6 +32,14 @@
     },
     "script": {
       "label": "Scénario"
+    },
+    "items": {
+      "label": "Objets",
+      "empty": "Aucun objet pour l'instant."
+    },
+    "species": {
+      "label": "Faune et flore",
+      "empty": "Aucun animal ni aucune plante pour l'instant."
     }
   },
   "features": {
@@ -73,6 +81,10 @@
       "plan": {
         "label": "Plan du récit",
         "description": "Le découpage de votre histoire, adapté au type de projet."
+      },
+      "read": {
+        "label": "Lecture complète",
+        "description": "Toute l'histoire d'un seul tenant, compilée dans l'ordre du découpage."
       }
     },
     "notes": {
@@ -131,8 +143,8 @@
     },
     "script": {
       "read": {
-        "label": "Scénario",
-        "description": "Le scénario page par page et case par case ; export pour le dessinateur."
+        "label": "Lecture de l'histoire",
+        "description": "L'histoire chapitre par chapitre : l'explication de chaque chapitre et ce que montrent ses pages."
       },
       "progress": {
         "label": "Suivi du scénario",
@@ -141,6 +153,26 @@
       "continuity": {
         "label": "Continuité",
         "description": "Où apparaît chaque personnage, et dans quel état, case par case."
+      }
+    },
+    "items": {
+      "create": {
+        "label": "Créer un objet",
+        "description": "Arme, véhicule, chapeau, téléphone… une fiche adaptée à chaque type."
+      },
+      "list": {
+        "label": "Liste des objets",
+        "description": "Tous les objets de votre histoire, rangés les uns dans les autres."
+      }
+    },
+    "species": {
+      "create": {
+        "label": "Créer une fiche",
+        "description": "Une espèce, ou un animal ou une plante précis (qui peut aussi être un personnage)."
+      },
+      "list": {
+        "label": "Liste de la faune et flore",
+        "description": "Les espèces de votre univers et leurs individus."
       }
     }
   }

@@ -1,0 +1,2582 @@
+{
+  "format": 1,
+  "project": {
+    "name": "Kazemusubi",
+    "description": "Projet d'exemple — manga. Dans un archipel où le vent se tisse et se paie, un garçon d'une île pauvre découvre qu'il peut le dénouer à mains nues. Visite guidée : Notes › « À lire d'abord ».",
+    "type": "manga",
+    "status": "in_progress"
+  },
+  "card": {
+    "pitch": "Dans l'archipel d'Amaori, le vent se tisse et se paie. Kai, quinze ans, voit les fils à l'œil nu et défait à mains nues la tempête que la Guilde envoie sur son île.",
+    "highlights": [
+      "Arc › Tome › Chapitre › Page : 2 arcs, 3 tomes, 10 chapitres",
+      "42 pages scénarisées case par case (152 cases), chapitres en cours ou à écrire",
+      "9 personnages, 12 lieux, 8 objets, factions et règles du tissage",
+      "Trame en 4 intrigues, passé à trente ans, mystères et indices"
+    ]
+  },
+  "synopsis": {
+    "text": "synopsis",
+    "genres": [
+      "Fantasy",
+      "Aventure"
+    ],
+    "subgenres": [
+      "Shōnen",
+      "Monde insulaire"
+    ],
+    "tones": [
+      "Lumineux",
+      "Épique"
+    ]
+  },
+  "characterSettings": {
+    "detailLevel": "advanced"
+  },
+  "locationSettings": {
+    "detailLevel": "advanced",
+    "customTypes": [
+      {
+        "key": "tour-metier",
+        "name": "Tour-métier",
+        "category": "built"
+      },
+      {
+        "key": "quai",
+        "name": "Quai",
+        "category": "built"
+      },
+      {
+        "key": "maison",
+        "name": "Maison",
+        "category": "built"
+      },
+      {
+        "key": "falaise",
+        "name": "Falaise",
+        "category": "natural"
+      }
+    ]
+  },
+  "world": {
+    "item": {
+      "enabled": true,
+      "categories": [
+        "tool",
+        "document",
+        "magic",
+        "weapon",
+        "vehicle",
+        "clothing"
+      ],
+      "detailLevel": "advanced"
+    },
+    "species": {
+      "enabled": true,
+      "categories": [
+        "fauna"
+      ],
+      "detailLevel": "advanced"
+    }
+  },
+  "mangaSettings": {
+    "panelWordsMax": 25,
+    "pageWordsMax": 90
+  },
+  "structure": {
+    "levels": [
+      {
+        "one": "Arc",
+        "other": "Arcs",
+        "numbering": "continuous",
+        "start": 1,
+        "digits": 1,
+        "color": "#7c5cbf"
+      },
+      {
+        "one": "Tome",
+        "other": "Tomes",
+        "numbering": "continuous",
+        "start": 1,
+        "digits": 1,
+        "color": "#3d6fb6"
+      },
+      {
+        "one": "Chapitre",
+        "other": "Chapitres",
+        "numbering": "continuous",
+        "start": 1,
+        "digits": 1,
+        "color": "#c2533b"
+      },
+      {
+        "one": "Page",
+        "other": "Pages",
+        "numbering": "perParent",
+        "start": 1,
+        "digits": 2,
+        "color": "#8a97a5"
+      }
+    ],
+    "autoNumbering": true,
+    "nodes": [
+      {
+        "key": "arc1",
+        "title": "Kesen",
+        "summary": "Kai découvre qu'il est un dénoueur, perd sa grand-mère emmenée par la Guilde et quitte son île. Fin d'arc : il apprend qui mène les Dénoueurs.",
+        "children": [
+          {
+            "key": "t1",
+            "title": "Le garçon qui dénouait le vent",
+            "summary": "Tome 1 (5 chapitres, environ 90 pages). De la tempête de Kesen à la rencontre avec « celle qui coupe ». Cible : bouclage du scénario fin novembre.",
+            "children": [
+              {
+                "key": "ch1",
+                "title": "Le garçon qui dénouait le vent",
+                "summary": "Kesen ne paie plus la dîme : la Guilde lui envoie les vents bruts. Kai, qui voit les fils de vent à l'œil nu, rompt la promesse faite à sa grand-mère et défait la tempête à mains nues. Mio, apprentie de la Guilde, a tout vu.",
+                "manga": {
+                  "narrativeGoal": "Installer le monde (le vent se tisse et se paie), le don de Kai et le prix de ce don (la brûlure, la promesse rompue). Finir sur une question qui dépasse Kai : le nœud de punition.",
+                  "pageGoal": 18,
+                  "scriptStatus": "final"
+                }
+              },
+              {
+                "key": "ch2",
+                "title": "La fileuse",
+                "summary": "Mio ment dans son rapport et se fait montrer les fils par Kai. Ume révèle qu'elle était fileuse et donne à Kai sa première leçon. Daigo revient, reconnaît la « Fileuse des Récifs » et l'emmène à Amaori.",
+                "manga": {
+                  "narrativeGoal": "Faire passer Mio d'adversaire à alliée sans qu'elle cède sur ce qu'elle croit. Révéler le passé d'Ume et lui faire payer : la perte d'Ume est le moteur du tome.",
+                  "pageGoal": 16,
+                  "scriptStatus": "review"
+                }
+              },
+              {
+                "key": "ch3",
+                "title": "Les Récifs Hurlants",
+                "summary": "Avec Tetsu et Mio, Kai part sur le Kamome. Pour éviter les patrouilles, ils traversent les Récifs Hurlants, où la Guilde n'a jamais tissé. Kai découvre des fils libres ; Mio les entend sans lunettes. Une voile noire les attend.",
+                "manga": {
+                  "narrativeGoal": "Former le trio et poser la grande opposition de la série : fils tissés contre fils libres. Montrer que Kai progresse (il écarte au lieu d'arracher).",
+                  "pageGoal": 18,
+                  "scriptStatus": "progress"
+                }
+              },
+              {
+                "key": "ch4",
+                "title": "La voile noire",
+                "summary": "Les Dénoueurs arraisonnent le Kamome. Ils coupent les fils de la Guilde pour rendre le vent aux îles, quitte à détruire les récoltes de celles qui paient. Kai est fasciné, Mio horrifiée, Tetsu pense au bateau de son père.",
+                "manga": {
+                  "narrativeGoal": "Donner un visage séduisant et dangereux à la révolte. Opposer la méthode de Kai (dénouer) à celle des Dénoueurs (couper). Planter le malaise : les Dénoueurs connaissent le nom d'Ume.",
+                  "pageGoal": 18,
+                  "scriptStatus": "todo"
+                }
+              },
+              {
+                "key": "ch5",
+                "title": "Celle qui coupe",
+                "summary": "La cheffe des Dénoueurs, « celle qui coupe », propose à Kai de délivrer Ume ensemble. Elle porte le même fil rouge que lui. Révélation de fin de tome : c'est Sayo Amaya, sa mère, qu'on croyait noyée.",
+                "manga": {
+                  "narrativeGoal": "Retournement de fin de tome. Le lecteur doit pouvoir le deviner à la relecture (fil rouge, voix, connaissance de Kesen), pas avant. Dernière page muette.",
+                  "pageGoal": 20,
+                  "scriptStatus": "todo"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "arc2",
+        "title": "Le Grand Métier",
+        "summary": "À Amaori, le procès d'Ume met à nu le système de la dîme. Kai doit choisir entre la méthode de sa mère et celle de sa grand-mère, puis affronter le Grand Métier lui-même.",
+        "children": [
+          {
+            "key": "t2",
+            "title": "Le procès d'Ume",
+            "summary": "Tome 2 (5 chapitres). Infiltration d'Amaori, preuve dans le registre de la dîme, procès public. Chapitres découpés, scénario à commencer en janvier.",
+            "children": [
+              {
+                "key": "ch6",
+                "title": "L'Anse noire",
+                "summary": "Au repaire des Dénoueurs, Sayo raconte les Récifs d'il y a trente ans : le nœud de capture, la tempête, la fuite d'Ume. Kai apprend à couper, et n'aime pas ce qu'il ressent.",
+                "manga": {
+                  "narrativeGoal": "Premier grand flash-back (8 pages au plus). Faire comprendre le passé par le point de vue de Sayo, partial : elle en veut à Ume.",
+                  "pageGoal": 18,
+                  "scriptStatus": "todo"
+                }
+              },
+              {
+                "key": "ch7",
+                "title": "Amaori",
+                "summary": "Le trio entre dans la capitale caché parmi les porteurs de dîme. Mio retrouve son école et ses camarades ; on la croit morte en mer.",
+                "manga": {
+                  "narrativeGoal": "Changer d'échelle : la ville, la foule, l'administration du vent. Le chapitre de Mio : ce qu'elle a quitté.",
+                  "pageGoal": 18,
+                  "scriptStatus": "todo"
+                }
+              },
+              {
+                "key": "ch8",
+                "title": "Le registre de la dîme",
+                "summary": "Mio vole le registre de la dîme : chaque nœud de punition y est commandé, daté et signé par le Maître-tisserand Hiraga. Daigo la surprend et la laisse partir.",
+                "manga": {
+                  "narrativeGoal": "La preuve. Faire basculer Daigo sans le rendre sympathique : il obéit à la loi, pas à Hiraga.",
+                  "pageGoal": 18,
+                  "scriptStatus": "todo"
+                }
+              },
+              {
+                "key": "ch9",
+                "title": "Le procès",
+                "summary": "Procès public d'Ume au pied du Grand Métier. Ume avoue avoir coupé le métier de Kesen et dit pourquoi. Mio produit le registre. Hiraga fait suspendre l'audience.",
+                "manga": {
+                  "narrativeGoal": "Chapitre de dialogue : tenir la tension par la mise en scène (foule, cadrages serrés, silences). Paiement de la question de la tour éteinte.",
+                  "pageGoal": 20,
+                  "scriptStatus": "todo"
+                }
+              },
+              {
+                "key": "ch10",
+                "title": "Le nœud du Grand Métier",
+                "summary": "Hiraga lance sur Amaori un nœud de punition pour reprendre la foule en main. Kai doit le défaire avec la méthode d'Ume, contre l'avis de Sayo qui veut couper le Grand Métier.",
+                "manga": {
+                  "narrativeGoal": "Climax de l'arc. Combat lisible : un seul nœud, trois manières d'agir (tisser, couper, dénouer). Fin ouverte sur Hiraga en fuite.",
+                  "pageGoal": 22,
+                  "scriptStatus": "todo"
+                }
+              }
+            ]
+          },
+          {
+            "key": "t3",
+            "title": "Le vent libre",
+            "summary": "Tome 3, à découper. Idées retenues : la tour de Kesen rallumée par Mio sans dîme ; le premier vent tissé « pour rien » ; Sayo et Ume face à face.",
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "locations": [
+    {
+      "key": "archipel",
+      "name": "Archipel d'Amaori",
+      "type": "archipelago",
+      "status": "existing",
+      "fields": {
+        "description": "Une soixantaine d'îles volcaniques sur une mer chaude et sans vent naturel stable. Chaque île habitée a sa tour-métier ; les vents qui font la pluie, la pêche et la navigation y sont tissés par la Guilde.",
+        "islandCount": "61 îles, dont 24 habitées",
+        "access": "Par mer seulement, le long des routes de vent tissées. Les Récifs Hurlants, au nord-ouest, ne sont pas tissés.",
+        "climate": "Chaud et humide ; sans tissage, calmes plats entrecoupés de rafales imprévisibles.",
+        "faunaFlora": "Mouettes-tempête, bancs de maquereaux et de sardines ; palmiers à fibres, bambou des falaises.",
+        "colorPalette": [
+          "#2e6f8e",
+          "#e9dcc0",
+          "#c2533b"
+        ],
+        "history": "La Guilde des Fileuses a « apprivoisé » le vent il y a trois siècles. Depuis, chaque île paie la dîme de vent au Grand Métier d'Amaori."
+      },
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          96,
+          160,
+          200
+        ],
+        "ground": [
+          233,
+          220,
+          192
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "ile-amaori",
+      "name": "Amaori",
+      "type": "island",
+      "parentId": "@loc:archipel",
+      "status": "existing",
+      "fields": {
+        "aliases": "La Capitale, l'Île-Métier",
+        "description": "La plus grande île, capitale de l'archipel. Ville en terrasses autour de la Tour-métier, ports, entrepôts de la dîme et école de la Guilde.",
+        "access": "Grand port au sud ; toutes les routes de vent y convergent.",
+        "climate": "Toujours parfait : la Guilde tisse d'abord pour elle-même.",
+        "firstAppearance": "@node:c1p01"
+      },
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          120,
+          180,
+          220
+        ],
+        "ground": [
+          240,
+          236,
+          228
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "tour-amaori",
+      "name": "Tour-métier d'Amaori (le Grand Métier)",
+      "type": "@ltype:tour-metier",
+      "parentId": "@loc:ile-amaori",
+      "status": "existing",
+      "fields": {
+        "description": "Tour de pierre blanche de neuf étages coiffée du Grand Métier, le plus grand métier à tisser du vent. Il enregistre chaque nœud tissé dans l'archipel et en garde la trace dans le registre de la dîme.",
+        "purpose": "Tisser les grands vents de l'archipel, contrôler les autres tours, tenir le registre.",
+        "owner": "La Guilde des Fileuses",
+        "architecturalStyle": "Pierre blanche, charpente de bois sombre, lices de bambou, cloches à vent.",
+        "condition": "intact",
+        "accessSecurity": "Gardes du Fil à chaque étage ; seules les maîtresses fileuses montent au Grand Métier.",
+        "firstAppearance": "@node:c1p01",
+        "history": "C'est au pied du Grand Métier que se tiennent les procès de la Guilde (tome 2)."
+      },
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          200,
+          210,
+          230
+        ],
+        "ground": [
+          250,
+          248,
+          240
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "ile-kesen",
+      "name": "Kesen",
+      "type": "island",
+      "parentId": "@loc:archipel",
+      "status": "existing",
+      "fields": {
+        "aliases": "L'île sans vent",
+        "description": "Petite île de falaises grises à l'extrémité nord de l'archipel, la dernière avant les Récifs Hurlants. Un seul village, un port minuscule, une tour-métier éteinte.",
+        "access": "Une passe étroite au sud ; navires de la Guilde deux fois par an.",
+        "climate": "Sans tissage depuis trente ans : brises faibles, calmes plats, coups de vent soudains venus des Récifs.",
+        "firstAppearance": "@node:c1p02",
+        "colorPalette": [
+          "#6b7682",
+          "#c9c2b0",
+          "#2e6f8e"
+        ],
+        "history": "Riche du temps où sa tour tissait les vents de pêche. Appauvrie depuis l'extinction de la tour ; en défaut de dîme depuis trois ans."
+      },
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          140,
+          150,
+          160
+        ],
+        "ground": [
+          201,
+          194,
+          176
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "village-kesen",
+      "name": "Village de Kesen",
+      "type": "port",
+      "parentId": "@loc:ile-kesen",
+      "status": "existing",
+      "fields": {
+        "description": "Maisons de bois serrées autour du port, filets pendus partout, odeur de poisson séché. Tout le monde se connaît ; personne ne parle de la tour.",
+        "population": "Environ 300 habitants",
+        "economy": "Pêche (sardine, maquereau), filets, algues séchées. Plus rien à vendre à la Guilde.",
+        "portKind": "fishing",
+        "atmosphere": "Résignation tranquille ; on rentre les bateaux et on attend. Tout le village sait qui est vraiment Ume, et personne n'en parle.",
+        "firstAppearance": "@node:c1p02"
+      },
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          150,
+          165,
+          175
+        ],
+        "ground": [
+          120,
+          95,
+          70
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "quai",
+      "name": "Quai de Kesen",
+      "type": "@ltype:quai",
+      "parentId": "@loc:village-kesen",
+      "status": "existing",
+      "fields": {
+        "description": "Quai de planches et de pierre où l'on ravaude les filets. Un poteau où la Guilde cloue ses avis.",
+        "purpose": "Débarquement, réparation des filets, lieu de rassemblement du village.",
+        "firstAppearance": "@node:c1p02"
+      }
+    },
+    {
+      "key": "jetee",
+      "name": "Jetée de Kesen",
+      "type": "@ltype:quai",
+      "parentId": "@loc:village-kesen",
+      "status": "existing",
+      "fields": {
+        "description": "Longue jetée de bois qui ferme le port à l'ouest, terminée par une bitte d'amarrage. C'est là que Kai défait la tempête.",
+        "purpose": "Brise-lames ; amarrage du Kamome.",
+        "condition": "damaged",
+        "history": "Abîmée par les vents bruts du troisième jour (planches arrachées en bout de jetée, à garder jusqu'à la fin du tome 1).",
+        "firstAppearance": "@node:c1p10"
+      }
+    },
+    {
+      "key": "maison-amaya",
+      "name": "Maison Amaya",
+      "type": "@ltype:maison",
+      "parentId": "@loc:village-kesen",
+      "status": "existing",
+      "fields": {
+        "description": "Maison pauvre d'une seule pièce. Filets aux poutres, foyer, un vieux métier à tisser sous une toile, et un coffre fermé à clé (le manteau de maîtresse fileuse d'Ume). Toit plat où Kai monte la nuit.",
+        "purpose": "Maison de Kai et d'Ume.",
+        "firstAppearance": "@node:c1p05"
+      }
+    },
+    {
+      "key": "tour-kesen",
+      "name": "Tour-métier de Kesen",
+      "type": "@ltype:tour-metier",
+      "parentId": "@loc:ile-kesen",
+      "status": "abandoned",
+      "fields": {
+        "description": "Tour de pierre grise sur la crête. Son métier, couvert de poussière, a toutes ses lices tranchées net. Mio y campe.",
+        "purpose": "Tisser les vents de Kesen (éteinte).",
+        "owner": "La Guilde des Fileuses",
+        "condition": "damaged",
+        "history": "Éteinte depuis trente ans. Version officielle : « usure des fils ». En réalité, Ume a coupé le métier la nuit des Récifs (révélé au chapitre 9).",
+        "firstAppearance": "@node:c1p02"
+      },
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          110,
+          115,
+          125
+        ],
+        "ground": [
+          150,
+          145,
+          135
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "falaise",
+      "name": "Falaise de Kesen",
+      "type": "@ltype:falaise",
+      "parentId": "@loc:ile-kesen",
+      "status": "existing",
+      "fields": {
+        "description": "Haute falaise herbeuse au nord du village, face au large. On y voit tous les fils au-dessus de la mer.",
+        "accessibility": "Sentier depuis la maison Amaya, une demi-heure de marche.",
+        "dangers": "Bord friable, rafales venues des Récifs.",
+        "firstAppearance": "@node:c2p05"
+      }
+    },
+    {
+      "key": "recifs",
+      "name": "Récifs Hurlants",
+      "type": "forbiddenZone",
+      "parentId": "@loc:archipel",
+      "status": "existing",
+      "fields": {
+        "description": "Chapelet de rochers noirs au nord-ouest, dans une brume permanente. Le vent y est sauvage : des centaines de fils libres, fins et colorés, jamais tissés. La mer y gronde jour et nuit.",
+        "forbiddenBy": "La Guilde des Fileuses",
+        "forbiddenReason": "Officiellement : trop dangereux. En vérité : l'échec du nœud de capture, il y a trente ans, que la Guilde a effacé de ses registres.",
+        "sanctions": "Perte de la licence de navigation ; prison pour les fileuses.",
+        "dangers": "Lames de fond, rochers à fleur d'eau, rafales qui changent de sens d'une seconde à l'autre.",
+        "firstAppearance": "@node:c3p06"
+      },
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          70,
+          80,
+          95
+        ],
+        "ground": [
+          30,
+          32,
+          40
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "anse-noire",
+      "name": "L'Anse noire",
+      "type": "cave",
+      "parentId": "@loc:recifs",
+      "status": "hidden",
+      "fields": {
+        "description": "Grotte marine au cœur des Récifs, accessible à marée basse, où les Dénoueurs cachent leurs bateaux à voile noire.",
+        "entrances": "Une arche marine, praticable deux heures par marée.",
+        "depth": "Une centaine de mètres sous la falaise.",
+        "contents": "Bateaux, ateliers de ciseaux de vent, dortoirs, un métier sauvage fait de fils libres.",
+        "firstAppearance": "@node:ch6"
+      }
+    }
+  ],
+  "characters": [
+    {
+      "key": "kai",
+      "firstName": "Kai",
+      "lastName": "Amaya",
+      "role": "main",
+      "status": "alive",
+      "fields": {
+        "age": "15 ans",
+        "gender": "male",
+        "occupation": "Ravaudeur de filets",
+        "origin": "@loc:ile-kesen",
+        "firstAppearance": "@node:c1p02",
+        "description": "Garçon de Kesen, élevé par sa grand-mère. Il voit les fils de vent à l'œil nu depuis toujours et croyait que tout le monde les voyait. Têtu, drôle, incapable de rester à l'écart quand quelqu'un est en danger.",
+        "mainGoal": "Ramener Ume à Kesen.",
+        "distinctiveTrait": "Il pense en termes de filets : un vent est « bien » ou « mal noué ».",
+        "height": "1,58 m (le plus petit du trio)",
+        "build": "slim",
+        "hair": "Noirs, en épis, toujours mouillés d'embruns",
+        "eyes": "Noirs, très mobiles",
+        "distinguishingMarks": "Main droite brûlée au chapitre 1, bandée jusqu'au chapitre 4, puis cicatrice en forme de fil.",
+        "mainOutfit": "Veste bleue de pêcheur rapiécée, bandeau rouge, pantalon retroussé, pieds nus.",
+        "accessories": "Fil rouge au poignet droit à partir du chapitre 3, page 3.",
+        "colorPalette": [
+          "#2e5c8e",
+          "#c23b3b",
+          "#e9dcc0"
+        ],
+        "voice": "Phrases courtes, familières ; tutoie tout le monde, même Daigo.",
+        "psychology": "Il a grandi avec l'idée que Kesen « attend » ; il refuse d'attendre. Agit d'abord, comprend ensuite. Se sent coupable d'avoir trahi sa promesse, mais le referait.",
+        "traits": [
+          "Têtu",
+          "Généreux",
+          "Impulsif"
+        ],
+        "strengths": [
+          "Voit les fils sans lunettes",
+          "Dénoue à mains nues",
+          "Courage physique"
+        ],
+        "flaws": [
+          "Imprudent",
+          "Ne sait pas demander d'aide"
+        ],
+        "motivations": "Protéger les siens ; ne plus voir Kesen courber la tête.",
+        "deepDesire": "Que le vent soit à tout le monde.",
+        "fears": "Faire du mal avec son don, comme la tempête qu'il a vue se nouer.",
+        "formativeEvent": "Sa mère, Sayo, a « disparu en mer » pendant un coup de vent venu des Récifs quand il avait quatre ans ; il n'a pas connu son père.",
+        "secret": "Il voit aussi un fil rouge très fin qui part du fuseau d'Ume vers le nord-ouest. Il n'en a jamais parlé.",
+        "innerConflict": "Dénouer comme sa grand-mère (rendre le vent sans rien casser) ou couper comme sa mère (plus vite, plus fort).",
+        "plannedArc": "Du garçon qui arrache les fils (ch. 1) à celui qui les écoute (ch. 3), puis qui doit choisir sa méthode face à Sayo et Hiraga (arc II)."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          233,
+          220,
+          192
+        ],
+        "figure": [
+          46,
+          92,
+          142
+        ]
+      }
+    },
+    {
+      "key": "mio",
+      "firstName": "Mio",
+      "lastName": "Tsugane",
+      "role": "main",
+      "status": "alive",
+      "fields": {
+        "age": "16 ans",
+        "gender": "female",
+        "occupation": "Apprentie fileuse de la Guilde (troisième année)",
+        "origin": "@loc:ile-amaori",
+        "firstAppearance": "@node:c1p14",
+        "description": "Première de sa promotion, envoyée seule rallumer la tour de Kesen. Fière, précise, cassante quand elle a peur. Ne voit les fils qu'à travers ses lunettes de trame, et mal.",
+        "mainGoal": "Comprendre ce qu'on lui a fait tisser à son examen.",
+        "distinctiveTrait": "Récite le règlement de la Guilde quand elle est déstabilisée.",
+        "height": "1,65 m",
+        "build": "slim",
+        "hair": "Noirs, coupe au carré, une mèche toujours dans les yeux",
+        "eyes": "Gris clair derrière les lunettes",
+        "mainOutfit": "Manteau blanc d'apprentie (retourné, doublure grise, à partir du ch. 3), lunettes de trame en cuivre.",
+        "accessories": "Gants de soie (droit retiré ch. 2 p. 10, gauche jeté à l'eau ch. 2 p. 16) ; brin de fil rouge au poignet à partir du ch. 3 p. 5.",
+        "colorPalette": [
+          "#f2f0ea",
+          "#8a97a5",
+          "#b08a2e"
+        ],
+        "voice": "Vouvoie les adultes, parle comme un manuel ; tutoie Kai quand elle s'énerve, puis tout le temps.",
+        "psychology": "A tout misé sur la Guilde, qui l'a sortie d'une famille de porteurs de dîme. Découvrir le nœud de punition lui retire le sol sous les pieds.",
+        "traits": [
+          "Rigoureuse",
+          "Fière",
+          "Loyale"
+        ],
+        "strengths": [
+          "Connaît toutes les trames",
+          "Lit les cartes",
+          "Sang-froid"
+        ],
+        "flaws": [
+          "Rigide",
+          "Orgueilleuse"
+        ],
+        "motivations": "Réparer : tisser un vent qui ne fasse de mal à personne.",
+        "deepDesire": "Entendre les fils comme Kai les entend.",
+        "fears": "Être une criminelle sans le savoir.",
+        "coreValues": "Le travail bien fait ; la parole donnée.",
+        "formativeEvent": "Son examen de troisième année : un « exercice » de nœud serré, dont on lui a dit qu'il serait détissé aussitôt.",
+        "secret": "Son rapport sur Kesen est un faux (« rupture naturelle »).",
+        "innerConflict": "Rester fileuse (et changer la Guilde de l'intérieur) ou la quitter.",
+        "plannedArc": "De la règle (« une tempête commandée, payée, réglementaire ») au choix de rallumer la tour de Kesen sans dîme (tome 3)."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          242,
+          240,
+          234
+        ],
+        "figure": [
+          138,
+          151,
+          165
+        ]
+      }
+    },
+    {
+      "key": "tetsu",
+      "firstName": "Tetsu",
+      "lastName": "Hamada",
+      "role": "ally",
+      "status": "alive",
+      "fields": {
+        "age": "15 ans",
+        "gender": "male",
+        "occupation": "Pêcheur, mousse sur le Kamome",
+        "origin": "@loc:ile-kesen",
+        "firstAppearance": "@node:c1p02",
+        "description": "Meilleur ami de Kai, grand et costaud, pragmatique. Ne voit aucun fil et ne croit que ce qu'il touche. Sait barrer n'importe quel bateau.",
+        "mainGoal": "Ramener tout le monde vivant, et le Kamome entier.",
+        "distinctiveTrait": "Se moque de tout, surtout quand il a peur.",
+        "height": "1,78 m",
+        "build": "stocky",
+        "mainOutfit": "Ciré jaune de son père, trop grand pour lui.",
+        "colorPalette": [
+          "#e0b030",
+          "#6b4a2e"
+        ],
+        "voice": "Ironique, concret ; c'est lui qui pose les questions du lecteur.",
+        "traits": [
+          "Pragmatique",
+          "Fidèle",
+          "Moqueur"
+        ],
+        "strengths": [
+          "Barre",
+          "Force",
+          "Bon sens"
+        ],
+        "flaws": [
+          "Méfiant envers tout ce qui ne se voit pas"
+        ],
+        "motivations": "Rembourser à Kai la vie de Nami.",
+        "fears": "Que sa sœur grandisse sur une île qui meurt.",
+        "plannedArc": "Le seul à ne rien voir : il devient celui qui tient le bateau et le groupe. Au tome 2, il est tenté de rester avec les Dénoueurs, qui paient bien les marins."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          224,
+          176,
+          48
+        ],
+        "figure": [
+          107,
+          74,
+          46
+        ]
+      }
+    },
+    {
+      "key": "nami",
+      "firstName": "Nami",
+      "lastName": "Hamada",
+      "role": "secondary",
+      "status": "alive",
+      "fields": {
+        "age": "8 ans",
+        "gender": "female",
+        "origin": "@loc:ile-kesen",
+        "firstAppearance": "@node:c1p10",
+        "description": "Petite sœur de Tetsu, sauvée de la tempête par Kai. Admire Kai sans réserve. C'est elle qui lui donne le fil rouge du fuseau d'Ume.",
+        "mainOutfit": "Robe de toile, châle de sa mère.",
+        "distinctiveTrait": "Pose les questions que les adultes n'osent pas poser (« Le vent est parti tout seul ? »).",
+        "plannedArc": "Reste à Kesen : c'est par ses yeux qu'on verra l'île changer au tome 3."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          233,
+          220,
+          192
+        ],
+        "figure": [
+          194,
+          120,
+          90
+        ]
+      }
+    },
+    {
+      "key": "ume",
+      "firstName": "Ume",
+      "lastName": "Amaya",
+      "role": "mentor",
+      "status": "alive",
+      "fields": {
+        "nickname": "La Fileuse des Récifs",
+        "age": "71 ans",
+        "gender": "female",
+        "occupation": "Fileuse de chanvre (ancienne maîtresse fileuse de la Guilde)",
+        "origin": "@loc:ile-amaori",
+        "firstAppearance": "@node:c1p05",
+        "description": "Grand-mère de Kai. Petite, voûtée, une toux qui s'aggrave. File du chanvre à un vieux fuseau de bois noir. Ne parle jamais du passé.",
+        "mainGoal": "Que Kai n'ait jamais à toucher un fil.",
+        "distinctiveTrait": "Ne se sépare jamais de son fuseau, jusqu'au chapitre 2, page 13.",
+        "accessories": "Fuseau de bois noir à bague de cuivre gravée du sceau de la Guilde.",
+        "colorPalette": [
+          "#5a4a3a",
+          "#f2f0ea",
+          "#c23b3b"
+        ],
+        "voice": "Peu de mots, ordres secs, humour très sec.",
+        "psychology": "Porte depuis trente ans la tempête des Récifs. A choisi de disparaître plutôt que de se justifier.",
+        "traits": [
+          "Secrète",
+          "Ferme",
+          "Tendre sans le montrer"
+        ],
+        "strengths": [
+          "Maîtrise du tissage",
+          "Volonté"
+        ],
+        "flaws": [
+          "Silence",
+          "Culpabilité"
+        ],
+        "motivations": "Protéger Kai de la Guilde et de son don.",
+        "formativeEvent": "Il y a trente ans, sur ordre de la Guilde, elle a tissé le nœud de capture des Récifs ; la tempête a tué les gens des Récifs et son mari, Isamu.",
+        "secret": "C'est elle qui a coupé le métier de Kesen, pour que la Guilde ne puisse plus s'en servir contre les Récifs. Tout le village le sait et se tait depuis trente ans. Elle croit sa fille Sayo morte.",
+        "innerConflict": "Se taire pour protéger Kai, ou tout dire pour qu'il comprenne.",
+        "plannedArc": "Mentor qu'on enlève au chapitre 2. Au procès (ch. 9), elle parle enfin, publiquement."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          242,
+          240,
+          234
+        ],
+        "figure": [
+          90,
+          74,
+          58
+        ]
+      }
+    },
+    {
+      "key": "daigo",
+      "firstName": "Daigo",
+      "lastName": "Kurogane",
+      "role": "antagonist",
+      "status": "alive",
+      "fields": {
+        "age": "44 ans",
+        "gender": "male",
+        "occupation": "Capitaine des Gardes du Fil",
+        "origin": "@loc:ile-amaori",
+        "firstAppearance": "@node:c1p03",
+        "description": "Immense, calme, las. Applique la loi de la Guilde sans plaisir ni état d'âme. Porte une aiguille de fer longue comme une lance.",
+        "mainGoal": "Faire respecter la dîme ; trouver le dénoueur de Kesen.",
+        "height": "1,95 m",
+        "build": "muscular",
+        "mainOutfit": "Manteau noir des Gardes du Fil, aiguille de fer à la ceinture.",
+        "colorPalette": [
+          "#1e1e24",
+          "#8a8a8a"
+        ],
+        "voice": "Lente, sans colère ; ne crie jamais.",
+        "traits": [
+          "Discipliné",
+          "Las",
+          "Juste à sa manière"
+        ],
+        "motivations": "L'ordre : sans dîme, pas de Guilde ; sans Guilde, pas de vent.",
+        "secret": "Il a perdu un frère dans des vents bruts envoyés à son île natale quand il était enfant.",
+        "innerConflict": "La loi contre ce qu'il voit faire en son nom.",
+        "plannedArc": "Antagoniste du tome 1. Bascule au chapitre 8 : il laisse partir Mio avec le registre."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          60,
+          60,
+          70
+        ],
+        "figure": [
+          30,
+          30,
+          36
+        ]
+      }
+    },
+    {
+      "key": "hiraga",
+      "firstName": "Sōen",
+      "lastName": "Hiraga",
+      "role": "antagonist",
+      "status": "alive",
+      "fields": {
+        "nickname": "Le Maître-tisserand",
+        "age": "63 ans",
+        "gender": "male",
+        "occupation": "Maître-tisserand, chef de la Guilde des Fileuses",
+        "origin": "@loc:ile-amaori",
+        "firstAppearance": "@node:c1p17",
+        "description": "Jamais vu dans le tome 1 : seulement nommé (rapport de Mio). Homme courtois, cultivé, qui parle du vent comme d'un service public.",
+        "mainGoal": "Garder le contrôle du vent, donc des îles.",
+        "voice": "Douce, précise, vocabulaire de gestionnaire.",
+        "traits": [
+          "Courtois",
+          "Calculateur"
+        ],
+        "motivations": "Il croit sincèrement qu'un vent libre tuerait plus de monde que la dîme.",
+        "secret": "Il a fait des nœuds de punition une méthode après l'échec des Récifs, et les fait tisser par les apprenties à leur examen pour ne jamais engager une maîtresse.",
+        "plannedArc": "Antagoniste de l'arc II. Première apparition au chapitre 7."
+      }
+    },
+    {
+      "key": "sayo",
+      "firstName": "Sayo",
+      "lastName": "Amaya",
+      "role": "antagonist",
+      "status": "missing",
+      "fields": {
+        "nickname": "Celle qui coupe",
+        "age": "38 ans",
+        "gender": "female",
+        "occupation": "Cheffe des Dénoueurs",
+        "origin": "@loc:ile-kesen",
+        "firstAppearance": "@node:ch5",
+        "description": "Mère de Kai, que tout Kesen croit noyée depuis onze ans. Cheffe des Dénoueurs, qui coupent les fils de la Guilde. Charismatique, drôle, impitoyable.",
+        "mainGoal": "Couper le Grand Métier et rendre le vent sauvage à tout l'archipel.",
+        "distinctiveTrait": "Le même fil rouge que Kai, noué au poignet gauche.",
+        "accessories": "Ciseaux de vent à lames noires.",
+        "colorPalette": [
+          "#1e1e24",
+          "#c23b3b"
+        ],
+        "psychology": "Elle en veut à Ume d'avoir tissé le nœud des Récifs, puis de s'être cachée. A laissé Kai à Kesen pour le protéger, et se le reproche.",
+        "traits": [
+          "Charismatique",
+          "Radicale"
+        ],
+        "motivations": "Que plus aucune île ne paie pour respirer.",
+        "secret": "Elle voit les fils comme Kai : c'est d'elle qu'il tient son don.",
+        "innerConflict": "Mère ou cheffe : récupérer son fils, ou en faire une arme.",
+        "plannedArc": "Révélée à la dernière page du tome 1. Alliée ambiguë de l'arc II ; rupture avec Kai au chapitre 10."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          40,
+          40,
+          48
+        ],
+        "figure": [
+          194,
+          59,
+          59
+        ]
+      }
+    },
+    {
+      "key": "genzo",
+      "firstName": "Genzō",
+      "lastName": "Hamada",
+      "role": "extra",
+      "status": "alive",
+      "fields": {
+        "age": "47 ans",
+        "gender": "male",
+        "occupation": "Pêcheur, patron du Kamome",
+        "origin": "@loc:ile-kesen",
+        "firstAppearance": "@node:c1p08",
+        "description": "Père de Tetsu et de Nami. En mer pendant la tempête ; rentré grâce à Kai, il lui prête le Kamome au chapitre 3.",
+        "notes": "Jamais montré de face dans le tome 1 (on le voit de loin, page 8, et on l'entend rapporté par Tetsu). Le dessiner seulement au tome 3."
+      }
+    }
+  ],
+  "items": [
+    {
+      "key": "lunettes",
+      "name": "Lunettes de trame",
+      "type": "instrument",
+      "status": "intact",
+      "fields": {
+        "description": "Lunettes à verres épais cerclés de cuivre, qui rendent visibles les fils de vent. Toutes les fileuses en portent ; la vision reste floue, « comme derrière une vitre mouillée ».",
+        "material": "Cuivre, verre de lave poli",
+        "use": "Voir les fils de vent",
+        "rarity": "uncommon",
+        "firstAppearance": "@node:c1p14"
+      }
+    },
+    {
+      "key": "fuseau",
+      "name": "Fuseau d'Ume",
+      "type": "artifact",
+      "status": "intact",
+      "fields": {
+        "description": "Fuseau de bois noir, bague de cuivre gravée du sceau de la Guilde et du nom d'Ume. Le fil rouge qui en sort est le motif de la série.",
+        "material": "Bois noir, cuivre",
+        "powers": "Aucun pouvoir propre : c'est l'outil d'une maîtresse fileuse. Il permet de filer du vent comme du chanvre.",
+        "rarity": "unique",
+        "firstAppearance": "@node:c1p05",
+        "history": "Saisi par Daigo au chapitre 2, page 14 ; pièce à conviction au procès (ch. 9)."
+      }
+    },
+    {
+      "key": "aiguille",
+      "name": "Aiguille de fer de Daigo",
+      "type": "spear",
+      "status": "intact",
+      "fields": {
+        "description": "Aiguille de fer longue comme une lance, insigne et arme des capitaines des Gardes du Fil. Elle peut percer un fil de vent.",
+        "material": "Fer forgé",
+        "damage": "Perce les fils de vent ; contondante contre les gens.",
+        "firstAppearance": "@node:c1p03"
+      }
+    },
+    {
+      "key": "registre",
+      "name": "Registre de la dîme",
+      "type": "book",
+      "status": "intact",
+      "fields": {
+        "description": "Grand livre du Grand Métier : chaque île, chaque dîme, chaque nœud tissé. Les nœuds de punition y figurent, datés et signés.",
+        "author": "Les greffières du Grand Métier, sous l'autorité du Maître-tisserand",
+        "content": "Colonnes : île, dîme due, dîme payée, nœuds tissés (numérotés), signature. Kesen y est barrée de rouge (ch. 1, p. 1).",
+        "rarity": "unique",
+        "firstAppearance": "@node:c1p01"
+      }
+    },
+    {
+      "key": "carte",
+      "name": "Carte des trames",
+      "type": "map",
+      "status": "damaged",
+      "fields": {
+        "description": "Carte de l'archipel où les routes de vent tissées sont tracées en couleur. Les Récifs Hurlants y sont une zone blanche marquée « non tissé ».",
+        "author": "École de la Guilde (exemplaire de Mio)",
+        "content": "Routes bleues (courants tissés), rouges (vents de pluie), zone blanche des Récifs.",
+        "firstAppearance": "@node:c3p02",
+        "history": "Trempée et déchirée au chapitre 3, page 8."
+      }
+    },
+    {
+      "key": "fil-rouge",
+      "name": "Fil rouge",
+      "type": "tool",
+      "status": "intact",
+      "fields": {
+        "description": "Pelote de fil rouge prise sur le rouet d'Ume. Kai en noue un brin à son poignet, puis à celui de Mio. Sayo porte le même.",
+        "use": "Porte-bonheur ; « pour retrouver le chemin ».",
+        "firstAppearance": "@node:c1p05",
+        "history": "Donné par Nami (ch. 3, p. 3)."
+      }
+    },
+    {
+      "key": "kamome",
+      "name": "Le Kamome",
+      "type": "boat",
+      "status": "worn",
+      "fields": {
+        "description": "Barque de pêche à voile unique, rapiécée, du père de Tetsu. Le bateau du trio pendant tout l'arc I.",
+        "capacity": "Quatre personnes et leurs provisions",
+        "propulsion": "Voile et godille",
+        "speed": "Lente, mais tient la mer",
+        "firstAppearance": "@node:c1p08"
+      }
+    },
+    {
+      "key": "manteau-ume",
+      "name": "Manteau de maîtresse fileuse",
+      "type": "cloak",
+      "status": "intact",
+      "fields": {
+        "description": "Manteau blanc de la Guilde à galon d'argent, plus orné que celui de Mio. Rangé trente ans dans le coffre de la maison Amaya.",
+        "material": "Soie de vent tissée",
+        "colors": "Blanc, galon d'argent",
+        "firstAppearance": "@node:c2p07"
+      }
+    }
+  ],
+  "species": [
+    {
+      "key": "mouette-tempete",
+      "name": "Mouette-tempête",
+      "type": "bird",
+      "status": "common",
+      "fields": {
+        "description": "Grande mouette grise aux ailes noires. Elle sent les vents bruts avant les fileuses : quand toute une colonie s'envole d'un coup, la tempête arrive.",
+        "scientificName": "Larus procellae (nom inventé)",
+        "size": "Envergure d'1,20 m",
+        "diet": "carnivore",
+        "temperament": "wary",
+        "dangerLevel": "none",
+        "behavior": "Vit en colonies sur les falaises ; fuit en nuée vers le sud avant chaque tempête tissée.",
+        "habitat": "Falaises de tout l'archipel, surtout Kesen.",
+        "firstAppearance": "@node:c1p08"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "sourceId": "@char:kai",
+      "targetId": "@char:ume",
+      "type": "family",
+      "label": "Grand-mère et petit-fils",
+      "description": "Elle l'élève seule depuis ses quatre ans. Une promesse les lie : ne jamais toucher un fil.",
+      "directed": false,
+      "intensity": 5,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:kai",
+      "targetId": "@char:tetsu",
+      "type": "friendship",
+      "label": "Amis d'enfance",
+      "description": "Inséparables. Tetsu ne voit rien des fils mais suit Kai partout.",
+      "directed": false,
+      "intensity": 5,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:kai",
+      "targetId": "@char:mio",
+      "type": "rivalry",
+      "label": "« Tu le tiens comme un poisson mort »",
+      "description": "Elle l'accuse, il la provoque. Chacun a ce qui manque à l'autre.",
+      "directed": false,
+      "intensity": 3,
+      "sentiment": "neutral",
+      "untilNode": "@node:c2p16"
+    },
+    {
+      "sourceId": "@char:kai",
+      "targetId": "@char:mio",
+      "type": "alliance",
+      "label": "Le fil rouge",
+      "description": "Depuis le départ de Kesen : ils apprennent l'un de l'autre (la carte, l'écoute).",
+      "directed": false,
+      "intensity": 4,
+      "sentiment": "positive",
+      "sinceNode": "@node:c2p16"
+    },
+    {
+      "sourceId": "@char:ume",
+      "targetId": "@char:kai",
+      "type": "mentor",
+      "label": "Première règle",
+      "description": "Puisqu'il a rompu sa promesse, elle lui apprend à écouter un fil avant de le tirer.",
+      "directed": true,
+      "intensity": 4,
+      "sentiment": "positive",
+      "sinceNode": "@node:c2p08"
+    },
+    {
+      "sourceId": "@char:tetsu",
+      "targetId": "@char:nami",
+      "type": "family",
+      "label": "Frère et sœur",
+      "description": "",
+      "directed": false,
+      "intensity": 5,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:genzo",
+      "targetId": "@char:tetsu",
+      "type": "family",
+      "label": "Père et fils",
+      "description": "",
+      "directed": true,
+      "intensity": 3,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:daigo",
+      "targetId": "@char:ume",
+      "type": "enmity",
+      "label": "La déserteuse",
+      "description": "Il l'arrête pour désertion ; il la croyait morte.",
+      "directed": true,
+      "intensity": 4,
+      "sentiment": "negative",
+      "sinceNode": "@node:c2p14"
+    },
+    {
+      "sourceId": "@char:daigo",
+      "targetId": "@char:kai",
+      "type": "enmity",
+      "label": "Le petit de Kesen",
+      "description": "Il cherche le dénoueur sans savoir encore que c'est lui.",
+      "directed": true,
+      "intensity": 3,
+      "sentiment": "negative"
+    },
+    {
+      "sourceId": "@char:mio",
+      "targetId": "@char:hiraga",
+      "type": "professional",
+      "label": "Apprentie et Maître-tisserand",
+      "description": "Elle lui doit tout, et lui ment depuis le chapitre 2.",
+      "directed": true,
+      "intensity": 3,
+      "sentiment": "neutral"
+    },
+    {
+      "sourceId": "@char:daigo",
+      "targetId": "@char:hiraga",
+      "type": "professional",
+      "label": "Le bras de la Guilde",
+      "description": "Il obéit à la loi de la Guilde, pas à l'homme.",
+      "directed": true,
+      "intensity": 3,
+      "sentiment": "neutral"
+    },
+    {
+      "sourceId": "@char:sayo",
+      "targetId": "@char:kai",
+      "type": "secret",
+      "label": "Sa mère",
+      "description": "Il la croit morte. Révélé à la dernière page du tome 1.",
+      "directed": true,
+      "intensity": 5,
+      "sentiment": "neutral"
+    },
+    {
+      "sourceId": "@char:ume",
+      "targetId": "@char:sayo",
+      "type": "family",
+      "label": "Mère et fille",
+      "description": "Ume croit Sayo noyée. Sayo n'a pas pardonné les Récifs.",
+      "directed": false,
+      "intensity": 4,
+      "sentiment": "negative"
+    },
+    {
+      "sourceId": "@char:sayo",
+      "targetId": "@char:hiraga",
+      "type": "enmity",
+      "label": "Couper le Grand Métier",
+      "description": "",
+      "directed": true,
+      "intensity": 5,
+      "sentiment": "negative"
+    }
+  ],
+  "graph": [
+    {
+      "characterId": "@char:kai",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "characterId": "@char:mio",
+      "x": 280,
+      "y": -40
+    },
+    {
+      "characterId": "@char:tetsu",
+      "x": -260,
+      "y": 40
+    },
+    {
+      "characterId": "@char:nami",
+      "x": -420,
+      "y": 180
+    },
+    {
+      "characterId": "@char:genzo",
+      "x": -460,
+      "y": -60
+    },
+    {
+      "characterId": "@char:ume",
+      "x": -40,
+      "y": -260
+    },
+    {
+      "characterId": "@char:sayo",
+      "x": 160,
+      "y": -380
+    },
+    {
+      "characterId": "@char:daigo",
+      "x": 300,
+      "y": 220
+    },
+    {
+      "characterId": "@char:hiraga",
+      "x": 540,
+      "y": 80
+    }
+  ],
+  "characterLocations": [
+    {
+      "characterId": "@char:kai",
+      "locationId": "@loc:maison-amaya",
+      "type": "lives",
+      "label": "Avec Ume",
+      "untilNode": "@node:c3p03"
+    },
+    {
+      "characterId": "@char:kai",
+      "locationId": "@loc:quai",
+      "type": "works",
+      "label": "Ravaude les filets"
+    },
+    {
+      "characterId": "@char:ume",
+      "locationId": "@loc:maison-amaya",
+      "type": "lives",
+      "label": "Depuis trente ans",
+      "untilNode": "@node:c2p15"
+    },
+    {
+      "characterId": "@char:ume",
+      "locationId": "@loc:tour-kesen",
+      "type": "works",
+      "label": "Ancienne maîtresse de la tour",
+      "description": "Jusqu'à la nuit des Récifs, il y a trente ans."
+    },
+    {
+      "characterId": "@char:ume",
+      "locationId": "@loc:tour-amaori",
+      "type": "imprisoned",
+      "label": "En attente de procès",
+      "sinceNode": "@node:c2p16"
+    },
+    {
+      "characterId": "@char:mio",
+      "locationId": "@loc:tour-kesen",
+      "type": "frequents",
+      "label": "Son campement",
+      "sinceNode": "@node:c1p17"
+    },
+    {
+      "characterId": "@char:mio",
+      "locationId": "@loc:ile-amaori",
+      "type": "grewUp",
+      "label": "École de la Guilde"
+    },
+    {
+      "characterId": "@char:tetsu",
+      "locationId": "@loc:village-kesen",
+      "type": "lives",
+      "label": "Maison Hamada"
+    },
+    {
+      "characterId": "@char:nami",
+      "locationId": "@loc:village-kesen",
+      "type": "lives",
+      "label": "Maison Hamada"
+    },
+    {
+      "characterId": "@char:genzo",
+      "locationId": "@loc:village-kesen",
+      "type": "lives",
+      "label": "Maison Hamada"
+    },
+    {
+      "characterId": "@char:daigo",
+      "locationId": "@loc:tour-amaori",
+      "type": "guards",
+      "label": "Capitaine des Gardes du Fil"
+    },
+    {
+      "characterId": "@char:hiraga",
+      "locationId": "@loc:tour-amaori",
+      "type": "rules",
+      "label": "Maître-tisserand"
+    },
+    {
+      "characterId": "@char:sayo",
+      "locationId": "@loc:anse-noire",
+      "type": "hides",
+      "label": "Repaire des Dénoueurs"
+    },
+    {
+      "characterId": "@char:sayo",
+      "locationId": "@loc:ile-kesen",
+      "type": "born",
+      "label": ""
+    }
+  ],
+  "worldLinks": [
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:ume",
+      "targetKind": "item",
+      "targetId": "@item:fuseau",
+      "type": "owns",
+      "label": "Ne le quitte jamais",
+      "untilNode": "@node:c2p13"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:daigo",
+      "targetKind": "item",
+      "targetId": "@item:fuseau",
+      "type": "owns",
+      "label": "Saisi comme preuve",
+      "sinceNode": "@node:c2p14"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:daigo",
+      "targetKind": "item",
+      "targetId": "@item:aiguille",
+      "type": "uses",
+      "label": "Arme et insigne"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:mio",
+      "targetKind": "item",
+      "targetId": "@item:lunettes",
+      "type": "uses",
+      "label": "Indispensables, puis de moins en moins"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:mio",
+      "targetKind": "item",
+      "targetId": "@item:carte",
+      "type": "owns",
+      "label": "Exemplaire d'école"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:kai",
+      "targetKind": "item",
+      "targetId": "@item:fil-rouge",
+      "type": "owns",
+      "label": "Au poignet droit",
+      "sinceNode": "@node:c3p03"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:genzo",
+      "targetKind": "item",
+      "targetId": "@item:kamome",
+      "type": "owns",
+      "label": "Prêté à Tetsu et Kai",
+      "description": "Prêté au chapitre 3, page 1."
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:ume",
+      "targetKind": "item",
+      "targetId": "@item:manteau-ume",
+      "type": "owns",
+      "label": "Dans le coffre"
+    },
+    {
+      "sourceKind": "item",
+      "sourceId": "@item:manteau-ume",
+      "targetKind": "location",
+      "targetId": "@loc:maison-amaya",
+      "type": "locatedIn",
+      "label": "Coffre fermé à clé"
+    },
+    {
+      "sourceKind": "item",
+      "sourceId": "@item:registre",
+      "targetKind": "location",
+      "targetId": "@loc:tour-amaori",
+      "type": "locatedIn",
+      "label": "Pupitre du Grand Métier",
+      "untilNode": "@node:ch8"
+    },
+    {
+      "sourceKind": "species",
+      "sourceId": "@species:mouette-tempete",
+      "targetKind": "location",
+      "targetId": "@loc:falaise",
+      "type": "livesIn",
+      "label": "Colonie de la falaise"
+    }
+  ],
+  "nodeLinks": [
+    {
+      "node": "@node:ch4",
+      "characters": {
+        "kai": "pov",
+        "mio": "present",
+        "tetsu": "present",
+        "sayo": "mentioned",
+        "ume": "mentioned"
+      },
+      "locations": {
+        "recifs": "setting"
+      }
+    },
+    {
+      "node": "@node:ch5",
+      "characters": {
+        "kai": "pov",
+        "sayo": "present",
+        "mio": "present",
+        "tetsu": "present"
+      },
+      "locations": {
+        "recifs": "setting",
+        "anse-noire": "mentioned"
+      }
+    },
+    {
+      "node": "@node:ch6",
+      "characters": {
+        "kai": "present",
+        "sayo": "pov",
+        "ume": "mentioned"
+      },
+      "locations": {
+        "anse-noire": "setting",
+        "recifs": "setting"
+      }
+    },
+    {
+      "node": "@node:ch7",
+      "characters": {
+        "mio": "pov",
+        "kai": "present",
+        "tetsu": "present",
+        "hiraga": "present"
+      },
+      "locations": {
+        "ile-amaori": "setting"
+      }
+    },
+    {
+      "node": "@node:ch8",
+      "characters": {
+        "mio": "pov",
+        "daigo": "present",
+        "hiraga": "mentioned"
+      },
+      "locations": {
+        "tour-amaori": "setting"
+      }
+    },
+    {
+      "node": "@node:ch9",
+      "characters": {
+        "ume": "present",
+        "hiraga": "present",
+        "mio": "present",
+        "kai": "pov",
+        "daigo": "present"
+      },
+      "locations": {
+        "tour-amaori": "setting",
+        "tour-kesen": "mentioned"
+      }
+    },
+    {
+      "node": "@node:ch10",
+      "characters": {
+        "kai": "pov",
+        "sayo": "present",
+        "hiraga": "present",
+        "ume": "present"
+      },
+      "locations": {
+        "tour-amaori": "setting",
+        "ile-amaori": "setting"
+      }
+    }
+  ],
+  "documents": [
+    {
+      "node": "@node:t1",
+      "name": "Charte des fils de vent.png",
+      "image": {
+        "kind": "swatches",
+        "colors": [
+          [
+            180,
+            200,
+            220
+          ],
+          [
+            120,
+            125,
+            135
+          ],
+          [
+            40,
+            40,
+            48
+          ],
+          [
+            194,
+            59,
+            59
+          ],
+          [
+            233,
+            220,
+            192
+          ]
+        ],
+        "width": 500,
+        "height": 120
+      },
+      "note": "Couleurs des fils : brise (bleu pâle), vent tissé ordinaire (gris), nœud de punition (noir), fil rouge (rouge), fils libres des Récifs (toutes couleurs, plus saturées). Voir la note « Charte des fils »."
+    },
+    {
+      "node": "@node:ch1",
+      "name": "Ambiance - Kesen au matin.png",
+      "image": {
+        "kind": "landscape",
+        "sky": [
+          150,
+          165,
+          175
+        ],
+        "ground": [
+          201,
+          194,
+          176
+        ],
+        "width": 480,
+        "height": 300
+      },
+      "note": "Référence de lumière pour les pages 2 à 7 : ciel couvert, mer plombée, tour éteinte sur la crête."
+    },
+    {
+      "node": "@node:ch3",
+      "name": "Ambiance - les Récifs Hurlants.png",
+      "image": {
+        "kind": "landscape",
+        "sky": [
+          70,
+          80,
+          95
+        ],
+        "ground": [
+          30,
+          32,
+          40
+        ],
+        "width": 480,
+        "height": 300
+      },
+      "note": "Brume, rochers noirs ; les fils libres sont la seule couleur vive de la page."
+    },
+    {
+      "node": "@node:ch2",
+      "name": "Retours éditeur - chapitre 2.txt",
+      "text": "doc:retours-ch2",
+      "note": "Retours de l'éditrice sur le storyboard du chapitre 2 (à intégrer avant le passage en définitif)."
+    },
+    {
+      "node": "@node:t1",
+      "name": "Planning du tome 1.md",
+      "text": "doc:planning",
+      "earlier": "doc:planning-v1",
+      "note": "Version précédente (avant le report du chapitre 3) gardée dans les versions du document."
+    },
+    {
+      "node": "@node:arc1",
+      "name": "Présentation de la série - dossier éditeur.docx",
+      "text": "doc:dossier",
+      "note": "Dossier envoyé à l'éditrice en septembre : pitch, public, format, trois premiers chapitres."
+    }
+  ],
+  "notes": {
+    "folders": [
+      {
+        "key": "serie",
+        "name": "Série"
+      },
+      {
+        "key": "univers",
+        "name": "Univers"
+      },
+      {
+        "key": "persos",
+        "name": "Personnages"
+      },
+      {
+        "key": "production",
+        "name": "Production"
+      }
+    ],
+    "notes": [
+      {
+        "key": "mode-emploi",
+        "title": "À lire d'abord : ce projet d'exemple",
+        "pinned": true
+      },
+      {
+        "key": "fiche-serie",
+        "title": "Fiche de la série",
+        "folder": "serie",
+        "pinned": true
+      },
+      {
+        "key": "arcs",
+        "title": "Arcs et tomes : la ligne de la série",
+        "folder": "serie"
+      },
+      {
+        "key": "tissage",
+        "title": "Le tissage du vent : règles",
+        "folder": "univers",
+        "pinned": true
+      },
+      {
+        "key": "charte-fils",
+        "title": "Charte des fils",
+        "folder": "univers"
+      },
+      {
+        "key": "factions",
+        "title": "Factions : la Guilde, les Gardes du Fil, les Dénoueurs",
+        "folder": "univers"
+      },
+      {
+        "key": "glossaire",
+        "title": "Glossaire",
+        "folder": "univers"
+      },
+      {
+        "key": "chronologie",
+        "title": "Chronologie de l'archipel",
+        "folder": "univers"
+      },
+      {
+        "key": "continuite",
+        "title": "Continuité : costumes, blessures, objets",
+        "folder": "persos",
+        "pinned": true
+      },
+      {
+        "key": "qui-sait-quoi",
+        "title": "Qui sait quoi, et quand",
+        "folder": "persos"
+      },
+      {
+        "key": "voix",
+        "title": "Voix des personnages",
+        "folder": "persos"
+      },
+      {
+        "key": "methode",
+        "title": "Méthode : du chapitre à la case",
+        "folder": "production"
+      },
+      {
+        "key": "rythme",
+        "title": "Rythme du tome 1",
+        "folder": "production"
+      },
+      {
+        "key": "a-faire",
+        "title": "À faire avant le bouclage du tome 1",
+        "folder": "production"
+      }
+    ],
+    "stickies": [
+      {
+        "text": "Le fil rouge doit être visible dans CHAQUE case où Kai agit à partir du ch. 3 p. 3",
+        "color": "pink",
+        "x": 40,
+        "y": 40
+      },
+      {
+        "text": "Ch. 3 : il manque 10 pages. Ne pas rallonger la traversée : couper dans les Récifs, garder la voile noire",
+        "color": "orange",
+        "x": 320,
+        "y": 40
+      },
+      {
+        "text": "Daigo ne crie jamais. Jamais.",
+        "color": "yellow",
+        "x": 60,
+        "y": 240
+      },
+      {
+        "text": "Tester : couverture du tome 1 sans Kai, seulement la main brûlée et le fil",
+        "color": "purple",
+        "x": 340,
+        "y": 260
+      },
+      {
+        "text": "SFX : rester en français, pas de katakana (choix validé avec l'éditrice)",
+        "color": "blue",
+        "x": 620,
+        "y": 120
+      },
+      {
+        "text": "Tetsu = les questions du lecteur. Lui donner une vraie scène au ch. 4",
+        "color": "green",
+        "x": 620,
+        "y": 330
+      }
+    ],
+    "systemNotes": false
+  },
+  "plot": {
+    "version": 1,
+    "lanes": [
+      {
+        "id": "kai",
+        "name": "Kai, le dénoueur",
+        "color": "#2e5c8e",
+        "main": true,
+        "hidden": false,
+        "characterId": "@char:kai"
+      },
+      {
+        "id": "mio",
+        "name": "Mio et la Guilde",
+        "color": "#b08a2e",
+        "main": false,
+        "hidden": false,
+        "characterId": "@char:mio"
+      },
+      {
+        "id": "ume",
+        "name": "Ume, la Fileuse des Récifs",
+        "color": "#c23b3b",
+        "main": false,
+        "hidden": false,
+        "characterId": "@char:ume"
+      },
+      {
+        "id": "guilde",
+        "name": "La dîme",
+        "color": "#5a5a66",
+        "main": false,
+        "hidden": false,
+        "characterId": "@char:daigo"
+      }
+    ],
+    "events": [
+      {
+        "id": "p1",
+        "laneId": "ume",
+        "row": -3,
+        "title": "Le nœud de capture des Récifs",
+        "note": "Sur ordre de la Guilde, Ume tisse depuis la tour de Kesen un nœud pour « apprivoiser » les Récifs. La tempête tue les gens des Récifs et Isamu, son mari.",
+        "pivot": true,
+        "status": "idea",
+        "tags": [
+          "passé"
+        ],
+        "characterIds": [
+          "@char:ume"
+        ],
+        "povId": "@char:ume",
+        "locationId": "@loc:recifs",
+        "nodeId": "@node:ch6",
+        "alsoNodeIds": [],
+        "noteIds": [
+          "@note:tissage"
+        ],
+        "date": "Il y a 30 ans",
+        "words": 0
+      },
+      {
+        "id": "p2",
+        "laneId": "guilde",
+        "row": -3,
+        "title": "Ume coupe le métier de Kesen",
+        "note": "La même nuit, Ume tranche les lices du métier de Kesen et disparaît. La Guilde la croit morte et efface les Récifs de ses registres.",
+        "pivot": true,
+        "status": "idea",
+        "tags": [
+          "passé"
+        ],
+        "characterIds": [
+          "@char:ume"
+        ],
+        "povId": null,
+        "locationId": "@loc:tour-kesen",
+        "nodeId": "@node:ch9",
+        "alsoNodeIds": [
+          "@node:c1p18"
+        ],
+        "noteIds": [],
+        "date": "Il y a 30 ans",
+        "words": 0
+      },
+      {
+        "id": "p3",
+        "laneId": "guilde",
+        "row": -2,
+        "title": "La dîme punitive",
+        "note": "Hiraga fait des nœuds de punition une méthode : les îles en défaut reçoivent les vents bruts, tissés par des apprenties à leur examen.",
+        "pivot": false,
+        "status": "idea",
+        "tags": [
+          "passé"
+        ],
+        "characterIds": [
+          "@char:hiraga"
+        ],
+        "povId": null,
+        "locationId": "@loc:tour-amaori",
+        "nodeId": "@node:ch8",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "Il y a 20 ans",
+        "words": 0
+      },
+      {
+        "id": "p4",
+        "laneId": "kai",
+        "row": -1,
+        "title": "Sayo disparaît en mer",
+        "note": "Un coup de vent venu des Récifs surprend les pêcheurs de Kesen ; Sayo ne rentre pas. Kai a quatre ans. En réalité, elle a rejoint les gens qui deviendront les Dénoueurs.",
+        "pivot": false,
+        "status": "idea",
+        "tags": [
+          "passé",
+          "secret"
+        ],
+        "characterIds": [
+          "@char:sayo",
+          "@char:kai",
+          "@char:ume"
+        ],
+        "povId": null,
+        "locationId": "@loc:ile-kesen",
+        "nodeId": "@node:ch5",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "Il y a 11 ans",
+        "words": 0
+      },
+      {
+        "id": "g1",
+        "laneId": "guilde",
+        "row": 0,
+        "title": "L'avis de la dîme",
+        "note": "Daigo cloue l'avis : vents bruts au troisième jour.",
+        "pivot": false,
+        "status": "revised",
+        "tags": [],
+        "characterIds": [
+          "@char:daigo"
+        ],
+        "povId": null,
+        "locationId": "@loc:quai",
+        "nodeId": "@node:c1p03",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "Jour 1",
+        "words": 0
+      },
+      {
+        "id": "k1",
+        "laneId": "kai",
+        "row": 0,
+        "title": "La promesse",
+        "note": "Ume comprend que Kai voit les fils sans lunettes et lui fait promettre de ne jamais en toucher un.",
+        "pivot": true,
+        "status": "revised",
+        "tags": [],
+        "characterIds": [
+          "@char:kai",
+          "@char:ume"
+        ],
+        "povId": "@char:kai",
+        "locationId": "@loc:maison-amaya",
+        "nodeId": "@node:c1p06",
+        "alsoNodeIds": [
+          "@node:c1p10"
+        ],
+        "noteIds": [],
+        "date": "Jour 1",
+        "words": 0
+      },
+      {
+        "id": "k2",
+        "laneId": "kai",
+        "row": 1,
+        "title": "Kai dénoue la tempête",
+        "note": "Pour sauver Nami, Kai attrape le fil du nœud noir à mains nues, se brûle et défait la tempête.",
+        "pivot": true,
+        "status": "revised",
+        "tags": [
+          "don"
+        ],
+        "characterIds": [
+          "@char:kai",
+          "@char:nami",
+          "@char:tetsu"
+        ],
+        "povId": "@char:kai",
+        "locationId": "@loc:jetee",
+        "nodeId": "@node:c1p11",
+        "alsoNodeIds": [
+          "@node:c1p12"
+        ],
+        "noteIds": [
+          "@note:tissage"
+        ],
+        "date": "Jour 3",
+        "words": 0
+      },
+      {
+        "id": "m1",
+        "laneId": "mio",
+        "row": 2,
+        "title": "Le nœud de son examen",
+        "note": "Dans la tour éteinte, Mio découvre les fils coupés exprès et reconnaît le nœud de punition qu'on lui a fait tisser.",
+        "pivot": true,
+        "status": "revised",
+        "tags": [],
+        "characterIds": [
+          "@char:mio"
+        ],
+        "povId": "@char:mio",
+        "locationId": "@loc:tour-kesen",
+        "nodeId": "@node:c1p18",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "Jour 3, nuit",
+        "words": 0
+      },
+      {
+        "id": "m2",
+        "laneId": "mio",
+        "row": 3,
+        "title": "Premier mensonge à la Guilde",
+        "note": "Rapport à Hiraga : « rupture naturelle, aucun dénoueur constaté ».",
+        "pivot": false,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:mio"
+        ],
+        "povId": "@char:mio",
+        "locationId": "@loc:tour-kesen",
+        "nodeId": "@node:c2p01",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "Jour 4",
+        "words": 0
+      },
+      {
+        "id": "u1",
+        "laneId": "ume",
+        "row": 3,
+        "title": "Le manteau dans le coffre",
+        "note": "Ume ouvre le coffre : son manteau de maîtresse fileuse.",
+        "pivot": false,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:ume"
+        ],
+        "povId": "@char:ume",
+        "locationId": "@loc:maison-amaya",
+        "nodeId": "@node:c2p07",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "Jour 4",
+        "words": 0
+      },
+      {
+        "id": "k3",
+        "laneId": "kai",
+        "row": 3,
+        "title": "Première règle",
+        "note": "« Un fil s'écoute avant de se tirer. » Kai tient une brise sans se brûler.",
+        "pivot": false,
+        "status": "written",
+        "tags": [
+          "don",
+          "apprentissage"
+        ],
+        "characterIds": [
+          "@char:kai",
+          "@char:ume"
+        ],
+        "povId": "@char:kai",
+        "locationId": "@loc:maison-amaya",
+        "nodeId": "@node:c2p08",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "Jour 4, nuit",
+        "words": 0
+      },
+      {
+        "id": "m3",
+        "laneId": "mio",
+        "row": 4,
+        "title": "Le fil chante",
+        "note": "Mio ôte son gant et entend un fil pour la première fois.",
+        "pivot": false,
+        "status": "written",
+        "tags": [
+          "apprentissage"
+        ],
+        "characterIds": [
+          "@char:mio",
+          "@char:kai"
+        ],
+        "povId": "@char:mio",
+        "locationId": "@loc:tour-kesen",
+        "nodeId": "@node:c2p11",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "Jour 5",
+        "words": 0
+      },
+      {
+        "id": "g2",
+        "laneId": "guilde",
+        "row": 4,
+        "title": "« Défait à la main »",
+        "note": "Le Grand Métier a enregistré le nœud défait : Daigo revient enquêter.",
+        "pivot": false,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:daigo"
+        ],
+        "povId": null,
+        "locationId": "@loc:quai",
+        "nodeId": "@node:c2p12",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "Jour 5",
+        "words": 0
+      },
+      {
+        "id": "u2",
+        "laneId": "ume",
+        "row": 5,
+        "title": "La Fileuse des Récifs",
+        "note": "Daigo trouve le fuseau, reconnaît Ume et l'arrête pour désertion.",
+        "pivot": true,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:ume",
+          "@char:daigo",
+          "@char:kai",
+          "@char:mio"
+        ],
+        "povId": null,
+        "locationId": "@loc:maison-amaya",
+        "nodeId": "@node:c2p14",
+        "alsoNodeIds": [
+          "@node:c2p15"
+        ],
+        "noteIds": [],
+        "date": "Jour 5",
+        "words": 0
+      },
+      {
+        "id": "k4",
+        "laneId": "kai",
+        "row": 5,
+        "title": "« Je vais la chercher »",
+        "note": "Kai décide de partir ; Mio jette son second gant.",
+        "pivot": true,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:kai",
+          "@char:mio"
+        ],
+        "povId": "@char:kai",
+        "locationId": "@loc:jetee",
+        "nodeId": "@node:c2p16",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "Jour 5, soir",
+        "words": 0
+      },
+      {
+        "id": "m4",
+        "laneId": "mio",
+        "row": 6,
+        "title": "L'aveu",
+        "note": "Mio avoue son mensonge et son examen. Kai lui noue un brin de fil rouge au poignet.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:mio",
+          "@char:kai"
+        ],
+        "povId": "@char:mio",
+        "locationId": "@loc:archipel",
+        "nodeId": "@node:c3p05",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "Nuit 6",
+        "words": 0
+      },
+      {
+        "id": "k5",
+        "laneId": "kai",
+        "row": 7,
+        "title": "Les fils libres",
+        "note": "Aux Récifs, Kai comprend que les fils sauvages ne sont pas emmêlés mais libres, et ouvre un passage sans dénouer.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [
+          "don"
+        ],
+        "characterIds": [
+          "@char:kai",
+          "@char:mio",
+          "@char:tetsu"
+        ],
+        "povId": "@char:kai",
+        "locationId": "@loc:recifs",
+        "nodeId": "@node:c3p06",
+        "alsoNodeIds": [
+          "@node:c3p07"
+        ],
+        "noteIds": [],
+        "date": "Jour 7",
+        "words": 0
+      },
+      {
+        "id": "m5",
+        "laneId": "mio",
+        "row": 7,
+        "title": "Mio écoute sans lunettes",
+        "note": "Dans la lame de fond, Mio guide Tetsu en écoutant les fils à mains nues.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [
+          "apprentissage"
+        ],
+        "characterIds": [
+          "@char:mio",
+          "@char:tetsu"
+        ],
+        "povId": "@char:mio",
+        "locationId": "@loc:recifs",
+        "nodeId": "@node:c3p08",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "Jour 7",
+        "words": 0
+      },
+      {
+        "id": "k6",
+        "laneId": "kai",
+        "row": 8,
+        "title": "La voile noire",
+        "note": "Les Dénoueurs arraisonnent le Kamome.",
+        "pivot": false,
+        "status": "idea",
+        "tags": [],
+        "characterIds": [
+          "@char:kai",
+          "@char:mio",
+          "@char:tetsu"
+        ],
+        "povId": null,
+        "locationId": "@loc:recifs",
+        "nodeId": "@node:ch4",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0
+      },
+      {
+        "id": "k7",
+        "laneId": "kai",
+        "row": 9,
+        "title": "Celle qui coupe",
+        "note": "La cheffe des Dénoueurs porte le même fil rouge que Kai : c'est Sayo, sa mère.",
+        "pivot": true,
+        "status": "idea",
+        "tags": [
+          "révélation"
+        ],
+        "characterIds": [
+          "@char:kai",
+          "@char:sayo"
+        ],
+        "povId": "@char:kai",
+        "locationId": "@loc:recifs",
+        "nodeId": "@node:ch5",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0
+      },
+      {
+        "id": "g3",
+        "laneId": "guilde",
+        "row": 11,
+        "title": "Le registre volé",
+        "note": "Mio vole le registre de la dîme ; Daigo la laisse partir.",
+        "pivot": false,
+        "status": "idea",
+        "tags": [],
+        "characterIds": [
+          "@char:mio",
+          "@char:daigo"
+        ],
+        "povId": "@char:mio",
+        "locationId": "@loc:tour-amaori",
+        "nodeId": "@node:ch8",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0
+      },
+      {
+        "id": "u3",
+        "laneId": "ume",
+        "row": 12,
+        "title": "Le procès",
+        "note": "Ume avoue avoir coupé le métier de Kesen, et dit pourquoi.",
+        "pivot": true,
+        "status": "idea",
+        "tags": [],
+        "characterIds": [
+          "@char:ume",
+          "@char:hiraga",
+          "@char:mio",
+          "@char:kai"
+        ],
+        "povId": null,
+        "locationId": "@loc:tour-amaori",
+        "nodeId": "@node:ch9",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0
+      },
+      {
+        "id": "g4",
+        "laneId": "guilde",
+        "row": 13,
+        "title": "Le nœud du Grand Métier",
+        "note": "Hiraga lance un nœud de punition sur Amaori ; Kai le défait à la manière d'Ume.",
+        "pivot": true,
+        "status": "idea",
+        "tags": [],
+        "characterIds": [
+          "@char:kai",
+          "@char:hiraga",
+          "@char:sayo",
+          "@char:ume"
+        ],
+        "povId": "@char:kai",
+        "locationId": "@loc:ile-amaori",
+        "nodeId": "@node:ch10",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0
+      }
+    ],
+    "links": [
+      {
+        "id": "l1",
+        "from": "k1",
+        "to": "k2",
+        "kind": "impact",
+        "label": "la promesse rompue",
+        "note": "La phrase d'Ume revient en pensée au moment de toucher le fil (ch. 1, p. 10)."
+      },
+      {
+        "id": "l2",
+        "from": "k2",
+        "to": "m1",
+        "kind": "meeting",
+        "label": "Mio a tout vu",
+        "note": ""
+      },
+      {
+        "id": "l3",
+        "from": "m1",
+        "to": "m2",
+        "kind": "impact",
+        "label": "elle se tait",
+        "note": ""
+      },
+      {
+        "id": "l4",
+        "from": "g2",
+        "to": "u2",
+        "kind": "impact",
+        "label": "l'enquête",
+        "note": ""
+      },
+      {
+        "id": "l5",
+        "from": "u2",
+        "to": "k4",
+        "kind": "impact",
+        "label": "le départ",
+        "note": ""
+      },
+      {
+        "id": "l6",
+        "from": "p1",
+        "to": "p3",
+        "kind": "influence",
+        "label": "l'échec devient méthode",
+        "note": ""
+      },
+      {
+        "id": "l7",
+        "from": "p2",
+        "to": "g1",
+        "kind": "influence",
+        "label": "tour éteinte, île pauvre",
+        "note": "Sans tour, Kesen ne peut plus payer : c'est la cause lointaine de l'avis."
+      },
+      {
+        "id": "l8",
+        "from": "k3",
+        "to": "k5",
+        "kind": "influence",
+        "label": "écouter avant de tirer",
+        "note": ""
+      },
+      {
+        "id": "l9",
+        "from": "m3",
+        "to": "m5",
+        "kind": "influence",
+        "label": "sans gants, puis sans lunettes",
+        "note": ""
+      },
+      {
+        "id": "l10",
+        "from": "g3",
+        "to": "u3",
+        "kind": "impact",
+        "label": "la preuve",
+        "note": ""
+      }
+    ],
+    "rowLabels": {
+      "-3": "Il y a 30 ans",
+      "-2": "Il y a 20 ans",
+      "-1": "Il y a 11 ans",
+      "0": "Jour 1",
+      "1": "Jour 3",
+      "2": "Jour 3, nuit",
+      "3": "Jour 4",
+      "4": "Jour 5",
+      "5": "Jour 5, soir",
+      "6": "Nuit 6",
+      "7": "Jour 7",
+      "8": "Ch. 4",
+      "9": "Ch. 5",
+      "11": "Ch. 8",
+      "12": "Ch. 9",
+      "13": "Ch. 10"
+    },
+    "acts": {
+      "0": "Arc I — Kesen",
+      "10": "Arc II — Le Grand Métier"
+    },
+    "tension": {
+      "-3": 9,
+      "-2": 5,
+      "-1": 6,
+      "0": 3,
+      "1": 9,
+      "2": 6,
+      "3": 3,
+      "4": 7,
+      "5": 8,
+      "6": 4,
+      "7": 7,
+      "8": 6,
+      "9": 9,
+      "11": 6,
+      "12": 8,
+      "13": 10
+    },
+    "readingOrder": [],
+    "readingFollowsStructure": true,
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Montrer Sayo de dos dès le chapitre 4 (une silhouette sur la voile noire) ?",
+        "done": false,
+        "eventId": "k6"
+      },
+      {
+        "id": "q2",
+        "text": "La brûlure de Kai : cicatrice définitive ou effacée au tome 2 ? (Garder : cicatrice en forme de fil.)",
+        "done": true,
+        "eventId": "k2"
+      },
+      {
+        "id": "q3",
+        "text": "Combien de pages pour le flash-back des Récifs au chapitre 6 ? Éditeur : 8 au plus.",
+        "done": false,
+        "eventId": "p1"
+      },
+      {
+        "id": "q4",
+        "text": "Le lecteur doit-il comprendre avant Kai que le fil rouge relie Ume à quelqu'un ?",
+        "done": false,
+        "eventId": "k7"
+      }
+    ],
+    "mysteries": [
+      {
+        "id": "y1",
+        "question": "Pourquoi la tour de Kesen est-elle éteinte ?",
+        "status": "open",
+        "answer": "Ume a coupé son métier la nuit des Récifs pour que la Guilde ne puisse plus s'en servir.",
+        "payoff": "Aveu d'Ume au procès.",
+        "payoffEventId": "u3"
+      },
+      {
+        "id": "y2",
+        "question": "Qui est la « Fileuse des Récifs » ?",
+        "status": "solved",
+        "answer": "Ume Amaya, ancienne maîtresse fileuse, qu'on croyait morte.",
+        "payoff": "Daigo lit la bague du fuseau.",
+        "payoffEventId": "u2"
+      },
+      {
+        "id": "y3",
+        "question": "Qui commande les nœuds de punition ?",
+        "status": "open",
+        "answer": "Le Maître-tisserand Hiraga, depuis vingt ans ; les apprenties les tissent sans le savoir.",
+        "payoff": "Le registre de la dîme.",
+        "payoffEventId": "g3"
+      },
+      {
+        "id": "y4",
+        "question": "Qui mène les Dénoueurs ?",
+        "status": "open",
+        "answer": "Sayo Amaya, la mère de Kai.",
+        "payoff": "Dernière page du tome 1.",
+        "payoffEventId": "k7"
+      }
+    ],
+    "clues": [
+      {
+        "id": "i1",
+        "text": "Les lices du métier de Kesen sont coupées net, pas usées.",
+        "eventId": "m1",
+        "mysteryId": "y1"
+      },
+      {
+        "id": "i2",
+        "text": "Le fuseau d'Ume porte le sceau de la Guilde.",
+        "eventId": "u2",
+        "mysteryId": "y2"
+      },
+      {
+        "id": "i3",
+        "text": "Mio a appris le nœud de punition comme un « exercice » d'examen.",
+        "eventId": "m1",
+        "mysteryId": "y3"
+      },
+      {
+        "id": "i4",
+        "text": "Ume : « Pendant vingt ans. Jusqu'aux Récifs. »",
+        "eventId": "k3",
+        "mysteryId": "y1"
+      },
+      {
+        "id": "i5",
+        "text": "Le fil rouge du fuseau d'Ume, que Kai voit filer vers le nord-ouest.",
+        "eventId": "k1",
+        "mysteryId": "y4"
+      }
+    ],
+    "goal": 0,
+    "templates": [
+      {
+        "id": "t1",
+        "name": "Chapitre de prépublication (18-20 p.)",
+        "steps": [
+          "Accroche",
+          "Rappel",
+          "Situation",
+          "Complication",
+          "Montée",
+          "Point de bascule",
+          "Choc",
+          "Cliffhanger"
+        ]
+      }
+    ],
+    "sceneOrder": {}
+  },
+  "versions": [
+    {
+      "kind": "synopsis",
+      "item": "default",
+      "name": "Synopsis envoyé à l'éditrice (septembre)",
+      "then": "synopsis-actuel"
+    },
+    {
+      "kind": "plot",
+      "item": "default",
+      "name": "Trame validée pour le tome 1"
+    }
+  ]
+}

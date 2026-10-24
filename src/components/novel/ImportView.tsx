@@ -1,12 +1,14 @@
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { BookOpenText, FileUp, Loader2, RotateCcw, Upload } from "lucide-react";
+import { FileUp, Loader2, Upload } from "lucide-react";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
 import { Button } from "@/components/ui/button";
 import { PageShell } from "@/components/workspace/views/PageShell";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { api } from "@/lib/api";
 import { errorText } from "@/lib/errors";
+import { notifyError } from "@/lib/notify";
+import { toast } from "@/stores/toastStore";
 import {
   buildPlan,
   IMPORT_EXTENSIONS,
@@ -45,7 +47,10 @@ export function ImportView({ project, feature, onOpenFeature }: ImportViewProps)
   const [sections, setSections] = useState<ImportSection[] | null>(null);
   const [split, setSplit] = useState(true);
   const [busy, setBusy] = useState<"read" | "import" | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "novel:import");
+  };
   const [done, setDone] = useState<{ result: ImportResult; undone: boolean } | null>(null);
 
   const levelCount = structure?.levels.length ?? 3;
@@ -84,6 +89,16 @@ export function ImportView({ project, feature, onOpenFeature }: ImportViewProps)
       const result = await api.importManuscript(project.id, plan);
       await fetchStructure(project.id);
       setDone({ result, undone: false });
+      // Résultat en notification (rien ne bouge dans la page), avec
+      // « Annuler l'import » et « Ouvrir le manuscrit ».
+      toast({
+        tone: "success",
+        key: `import:${project.id}`,
+        duration: 15000,
+        message: t("import.done", { nodes: result.nodes.toLocaleString(), words: result.words.toLocaleString() }),
+        action: { label: t("import.undo"), run: () => undo(result) },
+        secondary: { label: t("import.openManuscript"), run: () => onOpenFeature("manuscript.read") },
+      });
       setSections(null);
       setFileName(null);
     } catch (e) {
@@ -93,14 +108,15 @@ export function ImportView({ project, feature, onOpenFeature }: ImportViewProps)
     }
   }
 
-  async function undo() {
-    if (!done) return;
+  async function undo(imported: ImportResult | undefined = done?.result) {
+    if (!imported) return;
     setBusy("import");
     setError(null);
     try {
-      for (const id of done.result.roots) await api.deleteStructureNode(project.id, id);
+      for (const id of imported.roots) await api.deleteStructureNode(project.id, id);
       await fetchStructure(project.id);
-      setDone({ ...done, undone: true });
+      setDone({ result: imported, undone: true });
+      toast({ tone: "success", key: `import:${project.id}`, message: t("import.undone") });
     } catch (e) {
       setError(errorText(e));
     } finally {
@@ -142,31 +158,7 @@ export function ImportView({ project, feature, onOpenFeature }: ImportViewProps)
           </button>
         )}
 
-        {error && (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
-        )}
 
-        {done && (
-          <div role="status" className="flex flex-wrap items-center gap-3 rounded-lg border border-success/40 bg-success/10 px-4 py-2.5 text-sm">
-            <span className="tabular-nums">
-              {done.undone ? t("import.undone") : t("import.done", { nodes: done.result.nodes.toLocaleString(), words: done.result.words.toLocaleString() })}
-            </span>
-            {!done.undone && (
-              <span className="ml-auto flex gap-2">
-                <Button variant="outline" size="sm" className="h-7" onClick={() => onOpenFeature("manuscript.read")}>
-                  <BookOpenText />
-                  {t("import.openManuscript")}
-                </Button>
-                <Button variant="ghost" size="sm" className="h-7" disabled={busy !== null} onClick={() => void undo()}>
-                  <RotateCcw />
-                  {t("import.undo")}
-                </Button>
-              </span>
-            )}
-          </div>
-        )}
 
         {sections && (
           <section className="rounded-xl border bg-card shadow-sm">

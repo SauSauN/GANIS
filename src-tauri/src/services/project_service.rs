@@ -1012,9 +1012,49 @@ pub async fn restore_for_viewer(
         .ok_or_else(project_not_found)
 }
 
+/// Saisie de confirmation : le nom du projet, retapé (espaces de début et
+/// de fin et majuscules ignorés). Un nom vide ne confirme jamais rien.
+pub fn name_confirmed(name: &str, typed: Option<&str>) -> bool {
+    let expected = name.trim().to_lowercase();
+
+    !expected.is_empty() && typed.is_some_and(|typed| typed.trim().to_lowercase() == expected)
+}
+
 /// Efface définitivement un projet de la corbeille (sa clé disparaît avec
 /// la ligne). L'appelant supprime ensuite son dossier.
-pub async fn purge_for_viewer(pool: &SqlitePool, project_id: &str, viewer: &Viewer) -> AppResult<()> {
+///
+/// Un projet **public** est partagé par toutes les personnes qui utilisent
+/// GANIS sur cet ordinateur : son effacement doit avoir été confirmé
+/// explicitement (`confirm_public`, posé par l'interface après la saisie
+/// de confirmation), sans quoi il est refusé.
+pub async fn purge_for_viewer(
+    pool: &SqlitePool,
+    project_id: &str,
+    viewer: &Viewer,
+    confirm_public: bool,
+) -> AppResult<()> {
+    let visibility: Option<String> = sqlx::query_scalar(&format!(
+        "SELECT visibility FROM projects WHERE id = ? AND {TRASH_ACCESS}"
+    ))
+    .bind(project_id)
+    .bind(viewer.user_id())
+    .fetch_optional(pool)
+    .await
+    .map_err(|e| {
+        AppError::database(&e).with_detail(format!("Échec de la recherche du projet : {e}"))
+    })?;
+
+    let Some(visibility) = visibility else {
+        return Err(project_not_found());
+    };
+
+    if visibility == "public" && !confirm_public {
+        return Err(AppError::validation(
+            "Ce projet public est partagé avec les autres personnes qui utilisent cet ordinateur : confirmez sa suppression définitive.",
+        )
+        .with_key("project.purgePublicConfirm"));
+    }
+
     let sql = format!("DELETE FROM projects WHERE id = ? AND {TRASH_ACCESS}");
 
     let result = sqlx::query(&sql)
@@ -1067,6 +1107,8 @@ pub async fn purge_expired(pool: &SqlitePool, cutoff: &str) -> AppResult<Vec<Str
 ///
 /// - Public → privé : le projet est rattaché au compte ; son nom et sa
 ///   description sont chiffrés et sa clé est enfermée par la clé du compte.
+///   Il disparaît de l'espace public pour les autres : `confirm_name` doit
+///   reprendre son nom (voir [`name_confirmed`]).
 /// - Privé → public (projet du compte uniquement) : le projet n'appartient
 ///   plus à personne ; nom, description et clé sont gardés en clair.
 ///
@@ -1079,6 +1121,7 @@ pub async fn set_visibility(
     owner_id: &str,
     account_key: &SecretKey,
     target: ProjectVisibility,
+    confirm_name: Option<&str>,
 ) -> AppResult<Project> {
     let viewer = Viewer::Account {
         user_id: owner_id.to_owned(),
@@ -1091,6 +1134,16 @@ pub async fn set_visibility(
 
     if current.visibility == target {
         return reveal_for_viewer(current, &viewer);
+    }
+
+    // Public → privé : le projet quitte l'espace partagé et n'est plus
+    // ouvrable que par ce compte. Les autres personnes de cet ordinateur le
+    // perdent : le nom du projet doit avoir été retapé pour confirmer.
+    if target == ProjectVisibility::Private && !name_confirmed(&current.name, confirm_name) {
+        return Err(AppError::validation(
+            "Pour rendre ce projet privé, retapez son nom : il ne sera plus accessible aux autres personnes qui utilisent cet ordinateur.",
+        )
+        .with_key("project.makePrivateConfirm"));
     }
 
     let now = crate::utils::now_utc();
@@ -1157,4 +1210,42 @@ pub async fn set_visibility(
     find_for_viewer(pool, project_id, &viewer)
         .await?
         .ok_or_else(project_not_found)
+}
+// ----------------------------------------------------------------------------
+// Projets d'exemple (voir `demo_service`)
+// ----------------------------------------------------------------------------
+
+/// Projet actif créé à partir de l'exemple `demo_id` dans l'espace du
+/// visiteur : l'espace public pour un invité, ses projets privés pour un
+/// compte. Un projet à la corbeille ne compte plus.
+pub async fn find_demo_for_viewer(pool: &SqlitePool, demo_id: &str, viewer: &Viewer) -> AppResult<Option<String>> {
+    let query = match viewer.user_id() {
+        Some(user_id) => sqlx::query_scalar(
+            "SELECT id FROM projects WHERE demo_id = ? AND deleted_at IS NULL AND owner_id = ? \
+             ORDER BY created_at LIMIT 1",
+        )
+        .bind(demo_id)
+        .bind(user_id.to_owned()),
+        None => sqlx::query_scalar(
+            "SELECT id FROM projects WHERE demo_id = ? AND deleted_at IS NULL AND visibility = 'public' \
+             ORDER BY created_at LIMIT 1",
+        )
+        .bind(demo_id)
+        .bind(None::<String>),
+    };
+    query
+        .fetch_optional(pool)
+        .await
+        .map_err(|e| AppError::database(&e).with_detail(format!("Échec de la recherche d'un projet d'exemple : {e}")))
+}
+
+/// Marque un projet comme créé à partir d'un exemple.
+pub async fn set_demo_id(pool: &SqlitePool, project_id: &str, demo_id: &str) -> AppResult<()> {
+    sqlx::query("UPDATE projects SET demo_id = ? WHERE id = ?")
+        .bind(demo_id)
+        .bind(project_id)
+        .execute(pool)
+        .await
+        .map_err(|e| AppError::database(&e).with_detail(format!("Échec du marquage du projet d'exemple : {e}")))?;
+    Ok(())
 }

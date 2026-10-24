@@ -83,6 +83,7 @@ import { cn } from "@/lib/utils";
 import { usePlotStore, useProjectPlot } from "@/stores/plotStore";
 import { BoardSvg } from "@/components/plot/BoardSvg";
 import { InlineTitle } from "@/components/plot/InlineTitle";
+import { doubleClickHint } from "@/lib/doubleClick";
 import { PANEL_KEY, readView, writeView } from "@/components/plot/plotViewPrefs";
 import { TensionCurve } from "@/components/plot/TensionCurve";
 
@@ -594,6 +595,20 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
     }
   }
 
+  /**
+   * Double-clic sur l'en-tête d'une piste : la sélectionne, ouvre le
+   * panneau (s'il était fermé) et place le curseur dans son nom.
+   */
+  function renameLane(laneId: string) {
+    select({ type: "lane", id: laneId });
+    if (!panelOpen) togglePanel();
+    window.setTimeout(() => {
+      const input = document.querySelector<HTMLInputElement>(`[data-lane-name="${CSS.escape(laneId)}"]`);
+      input?.focus();
+      input?.select();
+    }, 50);
+  }
+
   function togglePanel() {
     setPanelOpen((open) => {
       try {
@@ -803,6 +818,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                   role="group"
                   aria-label={t("board.laneAria", { name: lane.name, index: index + 1 })}
                   onPointerDown={(e) => !(e.target as Element).closest("[data-add]") && startLaneDrag(e, lane.id)}
+                  onDoubleClick={(e) => !(e.target as Element).closest("[data-add]") && renameLane(lane.id)}
                   className={cn(
                     "group relative flex shrink-0 cursor-pointer flex-col justify-center border-r border-border/60 pr-10 pl-6 select-none hover:bg-muted/50 has-[[data-select]:focus-visible]:ring-2 has-[[data-select]:focus-visible]:ring-ring has-[[data-select]:focus-visible]:ring-inset",
                     lane.main && "bg-[color-mix(in_oklch,var(--lane)_10%,transparent)]",
@@ -815,7 +831,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                     ["--lane" as string]: lane.color,
                     transform: dragging ? `translateX(${drag.dx}px)` : undefined,
                   }}
-                  title={`${lane.main ? t("board.mainLane") : lane.characterId && links.characterName(lane.characterId) ? t("board.characterLane", { name: links.characterName(lane.characterId) }) : t("board.parallelLane")} · ${t("board.dragLane")}`}
+                  title={`${lane.main ? t("board.mainLane") : lane.characterId && links.characterName(lane.characterId) ? t("board.characterLane", { name: links.characterName(lane.characterId) }) : t("board.parallelLane")} · ${t("board.dragLane")} · ${doubleClickHint("renameLane")}`}
                 >
                   {/* Clavier : sélectionne la piste. À la souris, le clic est
                       géré par le glisser (un clic sans déplacement sélectionne). */}

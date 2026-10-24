@@ -1,0 +1,18 @@
+{
+  "kinds": ["character", "location", "item", "species"],
+  "types": [
+    {"id": "owns", "from": ["character"], "to": ["item", "species"]},
+    {"id": "uses", "from": ["character", "species"], "to": ["item"]},
+    {"id": "made", "from": ["character"], "to": ["item"]},
+    {"id": "seeks", "from": ["character"], "to": ["item", "species"]},
+    {"id": "companion", "from": ["character"], "to": ["species"]},
+    {"id": "locatedIn", "from": ["item"], "to": ["location"]},
+    {"id": "livesIn", "from": ["species"], "to": ["location"]},
+    {"id": "partOf", "from": ["item"], "to": ["item"]},
+    {"id": "madeFrom", "from": ["item"], "to": ["item", "species"]},
+    {"id": "eats", "from": ["character", "species"], "to": ["species"]},
+    {"id": "protects", "from": ["character", "species", "item"], "to": ["character", "location", "item", "species"]},
+    {"id": "related", "from": ["character", "location", "item", "species"], "to": ["character", "location", "item", "species"]},
+    {"id": "other", "from": ["character", "location", "item", "species"], "to": ["character", "location", "item", "species"]}
+  ]
+}

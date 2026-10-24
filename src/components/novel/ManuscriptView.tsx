@@ -1,3 +1,4 @@
+import { doubleClickHint } from "@/lib/doubleClick";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BookOpenText, FileText, ListTree, Loader2, PanelLeftClose, PanelLeftOpen, PenLine, RefreshCw, FileUp } from "lucide-react";
@@ -146,6 +147,9 @@ export function ManuscriptView({ project, feature, onOpenFeature }: ManuscriptVi
                 key={entry.node.id}
                 type="button"
                 onClick={() => scrollTo(entry.node.id)}
+                // Simple clic : aller au passage ; double-clic : ouvrir sa fiche.
+                onDoubleClick={() => onOpenFeature(structureNodeTabId(entry.node.id))}
+                title={doubleClickHint("openSheet")}
                 className="flex w-full items-baseline justify-between gap-2 py-1.5 pr-3 text-left text-sm hover:bg-muted"
                 style={{ paddingLeft: `${0.75 + entry.depth * 0.9}rem` }}
               >

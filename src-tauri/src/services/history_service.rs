@@ -28,14 +28,17 @@ const SESSION_MINUTES: i64 = 10;
 const MAX_AUTO_VERSIONS: i64 = 50;
 const MAX_NAME_CHARS: usize = 100;
 
-/// Colonnes jamais remplacées par une restauration.
-const KEPT_COLUMNS: [&str; 2] = ["id", "created_at"];
+/// Colonnes jamais remplacées par une restauration. `character_id` (faune
+/// et flore) : le lien avec une fiche de personnage se gère à part.
+const KEPT_COLUMNS: [&str; 3] = ["id", "created_at", "character_id"];
 
 /// Table d'un type d'élément versionné.
 fn table_of(kind: &str) -> AppResult<&'static str> {
     match kind {
         "character" => Ok("characters"),
         "location" => Ok("locations"),
+        "item" => Ok("items"),
+        "species" => Ok("species"),
         "structureNode" => Ok("structure_nodes"),
         "note" => Ok("notes"),
         "synopsis" => Ok("synopsis"),

@@ -47,7 +47,26 @@ function ToastItem({ toast }: { toast: Toast }) {
           toast.tone === "info" && "text-muted-foreground",
         )}
       />
-      <p className="min-w-0 flex-1 break-words">{toast.message}</p>
+      <p className="min-w-0 flex-1 break-words whitespace-pre-line">{toast.message}</p>
+
+      {toast.secondary && (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={async () => {
+            setBusy(true);
+            try {
+              await toast.secondary?.run();
+              dismiss(toast.id);
+            } finally {
+              setBusy(false);
+            }
+          }}
+          className="h-8 shrink-0 rounded-md px-3 text-sm font-medium text-foreground hover:bg-muted disabled:opacity-50"
+        >
+          {toast.secondary.label}
+        </button>
+      )}
 
       {toast.action && (
         <button

@@ -127,13 +127,19 @@
     "emptyHint": "Create chapters and pages in the structure.",
     "openPlan": "Open the structure",
     "editPage": "Edit page",
-    "fileSuffix": "script"
+    "fileSuffix": "script",
+    "toc": "Contents",
+    "details": "Art directions",
+    "detailsHint": "Show framing, setting, notes to the artist and continuity for each panel",
+    "legend": "Text types",
+    "turnPage": "Page turn"
   },
   "export": {
     "subtitle": "Script for the artist",
     "cast": "Characters",
     "places": "Locations",
-    "page": "{{label}} — {{count}} panel(s)",
+    "page_one": "{{label}} — {{count}} panel",
+    "page_other": "{{label}} — {{count}} panels",
     "panel": "Panel {{number}}",
     "goal": "Goal:",
     "rhythm": "Function: {{value}}",

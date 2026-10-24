@@ -26,6 +26,8 @@ function timeOf(iso: string, language: string): string {
  * enregistrements :
  * - « Enregistrement… » pendant une écriture ;
  * - « Échec de l'enregistrement » (message complet au survol) ;
+ * - « Dernier enregistrement en échec », une fois l'erreur masquée, tant
+ *   qu'aucune écriture n'a réussi depuis (jamais « Enregistré » à tort) ;
  * - « N modification(s) non enregistrée(s) », avec « Tout enregistrer » ;
  * - « Enregistré à 14:32 » ;
  * - « Prêt » tant que rien n'a été modifié.
@@ -40,6 +42,7 @@ export function StatusBar() {
   const pending = useSaveStatusStore((state) => state.pending);
   const lastSavedAt = useSaveStatusStore((state) => state.lastSavedAt);
   const lastError = useSaveStatusStore((state) => state.lastError);
+  const errorDismissed = useSaveStatusStore((state) => state.errorDismissed);
   const dismissError = useSaveStatusStore((state) => state.dismissError);
   const unsaved = useUnsavedStore((state) => Object.keys(state.entries).length);
 
@@ -48,7 +51,7 @@ export function StatusBar() {
     api.appInfo().then(setInfo).catch(() => setInfo(null));
   }, []);
 
-  const state = resolveSaveState(pending, lastError, unsaved, lastSavedAt);
+  const state = resolveSaveState(pending, lastError, unsaved, lastSavedAt, errorDismissed);
 
   async function saveAll() {
     setSavingAll(true);
@@ -75,26 +78,35 @@ export function StatusBar() {
         <span
           role="status"
           aria-live="polite"
-          title={state === "error" ? (lastError ?? undefined) : undefined}
+          title={state === "error" || state === "failed" ? (lastError ?? undefined) : undefined}
           className={cn(
             "flex items-center gap-1",
             state === "error" && "font-medium text-destructive",
+            state === "failed" && "text-destructive",
             state === "unsaved" && "text-foreground",
           )}
         >
           {state === "saving" && <Loader2 className="h-3 w-3 animate-spin" />}
-          {state === "error" && <CircleAlert className="h-3 w-3" />}
+          {(state === "error" || state === "failed") && <CircleAlert className="h-3 w-3" />}
           {state === "unsaved" && <CircleDot className="h-3 w-3 text-warning" />}
           {(state === "saved" || state === "idle") && <Check className="h-3 w-3 text-success" />}
           {state === "saved" && lastSavedAt
             ? t("save.savedAt", { time: timeOf(lastSavedAt, i18n.language) })
             : state === "unsaved"
               ? t("save.unsaved", { count: unsaved })
-              : t(state === "saving" ? "save.saving" : state === "error" ? "save.error" : "save.idle")}
+              : t(
+                  state === "saving"
+                    ? "save.saving"
+                    : state === "error"
+                      ? "save.error"
+                      : state === "failed"
+                        ? "save.failed"
+                        : "save.idle",
+                )}
         </span>
 
         {/* Détail de l'échec : au clic (et au clavier), pas seulement au survol. */}
-        {state === "error" && lastError && (
+        {(state === "error" || state === "failed") && lastError && (
           <button
             type="button"
             onClick={() => setDetailsOpen(true)}
@@ -142,15 +154,17 @@ export function StatusBar() {
           {lastError}
         </p>
         <DialogFooter className="mt-6 gap-2">
-          <Button
-            variant="ghost"
-            onClick={() => {
-              dismissError();
-              setDetailsOpen(false);
-            }}
-          >
-            {t("save.dismiss")}
-          </Button>
+          {!errorDismissed && (
+            <Button
+              variant="ghost"
+              onClick={() => {
+                dismissError();
+                setDetailsOpen(false);
+              }}
+            >
+              {t("save.dismiss")}
+            </Button>
+          )}
           <Button onClick={() => setDetailsOpen(false)}>{t("save.close")}</Button>
         </DialogFooter>
       </Dialog>

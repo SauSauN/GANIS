@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
-import { BetweenHorizontalEnd, BetweenHorizontalStart, Trash2 } from "lucide-react";
+import { BetweenHorizontalEnd, BetweenHorizontalStart, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +21,7 @@ import {
 import { cn } from "@/lib/utils";
 import type { Structure, StructureNumbering } from "@/types";
 import { errorText } from "@/lib/errors";
+import { notifyError, notifySaved } from "@/lib/notify";
 
 const fieldClass =
   "w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50";
@@ -109,8 +110,6 @@ export function StructureLevelsEditor({
 
   const [draft, setDraft] = useState<DraftLevel[]>(initial);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
 
   // Découpage rechargé (enregistrement, autre onglet) : on repart de lui.
   useEffect(() => {
@@ -121,14 +120,12 @@ export function StructureLevelsEditor({
   const valid = draft.every((level) => level.one.trim() !== "");
 
   function update(key: string, patch: Partial<DraftLevel>) {
-    setSaved(false);
     setDraft((current) => current.map((level) => (level.key === key ? { ...level, ...patch } : level)));
   }
 
   function insert(index: number) {
     if (draft.length >= MAX_LEVELS) return;
 
-    setSaved(false);
     setDraft((current) => {
       const next = [...current];
       next.splice(index, 0, {
@@ -146,13 +143,11 @@ export function StructureLevelsEditor({
   }
 
   function remove(key: string) {
-    setSaved(false);
     setDraft((current) => current.filter((level) => level.key !== key));
   }
 
   async function save() {
     setSaving(true);
-    setError(null);
 
     try {
       await api.setStructureLevels(
@@ -168,9 +163,9 @@ export function StructureLevelsEditor({
         })),
       );
       await onSaved();
-      setSaved(true);
+      notifySaved(t("levels.saved"), `levels:${projectId}`);
     } catch (e) {
-      setError(errorText(e));
+      notifyError(errorText(e), `levels:${projectId}`);
     } finally {
       setSaving(false);
     }
@@ -235,6 +230,7 @@ export function StructureLevelsEditor({
                   <Input
                     id={`${prefix}-one`}
                     value={level.one}
+                    placeholder={t("common:placeholders.levelName")}
                     maxLength={MAX_LEVEL_NAME}
                     disabled={saving}
                     aria-invalid={level.one.trim() === ""}
@@ -283,6 +279,7 @@ export function StructureLevelsEditor({
                     min={0}
                     max={MAX_START}
                     value={level.start}
+                    placeholder={t("common:placeholders.startNumber")}
                     disabled={saving || level.numbering === "none"}
                     onChange={(e) =>
                       update(level.key, {
@@ -360,20 +357,11 @@ export function StructureLevelsEditor({
         ))}
       </p>
 
-      {error && (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      )}
-      {saved && !dirty && (
-        <p role="status" className="text-sm text-success">
-          {t("levels.saved")}
-        </p>
-      )}
 
       <div className="flex flex-wrap gap-2">
         <Button type="button" size="sm" disabled={!dirty || !valid || saving} onClick={() => void save()}>
-          {saving ? t("levels.saving") : t("levels.save")}
+          {saving && <Loader2 className="mr-1.5 size-3.5 animate-spin" aria-hidden="true" />}
+          {t("levels.save")}
         </Button>
         {dirty && (
           <Button type="button" size="sm" variant="ghost" disabled={saving} onClick={() => setDraft(initial)}>

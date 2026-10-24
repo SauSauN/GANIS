@@ -3,8 +3,6 @@
     "title": "Profile detail level",
     "firstTime": "Choose how detailed the character profiles of this project are. It applies to every character and can be changed in the project settings.",
     "continue": "Continue",
-    "current": "Profiles at {{level}} level.",
-    "change": "Change",
     "count": "15 fields",
     "countMore": "+ 15 fields",
     "basic": {
@@ -147,7 +145,10 @@
     "innerConflict": "The two forces pulling against each other inside them.",
     "adversityResponse": "E.g. Runs away first, then comes back to fight",
     "plannedArc": "Who they are at the start of the story, who they become by the end.",
-    "tags": "E.g. Stubborn, generous… (Enter to add)"
+    "tags": "E.g. Stubborn, generous… (Enter to add)",
+    "traits": "E.g. Loyal, impulsive… (Enter to add)",
+    "strengths": "E.g. Brave, good strategist…",
+    "flaws": "E.g. Proud, resentful…"
   },
   "choice": {
     "none": "Not specified",

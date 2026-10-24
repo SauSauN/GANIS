@@ -166,11 +166,15 @@ pub async fn update_project(
 /// Rend un projet privé (rattaché au compte connecté, chiffré) ou public
 /// (ouvrable sans connexion). Réservé à un compte connecté ; un projet
 /// privé ne peut être rendu public que par son propriétaire.
+///
+/// Public → privé retire le projet aux autres personnes de cet ordinateur :
+/// `confirm_name` doit reprendre le nom du projet (saisi dans l'interface).
 #[tauri::command]
 pub async fn set_project_visibility(
     state: State<'_, AppState>,
     project_id: String,
     visibility: ProjectVisibility,
+    confirm_name: Option<String>,
 ) -> AppResult<Project> {
     let (user, account_key) = state.require_session().await?;
 
@@ -178,8 +182,15 @@ pub async fn set_project_visibility(
     // d'avant le chiffrement (sa clé doit exister pour être conservée).
     project_storage::pool_for_request(&state, &project_id).await?;
 
-    project_service::set_visibility(&state.app_db, &project_id, &user.id, &account_key, visibility)
-        .await
+    project_service::set_visibility(
+        &state.app_db,
+        &project_id,
+        &user.id,
+        &account_key,
+        visibility,
+        confirm_name.as_deref(),
+    )
+    .await
 }
 
 /// Duplique un projet accessible, données (synopsis, etc.) comprises. La
@@ -253,14 +264,25 @@ pub async fn restore_project(
 }
 
 /// Supprime définitivement un projet de la corbeille, avec ses données.
+///
+/// Projet public (partagé sur cet ordinateur) : refusé sans
+/// `confirm_public`, que l'interface ne pose qu'après une saisie de
+/// confirmation.
 #[tauri::command]
 pub async fn purge_project(
     state: State<'_, AppState>,
     project_id: String,
+    confirm_public: Option<bool>,
 ) -> AppResult<()> {
     let viewer = state.viewer().await;
 
-    project_service::purge_for_viewer(&state.app_db, &project_id, &viewer).await?;
+    project_service::purge_for_viewer(
+        &state.app_db,
+        &project_id,
+        &viewer,
+        confirm_public.unwrap_or(false),
+    )
+    .await?;
 
     project_storage::delete_storage(&state, &project_id).await;
 

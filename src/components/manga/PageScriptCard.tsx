@@ -33,6 +33,7 @@ import {
 import { cn } from "@/lib/utils";
 import { FRAMINGS, PANEL_TEXT_KINDS, RHYTHMS, type Character, type Location, type MangaSettings, type PanelTextKind } from "@/types";
 import { errorText } from "@/lib/errors";
+import { notifyError } from "@/lib/notify";
 
 const field = "w-full rounded-md border border-input bg-background px-2.5 text-sm outline-none focus:ring-2 focus:ring-ring";
 const select = cn(field, "h-8 pr-7");
@@ -516,7 +517,10 @@ function MovePanelDialog({
   const { t } = useTranslation(["manga", "common"]);
   const [target, setTarget] = useState("");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "manga:page");
+  };
 
   return (
     <Dialog
@@ -543,11 +547,6 @@ function MovePanelDialog({
               </option>
             ))}
           </select>
-        )}
-        {error && (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
         )}
         <DialogFooter>
           <Button variant="ghost" disabled={busy} onClick={onClose}>

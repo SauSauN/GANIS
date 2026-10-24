@@ -129,6 +129,20 @@
       "title": "Thème de couleurs",
       "description": "Palette utilisée en mode clair et en mode sombre.",
       "manage": "Gérer les packages"
+    },
+    "panelImage": {
+      "title": "Images du panneau du milieu",
+      "description": "Taille des images dans les listes des personnages, lieux, objets, faune et flore. Le même réglage s'applique à toutes.",
+      "smaller": "Réduire les images",
+      "larger": "Agrandir les images",
+      "value": "{{size}} px",
+      "range": "de {{min}} à {{max}} px",
+      "reset": "Taille par défaut",
+      "sample": {
+        "character": "Personnage",
+        "location": "Lieu",
+        "item": "Objet"
+      }
     }
   },
   "developer": {

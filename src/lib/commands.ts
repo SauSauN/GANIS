@@ -31,6 +31,8 @@ export type CommandId =
   | "openProjectSettings"
   | "openTrash"
   | "openHistory"
+  /** Bouton ▶ : lecture complète de l'histoire (ou retour à l'édition). */
+  | "readStory"
   | "palette";
 
 export interface CommandHandler {
@@ -39,6 +41,8 @@ export interface CommandHandler {
   label?: string;
   /** Vrai : visible mais grisée (ex. rien à enregistrer). */
   disabled?: boolean;
+  /** Vrai : commande à bascule actuellement enclenchée (lecture en cours). */
+  active?: boolean;
 }
 
 type Handlers = Partial<Record<CommandId, CommandHandler>>;
@@ -122,7 +126,7 @@ export function useRegisterCommands(handlers: Handlers) {
 
   // Clé stable : identifiants, libellés et états grisés (pas les fonctions).
   const signature = JSON.stringify(
-    Object.entries(handlers).map(([id, h]) => [id, h?.label ?? "", Boolean(h?.disabled)]),
+    Object.entries(handlers).map(([id, h]) => [id, h?.label ?? "", Boolean(h?.disabled), Boolean(h?.active)]),
   );
 
   useEffect(() => {
@@ -134,6 +138,7 @@ export function useRegisterCommands(handlers: Handlers) {
       wrapped[id] = {
         label: current.label,
         disabled: current.disabled,
+        active: current.active,
         run: () => latest.current[id]?.run(),
       };
     }

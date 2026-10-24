@@ -8,6 +8,7 @@ import { PageShell } from "@/components/workspace/views/PageShell";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { api } from "@/lib/api";
 import { errorText } from "@/lib/errors";
+import { notifyError, notifySaved } from "@/lib/notify";
 import { countWordsPlain, plainText } from "@/lib/novel";
 import type { ExportDocument } from "@/lib/novelExport";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
@@ -53,7 +54,6 @@ export function EditorialView({ project, feature }: EditorialViewProps) {
   const [saved, setSaved] = useState<Draft | null>(null);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [saving, setSaving] = useState(false);
-  const [status, setStatus] = useState<"saved" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -77,14 +77,13 @@ export function EditorialView({ project, feature }: EditorialViewProps) {
   async function save(): Promise<boolean> {
     if (!draft) return true;
     setSaving(true);
-    setError(null);
     try {
       const value = await api.updateEditorial(project.id, draft);
       setSaved({ pitch: value.pitch, summaryShort: value.summaryShort, summaryLong: value.summaryLong });
-      setStatus("saved");
+      notifySaved(t("editorial.saved"), `editorial:${project.id}`);
       return true;
     } catch (e) {
-      setError(errorText(e));
+      notifyError(errorText(e), `editorial:${project.id}`);
       return false;
     } finally {
       setSaving(false);
@@ -93,22 +92,18 @@ export function EditorialView({ project, feature }: EditorialViewProps) {
 
   useUnsavedChanges({ dirty, save, revision: draft ? JSON.stringify(draft) : null });
 
-  useEffect(() => {
-    if (dirty) setStatus(null);
-  }, [dirty]);
 
   async function fromSynopsis(field: Field) {
-    setError(null);
     try {
       const synopsis = await api.getSynopsis(project.id);
       const text = synopsisText(synopsis.content);
       if (!text) {
-        setError(t("editorial.synopsisEmpty"));
+        notifyError(t("editorial.synopsisEmpty"), `editorial:${project.id}`);
         return;
       }
       setDraft((current) => (current ? { ...current, [field]: text } : current));
     } catch (e) {
-      setError(errorText(e));
+      notifyError(errorText(e), `editorial:${project.id}`);
     }
   }
 
@@ -193,25 +188,15 @@ export function EditorialView({ project, feature }: EditorialViewProps) {
       description={t("editorial.intro")}
       actions={
         <div className="flex flex-wrap items-center gap-3">
-          {status === "saved" && !dirty && (
-            <span role="status" className="text-sm text-success">
-              {t("editorial.saved")}
-            </span>
-          )}
           <VersionsButton projectId={project.id} kind="editorial" itemId="default" name={feature.label} />
           <Button disabled={!dirty || saving} onClick={() => void save()}>
             {saving ? <Loader2 className="animate-spin" /> : <Save />}
-            {saving ? t("editorial.saving") : t("editorial.save")}
+            {t("editorial.save")}
           </Button>
         </div>
       }
     >
       <div className="space-y-6">
-        {error && (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
-        )}
         {section("pitch", 3, false)}
         {section("summaryShort", 6, true)}
         {section("summaryLong", 16, true)}

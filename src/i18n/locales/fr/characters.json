@@ -3,8 +3,6 @@
     "title": "Niveau de détail des fiches",
     "firstTime": "Choisissez le niveau de détail des fiches de ce projet. Il s'applique à tous les personnages et se change dans les paramètres du projet.",
     "continue": "Continuer",
-    "current": "Fiches au niveau {{level}}.",
-    "change": "Modifier",
     "count": "15 champs",
     "countMore": "+ 15 champs",
     "basic": {
@@ -147,7 +145,10 @@
     "innerConflict": "Les deux forces qui s'opposent en lui.",
     "adversityResponse": "Ex. Fuit d'abord, puis revient se battre",
     "plannedArc": "Qui il est au début de l'histoire, qui il devient à la fin.",
-    "tags": "Ex. Têtu, généreux… (Entrée pour ajouter)"
+    "tags": "Ex. Têtu, généreux… (Entrée pour ajouter)",
+    "traits": "Ex. Loyal, impulsif… (Entrée pour ajouter)",
+    "strengths": "Ex. Courageux, bon stratège…",
+    "flaws": "Ex. Orgueilleux, rancunier…"
   },
   "choice": {
     "none": "Non précisé",

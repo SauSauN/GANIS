@@ -16,6 +16,11 @@ interface PortraitPickerProps {
   size?: AvatarSize;
   /** Couleurs de la palette du personnage : un anneau entoure la photo. */
   ringColors?: string[];
+  /**
+   * Cadre carré sur toute la largeur de la carte, de la même taille que
+   * l'image des lieux, des objets et de la faune et flore.
+   */
+  frame?: boolean;
   onPick: (file: File) => void;
   onRemove: () => void;
 }
@@ -33,6 +38,7 @@ export function PortraitPicker({
   disabled = false,
   size = "xl",
   ringColors = [],
+  frame = false,
   onPick,
   onRemove,
 }: PortraitPickerProps) {
@@ -43,6 +49,7 @@ export function PortraitPicker({
   const locked = disabled || busy;
   const ring = paletteRing(ringColors);
   const removal = useConfirmImageRemoval(() => onRemove());
+  const round = frame ? "rounded-lg" : "rounded-full";
 
   function pickFirst(files: FileList | null) {
     const file = files?.[0];
@@ -76,7 +83,7 @@ export function PortraitPicker({
   const ActionIcon = url ? Trash2 : ImagePlus;
 
   return (
-    <div className="flex shrink-0 flex-col items-center gap-2">
+    <div className={cn("flex shrink-0 flex-col items-center gap-2", frame && "w-full")}>
       <button
         type="button"
         disabled={locked}
@@ -87,7 +94,9 @@ export function PortraitPicker({
         aria-label={actionLabel}
         title={dragOver ? t("portrait.drop") : actionLabel}
         className={cn(
-          "group relative rounded-full transition-shadow focus-visible:outline-none",
+          "group relative transition-shadow focus-visible:outline-none",
+          round,
+          frame && "aspect-square w-full",
           "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
           ring && "p-1",
           dragOver && "ring-4 ring-primary ring-offset-2 ring-offset-background",
@@ -96,12 +105,13 @@ export function PortraitPicker({
         style={ring ? { background: ring } : undefined}
       >
         {/* Fin liseré de la couleur de la carte entre l'anneau et la photo. */}
-        <span className={cn("relative block rounded-full", ring && "bg-card p-1")}>
+        <span className={cn("relative block", round, frame && "size-full", ring && "bg-card p-1")}>
           <AvatarFace
             colorKey={colorKey}
             name={name}
             url={url}
-            size={size}
+            size={frame ? "fill" : size}
+            square={frame}
             className={ring ? "ring-0" : undefined}
           />
 
@@ -109,7 +119,8 @@ export function PortraitPicker({
           {!locked && (
             <span
               className={cn(
-                "absolute inset-0 flex flex-col items-center justify-center gap-1 overflow-hidden rounded-full text-xs font-medium text-white opacity-0 transition-opacity",
+                "absolute inset-0 flex flex-col items-center justify-center gap-1 overflow-hidden text-xs font-medium text-white opacity-0 transition-opacity",
+                round,
                 "group-hover:opacity-100 group-focus-visible:opacity-100",
                 dragOver && "opacity-100",
                 "bg-black/60 backdrop-blur-[2px]",
@@ -125,7 +136,7 @@ export function PortraitPicker({
         </span>
 
         {busy && (
-          <span className="absolute inset-0 flex items-center justify-center rounded-full bg-background/70">
+          <span className={cn("absolute inset-0 flex items-center justify-center bg-background/70", round)}>
             <Loader2 className="size-6 animate-spin text-primary" aria-label={t("portrait.saving")} />
           </span>
         )}
@@ -161,7 +172,7 @@ export function PortraitPicker({
  * Fond de l'anneau : la couleur seule, ou un dégradé circulaire qui passe
  * par toutes les couleurs de la palette (et se referme sur la première).
  */
-function paletteRing(colors: string[]): string | null {
+export function paletteRing(colors: string[]): string | null {
   if (colors.length === 0) return null;
   if (colors.length === 1) return colors[0];
   return `conic-gradient(from 0deg, ${[...colors, colors[0]].join(", ")})`;

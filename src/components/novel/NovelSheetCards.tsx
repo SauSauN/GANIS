@@ -9,6 +9,7 @@ import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/Co
 import { api } from "@/lib/api";
 import { fullName } from "@/lib/characters";
 import { errorText } from "@/lib/errors";
+import { notifyError } from "@/lib/notify";
 import { goalPercent, STATUS_COLORS, statusOf } from "@/lib/novel";
 import { cn } from "@/lib/utils";
 import { useStructureStore } from "@/stores/structureStore";
@@ -177,7 +178,10 @@ export function NovelWritingCard({ projectId, node, totalWords, isChapter, isSce
   const linkCharacter = useStructureStore((s) => s.linkCharacter);
   const [goal, setGoal] = useState(node.wordGoal ? String(node.wordGoal) : "");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "novel:sheet");
+  };
 
   // L'objectif suit l'élément s'il change ailleurs (plan, suivi de rédaction).
   useEffect(() => setGoal(node.wordGoal ? String(node.wordGoal) : ""), [node.wordGoal]);
@@ -336,11 +340,6 @@ export function NovelWritingCard({ projectId, node, totalWords, isChapter, isSce
           </div>
         )}
 
-        {error && (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
-        )}
       </div>
     </CollapsibleCard>
   );

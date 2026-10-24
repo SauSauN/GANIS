@@ -1,6 +1,5 @@
 {
   "greeting": "Hello, {{name}}",
-  "defaultName": "creator",
   "subtitle": "Welcome to your narrative design studio.",
   "newProject": "New project",
   "search": {
@@ -68,7 +67,31 @@
   },
   "space": {
     "private": "Private space",
-    "public": "Public space"
+    "public": "Public space",
+    "explain": "What this space protects",
+    "info": {
+      "public": {
+        "title": "Public space",
+        "text": "Without an account, your projects go to the public space:",
+        "points": [
+          "Projects in the public space are not encrypted.",
+          "Anyone who uses GANIS on this computer can open, edit or delete them.",
+          "To protect a project: sign in, then make it private (project settings)."
+        ]
+      },
+      "private": {
+        "title": "Private space",
+        "text": "Your projects are protected by your account:",
+        "points": [
+          "They are encrypted and only open with your account.",
+          "Without your password they cannot be read: export a .ganix backup regularly (File › Export)."
+        ]
+      },
+      "continue": "Continue without an account",
+      "signIn": "Sign in",
+      "understood": "Got it",
+      "dontShowOnStart": "Don't show this when clicking “Get started” (still available from the “Public space” badge)"
+    }
   },
   "trash": {
     "intro": "Projects stay in the trash for 30 days, then are permanently deleted with all their data.",
@@ -91,8 +114,14 @@
     "confirm": {
       "title_one": "Permanently delete this project?",
       "title_other": "Permanently delete {{count}} projects?",
-      "description": "All their data (sheets, notes, documents, versions) will be erased. This cannot be undone.",
-      "confirm": "Delete permanently"
+      "description_one": "All its data (sheets, notes, documents, versions) will be erased. This cannot be undone.",
+      "description_other": "All their data (sheets, notes, documents, versions) will be erased. This cannot be undone.",
+      "confirm": "Delete permanently",
+      "publicWarning_one": "This project is public: it is shared with everyone who uses GANIS on this computer, and they will lose it too.",
+      "publicWarning_other": "These projects are public: they are shared with everyone who uses GANIS on this computer, and they will lose them too.",
+      "typeName": "To confirm, type the project name again: {{name}}",
+      "typeWord": "To confirm, type {{word}}",
+      "word": "DELETE"
     },
     "loading": "Loading trash…"
   }

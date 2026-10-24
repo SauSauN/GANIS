@@ -1,0 +1,2928 @@
+{
+  "format": 1,
+  "project": {
+    "name": "Les Plaques de verre",
+    "description": "Projet d'exemple — roman. Hiver 2019, un observatoire des Pyrénées va fermer ; en numérisant ses plaques de verre, une archiviste retrouve la trace d'une mesureuse qu'on a effacée. Visite guidée : Notes › « À lire d'abord ».",
+    "type": "novel",
+    "status": "in_progress"
+  },
+  "card": {
+    "pitch": "Hiver 2019 : en numérisant les plaques de verre d'un observatoire qui ferme, Jeanne découvre qu'on a effacé la découverte d'une mesureuse de 1913.",
+    "highlights": [
+      "3 parties, 9 chapitres, prologue, épilogue : 19 scènes dont 18 rédigées",
+      "9 personnages, 16 lieux, 7 objets",
+      "Trame en 4 intrigues, passé de 1913, mystères et indices",
+      "Notes de travail : chronologie, glossaire, « qui sait quoi »"
+    ]
+  },
+  "synopsis": {
+    "text": "synopsis",
+    "genres": [
+      "Roman contemporain",
+      "Mystère"
+    ],
+    "subgenres": [
+      "Huis clos",
+      "Roman d'enquête"
+    ],
+    "tones": [
+      "Mélancolique",
+      "Lumineux"
+    ]
+  },
+  "characterSettings": {
+    "detailLevel": "advanced"
+  },
+  "locationSettings": {
+    "detailLevel": "advanced",
+    "customTypes": [
+      {
+        "key": "observatoire",
+        "name": "Observatoire",
+        "category": "built"
+      },
+      {
+        "key": "coupole",
+        "name": "Coupole",
+        "category": "built"
+      },
+      {
+        "key": "piece",
+        "name": "Pièce",
+        "category": "built"
+      },
+      {
+        "key": "gare",
+        "name": "Gare de téléphérique",
+        "category": "built"
+      },
+      {
+        "key": "maison",
+        "name": "Maison",
+        "category": "built"
+      },
+      {
+        "key": "couloir",
+        "name": "Couloir d'avalanche",
+        "category": "natural"
+      }
+    ]
+  },
+  "world": {
+    "item": {
+      "enabled": true,
+      "categories": [
+        "document",
+        "tool",
+        "treasure"
+      ],
+      "detailLevel": "advanced"
+    }
+  },
+  "structure": {
+    "autoNumbering": true,
+    "nodes": [
+      {
+        "key": "p1",
+        "title": "Le relevé",
+        "summary": "Jeanne arrive au sommet, apprend le métier des plaques et découvre qu'il en manque trente-sept.",
+        "novel": {
+          "wordGoal": 16000
+        },
+        "children": [
+          {
+            "key": "prologue",
+            "title": "Prologue",
+            "summary": "9-13 janvier 1913. Marthe Lacoste voit une étoile grossir sur la plaque 4417 ; Émile Ferrand descend dans la tempête pour envoyer la découverte sous son nom.",
+            "numbered": false,
+            "novel": {
+              "wordGoal": 1500,
+              "writingStatus": "corrected",
+              "narrativePerson": "third",
+              "narrativeTense": "past"
+            }
+          },
+          {
+            "key": "ch1",
+            "title": "La benne du lundi",
+            "summary": "Arrivée de Jeanne ; la plaquothèque ; l'enjeu de la fermeture.",
+            "novel": {
+              "wordGoal": 5000,
+              "writingStatus": "proofread"
+            },
+            "children": [
+              {
+                "key": "s1-1",
+                "title": "L'arrivée",
+                "summary": "14 janvier 2019. Jeanne monte en benne ; Bastien l'accueille : « Vous êtes là pour fermer la maison. »",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              },
+              {
+                "key": "s1-2",
+                "title": "La plaquothèque",
+                "summary": "Hélène montre les 11 406 plaques et demande à Jeanne de lui signaler toute trouvaille.",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              }
+            ]
+          },
+          {
+            "key": "ch2",
+            "title": "Onze mille nuits",
+            "summary": "La routine de la numérisation ; Bastien observe Jeanne ; la lacune de janvier 1913.",
+            "novel": {
+              "wordGoal": 5000,
+              "writingStatus": "revision"
+            },
+            "children": [
+              {
+                "key": "s2-1",
+                "title": "La routine",
+                "summary": "Fin janvier. Le travail, les pannes, Yanis et les variables, l'annonce de la visite de Kerver.",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              },
+              {
+                "key": "s2-2",
+                "title": "La ronde de Bastien",
+                "summary": "Une nuit de fin janvier. Bastien voit Jeanne parler aux plaques et lui laisse une Thermos de thé.",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "present"
+                }
+              },
+              {
+                "key": "s2-3",
+                "title": "La lacune",
+                "summary": "4 février. Les plaques 4402 à 4438 sont déclarées brisées ; la 4417 est retrouvée dans la boîte d'avril 1914 : « M. L. — elle a grossi ».",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              }
+            ]
+          },
+          {
+            "key": "ch3",
+            "title": "Le carnet d'Émile",
+            "summary": "Hélène identifie « M. L. » et montre le carnet d'Émile Ferrand ; extraits de décembre 1912.",
+            "novel": {
+              "wordGoal": 4500,
+              "writingStatus": "revision"
+            },
+            "children": [
+              {
+                "key": "s3-1",
+                "title": "« M. L. »",
+                "summary": "6 février. Hélène raconte la mort d'Émile et lit sa dernière page ; elle rêve d'une nova qui sauverait la station.",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              },
+              {
+                "key": "s3-2",
+                "title": "Carnet, décembre 1912",
+                "summary": "Extraits du carnet : l'arrivée de Marthe, ses mesures plus justes que celles d'Émile.",
+                "novel": {
+                  "narrativePerson": "first",
+                  "narrativeTense": "past"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "p2",
+        "title": "La lacune",
+        "summary": "Jeanne remonte la piste de Marthe Lacoste à Estérac, se heurte à Hélène et gagne la confiance de Bastien.",
+        "novel": {
+          "wordGoal": 16000
+        },
+        "children": [
+          {
+            "key": "ch4",
+            "title": "Estérac",
+            "summary": "Jeanne descend au village et rencontre Rose Lacoste, qui lui confie les lettres et la loupe de Marthe.",
+            "novel": {
+              "wordGoal": 5000,
+              "writingStatus": "revision"
+            },
+            "children": [
+              {
+                "key": "s4-1",
+                "title": "La maison verte",
+                "summary": "7 février. L'ancienne poste ; Rose, ses chouquettes : « on lui avait volé une étoile ».",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              },
+              {
+                "key": "s4-2",
+                "title": "La boîte à biscuits",
+                "summary": "Les lettres de Marthe à Louise ; « là où on développe la nuit » ; Rose donne la loupe.",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              }
+            ]
+          },
+          {
+            "key": "ch5",
+            "title": "Ce que veut Hélène",
+            "summary": "La visite des investisseurs ; Yanis a signé avec Hauts Lieux ; Hélène veut une découverte majeure, Jeanne refuse.",
+            "novel": {
+              "wordGoal": 5000,
+              "writingStatus": "draft"
+            },
+            "children": [
+              {
+                "key": "s5-1",
+                "title": "Les investisseurs",
+                "summary": "20 février. Kerver fait visiter le futur hôtel et annonce que Yanis rejoint la société.",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              },
+              {
+                "key": "s5-2",
+                "title": "La dispute",
+                "summary": "Hélène veut annoncer une nova ; Jeanne refuse de grossir ce que montrent les plaques.",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              }
+            ]
+          },
+          {
+            "key": "ch6",
+            "title": "Le gardien",
+            "summary": "Bastien révèle la chambre noire murée par son grand-père ; le carnet raconte le refus de Valadier.",
+            "novel": {
+              "wordGoal": 4500,
+              "writingStatus": "draft"
+            },
+            "children": [
+              {
+                "key": "s6-1",
+                "title": "La salle des machines",
+                "summary": "Nuit du 20 au 21 février. Trois générations de Roux ; le feu de 1931 ; la boîte de métal derrière le mur.",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              },
+              {
+                "key": "s6-2",
+                "title": "Carnet, janvier 1913",
+                "summary": "Extraits du carnet du 10 au 13 janvier : la série de plaques, Valadier, la décision de descendre.",
+                "novel": {
+                  "narrativePerson": "first",
+                  "narrativeTense": "past"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "key": "p3",
+        "title": "La chambre noire",
+        "summary": "La tempête isole le sommet ; la chambre noire rend les plaques ; la station ferme.",
+        "novel": {
+          "wordGoal": 16000
+        },
+        "children": [
+          {
+            "key": "ch7",
+            "title": "La tempête",
+            "summary": "Le sommet coupé du monde ; Hélène fait la paix avec Jeanne ; Jeanne et Bastien ouvrent le mur.",
+            "novel": {
+              "wordGoal": 5000,
+              "writingStatus": "draft"
+            },
+            "children": [
+              {
+                "key": "s7-1",
+                "title": "Naufragés",
+                "summary": "9 mars. Téléphérique arrêté, groupe électrogène, six personnes dans la cuisine.",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              },
+              {
+                "key": "s7-2",
+                "title": "Le mur",
+                "summary": "Ouverture de la chambre noire : trente-six plaques et le cahier de Marthe dans une boîte en zinc.",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              }
+            ]
+          },
+          {
+            "key": "ch8",
+            "title": "La mesure",
+            "summary": "La nuit des mesures : l'étoile n'est pas une nova ; le matin, chacun choisit ce qu'il fera du nom de Marthe.",
+            "novel": {
+              "wordGoal": 5000,
+              "writingStatus": "draft"
+            },
+            "children": [
+              {
+                "key": "s8-1",
+                "title": "Les mesures de Marthe",
+                "summary": "Nuit du 9 au 10 mars. Le cahier, la loupe, la base de données de Yanis, le brouillon de la dépêche.",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              },
+              {
+                "key": "s8-2",
+                "title": "Le matin d'après",
+                "summary": "10 mars. Hélène confie l'article à Jeanne ; Kerver propose de garder la coupole ouverte au public.",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              }
+            ]
+          },
+          {
+            "key": "ch9",
+            "title": "Fermeture",
+            "summary": "Le dernier jour de la station.",
+            "novel": {
+              "wordGoal": 3500,
+              "writingStatus": "draft"
+            },
+            "children": [
+              {
+                "key": "s9-1",
+                "title": "La dernière plaque",
+                "summary": "31 mars. Jeanne numérise la plaque 11 406 et corrige le registre ; Bastien ferme la coupole.",
+                "novel": {
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              },
+              {
+                "key": "s9-2",
+                "title": "La dernière benne",
+                "summary": "À écrire. 1er avril : Jeanne et Bastien descendent avec les caisses de plaques ; ce qu'ils se disent dans la cabine.",
+                "novel": {
+                  "wordGoal": 1500,
+                  "narrativePerson": "third",
+                  "narrativeTense": "past"
+                }
+              }
+            ]
+          },
+          {
+            "key": "epilogue",
+            "title": "Épilogue",
+            "summary": "Juin 2019. La plaque d'émail sur la maison de Rose.",
+            "numbered": false,
+            "novel": {
+              "wordGoal": 1000,
+              "writingStatus": "draft",
+              "narrativePerson": "third",
+              "narrativeTense": "past"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "locations": [
+    {
+      "key": "massif",
+      "name": "Massif de Sorgue",
+      "type": "mountainRange",
+      "status": "existing",
+      "fields": {
+        "description": "Massif granitique des Pyrénées centrales, au-dessus de la vallée d'Estérac. Crêtes nues, couloirs d'avalanche, neige de novembre à mai.",
+        "climate": "Montagnard rude ; vents d'ouest violents l'hiver, inversions de température fréquentes.",
+        "terrain": "Granit, éboulis, pelouses d'altitude, forêts de sapins sous 1 800 m.",
+        "highestPeak": "Pic de Sorgue (2 877 m)",
+        "passes": "Col de la Hourquette, praticable l'été seulement.",
+        "faunaFlora": "Isards, gypaètes, lagopèdes ; rhododendrons et sapins dans le bas des versants."
+      },
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          150,
+          170,
+          200
+        ],
+        "ground": [
+          235,
+          238,
+          242
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "pic",
+      "name": "Pic de Sorgue",
+      "type": "mountain",
+      "parentId": "@loc:massif",
+      "status": "existing",
+      "fields": {
+        "description": "Sommet arrondi, assez large pour porter l'observatoire et la gare haute du téléphérique. On y voit, par temps clair, jusqu'aux plaines de Gascogne.",
+        "altitude": "2 877 m",
+        "climate": "De -15 à -25 °C l'hiver dans la galerie couverte ; vents fréquents au-dessus de 90 km/h.",
+        "dangers": "Corniches de neige, givre sur les passerelles, couloir de la Hourquette."
+      },
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          60,
+          90,
+          150
+        ],
+        "ground": [
+          240,
+          240,
+          245
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "observatoire",
+      "name": "Observatoire du pic de Sorgue",
+      "type": "@ltype:observatoire",
+      "parentId": "@loc:pic",
+      "status": "existing",
+      "fields": {
+        "aliases": "La station ; « la maison » (Bastien)",
+        "description": "Bâtiments de granit gris reliés par une galerie couverte qui suit l'arête, deux coupoles, une bibliothèque lambrissée, une cuisine qui sent la soupe et le fioul. Fermeture le 31 mars 2019.",
+        "history": "Fondé en 1881, agrandi sous la direction d'Auguste Valadier (grande coupole en 1902). Photographie du ciel sur plaques de verre de 1907 à 1962. Vendu par l'Université à la société Hauts Lieux en 2018.",
+        "purpose": "Station d'observation astronomique et météorologique ; bientôt hôtel d'altitude.",
+        "owner": "L'Université, puis la société Hauts Lieux",
+        "builtOn": "1881",
+        "architecturalStyle": "Granit et fer, volets de tôle, galerie couverte",
+        "condition": "intact",
+        "accessSecurity": "Téléphérique le lundi et le jeudi ; arrêt au-delà de 70 km/h de vent.",
+        "firstAppearance": "@node:s1-1"
+      },
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          40,
+          60,
+          110
+        ],
+        "ground": [
+          90,
+          95,
+          105
+        ],
+        "width": 240,
+        "height": 160
+      },
+      "gallery": [
+        {
+          "image": {
+            "kind": "landscape",
+            "sky": [
+              25,
+              30,
+              60
+            ],
+            "ground": [
+              200,
+              200,
+              210
+            ],
+            "width": 320,
+            "height": 200
+          },
+          "caption": "La galerie couverte sous la neige, vue depuis la gare haute"
+        },
+        {
+          "image": {
+            "kind": "landscape",
+            "sky": [
+              230,
+              150,
+              90
+            ],
+            "ground": [
+              70,
+              75,
+              85
+            ],
+            "width": 320,
+            "height": 200
+          },
+          "caption": "La grande coupole au coucher du soleil"
+        }
+      ]
+    },
+    {
+      "key": "coupole",
+      "name": "Grande coupole (coupole Valadier)",
+      "type": "@ltype:coupole",
+      "parentId": "@loc:observatoire",
+      "status": "existing",
+      "fields": {
+        "description": "Coupole de cuivre et d'acier de douze mètres, au bout de la galerie. Kerver veut y servir l'apéritif.",
+        "history": "Construite en 1902. Incendie en 1931, éteint par le gardien Jules Roux.",
+        "purpose": "Abriter la grande lunette photographique ; demain, un télescope ouvert au public.",
+        "builtOn": "1902",
+        "condition": "intact",
+        "firstAppearance": "@node:s1-1"
+      }
+    },
+    {
+      "key": "petite-coupole",
+      "name": "Petite coupole",
+      "type": "@ltype:coupole",
+      "parentId": "@loc:observatoire",
+      "status": "existing",
+      "fields": {
+        "description": "Coupole des années 1990 qui abrite le télescope robotisé piloté à distance. Le domaine de Yanis.",
+        "purpose": "Suivi automatique d'étoiles variables",
+        "firstAppearance": "@node:s2-1"
+      }
+    },
+    {
+      "key": "plaquotheque",
+      "name": "Plaquothèque",
+      "type": "library",
+      "parentId": "@loc:observatoire",
+      "status": "existing",
+      "fields": {
+        "aliases": "La salle des plaques (nom officiel)",
+        "description": "Au sous-sol, derrière une porte capitonnée : deux rangs d'armoires de chêne numérotées, tiroirs plats, boîtes de carton gris. Odeur de papier et de métal froid.",
+        "purpose": "Conserver les 11 406 plaques de verre (1907-1962) et le registre des plaques.",
+        "collections": "11 406 plaques de verre photographiques, le registre des plaques, la boîte 402 où dormait la plaque 4417.",
+        "firstAppearance": "@node:s1-2"
+      }
+    },
+    {
+      "key": "chambre-noire",
+      "name": "Chambre noire",
+      "type": "@ltype:piece",
+      "parentId": "@loc:coupole",
+      "status": "hidden",
+      "fields": {
+        "description": "Pièce sans fenêtre de trois mètres sur deux, sept marches sous la grande coupole : évier de grès, cuves de développement, lanterne au verre rouge fêlé, tabliers de toile cirée. Odeur de vinaigre.",
+        "history": "Murée en 1931 après l'incendie de la coupole. Marthe y avait caché les plaques de janvier 1913 et son cahier. Rouverte le 9 mars 2019.",
+        "purpose": "Développer les plaques après les poses",
+        "condition": "damaged",
+        "firstAppearance": "@node:s6-1"
+      }
+    },
+    {
+      "key": "salle-mesures",
+      "name": "Salle des mesures",
+      "type": "@ltype:piece",
+      "parentId": "@loc:observatoire",
+      "status": "existing",
+      "fields": {
+        "description": "Pièce du premier étage où les mesureuses travaillaient la nuit, chacune à sa machine, sous des lampes à abat-jour vert. En 2019, une réserve.",
+        "history": "Marthe y voit grossir l'étoile le 9 janvier 1913.",
+        "purpose": "Mesurer les plaques au micromètre",
+        "firstAppearance": "@node:prologue"
+      }
+    },
+    {
+      "key": "bibliotheque",
+      "name": "Bibliothèque",
+      "type": "library",
+      "parentId": "@loc:observatoire",
+      "status": "existing",
+      "fields": {
+        "description": "Longue pièce lambrissée aux rayonnages jusqu'au plafond, trois radiateurs. Le bureau d'Hélène. Le carnet d'Émile y dort sur la plus haute étagère.",
+        "collections": "Carnets d'observation, comptes rendus, revues anciennes.",
+        "firstAppearance": "@node:s1-2"
+      }
+    },
+    {
+      "key": "salle-machines",
+      "name": "Salle des machines",
+      "type": "@ltype:piece",
+      "parentId": "@loc:observatoire",
+      "status": "existing",
+      "fields": {
+        "description": "Au fond du couloir du rez-de-chaussée : le groupe électrogène, les cuves de fioul, l'établi de Bastien.",
+        "purpose": "Énergie de secours",
+        "firstAppearance": "@node:s2-2"
+      }
+    },
+    {
+      "key": "gare-haute",
+      "name": "Gare haute du téléphérique",
+      "type": "@ltype:gare",
+      "parentId": "@loc:pic",
+      "status": "existing",
+      "fields": {
+        "description": "Quai de béton, poulies, passerelle vers l'observatoire. La benne arrive à dix heures le lundi et le jeudi.",
+        "purpose": "Arrivée du téléphérique (2 860 m)",
+        "firstAppearance": "@node:s1-1"
+      }
+    },
+    {
+      "key": "hourquette",
+      "name": "Couloir de la Hourquette",
+      "type": "@ltype:couloir",
+      "parentId": "@loc:massif",
+      "status": "existing",
+      "fields": {
+        "description": "Couloir raide qui descend du col vers Estérac, emprunté par le sentier d'été. Émile Ferrand y meurt le 13 janvier 1913.",
+        "accessibility": "Été seulement",
+        "dangers": "Avalanches de plaque l'hiver",
+        "legends": "Les stagiaires disent qu'on y entend parfois quelqu'un appeler, les soirs de tempête.",
+        "firstAppearance": "@node:prologue"
+      }
+    },
+    {
+      "key": "esterac",
+      "name": "Estérac",
+      "type": "village",
+      "parentId": "@loc:massif",
+      "status": "existing",
+      "fields": {
+        "description": "Village de pierre et d'ardoise accroché au versant : une église trop grande, un café-épicerie, une rue unique en lacets jusqu'au lavoir.",
+        "population": "Environ 200 habitants l'hiver",
+        "economy": "Élevage, gîtes, téléphérique de l'observatoire.",
+        "atmosphere": "Odeur de feu de bois ; tout le monde sait déjà qui vous êtes.",
+        "firstAppearance": "@node:s4-1"
+      },
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          170,
+          190,
+          215
+        ],
+        "ground": [
+          110,
+          100,
+          90
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "maison-lacoste",
+      "name": "Maison Lacoste",
+      "type": "@ltype:maison",
+      "parentId": "@loc:esterac",
+      "status": "existing",
+      "fields": {
+        "aliases": "La maison verte",
+        "description": "Derrière l'église : volets qui ont été verts, jardin aux tuteurs de tomates, cuisine surchauffée où Rose écoute le rugby.",
+        "history": "Maison de la famille Lacoste ; Marthe y a vécu de 1913 à sa mort en 1974.",
+        "purpose": "Habitation",
+        "firstAppearance": "@node:s4-1"
+      }
+    },
+    {
+      "key": "poste",
+      "name": "Ancienne poste d'Estérac",
+      "type": "@ltype:maison",
+      "parentId": "@loc:esterac",
+      "status": "abandoned",
+      "fields": {
+        "description": "Au bas de la place ; on lit encore « POSTES ET TÉLÉGRAPHES » sous le crépi. Gîte fermé l'hiver.",
+        "history": "C'est là qu'Émile voulait télégraphier la découverte de Marthe, le soir du 13 janvier 1913.",
+        "purpose": "Bureau de poste et de télégraphe jusqu'en 1972",
+        "firstAppearance": "@node:s4-1"
+      }
+    },
+    {
+      "key": "toulouse",
+      "name": "Toulouse",
+      "type": "city",
+      "status": "existing",
+      "fields": {
+        "description": "La ville de Jeanne, où elle a travaillé dans un laboratoire de restauration photographique.",
+        "atmosphere": "Hors champ : n'apparaît que dans les souvenirs de Jeanne."
+      }
+    }
+  ],
+  "characters": [
+    {
+      "key": "jeanne",
+      "firstName": "Jeanne",
+      "lastName": "Castaing",
+      "role": "main",
+      "status": "alive",
+      "fields": {
+        "age": "34 ans",
+        "birthDate": "1984-04-21",
+        "gender": "female",
+        "occupation": "Numérisatrice de fonds photographiques (contrat de dix semaines)",
+        "origin": "@loc:toulouse",
+        "firstAppearance": "@node:s1-1",
+        "description": "Petite, mince, cheveux châtains tirés en chignon pour travailler, bonnet acheté dans une station-service. Méthodique jusqu'à l'obsession, elle compte pour ne pas avoir peur.",
+        "mainGoal": "Numériser les 11 406 plaques avant le 31 mars, sans en perdre une.",
+        "distinctiveTrait": "Elle parle aux plaques en les numérisant.",
+        "height": "1,60 m",
+        "build": "slim",
+        "eyes": "Gris-vert",
+        "hair": "Châtains, en chignon",
+        "voice": "Basse, précise ; elle s'excuse trop souvent.",
+        "clothingStyle": "Doudoune trop grande, mitaines, gants de coton blancs pour les plaques.",
+        "colorPalette": [
+          "#3d4a5c",
+          "#e8e4da",
+          "#b5523b"
+        ],
+        "psychology": "Elle a appris à se rendre invisible pour qu'on la laisse travailler, et en souffre sans le dire.",
+        "traits": [
+          "Méthodique",
+          "Scrupuleuse",
+          "Têtue"
+        ],
+        "strengths": [
+          "Patience",
+          "Précision",
+          "Sait réparer un scanner"
+        ],
+        "flaws": [
+          "Méfiance",
+          "S'efface trop"
+        ],
+        "motivations": "Faire un travail irréprochable ; ne plus jamais laisser quelqu'un signer à sa place.",
+        "deepDesire": "Que son nom figure, une fois, au bon endroit.",
+        "fears": "Parler trop tôt et se faire voler ce qu'elle a trouvé.",
+        "coreValues": "L'exactitude ; rendre à chacun ce qui lui revient.",
+        "formativeEvent": "Son ancien chef de laboratoire, Richard Saulnier, a présenté sous son seul nom la méthode de restauration qu'elle avait mise au point.",
+        "secret": "Elle a photographié les lettres de Marthe sans en parler à Hélène pendant deux semaines.",
+        "innerConflict": "Rester la technicienne qu'on paie pour scanner, ou prendre la parole pour Marthe.",
+        "plannedArc": "De « je suis là pour les plaques » à la signature, en premier, de l'article qui rend son nom à Marthe."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          215,
+          220,
+          228
+        ],
+        "figure": [
+          61,
+          74,
+          92
+        ]
+      },
+      "gallery": [
+        {
+          "image": {
+            "kind": "portrait",
+            "background": [
+              240,
+              236,
+              228
+            ],
+            "figure": [
+              181,
+              82,
+              59
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "key": "helene",
+      "firstName": "Hélène",
+      "lastName": "Marquès",
+      "role": "mentor",
+      "status": "alive",
+      "fields": {
+        "age": "61 ans",
+        "gender": "female",
+        "occupation": "Astronome, cheffe de la station depuis 1996",
+        "firstAppearance": "@node:s1-2",
+        "description": "Cheveux blancs coupés court, pull d'homme reprisé aux coudes, regard qui ne cille presque pas. Polie quand elle est en colère.",
+        "mainGoal": "Empêcher la vente de la station avant le 31 mars.",
+        "build": "average",
+        "eyes": "Noirs",
+        "hair": "Blancs, très courts",
+        "traits": [
+          "Brillante",
+          "Combative",
+          "Orgueilleuse"
+        ],
+        "flaws": [
+          "Prête à arranger la vérité"
+        ],
+        "motivations": "Trente ans de sa vie sont dans ces murs.",
+        "innerConflict": "Sauver la station ou dire exactement ce que montrent les plaques.",
+        "plannedArc": "De la stratège qui veut une nova pour les journaux à celle qui confie l'article à Jeanne."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          225,
+          225,
+          220
+        ],
+        "figure": [
+          150,
+          150,
+          160
+        ]
+      }
+    },
+    {
+      "key": "bastien",
+      "firstName": "Bastien",
+      "lastName": "Roux",
+      "role": "ally",
+      "status": "alive",
+      "fields": {
+        "age": "52 ans",
+        "gender": "male",
+        "occupation": "Gardien-mécanicien de l'observatoire depuis 1994",
+        "origin": "@loc:esterac",
+        "firstAppearance": "@node:s1-1",
+        "description": "Barbe grise, bonnet enfoncé jusqu'aux sourcils, veste de travail usée. Parle peu, devine beaucoup.",
+        "mainGoal": "Que la maison soit fermée proprement, et pas oubliée.",
+        "build": "stocky",
+        "voice": "Grave, avec l'accent de la vallée",
+        "traits": [
+          "Taiseux",
+          "Loyal",
+          "Bricoleur"
+        ],
+        "formativeEvent": "Enfant, son père lui a montré une plaque : « une nuit entière, rangée dans une vitre ».",
+        "secret": "Il sait depuis toujours, par son père, qu'une boîte de métal est restée derrière le mur de la chambre noire.",
+        "plannedArc": "De l'hostilité muette envers « celle qui ferme la maison » à l'allié qui ouvre le mur de son grand-père."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          210,
+          200,
+          185
+        ],
+        "figure": [
+          90,
+          85,
+          80
+        ]
+      }
+    },
+    {
+      "key": "yanis",
+      "firstName": "Yanis",
+      "lastName": "Belkacem",
+      "role": "secondary",
+      "status": "alive",
+      "fields": {
+        "age": "27 ans",
+        "gender": "male",
+        "occupation": "Doctorant en astrophysique (étoiles variables)",
+        "firstAppearance": "@node:s2-1",
+        "description": "Grand, maigre, toujours un ordinateur portable ouvert. Il ne dort jamais et parle des étoiles variables comme d'animaux familiers.",
+        "mainGoal": "Trouver un poste quand son contrat finira, en septembre.",
+        "traits": [
+          "Enthousiaste",
+          "Gêné",
+          "Sincère"
+        ],
+        "secret": "Il a signé avec la société Hauts Lieux pour animer le futur hôtel.",
+        "innerConflict": "Sa loyauté envers Hélène contre son avenir."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          200,
+          215,
+          230
+        ],
+        "figure": [
+          45,
+          60,
+          110
+        ]
+      }
+    },
+    {
+      "key": "rose",
+      "firstName": "Rose",
+      "lastName": "Lacoste",
+      "role": "ally",
+      "status": "alive",
+      "fields": {
+        "age": "88 ans",
+        "birthDate": "1931-05-02",
+        "gender": "female",
+        "occupation": "Retraitée, ancienne couturière",
+        "origin": "@loc:esterac",
+        "firstAppearance": "@node:s4-1",
+        "description": "Minuscule, yeux noirs très vifs, visage plissé comme une pomme d'hiver. Mange des chouquettes en affirmant qu'elle ne mange plus de sucre.",
+        "mainGoal": "Que quelqu'un, enfin, comprenne ce que disait sa grand-tante.",
+        "traits": [
+          "Malicieuse",
+          "Directe",
+          "Généreuse"
+        ],
+        "formativeEvent": "Avoir connu Marthe vieille, « un peu dérangée », qui regardait le ciel même quand il pleuvait."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          240,
+          225,
+          215
+        ],
+        "figure": [
+          120,
+          70,
+          90
+        ]
+      }
+    },
+    {
+      "key": "kerver",
+      "firstName": "Damien",
+      "lastName": "Kerver",
+      "role": "antagonist",
+      "status": "alive",
+      "fields": {
+        "age": "46 ans",
+        "gender": "male",
+        "occupation": "Directeur du développement de la société Hauts Lieux",
+        "firstAppearance": "@node:s5-1",
+        "description": "Sourire de publicité, main sur l'épaule, doudoune de marque. Pas méchant : pressé.",
+        "mainGoal": "Transformer l'observatoire en hôtel de vingt-quatre chambres.",
+        "traits": [
+          "Charmeur",
+          "Pragmatique"
+        ],
+        "plannedArc": "Bloqué au sommet par la tempête, il comprend ce qu'il achète, et accepte que la coupole reste une coupole."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          230,
+          220,
+          200
+        ],
+        "figure": [
+          40,
+          40,
+          45
+        ]
+      }
+    },
+    {
+      "key": "marthe",
+      "firstName": "Marthe",
+      "lastName": "Lacoste",
+      "role": "secondary",
+      "status": "dead",
+      "fields": {
+        "nickname": "Tata Marthe (pour Rose)",
+        "age": "21 ans en 1913",
+        "birthDate": "1891-03-08",
+        "gender": "female",
+        "occupation": "Mesureuse à l'observatoire (décembre 1912 - février 1913)",
+        "origin": "@loc:esterac",
+        "firstAppearance": "@node:prologue",
+        "description": "Fille du facteur d'Estérac. Mains sûres, mitaines de laine, une loupe de laiton au verre rayé d'un trait.",
+        "mainGoal": "Être exacte.",
+        "traits": [
+          "Exacte",
+          "Obstinée",
+          "Secrète"
+        ],
+        "formativeEvent": "La mort d'Émile, parti dans la tempête pour envoyer sa découverte sous son nom.",
+        "secret": "Elle a caché les plaques de janvier 1913 et son cahier dans la chambre noire.",
+        "plannedArc": "Présente par ses traces : plaques, lettres, cahier, loupe. Son nom est rendu dans l'épilogue."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          225,
+          215,
+          195
+        ],
+        "figure": [
+          110,
+          90,
+          70
+        ]
+      }
+    },
+    {
+      "key": "emile",
+      "firstName": "Émile",
+      "lastName": "Ferrand",
+      "role": "secondary",
+      "status": "dead",
+      "fields": {
+        "age": "33 ans à sa mort",
+        "birthDate": "1879-09-30",
+        "gender": "male",
+        "occupation": "Astronome adjoint (1906-1913)",
+        "firstAppearance": "@node:prologue",
+        "description": "Lunettes qu'il essuie sur sa manche, sourire d'enfant devant une vitrine. Tient un carnet d'observation détaillé.",
+        "mainGoal": "Que le nom de Marthe figure sur la dépêche, en premier.",
+        "coreValues": "Le mérite avant l'usage.",
+        "formativeEvent": "Meurt dans une avalanche au couloir de la Hourquette, le 13 janvier 1913."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          210,
+          205,
+          195
+        ],
+        "figure": [
+          70,
+          70,
+          80
+        ]
+      }
+    },
+    {
+      "key": "valadier",
+      "firstName": "Auguste",
+      "lastName": "Valadier",
+      "role": "antagonist",
+      "status": "dead",
+      "fields": {
+        "age": "52 ans en 1913",
+        "birthDate": "1861-02-11",
+        "gender": "male",
+        "occupation": "Directeur de l'observatoire (1898-1925)",
+        "firstAppearance": "@node:prologue",
+        "description": "Barbe « comme un balai de cantonnier », voix pareille. Signe toutes les communications de l'observatoire.",
+        "mainGoal": "La gloire de l'observatoire, c'est-à-dire la sienne.",
+        "coreValues": "L'usage, la hiérarchie, la discipline.",
+        "secret": "Il a déclaré « brisées par le gel » des plaques qu'il n'a jamais retrouvées."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          200,
+          190,
+          185
+        ],
+        "figure": [
+          60,
+          40,
+          35
+        ]
+      }
+    }
+  ],
+  "items": [
+    {
+      "key": "plaque-4417",
+      "name": "Plaque n° 4417",
+      "type": "photo",
+      "status": "intact",
+      "fields": {
+        "description": "Plaque de verre 13 × 18 cm, Cassiopée, 9 janvier 1913, pose 1 h 40. Un cercle à l'encre autour d'une étoile près du bord ; sur la pochette, au crayon : « M. L. — elle a grossi ».",
+        "rarity": "unique",
+        "firstAppearance": "@node:s2-3",
+        "history": "Seule plaque de janvier 1913 restée dans l'inventaire, rangée par erreur (ou exprès) dans la boîte 402, celle d'avril 1914.",
+        "writtenOn": "9 janvier 1913",
+        "author": "Émile Ferrand (pose), Marthe Lacoste (annotation)",
+        "content": "Champ de Cassiopée ; l'étoile entourée est la variable."
+      }
+    },
+    {
+      "key": "carnet-emile",
+      "name": "Carnet d'observation d'Émile Ferrand",
+      "type": "diary",
+      "status": "worn",
+      "fields": {
+        "description": "Petit carnet relié de cuir brun, coins usés jusqu'au carton. Dernière page datée du 13 janvier 1913.",
+        "firstAppearance": "@node:s3-1",
+        "author": "Émile Ferrand",
+        "writtenOn": "1906-1913",
+        "language": "Français",
+        "content": "Températures, poses, notes sur les mesureuses ; la décision de descendre à Estérac."
+      }
+    },
+    {
+      "key": "cahier-marthe",
+      "name": "Cahier de mesures de Marthe",
+      "type": "book",
+      "status": "hidden",
+      "fields": {
+        "description": "Cahier d'écolière à couverture bleue : « M. Lacoste — mesures — janvier 1913 ». Le brouillon de la dépêche d'Émile est glissé dedans.",
+        "rarity": "unique",
+        "firstAppearance": "@node:s7-2",
+        "author": "Marthe Lacoste",
+        "writtenOn": "Janvier 1913",
+        "content": "Diamètre du disque de l'étoile plaque par plaque : 2,5 divisions le 2 janvier, 6,5 le 12 (« maximum ? »)."
+      }
+    },
+    {
+      "key": "loupe",
+      "name": "Loupe de Marthe",
+      "type": "tool",
+      "status": "worn",
+      "fields": {
+        "description": "Loupe de laiton à manche d'os, au verre rayé d'un seul trait fin, « comme une signature ».",
+        "firstAppearance": "@node:s4-2",
+        "material": "Laiton, os, verre",
+        "history": "Emportée par Marthe en 1913, gardée dans une boîte à biscuits par Louise puis Rose, confiée à Jeanne.",
+        "use": "Lire les plaques ; Jeanne s'en sert pour retrouver l'étoile sur les 36 plaques."
+      }
+    },
+    {
+      "key": "boite-zinc",
+      "name": "Boîte en zinc",
+      "type": "container",
+      "status": "intact",
+      "fields": {
+        "description": "Boîte de la taille d'une boîte à chaussures, fermée par deux crochets, sur l'étagère du fond de la chambre noire.",
+        "firstAppearance": "@node:s7-2",
+        "contents": "Trente-six plaques de janvier 1913 enveloppées dans La Dépêche de décembre 1912, le cahier bleu de Marthe."
+      }
+    },
+    {
+      "key": "registre",
+      "name": "Registre des plaques",
+      "type": "book",
+      "status": "intact",
+      "fields": {
+        "description": "Grand cahier relié de toile noire, sur un lutrin au fond de la plaquothèque.",
+        "firstAppearance": "@node:s2-3",
+        "author": "Les directeurs successifs",
+        "content": "Entrées et sorties des plaques ; la ligne de Valadier sur les plaques « brisées par le gel » ; la correction de Jeanne au crayon (31 mars 2019)."
+      }
+    },
+    {
+      "key": "brique",
+      "name": "Brique de Jules Roux",
+      "type": "trophy",
+      "status": "damaged",
+      "fields": {
+        "description": "Brique noircie tirée du mur de la chambre noire, gravée au couteau par Bastien : « J. R. 1931 ».",
+        "firstAppearance": "@node:s8-2"
+      }
+    }
+  ],
+  "relations": [
+    {
+      "sourceId": "@char:bastien",
+      "targetId": "@char:jeanne",
+      "type": "professional",
+      "label": "« Celle qui ferme la maison »",
+      "description": "Bastien la tient à distance : elle annonce la fin.",
+      "directed": true,
+      "intensity": 2,
+      "sentiment": "negative",
+      "untilNode": "@node:s6-1"
+    },
+    {
+      "sourceId": "@char:bastien",
+      "targetId": "@char:jeanne",
+      "type": "friendship",
+      "label": "Le mur du grand-père",
+      "description": "Après la nuit de la salle des machines, il lui confie le secret de la chambre noire.",
+      "directed": false,
+      "intensity": 4,
+      "sentiment": "positive",
+      "sinceNode": "@node:s6-1"
+    },
+    {
+      "sourceId": "@char:helene",
+      "targetId": "@char:jeanne",
+      "type": "mentor",
+      "label": "Cheffe de station",
+      "description": "Hélène la guide et la presse de lui signaler toute trouvaille.",
+      "directed": true,
+      "intensity": 3,
+      "sentiment": "positive",
+      "untilNode": "@node:s5-2"
+    },
+    {
+      "sourceId": "@char:helene",
+      "targetId": "@char:jeanne",
+      "type": "rivalry",
+      "label": "La dispute du 20 février",
+      "description": "Hélène veut une nova pour les journaux ; Jeanne refuse de grossir la vérité.",
+      "directed": false,
+      "intensity": 4,
+      "sentiment": "negative",
+      "sinceNode": "@node:s5-2",
+      "untilNode": "@node:s7-1"
+    },
+    {
+      "sourceId": "@char:helene",
+      "targetId": "@char:yanis",
+      "type": "mentor",
+      "label": "Directrice de thèse",
+      "description": "Elle l'a fait venir au sommet ; il lui doit son sujet.",
+      "directed": true,
+      "intensity": 4,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:yanis",
+      "targetId": "@char:helene",
+      "type": "betrayal",
+      "label": "Le contrat Hauts Lieux",
+      "description": "Il a signé avec la société qui rachète la station, sans le lui dire.",
+      "directed": true,
+      "intensity": 3,
+      "sentiment": "negative",
+      "sinceNode": "@node:s5-1"
+    },
+    {
+      "sourceId": "@char:kerver",
+      "targetId": "@char:yanis",
+      "type": "professional",
+      "label": "Futur employeur",
+      "description": "Yanis animera les télescopes de l'hôtel.",
+      "directed": true,
+      "intensity": 2,
+      "sentiment": "neutral",
+      "sinceNode": "@node:s5-1"
+    },
+    {
+      "sourceId": "@char:kerver",
+      "targetId": "@char:helene",
+      "type": "political",
+      "label": "La vente de la station",
+      "description": "Kerver représente l'acheteur ; Hélène se bat contre la vente.",
+      "directed": false,
+      "intensity": 4,
+      "sentiment": "negative",
+      "sinceNode": "@node:s5-1"
+    },
+    {
+      "sourceId": "@char:rose",
+      "targetId": "@char:jeanne",
+      "type": "friendship",
+      "label": "Les chouquettes",
+      "description": "Rose lui confie les lettres et la loupe de Marthe.",
+      "directed": false,
+      "intensity": 3,
+      "sentiment": "positive",
+      "sinceNode": "@node:s4-1"
+    },
+    {
+      "sourceId": "@char:rose",
+      "targetId": "@char:marthe",
+      "type": "family",
+      "label": "Grand-tante et petite-nièce",
+      "description": "Marthe était la sœur de la grand-mère de Rose, Louise.",
+      "directed": false,
+      "intensity": 4,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:marthe",
+      "targetId": "@char:emile",
+      "type": "alliance",
+      "label": "Complices de la mesure",
+      "description": "Il vérifie ses mesures et la croit. Les lettres laissent deviner une affection jamais dite.",
+      "directed": false,
+      "intensity": 5,
+      "sentiment": "positive",
+      "untilNode": "@node:prologue"
+    },
+    {
+      "sourceId": "@char:valadier",
+      "targetId": "@char:marthe",
+      "type": "betrayal",
+      "label": "« Les mesureuses mesurent »",
+      "description": "Il veut signer seul la découverte de Marthe, puis la renvoie.",
+      "directed": true,
+      "intensity": 5,
+      "sentiment": "negative"
+    },
+    {
+      "sourceId": "@char:valadier",
+      "targetId": "@char:emile",
+      "type": "professional",
+      "label": "Directeur et adjoint",
+      "description": "Valadier refuse que le nom de Marthe figure sur la dépêche.",
+      "directed": true,
+      "intensity": 3,
+      "sentiment": "negative"
+    },
+    {
+      "sourceId": "@char:bastien",
+      "targetId": "@char:helene",
+      "type": "professional",
+      "label": "Vingt-trois ans de station",
+      "description": "Ils se respectent sans se parler beaucoup.",
+      "directed": false,
+      "intensity": 3,
+      "sentiment": "neutral"
+    }
+  ],
+  "graph": [
+    {
+      "characterId": "@char:jeanne",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "characterId": "@char:bastien",
+      "x": -260,
+      "y": -60
+    },
+    {
+      "characterId": "@char:helene",
+      "x": 230,
+      "y": -90
+    },
+    {
+      "characterId": "@char:yanis",
+      "x": 420,
+      "y": 40
+    },
+    {
+      "characterId": "@char:kerver",
+      "x": 380,
+      "y": 230
+    },
+    {
+      "characterId": "@char:rose",
+      "x": -160,
+      "y": 220
+    },
+    {
+      "characterId": "@char:marthe",
+      "x": -40,
+      "y": 400
+    },
+    {
+      "characterId": "@char:emile",
+      "x": 200,
+      "y": 420
+    },
+    {
+      "characterId": "@char:valadier",
+      "x": 60,
+      "y": 600
+    }
+  ],
+  "characterLocations": [
+    {
+      "characterId": "@char:jeanne",
+      "locationId": "@loc:toulouse",
+      "type": "lives",
+      "label": "Appartement près du canal",
+      "description": ""
+    },
+    {
+      "characterId": "@char:jeanne",
+      "locationId": "@loc:plaquotheque",
+      "type": "works",
+      "label": "Numérisation des plaques",
+      "description": "",
+      "sinceNode": "@node:s1-2"
+    },
+    {
+      "characterId": "@char:helene",
+      "locationId": "@loc:observatoire",
+      "type": "rules",
+      "label": "Cheffe de station",
+      "description": ""
+    },
+    {
+      "characterId": "@char:helene",
+      "locationId": "@loc:bibliotheque",
+      "type": "works",
+      "label": "Son bureau",
+      "description": ""
+    },
+    {
+      "characterId": "@char:yanis",
+      "locationId": "@loc:petite-coupole",
+      "type": "works",
+      "label": "Télescope robotisé",
+      "description": ""
+    },
+    {
+      "characterId": "@char:bastien",
+      "locationId": "@loc:observatoire",
+      "type": "works",
+      "label": "Gardien-mécanicien",
+      "description": ""
+    },
+    {
+      "characterId": "@char:bastien",
+      "locationId": "@loc:salle-machines",
+      "type": "frequents",
+      "label": "Son établi",
+      "description": ""
+    },
+    {
+      "characterId": "@char:bastien",
+      "locationId": "@loc:esterac",
+      "type": "grewUp",
+      "label": "",
+      "description": ""
+    },
+    {
+      "characterId": "@char:rose",
+      "locationId": "@loc:maison-lacoste",
+      "type": "lives",
+      "label": "",
+      "description": ""
+    },
+    {
+      "characterId": "@char:rose",
+      "locationId": "@loc:esterac",
+      "type": "born",
+      "label": "",
+      "description": ""
+    },
+    {
+      "characterId": "@char:marthe",
+      "locationId": "@loc:esterac",
+      "type": "born",
+      "label": "",
+      "description": ""
+    },
+    {
+      "characterId": "@char:marthe",
+      "locationId": "@loc:salle-mesures",
+      "type": "works",
+      "label": "Mesureuse",
+      "description": ""
+    },
+    {
+      "characterId": "@char:marthe",
+      "locationId": "@loc:maison-lacoste",
+      "type": "died",
+      "label": "1974",
+      "description": ""
+    },
+    {
+      "characterId": "@char:emile",
+      "locationId": "@loc:hourquette",
+      "type": "died",
+      "label": "13 janvier 1913",
+      "description": ""
+    },
+    {
+      "characterId": "@char:valadier",
+      "locationId": "@loc:observatoire",
+      "type": "rules",
+      "label": "Directeur (1898-1925)",
+      "description": ""
+    },
+    {
+      "characterId": "@char:kerver",
+      "locationId": "@loc:gare-haute",
+      "type": "frequents",
+      "label": "Bennes spéciales",
+      "description": ""
+    }
+  ],
+  "worldLinks": [
+    {
+      "sourceKind": "item",
+      "sourceId": "@item:plaque-4417",
+      "targetKind": "location",
+      "targetId": "@loc:plaquotheque",
+      "type": "locatedIn",
+      "label": "Boîte 402"
+    },
+    {
+      "sourceKind": "item",
+      "sourceId": "@item:boite-zinc",
+      "targetKind": "location",
+      "targetId": "@loc:chambre-noire",
+      "type": "locatedIn",
+      "label": "Étagère du fond",
+      "untilNode": "@node:s7-2"
+    },
+    {
+      "sourceKind": "item",
+      "sourceId": "@item:cahier-marthe",
+      "targetKind": "item",
+      "targetId": "@item:boite-zinc",
+      "type": "partOf",
+      "label": "Sous les plaques"
+    },
+    {
+      "sourceKind": "item",
+      "sourceId": "@item:carnet-emile",
+      "targetKind": "location",
+      "targetId": "@loc:bibliotheque",
+      "type": "locatedIn",
+      "label": "Plus haute étagère"
+    },
+    {
+      "sourceKind": "item",
+      "sourceId": "@item:registre",
+      "targetKind": "location",
+      "targetId": "@loc:plaquotheque",
+      "type": "locatedIn",
+      "label": "Sur le lutrin"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:rose",
+      "targetKind": "item",
+      "targetId": "@item:loupe",
+      "type": "owns",
+      "label": "Jusqu'au 7 février",
+      "untilNode": "@node:s4-2"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:jeanne",
+      "targetKind": "item",
+      "targetId": "@item:loupe",
+      "type": "uses",
+      "label": "Confiée par Rose",
+      "sinceNode": "@node:s4-2"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:marthe",
+      "targetKind": "item",
+      "targetId": "@item:cahier-marthe",
+      "type": "made"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:emile",
+      "targetKind": "item",
+      "targetId": "@item:carnet-emile",
+      "type": "made"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:valadier",
+      "targetKind": "item",
+      "targetId": "@item:registre",
+      "type": "uses",
+      "label": "La ligne du 16 janvier 1913"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:bastien",
+      "targetKind": "item",
+      "targetId": "@item:brique",
+      "type": "made",
+      "label": "Gravée la nuit du 9 mars"
+    }
+  ],
+  "nodeLinks": [
+    {
+      "node": "@node:prologue",
+      "characters": {
+        "marthe": "pov",
+        "emile": "present",
+        "valadier": "mentioned"
+      },
+      "locations": {
+        "salle-mesures": "setting",
+        "hourquette": "mentioned"
+      }
+    },
+    {
+      "node": "@node:s1-1",
+      "characters": {
+        "jeanne": "pov",
+        "bastien": "present"
+      },
+      "locations": {
+        "gare-haute": "setting",
+        "observatoire": "setting"
+      }
+    },
+    {
+      "node": "@node:s1-2",
+      "characters": {
+        "jeanne": "pov",
+        "helene": "present"
+      },
+      "locations": {
+        "bibliotheque": "setting",
+        "plaquotheque": "setting"
+      }
+    },
+    {
+      "node": "@node:s2-1",
+      "characters": {
+        "jeanne": "pov",
+        "yanis": "present",
+        "helene": "present",
+        "bastien": "present",
+        "kerver": "mentioned"
+      },
+      "locations": {
+        "plaquotheque": "setting",
+        "coupole": "mentioned"
+      }
+    },
+    {
+      "node": "@node:s2-2",
+      "characters": {
+        "bastien": "pov",
+        "jeanne": "present"
+      },
+      "locations": {
+        "salle-machines": "setting",
+        "plaquotheque": "setting"
+      }
+    },
+    {
+      "node": "@node:s2-3",
+      "characters": {
+        "jeanne": "pov",
+        "valadier": "mentioned",
+        "marthe": "mentioned",
+        "bastien": "present"
+      },
+      "locations": {
+        "plaquotheque": "setting"
+      }
+    },
+    {
+      "node": "@node:s3-1",
+      "characters": {
+        "jeanne": "pov",
+        "helene": "present",
+        "emile": "mentioned",
+        "marthe": "mentioned",
+        "valadier": "mentioned"
+      },
+      "locations": {
+        "bibliotheque": "setting",
+        "hourquette": "mentioned"
+      }
+    },
+    {
+      "node": "@node:s3-2",
+      "characters": {
+        "emile": "pov",
+        "marthe": "present",
+        "valadier": "present"
+      },
+      "locations": {
+        "salle-mesures": "setting",
+        "coupole": "setting"
+      }
+    },
+    {
+      "node": "@node:s4-1",
+      "characters": {
+        "jeanne": "pov",
+        "rose": "present",
+        "marthe": "mentioned"
+      },
+      "locations": {
+        "esterac": "setting",
+        "poste": "setting",
+        "maison-lacoste": "setting"
+      }
+    },
+    {
+      "node": "@node:s4-2",
+      "characters": {
+        "jeanne": "pov",
+        "rose": "present",
+        "marthe": "mentioned",
+        "emile": "mentioned"
+      },
+      "locations": {
+        "maison-lacoste": "setting",
+        "chambre-noire": "mentioned"
+      }
+    },
+    {
+      "node": "@node:s5-1",
+      "characters": {
+        "jeanne": "pov",
+        "kerver": "present",
+        "helene": "present",
+        "yanis": "present",
+        "bastien": "present"
+      },
+      "locations": {
+        "observatoire": "setting",
+        "petite-coupole": "setting",
+        "bibliotheque": "setting"
+      }
+    },
+    {
+      "node": "@node:s5-2",
+      "characters": {
+        "jeanne": "pov",
+        "helene": "present",
+        "bastien": "present",
+        "marthe": "mentioned"
+      },
+      "locations": {
+        "bibliotheque": "setting"
+      }
+    },
+    {
+      "node": "@node:s6-1",
+      "characters": {
+        "jeanne": "pov",
+        "bastien": "present"
+      },
+      "locations": {
+        "salle-machines": "setting",
+        "chambre-noire": "mentioned",
+        "coupole": "mentioned"
+      }
+    },
+    {
+      "node": "@node:s6-2",
+      "characters": {
+        "emile": "pov",
+        "marthe": "mentioned",
+        "valadier": "present"
+      },
+      "locations": {
+        "salle-mesures": "setting"
+      }
+    },
+    {
+      "node": "@node:s7-1",
+      "characters": {
+        "jeanne": "pov",
+        "helene": "present",
+        "bastien": "present",
+        "yanis": "present",
+        "kerver": "present"
+      },
+      "locations": {
+        "observatoire": "setting"
+      }
+    },
+    {
+      "node": "@node:s7-2",
+      "characters": {
+        "jeanne": "pov",
+        "bastien": "present",
+        "yanis": "present",
+        "helene": "present",
+        "marthe": "mentioned"
+      },
+      "locations": {
+        "chambre-noire": "setting",
+        "coupole": "setting"
+      }
+    },
+    {
+      "node": "@node:s8-1",
+      "characters": {
+        "jeanne": "pov",
+        "yanis": "present",
+        "helene": "present",
+        "kerver": "present",
+        "bastien": "present",
+        "marthe": "mentioned",
+        "emile": "mentioned"
+      },
+      "locations": {
+        "bibliotheque": "setting"
+      }
+    },
+    {
+      "node": "@node:s8-2",
+      "characters": {
+        "jeanne": "pov",
+        "helene": "present",
+        "kerver": "present",
+        "yanis": "present",
+        "bastien": "present",
+        "rose": "mentioned"
+      },
+      "locations": {
+        "observatoire": "setting"
+      }
+    },
+    {
+      "node": "@node:s9-1",
+      "characters": {
+        "jeanne": "pov",
+        "bastien": "present",
+        "helene": "present",
+        "yanis": "present"
+      },
+      "locations": {
+        "plaquotheque": "setting",
+        "coupole": "setting"
+      }
+    },
+    {
+      "node": "@node:s9-2",
+      "characters": {
+        "jeanne": "pov",
+        "bastien": "present"
+      },
+      "locations": {
+        "gare-haute": "setting"
+      }
+    },
+    {
+      "node": "@node:epilogue",
+      "characters": {
+        "jeanne": "pov",
+        "rose": "present",
+        "helene": "present",
+        "yanis": "present",
+        "bastien": "present",
+        "marthe": "mentioned"
+      },
+      "locations": {
+        "maison-lacoste": "setting",
+        "esterac": "setting"
+      }
+    }
+  ],
+  "manuscript": {
+    "goal": 50000,
+    "dailyGoal": 750
+  },
+  "editorial": {
+    "pitch": "Hiver 2019. En numérisant les plaques de verre d'un observatoire des Pyrénées qui va fermer, une archiviste découvre qu'en 1913 une mesureuse du village a vu la première une étoile que son directeur voulait signer.",
+    "summaryShort": "éditorial:court",
+    "summaryLong": "éditorial:long"
+  },
+  "documents": [
+    {
+      "node": "@node:p1",
+      "name": "Planche d'ambiance - le sommet en hiver.png",
+      "image": {
+        "kind": "landscape",
+        "sky": [
+          40,
+          55,
+          100
+        ],
+        "ground": [
+          235,
+          238,
+          242
+        ],
+        "width": 480,
+        "height": 300
+      },
+      "note": "Lumière de janvier à 10 h : ciel profond, neige aveuglante."
+    },
+    {
+      "node": "@node:ch1",
+      "name": "Palette de couverture.png",
+      "image": {
+        "kind": "swatches",
+        "colors": [
+          [
+            30,
+            38,
+            58
+          ],
+          [
+            61,
+            74,
+            92
+          ],
+          [
+            232,
+            228,
+            218
+          ],
+          [
+            181,
+            82,
+            59
+          ]
+        ],
+        "width": 400,
+        "height": 120
+      },
+      "note": "Proposition pour la couverture : nuit, verre, neige, cire rouge."
+    },
+    {
+      "node": "@node:s2-3",
+      "name": "Registre des plaques - extrait.md",
+      "text": "doc:registre-extrait",
+      "note": "Relevé de Jeanne : les boîtes autour de la lacune."
+    },
+    {
+      "node": "@node:s4-2",
+      "name": "Lettres de Marthe à Louise - transcription.docx",
+      "text": "doc:lettres-marthe",
+      "note": "Transcription des lettres photographiées chez Rose. Garder ces dates partout."
+    },
+    {
+      "node": "@node:ch4",
+      "name": "Repérages Estérac.txt",
+      "text": "doc:reperages-esterac",
+      "earlier": "doc:reperages-esterac-v1",
+      "note": "Version précédente gardée dans les versions du document."
+    }
+  ],
+  "notes": {
+    "folders": [
+      {
+        "key": "univers",
+        "name": "Univers"
+      },
+      {
+        "key": "chrono",
+        "name": "Chronologie"
+      },
+      {
+        "key": "persos",
+        "name": "Personnages"
+      },
+      {
+        "key": "recherches",
+        "name": "Recherches"
+      },
+      {
+        "key": "atelier",
+        "name": "Atelier"
+      }
+    ],
+    "notes": [
+      {
+        "key": "mode-emploi",
+        "title": "À lire d'abord : ce projet d'exemple",
+        "pinned": true
+      },
+      {
+        "key": "sommet",
+        "title": "La vie au sommet",
+        "folder": "univers",
+        "pinned": true
+      },
+      {
+        "key": "plaques",
+        "title": "Les plaques de verre",
+        "folder": "univers"
+      },
+      {
+        "key": "glossaire",
+        "title": "Glossaire",
+        "folder": "univers"
+      },
+      {
+        "key": "chronologie",
+        "title": "Chronologie générale",
+        "folder": "chrono",
+        "pinned": true
+      },
+      {
+        "key": "causes-1913",
+        "title": "Janvier 1913 : l'enchaînement",
+        "folder": "chrono"
+      },
+      {
+        "key": "qui-sait-quoi",
+        "title": "Qui sait quoi, et quand",
+        "folder": "persos"
+      },
+      {
+        "key": "ages",
+        "title": "Âges et dates",
+        "folder": "persos"
+      },
+      {
+        "key": "mesureuses",
+        "title": "Les mesureuses : notes de documentation",
+        "folder": "recherches"
+      },
+      {
+        "key": "variables",
+        "title": "Étoiles variables : pour la scène 8-1",
+        "folder": "recherches"
+      },
+      {
+        "key": "reecriture",
+        "title": "Chantier de réécriture",
+        "folder": "atelier"
+      },
+      {
+        "key": "themes",
+        "title": "Thèmes et motifs",
+        "folder": "atelier"
+      }
+    ],
+    "stickies": [
+      {
+        "text": "Motif : le verre ne se brise jamais. Seul le mur cède.",
+        "color": "yellow",
+        "x": 40,
+        "y": 40
+      },
+      {
+        "text": "Ch. 5 trop long : couper un tiers de la visite des investisseurs",
+        "color": "orange",
+        "x": 300,
+        "y": 50
+      },
+      {
+        "text": "Rose doit être nommée avant le ch. 4 (au dîner du ch. 2 ?)",
+        "color": "pink",
+        "x": 60,
+        "y": 250
+      },
+      {
+        "text": "Vérifier : vent maximal pour un téléphérique (70 km/h ?)",
+        "color": "blue",
+        "x": 330,
+        "y": 270
+      },
+      {
+        "text": "Titre de travail bis : « La Mesureuse »",
+        "color": "purple",
+        "x": 600,
+        "y": 110
+      },
+      {
+        "text": "Écrire la dernière benne : ce que Bastien ne dit pas",
+        "color": "green",
+        "x": 610,
+        "y": 320
+      }
+    ],
+    "systemNotes": true
+  },
+  "plot": {
+    "version": 1,
+    "lanes": [
+      {
+        "id": "jeanne",
+        "name": "L'inventaire de Jeanne",
+        "color": "#3d6fb6",
+        "main": true,
+        "hidden": false,
+        "characterId": "@char:jeanne"
+      },
+      {
+        "id": "station",
+        "name": "La station menacée",
+        "color": "#c2533b",
+        "main": false,
+        "hidden": false,
+        "characterId": "@char:helene"
+      },
+      {
+        "id": "gardien",
+        "name": "Le gardien",
+        "color": "#4f8a5b",
+        "main": false,
+        "hidden": false,
+        "characterId": "@char:bastien"
+      },
+      {
+        "id": "1913",
+        "name": "Janvier 1913",
+        "color": "#b08a2e",
+        "main": false,
+        "hidden": false,
+        "characterId": "@char:marthe"
+      }
+    ],
+    "events": [
+      {
+        "id": "h1",
+        "laneId": "1913",
+        "row": -5,
+        "title": "Marthe est engagée",
+        "note": "Montée à pied par le sentier d'été, en décembre.",
+        "pivot": false,
+        "status": "revised",
+        "tags": [
+          "passé"
+        ],
+        "characterIds": [
+          "@char:marthe",
+          "@char:emile",
+          "@char:valadier"
+        ],
+        "povId": null,
+        "locationId": "@loc:observatoire",
+        "nodeId": "@node:s3-2",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "18 décembre 1912",
+        "words": 0
+      },
+      {
+        "id": "h2",
+        "laneId": "1913",
+        "row": -4,
+        "title": "« Elle a grossi »",
+        "note": "Marthe voit l'étoile grossir sur la plaque 4417.",
+        "pivot": true,
+        "status": "revised",
+        "tags": [
+          "passé",
+          "découverte"
+        ],
+        "characterIds": [
+          "@char:marthe",
+          "@char:emile"
+        ],
+        "povId": "@char:marthe",
+        "locationId": "@loc:salle-mesures",
+        "nodeId": "@node:prologue",
+        "alsoNodeIds": [
+          "@node:s6-2"
+        ],
+        "noteIds": [
+          "@note:plaques"
+        ],
+        "date": "9 janvier 1913",
+        "words": 0
+      },
+      {
+        "id": "h3",
+        "laneId": "1913",
+        "row": -3,
+        "title": "Le refus de Valadier",
+        "note": "Une dépêche à son seul nom : « Les mesureuses mesurent. »",
+        "pivot": false,
+        "status": "written",
+        "tags": [
+          "passé"
+        ],
+        "characterIds": [
+          "@char:emile",
+          "@char:valadier"
+        ],
+        "povId": "@char:emile",
+        "locationId": "@loc:observatoire",
+        "nodeId": "@node:s6-2",
+        "alsoNodeIds": [
+          "@node:prologue"
+        ],
+        "noteIds": [],
+        "date": "12 janvier 1913",
+        "words": 0
+      },
+      {
+        "id": "h4",
+        "laneId": "1913",
+        "row": -2,
+        "title": "Émile descend",
+        "note": "Avalanche au couloir de la Hourquette ; la dépêche reste dans sa poche.",
+        "pivot": true,
+        "status": "revised",
+        "tags": [
+          "passé"
+        ],
+        "characterIds": [
+          "@char:emile"
+        ],
+        "povId": null,
+        "locationId": "@loc:hourquette",
+        "nodeId": "@node:prologue",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "13 janvier 1913",
+        "words": 0
+      },
+      {
+        "id": "h5",
+        "laneId": "1913",
+        "row": -1,
+        "title": "Marthe cache les plaques",
+        "note": "Dans la chambre noire, avec son cahier ; Valadier les déclare brisées.",
+        "pivot": false,
+        "status": "idea",
+        "tags": [
+          "passé",
+          "secret"
+        ],
+        "characterIds": [
+          "@char:marthe",
+          "@char:valadier"
+        ],
+        "povId": null,
+        "locationId": "@loc:chambre-noire",
+        "nodeId": null,
+        "alsoNodeIds": [],
+        "noteIds": [
+          "@note:causes-1913"
+        ],
+        "date": "15 janvier - 2 février 1913",
+        "words": 0
+      },
+      {
+        "id": "g0",
+        "laneId": "gardien",
+        "row": -1,
+        "title": "Jules Roux mure la chambre noire",
+        "note": "Après l'incendie de la grande coupole, il voit une boîte de métal sur l'étagère.",
+        "pivot": false,
+        "status": "idea",
+        "tags": [
+          "passé"
+        ],
+        "characterIds": [],
+        "povId": null,
+        "locationId": "@loc:chambre-noire",
+        "nodeId": null,
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "1931",
+        "words": 0
+      },
+      {
+        "id": "e1",
+        "laneId": "jeanne",
+        "row": 0,
+        "title": "La benne du lundi",
+        "note": "Jeanne arrive ; « Vous êtes là pour fermer la maison. »",
+        "pivot": false,
+        "status": "revised",
+        "tags": [],
+        "characterIds": [
+          "@char:jeanne",
+          "@char:bastien"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:gare-haute",
+        "nodeId": "@node:s1-1",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "14 janvier 2019",
+        "words": 900
+      },
+      {
+        "id": "s1",
+        "laneId": "station",
+        "row": 1,
+        "title": "Soixante-seize jours",
+        "note": "Hélène veut être la première informée de toute trouvaille.",
+        "pivot": false,
+        "status": "revised",
+        "tags": [],
+        "characterIds": [
+          "@char:helene",
+          "@char:jeanne"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:plaquotheque",
+        "nodeId": "@node:s1-2",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0
+      },
+      {
+        "id": "s2",
+        "laneId": "station",
+        "row": 2,
+        "title": "Kerver monte le 20 février",
+        "note": "L'annonce de la visite des investisseurs.",
+        "pivot": false,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:helene",
+          "@char:yanis",
+          "@char:jeanne"
+        ],
+        "povId": null,
+        "locationId": "@loc:observatoire",
+        "nodeId": "@node:s2-1",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0
+      },
+      {
+        "id": "g1",
+        "laneId": "gardien",
+        "row": 3,
+        "title": "La Thermos",
+        "note": "Bastien voit Jeanne parler aux plaques.",
+        "pivot": false,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:bastien",
+          "@char:jeanne"
+        ],
+        "povId": "@char:bastien",
+        "locationId": "@loc:plaquotheque",
+        "nodeId": "@node:s2-2",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0
+      },
+      {
+        "id": "e2",
+        "laneId": "jeanne",
+        "row": 4,
+        "title": "La lacune",
+        "note": "4402 à 4438 « brisées par le gel » ; la 4417 dans la boîte 402.",
+        "pivot": true,
+        "status": "written",
+        "tags": [
+          "indice"
+        ],
+        "characterIds": [
+          "@char:jeanne"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:plaquotheque",
+        "nodeId": "@node:s2-3",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "4 février 2019",
+        "words": 0
+      },
+      {
+        "id": "e3",
+        "laneId": "jeanne",
+        "row": 5,
+        "title": "Le carnet d'Émile",
+        "note": "« Le nom de M. partira ce soir ou jamais. »",
+        "pivot": false,
+        "status": "written",
+        "tags": [
+          "indice"
+        ],
+        "characterIds": [
+          "@char:jeanne",
+          "@char:helene"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:bibliotheque",
+        "nodeId": "@node:s3-1",
+        "alsoNodeIds": [
+          "@node:s3-2"
+        ],
+        "noteIds": [],
+        "date": "6 février 2019",
+        "words": 0
+      },
+      {
+        "id": "e4",
+        "laneId": "jeanne",
+        "row": 6,
+        "title": "Rose et les lettres",
+        "note": "« Là où on développe la nuit. »",
+        "pivot": true,
+        "status": "written",
+        "tags": [
+          "indice"
+        ],
+        "characterIds": [
+          "@char:jeanne",
+          "@char:rose"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:maison-lacoste",
+        "nodeId": "@node:s4-1",
+        "alsoNodeIds": [
+          "@node:s4-2"
+        ],
+        "noteIds": [],
+        "date": "7 février 2019",
+        "words": 0
+      },
+      {
+        "id": "s3",
+        "laneId": "station",
+        "row": 7,
+        "title": "Les investisseurs",
+        "note": "Yanis a signé avec Hauts Lieux.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [
+          "trahison"
+        ],
+        "characterIds": [
+          "@char:kerver",
+          "@char:helene",
+          "@char:yanis",
+          "@char:jeanne"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:observatoire",
+        "nodeId": "@node:s5-1",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "20 février 2019",
+        "words": 0
+      },
+      {
+        "id": "s4",
+        "laneId": "station",
+        "row": 8,
+        "title": "La dispute",
+        "note": "Hélène veut une nova ; Jeanne refuse.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:helene",
+          "@char:jeanne"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:bibliotheque",
+        "nodeId": "@node:s5-2",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0
+      },
+      {
+        "id": "g2",
+        "laneId": "gardien",
+        "row": 9,
+        "title": "La salle des machines",
+        "note": "Bastien raconte le mur de son grand-père.",
+        "pivot": true,
+        "status": "draft",
+        "tags": [
+          "indice"
+        ],
+        "characterIds": [
+          "@char:bastien",
+          "@char:jeanne"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:salle-machines",
+        "nodeId": "@node:s6-1",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0
+      },
+      {
+        "id": "s5",
+        "laneId": "station",
+        "row": 10,
+        "title": "La tempête",
+        "note": "Le téléphérique s'arrête ; Kerver est coincé au sommet.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:kerver",
+          "@char:helene",
+          "@char:jeanne",
+          "@char:bastien",
+          "@char:yanis"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:observatoire",
+        "nodeId": "@node:s7-1",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "9 mars 2019",
+        "words": 0
+      },
+      {
+        "id": "e5",
+        "laneId": "jeanne",
+        "row": 11,
+        "title": "Le mur",
+        "note": "La boîte en zinc : 36 plaques et le cahier de Marthe.",
+        "pivot": true,
+        "status": "draft",
+        "tags": [
+          "révélation"
+        ],
+        "characterIds": [
+          "@char:jeanne",
+          "@char:bastien",
+          "@char:yanis",
+          "@char:helene"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:chambre-noire",
+        "nodeId": "@node:s7-2",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0
+      },
+      {
+        "id": "g3",
+        "laneId": "gardien",
+        "row": 11,
+        "title": "Bastien ouvre le mur",
+        "note": "Il frappe ; Jeanne entre la première.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:bastien",
+          "@char:jeanne"
+        ],
+        "povId": null,
+        "locationId": "@loc:chambre-noire",
+        "nodeId": null,
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0
+      },
+      {
+        "id": "e6",
+        "laneId": "jeanne",
+        "row": 12,
+        "title": "Pas une nova",
+        "note": "Une variable à sursauts, cataloguée en 1934. Marthe l'avait vue avant.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [
+          "révélation"
+        ],
+        "characterIds": [
+          "@char:jeanne",
+          "@char:yanis",
+          "@char:helene",
+          "@char:kerver"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:bibliotheque",
+        "nodeId": "@node:s8-1",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0
+      },
+      {
+        "id": "s6",
+        "laneId": "station",
+        "row": 13,
+        "title": "Le matin d'après",
+        "note": "Hélène confie l'article à Jeanne ; la coupole restera ouverte au public.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:helene",
+          "@char:jeanne",
+          "@char:kerver",
+          "@char:yanis"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:observatoire",
+        "nodeId": "@node:s8-2",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "10 mars 2019",
+        "words": 0
+      },
+      {
+        "id": "e7",
+        "laneId": "jeanne",
+        "row": 14,
+        "title": "La dernière plaque",
+        "note": "N° 11 406 ; Jeanne corrige le registre.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:jeanne"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:plaquotheque",
+        "nodeId": "@node:s9-1",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "31 mars 2019",
+        "words": 0
+      },
+      {
+        "id": "g4",
+        "laneId": "gardien",
+        "row": 14,
+        "title": "La coupole fermée",
+        "note": "Bastien referme la fente sur le ciel.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:bastien"
+        ],
+        "povId": null,
+        "locationId": "@loc:coupole",
+        "nodeId": "@node:s9-1",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "31 mars 2019",
+        "words": 0
+      },
+      {
+        "id": "e8",
+        "laneId": "jeanne",
+        "row": 15,
+        "title": "La dernière benne",
+        "note": "À écrire.",
+        "pivot": false,
+        "status": "idea",
+        "tags": [],
+        "characterIds": [
+          "@char:jeanne",
+          "@char:bastien"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:gare-haute",
+        "nodeId": "@node:s9-2",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "1er avril 2019",
+        "words": 0
+      },
+      {
+        "id": "e9",
+        "laneId": "jeanne",
+        "row": 16,
+        "title": "La plaque d'émail",
+        "note": "« Ici vécut Marthe Lacoste, mesureuse d'étoiles. »",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:jeanne",
+          "@char:rose"
+        ],
+        "povId": "@char:jeanne",
+        "locationId": "@loc:maison-lacoste",
+        "nodeId": "@node:epilogue",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "juin 2019",
+        "words": 0
+      }
+    ],
+    "links": [
+      {
+        "id": "k1",
+        "from": "h2",
+        "to": "h3",
+        "kind": "impact",
+        "label": "la série",
+        "note": "Émile porte les plaques à Valadier."
+      },
+      {
+        "id": "k2",
+        "from": "h3",
+        "to": "h4",
+        "kind": "impact",
+        "label": "le refus",
+        "note": "Le télégraphe coupé l'oblige à descendre."
+      },
+      {
+        "id": "k3",
+        "from": "h4",
+        "to": "h5",
+        "kind": "impact",
+        "label": "la mort d'Émile",
+        "note": "Marthe cache tout pour que Valadier ne signe pas."
+      },
+      {
+        "id": "k4",
+        "from": "h5",
+        "to": "e2",
+        "kind": "influence",
+        "label": "la lacune",
+        "note": "Les plaques « brisées » manquent au registre."
+      },
+      {
+        "id": "k5",
+        "from": "g0",
+        "to": "g2",
+        "kind": "influence",
+        "label": "le récit du père",
+        "note": ""
+      },
+      {
+        "id": "k6",
+        "from": "e4",
+        "to": "g2",
+        "kind": "meeting",
+        "label": "la chambre noire",
+        "note": "Jeanne cherche la pièce ; Bastien sait où elle est."
+      },
+      {
+        "id": "k7",
+        "from": "s4",
+        "to": "s6",
+        "kind": "influence",
+        "label": "la honte d'Hélène",
+        "note": ""
+      },
+      {
+        "id": "k8",
+        "from": "s5",
+        "to": "e5",
+        "kind": "impact",
+        "label": "isolés",
+        "note": "Personne n'entendra la masse."
+      },
+      {
+        "id": "k9",
+        "from": "e5",
+        "to": "e6",
+        "kind": "impact",
+        "label": "le cahier",
+        "note": ""
+      },
+      {
+        "id": "k10",
+        "from": "s3",
+        "to": "s6",
+        "kind": "influence",
+        "label": "le poste de Yanis",
+        "note": "La coupole ouverte au public lui donne un vrai rôle."
+      }
+    ],
+    "rowLabels": {
+      "-5": "Décembre 1912",
+      "-4": "9 janvier 1913",
+      "-2": "13 janvier 1913",
+      "-1": "1913 - 1931",
+      "0": "14 janvier 2019",
+      "4": "4 février",
+      "7": "20 février",
+      "10": "9 mars",
+      "14": "31 mars",
+      "16": "Juin"
+    },
+    "acts": {
+      "0": "I. Le relevé",
+      "6": "II. La lacune",
+      "10": "III. La chambre noire"
+    },
+    "tension": {
+      "-4": 5,
+      "-3": 6,
+      "-2": 8,
+      "-1": 6,
+      "0": 2,
+      "1": 3,
+      "2": 3,
+      "3": 2,
+      "4": 5,
+      "5": 5,
+      "6": 6,
+      "7": 6,
+      "8": 7,
+      "9": 6,
+      "10": 8,
+      "11": 9,
+      "12": 7,
+      "13": 4,
+      "14": 3,
+      "16": 2
+    },
+    "readingOrder": [],
+    "readingFollowsStructure": true,
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Faire apparaître Rose avant le chapitre 4 ?",
+        "done": false,
+        "eventId": "e4"
+      },
+      {
+        "id": "q2",
+        "text": "Que devient Yanis après la fermeture ? (épilogue : badge Hauts Lieux)",
+        "done": true,
+        "eventId": "s6"
+      },
+      {
+        "id": "q3",
+        "text": "Que se disent Jeanne et Bastien dans la dernière benne ?",
+        "done": false,
+        "eventId": "e8"
+      }
+    ],
+    "mysteries": [
+      {
+        "id": "y1",
+        "question": "Où sont les plaques 4402 à 4438 ?",
+        "status": "solved",
+        "answer": "Cachées par Marthe dans la chambre noire, dans une boîte en zinc.",
+        "payoff": "Ouverture du mur pendant la tempête.",
+        "payoffEventId": "e5"
+      },
+      {
+        "id": "y2",
+        "question": "Qui est « M. L. » ?",
+        "status": "solved",
+        "answer": "Marthe Lacoste, mesureuse d'Estérac.",
+        "payoff": "Le carnet d'Émile, chez Hélène.",
+        "payoffEventId": "e3"
+      },
+      {
+        "id": "y3",
+        "question": "Pourquoi Émile est-il descendu dans la tempête ?",
+        "status": "solved",
+        "answer": "Pour télégraphier la découverte sous le nom de Marthe, malgré Valadier.",
+        "payoff": "Carnet, 12-13 janvier 1913.",
+        "payoffEventId": "h3"
+      },
+      {
+        "id": "y4",
+        "question": "L'étoile de Marthe est-elle une nova ?",
+        "status": "solved",
+        "answer": "Non : une variable à sursauts, cataloguée en 1934.",
+        "payoff": "La base de données de Yanis.",
+        "payoffEventId": "e6"
+      }
+    ],
+    "clues": [
+      {
+        "id": "i1",
+        "text": "« M. L. — elle a grossi » sur la pochette de la 4417.",
+        "eventId": "e2",
+        "mysteryId": "y2"
+      },
+      {
+        "id": "i2",
+        "text": "Traces de pochettes dans la poussière de la boîte 368.",
+        "eventId": "e2",
+        "mysteryId": "y1"
+      },
+      {
+        "id": "i3",
+        "text": "« Le nom de M. partira ce soir ou jamais. »",
+        "eventId": "e3",
+        "mysteryId": "y3"
+      },
+      {
+        "id": "i4",
+        "text": "« Là où on développe la nuit. »",
+        "eventId": "e4",
+        "mysteryId": "y1"
+      },
+      {
+        "id": "i5",
+        "text": "La boîte de métal derrière le mur de Jules Roux.",
+        "eventId": "g2",
+        "mysteryId": "y1"
+      },
+      {
+        "id": "i6",
+        "text": "Yanis : « des variables, il y en a des milliers ».",
+        "eventId": "s2",
+        "mysteryId": "y4"
+      }
+    ],
+    "goal": 50000,
+    "templates": [
+      {
+        "id": "t1",
+        "name": "Enquête à huis clos",
+        "steps": [
+          "Arrivée",
+          "Anomalie",
+          "Premier indice",
+          "Fausse piste",
+          "Allié inattendu",
+          "Isolement",
+          "Révélation",
+          "Prix à payer",
+          "Retour"
+        ]
+      }
+    ],
+    "sceneOrder": {}
+  },
+  "versions": [
+    {
+      "kind": "synopsis",
+      "item": "default",
+      "name": "Synopsis de février"
+    },
+    {
+      "kind": "structureNode",
+      "item": "@node:s1-1",
+      "name": "Premier jet",
+      "then": "révision:s1-1"
+    }
+  ]
+}

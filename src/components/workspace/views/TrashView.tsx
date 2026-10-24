@@ -15,6 +15,9 @@ import {
   UserRound,
   type LucideIcon,
   LayoutPanelTop,
+  Package,
+  PawPrint,
+  Link2,
 } from "lucide-react";
 import { SelectionBar, SelectionCheckbox } from "@/components/common/SelectionBar";
 import { ConfirmDialog } from "@/components/notes/ConfirmDialog";
@@ -40,6 +43,9 @@ const KIND_ICONS: Record<TrashKind, LucideIcon> = {
   sticky: StickyNote,
   relation: Network,
   placeLink: MapPin,
+  item: Package,
+  species: PawPrint,
+  worldLink: Link2,
   mangaPanel: LayoutPanelTop,
 };
 

@@ -127,13 +127,19 @@
     "emptyHint": "Créez des chapitres et des pages dans le découpage.",
     "openPlan": "Ouvrir le découpage",
     "editPage": "Modifier la page",
-    "fileSuffix": "scénario"
+    "fileSuffix": "scénario",
+    "toc": "Sommaire",
+    "details": "Indications de dessin",
+    "detailsHint": "Afficher le cadrage, le décor, les indications au dessinateur et la continuité de chaque case",
+    "legend": "Types de texte",
+    "turnPage": "Tourné de page"
   },
   "export": {
     "subtitle": "Scénario pour le dessinateur",
     "cast": "Personnages",
     "places": "Lieux",
-    "page": "{{label}} — {{count}} case(s)",
+    "page_one": "{{label}} — {{count}} case",
+    "page_other": "{{label}} — {{count}} cases",
     "panel": "Case {{number}}",
     "goal": "Objectif :",
     "rhythm": "Fonction : {{value}}",

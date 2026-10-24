@@ -1,12 +1,14 @@
 import { useMemo, useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2, Replace, RotateCcw, Search } from "lucide-react";
+import { Loader2, Replace, Search } from "lucide-react";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
 import { Button } from "@/components/ui/button";
 import { PageShell } from "@/components/workspace/views/PageShell";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { api } from "@/lib/api";
 import { errorText } from "@/lib/errors";
+import { notifyError } from "@/lib/notify";
+import { toast } from "@/stores/toastStore";
 import { notifyNovelTextChanged } from "@/lib/novelEvents";
 import { adaptCase, groupMatches, matchKey } from "@/lib/novelReplace";
 import { buildStructureTree, flattenVisible, STRUCTURE_NODE_TAB_PREFIX, structureNodeTabId } from "@/lib/structure";
@@ -30,7 +32,7 @@ const fieldClass = "h-9 w-full rounded-md border border-input bg-background px-3
  * scène modifiée et peut être annulé tout de suite.
  */
 export function ReplaceView({ project, feature, onOpenFeature }: ReplaceViewProps) {
-  const { t } = useTranslation("novel");
+  const { t } = useTranslation(["novel", "common"]);
   const { structure, labelOf } = useProjectStructure(project.id);
   const applyNode = useStructureStore((s) => s.applyNode);
 
@@ -43,7 +45,10 @@ export function ReplaceView({ project, feature, onOpenFeature }: ReplaceViewProp
   const [result, setResult] = useState<{ options: FindOptions; found: FindResult } | null>(null);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [busy, setBusy] = useState<"search" | "replace" | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "novel:replace");
+  };
   const [done, setDone] = useState<{ result: ReplaceResult; undone: boolean } | null>(null);
   const queryRef = useRef<HTMLInputElement>(null);
 
@@ -112,6 +117,14 @@ export function ReplaceView({ project, feature, onOpenFeature }: ReplaceViewProp
       notifyNovelTextChanged(project.id, outcome.nodes.map(({ node }) => node.id));
       refreshWriting(project.id);
       setDone({ result: outcome, undone: false });
+      // Résultat en notification (rien ne bouge dans la page), avec « Annuler ».
+      toast({
+        tone: "success",
+        key: `replace:${project.id}`,
+        duration: 15000,
+        message: t("replace.done", { count: outcome.replaced, scenes: t("replace.scenes", { count: outcome.nodes.length }) }),
+        action: { label: t("replace.undo"), run: () => undo(outcome) },
+      });
       setBusy(null);
       await search(result.options, true);
     } catch (e) {
@@ -121,17 +134,18 @@ export function ReplaceView({ project, feature, onOpenFeature }: ReplaceViewProp
     }
   }
 
-  async function undo() {
-    if (!done || done.undone) return;
+  async function undo(replaced: ReplaceResult | undefined = done && !done.undone ? done.result : undefined) {
+    if (!replaced) return;
     setBusy("replace");
     setError(null);
     try {
-      for (const { node, before } of done.result.nodes) {
+      for (const { node, before } of replaced.nodes) {
         applyNode(project.id, await api.setStructureNodeContent(project.id, node.id, before));
       }
-      notifyNovelTextChanged(project.id, done.result.nodes.map(({ node }) => node.id));
+      notifyNovelTextChanged(project.id, replaced.nodes.map(({ node }) => node.id));
       refreshWriting(project.id);
-      setDone({ ...done, undone: true });
+      setDone({ result: replaced, undone: true });
+      toast({ tone: "success", key: `replace:${project.id}`, message: t("replace.undone") });
       setBusy(null);
       if (result) await search(result.options, true);
     } catch (e) {
@@ -159,11 +173,11 @@ export function ReplaceView({ project, feature, onOpenFeature }: ReplaceViewProp
           <div className="grid gap-3 md:grid-cols-2">
             <label className="space-y-1.5 text-sm font-medium">
               {t("replace.find")}
-              <input ref={queryRef} value={query} maxLength={500} onChange={(e) => setQuery(e.target.value)} className={fieldClass} autoFocus />
+              <input ref={queryRef} value={query} maxLength={500} placeholder={t("common:placeholders.find")} onChange={(e) => setQuery(e.target.value)} className={fieldClass} autoFocus />
             </label>
             <label className="space-y-1.5 text-sm font-medium">
               {t("replace.replaceWith")}
-              <input value={replacement} maxLength={500} onChange={(e) => setReplacement(e.target.value)} className={fieldClass} />
+              <input value={replacement} maxLength={500} placeholder={t("common:placeholders.replaceWith")} onChange={(e) => setReplacement(e.target.value)} className={fieldClass} />
             </label>
           </div>
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
@@ -182,27 +196,7 @@ export function ReplaceView({ project, feature, onOpenFeature }: ReplaceViewProp
           </div>
         </form>
 
-        {error && (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
-        )}
 
-        {done && (
-          <div role="status" className="flex flex-wrap items-center gap-3 rounded-lg border border-success/40 bg-success/10 px-4 py-2.5 text-sm">
-            <span className="tabular-nums">
-              {done.undone
-                ? t("replace.undone")
-                : t("replace.done", { count: done.result.replaced, scenes: t("replace.scenes", { count: done.result.nodes.length }) })}
-            </span>
-            {!done.undone && (
-              <Button variant="outline" size="sm" className="ml-auto h-7" disabled={busy !== null} onClick={() => void undo()}>
-                <RotateCcw />
-                {t("replace.undo")}
-              </Button>
-            )}
-          </div>
-        )}
 
         {result && (
           <section className="rounded-xl border bg-card shadow-sm">

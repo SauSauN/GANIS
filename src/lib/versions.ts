@@ -136,6 +136,22 @@ export function readableFields(kind: VersionKind, row: Row, resolve: (id: string
         })),
       ];
     }
+    case "item":
+    case "species": {
+      const fields = fieldsOf(row.fields);
+      return [
+        { key: "name", label: "versions:fields.name", text: str(row.name) },
+        { key: "type", label: "versions:fields.type", text: str(row.type) },
+        ...(row.nature ? [{ key: "nature", label: "world:natures.title", text: str(row.nature) }] : []),
+        { key: "status", label: "versions:fields.status", text: str(row.status) },
+        { key: "parent", label: "versions:fields.parent", text: row.parent_id ? named(str(row.parent_id)) : "" },
+        ...Object.entries(fields).map(([key, value]) => ({
+          key: `fields.${key}`,
+          label: `world:${kind}.fields.${key}`,
+          text: value,
+        })),
+      ];
+    }
     case "location": {
       const fields = fieldsOf(row.fields);
       return [

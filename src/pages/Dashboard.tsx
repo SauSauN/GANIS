@@ -10,6 +10,7 @@ import {
   FileUp,
   FolderOpen,
   Globe,
+  Info,
   Lock,
   Plus,
   Search,
@@ -19,6 +20,8 @@ import {
 import { GanixImportDialog } from "@/components/projects/GanixImportDialog";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { ProjectTrashList } from "@/components/projects/ProjectTrashList";
+import { SpaceInfoDialog } from "@/components/projects/SpaceInfoDialog";
+import { useSetupStore } from "@/stores/setupStore";
 import {
   ProjectFormDialog,
   type ProjectFormValues,
@@ -50,6 +53,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { usePendingVisibility } from "@/stores/pendingVisibilityStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { toast } from "@/stores/toastStore";
+import { notifyError, notifyInfo } from "@/lib/notify";
 import type {
   GanixImportMode,
   GanixPreview,
@@ -81,6 +85,7 @@ const RECENT_LIMIT = 3;
  */
 export default function Dashboard() {
   const navigate = useNavigate();
+  const needsSetup = useSetupStore((state) => state.needsSetup);
   const { t } = useTranslation(["dashboard", "projects", "common", "menus"]);
 
   const user = useAuthStore((state) => state.user);
@@ -114,15 +119,23 @@ export default function Dashboard() {
    * sur une des cartes de filtre, la déplie.
    */
   const [listOpen, setListOpen] = useState(false);
+  /** Explication de l'espace courant (badge « Espace public / privé »). */
+  const [spaceInfoOpen, setSpaceInfoOpen] = useState(false);
 
   const [formOpen, setFormOpen] = useState(false);
   const [editing, setEditing] = useState<Project | null>(null);
   const [deleting, setDeleting] = useState<Project | null>(null);
   const [deletingBusy, setDeletingBusy] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
-  const [actionError, setActionError] = useState<string | null>(null);
+  // Retours d'action (erreurs, export, import) : en notification, pas dans
+  // la page, pour que rien ne bouge.
+  const setActionError = (message: string | null) => {
+    if (message) notifyError(message, "dashboard");
+  };
   /** Message de réussite (export, import). */
-  const [notice, setNotice] = useState<string | null>(null);
+  const setNotice = (message: string | null) => {
+    if (message) notifyInfo(message, "dashboard");
+  };
 
   /** Import .ganix : vérification en cours, puis aperçu à confirmer. */
   const [inspecting, setInspecting] = useState(false);
@@ -164,10 +177,10 @@ export default function Dashboard() {
   useEffect(() => {
     if (!signedIn) return;
 
-    const projectId = usePendingVisibility.getState().take();
-    if (!projectId) return;
+    const pendingVisibility = usePendingVisibility.getState().take();
+    if (!pendingVisibility) return;
 
-    setVisibility(projectId, "private")
+    setVisibility(pendingVisibility.projectId, "private", pendingVisibility.confirmName)
       .then((project) =>
         toast({
           tone: "success",
@@ -508,21 +521,37 @@ export default function Dashboard() {
                     : t("guest.title")}
                 </h1>
 
-                {/* Espace courant : privé (connecté) ou public */}
-                <span className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium text-muted-foreground">
+                {/* Espace courant : privé (connecté) ou public. Le badge
+                    ouvre une petite fenêtre qui explique ce que l'espace
+                    protège ou non. */}
+                <button
+                  type="button"
+                  aria-haspopup="dialog"
+                  onClick={() => setSpaceInfoOpen(true)}
+                  title={t("space.explain")}
+                  className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium text-muted-foreground hover:bg-muted hover:text-foreground"
+                >
                   {space === "private" ? (
-                    <Lock className="h-3 w-3" />
+                    <Lock className="h-3 w-3" aria-hidden="true" />
                   ) : (
-                    <Globe className="h-3 w-3" />
+                    <Globe className="h-3 w-3" aria-hidden="true" />
                   )}
                   {t(`space.${space}`)}
-                </span>
+                  <Info className="h-3 w-3" aria-hidden="true" />
+                </button>
               </div>
               {signedIn && (
                 <p className="text-sm text-muted-foreground">
                   {t("subtitle")}
                 </p>
               )}
+              <SpaceInfoDialog
+                open={spaceInfoOpen}
+                space={space}
+                mode="info"
+                onClose={() => setSpaceInfoOpen(false)}
+                onSignIn={() => navigate(needsSetup ? "/setup" : "/login")}
+              />
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
@@ -559,30 +588,15 @@ export default function Dashboard() {
           </div>
 
           {/* Erreurs */}
-          {(error || actionError) && (
+          {error && (
             <div
               role="alert"
               className="mt-6 rounded-md border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive"
             >
-              {actionError ?? error}
+              {error}
             </div>
           )}
 
-          {notice && !actionError && (
-            <div
-              role="status"
-              className="mt-6 flex items-start justify-between gap-4 rounded-md border border-success/30 bg-success/5 px-4 py-3 text-sm text-success"
-            >
-              <span className="whitespace-pre-line">{notice}</span>
-              <button
-                type="button"
-                className="shrink-0 text-xs underline-offset-2 hover:underline"
-                onClick={() => setNotice(null)}
-              >
-                {t("common:actions.close")}
-              </button>
-            </div>
-          )}
 
           {/* Filtres avec compteurs */}
           <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -717,6 +731,7 @@ export default function Dashboard() {
               </div>
             )}
           </section>
+
         </div>
       </main>
 

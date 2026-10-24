@@ -27,6 +27,9 @@
     "synopsis": "Synopsis",
     "plot": "Plot",
     "editorial": "Editorial pack",
-    "mangaPanel": "Manga panel"
+    "mangaPanel": "Manga panel",
+    "item": "Object",
+    "species": "Fauna and flora",
+    "worldLink": "Link between elements"
   }
 }

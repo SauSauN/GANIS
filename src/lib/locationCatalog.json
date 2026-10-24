@@ -57,6 +57,7 @@
   ],
   "fields": [
     {"key": "aliases", "kind": "text", "maxLength": 200},
+    {"key": "colorPalette", "kind": "colors", "maxLength": 200},
     {"key": "description", "kind": "longText", "maxLength": 20000},
     {"key": "firstAppearance", "kind": "reference", "maxLength": 200},
     {"key": "history", "kind": "longText", "maxLength": 20000},

@@ -12,10 +12,6 @@
       "label": "Installed",
       "description": "Themes available on this device: ready to use, no download needed."
     },
-    "discover": {
-      "label": "Discover",
-      "description": "The catalog of packages shared by the community."
-    },
     "import": {
       "label": "Import",
       "description": "Install a package from a .ganixpkg file, offline."
@@ -97,11 +93,6 @@
     "confirm": "Delete",
     "cancel": "Cancel",
     "failed": "Couldn't delete the theme."
-  },
-  "discover": {
-    "title": "Sharing is coming soon",
-    "text": "Soon you'll be able to browse and download themes shared by other creators. Meanwhile, system themes and your own creations are already available, no download needed.",
-    "toInstalled": "See installed themes"
   },
   "import": {
     "title": "Importing .ganixpkg files",

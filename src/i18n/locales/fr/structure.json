@@ -309,5 +309,24 @@
     "useDefault": "Couleur par défaut",
     "inSettings": "Les couleurs des niveaux se règlent dans les paramètres du projet et s'appliquent à tous leurs éléments.",
     "openSettings": "Choisir les couleurs"
+  },
+  "reading": {
+    "loading": "Compilation de l'histoire…",
+    "toc": "Sommaire",
+    "summary_one": "{{count}} élément du découpage",
+    "summary_other": "{{count}} éléments du découpage",
+    "minutes": "environ {{minutes}} min de lecture",
+    "unplaced_one": "{{count}} événement de la trame n'est rattaché à aucun élément : il n'est pas repris.",
+    "unplaced_other": "{{count}} événements de la trame ne sont rattachés à aucun élément : ils ne sont pas repris.",
+    "loadingDocuments": "Lecture des documents…",
+    "refresh": "Actualiser",
+    "export": "Exporter",
+    "dialogTitle": "Exporter la lecture complète",
+    "empty": "Rien à lire pour l'instant.",
+    "emptyHint": "Donnez un résumé ou un texte aux éléments du plan, rangez-y un document Word ou texte, ou rattachez-leur des événements de la trame.",
+    "openPlan": "Ouvrir le plan",
+    "openPlot": "Ouvrir la trame",
+    "edit": "Modifier",
+    "fromDocuments": "Texte repris des documents de l'élément"
   }
 }

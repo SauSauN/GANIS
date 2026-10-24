@@ -41,6 +41,7 @@ import enNovel from "./locales/en/novel.json";
 import enManga from "./locales/en/manga.json";
 import enWorkspace from "./locales/en/workspace.json";
 import enWorkspaceHome from "./locales/en/workspaceHome.json";
+import enWorld from "./locales/en/world.json";
 import frActivitybar from "./locales/fr/activitybar.json";
 import frCharacters from "./locales/fr/characters.json";
 import frCommon from "./locales/fr/common.json";
@@ -81,6 +82,7 @@ import frNovel from "./locales/fr/novel.json";
 import frManga from "./locales/fr/manga.json";
 import frWorkspace from "./locales/fr/workspace.json";
 import frWorkspaceHome from "./locales/fr/workspaceHome.json";
+import frWorld from "./locales/fr/world.json";
 
 /**
  * Traduction de l'interface (i18next + react-i18next).
@@ -164,6 +166,7 @@ export const resources = {
     manga: frManga,
     workspace: frWorkspace,
     workspaceHome: frWorkspaceHome,
+    world: frWorld,
   },
   en: {
     activitybar: enActivitybar,
@@ -206,6 +209,7 @@ export const resources = {
     manga: enManga,
     workspace: enWorkspace,
     workspaceHome: enWorkspaceHome,
+    world: enWorld,
   },
 } as const;
 
@@ -297,6 +301,7 @@ void i18n.use(initReactI18next).init({
     "manga",
     "workspace",
     "workspaceHome",
+    "world",
   ],
   defaultNS,
   // Ressources déjà en mémoire : initialisation synchrone, prête avant

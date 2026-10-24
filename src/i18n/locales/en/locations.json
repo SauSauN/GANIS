@@ -89,6 +89,7 @@
     "unknown": "Unknown"
   },
   "fields": {
+    "colorPalette": "Colour palette",
     "aliases": "Other names",
     "description": "General description",
     "firstAppearance": "First appearance",
@@ -489,10 +490,10 @@
       "works": "Works",
       "frequents": "Frequents",
       "guards": "Guards / protects",
-      "imprisoned": "Imprisoned",
+      "imprisoned": "Captivity",
       "hides": "Hides",
-      "exiled": "Exiled",
-      "died": "Died",
+      "exiled": "Exile",
+      "died": "Death",
       "other": "Other"
     },
     "dialog": {
@@ -535,7 +536,7 @@
       "label": "Basic",
       "theme": "The essentials",
       "goal": "Place and describe the location",
-      "count": "6 fields"
+      "count": "7 fields"
     },
     "intermediate": {
       "label": "Intermediate",

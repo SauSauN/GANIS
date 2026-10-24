@@ -6,6 +6,7 @@
 pub mod auth;
 pub mod character_locations;
 pub mod characters;
+pub mod demo;
 pub mod diagnostics;
 pub mod documents;
 pub mod ganix;
@@ -23,3 +24,4 @@ pub mod structure_links;
 pub mod synopsis;
 pub mod trash;
 pub mod users;
+pub mod world;

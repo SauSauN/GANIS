@@ -1,4 +1,5 @@
 import { Component, useState, type ErrorInfo, type ReactNode } from "react";
+import { recordError } from "@/lib/problemReport";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle, ChevronDown, ChevronRight, RefreshCw, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -37,6 +38,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   componentDidCatch(error: unknown, info: ErrorInfo) {
     // Gardé dans la console (et donc le journal de développement) seulement.
     console.error("Erreur de l'interface :", error, info.componentStack);
+    // Gardée aussi pour « Aide › Signaler un problème » (message seul).
+    recordError(error);
   }
 
   private retry = () => {

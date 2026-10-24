@@ -1,6 +1,5 @@
 {
   "greeting": "Bonjour, {{name}}",
-  "defaultName": "créateur",
   "subtitle": "Bienvenue dans votre studio de conception narrative.",
   "newProject": "Nouveau projet",
   "search": {
@@ -68,7 +67,31 @@
   },
   "space": {
     "private": "Espace privé",
-    "public": "Espace public"
+    "public": "Espace public",
+    "explain": "Ce que protège cet espace",
+    "info": {
+      "public": {
+        "title": "Espace public",
+        "text": "Sans compte, vos projets vont dans l'espace public :",
+        "points": [
+          "Les projets de l'espace public ne sont pas chiffrés.",
+          "Toute personne qui utilise GANIS sur cet ordinateur peut les ouvrir, les modifier ou les supprimer.",
+          "Pour protéger un projet : connectez-vous, puis rendez-le privé (paramètres du projet)."
+        ]
+      },
+      "private": {
+        "title": "Espace privé",
+        "text": "Vos projets sont protégés par votre compte :",
+        "points": [
+          "Ils sont chiffrés et ne s'ouvrent qu'avec votre compte.",
+          "Sans votre mot de passe, ils sont illisibles : exportez régulièrement une sauvegarde .ganix (Fichier › Exporter)."
+        ]
+      },
+      "continue": "Continuer sans compte",
+      "signIn": "Se connecter",
+      "understood": "J'ai compris",
+      "dontShowOnStart": "Ne plus afficher en cliquant sur « Commencer » (toujours disponible depuis le badge « Espace public »)"
+    }
   },
   "trash": {
     "intro": "Les projets restent 30 jours dans la corbeille, puis sont supprimés définitivement avec toutes leurs données.",
@@ -91,8 +114,14 @@
     "confirm": {
       "title_one": "Supprimer définitivement ce projet ?",
       "title_other": "Supprimer définitivement {{count}} projets ?",
-      "description": "Toutes leurs données (fiches, notes, documents, versions) seront effacées. Cette action est irréversible.",
-      "confirm": "Supprimer définitivement"
+      "description_one": "Toutes ses données (fiches, notes, documents, versions) seront effacées. Cette action est irréversible.",
+      "description_other": "Toutes leurs données (fiches, notes, documents, versions) seront effacées. Cette action est irréversible.",
+      "confirm": "Supprimer définitivement",
+      "publicWarning_one": "Ce projet est public : il est partagé avec toutes les personnes qui utilisent GANIS sur cet ordinateur, qui le perdront aussi.",
+      "publicWarning_other": "Ces projets sont publics : ils sont partagés avec toutes les personnes qui utilisent GANIS sur cet ordinateur, qui les perdront aussi.",
+      "typeName": "Pour confirmer, retapez le nom du projet : {{name}}",
+      "typeWord": "Pour confirmer, tapez {{word}}",
+      "word": "SUPPRIMER"
     },
     "loading": "Chargement de la corbeille…"
   }

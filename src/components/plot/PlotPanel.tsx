@@ -66,7 +66,7 @@ export function PlotPanel(props: PlotPanelProps) {
  * ensuite dans ce panneau.
  */
 function EventLinks({ projectId, data, event }: Pick<PlotPanelProps, "projectId" | "data"> & { event: PlotEvent }) {
-  const { t } = useTranslation("plot");
+  const { t } = useTranslation(["plot", "common"]);
   const select = usePlotStore((s) => s.select);
 
   const outgoing = data.links.filter((l) => l.from === event.id);
@@ -157,7 +157,7 @@ function EventLinks({ projectId, data, event }: Pick<PlotPanelProps, "projectId"
 // ----------------------------------------------------------------------------
 
 function EventPanel({ projectId, data, links, onOpenFeature, event }: PlotPanelProps & { event: PlotEvent }) {
-  const { t } = useTranslation("plot");
+  const { t } = useTranslation(["plot", "common"]);
   const mutate = useMutate(projectId);
   const requestFocus = usePlotStore((s) => s.requestFocus);
   const createNote = useNoteStore((s) => s.createNote);
@@ -193,7 +193,7 @@ function EventPanel({ projectId, data, links, onOpenFeature, event }: PlotPanelP
       <Head kind={t("panel.event")} color={lane?.color ?? "#888"} />
 
       <Field label={t("event.title")}>
-        <input value={event.title} maxLength={200} onChange={(e) => set("title", e.target.value, `ev:${event.id}:title`)} className={cn(input, "h-9 text-base font-medium")} />
+        <input value={event.title} maxLength={200} placeholder={t("common:placeholders.eventTitle")} onChange={(e) => set("title", e.target.value, `ev:${event.id}:title`)} className={cn(input, "h-9 text-base font-medium")} />
       </Field>
       <div className="mb-3">
         <span className="mb-1 block text-xs font-semibold text-muted-foreground" id={`status-${event.id}`}>
@@ -451,6 +451,7 @@ function EventPanel({ projectId, data, links, onOpenFeature, event }: PlotPanelP
             <input
               type="number"
               value={event.row >= 0 ? event.row + 1 : event.row}
+              placeholder={t("common:placeholders.moment")}
               title={t("event.momentHint")}
               onChange={(e) => {
                 const row = rowFromMoment(e.target.value);
@@ -495,7 +496,7 @@ function EventPanel({ projectId, data, links, onOpenFeature, event }: PlotPanelP
 // ----------------------------------------------------------------------------
 
 function LinkPanel({ projectId, data, link }: PlotPanelProps & { link: PlotLink }) {
-  const { t } = useTranslation("plot");
+  const { t } = useTranslation(["plot", "common"]);
   const mutate = useMutate(projectId);
   const select = usePlotStore((s) => s.select);
   const a = eventOf(data, link.from);
@@ -587,7 +588,7 @@ function LinkPanel({ projectId, data, link }: PlotPanelProps & { link: PlotLink 
 // ----------------------------------------------------------------------------
 
 function LanePanel({ projectId, data, links, onOpenFeature, onStartTour, lane }: PlotPanelProps & { lane: PlotLane }) {
-  const { t } = useTranslation("plot");
+  const { t } = useTranslation(["plot", "common"]);
   const mutate = useMutate(projectId);
   const select = usePlotStore((s) => s.select);
   const events = data.events.filter((e) => e.laneId === lane.id);
@@ -609,7 +610,7 @@ function LanePanel({ projectId, data, links, onOpenFeature, onStartTour, lane }:
     <div className="p-4">
       <Head kind={lane.main ? t("board.mainLane") : t("board.parallelLane")} color={lane.color} />
       <Field label={t("lane.name")}>
-        <input value={lane.name} maxLength={80} onChange={(e) => set("name", e.target.value, `ln:${lane.id}`)} className={input} />
+        <input data-lane-name={lane.id} value={lane.name} maxLength={80} placeholder={t("common:placeholders.laneName")} onChange={(e) => set("name", e.target.value, `ln:${lane.id}`)} className={input} />
       </Field>
       <div className="mb-3 flex items-center gap-2 text-sm">
         <span className="size-5 rounded-full border shadow-sm" style={{ backgroundColor: lane.color }} />
@@ -618,7 +619,7 @@ function LanePanel({ projectId, data, links, onOpenFeature, onStartTour, lane }:
           {t("lane.colorInSettings")}
         </button>
       </div>
-      <Field label={t("lane.character")} hint={t("lane.characterHint")}>
+      <Field label={t("lane.character")}>
         <select value={lane.characterId ?? ""} onChange={(e) => set("characterId", e.target.value || null)} className={input}>
           <option value="">{t("event.none")}</option>
           {links.characters.map((c) => (
@@ -713,7 +714,7 @@ function LanePanel({ projectId, data, links, onOpenFeature, onStartTour, lane }:
 // ----------------------------------------------------------------------------
 
 function RowPanel({ projectId, data, row }: PlotPanelProps & { row: number }) {
-  const { t } = useTranslation("plot");
+  const { t } = useTranslation(["plot", "common"]);
   const mutate = useMutate(projectId);
   const select = usePlotStore((s) => s.select);
   const count = data.events.filter((e) => e.row === row).length;
@@ -765,7 +766,6 @@ function RowPanel({ projectId, data, row }: PlotPanelProps & { row: number }) {
           }
           className="w-full accent-primary"
         />
-        <span className="block text-xs text-muted-foreground">{t("row.tensionHint")}</span>
         {tension !== undefined && (
           <Button
             variant="ghost"
@@ -781,8 +781,7 @@ function RowPanel({ projectId, data, row }: PlotPanelProps & { row: number }) {
           </Button>
         )}
       </div>
-      <p className="mb-1 text-xs text-muted-foreground">{count ? t("row.count", { count }) : t("row.empty")}</p>
-      <p className="text-xs text-muted-foreground">{t("row.simultaneous")}</p>
+      {count > 0 && <p className="text-xs text-muted-foreground">{t("row.count", { count })}</p>}
       <div className="mt-4 grid gap-1.5">
         <Button
           variant="outline"

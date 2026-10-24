@@ -89,6 +89,7 @@
     "unknown": "Inconnu"
   },
   "fields": {
+    "colorPalette": "Palette de couleurs",
     "aliases": "Autres noms",
     "description": "Description générale",
     "firstAppearance": "Première apparition",
@@ -489,10 +490,10 @@
       "works": "Travaille",
       "frequents": "Fréquente",
       "guards": "Garde / protège",
-      "imprisoned": "Emprisonné(e)",
+      "imprisoned": "Captivité",
       "hides": "Se cache",
-      "exiled": "Exilé(e)",
-      "died": "Mort(e)",
+      "exiled": "Exil",
+      "died": "Décès",
       "other": "Autre"
     },
     "dialog": {
@@ -535,7 +536,7 @@
       "label": "Basique",
       "theme": "L'essentiel",
       "goal": "Situer et décrire le lieu",
-      "count": "6 champs"
+      "count": "7 champs"
     },
     "intermediate": {
       "label": "Moyen",

@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
-  Compass,
   FileUp,
   Library,
   Plus,
@@ -39,12 +38,11 @@ import { useAuthStore } from "@/stores/authStore";
 import { usePackageStore } from "@/stores/packageStore";
 import { errorText } from "@/lib/errors";
 
-type ViewId = "installed" | "discover" | "import";
+type ViewId = "installed" | "import";
 
 /** Vues du gestionnaire (§20.3), dans l'ordre du menu. */
 const VIEWS: { id: ViewId; icon: LucideIcon; soon?: boolean }[] = [
   { id: "installed", icon: Library },
-  { id: "discover", icon: Compass, soon: true },
   { id: "import", icon: FileUp, soon: true },
 ];
 
@@ -179,21 +177,6 @@ export default function Packages() {
             </header>
 
             {view === "installed" && <InstalledView />}
-            {view === "discover" && (
-              <ComingSoon
-                icon={Compass}
-                title={t("discover.title")}
-                text={t("discover.text")}
-                action={
-                  <Button
-                    variant="outline"
-                    onClick={() => setParams({ view: "installed" }, { replace: true })}
-                  >
-                    {t("discover.toInstalled")}
-                  </Button>
-                }
-              />
-            )}
             {view === "import" && <ImportView />}
           </div>
         </main>

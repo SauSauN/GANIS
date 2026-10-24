@@ -13,5 +13,9 @@
   "activity": "Work rhythm",
   "guest": {
     "signIn": "Sign in"
+  },
+  "reading": {
+    "play": "Read the story",
+    "stop": "Exit reading"
   }
 }

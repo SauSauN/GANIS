@@ -129,6 +129,20 @@
       "title": "Color theme",
       "description": "Palette used in both light and dark modes.",
       "manage": "Manage packages"
+    },
+    "panelImage": {
+      "title": "Middle panel images",
+      "description": "Size of the images in the character, location, object, fauna and flora lists. The same setting applies to all of them.",
+      "smaller": "Smaller images",
+      "larger": "Larger images",
+      "value": "{{size}} px",
+      "range": "from {{min}} to {{max}} px",
+      "reset": "Default size",
+      "sample": {
+        "character": "Character",
+        "location": "Location",
+        "item": "Object"
+      }
     }
   },
   "developer": {

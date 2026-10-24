@@ -235,7 +235,6 @@
     "name": "Nom de la trame",
     "colorInSettings": "Changer la couleur (paramètres du projet)",
     "character": "Trame d'un personnage",
-    "characterHint": "Facultatif : la trame suit ce personnage (son nom s'affiche en tête de colonne).",
     "count_one": "{{count}} événement dans cette trame.",
     "count_other": "{{count}} événements dans cette trame.",
     "left": "À gauche",
@@ -256,12 +255,9 @@
     "actPlaceholder": "ex. Acte II : la descente",
     "tension": "Tension : {{value}} sur 10",
     "tensionNone": "Tension : non définie",
-    "tensionHint": "0 : calme plat, 10 : à bout de souffle. Vous pouvez aussi cliquer dans la colonne Tension.",
     "tensionClear": "Effacer la tension",
     "count_one": "{{count}} événement à ce moment.",
     "count_other": "{{count}} événements à ce moment.",
-    "empty": "Ce moment est vide.",
-    "simultaneous": "Tout ce qui est sur la même ligne se passe en même temps, dans des trames différentes.",
     "insertBefore": "Insérer un moment avant",
     "insertAfter": "Insérer un moment après",
     "delete": "Supprimer ce moment",
@@ -505,7 +501,11 @@
   "sidebar": {
     "title": "Trames",
     "hidden": "Trame masquée sur le plateau",
-    "summary": "{{events}} événement(s), {{links}} lien(s)"
+    "summary": "{{events}}, {{links}}",
+    "summaryEvents_one": "{{count}} événement",
+    "summaryEvents_other": "{{count}} événements",
+    "summaryLinks_one": "{{count}} lien",
+    "summaryLinks_other": "{{count}} liens"
   },
   "inStory": {
     "title": "Dans la trame",

@@ -50,7 +50,7 @@ export function SideBarCharacters({ projectId, activeTab, onOpenFeature }: SideB
                     active && "bg-sidebar-accent font-medium",
                   )}
                 >
-                  <CharacterAvatar projectId={projectId} character={character} size="xs" />
+                  <CharacterAvatar projectId={projectId} character={character} size="panel" />
                   <span className="flex-1 truncate text-left">{fullName(character)}</span>
                 </button>
               </li>

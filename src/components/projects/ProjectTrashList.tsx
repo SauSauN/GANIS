@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { SelectionBar, SelectionCheckbox } from "@/components/common/SelectionBar";
+import { TypedConfirmation, confirmationMatches } from "@/components/common/TypedConfirmation";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -53,6 +54,25 @@ export function ProjectTrashList({ projects, loading }: ProjectTrashListProps) {
   const [busy, setBusy] = useState(false);
   /** Projets dont la suppression définitive attend une confirmation. */
   const [confirming, setConfirming] = useState<string[] | null>(null);
+  /** Saisie de confirmation (projets publics seulement). */
+  const [typed, setTyped] = useState("");
+
+  /**
+   * Projets publics visés : ils sont partagés par les personnes qui
+   * utilisent cet ordinateur, leur suppression définitive demande de
+   * retaper le nom du projet (un seul) ou le mot de confirmation (plusieurs).
+   */
+  const targets = projects.filter((project) => confirming?.includes(project.id));
+  const publicTargets = targets.filter((project) => project.visibility === "public");
+  const needsTyping = publicTargets.length > 0;
+  const expected =
+    targets.length === 1 ? targets[0].name : t("trash.confirm.word");
+  const typedOk = !needsTyping || confirmationMatches(expected, typed);
+
+  function askPurge(ids: string[]) {
+    setTyped("");
+    setConfirming(ids);
+  }
 
   const dateFormat = new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" });
 
@@ -71,10 +91,11 @@ export function ProjectTrashList({ projects, loading }: ProjectTrashListProps) {
   }
 
   async function purge(ids: string[]) {
+    if (!typedOk) return;
     setBusy(true);
 
     try {
-      await purgeProjects(ids);
+      await purgeProjects(ids, needsTyping);
       toast({ tone: "success", message: t("trash.purged", { count: ids.length }) });
     } catch (error) {
       toast({ tone: "error", message: errorText(error, "dashboard:errors.deleteFailed") });
@@ -117,7 +138,7 @@ export function ProjectTrashList({ projects, loading }: ProjectTrashListProps) {
             size="sm"
             variant="destructive"
             disabled={busy}
-            onClick={() => setConfirming(projects.map((project) => project.id))}
+            onClick={() => askPurge(projects.map((project) => project.id))}
           >
             <Trash2 className="mr-1.5 size-3.5" />
             {t("trash.empty")}
@@ -128,7 +149,7 @@ export function ProjectTrashList({ projects, loading }: ProjectTrashListProps) {
           <RotateCcw className="mr-1.5 size-3.5" />
           {t("trash.restoreSelected")}
         </Button>
-        <Button size="sm" variant="destructive" disabled={busy} onClick={() => setConfirming(selection.selected)}>
+        <Button size="sm" variant="destructive" disabled={busy} onClick={() => askPurge(selection.selected)}>
           <Trash2 className="mr-1.5 size-3.5" />
           {t("trash.purgeSelected")}
         </Button>
@@ -177,7 +198,7 @@ export function ProjectTrashList({ projects, loading }: ProjectTrashListProps) {
                   size="icon-sm"
                   variant="ghost"
                   disabled={busy}
-                  onClick={() => setConfirming([project.id])}
+                  onClick={() => askPurge([project.id])}
                   aria-label={t("trash.purgeNamed", { name: project.name })}
                   title={t("trash.purge")}
                 >
@@ -192,22 +213,49 @@ export function ProjectTrashList({ projects, loading }: ProjectTrashListProps) {
       {/* Confirmation de la suppression définitive */}
       <Dialog
         open={confirming !== null}
+        guardInput={false}
         onOpenChange={(open) => {
           if (!open && !busy) setConfirming(null);
         }}
       >
-        <DialogHeader>
-          <DialogTitle>{t("trash.confirm.title", { count: confirming?.length ?? 1 })}</DialogTitle>
-          <DialogDescription>{t("trash.confirm.description")}</DialogDescription>
-        </DialogHeader>
-        <DialogFooter className="mt-6 gap-2">
-          <Button variant="ghost" disabled={busy} onClick={() => setConfirming(null)}>
-            {t("common:actions.cancel")}
-          </Button>
-          <Button variant="destructive" disabled={busy} onClick={() => confirming && void purge(confirming)}>
-            {t("trash.confirm.confirm")}
-          </Button>
-        </DialogFooter>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+            if (confirming) void purge(confirming);
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>{t("trash.confirm.title", { count: confirming?.length ?? 1 })}</DialogTitle>
+            <DialogDescription>{t("trash.confirm.description", { count: confirming?.length ?? 1 })}</DialogDescription>
+          </DialogHeader>
+
+          {needsTyping && (
+            <>
+              <p className="mt-4 rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-sm text-destructive">
+                {t("trash.confirm.publicWarning", { count: publicTargets.length })}
+              </p>
+              <TypedConfirmation
+                label={
+                  targets.length === 1
+                    ? t("trash.confirm.typeName", { name: expected })
+                    : t("trash.confirm.typeWord", { word: expected })
+                }
+                value={typed}
+                onChange={setTyped}
+                disabled={busy}
+              />
+            </>
+          )}
+
+          <DialogFooter className="mt-6 gap-2">
+            <Button type="button" variant="ghost" disabled={busy} onClick={() => setConfirming(null)}>
+              {t("common:actions.cancel")}
+            </Button>
+            <Button type="submit" variant="destructive" disabled={busy || !typedOk}>
+              {t("trash.confirm.confirm")}
+            </Button>
+          </DialogFooter>
+        </form>
       </Dialog>
     </div>
   );

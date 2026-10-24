@@ -473,6 +473,7 @@ export function DocumentsCard({ projectId, nodeId, name, nodeOptions }: Document
                           value={renaming.value}
                           maxLength={180}
                           aria-label={t("actions.rename")}
+                          placeholder={t("common:placeholders.documentName")}
                           onFocus={(event) => event.target.setSelectionRange(0, stemOf(renaming.value).length)}
                           onChange={(event) => setRenaming({ id: document.id, value: event.target.value })}
                           onBlur={() => void commitRename()}

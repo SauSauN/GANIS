@@ -82,7 +82,7 @@ function typing(target: EventTarget | null) {
  * autres types s'ouvrent dans l'application associée.
  */
 export function DocumentViewer({ projectId, documents, documentId, onClose, onShowVersions, onSaveAs }: DocumentViewerProps) {
-  const { t } = useTranslation("documents");
+  const { t } = useTranslation(["documents", "common"]);
   const [currentId, setCurrentId] = useState<string | null>(documentId);
   const [dirty, setDirty] = useState(false);
   const [askDiscard, setAskDiscard] = useState<null | (() => void)>(null);
@@ -274,7 +274,7 @@ export function DocumentViewer({ projectId, documents, documentId, onClose, onSh
 type Zoom = "fit" | "width" | "actual";
 
 function ImageView({ url, name }: { url: string; name: string }) {
-  const { t } = useTranslation("documents");
+  const { t } = useTranslation(["documents", "common"]);
   const [zoom, setZoom] = useState<Zoom>("fit");
   const zooms: Array<{ id: Zoom; icon: typeof Maximize; label: string }> = [
     { id: "fit", icon: Maximize, label: t("viewer.zoom.fit") },
@@ -319,7 +319,7 @@ function ImageView({ url, name }: { url: string; name: string }) {
 // ----------------------------------------------------------------------------
 
 function WordView({ blob, document, projectId }: { blob: Blob; document: StructureDocument; projectId: string }) {
-  const { t } = useTranslation("documents");
+  const { t } = useTranslation(["documents", "common"]);
   const [html, setHtml] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -387,7 +387,7 @@ interface TextEditorProps {
 }
 
 function TextEditor({ projectId, document, blob, onDirtyChange, saveRef }: TextEditorProps) {
-  const { t } = useTranslation("documents");
+  const { t } = useTranslation(["documents", "common"]);
   const [original, setOriginal] = useState<string | null>(null);
   const [text, setText] = useState("");
   const [saving, setSaving] = useState(false);
@@ -453,6 +453,7 @@ function TextEditor({ projectId, document, blob, onDirtyChange, saveRef }: TextE
         onChange={(event) => setText(event.target.value)}
         spellCheck
         aria-label={document.name}
+        placeholder={t("common:placeholders.documentText")}
         className="min-h-0 flex-1 resize-none bg-background px-[max(1.5rem,calc((100%-48rem)/2))] py-8 text-[0.95rem] leading-7 outline-none"
       />
     </div>
@@ -464,7 +465,7 @@ function TextEditor({ projectId, document, blob, onDirtyChange, saveRef }: TextE
 // ----------------------------------------------------------------------------
 
 function OtherView({ document, projectId, onSaveAs }: { document: StructureDocument; projectId: string; onSaveAs: () => void }) {
-  const { t } = useTranslation("documents");
+  const { t } = useTranslation(["documents", "common"]);
   const external = canOpenExternally(document.name);
   return (
     <div className="flex h-full flex-col items-center justify-center gap-4 p-8 text-center">

@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils";
 import { fullName } from "@/lib/characters";
 import { useCharacterStore } from "@/stores/characterStore";
 import { useLocationStore } from "@/stores/locationStore";
+import { useWorldStore } from "@/stores/worldStore";
 import { useNoteStore } from "@/stores/noteStore";
 import { usePlotStore } from "@/stores/plotStore";
 import { useReloadStore } from "@/stores/reloadStore";
@@ -34,13 +35,20 @@ interface VersionsDialogProps {
 function useResolver() {
   const characters = useCharacterStore((state) => state.characters);
   const locations = useLocationStore((state) => state.locations);
+  const items = useWorldStore((state) => state.item.entries);
+  const species = useWorldStore((state) => state.species.entries);
   return useCallback(
     (id: string) => {
       const character = characters.find((item) => item.id === id);
       if (character) return fullName(character);
-      return locations.find((item) => item.id === id)?.name ?? null;
+      return (
+        locations.find((item) => item.id === id)?.name ??
+        items.find((item) => item.id === id)?.name ??
+        species.find((item) => item.id === id)?.name ??
+        null
+      );
     },
-    [characters, locations],
+    [characters, locations, items, species],
   );
 }
 
@@ -52,6 +60,10 @@ async function refresh(projectId: string, kind: VersionKind) {
       break;
     case "location":
       await useLocationStore.getState().fetchLocations(projectId);
+      break;
+    case "item":
+    case "species":
+      await useWorldStore.getState().fetchEntries(projectId, kind);
       break;
     case "structureNode":
       await useStructureStore.getState().fetchStructure(projectId);

@@ -32,6 +32,14 @@
     },
     "script": {
       "label": "Script"
+    },
+    "items": {
+      "label": "Objects",
+      "empty": "No objects yet."
+    },
+    "species": {
+      "label": "Fauna and flora",
+      "empty": "No animals or plants yet."
     }
   },
   "features": {
@@ -73,6 +81,10 @@
       "plan": {
         "label": "Story outline",
         "description": "How your story is divided, adapted to the project type."
+      },
+      "read": {
+        "label": "Full reading",
+        "description": "The whole story in one piece, compiled in outline order."
       }
     },
     "notes": {
@@ -131,8 +143,8 @@
     },
     "script": {
       "read": {
-        "label": "Script",
-        "description": "The script page by page and panel by panel; export for the artist."
+        "label": "Story reading",
+        "description": "The story chapter by chapter: what each chapter is about and what its pages show."
       },
       "progress": {
         "label": "Script progress",
@@ -141,6 +153,26 @@
       "continuity": {
         "label": "Continuity",
         "description": "Where each character appears, and in what state, panel by panel."
+      }
+    },
+    "items": {
+      "create": {
+        "label": "Create an object",
+        "description": "Weapon, vehicle, hat, phone… an entry suited to each type."
+      },
+      "list": {
+        "label": "Object list",
+        "description": "All the objects in your story, stored inside one another."
+      }
+    },
+    "species": {
+      "create": {
+        "label": "Create an entry",
+        "description": "A species, or a specific animal or plant (which can also be a character)."
+      },
+      "list": {
+        "label": "Fauna and flora list",
+        "description": "The species of your world and their individuals."
       }
     }
   }

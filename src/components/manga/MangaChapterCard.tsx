@@ -5,6 +5,7 @@ import { ProgressBar } from "@/components/novel/NovelSheetCards";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import { api } from "@/lib/api";
 import { errorText } from "@/lib/errors";
+import { notifyError } from "@/lib/notify";
 import { goalPercent } from "@/lib/novel";
 import { cn } from "@/lib/utils";
 import { useStructureStore } from "@/stores/structureStore";
@@ -38,7 +39,10 @@ export function MangaChapterCard({ projectId, node, pages, writtenPages }: Manga
   const applyNode = useStructureStore((s) => s.applyNode);
   const [goal, setGoal] = useState(node.narrativeGoal);
   const [pageGoal, setPageGoal] = useState(node.pageGoal ? String(node.pageGoal) : "");
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "manga:chapter");
+  };
   const [busy, setBusy] = useState(false);
 
   useEffect(() => setGoal(node.narrativeGoal), [node.narrativeGoal]);
@@ -136,11 +140,6 @@ export function MangaChapterCard({ projectId, node, pages, writtenPages }: Manga
           </div>
         </div>
 
-        {error && (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
-        )}
       </div>
     </CollapsibleCard>
   );

@@ -9,6 +9,7 @@ import {
   NOVEL_FEATURES,
   MANGA_FEATURES,
   SETTINGS_PREFIX,
+  featureAvailable,
   findFeature,
 } from "@/components/workspace/modules";
 import { CharacterCreateView } from "@/components/workspace/views/CharacterCreateView";
@@ -18,6 +19,9 @@ import { LocationCreateView } from "@/components/workspace/views/LocationCreateV
 import { LocationEditView } from "@/components/workspace/views/LocationEditView";
 import { LocationListView } from "@/components/workspace/views/LocationListView";
 import { NoteCreateView } from "@/components/workspace/views/NoteCreateView";
+import { WorldCreateView } from "@/components/workspace/views/WorldCreateView";
+import { WorldEditView } from "@/components/workspace/views/WorldEditView";
+import { WorldListView } from "@/components/workspace/views/WorldListView";
 import { NotesListView } from "@/components/workspace/views/NotesListView";
 import { TrashView } from "@/components/workspace/views/TrashView";
 import {
@@ -30,6 +34,7 @@ import { WorkspaceHome } from "@/components/workspace/WorkspaceHome";
 import { characterIdOfTab } from "@/lib/characters";
 import { locationIdOfTab } from "@/lib/locations";
 import { noteIdOfTab } from "@/lib/notes";
+import { worldEntryOfTab } from "@/lib/world";
 import { structureNodeIdOfTab } from "@/lib/structure";
 import type { Project } from "@/types";
 
@@ -50,9 +55,10 @@ const ManuscriptView = lazy(() => import("@/components/novel/ManuscriptView").th
 const ProgressView = lazy(() => import("@/components/novel/ProgressView").then((module) => ({ default: module.ProgressView })));
 const ReplaceView = lazy(() => import("@/components/novel/ReplaceView").then((module) => ({ default: module.ReplaceView })));
 const ImportView = lazy(() => import("@/components/novel/ImportView").then((module) => ({ default: module.ImportView })));
-const ScriptReadView = lazy(() => import("@/components/manga/ScriptReadView").then((module) => ({ default: module.ScriptReadView })));
 const ScriptProgressView = lazy(() => import("@/components/manga/ScriptProgressView").then((module) => ({ default: module.ScriptProgressView })));
 const ContinuityView = lazy(() => import("@/components/manga/ContinuityView").then((module) => ({ default: module.ContinuityView })));
+// Lecture complète (film, série, jeu vidéo, JDR, projet libre).
+const StoryReadView = lazy(() => import("@/components/structure/StoryReadView").then((module) => ({ default: module.StoryReadView })));
 const EditorialView = lazy(() => import("@/components/novel/EditorialView").then((module) => ({ default: module.EditorialView })));
 
 interface WorkspaceViewProps {
@@ -185,7 +191,8 @@ function WorkspaceContent({
   }
 
   if (tabId === "script.read") {
-    return <ScriptReadView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+    // Lecture de l'histoire chapitre par chapitre (voir `StoryReadView`).
+    return <StoryReadView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
   if (tabId === "script.progress") {
@@ -204,6 +211,11 @@ function WorkspaceContent({
     return <PlotReadingView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
+
+  if (tabId === "structure.read") {
+    if (!featureAvailable(tabId, project.type)) return null;
+    return <StoryReadView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
 
   if (tabId === "structure.plan") {
     return <StructurePlanView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
@@ -271,6 +283,51 @@ function WorkspaceContent({
 
   if (tabId === "locations.list") {
     return <LocationListView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Objets, faune et flore (modules facultatifs)
+  // ---------------------------------------------------------------------------
+  const worldEntry = worldEntryOfTab(tabId);
+
+  if (worldEntry) {
+    return (
+      <WorldEditView
+        // Une autre fiche dans le même onglet : formulaire neuf.
+        key={tabId}
+        projectId={project.id}
+        module={worldEntry.module}
+        entryId={worldEntry.id}
+        onClose={() => onCloseTab(tabId)}
+        onOpenFeature={onOpenFeature}
+      />
+    );
+  }
+
+  if (tabId === "items.create" || tabId === "species.create") {
+    const worldModule = tabId === "items.create" ? "item" : "species";
+    return (
+      <WorldCreateView
+        key={worldModule}
+        projectId={project.id}
+        module={worldModule}
+        feature={feature}
+        onOpenFeature={onOpenFeature}
+      />
+    );
+  }
+
+  if (tabId === "items.list" || tabId === "species.list") {
+    const worldModule = tabId === "items.list" ? "item" : "species";
+    return (
+      <WorldListView
+        key={worldModule}
+        projectId={project.id}
+        module={worldModule}
+        feature={feature}
+        onOpenFeature={onOpenFeature}
+      />
+    );
   }
 
   // ---------------------------------------------------------------------------

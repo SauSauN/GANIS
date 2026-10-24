@@ -27,6 +27,9 @@
     "synopsis": "Synopsis",
     "plot": "Trame",
     "editorial": "Dossier éditorial",
-    "mangaPanel": "Case de manga"
+    "mangaPanel": "Case de manga",
+    "item": "Objet",
+    "species": "Faune et flore",
+    "worldLink": "Lien entre éléments"
   }
 }

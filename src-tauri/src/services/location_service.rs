@@ -94,6 +94,8 @@ pub enum FieldKind {
     Location,
     /// Personnage du projet (identifiant).
     Character,
+    /// Palette : tableau JSON de « #rrggbb » (cadre de l'image).
+    Colors,
 }
 
 #[derive(Debug, Deserialize)]
@@ -411,6 +413,11 @@ async fn clean_value(
         FieldKind::Character => {
             let found = exists(pool, "SELECT id FROM characters WHERE id = ?", value).await?;
             Ok(found.then(|| value.to_owned()))
+        }
+        FieldKind::Colors => {
+            let colors = crate::services::character_service::clean_palette(value)
+                .ok_or_else(|| AppError::validation("Palette illisible.").with_key("location.invalidValue"))?;
+            Ok((!colors.is_empty()).then(|| serde_json::to_string(&colors)).transpose()?)
         }
     }
 }
@@ -825,6 +832,10 @@ pub async fn delete_location(pool: &SqlitePool, id: &str) -> AppResult<String> {
     }
 
     snapshot.capture(&mut tx, "locations", "id", id).await?;
+
+    // Liens avec des objets et des espèces : supprimés avec lui (corbeille).
+    // Copiés après le lieu : à la restauration, le lieu revient d'abord.
+    crate::services::world_link_service::detach(&mut tx, &mut snapshot, id).await?;
 
     sqlx::query("DELETE FROM locations WHERE id = ?")
         .bind(id)
@@ -1337,5 +1348,17 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(left, 0);
+    }
+
+    #[tokio::test]
+    async fn color_palette_is_validated() {
+        let pool = pool().await;
+
+        let mut place = input("Valona", "city", None);
+        place.fields.insert("colorPalette".to_owned(), r##"["#C0FFEE"]"##.to_owned());
+        assert_eq!(create_location(&pool, &place).await.unwrap().fields["colorPalette"], r##"["#c0ffee"]"##);
+
+        place.fields.insert("colorPalette".to_owned(), "pas une palette".to_owned());
+        assert!(create_location(&pool, &place).await.is_err());
     }
 }

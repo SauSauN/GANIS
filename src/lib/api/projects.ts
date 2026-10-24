@@ -29,12 +29,17 @@ export const projectsApi = {
   /**
    * Rend un projet privé (lié au compte connecté) ou public.
    * Nécessite une connexion.
+   *
+   * Public → privé : `confirmName` doit reprendre le nom du projet (Rust le
+   * vérifie), car le projet n'est alors plus accessible aux autres
+   * personnes qui utilisent cet ordinateur.
    */
   setProjectVisibility: (
     projectId: string,
     visibility: Project["visibility"],
+    confirmName?: string,
   ) =>
-    call<Project>("set_project_visibility", { projectId, visibility }),
+    call<Project>("set_project_visibility", { projectId, visibility, confirmName }),
 
   /**
    * Liste les projets accessibles : projets publics, et projets privés du
@@ -101,9 +106,12 @@ export const projectsApi = {
 
   /**
    * Supprime définitivement un projet de la corbeille.
+   *
+   * Projet public (partagé sur cet ordinateur) : refusé par Rust sans
+   * `confirmPublic`, posé seulement après la saisie de confirmation.
    */
-  purgeProject: (projectId: string) =>
-    call<void>("purge_project", { projectId }),
+  purgeProject: (projectId: string, confirmPublic = false) =>
+    call<void>("purge_project", { projectId, confirmPublic }),
 
   // -------------------------------------------------------------------------
   // Format .ganix

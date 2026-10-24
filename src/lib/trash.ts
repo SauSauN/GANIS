@@ -8,10 +8,12 @@ import { useRelationStore } from "@/stores/relationStore";
 import { useStructureStore } from "@/stores/structureStore";
 import { toast, useToastStore } from "@/stores/toastStore";
 import { useTrashStore } from "@/stores/trashStore";
+import { useWorldLinkStore } from "@/stores/worldLinkStore";
+import { useWorldStore } from "@/stores/worldStore";
 import { fullName } from "@/lib/characters";
 import { useDocumentStore } from "@/lib/documents";
 import { notifyMangaScriptChanged } from "@/lib/mangaEvents";
-import type { CharacterLocation, Relation, TrashKind } from "@/types";
+import type { CharacterLocation, Relation, TrashKind, WorldLink, WorldLinkKind } from "@/types";
 import { errorText } from "@/lib/errors";
 
 /*
@@ -49,6 +51,23 @@ export function placeLinkLabel(projectId: string, link: CharacterLocation | unde
   const store = useLocationStore.getState();
   const place = store.projectId === projectId ? store.locations.find((item) => item.id === link.locationId) : undefined;
   return `${characterName(projectId, link.characterId)} – ${place?.name ?? "?"}`;
+}
+
+/** Nom d'un élément quelconque (lien du monde). */
+function elementName(projectId: string, kind: WorldLinkKind, id: string): string {
+  if (kind === "character") return characterName(projectId, id);
+  if (kind === "location") {
+    const store = useLocationStore.getState();
+    return (store.projectId === projectId ? store.locations.find((item) => item.id === id)?.name : undefined) ?? "?";
+  }
+  const slice = useWorldStore.getState()[kind];
+  return (slice.projectId === projectId ? slice.entries.find((item) => item.id === id)?.name : undefined) ?? "?";
+}
+
+/** « Aldric – Excalibur » pour un lien entre éléments. */
+export function worldLinkLabel(projectId: string, link: WorldLink | undefined): string {
+  if (!link) return "";
+  return `${elementName(projectId, link.sourceKind, link.sourceId)} – ${elementName(projectId, link.targetKind, link.targetId)}`;
 }
 
 /** Dernière suppression annulable avec Ctrl+Z (tant que son message est affiché). */
@@ -135,6 +154,25 @@ async function refreshAfterRestore(projectId: string, kind: TrashKind) {
   const structure = useStructureStore.getState();
   if (structure.projectId === projectId && ["character", "location", "structureNode"].includes(kind)) {
     tasks.push(structure.fetchStructure(projectId), structure.fetchLinks(projectId));
+  }
+
+  // Objets, faune et flore, et leurs liens. Un personnage restauré peut
+  // redevenir un animal (faune) ; un personnage ou un lieu restauré
+  // ramène ses liens avec des objets et des espèces.
+  const world = useWorldStore.getState();
+  if (world.item.projectId === projectId && ["item", "structureNode"].includes(kind)) {
+    tasks.push(world.fetchEntries(projectId, "item"));
+  }
+  if (world.species.projectId === projectId && ["species", "character", "structureNode"].includes(kind)) {
+    tasks.push(world.fetchEntries(projectId, "species"));
+  }
+
+  const worldLinks = useWorldLinkStore.getState();
+  if (
+    worldLinks.projectId === projectId &&
+    ["character", "location", "item", "species", "worldLink", "structureNode"].includes(kind)
+  ) {
+    tasks.push(worldLinks.fetchLinks(projectId));
   }
 
   // Documents (et ceux d'un élément du découpage restauré).

@@ -10,7 +10,10 @@
     "sticky": "Post-it",
     "relation": "Relation",
     "placeLink": "Lien personnage – lieu",
-    "mangaPanel": "Case de manga"
+    "mangaPanel": "Case de manga",
+    "item": "Objet",
+    "species": "Faune et flore",
+    "worldLink": "Lien entre éléments"
   },
   "deleted": {
     "character": "Personnage « {{name}} » supprimé.",
@@ -22,7 +25,10 @@
     "sticky": "Post-it « {{name}} » supprimé.",
     "relation": "Relation « {{name}} » supprimée.",
     "placeLink": "Lien « {{name}} » supprimé.",
-    "mangaPanel": "Case « {{name}} » supprimée."
+    "mangaPanel": "Case « {{name}} » supprimée.",
+    "item": "Objet « {{name}} » supprimé.",
+    "species": "« {{name}} » supprimé de la faune et flore.",
+    "worldLink": "Lien « {{name}} » supprimé."
   },
   "restored": {
     "character": "Personnage « {{name}} » restauré.",
@@ -34,7 +40,10 @@
     "sticky": "Post-it « {{name}} » restauré.",
     "relation": "Relation « {{name}} » restaurée.",
     "placeLink": "Lien « {{name}} » restauré.",
-    "mangaPanel": "Case « {{name}} » restaurée."
+    "mangaPanel": "Case « {{name}} » restaurée.",
+    "item": "Objet « {{name}} » restauré.",
+    "species": "« {{name}} » restauré dans la faune et flore.",
+    "worldLink": "Lien « {{name}} » restauré."
   },
   "untitled": {
     "character": "Personnage sans nom",
@@ -46,7 +55,10 @@
     "sticky": "Post-it vide",
     "relation": "Relation",
     "placeLink": "Lien",
-    "mangaPanel": "Case sans action"
+    "mangaPanel": "Case sans action",
+    "item": "Objet sans nom",
+    "species": "Fiche sans nom",
+    "worldLink": "Lien"
   },
   "view": {
     "description": "Les éléments supprimés restent ici 30 jours. En les restaurant, tout ce qui avait disparu avec eux revient aussi (images, relations, sous-éléments…).",

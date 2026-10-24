@@ -309,3 +309,62 @@ export function setIdleLock(minutes: IdleLockDelay) {
 export function useIdleLock(): IdleLockDelay {
   return useSyncExternalStore(subscribeTo(IDLE_LOCK_EVENT), getIdleLock);
 }
+// ----------------------------------------------------------------------------
+// Taille des images du panneau du milieu (personnages, lieux, objets, faune)
+// ----------------------------------------------------------------------------
+
+/** Bornes et pas du réglage, en pixels (à la taille de texte normale). */
+export const PANEL_IMAGE_MIN = 16;
+export const PANEL_IMAGE_MAX = 48;
+export const PANEL_IMAGE_STEP = 4;
+export const PANEL_IMAGE_DEFAULT = 24;
+
+const PANEL_IMAGE_KEY = "ganis-panel-image-size";
+const PANEL_IMAGE_EVENT = "ganis:panel-image-change";
+
+/** Taille ramenée dans les bornes, sur un multiple du pas. */
+export function clampPanelImageSize(size: number): number {
+  if (!Number.isFinite(size)) return PANEL_IMAGE_DEFAULT;
+  const stepped = Math.round(size / PANEL_IMAGE_STEP) * PANEL_IMAGE_STEP;
+  return Math.min(PANEL_IMAGE_MAX, Math.max(PANEL_IMAGE_MIN, stepped));
+}
+
+export function getPanelImageSize(): number {
+  try {
+    const saved = localStorage.getItem(PANEL_IMAGE_KEY);
+    if (saved !== null) return clampPanelImageSize(Number(saved));
+  } catch {
+    /* stockage indisponible : taille par défaut */
+  }
+  return PANEL_IMAGE_DEFAULT;
+}
+
+/**
+ * Applique la taille : variable CSS `--panel-thumb`, en rem pour suivre la
+ * taille du texte. Toutes les vignettes du panneau du milieu la lisent.
+ */
+function paintPanelImageSize(size: number) {
+  document.documentElement.style.setProperty("--panel-thumb", `${size / 16}rem`);
+}
+
+/** Applique la taille enregistrée au démarrage, avant le premier rendu. */
+export function initPanelImageSize() {
+  paintPanelImageSize(getPanelImageSize());
+}
+
+/** Enregistre la taille des images du panneau et l'applique aussitôt. */
+export function setPanelImageSize(size: number) {
+  const clamped = clampPanelImageSize(size);
+  try {
+    localStorage.setItem(PANEL_IMAGE_KEY, String(clamped));
+  } catch {
+    /* ignoré */
+  }
+  paintPanelImageSize(clamped);
+  window.dispatchEvent(new Event(PANEL_IMAGE_EVENT));
+}
+
+/** Taille courante des images du panneau, mise à jour dès qu'elle change. */
+export function usePanelImageSize(): number {
+  return useSyncExternalStore(subscribeTo(PANEL_IMAGE_EVENT), getPanelImageSize);
+}

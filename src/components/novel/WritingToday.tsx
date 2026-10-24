@@ -4,6 +4,7 @@ import { Flame, PenLine, RotateCcw } from "lucide-react";
 import { ProgressBar } from "@/components/novel/NovelSheetCards";
 import { Button } from "@/components/ui/button";
 import { errorText } from "@/lib/errors";
+import { notifyError } from "@/lib/notify";
 import { goalPercent } from "@/lib/novel";
 import { cn } from "@/lib/utils";
 import { sessionWords, useWritingStore } from "@/stores/writingStore";
@@ -70,7 +71,10 @@ export function WritingTodayCard({ projectId }: { projectId: string }) {
   const setGoal = useWritingStore((s) => s.setGoal);
   const newSession = useWritingStore((s) => s.newSession);
   const [draft, setDraft] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  // Erreurs en notification : la page ne bouge pas.
+  const setError = (message: string | null) => {
+    if (message) notifyError(message, "novel:today");
+  };
 
   useEffect(() => setDraft(stats?.dailyGoal ? String(stats.dailyGoal) : ""), [stats?.dailyGoal]);
 
@@ -149,11 +153,6 @@ export function WritingTodayCard({ projectId }: { projectId: string }) {
             </span>
           ) : null}
         </div>
-        {error && (
-          <p role="alert" className="text-sm text-destructive">
-            {error}
-          </p>
-        )}
       </div>
 
       {/* 30 derniers jours */}
