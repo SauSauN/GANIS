@@ -134,6 +134,34 @@
     "legend": "Text types",
     "turnPage": "Page turn"
   },
+  "flatplan": {
+    "volume": "Volume",
+    "noVolume": "No volume",
+    "direction": "Reading direction",
+    "rtl": "Right to left (manga)",
+    "ltr": "Left to right (comics)",
+    "firstFolio": "First page",
+    "firstFolioHint": "Printed number of the volume's first page. It decides which pages face each other.",
+    "summary": "{{pages}} · {{scripted}} with script · {{drawn}} with art",
+    "pages_one": "{{count}} page",
+    "pages_other": "{{count}} pages",
+    "spreads": "Spreads of the volume",
+    "folio": "Folio {{folio}}",
+    "legend": {
+      "empty": "Empty",
+      "scripted": "Script written",
+      "drawn": "Art filed",
+      "turn": "Reveal planned at the page turn"
+    },
+    "alerts": "Alerts",
+    "noAlerts": "No alerts on this volume.",
+    "alert": {
+      "turn": "Page {{folio}}: the reveal is planned at the page turn, but page {{next}} is on the facing page.",
+      "volume": "Page {{folio}}: heavy page, {{words}} words (threshold: {{max}})."
+    },
+    "unplaced_one": "{{count}} piece of art filed on a chapter has no matching page.",
+    "unplaced_other": "{{count}} pieces of art filed on a chapter have no matching page."
+  },
   "export": {
     "subtitle": "Script for the artist",
     "cast": "Characters",

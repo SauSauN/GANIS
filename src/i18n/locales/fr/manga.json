@@ -134,6 +134,34 @@
     "legend": "Types de texte",
     "turnPage": "Tourné de page"
   },
+  "flatplan": {
+    "volume": "Tome",
+    "noVolume": "Sans tome",
+    "direction": "Sens de lecture",
+    "rtl": "Droite à gauche (manga)",
+    "ltr": "Gauche à droite (BD)",
+    "firstFolio": "Première page",
+    "firstFolioHint": "Numéro imprimé de la première page du tome. Il décide des pages en vis-à-vis.",
+    "summary": "{{pages}} · {{scripted}} avec scénario · {{drawn}} avec dessin",
+    "pages_one": "{{count}} page",
+    "pages_other": "{{count}} pages",
+    "spreads": "Planches du tome",
+    "folio": "Folio {{folio}}",
+    "legend": {
+      "empty": "Vide",
+      "scripted": "Scénario écrit",
+      "drawn": "Dessin rangé",
+      "turn": "Révélation prévue au tourné"
+    },
+    "alerts": "Alertes",
+    "noAlerts": "Aucune alerte sur ce tome.",
+    "alert": {
+      "turn": "Page {{folio}} : la révélation est prévue au tourné, mais la page {{next}} est en vis-à-vis.",
+      "volume": "Page {{folio}} : page chargée, {{words}} mots (seuil : {{max}})."
+    },
+    "unplaced_one": "{{count}} dessin rangé sur un chapitre n'a pas de page correspondante.",
+    "unplaced_other": "{{count}} dessins rangés sur un chapitre n'ont pas de page correspondante."
+  },
   "export": {
     "subtitle": "Scénario pour le dessinateur",
     "cast": "Personnages",

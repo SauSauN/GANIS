@@ -1,20 +1,24 @@
 import { describe, expect, it } from "vitest";
 import {
+  assignArt,
   buildScriptExport,
   draftFromScript,
   draftSignature,
   duplicatePanel,
   inputFromDraft,
+  isTurnMisplaced,
   moveItem,
+  pagesByVolume,
   pagesInOrder,
   panelsByPage,
   panelVolume,
   pageVolume,
+  spreadsOf,
   textStats,
   type ScriptExportLabels,
 } from "@/lib/manga";
 import { documentToText } from "@/lib/novelExport";
-import type { Character, Location, Panel, StructureNode } from "@/types";
+import type { Character, Location, Panel, StructureDocument, StructureNode } from "@/types";
 
 const date = "2026-10-19T00:00:00Z";
 const node = (id: string, parentId: string | null, level: number, position: number, extra: Partial<StructureNode> = {}): StructureNode => ({
@@ -51,6 +55,43 @@ describe("ordre des pages", () => {
     expect(entries.map((e) => [e.page.id, e.chapter?.id])).toEqual([["p1", "c1"], ["p2", "c1"], ["p3", "c2"]]);
     const byPage = panelsByPage([panel("b", "p1", 1), panel("a", "p1", 0)]);
     expect(byPage.get("p1")!.map((p) => p.id)).toEqual(["a", "b"]);
+  });
+});
+
+describe("chemin de fer", () => {
+  const doc = (id: string, nodeId: string, name: string, mime: string) => ({ id, nodeId, name, mime }) as StructureDocument;
+
+  it("regroupe les pages par tome", () => {
+    const nodes = [node("t1", null, 0, 0), node("t2", null, 0, 1), node("c1", "t1", 1, 0), node("c2", "t2", 1, 0), node("p1", "c1", 2, 0), node("p2", "c2", 2, 0)];
+    expect(pagesByVolume(nodes, 3).map((g) => [g.volume?.id, g.entries.map((e) => e.page.id)])).toEqual([["t1", ["p1"]], ["t2", ["p2"]]]);
+    expect(pagesByVolume([node("c1", null, 0, 0), node("p1", "c1", 1, 0)], 2).map((g) => g.volume)).toEqual([null]);
+  });
+
+  it("forme les planches selon la parité du premier folio", () => {
+    const pages = (first: number, count: number) => Array.from({ length: count }, (_, i) => ({ folio: first + i }));
+    const shape = (first: number, count: number) => spreadsOf(pages(first, count)).map((s) => [s.first?.folio ?? null, s.second?.folio ?? null]);
+    expect(shape(1, 4)).toEqual([[null, 1], [2, 3], [4, null]]);
+    expect(shape(2, 3)).toEqual([[2, 3], [4, null]]);
+    expect(shape(1, 0)).toEqual([]);
+  });
+
+  it("signale une révélation qui ne tombe pas au tourné de page", () => {
+    const flagged = node("p", null, 2, 0, { pageTurn: true });
+    expect(isTurnMisplaced({ folio: 4, page: flagged })).toBe(true);
+    expect(isTurnMisplaced({ folio: 5, page: flagged })).toBe(false);
+    expect(isTurnMisplaced({ folio: 4, page: node("q", null, 2, 0) })).toBe(false);
+  });
+
+  it("attribue les dessins : ceux de la page, puis ceux du chapitre dans l'ordre", () => {
+    const nodes = [node("c1", null, 1, 0), node("p1", "c1", 2, 0), node("p2", "c1", 2, 1), node("p3", "c1", 2, 2)];
+    const documents = new Map([
+      ["p1", [doc("source", "p1", "p1.psd", "image/vnd.adobe.photoshop"), doc("png", "p1", "p1.png", "image/png")]],
+      ["p3", [doc("seul", "p3", "p3.clip", "application/x-clip-studio"), doc("note", "p3", "note.pdf", "application/pdf")]],
+      ["c1", [doc("a", "c1", "a.jpg", "image/jpeg"), doc("b", "c1", "b.jpg", "image/jpeg"), doc("pdf", "c1", "x.pdf", "application/pdf")]],
+    ]);
+    const { art, unplaced } = assignArt(pagesInOrder(nodes, 3), documents);
+    expect([art.get("p1")?.id, art.get("p2")?.id, art.get("p3")?.id]).toEqual(["png", "a", "seul"]);
+    expect(unplaced).toBe(1);
   });
 });
 
