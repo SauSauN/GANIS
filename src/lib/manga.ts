@@ -192,7 +192,7 @@ export interface FlatplanArt {
   /** Dessin de chaque page : le sien, sinon celui de son rang dans le chapitre. */
   art: Map<string, StructureDocument>;
   /** Dessins d'un chapitre qui n'ont pas trouvé de page. */
-  unplaced: number;
+  unplaced: StructureDocument[];
 }
 
 /**
@@ -210,15 +210,21 @@ export function assignArt(entries: PageEntry[], documents: Map<string, Structure
     else if (chapter) freeByChapter.set(chapter.id, [...(freeByChapter.get(chapter.id) ?? []), page]);
   }
   const chapterIds = new Set(entries.flatMap((entry) => (entry.chapter ? [entry.chapter.id] : [])));
-  let unplaced = 0;
+  const unplaced: StructureDocument[] = [];
   for (const chapterId of chapterIds) {
     const free = freeByChapter.get(chapterId) ?? [];
     (documents.get(chapterId) ?? []).filter(isArt).forEach((document, index) => {
       if (free[index]) art.set(free[index].id, document);
-      else unplaced += 1;
+      else unplaced.push(document);
     });
   }
   return { art, unplaced };
+}
+
+/** Images à enchaîner dans le lecteur : page par page, puis celles sans page. */
+export function readingOrder(entries: PageEntry[], { art, unplaced }: FlatplanArt): StructureDocument[] {
+  const placed = entries.flatMap(({ page }) => art.get(page.id) ?? []);
+  return [...placed, ...unplaced].filter((document) => documentKind(document) === "image");
 }
 
 // ----------------------------------------------------------------------------

@@ -21,7 +21,8 @@ use serde::{Deserialize, Serialize};
 use sqlx::{SqliteConnection, SqlitePool};
 
 use crate::error::{AppError, AppResult};
-use crate::services::structure_service::{find_node, StructureNode};
+use crate::models::project::ProjectType;
+use crate::services::structure_service::{self, find_node, StructureNode};
 use crate::services::trash_service::Snapshot;
 use crate::utils::{new_id, now_utc};
 
@@ -49,6 +50,7 @@ const MAX_FIELD_CHARS: usize = 10_000;
 const MAX_SHORT_CHARS: usize = 300;
 const MAX_PAGE_GOAL: i64 = 10_000;
 const MAX_WORDS_THRESHOLD: i64 = 100_000;
+const MAX_NEW_PAGES: i64 = 200;
 
 fn node_not_found() -> AppError {
     AppError::not_found("Élément du découpage introuvable.").with_key("structure.notFound")
@@ -498,6 +500,80 @@ pub async fn save_page_script(pool: &SqlitePool, page_id: &str, input: &PageScri
     page_script(pool, page_id).await
 }
 
+// ----------------------------------------------------------------------------
+// Versions et recherche
+// ----------------------------------------------------------------------------
+
+/// Cases d'une page en JSON, gardées dans les versions de la page.
+pub async fn panels_snapshot(pool: &SqlitePool, page_id: &str) -> AppResult<String> {
+    let mut conn = pool.acquire().await?;
+    let panels = panels_where(&mut conn, "WHERE page_id = ?", Some(page_id)).await?;
+    serde_json::to_string(&panels).map_err(|e| AppError::internal(format!("Version des cases : {e}")))
+}
+
+/// Remet les cases d'une version. Un personnage ou un lieu supprimé depuis
+/// est retiré de la case : le reste du texte revient.
+pub async fn restore_panels(pool: &SqlitePool, page_id: &str, snapshot: &str) -> AppResult<()> {
+    let mut panels: Vec<PanelInput> = serde_json::from_str(snapshot)
+        .map_err(|_| AppError::internal("Version illisible").with_key("history.unreadable"))?;
+    let characters: HashSet<String> = sqlx::query_scalar("SELECT id FROM characters").fetch_all(pool).await?.into_iter().collect();
+    let locations: HashSet<String> = sqlx::query_scalar("SELECT id FROM locations").fetch_all(pool).await?.into_iter().collect();
+    for panel in &mut panels {
+        panel.location_id = panel.location_id.take().filter(|id| locations.contains(id));
+        panel.characters.retain(|c| characters.contains(&c.character_id));
+        for text in &mut panel.texts {
+            text.character_id = text.character_id.take().filter(|id| characters.contains(id));
+        }
+    }
+    let page = find_node(pool, page_id).await?.ok_or_else(node_not_found)?;
+    let input = PageScriptInput { rhythm: page.rhythm, page_turn: page.page_turn, panels, page_label: page.title };
+    save_page_script(pool, page_id, &input).await?;
+    Ok(())
+}
+
+/// Page qui contient une case.
+pub async fn page_of_panel(pool: &SqlitePool, panel_id: &str) -> AppResult<Option<String>> {
+    Ok(sqlx::query_scalar("SELECT page_id FROM manga_panels WHERE id = ?").bind(panel_id).fetch_optional(pool).await?)
+}
+
+/// Texte des cases de chaque page, pour la recherche.
+pub async fn search_rows(pool: &SqlitePool) -> AppResult<HashMap<String, String>> {
+    let mut out: HashMap<String, String> = HashMap::new();
+    let panels: Vec<(String, String)> = sqlx::query_as(
+        "SELECT page_id, action || ' ' || setting || ' ' || artist_notes || ' ' || moment || ' ' || continuity FROM manga_panels ORDER BY page_id, position",
+    )
+    .fetch_all(pool)
+    .await?;
+    let texts: Vec<(String, String)> = sqlx::query_as(
+        "SELECT p.page_id, t.content FROM manga_panel_texts t JOIN manga_panels p ON p.id = t.panel_id ORDER BY p.page_id, p.position, t.position",
+    )
+    .fetch_all(pool)
+    .await?;
+    for (page_id, text) in panels.into_iter().chain(texts) {
+        let body = out.entry(page_id).or_default();
+        body.push_str(text.trim());
+        body.push('\n');
+    }
+    Ok(out)
+}
+
+// ----------------------------------------------------------------------------
+// Création de pages en lot
+// ----------------------------------------------------------------------------
+
+/// Ajoute `count` pages à la fin d'un chapitre.
+pub async fn create_pages(pool: &SqlitePool, project_type: ProjectType, chapter_id: &str, count: i64) -> AppResult<Vec<StructureNode>> {
+    if !(1..=MAX_NEW_PAGES).contains(&count) {
+        return Err(invalid("manga.invalidPageCount").with_param("max", MAX_NEW_PAGES));
+    }
+    let chapter = find_node(pool, chapter_id).await?.ok_or_else(node_not_found)?;
+    let mut created = Vec::with_capacity(count as usize);
+    for _ in 0..count {
+        created.push(structure_service::create_node(pool, project_type, Some(chapter_id), chapter.level + 1, "", None).await?);
+    }
+    Ok(created)
+}
+
 /// Erreur de clé étrangère (personnage ou lieu supprimé entre-temps).
 fn reference_error(error: sqlx::Error, key: &'static str) -> AppError {
     match &error {
@@ -593,8 +669,7 @@ pub async fn set_settings(pool: &SqlitePool, value: &MangaSettings) -> AppResult
 mod tests {
     use super::*;
     use crate::db::migrations::{run_migrations, PROJECT_MIGRATOR};
-    use crate::models::project::ProjectType;
-    use crate::services::{structure_service, trash_service};
+    use crate::services::{history_service, search_service, trash_service};
 
     async fn pool() -> SqlitePool {
         let pool = sqlx::sqlite::SqlitePoolOptions::new().max_connections(1).connect("sqlite::memory:").await.unwrap();
@@ -693,6 +768,74 @@ mod tests {
         let restored = page_script(&pool, &page.id).await.unwrap();
         assert_eq!(restored.panels[0].texts.len(), 1);
         assert_eq!(restored.panels[0].characters.len(), 1);
+    }
+
+    #[tokio::test]
+    async fn versions_of_a_page_keep_its_panels() {
+        let pool = pool().await;
+        character(&pool, "lea").await;
+        let chapter = structure_service::create_node(&pool, ProjectType::Manga, None, 1, "", None).await.unwrap();
+        let page = structure_service::create_node(&pool, ProjectType::Manga, Some(&chapter.id), 2, "", None).await.unwrap();
+        let script = |text: &str, who: Option<&str>| PageScriptInput {
+            rhythm: None,
+            page_turn: false,
+            panels: vec![panel("Porte.", vec![t("dialogue", who, text)])],
+            page_label: String::new(),
+        };
+
+        save_page_script(&pool, &page.id, &script("Première réplique", Some("lea"))).await.unwrap();
+        history_service::snapshot_before(&pool, "structureNode", &page.id).await;
+        save_page_script(&pool, &page.id, &PageScriptInput { rhythm: Some("action".into()), page_turn: true, ..script("Réécrite", None) }).await.unwrap();
+
+        let list = history_service::list_versions(&pool, "structureNode", &page.id).await.unwrap();
+        let version = &list.versions[0];
+        history_service::restore_version(&pool, &version.id).await.unwrap();
+
+        let back = page_script(&pool, &page.id).await.unwrap();
+        assert_eq!(back.panels[0].texts[0].content, "Première réplique");
+        assert_eq!(back.panels[0].texts[0].character_id.as_deref(), Some("lea"));
+        assert_eq!((back.page.rhythm, back.page.page_turn), (None, false));
+
+        // La réécriture est gardée dans les versions.
+        let list = history_service::list_versions(&pool, "structureNode", &page.id).await.unwrap();
+        assert!(list.versions.iter().any(|v| v.data["manga_panels"].as_str().is_some_and(|s| s.contains("Réécrite"))));
+
+        // Un personnage supprimé depuis ne bloque pas la restauration.
+        sqlx::query("DELETE FROM characters WHERE id = 'lea'").execute(&pool).await.unwrap();
+        history_service::restore_version(&pool, &version.id).await.unwrap();
+        let back = page_script(&pool, &page.id).await.unwrap();
+        assert_eq!((back.panels[0].texts[0].content.as_str(), back.panels[0].texts[0].character_id.as_deref()), ("Première réplique", None));
+    }
+
+    #[tokio::test]
+    async fn the_search_finds_the_text_of_panels() {
+        let pool = pool().await;
+        let chapter = structure_service::create_node(&pool, ProjectType::Manga, None, 1, "", None).await.unwrap();
+        let page = structure_service::create_node(&pool, ProjectType::Manga, Some(&chapter.id), 2, "", None).await.unwrap();
+        let input = PageScriptInput {
+            rhythm: None,
+            page_turn: false,
+            panels: vec![panel("Léa ouvre le coffre.", vec![t("sfx", None, "GRIIIN")]), panel("Couloir.", vec![t("dialogue", None, "Où est le phare ?")])],
+            page_label: String::new(),
+        };
+        save_page_script(&pool, &page.id, &input).await.unwrap();
+
+        for query in ["griiin", "ou est le phare", "coffre"] {
+            let hits = search_service::search(&pool, query).await.unwrap();
+            assert_eq!(hits.iter().map(|h| (h.kind.as_str(), h.id.as_str())).collect::<Vec<_>>(), vec![("structureNode", page.id.as_str())], "{query}");
+            assert!(!hits[0].snippet.is_empty());
+        }
+    }
+
+    #[tokio::test]
+    async fn creates_pages_in_a_batch() {
+        let pool = pool().await;
+        let chapter = structure_service::create_node(&pool, ProjectType::Manga, None, 1, "", None).await.unwrap();
+        let created = create_pages(&pool, ProjectType::Manga, &chapter.id, 3).await.unwrap();
+        assert_eq!(created.iter().map(|p| (p.level, p.position)).collect::<Vec<_>>(), vec![(2, 0), (2, 1), (2, 2)]);
+        assert!(created.iter().all(|p| p.parent_id.as_deref() == Some(chapter.id.as_str())));
+        assert!(create_pages(&pool, ProjectType::Manga, &chapter.id, 0).await.is_err());
+        assert!(create_pages(&pool, ProjectType::Manga, &chapter.id, MAX_NEW_PAGES + 1).await.is_err());
     }
 
     #[tokio::test]

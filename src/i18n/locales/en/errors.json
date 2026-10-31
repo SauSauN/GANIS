@@ -354,6 +354,7 @@
     "replaceStale": "The text changed since the search: search again."
   },
   "manga": {
+    "invalidPageCount": "Invalid number of pages (at most {{max}} at a time).",
     "tooManyPanels": "Too many panels on this page (at most {{max}}).",
     "tooManyTexts": "Too many texts in a panel (at most {{max}}).",
     "fieldTooLong": "A text is too long (at most {{max}} characters).",

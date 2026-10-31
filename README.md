@@ -80,6 +80,8 @@ Données : migration `023_novel.sql` (colonnes de `structure_nodes`, objectif da
 
 **Chemin de fer (projets de type Manga uniquement)** : Scénario › Chemin de fer affiche les pages d'un tome en planches, de droite à gauche ou de gauche à droite, avec leur vignette, l'état de chaque page (vide, scénario écrit, dessin rangé) et le début des chapitres. Le numéro de la première page décide des vis-à-vis ; une révélation prévue au tourné sur une page paire et une page trop chargée en texte sont signalées. Le sens de lecture et ce numéro sont des préférences locales : ils ne suivent pas le `.ganix`.
 
+**Pages de manga** : la fiche d'un chapitre crée plusieurs pages d'un coup. Le dessin rangé sur la fiche d'une page s'affiche à côté de ses cases, et la lecture du chapitre enchaîne les dessins de ses pages. Les cases sont trouvées par la recherche, et les versions d'une page les gardent.
+
 **Agrandir un onglet** : un double-clic sur un onglet affiche son contenu sur toute la surface de l'espace de travail (la barre des modules et le panneau du milieu sont masqués) ; un nouveau double-clic, ou le bouton à droite de la barre d'onglets, rétablit la disposition. Le contenu de l'onglet garde son état.
 
 **Passé narratif (Trame)** : le moment 1 est le début de l'histoire principale. Au-dessus, les moments −1, −2… forment le passé narratif : on y remonte en faisant défiler vers le haut, on y crée, déplace et relie des événements comme ailleurs. Le plateau s'ouvre toujours au début de l'histoire. Dans les données, ces événements ont simplement un moment (`row`) négatif ; les projets existants ne changent pas.

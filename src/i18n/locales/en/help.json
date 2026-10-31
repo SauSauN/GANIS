@@ -355,7 +355,8 @@
           "An item's sheet shows its summary, its characters (point of view, present…) and its locations.",
           "Documents: in an item's sheet, keep its files (manga pages, PDFs, Word files, images, sounds…) with “Add files” or by drag and drop. They are stored in the project (encrypted if the project is private) and exported in the .ganix.",
           "Click a document to read it in GANIS; “Read the pages” chains a chapter's images. “Edit in its application” opens it in Word, Acrobat, Clip Studio…: every save comes back, the previous content stays in the versions.",
-          "Manga / comic: Script › Flatplan shows a volume's pages as spreads, in the chosen reading direction. A page shows the art filed on its sheet; otherwise, art filed on the chapter is shared out in order. The first printed page decides which pages face each other: a reveal planned at the page turn on an even page is flagged."
+          "Manga / comic: Script › Flatplan shows a volume's pages as spreads, in the chosen reading direction. A page shows the art filed on its sheet; otherwise, art filed on the chapter is shared out in order. The first printed page decides which pages face each other: a reveal planned at the page turn on an even page is flagged.",
+          "Manga / comic: a chapter's sheet creates its pages in one go (“Add pages”). File each piece of art on its page's sheet: it shows next to the panels, and the chapter's “Read the pages” chains them. Panels are found by the search and kept in the page's versions."
         ]
       },
       "reading": {

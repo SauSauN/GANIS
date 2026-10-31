@@ -64,7 +64,8 @@
     "empty": "Aucune case. Ajoutez la première.",
     "add": "Ajouter une case",
     "loading": "Chargement des cases…",
-    "failed": "Les cases n'ont pas pu être chargées."
+    "failed": "Les cases n'ont pas pu être chargées.",
+    "artOpen": "Voir le dessin en grand"
   },
   "panel": {
     "title": "Case {{number}}",
@@ -115,6 +116,9 @@
     "pagesNoGoal_one": "{{count}} page",
     "pagesNoGoal_other": "{{count}} pages",
     "status": "Statut",
+    "addPages": "Ajouter des pages",
+    "addPagesButton_one": "Créer {{count}} page",
+    "addPagesButton_other": "Créer {{count}} pages",
     "save": "Enregistrer l'objectif",
     "saved": "Enregistré"
   },

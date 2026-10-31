@@ -64,7 +64,8 @@
     "empty": "No panels yet. Add the first one.",
     "add": "Add a panel",
     "loading": "Loading panels…",
-    "failed": "The panels could not be loaded."
+    "failed": "The panels could not be loaded.",
+    "artOpen": "View the art full size"
   },
   "panel": {
     "title": "Panel {{number}}",
@@ -115,6 +116,9 @@
     "pagesNoGoal_one": "{{count}} page",
     "pagesNoGoal_other": "{{count}} pages",
     "status": "Status",
+    "addPages": "Add pages",
+    "addPagesButton_one": "Create {{count}} page",
+    "addPagesButton_other": "Create {{count}} pages",
     "save": "Save goal",
     "saved": "Saved"
   },

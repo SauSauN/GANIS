@@ -19,7 +19,7 @@ async fn project_pool(state: &AppState, project_id: &str) -> AppResult<SqlitePoo
 }
 
 /// Base du projet et type du projet (qui donne le modèle par défaut).
-async fn project_pool_and_type(state: &AppState, project_id: &str) -> AppResult<(SqlitePool, ProjectType)> {
+pub(crate) async fn project_pool_and_type(state: &AppState, project_id: &str) -> AppResult<(SqlitePool, ProjectType)> {
     let viewer = state.viewer().await;
     let pool = project_storage::pool_for_viewer(state, project_id, &viewer).await?;
 

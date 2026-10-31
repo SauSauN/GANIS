@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Clapperboard } from "lucide-react";
+import { Clapperboard, Plus } from "lucide-react";
 import { ProgressBar } from "@/components/novel/NovelSheetCards";
+import { Button } from "@/components/ui/button";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import { api } from "@/lib/api";
 import { errorText } from "@/lib/errors";
@@ -20,6 +21,9 @@ export const SCRIPT_STATUS_COLORS: Record<ScriptStatus, string> = {
 };
 
 export const scriptStatusOf = (node: Pick<StructureNode, "scriptStatus">): ScriptStatus => node.scriptStatus ?? "todo";
+
+/** Pages ajoutées en une fois (comme dans Rust). */
+const MAX_NEW_PAGES = 200;
 
 interface MangaChapterCardProps {
   projectId: string;
@@ -44,6 +48,11 @@ export function MangaChapterCard({ projectId, node, pages, writtenPages }: Manga
     if (message) notifyError(message, "manga:chapter");
   };
   const [busy, setBusy] = useState(false);
+  const fetchStructure = useStructureStore((s) => s.fetchStructure);
+  // Pages à ajouter : par défaut, ce qu'il manque pour atteindre l'objectif.
+  const [editedNewPages, setNewPages] = useState<string | null>(null);
+  const newPages = editedNewPages ?? String(Math.min(MAX_NEW_PAGES, Math.max(1, (node.pageGoal ?? 0) - pages)));
+  const newPageCount = Math.min(MAX_NEW_PAGES, Number.parseInt(newPages, 10) || 0);
 
   useEffect(() => setGoal(node.narrativeGoal), [node.narrativeGoal]);
   useEffect(() => setPageGoal(node.pageGoal ? String(node.pageGoal) : ""), [node.pageGoal]);
@@ -69,6 +78,21 @@ export function MangaChapterCard({ projectId, node, pages, writtenPages }: Manga
       return;
     }
     if ((value || null) !== node.pageGoal) void save({ pageGoal: value || null });
+  }
+
+  async function addPages() {
+    if (newPageCount < 1) return;
+    setBusy(true);
+    setError(null);
+    try {
+      await api.createMangaPages(projectId, node.id, newPageCount);
+      await fetchStructure(projectId);
+      setNewPages(null);
+    } catch (e) {
+      setError(errorText(e));
+    } finally {
+      setBusy(false);
+    }
   }
 
   const percent = goalPercent(writtenPages, node.pageGoal);
@@ -111,6 +135,26 @@ export function MangaChapterCard({ projectId, node, pages, writtenPages }: Manga
               className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
             />
           </label>
+        </div>
+
+        <div className="flex flex-wrap items-end gap-2">
+          <label className="space-y-1.5">
+            <span className="block text-sm font-medium">{t("chapter.addPages")}</span>
+            <input
+              type="number"
+              min={1}
+              max={MAX_NEW_PAGES}
+              value={newPages}
+              disabled={busy}
+              onChange={(e) => setNewPages(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && void addPages()}
+              className="h-9 w-24 rounded-md border border-input bg-background px-3 text-right text-sm tabular-nums outline-none focus:ring-2 focus:ring-ring"
+            />
+          </label>
+          <Button variant="outline" disabled={busy || newPageCount < 1} onClick={() => void addPages()}>
+            <Plus />
+            {t("chapter.addPagesButton", { count: newPageCount })}
+          </Button>
         </div>
 
         <div className="space-y-1.5">

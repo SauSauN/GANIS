@@ -13,6 +13,7 @@ import {
   panelsByPage,
   panelVolume,
   pageVolume,
+  readingOrder,
   spreadsOf,
   textStats,
   type ScriptExportLabels,
@@ -89,9 +90,13 @@ describe("chemin de fer", () => {
       ["p3", [doc("seul", "p3", "p3.clip", "application/x-clip-studio"), doc("note", "p3", "note.pdf", "application/pdf")]],
       ["c1", [doc("a", "c1", "a.jpg", "image/jpeg"), doc("b", "c1", "b.jpg", "image/jpeg"), doc("pdf", "c1", "x.pdf", "application/pdf")]],
     ]);
-    const { art, unplaced } = assignArt(pagesInOrder(nodes, 3), documents);
+    const entries = pagesInOrder(nodes, 3);
+    const assigned = assignArt(entries, documents);
+    const { art, unplaced } = assigned;
     expect([art.get("p1")?.id, art.get("p2")?.id, art.get("p3")?.id]).toEqual(["png", "a", "seul"]);
-    expect(unplaced).toBe(1);
+    expect(unplaced.map((d) => d.id)).toEqual(["b"]);
+    // Lecteur : les images dans l'ordre des pages (sans le fichier source).
+    expect(readingOrder(entries, assigned).map((d) => d.id)).toEqual(["png", "a", "b"]);
   });
 });
 

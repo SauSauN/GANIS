@@ -20,6 +20,7 @@ import { useSynopsisStore } from "@/stores/synopsisStore";
 import { toast } from "@/stores/toastStore";
 import type { Version, VersionKind, VersionList } from "@/types";
 import { errorText } from "@/lib/errors";
+import { notifyMangaScriptChanged } from "@/lib/mangaEvents";
 
 interface VersionsDialogProps {
   open: boolean;
@@ -67,6 +68,8 @@ async function refresh(projectId: string, kind: VersionKind) {
       break;
     case "structureNode":
       await useStructureStore.getState().fetchStructure(projectId);
+      // Page de manga : ses cases sont revenues avec elle.
+      notifyMangaScriptChanged(projectId);
       break;
     case "note":
       await useNoteStore.getState().fetchNotes(projectId);
