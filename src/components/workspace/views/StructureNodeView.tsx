@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { VersionsButton } from "@/components/history/VersionsDialog";
+import { InfoTip } from "@/components/common/InfoTip";
 import { DocumentsCard } from "@/components/documents/DocumentsCard";
 import { SceneEventsCard } from "@/components/plot/SceneEventsCard";
 import { NovelTextCard, NovelWritingCard } from "@/components/novel/NovelSheetCards";
@@ -627,18 +628,18 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
                   </div>
                 )}
 
-                <label className="flex max-w-md items-start gap-2 pb-1 text-sm">
-                  <input
-                    type="checkbox"
-                    className="mt-0.5 size-4 accent-primary"
-                    checked={draft.numbered}
-                    onChange={(e) => setDraft({ ...draft, numbered: e.target.checked })}
-                  />
-                  <span>
+                <span className="flex items-center gap-1.5 pb-1 text-sm">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      className="size-4 accent-primary"
+                      checked={draft.numbered}
+                      onChange={(e) => setDraft({ ...draft, numbered: e.target.checked })}
+                    />
                     {t("plan.edit.numbered")}
-                    <span className="block text-xs text-muted-foreground">{t("plan.edit.numberedHint")}</span>
-                  </span>
-                </label>
+                  </label>
+                  <InfoTip>{t("plan.edit.numberedHint")}</InfoTip>
+                </span>
               </div>
 
               <div className="space-y-1.5">
@@ -1086,7 +1087,7 @@ function LinkSection({
                   );
                 })}
               </ul>
-              <p className="text-xs text-muted-foreground">{t("node.insideHint")}</p>
+              <InfoTip>{t("node.insideHint")}</InfoTip>
             </div>
           )}
 

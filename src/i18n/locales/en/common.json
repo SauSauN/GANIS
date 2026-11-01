@@ -7,7 +7,8 @@
     "save": "Save",
     "saving": "Saving…",
     "retry": "Retry",
-    "close": "Close"
+    "close": "Close",
+    "moreInfo": "More information"
   },
   "startup": "Starting GANIS…",
   "doubleClick": {

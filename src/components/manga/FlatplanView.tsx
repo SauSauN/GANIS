@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle, CheckCircle2, ListTree, Loader2, RotateCw, ScrollText } from "lucide-react";
+import { InfoTip } from "@/components/common/InfoTip";
 import { SCRIPT_STATUS_COLORS, scriptStatusOf } from "@/components/manga/MangaChapterCard";
 import { Thumbnail, useThumbnails, type ThumbnailLoader } from "@/components/manga/Thumbnail";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
@@ -124,10 +125,13 @@ export function FlatplanView({ project, feature, onOpenFeature }: FlatplanViewPr
             <option value="ltr">{t("flatplan.ltr")}</option>
           </select>
         </label>
-        <label className="flex items-center gap-2 text-sm" title={t("flatplan.firstFolioHint")}>
-          {t("flatplan.firstFolio")}
-          <input type="number" min={1} max={MAX_FIRST_FOLIO} value={firstFolio} onChange={(e) => changeFirstFolio(e.target.value)} className={cn(control, "w-16 text-right tabular-nums")} />
-        </label>
+        <span className="flex items-center gap-1.5 text-sm">
+          <label className="flex items-center gap-2">
+            {t("flatplan.firstFolio")}
+            <input type="number" min={1} max={MAX_FIRST_FOLIO} value={firstFolio} onChange={(e) => changeFirstFolio(e.target.value)} className={cn(control, "w-16 text-right tabular-nums")} />
+          </label>
+          <InfoTip>{t("flatplan.firstFolioHint")}</InfoTip>
+        </span>
         {!loading && pages.length > 0 && (
           <p className="ml-auto text-sm text-muted-foreground tabular-nums">
             {t("flatplan.summary", { pages: t("flatplan.pages", { count: pages.length }), scripted, drawn })}

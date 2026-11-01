@@ -23,6 +23,7 @@ import { ActionMenu, type MenuItem } from "@/components/documents/ActionMenu";
 import { DocumentIcon } from "@/components/documents/DocumentIcon";
 import { DocumentVersionsDialog } from "@/components/documents/DocumentVersionsDialog";
 import { DocumentViewer } from "@/components/documents/DocumentViewer";
+import { InfoTip } from "@/components/common/InfoTip";
 import { ReadingView } from "@/components/documents/ReadingView";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -101,7 +102,7 @@ export function DocumentsCard({ projectId, nodeId, name, nodeOptions, readingOrd
         <BookOpen />
         {t("reading.open", { count: pages.length })}
       </Button>
-      <span className="text-xs text-muted-foreground">{t("reading.hint")}</span>
+      <InfoTip>{t("reading.hint")}</InfoTip>
     </div>
   );
   const openHere = list.filter((document) => external[document.id]);
@@ -549,7 +550,7 @@ export function DocumentsCard({ projectId, nodeId, name, nodeOptions, readingOrd
                   </li>
                 ))}
               </ul>
-              <p className="text-xs text-muted-foreground">{t("dropHint")}</p>
+              <InfoTip>{t("dropHint")}</InfoTip>
             </>
           )}
         </div>
