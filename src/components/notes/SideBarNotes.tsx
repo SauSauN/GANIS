@@ -13,7 +13,9 @@ import {
   Pin,
   Trash2,
 } from "lucide-react";
+import { TreeGuides } from "@/components/common/TreeGuides";
 import { ConfirmDialog } from "@/components/notes/ConfirmDialog";
+import { activeGuide } from "@/lib/treeGuides";
 import {
   buildFolderTree,
   folderAndDescendants,
@@ -261,6 +263,10 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
   // --- Affichage ---------------------------------------------------------------
 
   const indent = (depth: number) => ({ paddingLeft: `${depth * 0.875}rem` });
+  const guideOf = activeGuide(
+    rows.map((row) => row.depth),
+    rows.findIndex((row) => row.kind === "note" && noteTabId(row.note.id) === activeTab),
+  );
 
   const iconButton = (label: string, icon: ReactNode, onClick: () => void) => (
     <button
@@ -312,15 +318,18 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
         <p className="px-4 text-xs text-muted-foreground">{t("sidebar.empty")}</p>
       ) : (
         <ul className="min-h-0 flex-1 overflow-y-auto px-2 pb-2" role="tree" aria-labelledby="sidebar-notes">
-          {rows.map((row) => {
+          {rows.map((row, index) => {
+            const guides = <TreeGuides depth={row.depth} active={guideOf(index)} />;
+
             if (row.kind === "draft" || row.kind === "rename") {
               const isRename = row.kind === "rename";
               return (
                 <li
                   key={isRename ? `rename-${row.folder.id}` : `draft-${row.parentId ?? "root"}`}
-                  className="flex items-center gap-1 py-0.5"
+                  className="relative flex items-center gap-1 py-0.5"
                   style={indent(row.depth)}
                 >
+                  {guides}
                   <span className="size-6 shrink-0" />
                   <Folder className="size-4 shrink-0 text-primary" />
                   <FolderNameInput
@@ -368,6 +377,7 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
                   )}
                   style={indent(row.depth)}
                 >
+                  {guides}
                   <button
                     type="button"
                     onClick={() => toggle(folder.id)}
@@ -425,9 +435,10 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
                 aria-level={row.depth + 1}
                 draggable={!row.note.system}
                 onDragStart={(event) => onDragStart(event, "note", row.note.id)}
-                className="flex items-center"
+                className="relative flex items-center"
                 style={indent(row.depth)}
               >
+                {guides}
                 <span className="size-6 shrink-0" />
                 <button
                   type="button"
