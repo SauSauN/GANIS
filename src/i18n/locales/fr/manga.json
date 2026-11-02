@@ -69,6 +69,10 @@
     "expandAll": "Tout déplier",
     "collapseAll": "Tout replier"
   },
+  "layout": {
+    "label": "Modèle de page : {{panels}}",
+    "next": "Autre disposition ({{current}}/{{total}})"
+  },
   "panel": {
     "title": "Case {{number}}",
     "action": "Action",

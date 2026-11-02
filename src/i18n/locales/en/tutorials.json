@@ -120,7 +120,8 @@
           "Texts: dialogue, thought, narration, sound effect, scenery text.",
           "Give a character a state (injury, outfit…): the Continuity view picks it up.",
           "“Page turn”: plans a reveal for the next page.",
-          "A page or panel with too much text is flagged."
+          "A page or panel with too much text is flagged.",
+          "Without art, the sheet shows a page template based on the number of panels: “Other layout” offers more."
         ]
       },
       "art": {

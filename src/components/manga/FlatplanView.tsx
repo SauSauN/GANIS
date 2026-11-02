@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { AlertTriangle, CheckCircle2, ListTree, Loader2, RotateCw, ScrollText } from "lucide-react";
 import { InfoTip } from "@/components/common/InfoTip";
 import { SCRIPT_STATUS_COLORS, scriptStatusOf } from "@/components/manga/MangaChapterCard";
+import { PageLayoutCells } from "@/components/manga/PageLayoutPreview";
 import { Thumbnail, useThumbnails, type ThumbnailLoader } from "@/components/manga/Thumbnail";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { fieldClass } from "@/components/workspace/views/PageShell";
 import { documentKind, extensionOf, useDocumentsOf } from "@/lib/documents";
 import { assignArt, foliosOf, isTurnMisplaced, pagesByVolume, pageStats, pageVolume, panelsByPage, spreadsOf, type FolioPage } from "@/lib/manga";
+import { useLayoutPrefs, useReadingDirection, type ReadingDirection } from "@/lib/mangaLayouts";
 import { structureNodeTabId } from "@/lib/structure";
 import { cn } from "@/lib/utils";
 import { useMangaSettings, useScriptPanels } from "@/stores/mangaStore";
@@ -20,8 +22,6 @@ interface FlatplanViewProps {
   feature: WorkspaceFeature;
   onOpenFeature: (featureId: string) => void;
 }
-
-type Direction = "rtl" | "ltr";
 
 const MAX_FIRST_FOLIO = 99;
 
@@ -41,7 +41,6 @@ function remember(key: string, value: string) {
   }
 }
 
-const directionKey = (projectId: string) => `ganis.flatplan.direction.${projectId}`;
 const firstFolioKey = (groupId: string) => `ganis.flatplan.firstFolio.${groupId}`;
 
 function storedFirstFolio(groupId: string): number {
@@ -61,7 +60,8 @@ export function FlatplanView({ project, feature, onOpenFeature }: FlatplanViewPr
   const { panels, error } = useScriptPanels(project.id);
   const settings = useMangaSettings(project.id);
   const [volumeId, setVolumeId] = useState("");
-  const [direction, setDirection] = useState<Direction>(() => (recall(directionKey(project.id)) === "ltr" ? "ltr" : "rtl"));
+  const direction = useReadingDirection(project.id);
+  const setDirection = useLayoutPrefs((state) => state.setDirection);
   const [folioEdits, setFolioEdits] = useState<Record<string, number>>({});
   const loadThumbnail = useThumbnails(project.id);
 
@@ -91,11 +91,6 @@ export function FlatplanView({ project, feature, onOpenFeature }: FlatplanViewPr
     return t("flatplan.alert.volume", { folio: page.folio, words, max: settings?.pageWordsMax ?? 0 });
   };
 
-  function changeDirection(next: Direction) {
-    setDirection(next);
-    remember(directionKey(project.id), next);
-  }
-
   function changeFirstFolio(value: string) {
     const parsed = Math.min(MAX_FIRST_FOLIO, Math.max(1, Number.parseInt(value, 10) || 1));
     setFolioEdits({ ...folioEdits, [groupId]: parsed });
@@ -120,7 +115,7 @@ export function FlatplanView({ project, feature, onOpenFeature }: FlatplanViewPr
         )}
         <label className="flex items-center gap-2 text-sm">
           {t("flatplan.direction")}
-          <select value={direction} onChange={(e) => changeDirection(e.target.value as Direction)} className={control}>
+          <select value={direction} onChange={(e) => setDirection(project.id, e.target.value as ReadingDirection)} className={control}>
             <option value="rtl">{t("flatplan.rtl")}</option>
             <option value="ltr">{t("flatplan.ltr")}</option>
           </select>
@@ -186,6 +181,7 @@ export function FlatplanView({ project, feature, onOpenFeature }: FlatplanViewPr
                     page ? (
                       <PageCard
                         key={page.page.id}
+                        projectId={project.id}
                         page={page}
                         chapterStart={pages[page.folio - firstFolio - 1]?.chapter?.id !== page.chapter?.id ? page.chapter : null}
                         chapterLabel={page.chapter ? labelOf(page.chapter) : ""}
@@ -244,6 +240,7 @@ function alertsOf(page: FolioPage, panels: Panel[], settings: MangaSettings | nu
 }
 
 interface PageCardProps {
+  projectId: string;
   page: FolioPage;
   /** Chapitre qui commence à cette page. */
   chapterStart: StructureNode | null;
@@ -256,7 +253,7 @@ interface PageCardProps {
   onOpen: () => void;
 }
 
-function PageCard({ page, chapterStart, chapterLabel, label, panels, art, alerts, loadThumbnail, onOpen }: PageCardProps) {
+function PageCard({ projectId, page, chapterStart, chapterLabel, label, panels, art, alerts, loadThumbnail, onOpen }: PageCardProps) {
   const { t } = useTranslation("manga");
   const description = [
     t("flatplan.folio", { folio: page.folio }),
@@ -297,7 +294,7 @@ function PageCard({ page, chapterStart, chapterLabel, label, panels, art, alerts
         ) : art ? (
           <span className="absolute inset-0 flex items-center justify-center text-sm font-semibold text-muted-foreground">{extensionOf(art.name)}</span>
         ) : panels.length > 0 ? (
-          <span className="absolute inset-0 flex items-center justify-center px-2 text-center text-xs text-muted-foreground tabular-nums">{t("page.panels", { count: panels.length })}</span>
+          <PageLayoutCells projectId={projectId} pageId={page.page.id} framings={panels.map((panel) => panel.framing)} compact />
         ) : null}
         <span className="absolute top-1 right-1 flex gap-0.5">
           {page.page.pageTurn && (

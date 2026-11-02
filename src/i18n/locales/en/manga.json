@@ -69,6 +69,10 @@
     "expandAll": "Expand all",
     "collapseAll": "Collapse all"
   },
+  "layout": {
+    "label": "Page template: {{panels}}",
+    "next": "Other layout ({{current}}/{{total}})"
+  },
   "panel": {
     "title": "Panel {{number}}",
     "action": "Action",

@@ -120,7 +120,8 @@
           "Textes : dialogue, pensée, narration, onomatopée, texte du décor.",
           "Donnez un état à un personnage (blessure, tenue…) : la vue Continuité le reprend.",
           "« Tourné de page » : prévoit une révélation pour la page suivante.",
-          "Une page ou une case trop chargée en texte est signalée."
+          "Une page ou une case trop chargée en texte est signalée.",
+          "Sans dessin, la fiche montre un modèle de page selon le nombre de cases : « Autre disposition » en propose d'autres."
         ]
       },
       "art": {

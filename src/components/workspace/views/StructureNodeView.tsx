@@ -6,6 +6,7 @@ import { SceneEventsCard } from "@/components/plot/SceneEventsCard";
 import { NovelTextCard, NovelWritingCard } from "@/components/novel/NovelSheetCards";
 import { MangaChapterCard } from "@/components/manga/MangaChapterCard";
 import { PageArtPreview } from "@/components/manga/PageArtPreview";
+import { PageLayoutPreview } from "@/components/manga/PageLayoutPreview";
 import { PageScriptCard } from "@/components/manga/PageScriptCard";
 import { usePageScript } from "@/components/manga/usePageScript";
 import { assignArt, isMangaProject, mangaLevels, pagesInOrder, readingOrder } from "@/lib/manga";
@@ -481,6 +482,9 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             {/* Page de manga dessinée : le dessin reste visible à côté des cases */}
             {pageArt ? (
               <PageArtPreview projectId={projectId} document={pageArt} title={heading.label} />
+            ) : isMangaPage && script.draft && script.draft.panels.length > 0 ? (
+              // Pas encore de dessin : le modèle de page selon le nombre de cases.
+              <PageLayoutPreview projectId={projectId} pageId={nodeId} framings={script.draft.panels.map((panel) => panel.framing)} />
             ) : (
               <span
                 className="flex size-24 items-center justify-center rounded-2xl"
