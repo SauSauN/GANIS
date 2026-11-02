@@ -83,7 +83,7 @@ Données : migration `023_novel.sql` (colonnes de `structure_nodes`, objectif da
 
 **Pages de manga** : la fiche d'un chapitre crée plusieurs pages d'un coup. Le dessin rangé sur la fiche d'une page s'affiche à côté de ses cases, et la lecture du chapitre enchaîne les dessins de ses pages. Les cases sont trouvées par la recherche, et les versions d'une page les gardent.
 
-**Modèles de page (manga)** : tant qu'une page n'a pas de dessin, sa fiche et le chemin de fer montrent un modèle de disposition selon son nombre de cases. Trois modèles au plus par nombre, de 1 à 10 cases ; au-delà, une grille régulière. Ils sont intégrés à l'application (hors ligne, sans IA) ; le modèle choisi est une préférence locale qui ne suit pas le `.ganix`.
+**Modèles de page (manga)** : tant qu'une page n'a pas de dessin, sa fiche et le chemin de fer montrent une planche type selon son nombre de cases : diagonales, colonnes, fonds perdus, cases incrustées. Trois modèles au plus par nombre, de 1 à 10 cases ; au-delà, des rangées de cases en biais. Ils sont intégrés à l'application (hors ligne, sans IA) ; le modèle choisi est une préférence locale qui ne suit pas le `.ganix`.
 
 **Agrandir un onglet** : un double-clic sur un onglet affiche son contenu sur toute la surface de l'espace de travail (la barre des modules et le panneau du milieu sont masqués) ; un nouveau double-clic, ou le bouton à droite de la barre d'onglets, rétablit la disposition. Le contenu de l'onglet garde son état.
 

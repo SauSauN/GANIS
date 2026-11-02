@@ -518,7 +518,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
               </div>
             </div>
 
-            {node.summary && (
+            {node.summary && !isMangaPage && (
               <p className="w-full border-t pt-4 text-left text-sm leading-6 whitespace-pre-line text-muted-foreground">
                 {node.summary}
               </p>

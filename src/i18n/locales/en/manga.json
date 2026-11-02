@@ -57,7 +57,6 @@
     "rhythm": "Page function",
     "pageTurn": "Page turn",
     "pageTurnHint": "Reveal after the page turn: the surprise must land at the top of the next page.",
-    "summary": "{{panels}} · {{words}} · {{chars}} chars",
     "panels_one": "{{count}} panel",
     "panels_other": "{{count}} panels",
     "high": "Busy page: {{words}} words (threshold: {{max}}).",

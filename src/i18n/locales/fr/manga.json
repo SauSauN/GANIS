@@ -57,7 +57,6 @@
     "rhythm": "Fonction de la page",
     "pageTurn": "Tourné de page",
     "pageTurnHint": "Révélation après le tourné : la surprise doit tomber en haut de la page suivante.",
-    "summary": "{{panels}} · {{words}} · {{chars}} car.",
     "panels_one": "{{count}} case",
     "panels_other": "{{count}} cases",
     "high": "Page chargée : {{words}} mots (seuil : {{max}}).",

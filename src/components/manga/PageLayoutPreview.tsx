@@ -1,7 +1,16 @@
+import { useId } from "react";
 import { useTranslation } from "react-i18next";
 import { Shuffle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { layoutsFor, layoutVariant, panelRects, useLayoutPrefs, useReadingDirection } from "@/lib/mangaLayouts";
+import {
+  layoutsFor,
+  layoutVariant,
+  PAGE_HEIGHT,
+  PAGE_WIDTH,
+  panelShapes,
+  useLayoutPrefs,
+  useReadingDirection,
+} from "@/lib/mangaLayouts";
 import type { Panel } from "@/types";
 
 /** Les cases d'un modèle, numérotées. Remplit son parent, positionné. */
@@ -19,29 +28,59 @@ export function PageLayoutCells({
   compact?: boolean;
 }) {
   const { t } = useTranslation("manga");
+  const clipId = useId();
   const direction = useReadingDirection(projectId);
   const variants = useLayoutPrefs((state) => state.variants);
   const layouts = layoutsFor(framings.length);
   const layout = layouts[layoutVariant(variants, pageId, layouts.length)];
   if (!layout) return null;
 
+  const shapes = panelShapes(layout, direction).map((shape, index) => ({ ...shape, index }));
+  // Les cases incrustées passent devant les autres, sans changer de numéro.
+  const ordered = [...shapes.filter((shape) => !shape.inset), ...shapes.filter((shape) => shape.inset)];
+
   return (
-    <div className="absolute inset-0 bg-white text-neutral-700" aria-hidden="true">
-      {panelRects(layout, direction).map((rect, index) => {
+    <svg viewBox={`0 0 ${PAGE_WIDTH} ${PAGE_HEIGHT}`} className="absolute inset-0 size-full bg-white" aria-hidden="true">
+      {ordered.map(({ points, center: [x, y], inset, index }) => {
+        const outline = points.map((point) => point.join(",")).join(" ");
         const framing = framings[index];
+        const lines = !compact && framing ? labelLines(t(`framing.${framing}`)) : [];
+        const id = `${clipId}-${index}`;
         return (
-          <div
-            key={index}
-            className="absolute flex flex-col items-center justify-center overflow-hidden border border-neutral-800 text-center leading-tight"
-            style={{ left: `${rect.x * 100}%`, top: `${rect.y * 100}%`, width: `${rect.width * 100}%`, height: `${rect.height * 100}%` }}
-          >
-            <span className={compact ? "text-[0.6rem]" : "text-sm font-semibold"}>{index + 1}</span>
-            {!compact && framing && <span className="line-clamp-2 px-0.5 text-[0.65rem]">{t(`framing.${framing}`)}</span>}
-          </div>
+          <g key={index}>
+            <clipPath id={id}>
+              <polygon points={outline} />
+            </clipPath>
+            {inset && <polygon points={outline} fill="none" stroke="#ffffff" strokeWidth={3} strokeLinejoin="round" />}
+            <polygon points={outline} fill="#ffffff" stroke="#262626" strokeWidth={compact ? 1.2 : 0.8} strokeLinejoin="round" />
+            <g clipPath={`url(#${id})`} fill="#404040" textAnchor="middle">
+              <text x={x} y={y - (lines.length * LABEL_LINE) / 2} dominantBaseline="middle" fontSize={compact ? 9 : 7} fontWeight={compact ? 400 : 600}>
+                {index + 1}
+              </text>
+              {lines.map((line, row) => (
+                <text key={row} x={x} y={y + 5 + row * LABEL_LINE - ((lines.length - 1) * LABEL_LINE) / 2} dominantBaseline="middle" fontSize={4.2}>
+                  {line}
+                </text>
+              ))}
+            </g>
+          </g>
         );
       })}
-    </div>
+    </svg>
   );
+}
+
+/** Hauteur d'une ligne du cadrage, en unités de la page. */
+const LABEL_LINE = 5;
+/** Au-delà, le cadrage passe sur deux lignes pour tenir dans la case. */
+const LABEL_MAX_LENGTH = 12;
+
+/** Cadrage sur une ou deux lignes, coupé à l'espace le plus proche du milieu. */
+function labelLines(label: string): string[] {
+  const spaces = [...label.matchAll(/ /g)].map((match) => match.index);
+  if (label.length <= LABEL_MAX_LENGTH || spaces.length === 0) return [label];
+  const cut = spaces.reduce((best, space) => (Math.abs(space - label.length / 2) < Math.abs(best - label.length / 2) ? space : best));
+  return [label.slice(0, cut), label.slice(cut + 1)];
 }
 
 /**

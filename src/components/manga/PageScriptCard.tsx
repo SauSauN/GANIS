@@ -138,15 +138,8 @@ export function PageScriptCard({ draft, failed, onChange, characters, locations,
               </label>
               <InfoTip>{t("page.pageTurnHint")}</InfoTip>
             </span>
-            <span className="ml-auto text-xs tabular-nums text-muted-foreground">
-              {t("page.summary", {
-                panels: t("page.panels", { count: draft.panels.length }),
-                words: t("words", { count: stats.words, value: stats.words.toLocaleString() }),
-                chars: stats.characters.toLocaleString(),
-              })}
-            </span>
             {draft.panels.length > 1 && (
-              <Button variant="ghost" size="sm" className="h-7 px-2 text-xs" onClick={() => setClosed(allClosed ? new Set() : new Set(draft.panels.map((p) => p.key)))}>
+              <Button variant="ghost" size="sm" className="ml-auto h-7 px-2 text-xs" onClick={() => setClosed(allClosed ? new Set() : new Set(draft.panels.map((p) => p.key)))}>
                 {allClosed ? <ChevronsUpDown className="size-3.5" /> : <ChevronsDownUp className="size-3.5" />}
                 {allClosed ? t("page.expandAll") : t("page.collapseAll")}
               </Button>
