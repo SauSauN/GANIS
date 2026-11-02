@@ -37,7 +37,8 @@
           "Cliquez à nouveau sur un module pour replier son panneau.",
           "Clic droit sur un onglet : l'épingler, fermer les autres, ceux de gauche ou de droite.",
           "Les onglets épinglés sont retrouvés à la prochaine ouverture du projet.",
-          "« Réduire » ne garde que les icônes de la barre de gauche."
+          "« Réduire » ne garde que les icônes de la barre de gauche.",
+          "Chaque type de projet et chaque module a son tutoriel : bouton ? en haut du panneau, ou Aide › Tutoriel."
         ]
       },
       "synopsis": {

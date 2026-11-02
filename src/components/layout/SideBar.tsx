@@ -6,6 +6,7 @@ import {
   type PointerEvent as ReactPointerEvent,
 } from "react";
 import { useTranslation } from "react-i18next";
+import { CircleHelp } from "lucide-react";
 import { SideBarCharacters } from "@/components/characters/SideBarCharacters";
 import { SideBarLocations } from "@/components/locations/SideBarLocations";
 import { SideBarWorld } from "@/components/world/SideBarWorld";
@@ -27,6 +28,7 @@ import {
   setPanelWidth,
   usePanelWidth,
 } from "@/lib/preferences";
+import { tutorialForModule, tutorialText, useTutorialStore } from "@/lib/tutorials";
 import { cn } from "@/lib/utils";
 import { useProjectStore } from "@/stores/projectStore";
 
@@ -78,6 +80,8 @@ export function SideBar({
 }: SideBarProps) {
   const { t } = useTranslation("sidebar");
   const module = getModule(moduleId);
+  const tutorial = tutorialForModule(moduleId);
+  const showTutorial = useTutorialStore((s) => s.show);
   const projectType = useProjectStore((s) => s.projects.find((p) => p.id === projectId)?.type);
   const savedWidth = usePanelWidth();
 
@@ -187,9 +191,22 @@ export function SideBar({
           !collapsing && "border-r border-sidebar-border",
         )}
       >
-        <div className="px-4 py-3">
-          <p className="text-xs text-muted-foreground">{module.label}</p>
-          <p className="truncate text-sm font-semibold">{projectName}</p>
+        <div className="flex items-start gap-2 px-4 py-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs text-muted-foreground">{module.label}</p>
+            <p className="truncate text-sm font-semibold">{projectName}</p>
+          </div>
+          {tutorial && (
+            <button
+              type="button"
+              title={tutorialText("button")}
+              aria-label={tutorialText("button")}
+              onClick={() => showTutorial(tutorial)}
+              className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-foreground"
+            >
+              <CircleHelp className="size-4" aria-hidden="true" />
+            </button>
+          )}
         </div>
 
         {module.id === "search" ? (

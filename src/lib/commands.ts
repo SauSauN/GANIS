@@ -33,6 +33,8 @@ export type CommandId =
   | "openHistory"
   /** Bouton ▶ : lecture complète de l'histoire (ou retour à l'édition). */
   | "readStory"
+  /** Tutoriel du module affiché (sinon du type de projet). */
+  | "openTutorial"
   | "palette";
 
 export interface CommandHandler {

@@ -37,7 +37,8 @@
           "Click a module again to collapse its panel.",
           "Right-click a tab to pin it, or close the others, those on the left or on the right.",
           "Pinned tabs come back the next time you open the project.",
-          "“Collapse” keeps only the icons in the left bar."
+          "“Collapse” keeps only the icons in the left bar.",
+          "Each project type and module has its tutorial: the ? button at the top of the panel, or Help › Tutorial."
         ]
       },
       "synopsis": {

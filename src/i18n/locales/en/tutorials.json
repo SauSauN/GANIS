@@ -1,0 +1,419 @@
+{
+  "progress": "Step {{current}} of {{total}}",
+  "previous": "Previous",
+  "next": "Next",
+  "finish": "Let's go!",
+  "close": "Close the tutorial",
+  "open": "Open: {{feature}}",
+  "button": "See the tutorial",
+  "menu": "Tutorial: {{name}}",
+  "home": {
+    "title": "Tutorials",
+    "text": "Go back over where to start, or discover a module in a few steps.",
+    "start": "Where to start?"
+  },
+  "novel": {
+    "title": "Starting a novel",
+    "name": "Novel",
+    "intro": "From the first idea to the exported manuscript, with the Manuscript module, reserved for novels.",
+    "steps": {
+      "start": {
+        "title": "Lay out your story",
+        "text": "Start with a few lines: what is this novel about? The synopsis can later be the base of your editorial file.",
+        "points": [
+          "Details › Project synopsis: summary, genres, subgenres and tone.",
+          "Nothing is set in stone: come back to it as often as you need."
+        ]
+      },
+      "plan": {
+        "title": "Build the outline",
+        "text": "A novel is split into parts, chapters and scenes. The outline decides the order of the manuscript.",
+        "points": [
+          "Structure › Story outline: add your parts, chapters and scenes.",
+          "No need for parts: a chapter can sit directly at the root of the outline.",
+          "Moving a scene in the outline also moves it in the manuscript."
+        ]
+      },
+      "write": {
+        "title": "Write in the sheets",
+        "text": "The text is written in the sheet of a scene, or of a chapter without scenes: the “Text” card. The “Writing” card keeps your goal and narration choices.",
+        "points": [
+          "Open a scene from the outline, then write in the “Text” card.",
+          "“Writing”: word goal, writing state, point of view, person and tense.",
+          "The text is saved with the sheet (Ctrl+S or autosave) and keeps its versions."
+        ]
+      },
+      "import": {
+        "title": "Already have a text?",
+        "text": "Import a Word, Markdown or text file: GANIS splits it into parts, chapters and scenes.",
+        "points": [
+          "Manuscript › Import a manuscript.",
+          "Without an import, a scene can also use the text of a document filed on it."
+        ]
+      },
+      "manuscript": {
+        "title": "Read and export the manuscript",
+        "text": "The manuscript assembles the whole novel in one piece, in outline order. Nothing is copied: it is always up to date.",
+        "points": [
+          "Manuscript › Manuscript, or the ▶ button in the title bar (F5) to read in the whole space.",
+          "Export to Word, PDF or text, with a title page and chapters starting on a new page."
+        ]
+      },
+      "progress": {
+        "title": "Track your writing",
+        "text": "Tracking gathers words and goals, from the whole novel down to the scene, and flags narration changes.",
+        "points": [
+          "Filter chapters by state: to write, first draft, in revision, proofread, corrected.",
+          "A scene whose person or tense differs from the rest of the novel is flagged.",
+          "Set a daily goal and follow your session and your streak."
+        ]
+      },
+      "replace": {
+        "title": "Correct across the whole novel",
+        "text": "A character changes name? Find and replace corrects a name or a word across all the scene text.",
+        "points": ["Manuscript › Find and replace."]
+      },
+      "editorial": {
+        "title": "Prepare the editorial file",
+        "text": "The texts that present the novel to a publisher or an agent, independent from the synopsis.",
+        "points": [
+          "One-sentence pitch, short summary and long summary.",
+          "“Start from the synopsis” gives you a first base.",
+          "Each text is exported separately."
+        ]
+      }
+    }
+  },
+  "manga": {
+    "title": "Starting a manga",
+    "name": "Manga",
+    "intro": "From the volume to the panel, up to a script ready for the artist, with the Script module, reserved for manga and comics.",
+    "steps": {
+      "start": {
+        "title": "Lay out your story",
+        "text": "Start with a few lines: what is this series about, and in what tone?",
+        "points": [
+          "Details › Project synopsis: summary, genres, subgenres and tone.",
+          "Create your characters and locations whenever you like: panels can refer to them."
+        ]
+      },
+      "plan": {
+        "title": "Build the outline",
+        "text": "A manga is split into volumes, chapters and pages. The outline decides the reading order.",
+        "points": [
+          "Structure › Story outline: add a volume, then its chapters.",
+          "For a comic or a one-shot, keep only the levels you need."
+        ]
+      },
+      "chapter": {
+        "title": "Prepare a chapter",
+        "text": "A chapter's sheet has its “Chapter script” card: what it must achieve, how many pages it aims for, and where it stands.",
+        "points": [
+          "Narrative goal, target pages and status.",
+          "“Add pages” creates several pages in one go."
+        ]
+      },
+      "panels": {
+        "title": "Write the page, panel by panel",
+        "text": "A page's “Panels” card describes what the reader sees: action, framing, characters and texts.",
+        "points": [
+          "Texts: dialogue, thought, narration, sound effect, scenery text.",
+          "Give a character a state (injury, outfit…): the Continuity view picks it up.",
+          "“Page turn”: plans a reveal for the next page.",
+          "A page or panel with too much text is flagged."
+        ]
+      },
+      "art": {
+        "title": "File the art",
+        "text": "Drop each piece of art on its page's sheet: it shows next to its panels.",
+        "points": [
+          "“Documents” card: “Add files”, or drag and drop.",
+          "A chapter's “Read the pages” chains its art.",
+          "Art filed on the chapter is shared out over its pages, in order."
+        ]
+      },
+      "read": {
+        "title": "Read and export the script",
+        "text": "The story chapter by chapter: what each chapter is about, then what its pages show.",
+        "points": [
+          "“Art directions” shows the framing, the setting and the notes for the artist.",
+          "“Export” prepares the script, with characters and locations up front if you wish.",
+          "The ▶ button in the title bar (F5) starts reading in the whole space."
+        ]
+      },
+      "flatplan": {
+        "title": "Check the flatplan",
+        "text": "All of a volume's pages as spreads, in the chosen reading direction: empty, script written or art filed.",
+        "points": [
+          "Right to left for a manga, left to right for a comic.",
+          "The number of the first page decides which pages face each other.",
+          "A reveal badly placed relative to the page turn is flagged."
+        ]
+      },
+      "progress": {
+        "title": "Track progress",
+        "text": "Planned and written pages, statuses and text volume, chapter by chapter.",
+        "points": [
+          "Set the alert thresholds: words per panel and words per page.",
+          "These alerts are only indicative: readability also depends on balloons and art."
+        ]
+      },
+      "continuity": {
+        "title": "Keep continuity",
+        "text": "Pick a character: every panel they appear in, with their state, location and moment.",
+        "points": [
+          "See at a glance where their state changes.",
+          "Filter by location to check a specific scene."
+        ]
+      }
+    }
+  },
+  "story": {
+    "title": "Starting a project: {{type}}",
+    "name": "{{type}}",
+    "intro": "The main steps to build your story, from the idea to the full read.",
+    "steps": {
+      "start": {
+        "title": "Lay out your story",
+        "text": "Start with a few lines: what is this project about, and in what tone?",
+        "points": ["Details › Project synopsis: summary, genres, subgenres and tone."]
+      },
+      "cast": {
+        "title": "Create your characters",
+        "text": "One sheet per character, from the simplest to the most detailed, then their relationships.",
+        "points": [
+          "Characters › Create a character, or Ctrl+N in the module.",
+          "The relationship graph shows who is linked to whom."
+        ]
+      },
+      "world": {
+        "title": "Build your world",
+        "text": "From the continent to the room: locations fit inside one another.",
+        "points": ["Need objects, animals or plants? Turn on those modules in the project settings."]
+      },
+      "plan": {
+        "title": "Split up the story",
+        "text": "For this type of project, the outline offers by default: {{levels}}. You can rename these levels in the settings.",
+        "points": [
+          "Structure › Story outline: add the items and arrange them.",
+          "Each item has its sheet: summary, text, characters, locations and documents."
+        ]
+      },
+      "plot": {
+        "title": "Weave the plots",
+        "text": "The board shows your plots in columns, time running downward, and their cause-and-effect links.",
+        "points": [
+          "Double-click in a column to place an event.",
+          "Attach an event to an outline item: it feeds the full read."
+        ]
+      },
+      "read": {
+        "title": "Read the whole story",
+        "text": "The full read compiles the story in outline order: summaries, texts and documents, or otherwise the plot's events.",
+        "points": [
+          "The ▶ button in the title bar (F5) shows it in the whole space.",
+          "It can be exported to Word, PDF or text."
+        ]
+      }
+    }
+  },
+  "characters": {
+    "title": "Tutorial: Characters",
+    "name": "Characters",
+    "intro": "Your characters' sheets and what links them.",
+    "steps": {
+      "create": {
+        "title": "Create a character",
+        "text": "Identity, appearance and personality: fill in only what is useful to you.",
+        "points": ["Each sheet opens in its own tab.", "Ctrl+N in the module creates a character."]
+      },
+      "level": {
+        "title": "Choose the level of detail",
+        "text": "Essential, intermediate or advanced: this level applies to all the project's sheets.",
+        "points": ["Fields already filled in are never erased when you change it."]
+      },
+      "images": {
+        "title": "Add images",
+        "text": "A main image, a reference gallery and a color palette on each sheet.",
+        "points": ["Drag your images straight onto the sheet.", "The palette's colors frame the portrait."]
+      },
+      "relations": {
+        "title": "Link them",
+        "text": "Family, friendships, rivalries, alliances: the graph shows everyone at a glance.",
+        "points": ["Characters move freely in the graph.", "From the sheet, also link a character to their locations."]
+      }
+    }
+  },
+  "locations": {
+    "title": "Tutorial: Locations",
+    "name": "Locations",
+    "intro": "Your story's geography, from the continent to the room.",
+    "steps": {
+      "create": {
+        "title": "Create a location",
+        "text": "The type of a location (city, forest, palace…) chooses the fields on its sheet.",
+        "points": ["Each sheet has a banner, a gallery and a color palette."]
+      },
+      "nest": {
+        "title": "Fit locations inside one another",
+        "text": "A continent contains kingdoms, which contain cities. The panel shows them as a tree.",
+        "points": ["“Add a place in…” creates a location inside another."]
+      },
+      "types": {
+        "title": "Add your own types",
+        "text": "A particular universe? The project settings take your own location types and statuses.",
+        "points": []
+      },
+      "links": {
+        "title": "Link them to the story",
+        "text": "Characters linked to a location appear on its sheet, and structure items show their locations.",
+        "points": ["Where a character lives, works, grew up — with the story period if needed."]
+      }
+    }
+  },
+  "items": {
+    "title": "Tutorial: Objects",
+    "name": "Objects",
+    "intro": "Weapons, vehicles, phones, magical objects… everything that matters in your story.",
+    "steps": {
+      "enable": {
+        "title": "Turn on the module",
+        "text": "The Objects module is optional: it appears in the left bar only once turned on in the project settings.",
+        "points": ["Turning it off later deletes nothing: your sheets are kept."]
+      },
+      "categories": {
+        "title": "Keep the useful categories",
+        "text": "Choose what your story needs: only these categories are offered when creating.",
+        "points": ["Add your own types and statuses.", "Set the level of detail of the module's sheets."]
+      },
+      "create": {
+        "title": "Create an object",
+        "text": "Choose its type: the sheet adapts to a weapon, a vehicle, a phone…",
+        "points": ["Add an image, a gallery and a color palette.", "Ctrl+N in the module creates an object."]
+      },
+      "nest": {
+        "title": "Arrange the objects",
+        "text": "An object can be placed inside another, like a key in a chest. The panel shows them as a tree.",
+        "points": []
+      },
+      "links": {
+        "title": "Link them to the story",
+        "text": "On the sheet, link an object to a character, a location or another object: “owns”, “is part of”…",
+        "points": ["Give a story period when an object changes hands."]
+      }
+    }
+  },
+  "species": {
+    "title": "Tutorial: Fauna and flora",
+    "name": "Fauna and flora",
+    "intro": "The animals and plants of your universe, from a whole species to the individual with a name.",
+    "steps": {
+      "enable": {
+        "title": "Turn on the module",
+        "text": "Fauna and flora is optional: it appears in the left bar only once turned on in the project settings.",
+        "points": ["Then choose the useful categories and the level of detail.", "Turning it off later deletes nothing."]
+      },
+      "nature": {
+        "title": "Species or individual?",
+        "text": "A sheet describes either a whole species (grey wolves, the moon rose), or a specific animal or plant (Lightning, the hero's horse).",
+        "points": ["Choose its nature when creating it: the sheet's fields adapt."]
+      },
+      "hierarchy": {
+        "title": "File individuals under their species",
+        "text": "The panel shows species as a tree, with their individuals.",
+        "points": []
+      },
+      "character": {
+        "title": "An animal can be a character",
+        "text": "Your animal talks or has relationships? On its sheet, create its character sheet, or associate it with an existing character.",
+        "points": ["The two sheets stay linked."]
+      },
+      "links": {
+        "title": "Link them to the story",
+        "text": "On the sheet, link them to characters, locations, objects and other species: “lives in”, “belongs to”…",
+        "points": ["Give a story period if needed."]
+      }
+    }
+  },
+  "structure": {
+    "title": "Tutorial: Structure",
+    "name": "Structure",
+    "intro": "The outline of your story. For this project, by default: {{levels}}.",
+    "steps": {
+      "plan": {
+        "title": "Build the outline",
+        "text": "Add your items in Story outline: they form a tree, numbered for you.",
+        "points": ["Take an item out of the numbering for a prologue or an interlude."]
+      },
+      "sheet": {
+        "title": "Fill in the sheets",
+        "text": "Each item has its sheet: summary, characters (point of view, present…) and locations.",
+        "points": ["The Plot module can also attach to it."]
+      },
+      "documents": {
+        "title": "File the documents",
+        "text": "PDF, Word, images, sounds: file them on an item's sheet, with “Add files” or by drag and drop.",
+        "points": ["Click a document to read it in GANIS.", "“Edit in its application” picks up every save and keeps older versions."]
+      },
+      "settings": {
+        "title": "Adapt the levels",
+        "text": "In the project settings: the name of each level, automatic numbering and colors.",
+        "points": []
+      }
+    }
+  },
+  "plot": {
+    "title": "Tutorial: Plot",
+    "name": "Plot",
+    "intro": "Your parallel plots on a single board: one column per plot, time running downward.",
+    "steps": {
+      "board": {
+        "title": "Place the events",
+        "text": "Double-click in a column to place an event; drag the cards to change their moment or plot.",
+        "points": ["Go above moment 1 for the narrative past: flashbacks and memories.", "Ctrl+Z undoes each gesture on the board."]
+      },
+      "links": {
+        "title": "Link them",
+        "text": "Pull a card's round handle toward another: impact, influence or crossing.",
+        "points": ["The “Tension” button shows the tension curve."]
+      },
+      "connect": {
+        "title": "Attach them to the project",
+        "text": "Point of view, characters present, location, outline chapter and notes: everything links from the event.",
+        "points": ["Linked sheets show these events under “In the plot”."]
+      },
+      "reading": {
+        "title": "Read in the reader's order",
+        "text": "Story reading shows the events in reading order, by default that of the outline.",
+        "points": ["“Walk through” follows the story event by event, right on the board."]
+      }
+    }
+  },
+  "notes": {
+    "title": "Tutorial: Notes",
+    "name": "Notes",
+    "intro": "Everything that fits nowhere else: research, ideas, documentation.",
+    "steps": {
+      "create": {
+        "title": "Create a note",
+        "text": "A note is written with a real editor, saved and versioned like the rest of the project.",
+        "points": []
+      },
+      "editor": {
+        "title": "Structure your ideas",
+        "text": "Headings, lists, tables and links, but also callouts, linked boxes and diagrams.",
+        "points": ["Less common tools are in the “…” menu at the end of the bar."]
+      },
+      "organize": {
+        "title": "Arrange your notes",
+        "text": "Sort notes into folders by drag and drop, and pin the most important ones.",
+        "points": []
+      },
+      "wall": {
+        "title": "Empty your head on the wall",
+        "text": "The sticky-note wall takes ideas in bulk: move them by their strip, resize them by their corner.",
+        "points": []
+      }
+    }
+  }
+}
