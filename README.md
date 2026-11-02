@@ -66,7 +66,7 @@ L'espace de travail reprend le modèle d'un éditeur de code : une barre d'activ
 | **Lieux** | Fiches hiérarchiques (un lieu peut en contenir d'autres), types personnalisés, portrait, galerie légendée |
 | **Découpage** | Plan du récit en 1 à 5 niveaux (parties, chapitres, scènes…), numérotation automatique ou manuelle, couleurs par niveau, liens vers les personnages et les lieux |
 | **Trame** | Plateau des intrigues parallèles avec vue de lecture (par plan ou par trame) et visite guidée ; passé narratif au-dessus du début de l'histoire (flash-back, souvenirs, événements antérieurs) |
-| **Notes** | Éditeur riche (Tiptap) : tableaux, encadrés, diagrammes, chaînes, mentions de personnages et de lieux, correcteur orthographique ; dossiers, mur de post-it, notes système synchronisées avec les fiches |
+| **Notes** | Éditeur riche (Tiptap) : tableaux, encadrés, diagrammes, chaînes, mentions de personnages et de lieux, correcteur orthographique ; dossiers, mur de post-it, notes système synchronisées avec les fiches (police, taille et listes, gardées dans la note ; la fiche reste en texte simple) |
 | **Documents** | Fichiers rangés dans le découpage (PDF, Word, images, textes, sons, vidéos, pages de manga…), lecture intégrée, modification dans l'application associée avec reprise automatique, 20 versions par document |
 | **Recherche** | Recherche globale insensible à la casse et aux accents, palette de commandes (`Ctrl+K`) |
 | **Paramètres** | Réglages propres au projet (personnages, lieux, découpage, trame, notes) |

@@ -203,7 +203,7 @@
     "ignore": "Ignorer"
   },
   "system": {
-    "banner": "Note système : elle reprend la fiche. Les titres sont fixes ; le texte écrit sous un titre est enregistré dans la fiche, en texte simple.",
+    "banner": "Note système : elle reprend la fiche. Les titres sont fixes ; le texte écrit sous un titre est enregistré dans la fiche, en texte simple. La mise en forme (police, taille, listes) reste dans la note, et se perd pour une section dont le texte est modifié depuis la fiche.",
     "folder": "Dossier système"
   }
 }

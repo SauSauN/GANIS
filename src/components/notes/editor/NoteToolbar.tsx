@@ -227,9 +227,10 @@ const selectClass =
 
 /**
  * Barre d'outils de l'éditeur de notes : typographie, listes, tableaux,
- * encadrés post-it, cases enchaînées et schémas.
+ * encadrés post-it, cases enchaînées et schémas. `system` (note système) :
+ * police, taille, gras, italique, souligné, barré et listes seulement.
  */
-export function NoteToolbar({ editor }: { editor: Editor }) {
+export function NoteToolbar({ editor, system = false }: { editor: Editor; system?: boolean }) {
   const { t } = useTranslation("notes");
   const [linkDraft, setLinkDraft] = useState("");
 
@@ -304,18 +305,20 @@ export function NoteToolbar({ editor }: { editor: Editor }) {
       <Separator />
 
       {/* Style de paragraphe */}
-      <select
-        aria-label={t("editor.block.label")}
-        title={t("editor.block.label")}
-        value={state.block}
-        onChange={(event) => setBlock(event.target.value)}
-        className={cn(selectClass, "w-28")}
-      >
-        <option value="p">{t("editor.block.paragraph")}</option>
-        <option value="h1">{t("editor.block.h1")}</option>
-        <option value="h2">{t("editor.block.h2")}</option>
-        <option value="h3">{t("editor.block.h3")}</option>
-      </select>
+      {!system && (
+        <select
+          aria-label={t("editor.block.label")}
+          title={t("editor.block.label")}
+          value={state.block}
+          onChange={(event) => setBlock(event.target.value)}
+          className={cn(selectClass, "w-28")}
+        >
+          <option value="p">{t("editor.block.paragraph")}</option>
+          <option value="h1">{t("editor.block.h1")}</option>
+          <option value="h2">{t("editor.block.h2")}</option>
+          <option value="h3">{t("editor.block.h3")}</option>
+        </select>
+      )}
 
       {/* Police */}
       <select
@@ -362,6 +365,8 @@ export function NoteToolbar({ editor }: { editor: Editor }) {
       <ToolButton icon={Underline} label={t("editor.underline")} active={state.underline} onClick={() => chain().toggleUnderline().run()} />
       <ToolButton icon={Strikethrough} label={t("editor.strike")} active={state.strike} onClick={() => chain().toggleStrike().run()} />
 
+      {!system && (
+      <>
       <ToolMenu icon={Baseline} label={t("editor.color")} indicator={state.color ?? "currentColor"}>
         {(close) => (
           <Swatches
@@ -401,11 +406,16 @@ export function NoteToolbar({ editor }: { editor: Editor }) {
       <ToolButton icon={AlignLeft} label={t("editor.align.left")} active={state.align === "left"} onClick={() => chain().setTextAlign("left").run()} />
       <ToolButton icon={AlignCenter} label={t("editor.align.center")} active={state.align === "center"} onClick={() => chain().setTextAlign("center").run()} />
       <ToolButton icon={AlignRight} label={t("editor.align.right")} active={state.align === "right"} onClick={() => chain().setTextAlign("right").run()} />
+      </>
+      )}
       <Separator />
 
       <ToolButton icon={List} label={t("editor.bulletList")} active={state.bullet} onClick={() => chain().toggleBulletList().run()} />
       <ToolButton icon={ListOrdered} label={t("editor.orderedList")} active={state.ordered} onClick={() => chain().toggleOrderedList().run()} />
       <ToolButton icon={ListChecks} label={t("editor.taskList")} active={state.task} onClick={() => chain().toggleTaskList().run()} />
+
+      {!system && (
+      <>
       <Separator />
 
       <ToolButton icon={Quote} label={t("editor.quote")} active={state.quote} onClick={() => chain().toggleBlockquote().run()} />
@@ -543,6 +553,8 @@ export function NoteToolbar({ editor }: { editor: Editor }) {
           );
         }}
       </ToolMenu>
+      </>
+      )}
     </div>
   );
 }

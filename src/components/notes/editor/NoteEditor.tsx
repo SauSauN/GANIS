@@ -22,7 +22,7 @@ interface NoteEditorProps {
   onReady?: (editor: Editor) => void;
   /** Ouvre la fiche d'un élément cité avec « $$ ». */
   onOpenFeature?: (featureId: string) => void;
-  /** Note système : titres fixes, pas de mise en forme (texte simple des fiches). */
+  /** Note système : titres fixes, mise en forme de l'écriture seulement. */
   system?: boolean;
 }
 
@@ -51,7 +51,7 @@ export function NoteEditor({ projectId, initialContent, onChange, onReady, onOpe
 
   const editor = useEditor({
     extensions: noteExtensions(system ? "" : t("editor.placeholder"), {
-      lockHeadings: system,
+      system,
       mentions: { getItems: () => linksRef.current.items },
       spelling: {
         getLanguage: () => spellLanguage(languageRef.current),
@@ -89,7 +89,7 @@ export function NoteEditor({ projectId, initialContent, onChange, onReady, onOpe
   return (
     <NoteLinksContext.Provider value={links}>
       <div className="note-editor rounded-xl border bg-card shadow-sm">
-        {!system && <NoteToolbar editor={editor} />}
+        <NoteToolbar editor={editor} system={system} />
         <div
           className="px-6 py-6 sm:px-10"
           onClick={(event) => {
