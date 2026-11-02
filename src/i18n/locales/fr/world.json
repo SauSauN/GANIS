@@ -157,7 +157,7 @@
       "title": "Statuts",
       "description": "Valeurs proposées pour le statut d'une fiche.",
       "add": "Ajouter",
-      "placeholder": "Nouveau statut",
+      "placeholder": "Ex. Maudit",
       "reset": "Valeurs par défaut",
       "remove": "Retirer « {{value}} »"
     }

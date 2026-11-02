@@ -1,4 +1,5 @@
 import { useId } from "react";
+import { useTranslation } from "react-i18next";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
@@ -26,6 +27,7 @@ interface TypedConfirmationProps {
 }
 
 export function TypedConfirmation({ label, value, onChange, disabled }: TypedConfirmationProps) {
+  const { t } = useTranslation("common");
   const id = useId();
 
   return (
@@ -36,6 +38,7 @@ export function TypedConfirmation({ label, value, onChange, disabled }: TypedCon
       <Input
         id={id}
         value={value}
+        placeholder={t("placeholders.typedConfirmation")}
         disabled={disabled}
         autoComplete="off"
         spellCheck={false}

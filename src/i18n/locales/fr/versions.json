@@ -3,7 +3,7 @@
   "buttonHint": "Voir les états précédents et revenir en arrière",
   "title": "Versions : {{name}}",
   "description": "Les états précédents de cet élément. Choisissez-en un pour le comparer à l'état actuel, puis restaurez-le si besoin : l'état actuel est gardé avant.",
-  "namePlaceholder": "Nommer l'état actuel…",
+  "namePlaceholder": "Ex. Avant réécriture",
   "create": "Créer une version de l'état actuel",
   "listLabel": "Versions",
   "loading": "Chargement…",

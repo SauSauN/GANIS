@@ -55,7 +55,7 @@ function storedFirstFolio(groupId: string): number {
  * tourné de page.
  */
 export function FlatplanView({ project, feature, onOpenFeature }: FlatplanViewProps) {
-  const { t } = useTranslation("manga");
+  const { t } = useTranslation(["manga", "common"]);
   const { structure, labelOf } = useProjectStructure(project.id);
   const { panels, error } = useScriptPanels(project.id);
   const settings = useMangaSettings(project.id);
@@ -123,7 +123,7 @@ export function FlatplanView({ project, feature, onOpenFeature }: FlatplanViewPr
         <span className="flex items-center gap-1.5 text-sm">
           <label className="flex items-center gap-2">
             {t("flatplan.firstFolio")}
-            <input type="number" min={1} max={MAX_FIRST_FOLIO} value={firstFolio} onChange={(e) => changeFirstFolio(e.target.value)} className={cn(control, "w-16 text-right tabular-nums")} />
+            <input type="number" placeholder={t("common:placeholders.startNumber")} min={1} max={MAX_FIRST_FOLIO} value={firstFolio} onChange={(e) => changeFirstFolio(e.target.value)} className={cn(control, "w-16 text-right tabular-nums")} />
           </label>
           <InfoTip>{t("flatplan.firstFolioHint")}</InfoTip>
         </span>

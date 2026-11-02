@@ -85,11 +85,12 @@
     "recoveryGroup": "Les caractères du groupe demandé",
     "find": "Mot ou expression à chercher…",
     "replaceWith": "Nouveau texte (vide : le supprimer)",
-    "eventTitle": "Titre de l'événement",
-    "laneName": "Nom de la trame",
+    "eventTitle": "Ex. La trahison du roi",
+    "laneName": "Ex. La vengeance de Mira",
     "rows": "Ex. 12",
     "moment": "Ex. 4",
-    "documentName": "Nouveau nom du document",
-    "documentText": "Écrivez ici…"
+    "documentName": "Ex. Chapitre 3 - brouillon",
+    "documentText": "Écrivez ici…",
+    "typedConfirmation": "Retapez le nom ici"
   }
 }

@@ -456,14 +456,14 @@ function PanelEditor(props: PanelEditorProps) {
                   <input value={panel.moment} maxLength={300} placeholder={t("panel.momentPlaceholder")} onChange={(e) => set("moment", e.target.value)} className={cn(field, "h-8")} />
                 </Labeled>
                 <Labeled label={t("panel.setting")} help={t("panel.settingPlaceholder")}>
-                  <textarea rows={2} value={panel.setting} onChange={(e) => set("setting", e.target.value)} className={area} />
+                  <textarea rows={2} value={panel.setting} placeholder={t("panel.settingExample")} onChange={(e) => set("setting", e.target.value)} className={area} />
                 </Labeled>
                 <Labeled label={t("panel.notes")} help={t("panel.notesPlaceholder")}>
-                  <textarea rows={2} value={panel.artistNotes} onChange={(e) => set("artistNotes", e.target.value)} className={area} />
+                  <textarea rows={2} value={panel.artistNotes} placeholder={t("panel.notesExample")} onChange={(e) => set("artistNotes", e.target.value)} className={area} />
                 </Labeled>
                 <div className="sm:col-span-2">
                   <Labeled label={t("panel.continuity")} help={t("panel.continuityPlaceholder")}>
-                    <textarea rows={2} value={panel.continuity} onChange={(e) => set("continuity", e.target.value)} className={area} />
+                    <textarea rows={2} value={panel.continuity} placeholder={t("panel.continuityExample")} onChange={(e) => set("continuity", e.target.value)} className={area} />
                   </Labeled>
                 </div>
               </div>

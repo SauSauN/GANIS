@@ -38,7 +38,7 @@ interface MangaChapterCardProps {
  * pages visé, statut. Chaque changement est enregistré aussitôt.
  */
 export function MangaChapterCard({ projectId, node, pages, writtenPages }: MangaChapterCardProps) {
-  const { t } = useTranslation("manga");
+  const { t } = useTranslation(["manga", "common"]);
   const [open, setOpen] = useCollapsible("ganis.nodeSheet.mangaChapter.collapsed");
   const applyNode = useStructureStore((s) => s.applyNode);
   const [goal, setGoal] = useState(node.narrativeGoal);
@@ -142,6 +142,7 @@ export function MangaChapterCard({ projectId, node, pages, writtenPages }: Manga
             <span className="block text-sm font-medium">{t("chapter.addPages")}</span>
             <input
               type="number"
+              placeholder={t("common:placeholders.number")}
               min={1}
               max={MAX_NEW_PAGES}
               value={newPages}

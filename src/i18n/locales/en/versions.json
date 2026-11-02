@@ -3,7 +3,7 @@
   "buttonHint": "See earlier states and go back",
   "title": "Versions: {{name}}",
   "description": "Earlier states of this item. Pick one to compare it with the current state, then restore it if needed: the current state is kept first.",
-  "namePlaceholder": "Name the current state…",
+  "namePlaceholder": "E.g. Before the rewrite",
   "create": "Create a version of the current state",
   "listLabel": "Versions",
   "loading": "Loading…",
