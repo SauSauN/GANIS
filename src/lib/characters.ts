@@ -308,6 +308,3 @@ export function characterTabId(characterId: string): string {
 export function characterIdOfTab(tabId: string): string | null {
   return tabId.startsWith(CHARACTER_TAB_PREFIX) ? tabId.slice(CHARACTER_TAB_PREFIX.length) : null;
 }
-
-/** Onglet des paramètres du projet consacré aux personnages. */
-export const CHARACTER_SETTINGS_TAB = "settings:characters";

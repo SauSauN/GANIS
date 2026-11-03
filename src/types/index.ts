@@ -1059,11 +1059,6 @@ export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
   done: "Terminé",
 };
 
-export const ROLE_LABELS: Record<Role, string> = {
-  admin: "Administrateur",
-  developer: "Développeur",
-  user: "Utilisateur",
-};
 // ----------------------------------------------------------------------------
 // Documents rangés dans le découpage (voir `document_service.rs`)
 // ----------------------------------------------------------------------------

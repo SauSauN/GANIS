@@ -23,9 +23,6 @@ import type {
  * - un élément peut être hors numérotation (`numbered: false`).
  */
 
-/** Nombre de niveaux des modèles. */
-export const TEMPLATE_LEVELS = 3;
-
 /** Nombre maximal de niveaux personnalisés. */
 export const MAX_LEVELS = 5;
 

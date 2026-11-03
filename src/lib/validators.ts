@@ -2,11 +2,8 @@
  * Validateurs pour les formulaires d'authentification.
  * Ces règles sont également vérifiées côté Rust pour la sécurité.
  *
- * Deux niveaux :
- * - `checkX` renvoie un code de problème, traduit par l'interface
- *   (`t(\`validation.${code}\`)`, espace de noms `common`) ;
- * - `validateX` renvoie directement le message français, pour les écrans
- *   pas encore traduits. À supprimer quand tous l'auront été.
+ * `checkX` renvoie un code de problème, traduit par l'interface
+ * (`t(\`validation.${code}\`)`, espace de noms `common`).
  */
 
 export type UsernameIssue =
@@ -55,36 +52,4 @@ export function checkEmail(email: string): EmailIssue | null {
   // Regex simple pour la validation d'email
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return "emailInvalid";
   return null;
-}
-
-// ----------------------------------------------------------------------------
-// Messages français (écrans pas encore traduits)
-// ----------------------------------------------------------------------------
-
-const MESSAGES_FR: Record<ValidationIssue, string> = {
-  usernameTooShort: "Le nom d'utilisateur doit contenir au moins 3 caractères.",
-  usernameTooLong: "Le nom d'utilisateur ne doit pas dépasser 50 caractères.",
-  usernameInvalidChars:
-    "Le nom d'utilisateur ne peut contenir que des lettres, chiffres, tirets et underscores.",
-  passwordTooShort: "Le mot de passe doit contenir au moins 8 caractères.",
-  passwordTooLong: "Le mot de passe ne doit pas dépasser 128 caractères.",
-  passwordNeedsLetterAndDigit:
-    "Le mot de passe doit contenir au moins une lettre et un chiffre.",
-  passwordMismatch: "Les deux mots de passe ne correspondent pas.",
-  emailInvalid: "L'adresse e-mail n'est pas valide.",
-};
-
-const toMessage = (issue: ValidationIssue | null) =>
-  issue ? MESSAGES_FR[issue] : null;
-
-export function validateUsername(username: string): string | null {
-  return toMessage(checkUsername(username));
-}
-
-export function validatePassword(password: string): string | null {
-  return toMessage(checkPassword(password));
-}
-
-export function validateEmail(email: string): string | null {
-  return toMessage(checkEmail(email));
 }

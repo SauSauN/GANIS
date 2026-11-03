@@ -138,20 +138,9 @@
     "saved": "Enregistré"
   },
   "read": {
-    "all": "Tout le scénario",
-    "includeCast": "Personnages et lieux en tête",
-    "export": "Exporter",
-    "dialogTitle": "Exporter le scénario",
     "empty": "Aucune page pour l'instant.",
     "emptyHint": "Créez des chapitres et des pages dans le découpage.",
-    "openPlan": "Ouvrir le découpage",
-    "editPage": "Modifier la page",
-    "fileSuffix": "scénario",
-    "toc": "Sommaire",
-    "details": "Indications de dessin",
-    "detailsHint": "Afficher le cadrage, le décor, les indications au dessinateur et la continuité de chaque case",
-    "legend": "Types de texte",
-    "turnPage": "Tourné de page"
+    "openPlan": "Ouvrir le découpage"
   },
   "flatplan": {
     "volume": "Tome",
@@ -182,30 +171,7 @@
     "unplaced_other": "{{count}} dessins rangés sur un chapitre n'ont pas de page correspondante."
   },
   "export": {
-    "subtitle": "Scénario pour le dessinateur",
-    "cast": "Personnages",
-    "places": "Lieux",
-    "page_one": "{{label}} — {{count}} case",
-    "page_other": "{{label}} — {{count}} cases",
-    "panel": "Case {{number}}",
-    "goal": "Objectif :",
-    "rhythm": "Fonction : {{value}}",
-    "pageTurn": "Révélation après le tourné de page",
-    "setting": "Décor :",
-    "place": "Lieu :",
-    "characters": "Personnages :",
-    "notes": "Pour le dessinateur :",
-    "continuity": "Continuité :",
-    "noPanels": "(aucune case)",
-    "text": {
-      "dialogue": "{{speaker}} :",
-      "dialogueAnon": "DIALOGUE :",
-      "thought": "{{speaker}} (pensée) :",
-      "thoughtAnon": "PENSÉE :",
-      "narration": "NARRATION :",
-      "sfx": "ONOMATOPÉE :",
-      "sign": "TEXTE DU DÉCOR :"
-    }
+    "pageTurn": "Révélation après le tourné de page"
   },
   "progress": {
     "pages": "Pages",

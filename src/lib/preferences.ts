@@ -23,12 +23,6 @@ export type TextSize = "small" | "normal" | "large";
 
 export const TEXT_SIZES: TextSize[] = ["small", "normal", "large"];
 
-export const TEXT_SIZE_LABELS: Record<TextSize, string> = {
-  small: "Petite",
-  normal: "Normale",
-  large: "Grande",
-};
-
 /** Taille de base de l'interface, en pixels (toute l'interface est en rem). */
 const TEXT_SIZE_PX: Record<TextSize, number> = {
   small: 14,

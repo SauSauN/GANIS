@@ -496,9 +496,6 @@ export function pastRowsCount(data: PlotData): number {
   return Math.max(PAST_MIN_ROWS, -min + 2);
 }
 
-/** Vrai pour un moment du passé narratif (avant le début de l'histoire). */
-export const isPast = (row: number) => row < 0;
-
 /**
  * Numéro affiché d'un moment : 1, 2, 3… pour l'histoire principale,
  * −1, −2… pour le passé narratif (−1 juste avant le début).
@@ -953,10 +950,6 @@ export function moveInScene(data: PlotData, nodeId: string, eventId: string, del
   data.sceneOrder[nodeId] = moveInReadingOrder(order, eventId, delta);
 }
 
-export function eventsOfNote(data: PlotData, noteId: string): PlotEvent[] {
-  return planOrder(data).filter((e) => e.noteIds.includes(noteId));
-}
-
 /** Retire les liens vers des éléments qui n'existent plus (nettoyage volontaire). Modifie `data`. */
 export function dropMissing(
   data: PlotData,
@@ -1031,6 +1024,3 @@ export function nextColor(data: PlotData): string {
   const used = new Set(data.lanes.map((lane) => lane.color.toLowerCase()));
   return PLOT_PALETTE.find((color) => !used.has(color)) ?? PLOT_PALETTE[data.lanes.length % PLOT_PALETTE.length];
 }
-
-/** Total des mots renseignés sur les événements. */
-export const sumWords = (data: PlotData) => data.events.reduce((sum, event) => sum + event.words, 0);
