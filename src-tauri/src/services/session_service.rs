@@ -44,37 +44,6 @@ pub async fn create_session(pool: &SqlitePool, user_id: &str) -> AppResult<Strin
     Ok(token)
 }
 
-/// Vérifie si un token de session est valide et retourne l'ID de l'utilisateur.
-pub async fn verify_session(pool: &SqlitePool, token: &str) -> AppResult<Option<String>> {
-    let mut hasher = Sha256::new();
-    hasher.update(token.as_bytes());
-    let token_hash = format!("{:x}", hasher.finalize());
-
-    let row: Option<(String, i64)> = sqlx::query_as(
-        "SELECT user_id, expires_at FROM sessions WHERE token_hash = ?",
-    )
-    .bind(&token_hash)
-    .fetch_optional(pool)
-    .await
-    .map_err(|e| AppError::database(e).with_detail("Échec de la vérification de session"))?;
-
-    match row {
-        Some((user_id, expires_at)) => {
-            if expires_at > now_unix() {
-                Ok(Some(user_id))
-            } else {
-                // Session expirée, on la supprime
-                let _ = sqlx::query("DELETE FROM sessions WHERE token_hash = ?")
-                    .bind(&token_hash)
-                    .execute(pool)
-                    .await;
-                Ok(None)
-            }
-        }
-        None => Ok(None),
-    }
-}
-
 /// Supprime toutes les sessions d'un utilisateur.
 pub async fn delete_user_sessions(pool: &SqlitePool, user_id: &str) -> AppResult<()> {
     sqlx::query("DELETE FROM sessions WHERE user_id = ?")

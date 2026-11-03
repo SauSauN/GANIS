@@ -45,17 +45,6 @@ impl Role {
             Role::User => "user",
         }
     }
-
-    /// Convertit une chaîne en rôle.
-    ///
-    /// Toute valeur inconnue est considérée comme `User`.
-    pub fn from_str(s: &str) -> Self {
-        match s.to_lowercase().as_str() {
-            "admin" => Role::Admin,
-            "developer" => Role::Developer,
-            _ => Role::User,
-        }
-    }
 }
 
 /// Représente un utilisateur dans la base de données de l'application.

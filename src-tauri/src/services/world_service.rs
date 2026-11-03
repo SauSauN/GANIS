@@ -164,6 +164,7 @@ impl Module {
         !self.catalog().natures.is_empty()
     }
 
+    #[cfg(test)]
     pub const ALL: [Module; 3] = [Module::Item, Module::Species, Module::Faction];
 }
 

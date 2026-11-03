@@ -487,48 +487,13 @@ pub async fn update_project(
         })
 }
 
-/// Enregistre l'ouverture d'un projet et le retourne.
-///
-/// Seule `last_opened_at` change : la date de modification
-/// (`updated_at`) reste celle de la dernière modification réelle.
-pub async fn mark_opened(
-    pool: &SqlitePool,
-    project_id: &str,
-    owner_id: &str,
-    account_key: &SecretKey,
-) -> AppResult<Project> {
-    let now = crate::utils::now_utc();
-
-    let result = sqlx::query(
-        r#"
-        UPDATE projects
-        SET last_opened_at = ?
-        WHERE id = ? AND owner_id = ?
-        "#,
-    )
-    .bind(&now)
-    .bind(project_id)
-    .bind(owner_id)
-    .execute(pool)
-    .await
-    .map_err(|e| {
-        AppError::database(&e)
-            .with_detail(format!("Échec de l'ouverture du projet : {e}"))
-    })?;
-
-    if result.rows_affected() == 0 {
-        return Err(project_not_found());
-    }
-
-    find_by_id_for_user(pool, project_id, owner_id, account_key)
-        .await?
-        .ok_or_else(project_not_found)
-}
-
 /// Duplique un projet appartenant à l'utilisateur.
 ///
 /// La copie reprend le type et la description, avec le statut
 /// « en préparation », sans favori ni archivage. Elle a sa propre clé.
+/// L'application passe par `duplicate_for_viewer` ; celle-ci sert aux tests
+/// de chiffrement (`encryption_tests.rs`).
+#[cfg(test)]
 pub async fn duplicate_project(
     pool: &SqlitePool,
     project_id: &str,

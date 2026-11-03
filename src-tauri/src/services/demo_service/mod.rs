@@ -91,7 +91,8 @@ const SOURCES: [Source; 2] = [
     },
 ];
 
-/// Identifiants des exemples, dans l'ordre d'affichage.
+/// Identifiants des exemples, dans l'ordre d'affichage (pour les tests).
+#[cfg(test)]
 pub fn ids() -> Vec<&'static str> {
     SOURCES.iter().map(|s| s.id).collect()
 }
@@ -544,10 +545,6 @@ impl Registry {
 
     fn get(&self, kind: &str, key: &str) -> AppResult<String> {
         self.ids.get(&format!("{kind}:{key}")).cloned().ok_or_else(|| invalid(format!("référence inconnue : @{kind}:{key}")))
-    }
-
-    fn has(&self, kind: &str, key: &str) -> bool {
-        self.ids.contains_key(&format!("{kind}:{key}"))
     }
 
     /// Remplace, dans une valeur JSON, chaque chaîne `@sorte:clé` par
