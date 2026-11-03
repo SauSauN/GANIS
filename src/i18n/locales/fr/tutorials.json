@@ -87,7 +87,7 @@
   "manga": {
     "title": "Démarrer un manga",
     "name": "Manga",
-    "intro": "Du tome à la case, jusqu'au scénario prêt pour le dessinateur, avec le module Scénario, réservé aux mangas et BD.",
+    "intro": "Du tome à la case, jusqu'à la lecture de toute l'histoire, avec le module Scénario, réservé aux mangas et BD.",
     "steps": {
       "start": {
         "title": "Posez votre histoire",
@@ -134,11 +134,11 @@
         ]
       },
       "read": {
-        "title": "Lisez et exportez le scénario",
+        "title": "Lisez et exportez l'histoire",
         "text": "L'histoire chapitre par chapitre : l'explication de chaque chapitre, puis ce que montrent ses pages.",
         "points": [
-          "« Indications de dessin » affiche le cadrage, le décor et les notes au dessinateur.",
-          "« Exporter » prépare le scénario, avec personnages et lieux en tête si vous le souhaitez.",
+          "Le sommaire, à gauche, mène à un chapitre ; le crayon ouvre sa fiche.",
+          "« Exporter » enregistre l'histoire en Word, PDF ou texte.",
           "Le bouton ▶ de la barre de titre (F5) lance la lecture sur tout l'espace."
         ]
       },

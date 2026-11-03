@@ -87,7 +87,7 @@
   "manga": {
     "title": "Starting a manga",
     "name": "Manga",
-    "intro": "From the volume to the panel, up to a script ready for the artist, with the Script module, reserved for manga and comics.",
+    "intro": "From the volume to the panel, up to reading the whole story, with the Script module, reserved for manga and comics.",
     "steps": {
       "start": {
         "title": "Lay out your story",
@@ -134,11 +134,11 @@
         ]
       },
       "read": {
-        "title": "Read and export the script",
+        "title": "Read and export the story",
         "text": "The story chapter by chapter: what each chapter is about, then what its pages show.",
         "points": [
-          "“Art directions” shows the framing, the setting and the notes for the artist.",
-          "“Export” prepares the script, with characters and locations up front if you wish.",
+          "The table of contents, on the left, leads to a chapter; the pencil opens its sheet.",
+          "“Export” saves the story as Word, PDF or text.",
           "The ▶ button in the title bar (F5) starts reading in the whole space."
         ]
       },
