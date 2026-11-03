@@ -14,9 +14,5 @@
     "title": "Informations du projet",
     "createdAt": "Créé le",
     "updatedAt": "Dernière modification"
-  },
-  "help": {
-    "title": "Organiser votre projet",
-    "text": "Utilisez la barre de gauche pour organiser les personnages, les lieux, le découpage et les autres éléments de votre projet."
   }
 }
