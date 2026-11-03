@@ -175,10 +175,11 @@ pub async fn search(pool: &SqlitePool, query: &str) -> AppResult<Vec<SearchHit>>
         body: fields_text(&fields),
     }));
 
-    // Objets, faune et flore : seulement si le module est activé.
+    // Objets, faune et flore, factions : seulement si le module est activé.
     for (kind, sql) in [
         ("item", "SELECT id, name, fields FROM items WHERE (SELECT enabled FROM item_settings WHERE id = 'default') = 1"),
         ("species", "SELECT id, name, fields FROM species WHERE (SELECT enabled FROM species_settings WHERE id = 'default') = 1"),
+        ("faction", "SELECT id, name, fields FROM factions WHERE (SELECT enabled FROM faction_settings WHERE id = 'default') = 1"),
     ] {
         let rows: Vec<(String, String, String)> = sqlx::query_as(sql).fetch_all(pool).await?;
         candidates.extend(rows.into_iter().map(|(id, name, fields)| Candidate {

@@ -45,6 +45,7 @@ fn table_of(kind: &str) -> AppResult<&'static str> {
         "location" => Ok("locations"),
         "item" => Ok("items"),
         "species" => Ok("species"),
+        "faction" => Ok("factions"),
         "structureNode" => Ok("structure_nodes"),
         "note" => Ok("notes"),
         "synopsis" => Ok("synopsis"),

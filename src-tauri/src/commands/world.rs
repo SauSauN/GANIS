@@ -1,9 +1,9 @@
-//! Commandes Tauri des objets, de la faune et de la flore, et des liens
-//! entre éléments (voir `services::world_service` et
+//! Commandes Tauri des objets, de la faune et de la flore, des factions et
+//! des liens entre éléments (voir `services::world_service` et
 //! `services::world_link_service`).
 //!
-//! Les objets et les espèces partagent les mêmes commandes : le paramètre
-//! `module` (`"item"` ou `"species"`) choisit lequel.
+//! Les trois modules partagent les mêmes commandes : le paramètre `module`
+//! (`"item"`, `"species"` ou `"faction"`) choisit lequel.
 //!
 //! Chaque commande obtient la base du projet auprès de `project_storage`,
 //! qui vérifie d'abord que l'utilisateur connecté en est le propriétaire.

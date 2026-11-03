@@ -1,22 +1,23 @@
-//! Objets, faune et flore d'un projet (base du projet).
+//! Objets, faune et flore, et factions d'un projet (base du projet).
 //!
-//! # Deux modules, un seul moteur
+//! # Trois modules, un seul moteur
 //!
-//! Les **objets** (`items` : armes, véhicules, vêtements, téléphones…) et la
-//! **faune et flore** (`species` : animaux, plantes) fonctionnent comme les
+//! Les **objets** (`items` : armes, véhicules, vêtements, téléphones…), la
+//! **faune et flore** (`species` : animaux, plantes) et les **factions**
+//! (`factions` : guildes, ordres, clans, cultes…) fonctionnent comme les
 //! lieux (`location_service`) : un type rangé dans une catégorie, une fiche
 //! en trois couches de champs (communs, de la catégorie, du type) gardée en
 //! JSON, une image principale, une galerie, des types ajoutés par l'auteur,
 //! une liste de statuts personnalisable et un niveau de détail.
 //!
-//! Ce fichier les gère tous les deux ; seuls les noms de tables et le
+//! Ce fichier les gère tous les trois ; seuls les noms de tables et le
 //! catalogue changent (voir [`Module`]). Les catalogues sont lus à la fois
-//! par l'interface et par Rust :
-//! `src/lib/itemCatalog.json` et `src/lib/speciesCatalog.json`.
+//! par l'interface et par Rust : `src/lib/itemCatalog.json`,
+//! `src/lib/speciesCatalog.json` et `src/lib/factionCatalog.json`.
 //!
 //! # Activation
 //!
-//! Les deux modules sont **désactivés par défaut**. L'auteur les active dans
+//! Les trois modules sont **désactivés par défaut**. L'auteur les active dans
 //! Paramètres du projet et choisit les catégories qu'il veut utiliser
 //! (`*_settings.enabled`, `*_settings.categories`). Désactiver un module ne
 //! supprime rien : il est seulement masqué.
@@ -25,7 +26,7 @@
 //!
 //! `parent_id` : objet qui contient celui-ci (un coffre, un vaisseau) ;
 //! pour la faune et la flore, espèce à laquelle appartient un animal ou une
-//! plante précis. Pas de boucle ; supprimer un élément fait remonter ce
+//! plante précis ; pour une faction, celle dont elle est une branche. Pas de boucle ; supprimer un élément fait remonter ce
 //! qu'il contenait d'un niveau.
 //!
 //! # Animal personnage
@@ -66,12 +67,13 @@ pub const LISTS: [&str; 1] = ["status"];
 // Modules
 // ----------------------------------------------------------------------------
 
-/// Module concerné : objets ou faune et flore.
+/// Module concerné : objets, faune et flore, ou factions.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum Module {
     Item,
     Species,
+    Faction,
 }
 
 /// Noms des tables et colonnes d'un module (constantes : jamais saisies).
@@ -100,11 +102,20 @@ const SPECIES_SPEC: Spec = Spec {
     fk: "species_id",
 };
 
+const FACTION_SPEC: Spec = Spec {
+    table: "factions",
+    settings: "faction_settings",
+    portraits: "faction_portraits",
+    images: "faction_images",
+    fk: "faction_id",
+};
+
 impl Module {
     fn spec(self) -> &'static Spec {
         match self {
             Module::Item => &ITEM_SPEC,
             Module::Species => &SPECIES_SPEC,
+            Module::Faction => &FACTION_SPEC,
         }
     }
 
@@ -113,6 +124,7 @@ impl Module {
         match self {
             Module::Item => "item",
             Module::Species => "species",
+            Module::Faction => "faction",
         }
     }
 
@@ -137,6 +149,13 @@ impl Module {
                         .expect("src/lib/speciesCatalog.json invalide (voir le test catalogs_are_consistent)")
                 })
             }
+            Module::Faction => {
+                static CATALOG: OnceLock<Catalog> = OnceLock::new();
+                CATALOG.get_or_init(|| {
+                    serde_json::from_str(include_str!("../../../src/lib/factionCatalog.json"))
+                        .expect("src/lib/factionCatalog.json invalide (voir le test catalogs_are_consistent)")
+                })
+            }
         }
     }
 
@@ -145,7 +164,7 @@ impl Module {
         !self.catalog().natures.is_empty()
     }
 
-    pub const ALL: [Module; 2] = [Module::Item, Module::Species];
+    pub const ALL: [Module; 3] = [Module::Item, Module::Species, Module::Faction];
 }
 
 // ----------------------------------------------------------------------------
@@ -1412,6 +1431,47 @@ mod tests {
             assert_eq!(settings.detail_level, Some(DetailLevel::Basic));
             assert!(settings.enabled);
         }
+    }
+
+    #[tokio::test]
+    async fn factions_have_branches_and_come_back_from_the_trash() {
+        let pool = pool().await;
+        let m = Module::Faction;
+        assert!(!m.has_nature());
+
+        let order = create_entry(&pool, m, &input("  L'Ordre d'Aval ", "knightOrder")).await.unwrap();
+        assert_eq!(order.name, "L'Ordre d'Aval");
+        assert_eq!(order.status, "active");
+
+        // Champs de la catégorie (militaire) et du type (ordre de chevaliers).
+        let mut changed = input("L'Ordre d'Aval", "knightOrder");
+        changed.status = "underground".to_owned();
+        changed.fields.insert("motto".to_owned(), "Rien ne passe".to_owned());
+        changed.fields.insert("influence".to_owned(), "regional".to_owned());
+        changed.fields.insert("strength".to_owned(), "300 chevaliers".to_owned());
+        changed.fields.insert("oath".to_owned(), "Servir la reine".to_owned());
+        let saved = update_entry(&pool, m, &order.id, &changed).await.unwrap();
+        assert_eq!(saved.status, "underground");
+        assert_eq!(saved.fields["oath"], "Servir la reine");
+
+        let mut bad = input("X", "guild");
+        bad.fields.insert("influence".to_owned(), "galactique".to_owned());
+        assert!(create_entry(&pool, m, &bad).await.is_err());
+        assert!(create_entry(&pool, m, &input("X", "sword")).await.is_err());
+
+        // Une branche ; pas de boucle ; l'ordre supprimé, la branche remonte
+        // puis revient sous lui avec la corbeille.
+        let branch = create_entry(&pool, m, &WorldEntryInput { parent_id: Some(order.id.clone()), ..input("Garde du Nord", "guard") })
+            .await
+            .unwrap();
+        let loop_input = WorldEntryInput { parent_id: Some(branch.id.clone()), ..input("L'Ordre d'Aval", "knightOrder") };
+        assert!(update_entry(&pool, m, &order.id, &loop_input).await.is_err());
+
+        let trash = delete_entry(&pool, m, &order.id).await.unwrap();
+        assert_eq!(get_entry(&pool, m, &branch.id).await.unwrap().parent_id, None);
+        trash_service::restore(&pool, &trash).await.unwrap();
+        assert_eq!(get_entry(&pool, m, &branch.id).await.unwrap().parent_id, Some(order.id.clone()));
+        assert_eq!(list_entries(&pool, m).await.unwrap().len(), 2);
     }
 
     #[tokio::test]
