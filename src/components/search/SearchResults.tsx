@@ -12,7 +12,9 @@ import {
   Waypoints,
   type LucideIcon,
 } from "lucide-react";
+import { findFeature } from "@/components/workspace/modules";
 import { SEARCH_ORDER } from "@/lib/search";
+import { structureNodeTabId } from "@/lib/structure";
 import { cn } from "@/lib/utils";
 import type { SearchHit } from "@/types";
 
@@ -125,7 +127,7 @@ export function SearchResults({ hits, query, activeIndex = -1, onOpen, compact }
                       <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" />
                       <span className="min-w-0 flex-1">
                         <span className={cn("block truncate", !hit.title && "text-muted-foreground italic")}>
-                          <Highlight text={hit.title || tt(`untitled.${kind}`)} query={query} />
+                          <Highlight text={hit.title || (kind === "structureNode" && findFeature(structureNodeTabId(hit.id))?.feature.label) || tt(`untitled.${kind}`)} query={query} />
                         </span>
                         {hit.snippet && (
                           <span className={cn("block text-xs text-muted-foreground", compact ? "truncate" : "line-clamp-2")}>

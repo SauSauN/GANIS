@@ -24,11 +24,40 @@ export function isSafeLink(url: string): boolean {
  * Éléments de l'éditeur de notes. Ce qui n'est pas dans cette liste est
  * écarté à la lecture d'une note (le document enregistré ne peut rien
  * contenir d'autre).
+ *
+ * `system` (note système) : l'écriture seule, comme `WRITING_NODES` et
+ * `WRITING_MARKS` côté Rust : titres fixes, police, taille, gras, italique,
+ * souligné, barré et listes ; ni tableau, ni encadré, ni schéma. Ce qui est
+ * collé d'ailleurs garde son texte.
  */
 export function noteExtensions(
   placeholder: string,
-  options: { mentions?: EntityMentionOptions; spelling?: SpellCheckOptions; lockHeadings?: boolean } = {},
+  options: { mentions?: EntityMentionOptions; spelling?: SpellCheckOptions; system?: boolean } = {},
 ): Extensions {
+  const shared: Extensions = [
+    Placeholder.configure({ placeholder, includeChildren: false }),
+    EntityMention.configure(options.mentions ?? {}),
+    ...(options.spelling ? [SpellCheck.configure(options.spelling)] : []),
+  ];
+
+  if (options.system) {
+    return [
+      StarterKit.configure({
+        heading: { levels: [1, 2, 3] },
+        blockquote: false,
+        code: false,
+        codeBlock: false,
+        horizontalRule: false,
+        link: false,
+      }),
+      TextStyleKit.configure({ lineHeight: false, color: false, backgroundColor: false }),
+      TaskList,
+      TaskItem.configure({ nested: true }),
+      ProtectedHeadings,
+      ...shared,
+    ];
+  }
+
   return [
     StarterKit.configure({
       heading: { levels: [1, 2, 3] },
@@ -48,13 +77,10 @@ export function noteExtensions(
     TaskItem.configure({ nested: true }),
     Subscript,
     Superscript,
-    Placeholder.configure({ placeholder, includeChildren: false }),
     Callout,
     Chain,
     ChainItem,
     Diagram,
-    EntityMention.configure(options.mentions ?? {}),
-    ...(options.spelling ? [SpellCheck.configure(options.spelling)] : []),
-    ...(options.lockHeadings ? [ProtectedHeadings] : []),
+    ...shared,
   ];
 }

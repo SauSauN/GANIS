@@ -115,7 +115,7 @@
   "note": {
     "title": "Note sur « {{name}} »",
     "description": "Une remarque pour vous : planches à reprendre, version envoyée à l'éditeur…",
-    "placeholder": "Votre note…"
+    "placeholder": "Ex. Version envoyée à l'éditeur"
   },
   "move": {
     "title": "Ranger « {{name}} » dans…",

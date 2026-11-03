@@ -11,6 +11,7 @@ import { categoryIcon, categoryTint, MODULE_ICONS } from "@/components/world/wor
 import { errorText } from "@/lib/errors";
 import { notifyError } from "@/lib/notify";
 import { cn } from "@/lib/utils";
+import { tutorialText, useTutorialStore } from "@/lib/tutorials";
 import { catalogOf, statusValues } from "@/lib/world";
 import { useWorldEntries, useWorldStore } from "@/stores/worldStore";
 import type { CharacterDetailLevel, WorldModule } from "@/types";
@@ -25,6 +26,7 @@ import type { CharacterDetailLevel, WorldModule } from "@/types";
  */
 export function WorldSettingsSection({ projectId, module }: { projectId: string; module: WorldModule }) {
   const { t } = useTranslation("world");
+  const showTutorial = useTutorialStore((state) => state.show);
   const switchLabel = useId();
   const { entries, settings, loaded } = useWorldEntries(projectId, module);
   const labels = useWorldLabels(module, settings.customTypes);
@@ -84,6 +86,9 @@ export function WorldSettingsSection({ projectId, module }: { projectId: string;
               {!settings.enabled && entries.length > 0 && (
                 <p className="mt-1 text-xs text-muted-foreground">{labels.text("settings.kept", { count: entries.length })}</p>
               )}
+              <Button variant="link" size="sm" className="mt-1 h-auto p-0" onClick={() => showTutorial(module === "item" ? "items" : "species")}>
+                {tutorialText("button")}
+              </Button>
             </div>
             {busy === "enabled" && <Loader2 className="mt-1 size-4 animate-spin text-muted-foreground" aria-hidden="true" />}
             <button

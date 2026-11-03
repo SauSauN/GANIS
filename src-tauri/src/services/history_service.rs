@@ -10,13 +10,15 @@
 //!   actuel est d'abord gardé comme version, donc rien n'est perdu.
 //!
 //! Une version est la copie de la ligne de l'élément (toutes ses colonnes,
-//! avec leur type exact). Les images ne sont pas versionnées.
+//! avec leur type exact), plus les cases d'une page de manga. Les images ne
+//! sont pas versionnées.
 
 use serde::Serialize;
 use serde_json::{Map, Value};
 use sqlx::SqlitePool;
 
 use crate::error::{AppError, AppResult};
+use crate::services::manga_service;
 use crate::services::trash_service::{bind, quote, select_rows, table_columns, Val};
 use crate::utils::{new_id, now_utc};
 
@@ -32,6 +34,10 @@ const MAX_NAME_CHARS: usize = 100;
 /// et flore) : le lien avec une fiche de personnage se gère à part.
 const KEPT_COLUMNS: [&str; 3] = ["id", "created_at", "character_id"];
 
+/// Entrée d'une version d'un élément du découpage : ses cases de manga (JSON).
+/// Ce n'est pas une colonne : elle est restaurée à part.
+const PANELS_COLUMN: &str = "manga_panels";
+
 /// Table d'un type d'élément versionné.
 fn table_of(kind: &str) -> AppResult<&'static str> {
     match kind {
@@ -39,6 +45,7 @@ fn table_of(kind: &str) -> AppResult<&'static str> {
         "location" => Ok("locations"),
         "item" => Ok("items"),
         "species" => Ok("species"),
+        "faction" => Ok("factions"),
         "structureNode" => Ok("structure_nodes"),
         "note" => Ok("notes"),
         "synopsis" => Ok("synopsis"),
@@ -252,7 +259,15 @@ async fn current_row(pool: &SqlitePool, kind: &str, item_id: &str) -> AppResult<
     let mut conn = pool.acquire().await?;
     let columns = table_columns(&mut conn, table).await?;
     let rows = select_rows(&mut conn, table, &columns, &[("id".to_owned(), Val::text(item_id))]).await?;
-    Ok(rows.into_iter().next().map(|values| columns.into_iter().zip(values).collect()))
+    drop(conn);
+    let Some(values) = rows.into_iter().next() else {
+        return Ok(None);
+    };
+    let mut row: Row = columns.into_iter().zip(values).collect();
+    if kind == "structureNode" {
+        row.push((PANELS_COLUMN.to_owned(), Val::text(manga_service::panels_snapshot(pool, item_id).await?)));
+    }
+    Ok(Some(row))
 }
 
 fn friendly(row: &Row) -> Map<String, Value> {
@@ -370,7 +385,7 @@ pub async fn restore_version(pool: &SqlitePool, version_id: &str) -> AppResult<(
 
     // Colonnes existant encore (le schéma a pu changer depuis la version).
     let table = table_of(&kind)?;
-    let existing: Vec<String> = current.iter().map(|(column, _)| column.clone()).collect();
+    let existing: Vec<String> = current.iter().map(|(column, _)| column.clone()).filter(|column| column != PANELS_COLUMN).collect();
     let mut sets: Vec<(&str, Val)> = saved
         .iter()
         .filter(|(column, _)| existing.contains(column) && !KEPT_COLUMNS.contains(&column.as_str()) && column != "updated_at")
@@ -393,6 +408,11 @@ pub async fn restore_version(pool: &SqlitePool, version_id: &str) -> AppResult<(
     query.execute(pool).await.map_err(|e| {
         AppError::conflict("Cette version ne peut plus être restaurée.").with_key("history.restoreFailed").with_detail(e)
     })?;
+
+    // Les cases de la version (absentes des versions anciennes : inchangées).
+    if let Some((_, Val::Text(panels))) = saved.iter().find(|(column, _)| column == PANELS_COLUMN) {
+        manga_service::restore_panels(pool, &item_id, panels).await?;
+    }
 
     Ok((kind, item_id))
 }

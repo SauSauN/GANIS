@@ -92,6 +92,7 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature, module
         ["closeTab", t("menus:file.closeTab")],
         ["exportProject", t("menus:file.export")],
         ["readStory", t("menus:project.read")],
+        ["openTutorial", t("menus:help.tutorial")],
       ] as Array<[CommandId, string]>
     )
       .filter(([id]) => available(id))

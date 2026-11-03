@@ -1,8 +1,10 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { TreeGuides } from "@/components/common/TreeGuides";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
 import { buildStructureTree, flattenVisible, structureNodeTabId } from "@/lib/structure";
+import { activeGuide } from "@/lib/treeGuides";
 import { cn } from "@/lib/utils";
 
 interface SideBarStructureProps {
@@ -26,6 +28,10 @@ export function SideBarStructure({ projectId, activeTab, onOpenFeature }: SideBa
   const rows = useMemo(
     () => (structure ? flattenVisible(buildStructureTree(structure.nodes), collapsed) : []),
     [structure, collapsed],
+  );
+  const guideOf = activeGuide(
+    rows.map((node) => node.depth),
+    rows.findIndex((node) => structureNodeTabId(node.id) === activeTab),
   );
 
   function toggle(id: string) {
@@ -55,7 +61,7 @@ export function SideBarStructure({ projectId, activeTab, onOpenFeature }: SideBa
         <p className="px-4 text-xs text-muted-foreground">{t("sidebar.empty")}</p>
       ) : (
         <ul className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-2 pb-2" role="tree" aria-labelledby="sidebar-structure">
-          {rows.map((node) => {
+          {rows.map((node, index) => {
             const expanded = !collapsed.has(node.id);
             const heading = headingOf(node);
             const tabId = structureNodeTabId(node.id);
@@ -67,9 +73,10 @@ export function SideBarStructure({ projectId, activeTab, onOpenFeature }: SideBa
                 role="treeitem"
                 aria-level={node.depth + 1}
                 aria-expanded={node.children.length > 0 ? expanded : undefined}
-                className="flex items-center"
+                className="relative flex items-center"
                 style={{ paddingLeft: `${node.depth * 0.875}rem` }}
               >
+                <TreeGuides depth={node.depth} active={guideOf(index)} />
                 <button
                   type="button"
                   tabIndex={node.children.length > 0 ? 0 : -1}

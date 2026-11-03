@@ -157,7 +157,7 @@
       "title": "Statuses",
       "description": "Values offered for an entry's status.",
       "add": "Add",
-      "placeholder": "New status",
+      "placeholder": "E.g. Cursed",
       "reset": "Default values",
       "remove": "Remove “{{value}}”"
     }

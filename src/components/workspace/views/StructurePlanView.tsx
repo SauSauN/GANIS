@@ -51,6 +51,7 @@ import {
   type StructureTreeNode,
 } from "@/lib/structure";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
+import { TreeGuides } from "@/components/common/TreeGuides";
 import { cn } from "@/lib/utils";
 import { useProjectPlot } from "@/stores/plotStore";
 import type { Project, StructureNode, StructureTemplateId } from "@/types";
@@ -533,7 +534,9 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
                 aria-level={node.depth + 1}
                 aria-expanded={node.children.length > 0 ? !isCollapsed : undefined}
                 aria-selected={editing}
+                className="relative"
               >
+                <TreeGuides depth={node.depth} step={1.5} offset={1.25} />
                 <div
                   // Double-clic sur la ligne : ouvre la fiche de l'élément
                   // (le clic sur le titre, lui, le renomme).

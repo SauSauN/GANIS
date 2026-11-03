@@ -29,6 +29,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import ganisLogo from "@/assets/ganis-logo.png";
+import { SameWidth } from "@/components/common/SameWidth";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { writeText as writeNativeClipboard } from "@tauri-apps/plugin-clipboard-manager";
@@ -77,17 +78,15 @@ function GuideDialog({ open, onClose }: { open: boolean; onClose: () => void }) 
     if (open) setStep(0);
   }, [open]);
 
-  const current = STEPS[step];
-  const Icon = current.icon;
   const last = step === STEPS.length - 1;
   const tt = t as unknown as (key: string, options?: Record<string, unknown>) => string;
-  const points = t(`guide.steps.${current.id}.points` as never, {
-    returnObjects: true,
-  }) as unknown;
-  const pointList = Array.isArray(points) ? (points as string[]) : [];
+  const pointsOf = (id: string) => {
+    const points = t(`guide.steps.${id}.points` as never, { returnObjects: true }) as unknown;
+    return Array.isArray(points) ? (points as string[]) : [];
+  };
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-xl" guardInput={false}>
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-3xl" guardInput={false}>
       <DialogHeader>
         <p className="text-xs font-medium text-primary">
           {t("guide.progress", { current: step + 1, total: STEPS.length })}
@@ -96,26 +95,35 @@ function GuideDialog({ open, onClose }: { open: boolean; onClose: () => void }) 
         <DialogDescription>{t("guide.description")}</DialogDescription>
       </DialogHeader>
 
-      {/* Hauteur minimale : les boutons ne sautent pas d'une étape à l'autre. */}
-      <div className="mt-5 flex min-h-[17rem] gap-4 rounded-lg border bg-muted/30 p-5">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <Icon className="size-5" />
-        </span>
-        <div className="min-w-0 space-y-3">
-          <h3 className="font-semibold">{tt(`guide.steps.${current.id}.title`)}</h3>
-          <p className="text-sm leading-6 text-muted-foreground">{tt(`guide.steps.${current.id}.text`)}</p>
+      {/* Toutes les étapes dans la même case, une seule visible : la fenêtre
+          garde la hauteur de la plus longue, et les boutons ne bougent pas. */}
+      <div className="mt-5 grid rounded-lg border bg-muted/30">
+        {STEPS.map(({ id, icon: Icon }, index) => (
+          <div
+            key={id}
+            aria-hidden={index !== step}
+            className={cn("col-start-1 row-start-1 flex gap-4 p-5", index !== step && "invisible")}
+          >
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+              <Icon className="size-5" />
+            </span>
+            <div className="min-w-0 space-y-3">
+              <h3 className="font-semibold">{tt(`guide.steps.${id}.title`)}</h3>
+              <p className="text-sm leading-6 text-muted-foreground">{tt(`guide.steps.${id}.text`)}</p>
 
-          {pointList.length > 0 && (
-            <ul className="space-y-1.5">
-              {pointList.map((point) => (
-                <li key={point} className="flex gap-2 text-sm leading-6">
-                  <Check className="mt-1 size-4 shrink-0 text-primary" />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+              {pointsOf(id).length > 0 && (
+                <ul className="space-y-1.5">
+                  {pointsOf(id).map((point) => (
+                    <li key={point} className="flex gap-2 text-sm leading-6">
+                      <Check className="mt-1 size-4 shrink-0 text-primary" />
+                      <span>{point}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Points de progression : un clic va directement à l'étape. */}
@@ -150,8 +158,16 @@ function GuideDialog({ open, onClose }: { open: boolean; onClose: () => void }) 
           {t("guide.previous")}
         </Button>
         <Button onClick={() => (last ? onClose() : setStep(step + 1))}>
-          {last ? t("guide.finish") : t("guide.next")}
-          {!last && <ChevronRight className="ml-1 size-4" />}
+          <SameWidth
+            active={last ? 1 : 0}
+            labels={[
+              <>
+                {t("guide.next")}
+                <ChevronRight className="ml-1 size-4" />
+              </>,
+              t("guide.finish"),
+            ]}
+          />
         </Button>
       </DialogFooter>
     </Dialog>

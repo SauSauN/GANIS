@@ -23,6 +23,7 @@ import {
 } from "@/components/workspace/WorkspaceTabs";
 import { WorkspaceView } from "@/components/workspace/WorkspaceView";
 import { CreateChooser } from "@/components/workspace/CreateChooser";
+import { TutorialDialog } from "@/components/workspace/TutorialDialog";
 import { CommandPalette } from "@/components/search/CommandPalette";
 
 import i18n from "@/i18n";
@@ -54,6 +55,13 @@ import {
 } from "@/lib/unsavedChanges";
 import { api } from "@/lib/api";
 import { useRegisterCommands } from "@/lib/commands";
+import {
+  showTutorialOnce,
+  tutorialForModule,
+  tutorialForProject,
+  tutorialText,
+  useTutorialStore,
+} from "@/lib/tutorials";
 import { toast } from "@/stores/toastStore";
 import { useReloadStore } from "@/stores/reloadStore";
 import { useCharacterStore } from "@/stores/characterStore";
@@ -345,8 +353,16 @@ export default function Workspace() {
   /** Lecture complète en cours : son onglet est affiché seul (bouton ▶ enfoncé). */
   const reading = maximized && activeTab !== null && READING_FEATURES.has(activeTab);
   const createTarget = NEW_TARGETS[activeModule] ?? null;
+  const tutorial = tutorialForModule(activeModule) ?? tutorialForProject(project?.type);
 
   useRegisterCommands({
+    openTutorial: {
+      disabled: !project,
+      label: tutorialText("menu", {
+        name: tutorialText(`${tutorial}.name`, { type: project ? t(`projects:types.${project.type}`) : "" }),
+      }),
+      run: () => useTutorialStore.getState().show(tutorial),
+    },
     new: {
       label: createTarget ? t(`menus:file.newIn.${createTarget}` as never) : t("menus:file.newChoose"),
       run: () => (createTarget ? openFeature(createTarget) : setChooserOpen(true)),
@@ -428,6 +444,21 @@ export default function Workspace() {
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectType]);
+
+  /**
+   * Tutoriels : le mode de démarrage du type de projet s'ouvre seul la
+   * première fois, puis ceux d'Objets et de Faune et flore à la première
+   * visite de ces modules facultatifs, une fois activés.
+   */
+  useEffect(() => {
+    if (projectType) showTutorialOnce(tutorialForProject(projectType));
+  }, [projectType]);
+
+  useEffect(() => {
+    if (!projectType) return;
+    if (activeModule === "items" && worldModules.item) showTutorialOnce("items");
+    if (activeModule === "species" && worldModules.species) showTutorialOnce("species");
+  }, [projectType, activeModule, worldModules.item, worldModules.species]);
 
   /**
    * Si le projet est inexistant ou a été supprimé,
@@ -846,6 +877,15 @@ export default function Workspace() {
         onOpenFeature={openFeature}
       />
       <CreateChooser world={worldModules} open={chooserOpen} onClose={() => setChooserOpen(false)} onOpenFeature={openFeature} />
+
+      {/* Mode de démarrage du type de projet et tutoriels des modules */}
+      <TutorialDialog
+        projectType={project.type}
+        onOpenFeature={(id) => {
+          setMaximized(false);
+          openFeature(id);
+        }}
+      />
 
       {/* Documents ouverts dans une autre application : modifications reprises */}
       <ExternalDocumentsWatcher projectId={project.id} />

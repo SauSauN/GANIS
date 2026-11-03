@@ -149,6 +149,7 @@ pub fn run() {
             commands::manga::save_page_script,
             commands::manga::get_script_panels,
             commands::manga::move_manga_panel,
+            commands::manga::create_manga_pages,
             commands::manga::set_manga_chapter,
             commands::manga::get_manga_settings,
             commands::manga::set_manga_settings,

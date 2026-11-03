@@ -1,64 +1,65 @@
-Documents rangés dans le découpage du manga d'exemple (retours de
-l'éditrice, planning, dossier éditeur). Une section par document :
+Documents rangés dans le découpage de « Kodama-sen » (retours de l'éditrice,
+planning, dossier éditeur, feuille de lettrage). Une section par document :
 « === doc:<clé> === » ; le fichier, son format et sa place sont dans
 projet.json. Voir ../README.md.
 
-=== doc:retours-ch2 ===
-Retours sur le storyboard du chapitre 2 — « La fileuse »
+=== doc:retours-ch3-v1 ===
+Retours sur le storyboard du chapitre 3 — « Le tunnel n° 7 »
 
-Dans l'ensemble : très bon chapitre de personnages, la relation Kai / Mio fonctionne dès la page 4. Le départ final est fort.
+Page 1 : superbe idée, mais on ne comprend pas que Sōta ne voit rien. À travailler.
 
-Page 6 : trop de texte dans la première case (le discours de Mio sur la Guilde). Couper la moitié, ou passer une phrase dans la case 3.
+Page 3 : la révélation arrive trop vite. Faire languir une case de plus.
 
-Page 9 : la réplique « Jusqu'aux Récifs » est parfaite, ne rien ajouter. En revanche la case 1 répète la page 8 ; à fondre avec la case 4 de la page 8 ?
+=== doc:retours-ch3 ===
+Retours sur le storyboard du chapitre 3 — « Le tunnel n° 7 »
 
-Pages 10-11 : la scène du gant est le meilleur moment du chapitre. Garder le gros plan de la larme.
+Dans l'ensemble : le meilleur chapitre du tome. La voûte de phalènes est l'image de couverture.
 
-Page 13 : on ne comprend pas tout de suite que le fuseau est sur la table. Le montrer plus tôt (case 2 en plan plus large).
+Page 1 : on comprend désormais que Sōta ne voit rien grâce au contrechamp de la case 3. Garder.
 
-Rythme : le milieu (pages 5 à 9) est un peu lent pour une prépublication. Pas de pleine page dans tout le chapitre : en garder une pour Ume et le manteau (page 7) ?
+Page 3 : la phrase de Ren est parfaite. Surtout, ne pas ajouter de pensée de Hina après.
+
+Page 4 : attention, le tourné de page tombe mal. La case « TOKUBEI » est sur une page de gauche, le lecteur voit la page suivante en même temps. Soit décaler d'une page, soit retirer l'effet. (Voir le chemin de fer : l'alerte est signalée.)
+
+Page 9 : ne pas rajouter de texte sur la dernière case.
 
 === doc:planning-v1 ===
-# Planning du tome 1
-| Chapitre | Scénario | Storyboard | Encrage |
+# Planning de la série
+| Tome | Scénario | Storyboard | Encrage |
 |---|---|---|---|
-| 1 | Septembre | Septembre | Octobre |
-| 2 | Septembre | Octobre | Octobre |
-| 3 | Octobre | Octobre | Novembre |
-| 4 | Octobre | Novembre | Novembre |
-| 5 | Novembre | Novembre | Décembre |
+| 1 | Septembre | Octobre | Novembre |
+| 2 | Octobre | Novembre | Décembre |
 
-Remise du tome à l'éditrice : 15 décembre.
+Remise à l'éditrice : 15 décembre.
 
 === doc:planning ===
-# Planning du tome 1
-Mis à jour après les retours sur le chapitre 2 : le chapitre 3 glisse de trois semaines.
+# Planning de la série
+Mis à jour après les retours : le chapitre 3 repart en storyboard, le chapitre 6 prend deux pages de plus.
 
-| Chapitre | Scénario | Storyboard | Encrage |
-|---|---|---|---|
-| 1 | Septembre (fait) | Septembre (fait) | Octobre (fait) |
-| 2 | Septembre (fait) | Octobre (en relecture) | Novembre |
-| 3 | Octobre-novembre (8 pages sur 18) | Novembre | Décembre |
-| 4 | Novembre | Décembre | Janvier |
-| 5 | Décembre | Janvier | Janvier |
+| Tome | Scénario | Storyboard | Encrage | Lettrage |
+|---|---|---|---|---|
+| 1 | Fait | Fait (ch. 3 en reprise) | Décembre | Janvier |
+| 2 | Chapitres 5 et 6 en cours | Janvier | Février | Mars |
 
-Remise du tome à l'éditrice : 31 janvier.
-
-Points bloquants :
-- silhouette de Sayo à valider avec le dessinateur avant le chapitre 4 ;
-- choix du titre français (voir la fiche de la série).
+Remise à l'éditrice : 31 mars.
 
 === doc:dossier ===
-Kazemusubi — dossier de présentation
+Kodama-sen — La ligne des échos : dossier de présentation
 
-Pitch. Dans l'archipel d'Amaori, le vent ne souffle pas : il se tisse, et il se paie. Kai, quinze ans, voit les fils de vent à l'œil nu et défait à mains nues la tempête que la Guilde envoie sur son île. Il vient de trouver la seule chose que la Guilde ne peut pas vendre.
+Pitch. Dans une vallée condamnée par un barrage, une apprentie contrôleuse muette entend les dernières paroles des morts. Elle a trente jours pour les recueillir dans des lanternes, avant que l'eau ne les efface toutes, et pour écouter enfin celle de son frère.
 
-Public et format. Shōnen d'aventure pour les 10-15 ans, lecture familiale. Chapitres de 16 à 22 pages en noir et blanc, tomes de cinq chapitres (environ 90 pages), sens de lecture français.
+Public et format. Seinen doux, à partir de 13 ans. Récit complet en deux tomes (environ 60 pages de scénario détaillé, 180 pages dessinées), noir et blanc, sens de lecture japonais.
 
-Pourquoi maintenant. Une série d'aventure lumineuse sur une question concrète pour les jeunes lecteurs : à qui appartiennent le vent, la pluie, ce qu'on croit gratuit. Pas de méchant sans raisons : la Guilde fait vraiment pleuvoir au bon moment.
+Pourquoi maintenant. Une histoire sur ce qu'on sacrifie au nom du progrès, sans méchant simple : la directrice construit ce lac par deuil, le mécanicien coupable est celui qui a élevé l'héroïne.
 
-Personnages. Kai, garçon d'une île pauvre, têtu et généreux ; Mio, apprentie fileuse, première de sa promotion, qui découvre ce qu'on lui a fait tisser ; Tetsu, son ami pêcheur, qui ne voit rien et tient la barre ; Ume, la grand-mère qui cache un passé de maîtresse fileuse.
+Particularité. Après le prologue, l'héroïne n'a qu'une seule réplique, vers la fin du second tome.
 
-Ligne de la série. Arc I (tome 1) : Kai découvre son don et perd sa grand-mère, emmenée pour être jugée. Arc II (tomes 2 et 3) : le procès d'Ume au pied du Grand Métier met à nu le système de la dîme.
+=== doc:lettrage ===
+Page	Case	Type	Texte
+c3p03	3	Dialogue (écho, bord pointillé)	Ils ont tiré deux fois. Tokubei tenait le détonateur. Hina, compte jusqu'à cent.
+c6p08	2	Dialogue (seule réplique de Hina)	REN.
 
-Joint à ce dossier : le scénario des chapitres 1 à 3 (export de GANIS) et les planches d'ambiance.
+=== doc:lettre-haruki ===
+Mot retrouvé dans le cartable d'Haruki Ishigami :
+
+Maman, je reviens pour le goûter.

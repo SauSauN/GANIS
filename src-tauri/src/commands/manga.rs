@@ -4,6 +4,7 @@
 //! qui vérifie d'abord que le projet est public ou appartient au compte
 //! connecté. Les modifications sont inscrites au journal du projet.
 
+use crate::commands::structure::project_pool_and_type;
 use crate::error::AppResult;
 use crate::services::history_service as history;
 use crate::services::manga_service::{self, ChapterFields, MangaSettings, PageScript, PageScriptInput, Panel};
@@ -32,6 +33,7 @@ pub async fn save_page_script(
     input: PageScriptInput,
 ) -> AppResult<PageScript> {
     let pool = project_pool(&state, &project_id).await?;
+    history::snapshot_before(&pool, "structureNode", &page_id).await;
     let saved = manga_service::save_page_script(&pool, &page_id, &input).await?;
     history::record(&pool, "updated", "structureNode", &saved.page.id, &saved.page.title, "").await;
     Ok(saved)
@@ -47,9 +49,22 @@ pub async fn get_script_panels(state: State<'_, AppState>, project_id: String) -
 #[tauri::command(rename_all = "camelCase")]
 pub async fn move_manga_panel(state: State<'_, AppState>, project_id: String, panel_id: String, page_id: String) -> AppResult<()> {
     let pool = project_pool(&state, &project_id).await?;
+    if let Some(source) = manga_service::page_of_panel(&pool, &panel_id).await? {
+        history::snapshot_before(&pool, "structureNode", &source).await;
+    }
+    history::snapshot_before(&pool, "structureNode", &page_id).await;
     manga_service::move_panel(&pool, &panel_id, &page_id).await?;
     history::touch_day(&pool).await;
     Ok(())
+}
+
+/// Ajoute plusieurs pages à la fin d'un chapitre.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn create_manga_pages(state: State<'_, AppState>, project_id: String, chapter_id: String, count: i64) -> AppResult<Vec<StructureNode>> {
+    let (pool, project_type) = project_pool_and_type(&state, &project_id).await?;
+    let created = manga_service::create_pages(&pool, project_type, &chapter_id, count).await?;
+    history::record(&pool, "updated", "structureNode", &chapter_id, "", "").await;
+    Ok(created)
 }
 
 /// Objectif narratif, nombre de pages visé et statut d'un chapitre.

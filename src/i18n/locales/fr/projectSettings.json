@@ -82,7 +82,7 @@
     "lists": {
       "title": "Listes personnalisables",
       "description": "Valeurs proposées dans les fiches de ce projet. Une valeur retirée reste sur les fiches qui l'utilisent.",
-      "placeholder": "Nouvelle valeur",
+      "placeholder": "Ex. Autre",
       "add": "Ajouter",
       "remove": "Retirer « {{value}} »",
       "reset": "Valeurs par défaut"

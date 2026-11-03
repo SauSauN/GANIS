@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { create } from "zustand";
 import i18n from "@/i18n";
 import { errorText as sharedErrorText } from "@/lib/errors";
@@ -195,6 +195,45 @@ export function useNodeDocuments(projectId: string, nodeId: string): {
   }, [documents, fetchNode, projectId, nodeId]);
 
   return { documents, reload: () => fetchNode(projectId, nodeId) };
+}
+
+/** Lectures de listes de documents en parallèle. */
+const LIST_BATCH = 8;
+
+/**
+ * Documents de plusieurs éléments (ceux qui en ont), relus quand un document
+ * change. Sans passer par le store : une page peut en demander des centaines.
+ */
+export function useDocumentsOf(projectId: string, nodeIds: string[]): Map<string, StructureDocument[]> {
+  const [documents, setDocuments] = useState(new Map<string, StructureDocument[]>());
+  const changes = useDocumentStore((state) => state.byNode);
+  const key = nodeIds.join();
+
+  useEffect(() => {
+    if (!key) return;
+    let stale = false;
+    const wanted = new Set(key.split(","));
+    void (async () => {
+      try {
+        const counts = await api.countStructureDocuments(projectId);
+        const ids = Object.keys(counts).filter((id) => counts[id] > 0 && wanted.has(id));
+        const next = new Map<string, StructureDocument[]>();
+        for (let start = 0; start < ids.length && !stale; start += LIST_BATCH) {
+          const batch = ids.slice(start, start + LIST_BATCH);
+          const lists = await Promise.all(batch.map((id) => api.listStructureDocuments(projectId, id)));
+          batch.forEach((id, index) => next.set(id, lists[index]));
+        }
+        if (!stale) setDocuments(next);
+      } catch (error) {
+        if (!stale) toast({ message: errorText(error), tone: "error", key: "documents:list" });
+      }
+    })();
+    return () => {
+      stale = true;
+    };
+  }, [projectId, key, changes]);
+
+  return documents;
 }
 
 // ----------------------------------------------------------------------------

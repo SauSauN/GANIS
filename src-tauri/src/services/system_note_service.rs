@@ -20,8 +20,9 @@
 //! - Modifier le texte d'une note système (`update_note`) l'écrit dans la
 //!   fiche : le texte sous le n-ième titre de niveau 2 va dans le n-ième
 //!   champ (l'éditeur empêche de modifier, d'ajouter ou de supprimer les
-//!   titres). La mise en forme n'est pas gardée : les champs des fiches sont
-//!   du texte simple.
+//!   titres). Les champs des fiches sont du texte simple : la mise en forme
+//!   (police, taille, gras…, listes) reste dans la note, et `reconcile` la
+//!   garde tant que le texte de sa section est celui de la fiche.
 //! - Ces notes et dossiers ne se suppriment, ne se renomment et ne se
 //!   déplacent pas à la main ; désactiver l'option les retire (rien n'est
 //!   perdu : le texte est dans les fiches).
@@ -333,22 +334,80 @@ fn heading(level: u8, text: &str) -> Value {
     json!({ "type": "heading", "attrs": { "level": level }, "content": [text_node(text)] })
 }
 
+/// Le texte d'un champ, un paragraphe par ligne.
+fn value_blocks(value: &str) -> Vec<Value> {
+    let lines: Vec<&str> = value.lines().collect();
+    if lines.is_empty() {
+        return vec![json!({ "type": "paragraph" })];
+    }
+    lines
+        .into_iter()
+        .map(|line| {
+            if line.is_empty() {
+                json!({ "type": "paragraph" })
+            } else {
+                json!({ "type": "paragraph", "content": [text_node(line)] })
+            }
+        })
+        .collect()
+}
+
+fn note_name<'a>(entity: &'a Entity, t: &Texts) -> &'a str {
+    if entity.name.trim().is_empty() { t.untitled } else { entity.name.trim() }
+}
+
 /// Document de l'éditeur : le nom en titre, puis un titre et le texte de chaque champ.
 fn render(kind: Kind, entity: &Entity, t: &Texts) -> String {
-    let name = if entity.name.trim().is_empty() { t.untitled } else { entity.name.trim() };
-    let mut content = vec![heading(1, name)];
+    let mut content = vec![heading(1, note_name(entity, t))];
     for (key, value) in kind.fields().iter().zip(&entity.values) {
         content.push(heading(2, (t.field)(key)));
-        let lines: Vec<&str> = value.lines().collect();
-        if lines.is_empty() {
-            content.push(json!({ "type": "paragraph" }));
-        }
-        for line in lines {
-            if line.is_empty() {
-                content.push(json!({ "type": "paragraph" }));
-            } else {
-                content.push(json!({ "type": "paragraph", "content": [text_node(line)] }));
-            }
+        content.extend(value_blocks(value));
+    }
+    json!({ "type": "doc", "content": content }).to_string()
+}
+
+/// Ce qu'une note système peut contenir : l'écriture seule, sans tableau,
+/// encadré, schéma… (voir `noteExtensions` côté interface).
+const WRITING_NODES: [&str; 10] =
+    ["doc", "heading", "paragraph", "text", "hardBreak", "bulletList", "orderedList", "listItem", "taskList", "taskItem"];
+const WRITING_MARKS: [&str; 5] = ["textStyle", "bold", "italic", "underline", "strike"];
+
+fn only_writing_format(node: &Value) -> bool {
+    let kind = node.get("type").and_then(Value::as_str).unwrap_or_default();
+    let marks = node.get("marks").and_then(Value::as_array);
+    let children = node.get("content").and_then(Value::as_array);
+    (WRITING_NODES.contains(&kind) || kind == "entityMention")
+        && marks.into_iter().flatten().all(|mark| {
+            WRITING_MARKS.contains(&mark.get("type").and_then(Value::as_str).unwrap_or_default())
+        })
+        && children.into_iter().flatten().all(only_writing_format)
+}
+
+/// Document de la note à partir de sa version précédente : la mise en forme
+/// d'une section est gardée tant que son texte est celui de la fiche. Une
+/// section modifiée depuis la fiche repart de son texte ; les titres suivent
+/// le nom de l'élément et la langue.
+fn reconcile(kind: Kind, entity: &Entity, t: &Texts, previous: &str) -> String {
+    let doc: Value = serde_json::from_str(previous).unwrap_or(Value::Null);
+    if !only_writing_format(&doc) {
+        return render(kind, entity, t);
+    }
+    let (title, sections) = split_sections(&doc);
+    if sections.len() != kind.fields().len() {
+        return render(kind, entity, t);
+    }
+    let keep_heading = |old: Option<&Value>, level: u8, text: &str| match old {
+        Some(node) if inline_text(node) == text => node.clone(),
+        _ => heading(level, text),
+    };
+
+    let mut content = vec![keep_heading(title, 1, note_name(entity, t))];
+    for ((key, value), (old_heading, blocks)) in kind.fields().iter().zip(&entity.values).zip(&sections) {
+        content.push(keep_heading(Some(old_heading), 2, (t.field)(key)));
+        if !blocks.is_empty() && section_text(blocks).trim() == value.trim() {
+            content.extend(blocks.iter().map(|block| (*block).clone()));
+        } else {
+            content.extend(value_blocks(value));
         }
     }
     json!({ "type": "doc", "content": content }).to_string()
@@ -401,30 +460,40 @@ fn inline_text(node: &Value) -> String {
     text
 }
 
+/// Le titre de niveau 1, puis chaque titre de niveau 2 et les blocs qui le suivent.
+#[allow(clippy::type_complexity)]
+fn split_sections(doc: &Value) -> (Option<&Value>, Vec<(&Value, Vec<&Value>)>) {
+    let mut title = None;
+    let mut result: Vec<(&Value, Vec<&Value>)> = Vec::new();
+    for node in doc.get("content").and_then(Value::as_array).into_iter().flatten() {
+        let level = (node.get("type").and_then(Value::as_str) == Some("heading"))
+            .then(|| node.get("attrs").and_then(|a| a.get("level")).and_then(Value::as_u64))
+            .flatten();
+        match level {
+            Some(2) => result.push((node, Vec::new())),
+            Some(1) => title = title.or(Some(node)),
+            _ => {
+                if let Some((_, blocks)) = result.last_mut() {
+                    blocks.push(node);
+                }
+            }
+        }
+    }
+    (title, result)
+}
+
+fn section_text(blocks: &[&Value]) -> String {
+    let mut lines = Vec::new();
+    for block in blocks {
+        block_text(block, &mut lines);
+    }
+    lines.join("\n").trim_matches('\n').trim_end().to_owned()
+}
+
 /// Texte sous chaque titre de niveau 2, dans l'ordre.
 fn sections(content: &str) -> Vec<String> {
     let doc: Value = serde_json::from_str(content).unwrap_or(Value::Null);
-    let mut result: Vec<Vec<String>> = Vec::new();
-    for node in doc.get("content").and_then(Value::as_array).into_iter().flatten() {
-        let is_h2 = node.get("type").and_then(Value::as_str) == Some("heading")
-            && node.get("attrs").and_then(|a| a.get("level")).and_then(Value::as_u64) == Some(2);
-        if is_h2 {
-            result.push(Vec::new());
-        } else if node.get("type").and_then(Value::as_str) == Some("heading")
-            && node.get("attrs").and_then(|a| a.get("level")).and_then(Value::as_u64) == Some(1)
-        {
-            continue;
-        } else if let Some(current) = result.last_mut() {
-            block_text(node, current);
-        }
-    }
-    result
-        .into_iter()
-        .map(|lines| {
-            let text = lines.join("\n");
-            text.trim_matches('\n').trim_end().to_owned()
-        })
-        .collect()
+    split_sections(&doc).1.iter().map(|(_, blocks)| section_text(blocks)).collect()
 }
 
 // ----------------------------------------------------------------------------
@@ -533,12 +602,12 @@ async fn sync_locked(pool: &SqlitePool, project_type: ProjectType, language: Opt
         let folder = &folders[&kind];
         for entity in entities(pool, kind, project_type, &t).await? {
             let title: String = if entity.name.trim().is_empty() { t.untitled.to_owned() } else { entity.name.trim().chars().take(200).collect() };
-            let content = render(kind, &entity, &t);
             let now = now_utc();
             match by_entity.get(&(kind, entity.id.clone())).filter(|id| notes.contains_key(*id)) {
                 Some(note_id) => {
                     kept.insert(note_id.clone());
                     let (old_title, old_content, old_folder) = &notes[note_id];
+                    let content = reconcile(kind, &entity, &t, old_content);
                     if *old_title != title || *old_content != content || old_folder.as_deref() != Some(folder.as_str()) {
                         sqlx::query("UPDATE notes SET title = ?, content = ?, excerpt = ?, folder_id = ?, updated_at = ? WHERE id = ?")
                             .bind(&title)
@@ -553,6 +622,7 @@ async fn sync_locked(pool: &SqlitePool, project_type: ProjectType, language: Opt
                 }
                 None => {
                     let id = new_id();
+                    let content = render(kind, &entity, &t);
                     sqlx::query("DELETE FROM system_notes WHERE kind = ? AND entity_id = ?")
                         .bind(kind.as_str())
                         .bind(&entity.id)
@@ -658,17 +728,19 @@ pub async fn update_note(pool: &SqlitePool, note_id: &str, content: Option<&str>
         sqlx::query("UPDATE notes SET pinned = ? WHERE id = ?").bind(pinned).bind(note_id).execute(pool).await?;
     }
 
-    refresh_one(pool, note_id, kind, &entity_id).await?;
+    refresh_one(pool, note_id, kind, &entity_id, content).await?;
     note_service::get_note(pool, note_id).await
 }
 
 /// Recalcule une note système depuis sa fiche (après l'avoir enregistrée
-/// depuis la note). Le titre (nom de l'élément) ne change pas ici : il suit
-/// la fiche à la prochaine lecture des notes.
-async fn refresh_one(pool: &SqlitePool, note_id: &str, kind: Kind, entity_id: &str) -> AppResult<()> {
+/// depuis la note) en gardant la mise en forme de `edited`, ou à défaut de
+/// la note enregistrée. Le titre (nom de l'élément) ne change pas ici : il
+/// suit la fiche à la prochaine lecture des notes.
+async fn refresh_one(pool: &SqlitePool, note_id: &str, kind: Kind, entity_id: &str, edited: Option<&str>) -> AppResult<()> {
     let _guard = SYNC.lock().await;
     let t = texts(&settings(pool).await?.language);
-    let title: String = sqlx::query_scalar("SELECT title FROM notes WHERE id = ?").bind(note_id).fetch_one(pool).await?;
+    let (title, stored): (String, String) =
+        sqlx::query_as("SELECT title, content FROM notes WHERE id = ?").bind(note_id).fetch_one(pool).await?;
     let values: Vec<String> = match kind {
         Kind::Node => {
             let summary: Option<String> =
@@ -687,7 +759,7 @@ async fn refresh_one(pool: &SqlitePool, note_id: &str, kind: Kind, entity_id: &s
     };
     let entity = Entity { id: entity_id.to_owned(), name: title, values };
     sqlx::query("UPDATE notes SET content = ?, excerpt = ?, updated_at = ? WHERE id = ?")
-        .bind(render(kind, &entity, &t))
+        .bind(reconcile(kind, &entity, &t, edited.unwrap_or(&stored)))
         .bind(excerpt(&entity))
         .bind(now_utc())
         .bind(note_id)
@@ -807,6 +879,86 @@ mod tests {
         let saved = update_note(&pool, &note.id, Some(&edited), None).await.unwrap();
         assert_eq!(saved.title, "Scene 1");
         assert!(saved.content.contains("Summary") && saved.content.contains("Arrivée"));
+    }
+
+    /// Note d'un personnage : la description en police choisie et en liste.
+    fn formatted(description_title: &str, notes_title: &str, notes: &str) -> String {
+        json!({ "type": "doc", "content": [
+            heading(1, "Aldric"),
+            heading(2, description_title),
+            { "type": "paragraph", "content": [
+                { "type": "text", "text": "Le prince", "marks": [{ "type": "textStyle", "attrs": { "fontFamily": "Georgia", "fontSize": "20px" } }, { "type": "bold" }] },
+            ] },
+            { "type": "bulletList", "content": [{ "type": "listItem", "content": [{ "type": "paragraph", "content": [text_node("Héritier")] }] }] },
+            heading(2, notes_title),
+            { "type": "paragraph", "content": [text_node(notes)] },
+        ] })
+        .to_string()
+    }
+
+    #[tokio::test]
+    async fn formatting_survives_saving_and_syncing() {
+        let pool = pool().await;
+        add_character(&pool, "c1", "Aldric", r#"{"description":"Ancien","notes":"Revoir"}"#).await;
+        set_enabled(&pool, ProjectType::Novel, true, "fr").await.unwrap();
+        let note = system_note_of(&pool, "c1").await;
+
+        let saved = update_note(&pool, &note.id, Some(&formatted("Description générale", "Notes de l'auteur", "Revoir")), None).await.unwrap();
+        assert!(saved.content.contains("Georgia") && saved.content.contains("bulletList"));
+
+        // La fiche reste en texte simple.
+        let fields: String = sqlx::query_scalar("SELECT fields FROM characters WHERE id = 'c1'").fetch_one(&pool).await.unwrap();
+        assert!(fields.contains(r"Le prince\n- Héritier") && !fields.contains("Georgia"));
+
+        // Une lecture ne change rien, et ne réécrit pas la note.
+        sync(&pool, ProjectType::Novel, None).await.unwrap();
+        assert_eq!(system_note_of(&pool, "c1").await.content, saved.content);
+        assert_eq!(system_note_of(&pool, "c1").await.updated_at, saved.updated_at);
+
+        // Épingler non plus.
+        let pinned = update_note(&pool, &note.id, None, Some(true)).await.unwrap();
+        assert!(pinned.content.contains("Georgia"));
+
+        // Les titres suivent la langue, la mise en forme reste.
+        sync(&pool, ProjectType::Novel, Some("en")).await.unwrap();
+        let english = system_note_of(&pool, "c1").await;
+        assert!(english.content.contains("General description") && english.content.contains("Georgia"));
+
+        // Une autre section modifiée dans la fiche : celle-ci garde sa mise en forme.
+        let edit = r#"{"description":"Le prince\n- Héritier","notes":"Depuis la fiche"}"#;
+        sqlx::query("UPDATE characters SET fields = ? WHERE id = 'c1'").bind(edit).execute(&pool).await.unwrap();
+        sync(&pool, ProjectType::Novel, None).await.unwrap();
+        let note = system_note_of(&pool, "c1").await;
+        assert!(note.content.contains("Georgia") && note.content.contains("Depuis la fiche"));
+
+        // Sa propre section modifiée dans la fiche : elle repart du nouveau texte.
+        sqlx::query("UPDATE characters SET fields = '{\"description\":\"Roi\",\"notes\":\"Depuis la fiche\"}' WHERE id = 'c1'").execute(&pool).await.unwrap();
+        sync(&pool, ProjectType::Novel, None).await.unwrap();
+        let note = system_note_of(&pool, "c1").await;
+        assert!(!note.content.contains("Georgia") && note.content.contains("Roi"));
+        assert_eq!(sections(&note.content), vec!["Roi".to_owned(), "Depuis la fiche".to_owned()]);
+    }
+
+    #[tokio::test]
+    async fn only_writing_format_is_stored() {
+        let pool = pool().await;
+        add_character(&pool, "c1", "Aldric", r#"{"description":"","notes":""}"#).await;
+        set_enabled(&pool, ProjectType::Novel, true, "fr").await.unwrap();
+        let note = system_note_of(&pool, "c1").await;
+
+        let with_table = json!({ "type": "doc", "content": [
+            heading(1, "Aldric"),
+            heading(2, "Description générale"),
+            { "type": "table", "content": [{ "type": "tableRow", "content": [{ "type": "tableCell", "content": [{ "type": "paragraph", "content": [text_node("Cellule")] }] }] }] },
+            heading(2, "Notes de l'auteur"),
+            { "type": "paragraph", "content": [{ "type": "text", "text": "Surligné", "marks": [{ "type": "highlight" }] }] },
+        ] })
+        .to_string();
+
+        // Le texte va dans la fiche ; la note ne garde ni tableau ni surlignage.
+        let saved = update_note(&pool, &note.id, Some(&with_table), None).await.unwrap();
+        assert!(!saved.content.contains("table") && !saved.content.contains("highlight"));
+        assert_eq!(sections(&saved.content), vec!["Cellule".to_owned(), "Surligné".to_owned()]);
     }
 
     #[test]

@@ -157,6 +157,36 @@ struct Data {
     plot: Option<Value>,
     #[serde(default)]
     versions: Vec<VersionDef>,
+    /// Individus de la faune qui sont aussi des personnages (clé d'espèce).
+    #[serde(default)]
+    animal_characters: Vec<String>,
+    /// Éléments mis à la corbeille à la fin (`@sorte:clé`).
+    #[serde(default)]
+    trash: Vec<String>,
+    /// Lignes du journal du projet.
+    #[serde(default)]
+    journal: Vec<JournalDef>,
+    /// Jours du calendrier de travail.
+    #[serde(default)]
+    work_days: Vec<WorkDayDef>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct JournalDef {
+    action: String,
+    kind: String,
+    item: String,
+    label: String,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct WorkDayDef {
+    day: String,
+    actions: i64,
+    minutes: i64,
+    words: i64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -347,6 +377,20 @@ struct VersionDef {
     name: String,
     #[serde(default)]
     then: Option<String>,
+    /// Page de manga : état antérieur des cases, gardé sous ce nom ; les cases
+    /// du scénario restent l'état actuel.
+    #[serde(default)]
+    earlier_panels: Vec<EarlierPanelDef>,
+}
+
+/// État antérieur d'une case (index dans la page) et de son premier texte.
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct EarlierPanelDef {
+    panel: usize,
+    action: String,
+    #[serde(default)]
+    text: Option<String>,
 }
 
 // ----------------------------------------------------------------------------
@@ -661,6 +705,41 @@ impl<'a> Builder<'a> {
         // La construction n'est pas une séance de travail de l'auteur.
         sqlx::query("DELETE FROM work_days").execute(pool).await?;
         sqlx::query("DELETE FROM activity").execute(pool).await?;
+
+        // Sauf ce que l'exemple décrit lui-même : corbeille, journal, calendrier.
+        self.trash().await?;
+        for line in &self.parsed.data.journal {
+            let item = if line.item == "default" { line.item.clone() } else { self.refs.id("node", &line.item)? };
+            history::record(pool, &line.action, &line.kind, &item, &line.label, "").await;
+        }
+        sqlx::query("DELETE FROM work_days").execute(pool).await?;
+        for day in &self.parsed.data.work_days {
+            sqlx::query("INSERT INTO work_days (day, actions, minutes, last_minute, words) VALUES (?, ?, ?, '', ?)")
+                .bind(&day.day)
+                .bind(day.actions)
+                .bind(day.minutes)
+                .bind(day.words)
+                .execute(pool)
+                .await?;
+        }
+        Ok(())
+    }
+
+    async fn trash(&self) -> AppResult<()> {
+        let pool = self.pool;
+        for value in &self.parsed.data.trash {
+            let (kind, key) = reference(value).ok_or_else(|| invalid(format!("corbeille : référence attendue, « {value} »")))?;
+            let id = self.refs.get(kind, key)?;
+            match kind {
+                "node" => drop(structure::delete_node(pool, &id).await?),
+                "char" => drop(characters::delete_character(pool, &id).await?),
+                "loc" => drop(locations::delete_location(pool, &id).await?),
+                "item" => drop(world::delete_entry(pool, Module::Item, &id).await?),
+                "species" => drop(world::delete_entry(pool, Module::Species, &id).await?),
+                "note" => drop(notes::delete_note(pool, &id).await?),
+                other => return Err(invalid(format!("corbeille : sorte inconnue « {other} »"))),
+            }
+        }
         Ok(())
     }
 
@@ -858,6 +937,10 @@ impl<'a> Builder<'a> {
                 }
                 for (image, caption) in &e.gallery {
                     world::add_gallery_image(self.pool, module, &created.id, &image.base64()?, caption.as_deref()).await?;
+                }
+                if module == Module::Species && data.animal_characters.contains(&e.key) {
+                    let (_, character) = world::create_character(self.pool, module, &created.id).await?;
+                    self.refs.add("char", &e.key, &character.id)?;
                 }
             }
         }
@@ -1085,6 +1168,10 @@ impl<'a> Builder<'a> {
     async fn versions(&mut self) -> AppResult<()> {
         for v in &self.parsed.data.versions {
             let item = if v.item == "default" { v.item.clone() } else { self.refs.id("node", &v.item)? };
+            if !v.earlier_panels.is_empty() {
+                self.named_earlier_panels(&item, v).await?;
+                continue;
+            }
             history::create_named_version(self.pool, &v.kind, &item, &v.name).await?;
             if let Some(section) = &v.then {
                 let html = self.html(section)?;
@@ -1100,6 +1187,31 @@ impl<'a> Builder<'a> {
                 }
             }
         }
+        Ok(())
+    }
+}
+
+impl Builder<'_> {
+    /// Écrit l'état antérieur des cases d'une page, le garde sous le nom donné,
+    /// puis remet les cases du scénario.
+    async fn named_earlier_panels(&self, page_id: &str, v: &VersionDef) -> AppResult<()> {
+        let pool = self.pool;
+        let page = structure::find_node(pool, page_id).await?.ok_or_else(|| invalid(format!("version « {} » : page inconnue", v.name)))?;
+        let snapshot = manga::panels_snapshot(pool, page_id).await?;
+        let read = || serde_json::from_str::<Vec<PanelInput>>(&snapshot).map_err(|e| invalid(format!("version « {} » : {e}", v.name)));
+        let script = |panels| PageScriptInput { rhythm: page.rhythm.clone(), page_turn: page.page_turn, panels, page_label: page.title.clone() };
+
+        let mut earlier = read()?;
+        for change in &v.earlier_panels {
+            let panel = earlier.get_mut(change.panel).ok_or_else(|| invalid(format!("version « {} » : case {} absente", v.name, change.panel)))?;
+            panel.action = change.action.clone();
+            if let (Some(content), Some(first)) = (&change.text, panel.texts.first_mut()) {
+                first.content = content.clone();
+            }
+        }
+        manga::save_page_script(pool, page_id, &script(earlier)).await?;
+        history::create_named_version(pool, &v.kind, page_id, &v.name).await?;
+        manga::save_page_script(pool, page_id, &script(read()?)).await?;
         Ok(())
     }
 }

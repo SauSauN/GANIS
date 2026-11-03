@@ -87,6 +87,9 @@ export const structureApi = {
   /** Déplace une case à la fin d'une autre page. */
   moveMangaPanel: (projectId: string, panelId: string, pageId: string) => call<void>("move_manga_panel", { projectId, panelId, pageId }),
 
+  /** Ajoute plusieurs pages à la fin d'un chapitre. */
+  createMangaPages: (projectId: string, chapterId: string, count: number) => call<StructureNode[]>("create_manga_pages", { projectId, chapterId, count }),
+
   /** Objectif narratif, pages visées et statut d'un chapitre. */
   setMangaChapter: (projectId: string, nodeId: string, fields: MangaChapterFields) =>
     call<StructureNode>("set_manga_chapter", { projectId, nodeId, fields }),

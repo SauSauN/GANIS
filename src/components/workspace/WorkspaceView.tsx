@@ -55,6 +55,7 @@ const ManuscriptView = lazy(() => import("@/components/novel/ManuscriptView").th
 const ProgressView = lazy(() => import("@/components/novel/ProgressView").then((module) => ({ default: module.ProgressView })));
 const ReplaceView = lazy(() => import("@/components/novel/ReplaceView").then((module) => ({ default: module.ReplaceView })));
 const ImportView = lazy(() => import("@/components/novel/ImportView").then((module) => ({ default: module.ImportView })));
+const FlatplanView = lazy(() => import("@/components/manga/FlatplanView").then((module) => ({ default: module.FlatplanView })));
 const ScriptProgressView = lazy(() => import("@/components/manga/ScriptProgressView").then((module) => ({ default: module.ScriptProgressView })));
 const ContinuityView = lazy(() => import("@/components/manga/ContinuityView").then((module) => ({ default: module.ContinuityView })));
 // Lecture complète (film, série, jeu vidéo, JDR, projet libre).
@@ -193,6 +194,10 @@ function WorkspaceContent({
   if (tabId === "script.read") {
     // Lecture de l'histoire chapitre par chapitre (voir `StoryReadView`).
     return <StoryReadView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "script.flatplan") {
+    return <FlatplanView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
   if (tabId === "script.progress") {

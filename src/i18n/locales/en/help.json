@@ -37,7 +37,8 @@
           "Click a module again to collapse its panel.",
           "Right-click a tab to pin it, or close the others, those on the left or on the right.",
           "Pinned tabs come back the next time you open the project.",
-          "“Collapse” keeps only the icons in the left bar."
+          "“Collapse” keeps only the icons in the left bar.",
+          "Each project type and module has its tutorial: the ? button at the top of the panel, or Help › Tutorial."
         ]
       },
       "synopsis": {
@@ -115,7 +116,7 @@
         "points": [
           "File your notes in folders.",
           "The sticky-note wall holds loose ideas, placed freely.",
-          "Sheet descriptions also exist as system notes, editable from the notes."
+          "Sheet descriptions also exist as system notes, editable from the notes, with font, size and lists."
         ]
       },
       "search": {
@@ -354,7 +355,9 @@
           "Automatic numbering (renumbering on every move) is turned on in the project settings, as is each level's colour.",
           "An item's sheet shows its summary, its characters (point of view, present…) and its locations.",
           "Documents: in an item's sheet, keep its files (manga pages, PDFs, Word files, images, sounds…) with “Add files” or by drag and drop. They are stored in the project (encrypted if the project is private) and exported in the .ganix.",
-          "Click a document to read it in GANIS; “Read the pages” chains a chapter's images. “Edit in its application” opens it in Word, Acrobat, Clip Studio…: every save comes back, the previous content stays in the versions."
+          "Click a document to read it in GANIS; “Read the pages” chains a chapter's images. “Edit in its application” opens it in Word, Acrobat, Clip Studio…: every save comes back, the previous content stays in the versions.",
+          "Manga / comic: Script › Flatplan shows a volume's pages as spreads, in the chosen reading direction. A page shows the art filed on its sheet; otherwise, art filed on the chapter is shared out in order. The first printed page decides which pages face each other: a reveal planned at the page turn on an even page is flagged.",
+          "Manga / comic: a chapter's sheet creates its pages in one go (“Add pages”). File each piece of art on its page's sheet: it shows next to the panels, and the chapter's “Read the pages” chains them. Panels are found by the search and kept in the page's versions."
         ]
       },
       "reading": {

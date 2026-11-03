@@ -41,6 +41,7 @@ Tout reste sur l'ordinateur de l'utilisateur. GANIS fonctionne **sans connexion 
 - **Accueil** : un message court, un plateau de trame en miniature (intrigues, scènes, personnages, lieu) dessiné aux couleurs du thème, et deux boutons : « Commencer » et « Se connecter ».
 - **Deux espaces, jamais mélangés** : sans connexion (« Commencer »), le tableau de bord montre l'**espace public** (projets publics uniquement) ; connecté, l'**espace privé** (projets privés du compte uniquement). Il n'y a pas de filtre : le mode décide. Les projets créés prennent automatiquement la visibilité de l'espace.
 - **Guide de démarrage** : il s'ouvre une seule fois, à la première arrivée sur le tableau de bord (avec ou sans compte), puis reste disponible dans Aide › Guide de démarrage. 16 étapes, chacune avec un court texte et ses points clés : projets, espaces public et privé, espace de travail, accueil du projet, personnages, lieux, relations, découpage, trame, notes, recherche, enregistrement et versions, historique et corbeille, export .ganix, personnalisation, raccourcis.
+- **Tutoriels** : à la première ouverture d'un projet de chaque sorte (roman, manga, ou autre type), un mode de démarrage explique par où commencer ; Objets et Faune et flore ont le leur à leur première ouverture. Chaque module a aussi son tutoriel, à la demande : bouton `?` du panneau, Aide › Tutoriel, ou palette. Les étapes peuvent ouvrir la fonctionnalité dont elles parlent, puis le tutoriel reprend au même endroit.
 - **Changer la visibilité** : paramètres du projet → « Statut et organisation » → « Visibilité ».
   - Public → privé : immédiat si on est connecté ; sinon une connexion est demandée sur place, puis le projet devient privé. Si la connexion passe par la création d'un compte ou l'assistant, le changement est appliqué à l'arrivée sur le tableau de bord.
   - Privé → public : confirmation explicite (« Annuler » / « Rendre public »).
@@ -65,7 +66,7 @@ L'espace de travail reprend le modèle d'un éditeur de code : une barre d'activ
 | **Lieux** | Fiches hiérarchiques (un lieu peut en contenir d'autres), types personnalisés, portrait, galerie légendée |
 | **Découpage** | Plan du récit en 1 à 5 niveaux (parties, chapitres, scènes…), numérotation automatique ou manuelle, couleurs par niveau, liens vers les personnages et les lieux |
 | **Trame** | Plateau des intrigues parallèles avec vue de lecture (par plan ou par trame) et visite guidée ; passé narratif au-dessus du début de l'histoire (flash-back, souvenirs, événements antérieurs) |
-| **Notes** | Éditeur riche (Tiptap) : tableaux, encadrés, diagrammes, chaînes, mentions de personnages et de lieux, correcteur orthographique ; dossiers, mur de post-it, notes système synchronisées avec les fiches |
+| **Notes** | Éditeur riche (Tiptap) : tableaux, encadrés, diagrammes, chaînes, mentions de personnages et de lieux, correcteur orthographique ; dossiers, mur de post-it, notes système synchronisées avec les fiches (police, taille et listes, gardées dans la note ; la fiche reste en texte simple) |
 | **Documents** | Fichiers rangés dans le découpage (PDF, Word, images, textes, sons, vidéos, pages de manga…), lecture intégrée, modification dans l'application associée avec reprise automatique, 20 versions par document |
 | **Recherche** | Recherche globale insensible à la casse et aux accents, palette de commandes (`Ctrl+K`) |
 | **Paramètres** | Réglages propres au projet (personnages, lieux, découpage, trame, notes) |
@@ -77,6 +78,12 @@ L'espace de travail reprend le modèle d'un éditeur de code : une barre d'activ
 - **Suivi de rédaction** : mots et objectifs du manuscrit, des parties, chapitres et scènes ; filtre par état de rédaction ; scènes dont la personne ou le temps diffère du reste du roman signalées.
 - **Dossier éditorial** : pitch en une phrase, résumé court, résumé long, indépendants du synopsis (qui peut servir de point de départ), versionnés et exportables séparément (Word, PDF, texte).
 Données : migration `023_novel.sql` (colonnes de `structure_nodes`, objectif dans `structure_settings`, table `editorial`), `services/novel_service.rs`, `commands/novel.rs`, `src/lib/novel.ts`, `src/lib/novelExport.ts`, `src/components/novel/*`.
+
+**Chemin de fer (projets de type Manga uniquement)** : Scénario › Chemin de fer affiche les pages d'un tome en planches, de droite à gauche ou de gauche à droite, avec leur vignette, l'état de chaque page (vide, scénario écrit, dessin rangé) et le début des chapitres. Le numéro de la première page décide des vis-à-vis ; une révélation prévue au tourné sur une page paire et une page trop chargée en texte sont signalées. Le sens de lecture et ce numéro sont des préférences locales : ils ne suivent pas le `.ganix`.
+
+**Pages de manga** : la fiche d'un chapitre crée plusieurs pages d'un coup. Le dessin rangé sur la fiche d'une page s'affiche à côté de ses cases, et la lecture du chapitre enchaîne les dessins de ses pages. Les cases sont trouvées par la recherche, et les versions d'une page les gardent.
+
+**Modèles de page (manga)** : tant qu'une page n'a pas de dessin, sa fiche et le chemin de fer montrent une planche type selon son nombre de cases : diagonales, colonnes, fonds perdus, cases incrustées. Trois modèles au plus par nombre, de 1 à 10 cases ; au-delà, des rangées de cases en biais. Ils sont intégrés à l'application (hors ligne, sans IA) ; le modèle choisi est une préférence locale qui ne suit pas le `.ganix`.
 
 **Agrandir un onglet** : un double-clic sur un onglet affiche son contenu sur toute la surface de l'espace de travail (la barre des modules et le panneau du milieu sont masqués) ; un nouveau double-clic, ou le bouton à droite de la barre d'onglets, rétablit la disposition. Le contenu de l'onglet garde son état.
 

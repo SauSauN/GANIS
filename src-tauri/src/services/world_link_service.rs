@@ -1,6 +1,7 @@
 //! Liens entre éléments du monde (base du projet).
 //!
-//! Un lien relie deux éléments, dont au moins un objet ou une espèce :
+//! Un lien relie deux éléments, dont au moins un objet, une espèce ou une
+//! faction :
 //! « Aldric **possède** Excalibur », « Le loup **vit dans** la Forêt
 //! d'Ébène », « La potion **est faite à partir de** la Rose de lune ».
 //! Il a un sens (source → cible) et apparaît sur les deux fiches ; chaque
@@ -60,13 +61,14 @@ fn table_of(kind: &str) -> Option<&'static str> {
         "location" => Some("locations"),
         "item" => Some("items"),
         "species" => Some("species"),
+        "faction" => Some("factions"),
         _ => None,
     }
 }
 
 /// Sortes qui ont besoin d'un lien du monde (les autres paires ont déjà les leurs).
 fn is_world_kind(kind: &str) -> bool {
-    kind == "item" || kind == "species"
+    matches!(kind, "item" | "species" | "faction")
 }
 
 // ----------------------------------------------------------------------------
@@ -155,7 +157,8 @@ fn known_kind(kind: &str) -> AppResult<(&'static str, &'static str)> {
         "character" => "character",
         "location" => "location",
         "item" => "item",
-        _ => "species",
+        "species" => "species",
+        _ => "faction",
     };
     Ok((name, table))
 }
@@ -310,7 +313,8 @@ async fn name_of(conn: &mut SqliteConnection, kind: &str, id: &str) -> String {
         "character" => "SELECT trim(first_name || ' ' || last_name) FROM characters WHERE id = ?",
         "location" => "SELECT name FROM locations WHERE id = ?",
         "item" => "SELECT name FROM items WHERE id = ?",
-        _ => "SELECT name FROM species WHERE id = ?",
+        "species" => "SELECT name FROM species WHERE id = ?",
+        _ => "SELECT name FROM factions WHERE id = ?",
     };
     sqlx::query_scalar::<_, String>(sql)
         .bind(id)
@@ -461,10 +465,10 @@ mod tests {
             for kind in t.from.iter().chain(&t.to) {
                 assert!(catalog.kinds.contains(kind), "{} : sorte {kind}", t.id);
             }
-            // Chaque type relie au moins une paire qui contient un objet ou une espèce.
+            // Chaque type relie au moins une paire qui contient un objet, une espèce ou une faction.
             assert!(
                 t.from.iter().any(|k| is_world_kind(k)) || t.to.iter().any(|k| is_world_kind(k)),
-                "{} ne concerne ni objet ni espèce",
+                "{} ne concerne ni objet, ni espèce, ni faction",
                 t.id
             );
         }
@@ -526,5 +530,72 @@ mod tests {
         assert!(list_links(&pool).await.unwrap().is_empty());
         trash_service::restore(&pool, &trash).await.unwrap();
         assert_eq!(list_links(&pool).await.unwrap().len(), 1);
+    }
+
+    #[tokio::test]
+    async fn factions_link_to_their_members_allies_and_seat() {
+        let pool = pool().await;
+        let aldric = character(&pool, "Aldric").await;
+        let city = location(&pool, "Aval").await;
+        let order = entry(&pool, Module::Faction, "Ordre d'Aval", "knightOrder").await;
+        let guild = entry(&pool, Module::Faction, "Guilde des Ombres", "thievesGuild").await;
+        let sword = entry(&pool, Module::Item, "Excalibur", "sword").await;
+
+        create_link(&pool, &link(("character", &aldric), ("faction", &order), "leads")).await.unwrap();
+        create_link(&pool, &link(("faction", &order), ("location", &city), "basedIn")).await.unwrap();
+        create_link(&pool, &link(("faction", &order), ("faction", &guild), "enemyOf")).await.unwrap();
+        create_link(&pool, &link(("faction", &guild), ("item", &sword), "seeks")).await.unwrap();
+        assert_eq!(list_links(&pool).await.unwrap().len(), 4);
+
+        // Dans le mauvais sens, ou entre deux sortes qui ne s'y prêtent pas : refusé.
+        assert!(create_link(&pool, &link(("faction", &order), ("character", &aldric), "leads")).await.is_err());
+        assert!(create_link(&pool, &link(("faction", &order), ("location", &city), "memberOf")).await.is_err());
+
+        // Faction supprimée : ses liens partent avec elle, puis reviennent.
+        let trash = world_service::delete_entry(&pool, Module::Faction, &order).await.unwrap();
+        assert_eq!(list_links(&pool).await.unwrap().len(), 1);
+        trash_service::restore(&pool, &trash).await.unwrap();
+        assert_eq!(list_links(&pool).await.unwrap().len(), 4);
+    }
+
+    #[tokio::test]
+    async fn links_survive_the_migration_that_adds_factions() {
+        use sqlx::migrate::Migrator;
+        use std::borrow::Cow;
+
+        let pool = SqlitePoolOptions::new().max_connections(1).connect("sqlite::memory:").await.unwrap();
+        sqlx::query("PRAGMA foreign_keys = ON").execute(&pool).await.unwrap();
+        let before = Migrator {
+            migrations: Cow::Owned(PROJECT_MIGRATOR.migrations.iter().filter(|m| m.version < 27).cloned().collect()),
+            ignore_missing: false,
+            locking: true,
+            no_tx: false,
+        };
+        run_migrations(&pool, &before).await.unwrap();
+
+        for sql in [
+            "INSERT INTO characters (id, first_name, last_name, fields, created_at, updated_at) VALUES ('c1', 'Aldric', '', '{}', 'x', 'x')",
+            "INSERT INTO items (id, name, type, created_at, updated_at) VALUES ('i1', 'Excalibur', 'sword', 'x', 'x')",
+            "INSERT INTO world_links (id, source_kind, source_id, target_kind, target_id, type, label, created_at, updated_at) 
+             VALUES ('l1', 'character', 'c1', 'item', 'i1', 'owns', 'depuis toujours', 'x', 'x')",
+        ] {
+            sqlx::query(sql).execute(&pool).await.unwrap();
+        }
+
+        run_migrations(&pool, &PROJECT_MIGRATOR).await.unwrap();
+        let links = list_links(&pool).await.unwrap();
+        assert_eq!(links.len(), 1);
+        assert_eq!((links[0].id.as_str(), links[0].label.as_str()), ("l1", "depuis toujours"));
+
+        // La nouvelle table accepte les factions, et garde ses règles.
+        let order = entry(&pool, Module::Faction, "Ordre d'Aval", "knightOrder").await;
+        create_link(&pool, &link(("character", "c1"), ("faction", &order), "memberOf")).await.unwrap();
+        let both_plain = sqlx::query(
+            "INSERT INTO world_links (id, source_kind, source_id, target_kind, target_id, type, created_at, updated_at) 
+             VALUES ('l2', 'character', 'c1', 'location', 'z', 'related', 'x', 'x')",
+        )
+        .execute(&pool)
+        .await;
+        assert!(both_plain.is_err());
     }
 }

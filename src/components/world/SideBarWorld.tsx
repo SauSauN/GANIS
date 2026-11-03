@@ -2,6 +2,8 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { WorldThumb } from "@/components/world/WorldVisuals";
+import { TreeGuides } from "@/components/common/TreeGuides";
+import { activeGuide } from "@/lib/treeGuides";
 import { buildWorldTree, flattenWorldTree, groupWorldTreeByCategory, worldTabId } from "@/lib/world";
 import { cn } from "@/lib/utils";
 import { useWorldEntries } from "@/stores/worldStore";
@@ -97,6 +99,11 @@ export function SideBarWorld({
             const open = !closedGroups.has(key);
             const label = group.category ? t(`${module}.categories.${group.category}.label`) : t("sidebar.otherCategory");
             const rows = flattenWorldTree(group.nodes, collapsed);
+            // Une ligne de plus que la profondeur : celle de la catégorie.
+            const guideOf = activeGuide(
+              rows.map((row) => row.depth + 1),
+              rows.findIndex((row) => worldTabId(module, row.entry.id) === activeTab),
+            );
 
             return (
               <li key={key} role="treeitem" aria-level={1} aria-expanded={open} aria-label={label} className="mt-1 first:mt-0">
@@ -115,7 +122,7 @@ export function SideBarWorld({
 
                 {open && (
                   <ul role="group">
-                    {rows.map(({ entry, depth, children }) => {
+                    {rows.map(({ entry, depth, children }, index) => {
                       const tabId = worldTabId(module, entry.id);
                       const active = activeTab === tabId;
                       const expanded = !collapsed.has(entry.id);
@@ -126,9 +133,10 @@ export function SideBarWorld({
                           role="treeitem"
                           aria-level={depth + 2}
                           aria-expanded={children.length > 0 ? expanded : undefined}
-                          className="flex items-center"
+                          className="relative flex items-center"
                           style={{ paddingLeft: `${(depth + 1) * 0.875}rem` }}
                         >
+                          <TreeGuides depth={depth + 1} active={guideOf(index)} />
                           <button
                             type="button"
                             tabIndex={children.length > 0 ? 0 : -1}

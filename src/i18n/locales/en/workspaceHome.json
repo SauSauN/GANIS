@@ -14,9 +14,5 @@
     "title": "Project information",
     "createdAt": "Created on",
     "updatedAt": "Last modified"
-  },
-  "help": {
-    "title": "Organize your project",
-    "text": "Use the left bar to organize the characters, locations, story outline and other elements of your project."
   }
 }

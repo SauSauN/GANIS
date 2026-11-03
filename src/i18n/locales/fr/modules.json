@@ -146,6 +146,10 @@
         "label": "Lecture de l'histoire",
         "description": "L'histoire chapitre par chapitre : l'explication de chaque chapitre et ce que montrent ses pages."
       },
+      "flatplan": {
+        "label": "Chemin de fer",
+        "description": "Toutes les pages d'un tome en planches : ce qui est écrit, dessiné, et les tournés de page."
+      },
       "progress": {
         "label": "Suivi du scénario",
         "description": "Pages prévues et écrites, statuts, volume de texte."

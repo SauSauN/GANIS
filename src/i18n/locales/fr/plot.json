@@ -542,7 +542,7 @@
     "addNew": "Ajouter un événement à cette scène",
     "linkExisting": "Relier un événement existant",
     "noLane": "Créez d'abord une trame sur le plateau.",
-    "newPlaceholder": "Ce qui se passe (titre)",
+    "newPlaceholder": "Ex. Le roi découvre la trahison",
     "newTitle": "Titre du nouvel événement",
     "lane": "Trame",
     "create": "Ajouter",

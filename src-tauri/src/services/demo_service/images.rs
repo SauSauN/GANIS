@@ -40,6 +40,8 @@ pub enum ImageSpec {
         #[serde(default = "default_height")]
         height: u32,
     },
+    /// Planche de storyboard : cases encadrées, silhouettes crayonnées.
+    Planche { panels: u32, seed: u32 },
 }
 
 fn default_width() -> u32 {
@@ -74,6 +76,12 @@ impl ImageSpec {
                     return Err(AppError::internal("Planche de couleurs sans couleur"));
                 }
                 Ok(swatches(colors, *width, *height))
+            }
+            ImageSpec::Planche { panels, seed } => {
+                if !(1..=9).contains(panels) {
+                    return Err(AppError::internal("Planche : de 1 à 9 cases"));
+                }
+                Ok(planche(*panels, *seed))
             }
         }
     }
@@ -151,6 +159,62 @@ fn shade(color: Rgb, factor: f32) -> Rgb {
         (color[1] as f32 * factor).clamp(0.0, 255.0) as u8,
         (color[2] as f32 * factor).clamp(0.0, 255.0) as u8,
     ]
+}
+
+/// Planche de storyboard (proportions d'une page de manga) : `panels` cases
+/// réparties en rangées, chacune avec une silhouette crayonnée et un fond tramé.
+pub fn planche(panels: u32, seed: u32) -> Vec<u8> {
+    const WIDTH: u32 = 300;
+    const HEIGHT: u32 = 424;
+    const MARGIN: u32 = 16;
+    const GUTTER: u32 = 8;
+
+    // Rangées de une ou deux cases, en commençant par une case large.
+    let mut rows: Vec<u32> = Vec::new();
+    let mut left = panels;
+    while left > 0 {
+        let wide = (rows.len() as u32 + seed).is_multiple_of(2) || left == 1;
+        rows.push(if wide { 1 } else { 2 });
+        left -= *rows.last().unwrap_or(&1);
+    }
+
+    let row_height = (HEIGHT - 2 * MARGIN - GUTTER * (rows.len() as u32 - 1)) / rows.len() as u32;
+    let mut boxes: Vec<(u32, u32, u32, u32)> = Vec::new();
+    for (index, count) in rows.iter().enumerate() {
+        let top = MARGIN + index as u32 * (row_height + GUTTER);
+        let cell = (WIDTH - 2 * MARGIN - GUTTER * (count - 1)) / count;
+        for column in 0..*count {
+            let x = MARGIN + column * (cell + GUTTER);
+            boxes.push((x, top, x + cell, top + row_height));
+        }
+    }
+
+    png(WIDTH, HEIGHT, |x, y| {
+        let found = boxes.iter().enumerate().find(|(_, b)| x >= b.0 && x < b.2 && y >= b.1 && y < b.3);
+        let Some((index, b)) = found else {
+            return [250, 249, 245];
+        };
+        if x < b.0 + 2 || x + 2 >= b.2 || y < b.1 + 2 || y + 2 >= b.3 {
+            return [30, 30, 32];
+        }
+        // Silhouette : tête et épaules, décalée selon la case.
+        let spread = 0.3 + 0.4 * (((index as u32 + seed) * 37 % 10) as f32 / 10.0);
+        let cx = b.0 as f32 + (b.2 - b.0) as f32 * spread;
+        let size = (b.3 - b.1) as f32 * 0.22;
+        let (fx, fy) = (x as f32, y as f32);
+        let head = (fx - cx).powi(2) + (fy - (b.3 as f32 - size * 2.2)).powi(2) < size.powi(2);
+        let body = (fx - cx).powi(2) / (size * 1.7).powi(2) + (fy - b.3 as f32).powi(2) / (size * 1.3).powi(2) < 1.0;
+        if head || body {
+            return [90, 90, 96];
+        }
+        // Fond : hachures dont le sens change d'une case à l'autre.
+        let line = if (index as u32 + seed).is_multiple_of(2) { x + y } else { x + HEIGHT - y };
+        if line % 9 == 0 {
+            [205, 205, 200]
+        } else {
+            [250, 249, 245]
+        }
+    })
 }
 
 /// Portrait stylisé : fond dégradé, tête et épaules de la couleur donnée.

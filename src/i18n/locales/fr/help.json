@@ -37,7 +37,8 @@
           "Cliquez à nouveau sur un module pour replier son panneau.",
           "Clic droit sur un onglet : l'épingler, fermer les autres, ceux de gauche ou de droite.",
           "Les onglets épinglés sont retrouvés à la prochaine ouverture du projet.",
-          "« Réduire » ne garde que les icônes de la barre de gauche."
+          "« Réduire » ne garde que les icônes de la barre de gauche.",
+          "Chaque type de projet et chaque module a son tutoriel : bouton ? en haut du panneau, ou Aide › Tutoriel."
         ]
       },
       "synopsis": {
@@ -115,7 +116,7 @@
         "points": [
           "Rangez vos notes dans des dossiers.",
           "Le mur de post-it accueille les idées en vrac, à placer librement.",
-          "Les descriptions des fiches existent aussi sous forme de notes système, modifiables depuis les notes."
+          "Les descriptions des fiches existent aussi sous forme de notes système, modifiables depuis les notes, avec police, taille et listes."
         ]
       },
       "search": {
@@ -354,7 +355,9 @@
           "La numérotation automatique (renumérotation à chaque déplacement) s'active dans les paramètres du projet, tout comme la couleur de chaque niveau.",
           "La fiche d'un élément montre son résumé, ses personnages (point de vue, présents…) et ses lieux.",
           "Documents : dans la fiche d'un élément, rangez ses fichiers (pages de manga, PDF, Word, images, sons…) avec « Ajouter des fichiers » ou par glisser-déposer. Ils sont rangés dans le projet (chiffrés si le projet est privé) et exportés dans le .ganix.",
-          "Cliquez sur un document pour le lire dans GANIS ; « Lire les pages » enchaîne les images d'un chapitre. « Modifier dans l'application » l'ouvre dans Word, Acrobat, Clip Studio… : chaque enregistrement est repris, l'ancien contenu reste dans les versions."
+          "Cliquez sur un document pour le lire dans GANIS ; « Lire les pages » enchaîne les images d'un chapitre. « Modifier dans l'application » l'ouvre dans Word, Acrobat, Clip Studio… : chaque enregistrement est repris, l'ancien contenu reste dans les versions.",
+          "Manga / BD : Scénario › Chemin de fer montre les pages d'un tome en planches, dans le sens de lecture choisi. Une page affiche le dessin rangé sur sa fiche ; à défaut, les dessins rangés sur le chapitre sont répartis dans l'ordre. La première page imprimée décide des vis-à-vis : une révélation prévue au tourné sur une page paire est signalée.",
+          "Manga / BD : la fiche d'un chapitre crée ses pages en une fois (« Ajouter des pages »). Rangez chaque dessin sur la fiche de sa page : il s'affiche à côté des cases, et « Lire les pages » du chapitre les enchaîne. Les cases sont trouvées par la recherche et gardées dans les versions de la page."
         ]
       },
       "reading": {

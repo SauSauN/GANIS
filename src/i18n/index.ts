@@ -33,6 +33,7 @@ import enStructure from "./locales/en/structure.json";
 import enSynopsis from "./locales/en/synopsis.json";
 import enTabs from "./locales/en/tabs.json";
 import enTitlebar from "./locales/en/titlebar.json";
+import enTutorials from "./locales/en/tutorials.json";
 import enUnsaved from "./locales/en/unsaved.json";
 import enUsermenu from "./locales/en/usermenu.json";
 import enViews from "./locales/en/views.json";
@@ -74,6 +75,7 @@ import frStructure from "./locales/fr/structure.json";
 import frSynopsis from "./locales/fr/synopsis.json";
 import frTabs from "./locales/fr/tabs.json";
 import frTitlebar from "./locales/fr/titlebar.json";
+import frTutorials from "./locales/fr/tutorials.json";
 import frUnsaved from "./locales/fr/unsaved.json";
 import frUsermenu from "./locales/fr/usermenu.json";
 import frViews from "./locales/fr/views.json";
@@ -158,6 +160,7 @@ export const resources = {
     synopsis: frSynopsis,
     tabs: frTabs,
     titlebar: frTitlebar,
+    tutorials: frTutorials,
     unsaved: frUnsaved,
     usermenu: frUsermenu,
     views: frViews,
@@ -201,6 +204,7 @@ export const resources = {
     synopsis: enSynopsis,
     tabs: enTabs,
     titlebar: enTitlebar,
+    tutorials: enTutorials,
     unsaved: enUnsaved,
     usermenu: enUsermenu,
     views: enViews,
@@ -293,6 +297,7 @@ void i18n.use(initReactI18next).init({
     "synopsis",
     "tabs",
     "titlebar",
+    "tutorials",
     "unsaved",
     "usermenu",
     "views",

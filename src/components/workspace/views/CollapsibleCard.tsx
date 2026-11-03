@@ -1,10 +1,10 @@
 import { useCallback, useId, useState, type CSSProperties, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, type LucideIcon } from "lucide-react";
+import { InfoTip } from "@/components/common/InfoTip";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -101,7 +101,7 @@ export function CollapsibleCard({
           aria-controls={contentId}
           title={toggleTitle}
           onClick={() => onOpenChange(!open)}
-          className="flex min-w-0 flex-1 items-center gap-4 rounded-tl-xl py-5 pl-6 text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+          className="flex min-w-0 items-center gap-4 rounded-tl-xl py-5 pl-6 text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
         >
           <span
             className={cn(
@@ -113,11 +113,13 @@ export function CollapsibleCard({
             <Icon className="size-5" aria-hidden="true" />
           </span>
 
-          <span className="min-w-0 flex-1">
-            <CardTitle className="truncate">{title}</CardTitle>
-            {description && <CardDescription>{description}</CardDescription>}
-          </span>
+          <CardTitle className="min-w-0 truncate">{title}</CardTitle>
         </button>
+
+        {description && <InfoTip>{description}</InfoTip>}
+
+        {/* Le reste de l'en-tête replie aussi la carte. */}
+        <button type="button" tabIndex={-1} aria-hidden="true" title={toggleTitle} onClick={() => onOpenChange(!open)} className="min-w-4 flex-1 self-stretch" />
 
         {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
 

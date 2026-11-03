@@ -4,6 +4,7 @@ import {
   BookText,
   Columns3,
   FileText,
+  GalleryThumbnails,
   History,
   Info,
   LayoutGrid,
@@ -132,6 +133,7 @@ type FeatureId =
   | "manuscript.import"
   | "manuscript.editorial"
   | "script.read"
+  | "script.flatplan"
   | "script.progress"
   | "script.continuity";
 
@@ -244,10 +246,11 @@ export const NOVEL_FEATURES = new Set(NOVEL_MODULE.features.map((feature) => fea
 
 /**
  * Scénario : outils du manga / de la BD (lecture et export du scénario,
- * suivi, continuité). Proposé seulement aux projets de manga.
+ * chemin de fer, suivi, continuité). Proposé seulement aux projets de manga.
  */
 export const MANGA_MODULE: WorkspaceModule = defineModule("script", Clapperboard, [
   defineFeature("script.read", BookOpenText),
+  defineFeature("script.flatplan", GalleryThumbnails),
   defineFeature("script.progress", Target),
   defineFeature("script.continuity", Route),
 ]);
