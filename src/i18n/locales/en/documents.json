@@ -115,7 +115,7 @@
   "note": {
     "title": "Note on “{{name}}”",
     "description": "A reminder for yourself: pages to redo, version sent to the publisher…",
-    "placeholder": "Your note…"
+    "placeholder": "E.g. Version sent to the publisher"
   },
   "move": {
     "title": "File “{{name}}” in…",

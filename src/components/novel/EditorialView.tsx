@@ -167,7 +167,7 @@ export function EditorialView({ project, feature }: EditorialViewProps) {
             rows={rows}
             maxLength={MAX[field]}
             value={value}
-            placeholder={field === "pitch" ? t("editorial.pitchPlaceholder") : undefined}
+            placeholder={t(`editorial.${key}Placeholder`)}
             onChange={(e) => setDraft({ ...draft, [field]: e.target.value })}
             className={cn(
               "w-full resize-y rounded-md border border-input bg-background px-3 py-2 leading-7 outline-none focus:ring-2 focus:ring-ring",

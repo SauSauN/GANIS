@@ -7,7 +7,7 @@ aucun texte d'exemple.
 | Dossier | Projet | Fichiers |
 |---|---|---|
 | `roman/` | *Les Plaques de verre* (roman) | `projet.json`, `manuscrit.md`, `notes.md`, `documents.md` |
-| `manga/` | *Kazemusubi* (manga) | `projet.json`, `scenario.md`, `notes.md`, `documents.md` |
+| `manga/` | *Kodama-sen* (manga) | `projet.json`, `scenario.md`, `notes.md`, `documents.md` |
 
 Les fichiers sont intégrés au binaire à la compilation (`include_str!`) : une
 modification est prise en compte au prochain `cargo build`. Pour ajouter un
@@ -56,6 +56,10 @@ Objet JSON, clés en camelCase. Toute clé inconnue est refusée.
 | `notes` | `folders`, `notes` (`key`, `title`, `folder`, `pinned`), `stickies` (post-it), `systemNotes` |
 | `plot` | Trame, au format enregistré par l'application (voir `src/lib/plot.ts`) |
 | `versions` | Versions nommées (voir ci-dessous) |
+| `animalCharacters` | Clés d'individus de la faune qui sont aussi des personnages (`@char:clé` les désigne ensuite) |
+| `trash` | Éléments mis à la corbeille à la fin (`@node:…`, `@char:…`, `@note:…`…) |
+| `journal` | Lignes du journal du projet : `action`, `kind`, `item`, `label` |
+| `workDays` | Jours du calendrier de travail : `day`, `actions`, `minutes`, `words` |
 
 ### Clés et références
 
@@ -96,6 +100,7 @@ personnages créés.
 { "kind": "portrait", "background": [215, 220, 228], "figure": [61, 74, 92] }
 { "kind": "landscape", "sky": [60, 90, 150], "ground": [240, 240, 245], "width": 240, "height": 160 }
 { "kind": "swatches", "colors": [[30, 38, 58], [181, 82, 59]], "width": 400, "height": 120 }
+{ "kind": "planche", "panels": 4, "seed": 7 }
 ```
 
 ### Documents
@@ -114,6 +119,8 @@ personnages créés.
 L'état présent reçoit le nom donné. Avec `then`, le texte est ensuite remplacé
 par la section indiquée (texte d'une scène, ou synopsis) : la version nommée
 garde l'ancien texte, comparable dans l'historique.
+
+Pour une page de manga, `earlierPanels` (`panel`, `action`, `text`) décrit l'état antérieur de ses cases : il est gardé sous le nom donné, et le scénario reste l'état actuel.
 
 ## Fichiers de texte (`.md`)
 

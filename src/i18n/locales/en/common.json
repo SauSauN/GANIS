@@ -7,7 +7,8 @@
     "save": "Save",
     "saving": "Saving…",
     "retry": "Retry",
-    "close": "Close"
+    "close": "Close",
+    "moreInfo": "More information"
   },
   "startup": "Starting GANIS…",
   "doubleClick": {
@@ -84,11 +85,12 @@
     "recoveryGroup": "The characters of the requested group",
     "find": "Word or phrase to find…",
     "replaceWith": "New text (empty: delete it)",
-    "eventTitle": "Event title",
-    "laneName": "Plotline name",
+    "eventTitle": "E.g. The king's betrayal",
+    "laneName": "E.g. Mira's revenge",
     "rows": "E.g. 12",
     "moment": "E.g. 4",
-    "documentName": "New document name",
-    "documentText": "Write here…"
+    "documentName": "E.g. Chapter 3 - draft",
+    "documentText": "Write here…",
+    "typedConfirmation": "Retype the name here"
   }
 }

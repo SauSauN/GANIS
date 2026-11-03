@@ -542,7 +542,7 @@
     "addNew": "Add an event to this scene",
     "linkExisting": "Link an existing event",
     "noLane": "Create a plot on the board first.",
-    "newPlaceholder": "What happens (title)",
+    "newPlaceholder": "E.g. The king discovers the betrayal",
     "newTitle": "New event title",
     "lane": "Plot",
     "create": "Add",

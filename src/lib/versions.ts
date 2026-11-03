@@ -89,6 +89,21 @@ function fieldsOf(value: string | number | null): Record<string, string> {
 
 const str = (value: string | number | null | undefined) => (value === null || value === undefined ? "" : String(value));
 
+/** Cases d'une page de manga (JSON d'une version), lisibles case par case. */
+export function panelsText(value: string | number | null, named: (id: string) => string): string {
+  if (typeof value !== "string") return "";
+  try {
+    const panels = JSON.parse(value) as Array<{ action: string; texts: Array<{ characterId: string | null; content: string }> }>;
+    return panels
+      .map((panel, index) =>
+        [`#${index + 1} ${panel.action}`.trim(), ...panel.texts.map((text) => (text.characterId ? `${named(text.characterId)} : ${text.content}` : text.content))].join("\n"),
+      )
+      .join("\n\n");
+  } catch {
+    return "";
+  }
+}
+
 /** Champs lisibles d'une version, dans l'ordre d'affichage. */
 export function readableFields(kind: VersionKind, row: Row, resolve: (id: string) => string | null): FieldValue[] {
   const named = (value: string) => (isId(value) ? (resolve(value) ?? value) : value);
@@ -115,6 +130,8 @@ export function readableFields(kind: VersionKind, row: Row, resolve: (id: string
         { key: "number", label: "versions:fields.number", text: row.numbered === 0 ? "—" : str(row.number) },
         // Roman : texte de la scène (colonne absente des versions anciennes).
         ...(row.content ? [{ key: "content", label: "versions:fields.text", text: htmlText(row.content) }] : []),
+        // Manga : cases de la page (entrée absente des versions anciennes).
+        ...(row.manga_panels ? [{ key: "panels", label: "versions:fields.panels", text: panelsText(row.manga_panels, named) }] : []),
       ];
     case "editorial":
       return [

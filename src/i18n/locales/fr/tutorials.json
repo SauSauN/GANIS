@@ -1,0 +1,415 @@
+{
+  "progress": "Étape {{current}} sur {{total}}",
+  "previous": "Précédent",
+  "next": "Suivant",
+  "finish": "C'est parti !",
+  "close": "Fermer le tutoriel",
+  "open": "Ouvrir : {{feature}}",
+  "button": "Voir le tutoriel",
+  "menu": "Tutoriel : {{name}}",
+  "novel": {
+    "title": "Démarrer un roman",
+    "name": "Roman",
+    "intro": "De la première idée au manuscrit exporté, avec le module Manuscrit, réservé aux romans.",
+    "steps": {
+      "start": {
+        "title": "Posez votre histoire",
+        "text": "Commencez par quelques lignes : de quoi parle ce roman ? Le synopsis pourra servir ensuite de base au dossier éditorial.",
+        "points": [
+          "Détails › Synopsis du projet : résumé, genres, sous-genres et ton.",
+          "Rien n'est figé : vous y reviendrez aussi souvent que nécessaire."
+        ]
+      },
+      "plan": {
+        "title": "Construisez le plan",
+        "text": "Le roman se découpe en parties, chapitres et scènes. Le plan décide de l'ordre du manuscrit.",
+        "points": [
+          "Découpage › Plan du récit : ajoutez vos parties, chapitres et scènes.",
+          "Pas besoin de parties : un chapitre peut être placé directement à la racine du plan.",
+          "Déplacer une scène dans le plan la déplace aussi dans le manuscrit."
+        ]
+      },
+      "write": {
+        "title": "Écrivez dans les fiches",
+        "text": "Le texte s'écrit dans la fiche d'une scène, ou d'un chapitre sans scène : carte « Texte ». La carte « Écriture » garde votre objectif et vos choix de narration.",
+        "points": [
+          "Ouvrez une scène depuis le plan, puis écrivez dans la carte « Texte ».",
+          "« Écriture » : objectif de mots, état de rédaction, point de vue, personne et temps.",
+          "Le texte s'enregistre avec la fiche (Ctrl+S ou enregistrement automatique) et garde ses versions."
+        ]
+      },
+      "import": {
+        "title": "Vous avez déjà un texte ?",
+        "text": "Importez un fichier Word, Markdown ou texte : GANIS le découpe en parties, chapitres et scènes.",
+        "points": [
+          "Manuscrit › Importer un manuscrit.",
+          "Sans import, une scène peut aussi reprendre le texte d'un document qui y est rangé."
+        ]
+      },
+      "manuscript": {
+        "title": "Lisez et exportez le manuscrit",
+        "text": "Le manuscrit assemble tout le roman d'un seul tenant, dans l'ordre du plan. Rien n'est copié : il reste toujours à jour.",
+        "points": [
+          "Manuscrit › Manuscrit, ou le bouton ▶ de la barre de titre (F5) pour lire sur tout l'espace.",
+          "Export Word, PDF ou texte, avec page de titre et chapitres sur une nouvelle page."
+        ]
+      },
+      "progress": {
+        "title": "Suivez votre rédaction",
+        "text": "Le suivi rassemble mots et objectifs, du roman entier jusqu'à la scène, et signale les changements de narration.",
+        "points": [
+          "Filtrez les chapitres par état : à écrire, premier jet, en révision, relu, corrigé.",
+          "Une scène dont la personne ou le temps diffère du reste du roman est signalée.",
+          "Fixez un objectif par jour et suivez votre séance et vos jours d'affilée."
+        ]
+      },
+      "replace": {
+        "title": "Corrigez dans tout le roman",
+        "text": "Un personnage change de nom ? Rechercher et remplacer corrige un nom ou un mot dans tout le texte des scènes.",
+        "points": ["Manuscrit › Rechercher et remplacer."]
+      },
+      "editorial": {
+        "title": "Préparez le dossier éditorial",
+        "text": "Les textes qui présentent le roman à un éditeur ou à un agent, indépendants du synopsis.",
+        "points": [
+          "Pitch en une phrase, résumé court et résumé long.",
+          "« Partir du synopsis » en fait une première base.",
+          "Chaque texte s'exporte séparément."
+        ]
+      }
+    }
+  },
+  "manga": {
+    "title": "Démarrer un manga",
+    "name": "Manga",
+    "intro": "Du tome à la case, jusqu'à la lecture de toute l'histoire, avec le module Scénario, réservé aux mangas et BD.",
+    "steps": {
+      "start": {
+        "title": "Posez votre histoire",
+        "text": "Commencez par quelques lignes : de quoi parle cette série, et sur quel ton ?",
+        "points": [
+          "Détails › Synopsis du projet : résumé, genres, sous-genres et ton.",
+          "Créez vos personnages et vos lieux quand vous voulez : les cases pourront s'y référer."
+        ]
+      },
+      "plan": {
+        "title": "Construisez le plan",
+        "text": "Le manga se découpe en tomes, chapitres et pages. Le plan décide de l'ordre de lecture.",
+        "points": [
+          "Découpage › Plan du récit : ajoutez un tome, puis ses chapitres.",
+          "Pour une BD ou un one-shot, gardez seulement les niveaux utiles."
+        ]
+      },
+      "chapter": {
+        "title": "Préparez un chapitre",
+        "text": "La fiche d'un chapitre porte sa carte « Scénario du chapitre » : ce qu'il doit accomplir, combien de pages il vise, et où il en est.",
+        "points": [
+          "Objectif narratif, pages visées et statut.",
+          "« Ajouter des pages » crée plusieurs pages d'un coup."
+        ]
+      },
+      "panels": {
+        "title": "Écrivez la page, case par case",
+        "text": "La carte « Cases » d'une page décrit ce que voit le lecteur : action, cadrage, personnages et textes.",
+        "points": [
+          "Textes : dialogue, pensée, narration, onomatopée, texte du décor.",
+          "Donnez un état à un personnage (blessure, tenue…) : la vue Continuité le reprend.",
+          "« Tourné de page » : prévoit une révélation pour la page suivante.",
+          "Une page ou une case trop chargée en texte est signalée.",
+          "Sans dessin, la fiche montre un modèle de page selon le nombre de cases : « Autre disposition » en propose d'autres."
+        ]
+      },
+      "art": {
+        "title": "Rangez les dessins",
+        "text": "Déposez chaque dessin sur la fiche de sa page : il s'affiche à côté de ses cases.",
+        "points": [
+          "Carte « Documents » : « Ajouter des fichiers », ou glisser-déposer.",
+          "« Lire les pages » d'un chapitre enchaîne ses dessins.",
+          "Des dessins rangés sur le chapitre sont répartis dans l'ordre sur ses pages."
+        ]
+      },
+      "read": {
+        "title": "Lisez et exportez l'histoire",
+        "text": "L'histoire chapitre par chapitre : l'explication de chaque chapitre, puis ce que montrent ses pages.",
+        "points": [
+          "Le sommaire, à gauche, mène à un chapitre ; le crayon ouvre sa fiche.",
+          "« Exporter » enregistre l'histoire en Word, PDF ou texte.",
+          "Le bouton ▶ de la barre de titre (F5) lance la lecture sur tout l'espace."
+        ]
+      },
+      "flatplan": {
+        "title": "Vérifiez le chemin de fer",
+        "text": "Toutes les pages d'un tome en planches, dans le sens de lecture choisi : vide, scénario écrit ou dessin rangé.",
+        "points": [
+          "Droite à gauche pour un manga, gauche à droite pour une BD.",
+          "Le numéro de la première page décide des pages en vis-à-vis.",
+          "Une révélation mal placée par rapport au tourné de page est signalée."
+        ]
+      },
+      "progress": {
+        "title": "Suivez l'avancement",
+        "text": "Pages prévues et écrites, statuts et volume de texte, chapitre par chapitre.",
+        "points": [
+          "Réglez les seuils d'alerte : mots par case et mots par page.",
+          "Ces alertes restent indicatives : la lisibilité dépend aussi des bulles et du dessin."
+        ]
+      },
+      "continuity": {
+        "title": "Gardez la continuité",
+        "text": "Choisissez un personnage : toutes les cases où il apparaît, avec son état, son lieu et son moment.",
+        "points": [
+          "Repérez d'un coup d'œil où son état change.",
+          "Filtrez par lieu pour vérifier une scène précise."
+        ]
+      }
+    }
+  },
+  "story": {
+    "title": "Démarrer un projet : {{type}}",
+    "name": "{{type}}",
+    "intro": "Les grandes étapes pour bâtir votre histoire, de l'idée à la lecture complète.",
+    "steps": {
+      "start": {
+        "title": "Posez votre histoire",
+        "text": "Commencez par quelques lignes : de quoi parle ce projet, et sur quel ton ?",
+        "points": ["Détails › Synopsis du projet : résumé, genres, sous-genres et ton."]
+      },
+      "cast": {
+        "title": "Créez vos personnages",
+        "text": "Une fiche par personnage, du plus simple au plus détaillé, puis leurs relations.",
+        "points": [
+          "Personnages › Créer un personnage, ou Ctrl+N dans le module.",
+          "Le graphe des relations montre qui est lié à qui."
+        ]
+      },
+      "world": {
+        "title": "Construisez votre monde",
+        "text": "Du continent à la pièce : les lieux se rangent les uns dans les autres.",
+        "points": ["Besoin d'objets, d'animaux ou de plantes ? Activez ces modules dans les paramètres du projet."]
+      },
+      "plan": {
+        "title": "Découpez le récit",
+        "text": "Pour ce type de projet, le plan propose par défaut : {{levels}}. Vous pouvez renommer ces niveaux dans les paramètres.",
+        "points": [
+          "Découpage › Plan du récit : ajoutez les éléments et rangez-les.",
+          "Chaque élément a sa fiche : résumé, texte, personnages, lieux et documents."
+        ]
+      },
+      "plot": {
+        "title": "Tissez les intrigues",
+        "text": "Le plateau montre vos intrigues en colonnes, le temps vers le bas, et leurs liens de cause à effet.",
+        "points": [
+          "Double-cliquez dans une colonne pour poser un événement.",
+          "Rattachez un événement à un élément du plan : il alimente la lecture complète."
+        ]
+      },
+      "read": {
+        "title": "Lisez toute l'histoire",
+        "text": "La lecture complète compile l'histoire dans l'ordre du plan : résumés, textes et documents, ou à défaut les événements de la trame.",
+        "points": [
+          "Le bouton ▶ de la barre de titre (F5) l'affiche sur tout l'espace.",
+          "Elle s'exporte en Word, PDF ou texte."
+        ]
+      }
+    }
+  },
+  "characters": {
+    "title": "Tutoriel : Personnages",
+    "name": "Personnages",
+    "intro": "Les fiches de vos personnages et ce qui les relie.",
+    "steps": {
+      "create": {
+        "title": "Créez un personnage",
+        "text": "Identité, apparence et personnalité : remplissez seulement ce qui vous est utile.",
+        "points": ["Chaque fiche s'ouvre dans son propre onglet.", "Ctrl+N dans le module crée un personnage."]
+      },
+      "level": {
+        "title": "Choisissez le niveau de détail",
+        "text": "Essentiel, intermédiaire ou avancé : ce niveau vaut pour toutes les fiches du projet.",
+        "points": ["Les champs déjà remplis ne sont jamais effacés quand vous en changez."]
+      },
+      "images": {
+        "title": "Ajoutez des images",
+        "text": "Une image principale, une galerie de références et une palette de couleurs sur chaque fiche.",
+        "points": ["Glissez vos images directement sur la fiche.", "Les couleurs de la palette encadrent le portrait."]
+      },
+      "relations": {
+        "title": "Reliez-les",
+        "text": "Famille, amitiés, rivalités, alliances : le graphe montre tout le monde d'un coup d'œil.",
+        "points": ["Les personnages se déplacent librement dans le graphe.", "Depuis la fiche, reliez aussi un personnage à ses lieux."]
+      }
+    }
+  },
+  "locations": {
+    "title": "Tutoriel : Lieux",
+    "name": "Lieux",
+    "intro": "La géographie de votre histoire, du continent à la pièce.",
+    "steps": {
+      "create": {
+        "title": "Créez un lieu",
+        "text": "Le type du lieu (ville, forêt, palais…) choisit les champs de sa fiche.",
+        "points": ["Chaque fiche a une bannière, une galerie et une palette de couleurs."]
+      },
+      "nest": {
+        "title": "Rangez les lieux les uns dans les autres",
+        "text": "Un continent contient des royaumes, qui contiennent des villes. Le panneau les montre en arbre.",
+        "points": ["« Ajouter un lieu dans… » crée un lieu à l'intérieur d'un autre."]
+      },
+      "types": {
+        "title": "Ajoutez vos propres types",
+        "text": "Un univers particulier ? Les paramètres du projet accueillent vos types de lieux et vos statuts.",
+        "points": []
+      },
+      "links": {
+        "title": "Reliez-les à l'histoire",
+        "text": "Les personnages liés à un lieu apparaissent sur sa fiche, et les éléments du découpage indiquent leurs lieux.",
+        "points": ["Où un personnage vit, travaille, a grandi — avec la période du récit si besoin."]
+      }
+    }
+  },
+  "items": {
+    "title": "Tutoriel : Objets",
+    "name": "Objets",
+    "intro": "Armes, véhicules, téléphones, objets magiques… tout ce qui compte dans votre histoire.",
+    "steps": {
+      "enable": {
+        "title": "Activez le module",
+        "text": "Le module Objets est facultatif : il n'apparaît dans la barre de gauche qu'une fois activé dans les paramètres du projet.",
+        "points": ["Le désactiver plus tard ne supprime rien : vos fiches sont gardées."]
+      },
+      "categories": {
+        "title": "Gardez les catégories utiles",
+        "text": "Choisissez ce dont votre histoire a besoin : seules ces catégories sont proposées à la création.",
+        "points": ["Ajoutez vos propres types et statuts.", "Réglez le niveau de détail des fiches du module."]
+      },
+      "create": {
+        "title": "Créez un objet",
+        "text": "Choisissez son type : la fiche s'adapte à une arme, à un véhicule, à un téléphone…",
+        "points": ["Ajoutez une image, une galerie et une palette de couleurs.", "Ctrl+N dans le module crée un objet."]
+      },
+      "nest": {
+        "title": "Rangez les objets",
+        "text": "Un objet peut être rangé dans un autre, comme une clé dans un coffre. Le panneau les montre en arbre.",
+        "points": []
+      },
+      "links": {
+        "title": "Reliez-les à l'histoire",
+        "text": "Sur la fiche, liez un objet à un personnage, à un lieu ou à un autre objet : « possède », « fait partie de »…",
+        "points": ["Précisez une période du récit quand un objet change de main."]
+      }
+    }
+  },
+  "species": {
+    "title": "Tutoriel : Faune et flore",
+    "name": "Faune et flore",
+    "intro": "Les animaux et les plantes de votre univers, de l'espèce entière à l'individu qui a son nom.",
+    "steps": {
+      "enable": {
+        "title": "Activez le module",
+        "text": "Faune et flore est facultatif : il n'apparaît dans la barre de gauche qu'une fois activé dans les paramètres du projet.",
+        "points": ["Choisissez ensuite les catégories utiles et le niveau de détail.", "Le désactiver plus tard ne supprime rien."]
+      },
+      "nature": {
+        "title": "Espèce ou individu ?",
+        "text": "Une fiche décrit soit toute une espèce (les loups gris, la rose de lune), soit un animal ou une plante précis (Éclair, le cheval du héros).",
+        "points": ["Choisissez sa nature à la création : les champs de la fiche s'y adaptent."]
+      },
+      "hierarchy": {
+        "title": "Rangez les individus sous leur espèce",
+        "text": "Le panneau montre les espèces en arbre, avec leurs individus.",
+        "points": []
+      },
+      "character": {
+        "title": "Un animal peut être un personnage",
+        "text": "Votre animal parle ou a des relations ? Sur sa fiche, créez sa fiche de personnage, ou associez-le à un personnage existant.",
+        "points": ["Les deux fiches restent reliées."]
+      },
+      "links": {
+        "title": "Reliez-les à l'histoire",
+        "text": "Sur la fiche, liez-les aux personnages, aux lieux, aux objets et aux autres espèces : « vit à », « appartient à »…",
+        "points": ["Précisez une période du récit si besoin."]
+      }
+    }
+  },
+  "structure": {
+    "title": "Tutoriel : Découpage",
+    "name": "Découpage",
+    "intro": "Le plan de votre histoire. Pour ce projet, par défaut : {{levels}}.",
+    "steps": {
+      "plan": {
+        "title": "Construisez le plan",
+        "text": "Ajoutez vos éléments dans Plan du récit : ils forment une arborescence, numérotée pour vous.",
+        "points": ["Sortez un élément de la numérotation pour un prologue ou un interlude."]
+      },
+      "sheet": {
+        "title": "Remplissez les fiches",
+        "text": "Chaque élément a sa fiche : résumé, personnages (point de vue, présents…) et lieux.",
+        "points": ["Le module Trame peut aussi s'y rattacher."]
+      },
+      "documents": {
+        "title": "Rangez les documents",
+        "text": "PDF, Word, images, sons : rangez les fichiers sur la fiche d'un élément, avec « Ajouter des fichiers » ou par glisser-déposer.",
+        "points": ["Cliquez sur un document pour le lire dans GANIS.", "« Modifier dans l'application » reprend chaque enregistrement et garde les anciennes versions."]
+      },
+      "settings": {
+        "title": "Adaptez les niveaux",
+        "text": "Dans les paramètres du projet : nom de chaque niveau, numérotation automatique et couleurs.",
+        "points": []
+      }
+    }
+  },
+  "plot": {
+    "title": "Tutoriel : Trame",
+    "name": "Trame",
+    "intro": "Vos intrigues parallèles sur un même plateau : une colonne par trame, le temps vers le bas.",
+    "steps": {
+      "board": {
+        "title": "Posez les événements",
+        "text": "Double-cliquez dans une colonne pour poser un événement ; glissez les cartes pour changer leur moment ou leur trame.",
+        "points": ["Remontez au-dessus du moment 1 pour le passé narratif : flash-back et souvenirs.", "Ctrl+Z annule chaque geste sur le plateau."]
+      },
+      "links": {
+        "title": "Reliez-les",
+        "text": "Tirez la poignée ronde d'une carte vers une autre : impact, influence ou croisement.",
+        "points": ["Le bouton « Tension » affiche la courbe de tension."]
+      },
+      "connect": {
+        "title": "Rattachez-les au projet",
+        "text": "Point de vue, personnages présents, lieu, chapitre du découpage et notes : tout se relie depuis l'événement.",
+        "points": ["Les fiches liées montrent ces événements dans « Dans la trame »."]
+      },
+      "reading": {
+        "title": "Lisez dans l'ordre du lecteur",
+        "text": "Lecture de l'histoire affiche les événements dans l'ordre de lecture, par défaut celui du découpage.",
+        "points": ["« Parcourir » suit l'histoire événement par événement, directement sur le plateau."]
+      }
+    }
+  },
+  "notes": {
+    "title": "Tutoriel : Notes",
+    "name": "Notes",
+    "intro": "Tout ce qui ne rentre pas ailleurs : recherches, idées, documentation.",
+    "steps": {
+      "create": {
+        "title": "Créez une note",
+        "text": "Une note s'écrit avec un vrai éditeur, enregistré et versionné comme le reste du projet.",
+        "points": []
+      },
+      "editor": {
+        "title": "Structurez vos idées",
+        "text": "Titres, listes, tableaux et liens, mais aussi encadrés, cases enchaînées et schémas.",
+        "points": ["Les outils moins courants sont dans le menu « … » au bout de la barre."]
+      },
+      "organize": {
+        "title": "Rangez vos notes",
+        "text": "Classez les notes dans des dossiers par glisser-déposer, et épinglez les plus importantes.",
+        "points": []
+      },
+      "wall": {
+        "title": "Videz-vous la tête sur le mur",
+        "text": "Le mur de post-it accueille les idées en vrac : déplacez-les par leur bandeau, agrandissez-les par leur coin.",
+        "points": []
+      }
+    }
+  }
+}

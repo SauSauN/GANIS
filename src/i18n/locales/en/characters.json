@@ -114,6 +114,7 @@
     "firstName": "E.g. Aldric",
     "lastName": "E.g. VENN",
     "nickname": "E.g. The Raven",
+    "birthDate": "E.g. March 12, 1890",
     "age": "E.g. 32, mid-forties…",
     "occupation": "E.g. Captain of the guard, smuggler…",
     "origin": "E.g. Port of Ysmir, a fishing family…",
@@ -153,7 +154,7 @@
   "choice": {
     "none": "Not specified",
     "add": "+ Add a value…",
-    "newPlaceholder": "New value",
+    "newPlaceholder": "E.g. Other",
     "confirm": "Add",
     "cancel": "Cancel"
   },

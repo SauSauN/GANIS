@@ -1,12 +1,15 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { VersionsButton } from "@/components/history/VersionsDialog";
+import { InfoTip } from "@/components/common/InfoTip";
 import { DocumentsCard } from "@/components/documents/DocumentsCard";
 import { SceneEventsCard } from "@/components/plot/SceneEventsCard";
 import { NovelTextCard, NovelWritingCard } from "@/components/novel/NovelSheetCards";
 import { MangaChapterCard } from "@/components/manga/MangaChapterCard";
+import { PageArtPreview } from "@/components/manga/PageArtPreview";
+import { PageLayoutPreview } from "@/components/manga/PageLayoutPreview";
 import { PageScriptCard } from "@/components/manga/PageScriptCard";
 import { usePageScript } from "@/components/manga/usePageScript";
-import { isMangaProject, mangaLevels, pagesInOrder } from "@/lib/manga";
+import { assignArt, isMangaProject, mangaLevels, pagesInOrder, readingOrder } from "@/lib/manga";
 import { notifyMangaScriptChanged } from "@/lib/mangaEvents";
 import { useMangaSettings, useScriptPanelsIf } from "@/stores/mangaStore";
 import { onNovelTextChanged } from "@/lib/novelEvents";
@@ -68,7 +71,7 @@ import {
 } from "@/lib/structure";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
 import { notifyError, notifySaved } from "@/lib/notify";
-import { useNodeDocuments } from "@/lib/documents";
+import { useDocumentsOf, useNodeDocuments } from "@/lib/documents";
 import { canHoldText, chapterLevel, countWords, isNovelProject, sceneLevel, wordTotals } from "@/lib/novel";
 import { useProjectStore } from "@/stores/projectStore";
 import { cn } from "@/lib/utils";
@@ -145,6 +148,20 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   const script = usePageScript(projectId, nodeId, isMangaPage);
   const mangaSettings = useMangaSettings(projectId, isMangaPage);
   const { panels: allPanels } = useScriptPanelsIf(projectId, isMangaChapter);
+  // Dessins : ceux du chapitre entier, car un dessin rangé sur le chapitre va
+  // à la page de son rang (voir `assignArt`).
+  const artEntries = useMemo(() => {
+    if (!structure || !(isMangaPage || isMangaChapter)) return [];
+    const all = pagesInOrder(structure.nodes, levelCount);
+    const chapterId = isMangaChapter ? nodeId : all.find((entry) => entry.page.id === nodeId)?.chapter?.id;
+    return chapterId ? all.filter((entry) => entry.chapter?.id === chapterId) : all.filter((entry) => entry.page.id === nodeId);
+  }, [structure, levelCount, isMangaPage, isMangaChapter, nodeId]);
+  const artNodeIds = useMemo(() => [...new Set(artEntries.flatMap((entry) => (entry.chapter ? [entry.page.id, entry.chapter.id] : [entry.page.id])))].sort(), [artEntries]);
+  const artDocuments = useDocumentsOf(projectId, artNodeIds);
+  const assignedArt = useMemo(() => assignArt(artEntries, artDocuments), [artEntries, artDocuments]);
+  const pageArt = isMangaPage ? assignedArt.art.get(nodeId) : undefined;
+  const chapterReading = useMemo(() => (isMangaChapter ? readingOrder(artEntries, assignedArt) : []), [isMangaChapter, artEntries, assignedArt]);
+
   const { documents } = useNodeDocuments(projectId, nodeId);
   const hasTextDocuments = (documents ?? []).some((d) => /\.(docx|md|markdown|txt)$/i.test(d.name));
 
@@ -462,17 +479,25 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             ================================================================ */}
         <Card className={cn(cardClass, "lg:sticky lg:top-0")}>
           <CardContent className="flex flex-col items-center gap-4 px-5 py-6 text-center">
-            <span
-              className="flex size-24 items-center justify-center rounded-2xl"
-              style={{ backgroundColor: `${color}1f`, color }}
-              aria-hidden="true"
-            >
-              {heading.number !== null ? (
-                <span className="text-3xl font-semibold tabular-nums">{heading.number}</span>
-              ) : (
-                <ListTree className="size-10" />
-              )}
-            </span>
+            {/* Page de manga dessinée : le dessin reste visible à côté des cases */}
+            {pageArt ? (
+              <PageArtPreview projectId={projectId} document={pageArt} title={heading.label} />
+            ) : isMangaPage && script.draft && script.draft.panels.length > 0 ? (
+              // Pas encore de dessin : le modèle de page selon le nombre de cases.
+              <PageLayoutPreview projectId={projectId} pageId={nodeId} framings={script.draft.panels.map((panel) => panel.framing)} />
+            ) : (
+              <span
+                className="flex size-24 items-center justify-center rounded-2xl"
+                style={{ backgroundColor: `${color}1f`, color }}
+                aria-hidden="true"
+              >
+                {heading.number !== null ? (
+                  <span className="text-3xl font-semibold tabular-nums">{heading.number}</span>
+                ) : (
+                  <ListTree className="size-10" />
+                )}
+              </span>
+            )}
 
             <div className="w-full min-w-0 space-y-2">
               <p className="break-words text-lg font-semibold">{heading.prefix}</p>
@@ -493,7 +518,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
               </div>
             </div>
 
-            {node.summary && (
+            {node.summary && !isMangaPage && (
               <p className="w-full border-t pt-4 text-left text-sm leading-6 whitespace-pre-line text-muted-foreground">
                 {node.summary}
               </p>
@@ -607,18 +632,18 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
                   </div>
                 )}
 
-                <label className="flex max-w-md items-start gap-2 pb-1 text-sm">
-                  <input
-                    type="checkbox"
-                    className="mt-0.5 size-4 accent-primary"
-                    checked={draft.numbered}
-                    onChange={(e) => setDraft({ ...draft, numbered: e.target.checked })}
-                  />
-                  <span>
+                <span className="flex items-center gap-1.5 pb-1 text-sm">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      className="size-4 accent-primary"
+                      checked={draft.numbered}
+                      onChange={(e) => setDraft({ ...draft, numbered: e.target.checked })}
+                    />
                     {t("plan.edit.numbered")}
-                    <span className="block text-xs text-muted-foreground">{t("plan.edit.numberedHint")}</span>
-                  </span>
-                </label>
+                  </label>
+                  <InfoTip>{t("plan.edit.numberedHint")}</InfoTip>
+                </span>
               </div>
 
               <div className="space-y-1.5">
@@ -695,7 +720,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             />
           )}
 
-          <DocumentsCard projectId={projectId} nodeId={nodeId} name={name} nodeOptions={nodeOptions} />
+          <DocumentsCard projectId={projectId} nodeId={nodeId} name={name} nodeOptions={nodeOptions} readingOrder={chapterReading.length ? chapterReading : undefined} />
 
           <SceneEventsCard projectId={projectId} nodeId={nodeId} name={name} onOpenFeature={onOpenFeature} />
 
@@ -1066,7 +1091,7 @@ function LinkSection({
                   );
                 })}
               </ul>
-              <p className="text-xs text-muted-foreground">{t("node.insideHint")}</p>
+              <InfoTip>{t("node.insideHint")}</InfoTip>
             </div>
           )}
 

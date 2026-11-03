@@ -114,7 +114,7 @@
     "expand": "Déplier",
     "collapse": "Replier",
     "folderName": "Nom du dossier",
-    "folderPlaceholder": "Nom du dossier puis Entrée",
+    "folderPlaceholder": "Ex. Recherches, puis Entrée",
     "dropRoot": "Déposer ici pour sortir du dossier",
     "pinned": "Épinglée",
     "actions": "Actions du dossier"
@@ -157,7 +157,7 @@
     "creating": "Création…"
   },
   "edit": {
-    "titlePlaceholder": "Titre de la note",
+    "titlePlaceholder": "Ex. Le système de magie",
     "folder": "Dossier",
     "pin": "Épingler la note",
     "unpin": "Ne plus épingler",
@@ -177,7 +177,7 @@
     "addColor": "Ajouter un post-it {{color}}",
     "hint": "Déplacez un post-it par son bandeau, agrandissez-le par son coin. Un clic le met au premier plan.",
     "empty": "Le mur est vide : ajoutez un premier post-it.",
-    "placeholder": "Écrivez ici…",
+    "placeholder": "Ex. Et si le traître était sa sœur ?",
     "delete": "Supprimer le post-it",
     "loading": "Chargement du mur…",
     "resize": "Redimensionner",
@@ -203,7 +203,7 @@
     "ignore": "Ignorer"
   },
   "system": {
-    "banner": "Note système : elle reprend la fiche. Les titres sont fixes ; le texte écrit sous un titre est enregistré dans la fiche, en texte simple.",
+    "banner": "Note système : elle reprend la fiche. Les titres sont fixes ; le texte écrit sous un titre est enregistré dans la fiche, en texte simple. La mise en forme (police, taille, listes) reste dans la note, et se perd pour une section dont le texte est modifié depuis la fiche.",
     "folder": "Dossier système"
   }
 }

@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { LocationThumb } from "@/components/locations/LocationVisuals";
 import { buildLocationTree, flattenTree, locationTabId } from "@/lib/locations";
+import { TreeGuides } from "@/components/common/TreeGuides";
+import { activeGuide } from "@/lib/treeGuides";
 import { cn } from "@/lib/utils";
 import { useProjectLocations } from "@/stores/locationStore";
 
@@ -25,6 +27,10 @@ export function SideBarLocations({ projectId, activeTab, onOpenFeature }: SideBa
   const rows = useMemo(
     () => flattenTree(buildLocationTree(locations), collapsed),
     [locations, collapsed],
+  );
+  const guideOf = activeGuide(
+    rows.map((row) => row.depth),
+    rows.findIndex((row) => locationTabId(row.location.id) === activeTab),
   );
 
   function toggle(id: string) {
@@ -52,7 +58,7 @@ export function SideBarLocations({ projectId, activeTab, onOpenFeature }: SideBa
         <p className="px-4 text-xs text-muted-foreground">{t("sidebar.empty")}</p>
       ) : (
         <ul className="min-h-0 flex-1 overflow-y-auto px-2 pb-2" role="tree">
-          {rows.map(({ location, depth, children }) => {
+          {rows.map(({ location, depth, children }, index) => {
             const tabId = locationTabId(location.id);
             const active = activeTab === tabId;
             const open = !collapsed.has(location.id);
@@ -63,9 +69,10 @@ export function SideBarLocations({ projectId, activeTab, onOpenFeature }: SideBa
                 role="treeitem"
                 aria-level={depth + 1}
                 aria-expanded={children.length > 0 ? open : undefined}
-                className="flex items-center"
+                className="relative flex items-center"
                 style={{ paddingLeft: `${depth * 0.875}rem` }}
               >
+                <TreeGuides depth={depth} active={guideOf(index)} />
                 <button
                   type="button"
                   tabIndex={children.length > 0 ? 0 : -1}

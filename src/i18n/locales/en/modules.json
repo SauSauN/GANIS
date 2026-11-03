@@ -146,6 +146,10 @@
         "label": "Story reading",
         "description": "The story chapter by chapter: what each chapter is about and what its pages show."
       },
+      "flatplan": {
+        "label": "Flatplan",
+        "description": "All the pages of a volume as spreads: what is written, what is drawn, and the page turns."
+      },
       "progress": {
         "label": "Script progress",
         "description": "Planned and written pages, statuses, text volume."

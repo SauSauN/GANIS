@@ -191,15 +191,44 @@ async fn the_manga_is_complete_with_its_script() {
     let synopsis = synopsis_service::get_synopsis(&pool).await.unwrap();
     let versions = history::list_versions(&pool, "synopsis", &synopsis.id).await.unwrap();
     assert!(versions.versions.iter().any(|v| v.name.starts_with("Synopsis envoyé")));
-    assert!(synopsis.content.contains("Récifs Hurlants"));
+    assert!(synopsis.content.contains("cote 412"));
 
     // Trame : chaque événement placé sur une page ou un chapitre existe.
     let plot = plot_service::get(&pool).await.unwrap();
     assert!(!plot.data.contains("\"@"), "référence non résolue dans la trame");
 
-    assert_eq!(characters::list_characters(&pool).await.unwrap().len(), parsed.data.characters.len());
+    // Un personnage retiré à la corbeille, un animal devenu personnage en plus.
+    let cast = characters::list_characters(&pool).await.unwrap();
+    assert_eq!(cast.len(), parsed.data.characters.len() - 1 + parsed.data.animal_characters.len());
     assert!(manga::settings(&pool).await.unwrap().panel_words_max.is_some());
-    assert_eq!(count(&pool, "SELECT COUNT(*) FROM work_days").await, 0);
+
+    // Tous les cadrages, rythmes et types de texte servent.
+    for framing in manga::FRAMINGS {
+        assert!(panels.iter().any(|p| p.framing == framing), "cadrage {framing} inutilisé");
+    }
+    for rhythm in manga::RHYTHMS {
+        assert!(panels.iter().any(|p| p.rhythm.as_deref() == Some(rhythm)), "rythme {rhythm} inutilisé");
+    }
+    for kind in manga::TEXT_KINDS {
+        assert!(panels.iter().flat_map(|p| &p.texts).any(|t| t.kind == kind), "texte {kind} inutilisé");
+    }
+    for status in manga::SCRIPT_STATUSES.iter().filter(|s| **s != "todo") {
+        assert!(chapters.iter().any(|c| c.script_status.as_deref() == Some(*status)), "statut {status} inutilisé");
+    }
+
+    // Hina n'a qu'une réplique, sa version de page garde le premier jet, l'état actuel le texte final.
+    let hina: &str = &cast.iter().find(|c| c.first_name == "Hina").unwrap().id;
+    let lines = panels.iter().flat_map(|p| &p.texts).filter(|t| t.kind == "dialogue" && t.character_id.as_deref() == Some(hina)).count();
+    assert_eq!(lines, 2, "le cri du prologue et « REN. »");
+    let versioned: String = sqlx::query_scalar("SELECT item_id FROM versions WHERE name = 'Premier jet de la page'").fetch_one(&pool).await.unwrap();
+    let list = history::list_versions(&pool, "structureNode", &versioned).await.unwrap();
+    assert!(list.versions[0].data["manga_panels"].as_str().unwrap().contains("en marchant dans le village"));
+    assert!(!list.current["manga_panels"].as_str().unwrap().contains("en marchant dans le village"));
+
+    // Corbeille, journal et calendrier sont peuplés.
+    assert_eq!(count(&pool, "SELECT COUNT(*) FROM trash").await, parsed.data.trash.len() as i64);
+    assert_eq!(count(&pool, "SELECT COUNT(*) FROM work_days").await, parsed.data.work_days.len() as i64);
+    assert!(count(&pool, "SELECT COUNT(*) FROM activity").await > 0);
 }
 
 #[tokio::test]

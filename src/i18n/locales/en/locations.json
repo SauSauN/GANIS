@@ -454,7 +454,7 @@
       "title": "Location statuses",
       "description": "Values offered for a location's status.",
       "add": "Add",
-      "placeholder": "New status",
+      "placeholder": "E.g. In ruins",
       "reset": "Default values",
       "remove": "Remove “{{value}}”"
     },

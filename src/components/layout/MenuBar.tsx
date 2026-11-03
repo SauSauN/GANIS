@@ -88,6 +88,7 @@ export function MenuBar() {
     openTrash: useCommand("openTrash"),
     openHistory: useCommand("openHistory"),
     readStory: useCommand("readStory"),
+    openTutorial: useCommand("openTutorial"),
     palette: useCommand("palette"),
   };
 
@@ -223,6 +224,7 @@ export function MenuBar() {
     help: [
       { kind: "item", id: "center", label: t("help.center"), shortcut: keys("center"), onSelect: () => showHelp("center") },
       { kind: "item", id: "guide", label: t("help.guide"), onSelect: () => showHelp("guide") },
+      command("openTutorial", t("help.tutorial")),
       {
         kind: "item",
         id: "shortcuts",

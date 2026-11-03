@@ -114,7 +114,7 @@
     "expand": "Expand",
     "collapse": "Collapse",
     "folderName": "Folder name",
-    "folderPlaceholder": "Folder name, then Enter",
+    "folderPlaceholder": "E.g. Research, then Enter",
     "dropRoot": "Drop here to move out of the folder",
     "pinned": "Pinned",
     "actions": "Folder actions"
@@ -157,7 +157,7 @@
     "creating": "Creating…"
   },
   "edit": {
-    "titlePlaceholder": "Note title",
+    "titlePlaceholder": "E.g. The magic system",
     "folder": "Folder",
     "pin": "Pin note",
     "unpin": "Unpin",
@@ -177,7 +177,7 @@
     "addColor": "Add a {{color}} sticky note",
     "hint": "Move a sticky note by its top strip, resize it from its corner. Clicking brings it to the front.",
     "empty": "The wall is empty: add a first sticky note.",
-    "placeholder": "Write here…",
+    "placeholder": "E.g. What if the traitor was her sister?",
     "delete": "Delete sticky note",
     "loading": "Loading the wall…",
     "resize": "Resize",
@@ -203,7 +203,7 @@
     "ignore": "Ignore"
   },
   "system": {
-    "banner": "System note: it mirrors the sheet. Headings are fixed; text written under a heading is saved to the sheet, as plain text.",
+    "banner": "System note: it mirrors the sheet. Headings are fixed; text written under a heading is saved to the sheet, as plain text. Formatting (font, size, lists) stays in the note, and is lost for a section whose text is changed from the sheet.",
     "folder": "System folder"
   }
 }

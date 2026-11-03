@@ -454,7 +454,7 @@
       "title": "Statuts des lieux",
       "description": "Valeurs proposées pour le statut d'un lieu.",
       "add": "Ajouter",
-      "placeholder": "Nouveau statut",
+      "placeholder": "Ex. En ruines",
       "reset": "Valeurs par défaut",
       "remove": "Retirer « {{value}} »"
     },

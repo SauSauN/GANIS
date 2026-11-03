@@ -354,6 +354,7 @@
     "replaceStale": "Le texte a changé depuis la recherche : relancez la recherche."
   },
   "manga": {
+    "invalidPageCount": "Nombre de pages invalide ({{max}} au maximum par ajout).",
     "tooManyPanels": "Trop de cases sur cette page ({{max}} au maximum).",
     "tooManyTexts": "Trop de textes dans une case ({{max}} au maximum).",
     "fieldTooLong": "Un texte est trop long ({{max}} caractères au maximum).",

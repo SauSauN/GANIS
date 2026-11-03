@@ -114,6 +114,7 @@
     "firstName": "Ex. Aldric",
     "lastName": "Ex. VENN",
     "nickname": "Ex. Le Corbeau",
+    "birthDate": "Ex. 12 mars 1890",
     "age": "Ex. 32 ans, la quarantaine…",
     "occupation": "Ex. Capitaine de la garde, contrebandier…",
     "origin": "Ex. Port d'Ysmir, famille de pêcheurs…",
@@ -153,7 +154,7 @@
   "choice": {
     "none": "Non précisé",
     "add": "+ Ajouter une valeur…",
-    "newPlaceholder": "Nouvelle valeur",
+    "newPlaceholder": "Ex. Autre",
     "confirm": "Ajouter",
     "cancel": "Annuler"
   },

@@ -1,3 +1,4 @@
+import { documentKind, extensionOf } from "@/lib/documents";
 import { countWordsPlain, chapterLevel, sceneLevel } from "@/lib/novel";
 import type { ExportBlock, ExportDocument } from "@/lib/novelExport";
 import { buildStructureTree, flattenVisible } from "@/lib/structure";
@@ -14,6 +15,7 @@ import {
   type PanelTextKind,
   type Project,
   type Rhythm,
+  type StructureDocument,
   type StructureNode,
 } from "@/types";
 
@@ -109,6 +111,120 @@ export function panelsByPage(panels: Panel[]): Map<string, Panel[]> {
   }
   for (const list of map.values()) list.sort((a, b) => a.position - b.position);
   return map;
+}
+
+// ----------------------------------------------------------------------------
+// Chemin de fer : tomes, folios, planches et dessins
+// ----------------------------------------------------------------------------
+
+export interface VolumeGroup {
+  /** Tome (niveau juste au-dessus des chapitres) ; `null` s'il n'y en a pas. */
+  volume: StructureNode | null;
+  entries: PageEntry[];
+}
+
+/** Pages dans l'ordre du plan, regroupées par tome. */
+export function pagesByVolume(nodes: StructureNode[], levelCount: number): VolumeGroup[] {
+  const volumeLevel = mangaLevels(levelCount).chapter - 1;
+  const byId = new Map(nodes.map((n) => [n.id, n]));
+  const volumeOf = (node: StructureNode): StructureNode | null => {
+    if (volumeLevel < 0) return null;
+    let current = node.parentId ? byId.get(node.parentId) : undefined;
+    while (current && current.level > volumeLevel) current = current.parentId ? byId.get(current.parentId) : undefined;
+    return current?.level === volumeLevel ? current : null;
+  };
+  const groups: VolumeGroup[] = [];
+  for (const entry of pagesInOrder(nodes, levelCount)) {
+    const volume = volumeOf(entry.page);
+    const last = groups[groups.length - 1];
+    if (last && last.volume?.id === volume?.id) last.entries.push(entry);
+    else groups.push({ volume, entries: [entry] });
+  }
+  return groups;
+}
+
+export interface FolioPage extends PageEntry {
+  /** Numéro imprimé de la page dans son tome. */
+  folio: number;
+}
+
+export function foliosOf(entries: PageEntry[], firstFolio: number): FolioPage[] {
+  return entries.map((entry, index) => ({ ...entry, folio: firstFolio + index }));
+}
+
+/**
+ * Planche : deux pages en vis-à-vis. Quel que soit le sens de lecture, une
+ * page paire est lue d'abord et une page impaire ensuite ; on tourne donc
+ * la page après un folio impair.
+ */
+export interface Spread<T> {
+  first: T | null;
+  second: T | null;
+}
+
+export function spreadsOf<T extends { folio: number }>(pages: T[]): Array<Spread<T>> {
+  const spreads: Array<Spread<T>> = [];
+  let index = 0;
+  // Un folio impair au début est seul : sa page en vis-à-vis est hors du tome.
+  if (pages[0] && pages[0].folio % 2 !== 0) {
+    spreads.push({ first: null, second: pages[0] });
+    index = 1;
+  }
+  for (; index < pages.length; index += 2) {
+    spreads.push({ first: pages[index], second: pages[index + 1] ?? null });
+  }
+  return spreads;
+}
+
+/** Révélation prévue au tourné, alors que la suite est déjà en vis-à-vis. */
+export function isTurnMisplaced(page: { folio: number; page: Pick<StructureNode, "pageTurn"> }): boolean {
+  return page.page.pageTurn && page.folio % 2 === 0;
+}
+
+/** Fichiers de dessin que GANIS range sans pouvoir les afficher. */
+const ART_SOURCE_EXTENSIONS = new Set(["TIF", "TIFF", "PSD", "PSB", "CLIP", "KRA", "SAI", "SAI2", "MDP", "CSP", "XCF"]);
+
+function isArt(document: Pick<StructureDocument, "mime" | "name">): boolean {
+  return documentKind(document) === "image" || ART_SOURCE_EXTENSIONS.has(extensionOf(document.name));
+}
+
+export interface FlatplanArt {
+  /** Dessin de chaque page : le sien, sinon celui de son rang dans le chapitre. */
+  art: Map<string, StructureDocument>;
+  /** Dessins d'un chapitre qui n'ont pas trouvé de page. */
+  unplaced: StructureDocument[];
+}
+
+/**
+ * Attribue un dessin à chaque page. Une page préfère une image affichable à
+ * un fichier source. Les dessins déposés sur le chapitre (cas prévu par le
+ * lecteur de pages) vont aux pages qui n'en ont pas, dans l'ordre.
+ */
+export function assignArt(entries: PageEntry[], documents: Map<string, StructureDocument[]>): FlatplanArt {
+  const art = new Map<string, StructureDocument>();
+  const freeByChapter = new Map<string, StructureNode[]>();
+  for (const { page, chapter } of entries) {
+    const own = (documents.get(page.id) ?? []).filter(isArt);
+    const chosen = own.find((document) => documentKind(document) === "image") ?? own[0];
+    if (chosen) art.set(page.id, chosen);
+    else if (chapter) freeByChapter.set(chapter.id, [...(freeByChapter.get(chapter.id) ?? []), page]);
+  }
+  const chapterIds = new Set(entries.flatMap((entry) => (entry.chapter ? [entry.chapter.id] : [])));
+  const unplaced: StructureDocument[] = [];
+  for (const chapterId of chapterIds) {
+    const free = freeByChapter.get(chapterId) ?? [];
+    (documents.get(chapterId) ?? []).filter(isArt).forEach((document, index) => {
+      if (free[index]) art.set(free[index].id, document);
+      else unplaced.push(document);
+    });
+  }
+  return { art, unplaced };
+}
+
+/** Images à enchaîner dans le lecteur : page par page, puis celles sans page. */
+export function readingOrder(entries: PageEntry[], { art, unplaced }: FlatplanArt): StructureDocument[] {
+  const placed = entries.flatMap(({ page }) => art.get(page.id) ?? []);
+  return [...placed, ...unplaced].filter((document) => documentKind(document) === "image");
 }
 
 // ----------------------------------------------------------------------------

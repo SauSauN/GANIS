@@ -23,6 +23,7 @@ import { ActionMenu, type MenuItem } from "@/components/documents/ActionMenu";
 import { DocumentIcon } from "@/components/documents/DocumentIcon";
 import { DocumentVersionsDialog } from "@/components/documents/DocumentVersionsDialog";
 import { DocumentViewer } from "@/components/documents/DocumentViewer";
+import { InfoTip } from "@/components/common/InfoTip";
 import { ReadingView } from "@/components/documents/ReadingView";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -62,6 +63,8 @@ interface DocumentsCardProps {
   name: string;
   /** Éléments du découpage, dans l'ordre du plan (« Ranger dans… »). */
   nodeOptions: NodeOption[];
+  /** Pages du lecteur, si elles dépassent cet élément (chapitre de manga). */
+  readingOrder?: StructureDocument[];
 }
 
 /**
@@ -70,7 +73,7 @@ interface DocumentsCardProps {
  * Word, des repères sonores… On les ajoute (bouton ou glisser-déposer), on
  * les lit dans GANIS, on les modifie dans l'application de son choix.
  */
-export function DocumentsCard({ projectId, nodeId, name, nodeOptions }: DocumentsCardProps) {
+export function DocumentsCard({ projectId, nodeId, name, nodeOptions, readingOrder }: DocumentsCardProps) {
   const { t, i18n } = useTranslation(["documents", "common"]);
   const [open, setOpen] = useCollapsible("ganis.nodeSheet.documents.collapsed");
   const { documents } = useNodeDocuments(projectId, nodeId);
@@ -92,7 +95,16 @@ export function DocumentsCard({ projectId, nodeId, name, nodeOptions }: Document
 
   const list = documents ?? [];
   const selection = useSelection(list.map((document) => document.id));
-  const pages = readingPages(list);
+  const pages = readingOrder ?? readingPages(list);
+  const readingButton = pages.length > 1 && (
+    <div className="flex flex-wrap items-center gap-2">
+      <Button size="sm" variant="secondary" onClick={() => setReading(true)}>
+        <BookOpen />
+        {t("reading.open", { count: pages.length })}
+      </Button>
+      <InfoTip>{t("reading.hint")}</InfoTip>
+    </div>
+  );
   const openHere = list.filter((document) => external[document.id]);
 
   const date = (iso: string) => new Intl.DateTimeFormat(i18n.language, { dateStyle: "medium" }).format(new Date(iso));
@@ -394,26 +406,21 @@ export function DocumentsCard({ projectId, nodeId, name, nodeOptions }: Document
               {t("loading")}
             </p>
           ) : list.length === 0 ? (
-            <button
-              type="button"
-              onClick={() => void pick()}
-              className="flex w-full flex-col items-center gap-1.5 rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted/40"
-            >
-              <Upload className="size-5" />
-              <span className="font-medium text-foreground">{t("empty.title")}</span>
-              <span className="max-w-md text-xs">{t("empty.hint")}</span>
-            </button>
+            <>
+              {readingButton}
+              <button
+                type="button"
+                onClick={() => void pick()}
+                className="flex w-full flex-col items-center gap-1.5 rounded-lg border border-dashed px-4 py-8 text-center text-sm text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted/40"
+              >
+                <Upload className="size-5" />
+                <span className="font-medium text-foreground">{t("empty.title")}</span>
+                <span className="max-w-md text-xs">{t("empty.hint")}</span>
+              </button>
+            </>
           ) : (
             <>
-              {pages.length > 1 && (
-                <div className="flex flex-wrap items-center gap-2">
-                  <Button size="sm" variant="secondary" onClick={() => setReading(true)}>
-                    <BookOpen />
-                    {t("reading.open", { count: pages.length })}
-                  </Button>
-                  <span className="text-xs text-muted-foreground">{t("reading.hint")}</span>
-                </div>
-              )}
+              {readingButton}
 
               {list.length > 1 && (
                 <SelectionBar selection={selection} disabled={busy !== null}>
@@ -543,7 +550,7 @@ export function DocumentsCard({ projectId, nodeId, name, nodeOptions }: Document
                   </li>
                 ))}
               </ul>
-              <p className="text-xs text-muted-foreground">{t("dropHint")}</p>
+              <InfoTip>{t("dropHint")}</InfoTip>
             </>
           )}
         </div>

@@ -82,7 +82,7 @@
     "lists": {
       "title": "Custom lists",
       "description": "Values offered in this project's profiles. A removed value stays on the profiles that use it.",
-      "placeholder": "New value",
+      "placeholder": "E.g. Other",
       "add": "Add",
       "remove": "Remove “{{value}}”",
       "reset": "Default values"
