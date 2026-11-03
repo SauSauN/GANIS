@@ -9,7 +9,6 @@ import {
   TUTORIALS,
   tutorialForModule,
   tutorialForProject,
-  tutorialsFor,
   useTutorialStore,
   type TutorialId,
 } from "@/lib/tutorials";
@@ -64,13 +63,6 @@ describe("registre", () => {
     expect(tutorialForModule("items")).toBe("items");
     expect(tutorialForModule("species")).toBe("species");
     expect(tutorialForModule("search")).toBeNull();
-  });
-
-  it("un projet liste son mode de démarrage en premier, et aucun autre", () => {
-    const list = tutorialsFor("manga");
-    expect(list[0]).toBe("manga");
-    expect(list).not.toContain("novel");
-    expect(list).not.toContain("story");
   });
 });
 

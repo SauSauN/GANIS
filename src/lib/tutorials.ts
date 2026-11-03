@@ -207,11 +207,6 @@ export function tutorialForModule(moduleId: string): TutorialId | null {
   }
 }
 
-/** Tous les tutoriels d'un projet : son mode de démarrage, puis les modules. */
-export function tutorialsFor(projectType: string | null | undefined): TutorialId[] {
-  return [tutorialForProject(projectType), "characters", "locations", "items", "species", "structure", "plot", "notes"];
-}
-
 // ----------------------------------------------------------------------------
 // Fenêtre du tutoriel
 // ----------------------------------------------------------------------------

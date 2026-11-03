@@ -7,11 +7,6 @@
   "open": "Ouvrir : {{feature}}",
   "button": "Voir le tutoriel",
   "menu": "Tutoriel : {{name}}",
-  "home": {
-    "title": "Tutoriels",
-    "text": "Revoyez par où commencer, ou découvrez un module en quelques étapes.",
-    "start": "Par où commencer ?"
-  },
   "novel": {
     "title": "Démarrer un roman",
     "name": "Roman",

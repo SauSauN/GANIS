@@ -9,10 +9,8 @@ import {
   Loader2,
 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SynopsisContent } from "@/components/workspace/SynopsisContent";
-import { TUTORIALS, tutorialsFor, tutorialText, useTutorialStore } from "@/lib/tutorials";
 import {
   useProjectSynopsis,
   useSynopsisStore,
@@ -197,11 +195,9 @@ function SynopsisReadonly({ projectId }: { projectId: string }) {
  * 2. Description
  * 3. Synopsis et informations narratives
  * 4. Informations techniques du projet
- * 5. Tutoriels du projet
  */
 export function WorkspaceHome({ project }: { project: Project }) {
   const { t, i18n } = useTranslation(["workspaceHome", "projects"]);
-  const showTutorial = useTutorialStore((state) => state.show);
 
   const dateLocale =
     i18n.resolvedLanguage === "en" ? DATE_LOCALES.en : DATE_LOCALES.fr;
@@ -312,27 +308,6 @@ export function WorkspaceHome({ project }: { project: Project }) {
                 </div>
               </div>
             </div>
-          </div>
-        </section>
-
-        {/* ================================================================
-            5. TUTORIELS DU PROJET
-            ================================================================ */}
-
-        <section className="rounded-xl border bg-muted/30 p-5">
-          <h2 className="text-sm font-semibold">{tutorialText("home.title")}</h2>
-          <p className="mt-1 text-sm leading-6 text-muted-foreground">{tutorialText("home.text")}</p>
-
-          <div className="mt-3 flex flex-wrap gap-2">
-            {tutorialsFor(project.type).map((id, index) => {
-              const Icon = TUTORIALS[id].icon;
-              return (
-                <Button key={id} variant={index === 0 ? "default" : "outline"} size="sm" onClick={() => showTutorial(id)}>
-                  <Icon className="mr-1.5 size-3.5" aria-hidden="true" />
-                  {tutorialText(index === 0 ? "home.start" : `${id}.name`)}
-                </Button>
-              );
-            })}
           </div>
         </section>
       </div>

@@ -7,11 +7,6 @@
   "open": "Open: {{feature}}",
   "button": "See the tutorial",
   "menu": "Tutorial: {{name}}",
-  "home": {
-    "title": "Tutorials",
-    "text": "Go back over where to start, or discover a module in a few steps.",
-    "start": "Where to start?"
-  },
   "novel": {
     "title": "Starting a novel",
     "name": "Novel",
