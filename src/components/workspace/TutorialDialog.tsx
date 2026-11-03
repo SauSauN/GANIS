@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ArrowUpRight, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { SameWidth } from "@/components/common/SameWidth";
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { featureAvailable, findFeature } from "@/components/workspace/modules";
 import { templateForProjectType } from "@/lib/structure";
@@ -35,7 +36,6 @@ export function TutorialDialog({ projectType, onOpenFeature }: TutorialDialogPro
   const current = tutorial?.steps[step] ?? tutorial?.steps[0];
   if (!id || !tutorial || !current) return null;
 
-  const Icon = current.icon;
   const last = step === tutorial.steps.length - 1;
 
   // Noms du découpage de ce type de projet : « Actes, séquences, scènes ».
@@ -46,54 +46,65 @@ export function TutorialDialog({ projectType, onOpenFeature }: TutorialDialogPro
     type: t(`projects:types.${projectType}`),
   };
 
-  const stepKey = `${id}.steps.${current.id}`;
-  const points = text<unknown>(`${stepKey}.points`, { ...options, returnObjects: true });
-  const pointList = Array.isArray(points) ? (points as string[]) : [];
-  const feature = current.open && featureAvailable(current.open, projectType) ? findFeature(current.open)?.feature : undefined;
   const title = text(`${id}.title`, options);
 
   return (
-    <Dialog open onOpenChange={(value) => !value && close()} className="max-w-xl" guardInput={false}>
+    <Dialog open onOpenChange={(value) => !value && close()} className="max-w-3xl" guardInput={false}>
       <DialogHeader>
         <p className="text-xs font-medium text-primary">{text("progress", { current: step + 1, total: tutorial.steps.length })}</p>
         <DialogTitle>{title}</DialogTitle>
         <DialogDescription>{text(`${id}.intro`, options)}</DialogDescription>
       </DialogHeader>
 
-      {/* Hauteur minimale : les boutons ne sautent pas d'une étape à l'autre. */}
-      <div className="mt-5 flex min-h-[17rem] gap-4 rounded-lg border bg-muted/30 p-5">
-        <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-          <Icon className="size-5" aria-hidden="true" />
-        </span>
-        <div className="min-w-0 space-y-3">
-          <h3 className="font-semibold">{text(`${stepKey}.title`, options)}</h3>
-          <p className="text-sm leading-6 text-muted-foreground">{text(`${stepKey}.text`, options)}</p>
-
-          {pointList.length > 0 && (
-            <ul className="space-y-1.5">
-              {pointList.map((point) => (
-                <li key={point} className="flex gap-2 text-sm leading-6">
-                  <Check className="mt-1 size-4 shrink-0 text-primary" aria-hidden="true" />
-                  <span>{point}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-
-          {feature && current.open && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                pause(step);
-                onOpenFeature(current.open as string);
-              }}
+      {/* Toutes les étapes dans la même case, une seule visible : la fenêtre
+          garde la hauteur de la plus longue, et les boutons ne bougent pas. */}
+      <div className="mt-5 grid rounded-lg border bg-muted/30">
+        {tutorial.steps.map(({ id: stepId, icon: Icon, open }, index) => {
+          const stepKey = `${id}.steps.${stepId}`;
+          const points = text<unknown>(`${stepKey}.points`, { ...options, returnObjects: true });
+          const pointList = Array.isArray(points) ? (points as string[]) : [];
+          const feature = open && featureAvailable(open, projectType) ? findFeature(open)?.feature : undefined;
+          return (
+            <div
+              key={stepId}
+              aria-hidden={index !== step}
+              className={cn("col-start-1 row-start-1 flex gap-4 p-5", index !== step && "invisible")}
             >
-              {text("open", { feature: feature.label })}
-              <ArrowUpRight className="ml-1 size-3.5" aria-hidden="true" />
-            </Button>
-          )}
-        </div>
+              <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Icon className="size-5" aria-hidden="true" />
+              </span>
+              <div className="min-w-0 space-y-3">
+                <h3 className="font-semibold">{text(`${stepKey}.title`, options)}</h3>
+                <p className="text-sm leading-6 text-muted-foreground">{text(`${stepKey}.text`, options)}</p>
+
+                {pointList.length > 0 && (
+                  <ul className="space-y-1.5">
+                    {pointList.map((point) => (
+                      <li key={point} className="flex gap-2 text-sm leading-6">
+                        <Check className="mt-1 size-4 shrink-0 text-primary" aria-hidden="true" />
+                        <span>{point}</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+
+                {feature && open && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      pause(step);
+                      onOpenFeature(open);
+                    }}
+                  >
+                    {text("open", { feature: feature.label })}
+                    <ArrowUpRight className="ml-1 size-3.5" aria-hidden="true" />
+                  </Button>
+                )}
+              </div>
+            </div>
+          );
+        })}
       </div>
 
       {/* Points de progression : un clic va directement à l'étape. */}
@@ -126,8 +137,16 @@ export function TutorialDialog({ projectType, onOpenFeature }: TutorialDialogPro
           {text("previous")}
         </Button>
         <Button onClick={() => (last ? close() : setStep(step + 1))}>
-          {last ? text("finish") : text("next")}
-          {!last && <ChevronRight className="ml-1 size-4" />}
+          <SameWidth
+            active={last ? 1 : 0}
+            labels={[
+              <>
+                {text("next")}
+                <ChevronRight className="ml-1 size-4" />
+              </>,
+              text("finish"),
+            ]}
+          />
         </Button>
       </DialogFooter>
     </Dialog>
