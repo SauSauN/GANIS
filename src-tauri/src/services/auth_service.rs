@@ -204,7 +204,8 @@ pub fn normalize_email(email: Option<&str>) -> AppResult<Option<String>> {
 /// Condition vérifiée par SQLite au moment même de l'insertion.
 #[derive(Debug, Clone, Copy)]
 enum Precondition {
-    /// Aucune condition.
+    /// Aucune condition (création de comptes par l'administrateur, désactivée).
+    #[allow(dead_code)]
     None,
     /// La table `users` doit être vide (premier administrateur).
     NoUserYet,
@@ -455,6 +456,8 @@ pub async fn register_user(
 /// Réservé aux administrateurs : la commande appelante vérifie ce droit.
 /// Le trousseau du compte sera créé à la première connexion de
 /// l'utilisateur, qui recevra alors lui-même sa clé de récupération.
+// Gestion des comptes par l'administrateur : désactivée (voir `lib.rs`), gardée pour être rétablie.
+#[allow(dead_code)]
 pub async fn create_user_with_role(
     pool: &SqlitePool,
     username: &str,

@@ -72,7 +72,9 @@ pub struct User {
     #[serde(skip_serializing)]
     pub password_hash: String,
 
+    /// Colonne remplie à la création ; le sel est aussi contenu dans `password_hash`.
     #[serde(skip_serializing)]
+    #[allow(dead_code)]
     pub password_salt: String,
 
     /// Nom SQL : `created_at`

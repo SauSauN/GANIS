@@ -567,6 +567,10 @@ export function createFeatureOf(module: WorldModule): string {
   return `${WORKSPACE_MODULE[module]}.create`;
 }
 
+export function listFeatureOf(module: WorldModule): string {
+  return `${WORKSPACE_MODULE[module]}.list`;
+}
+
 /** Onglet des paramètres du projet consacré au module. */
 export function worldSettingsTab(module: WorldModule): string {
   return `settings:${WORKSPACE_MODULE[module]}`;

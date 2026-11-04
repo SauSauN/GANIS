@@ -90,6 +90,8 @@ pub struct ThemeData {
 #[derive(Debug, Clone, sqlx::FromRow)]
 pub struct PackageRow {
     pub id: String,
+    /// Lu avec la ligne ; la propriété est vérifiée dans les requêtes SQL.
+    #[allow(dead_code)]
     pub owner_id: String,
     pub package_id: String,
     pub package_type: PackageType,
