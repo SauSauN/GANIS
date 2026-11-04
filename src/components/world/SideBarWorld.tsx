@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { WorldItemMenu } from "@/components/common/PanelItemMenus";
 import { WorldThumb } from "@/components/world/WorldVisuals";
 import { TreeGuides } from "@/components/common/TreeGuides";
 import { activeGuide } from "@/lib/treeGuides";
@@ -128,41 +129,45 @@ export function SideBarWorld({
                       const expanded = !collapsed.has(entry.id);
 
                       return (
-                        <li
-                          key={entry.id}
-                          role="treeitem"
-                          aria-level={depth + 2}
-                          aria-expanded={children.length > 0 ? expanded : undefined}
-                          className="relative flex items-center"
-                          style={{ paddingLeft: `${(depth + 1) * 0.875}rem` }}
-                        >
-                          <TreeGuides depth={depth + 1} active={guideOf(index)} />
-                          <button
-                            type="button"
-                            tabIndex={children.length > 0 ? 0 : -1}
-                            onClick={() => toggle(entry.id)}
-                            aria-label={expanded ? t("list.collapse") : t("list.expand")}
-                            className={cn(
-                              "flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent",
-                              children.length === 0 && "invisible",
-                            )}
-                          >
-                            {expanded ? <ChevronDown className="size-3.5" /> : <ChevronRight className="size-3.5" />}
-                          </button>
+                        <WorldItemMenu key={entry.id} projectId={projectId} module={module} entry={entry} onOpen={() => onOpenFeature(tabId)} onOpenFeature={onOpenFeature}>
+                          {(onContextMenu) => (
+                            <li
+                              onContextMenu={onContextMenu}
+                              role="treeitem"
+                              aria-level={depth + 2}
+                              aria-expanded={children.length > 0 ? expanded : undefined}
+                              className="relative flex items-center"
+                              style={{ paddingLeft: `${(depth + 1) * 0.875}rem` }}
+                            >
+                              <TreeGuides depth={depth + 1} active={guideOf(index)} />
+                              <button
+                                type="button"
+                                tabIndex={children.length > 0 ? 0 : -1}
+                                onClick={() => toggle(entry.id)}
+                                aria-label={expanded ? t("list.collapse") : t("list.expand")}
+                                className={cn(
+                                  "flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent",
+                                  children.length === 0 && "invisible",
+                                )}
+                              >
+                                {expanded ? <ChevronDown className="size-3.5" /> : <ChevronRight className="size-3.5" />}
+                              </button>
 
-                          <button
-                            type="button"
-                            aria-current={active ? "page" : undefined}
-                            onClick={() => onOpenFeature(tabId)}
-                            className={cn(
-                              "flex min-w-0 flex-1 items-center gap-2 rounded-md px-1.5 py-1 text-sm hover:bg-sidebar-accent",
-                              active && "bg-sidebar-accent font-medium",
-                            )}
-                          >
-                            <WorldThumb projectId={projectId} module={module} entry={entry} customTypes={settings.customTypes} size="panel" />
-                            <span className="flex-1 truncate text-left">{entry.name}</span>
-                          </button>
-                        </li>
+                              <button
+                                type="button"
+                                aria-current={active ? "page" : undefined}
+                                onClick={() => onOpenFeature(tabId)}
+                                className={cn(
+                                  "flex min-w-0 flex-1 items-center gap-2 rounded-md px-1.5 py-1 text-sm hover:bg-sidebar-accent",
+                                  active && "bg-sidebar-accent font-medium",
+                                )}
+                              >
+                                <WorldThumb projectId={projectId} module={module} entry={entry} customTypes={settings.customTypes} size="panel" />
+                                <span className="flex-1 truncate text-left">{entry.name}</span>
+                              </button>
+                            </li>
+                          )}
+                        </WorldItemMenu>
                       );
                     })}
                   </ul>

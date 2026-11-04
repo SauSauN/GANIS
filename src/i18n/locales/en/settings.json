@@ -143,6 +143,13 @@
         "location": "Location",
         "item": "Object"
       }
+    },
+    "panelMenu": {
+      "title": "Right-click menu in the middle panel",
+      "description": "Right-clicking a character, a location, an item, a note… offers Open, Rename, Add inside, Duplicate and Delete.",
+      "toggle": "Right-click menu",
+      "on": "On: right-clicking opens the element's menu.",
+      "off": "Off: right-clicking does nothing; left-clicking still opens the sheet."
     }
   },
   "developer": {

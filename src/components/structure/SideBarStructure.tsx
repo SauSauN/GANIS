@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { StructureItemMenu } from "@/components/common/PanelItemMenus";
 import { TreeGuides } from "@/components/common/TreeGuides";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
 import { buildStructureTree, flattenVisible, structureNodeTabId } from "@/lib/structure";
@@ -22,7 +23,7 @@ interface SideBarStructureProps {
  */
 export function SideBarStructure({ projectId, activeTab, onOpenFeature }: SideBarStructureProps) {
   const { t } = useTranslation("structure");
-  const { structure, headingOf, colorOf } = useProjectStructure(projectId);
+  const { structure, levels, headingOf, colorOf } = useProjectStructure(projectId);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
   const rows = useMemo(
@@ -68,51 +69,63 @@ export function SideBarStructure({ projectId, activeTab, onOpenFeature }: SideBa
             const active = activeTab === tabId;
 
             return (
-              <li
+              <StructureItemMenu
                 key={node.id}
-                role="treeitem"
-                aria-level={node.depth + 1}
-                aria-expanded={node.children.length > 0 ? expanded : undefined}
-                className="relative flex items-center"
-                style={{ paddingLeft: `${node.depth * 0.875}rem` }}
+                projectId={projectId}
+                node={node}
+                label={heading.label}
+                canAddInside={node.level + 1 < levels.length}
+                onOpen={() => onOpenFeature(tabId)}
+                onOpenFeature={onOpenFeature}
               >
-                <TreeGuides depth={node.depth} active={guideOf(index)} />
-                <button
-                  type="button"
-                  tabIndex={node.children.length > 0 ? 0 : -1}
-                  onClick={() => toggle(node.id)}
-                  aria-label={expanded ? t("sidebar.collapse") : t("sidebar.expand")}
-                  className={cn(
-                    "flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent",
-                    node.children.length === 0 && "invisible",
-                  )}
-                >
-                  {expanded ? <ChevronDown className="size-3.5" /> : <ChevronRight className="size-3.5" />}
-                </button>
+                {(onContextMenu) => (
+                  <li
+                    onContextMenu={onContextMenu}
+                    role="treeitem"
+                    aria-level={node.depth + 1}
+                    aria-expanded={node.children.length > 0 ? expanded : undefined}
+                    className="relative flex items-center"
+                    style={{ paddingLeft: `${node.depth * 0.875}rem` }}
+                  >
+                    <TreeGuides depth={node.depth} active={guideOf(index)} />
+                    <button
+                      type="button"
+                      tabIndex={node.children.length > 0 ? 0 : -1}
+                      onClick={() => toggle(node.id)}
+                      aria-label={expanded ? t("sidebar.collapse") : t("sidebar.expand")}
+                      className={cn(
+                        "flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent",
+                        node.children.length === 0 && "invisible",
+                      )}
+                    >
+                      {expanded ? <ChevronDown className="size-3.5" /> : <ChevronRight className="size-3.5" />}
+                    </button>
 
-                <button
-                  type="button"
-                  title={heading.label}
-                  aria-current={active ? "page" : undefined}
-                  onClick={() => onOpenFeature(tabId)}
-                  className={cn(
-                    "flex min-w-0 flex-1 items-center gap-2 rounded-md px-1.5 py-1 text-sm hover:bg-sidebar-accent",
-                    active && "bg-sidebar-accent",
-                  )}
-                >
-                  <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: colorOf(node) }} />
-                  <span className="min-w-0 flex-1 truncate text-left">
-                    {heading.number !== null ? (
-                      <>
-                        <span className="font-medium">{heading.prefix}</span>
-                        {heading.title && <span className="text-muted-foreground"> — {heading.title}</span>}
-                      </>
-                    ) : (
-                      <span className="italic">{heading.label}</span>
-                    )}
-                  </span>
-                </button>
-              </li>
+                    <button
+                      type="button"
+                      title={heading.label}
+                      aria-current={active ? "page" : undefined}
+                      onClick={() => onOpenFeature(tabId)}
+                      className={cn(
+                        "flex min-w-0 flex-1 items-center gap-2 rounded-md px-1.5 py-1 text-sm hover:bg-sidebar-accent",
+                        active && "bg-sidebar-accent",
+                      )}
+                    >
+                      <span className="size-2 shrink-0 rounded-full" style={{ backgroundColor: colorOf(node) }} />
+                      <span className="min-w-0 flex-1 truncate text-left">
+                        {heading.number !== null ? (
+                          <>
+                            <span className="font-medium">{heading.prefix}</span>
+                            {heading.title && <span className="text-muted-foreground"> — {heading.title}</span>}
+                          </>
+                        ) : (
+                          <span className="italic">{heading.label}</span>
+                        )}
+                      </span>
+                    </button>
+                  </li>
+                )}
+              </StructureItemMenu>
             );
           })}
         </ul>

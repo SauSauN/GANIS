@@ -92,5 +92,29 @@
     "documentName": "Ex. Chapitre 3 - brouillon",
     "documentText": "Écrivez ici…",
     "typedConfirmation": "Retapez le nom ici"
+  },
+  "panelActions": {
+    "open": "Ouvrir",
+    "rename": "Renommer…",
+    "duplicate": "Dupliquer",
+    "delete": "Supprimer…",
+    "menu": "Actions pour « {{name}} »",
+    "deleteTitle": "Supprimer « {{name}} » ?",
+    "deleteConfirm": "Supprimer",
+    "renameTitle": "Renommer « {{name}} »",
+    "renameDescription": "Le nouveau nom s'affiche partout dans le projet.",
+    "renameEmpty": "Le nom ne peut pas être vide.",
+    "copyName": "{{name}} (copie)",
+    "duplicated": "« {{name}} » dupliqué.",
+    "addInside": "Ajouter dedans…",
+    "nameLabel": "Nom",
+    "titleLabel": "Titre",
+    "firstNameLabel": "Prénom",
+    "lastNameLabel": "Nom de famille",
+    "titlePlaceholder": "Ex. La traversée",
+    "deleteTrash": "« {{name}} » ira dans la corbeille : vous pourrez le restaurer depuis là.",
+    "deleteTrashChildren": "« {{name}} » ira dans la corbeille ; ce qu'il contient remonte d'un niveau. Vous pourrez le restaurer depuis la corbeille.",
+    "deleteStructure": "« {{name}} » et tout ce qu'il contient (texte compris) iront dans la corbeille. Vous pourrez les restaurer depuis là.",
+    "deleteLane": "La trame « {{name}} » et tous ses événements seront supprimés. Vous pourrez annuler juste après."
   }
 }

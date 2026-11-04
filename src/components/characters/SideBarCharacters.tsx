@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { CharacterItemMenu } from "@/components/common/PanelItemMenus";
 import { CharacterAvatar } from "@/components/characters/CharacterAvatar";
 import { characterTabId, fullName } from "@/lib/characters";
 import { cn } from "@/lib/utils";
@@ -40,20 +41,24 @@ export function SideBarCharacters({ projectId, activeTab, onOpenFeature }: SideB
             const active = activeTab === tabId;
 
             return (
-              <li key={character.id}>
-                <button
-                  type="button"
-                  aria-current={active ? "page" : undefined}
-                  onClick={() => onOpenFeature(tabId)}
-                  className={cn(
-                    "flex w-full items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-sidebar-accent",
-                    active && "bg-sidebar-accent font-medium",
-                  )}
-                >
-                  <CharacterAvatar projectId={projectId} character={character} size="panel" />
-                  <span className="flex-1 truncate text-left">{fullName(character)}</span>
-                </button>
-              </li>
+              <CharacterItemMenu key={character.id} projectId={projectId} character={character} onOpen={() => onOpenFeature(tabId)}>
+                {(onContextMenu) => (
+                  <li onContextMenu={onContextMenu}>
+                    <button
+                      type="button"
+                      aria-current={active ? "page" : undefined}
+                      onClick={() => onOpenFeature(tabId)}
+                      className={cn(
+                        "flex w-full items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-sidebar-accent",
+                        active && "bg-sidebar-accent font-medium",
+                      )}
+                    >
+                      <CharacterAvatar projectId={projectId} character={character} size="panel" />
+                      <span className="flex-1 truncate text-left">{fullName(character)}</span>
+                    </button>
+                  </li>
+                )}
+              </CharacterItemMenu>
             );
           })}
         </ul>

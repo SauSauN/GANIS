@@ -21,8 +21,10 @@ import {
   PANEL_IMAGE_STEP,
   TEXT_SIZES,
   setPanelImageSize,
+  setPanelMenuEnabled,
   setTextSize,
   usePanelImageSize,
+  usePanelMenuEnabled,
   useTextSize,
   type TextSize,
 } from "@/lib/preferences";
@@ -212,6 +214,12 @@ export function AppearanceSection() {
       <PanelImageCard />
 
       {/* ==================================================================
+          MENU CLIC DROIT DU PANNEAU DU MILIEU
+          ================================================================== */}
+
+      <PanelMenuCard />
+
+      {/* ==================================================================
           NOTE
           ================================================================== */}
 
@@ -293,6 +301,56 @@ function ColorThemeCard() {
     </Card>
   );
 }
+/**
+ * Menu clic droit des éléments du panneau du milieu (ouvrir, renommer,
+ * ajouter dedans, dupliquer, supprimer) : activé par défaut.
+ */
+function PanelMenuCard() {
+  const { t } = useTranslation("settings");
+  const enabled = usePanelMenuEnabled();
+
+  return (
+    <Card className={cardClass}>
+      <CardHeader className={cardHeaderClass}>
+        <CardTitle>{t("appearance.panelMenu.title")}</CardTitle>
+        <CardDescription>{t("appearance.panelMenu.description")}</CardDescription>
+      </CardHeader>
+
+      <CardContent className="px-6 py-6">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p id="panel-menu-label" className="text-sm font-medium">
+              {t("appearance.panelMenu.toggle")}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {enabled ? t("appearance.panelMenu.on") : t("appearance.panelMenu.off")}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            role="switch"
+            aria-checked={enabled}
+            aria-labelledby="panel-menu-label"
+            onClick={() => setPanelMenuEnabled(!enabled)}
+            className={cn(
+              "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              enabled ? "bg-primary" : "bg-input",
+            )}
+          >
+            <span
+              className={cn(
+                "inline-block h-5 w-5 rounded-full bg-background shadow transition-transform",
+                enabled ? "translate-x-5" : "translate-x-0",
+              )}
+            />
+          </button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 /**
  * Taille des images du panneau du milieu (listes des personnages, lieux,
  * objets, faune et flore) : un seul réglage pour toutes, borné.

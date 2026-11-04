@@ -170,21 +170,7 @@ export function WorldListView({
     return <WorldDisabledNotice module={module} title={feature.label} onOpenFeature={onOpenFeature} />;
   }
 
-  if (entries.length === 0) {
-    const Icon = MODULE_ICONS[module];
-    return (
-      <PageShell title={feature.label} description={feature.description}>
-        <div className="flex flex-col items-center rounded-xl border border-dashed px-6 py-16 text-center">
-          <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <Icon className="size-7" aria-hidden="true" />
-          </span>
-          <h2 className="text-lg font-semibold">{labels.text("list.emptyTitle")}</h2>
-          <p className="mt-2 mb-6 max-w-md text-sm text-muted-foreground">{labels.text("list.emptyDescription")}</p>
-          {createButton}
-        </div>
-      </PageShell>
-    );
-  }
+  const ModuleIcon = MODULE_ICONS[module];
 
   return (
     <PageShell title={feature.label} description={labels.text("list.count", { count: entries.length })} actions={createButton}>
@@ -233,7 +219,10 @@ export function WorldListView({
       </div>
 
       {rows.length === 0 ? (
-        <p className="py-10 text-center text-sm text-muted-foreground">{t("list.noResult")}</p>
+<div className="rounded-xl border border-dashed px-6 py-14 text-center text-sm text-muted-foreground">
+          <ModuleIcon className="mx-auto mb-3 size-8 opacity-40" aria-hidden="true" />
+          {entries.length === 0 ? labels.text("list.emptyTitle") : t("list.noResult")}
+        </div>
       ) : (
         <ul className="divide-y rounded-xl border bg-card" role="tree">
           {rows.map(({ entry, depth, children }) => {

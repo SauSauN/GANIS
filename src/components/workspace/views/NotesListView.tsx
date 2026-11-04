@@ -82,7 +82,7 @@ export function NotesListView({ projectId, feature, onOpenFeature }: NotesListVi
   return (
     <PageShell
       title={feature.label}
-      description={feature.description}
+      description={loaded ? t("list.count", { count: notes.length }) : undefined}
       actions={
         <Button onClick={newNote}>
           <Plus className="mr-1.5 size-4" />
@@ -117,9 +117,6 @@ export function NotesListView({ projectId, feature, onOpenFeature }: NotesListVi
           ))}
         </select>
 
-        {loaded && (
-          <span className="text-sm text-muted-foreground">{t("list.count", { count: visible.length })}</span>
-        )}
       </div>
 
       {error && (

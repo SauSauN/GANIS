@@ -188,21 +188,6 @@ export function LocationListView({ projectId, feature, onOpenFeature }: Location
   // Aucun lieu
   // ---------------------------------------------------------------------------
 
-  if (locations.length === 0) {
-    return (
-      <PageShell title={feature.label} description={feature.description}>
-        <div className="flex flex-col items-center rounded-xl border border-dashed px-6 py-16 text-center">
-          <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <MapPinned className="size-7" aria-hidden="true" />
-          </span>
-          <h2 className="text-lg font-semibold">{t("list.empty.title")}</h2>
-          <p className="mt-2 mb-6 max-w-md text-sm text-muted-foreground">{t("list.empty.description")}</p>
-          {createButton}
-        </div>
-      </PageShell>
-    );
-  }
-
   // ---------------------------------------------------------------------------
   // Liste
   // ---------------------------------------------------------------------------
@@ -285,7 +270,10 @@ export function LocationListView({ projectId, feature, onOpenFeature }: Location
       </div>
 
       {matching.length === 0 ? (
-        <p className="py-10 text-center text-sm text-muted-foreground">{t("list.noResult")}</p>
+<div className="rounded-xl border border-dashed px-6 py-14 text-center text-sm text-muted-foreground">
+          <MapPinned className="mx-auto mb-3 size-8 opacity-40" aria-hidden="true" />
+          {locations.length === 0 ? t("list.empty.title") : t("list.noResult")}
+        </div>
       ) : layout === "tree" ? (
         <ul className="overflow-hidden rounded-xl border bg-card" role="tree" aria-label={feature.label}>
           {rows.map((node) => (

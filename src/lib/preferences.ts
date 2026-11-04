@@ -362,3 +362,35 @@ export function setPanelImageSize(size: number) {
 export function usePanelImageSize(): number {
   return useSyncExternalStore(subscribeTo(PANEL_IMAGE_EVENT), getPanelImageSize);
 }
+
+// ----------------------------------------------------------------------------
+// Menu clic droit des éléments du panneau du milieu
+// ----------------------------------------------------------------------------
+
+const PANEL_MENU_KEY = "ganis-panel-menu";
+const PANEL_MENU_EVENT = "ganis:panel-menu-change";
+
+/** Vrai si le clic droit ouvre le menu d'un élément (valeur par défaut). */
+export function getPanelMenuEnabled(): boolean {
+  try {
+    return localStorage.getItem(PANEL_MENU_KEY) !== "false";
+  } catch {
+    return true;
+  }
+}
+
+/** Active ou désactive le menu clic droit du panneau du milieu. */
+export function setPanelMenuEnabled(enabled: boolean) {
+  try {
+    localStorage.setItem(PANEL_MENU_KEY, String(enabled));
+  } catch {
+    /* ignoré */
+  }
+
+  window.dispatchEvent(new Event(PANEL_MENU_EVENT));
+}
+
+/** Réglage du menu clic droit, mis à jour dès qu'il change. */
+export function usePanelMenuEnabled(): boolean {
+  return useSyncExternalStore(subscribeTo(PANEL_MENU_EVENT), getPanelMenuEnabled);
+}

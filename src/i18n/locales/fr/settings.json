@@ -143,6 +143,13 @@
         "location": "Lieu",
         "item": "Objet"
       }
+    },
+    "panelMenu": {
+      "title": "Menu clic droit du panneau du milieu",
+      "description": "Un clic droit sur un personnage, un lieu, un objet, une note… propose Ouvrir, Renommer, Ajouter dedans, Dupliquer et Supprimer.",
+      "toggle": "Menu au clic droit",
+      "on": "Activé : le clic droit ouvre le menu de l'élément.",
+      "off": "Désactivé : le clic droit ne fait rien ; le clic gauche ouvre toujours la fiche."
     }
   },
   "developer": {
