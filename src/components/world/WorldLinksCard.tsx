@@ -317,6 +317,9 @@ export function FactionMembersCard({
   );
 }
 
+/** Valeur d'une nature de lien dans la liste : sa clé et son sens. */
+const choiceValue = (item: { type: string; forward: boolean }) => `${item.type}:${item.forward ? "forward" : "backward"}`;
+
 function Field({ label, children }: { label: string; children: (id: string) => ReactNode }) {
   const id = useId();
   return (
@@ -502,31 +505,25 @@ function WorldLinkDialog({
 
             <Field label={t("links.dialog.element")}>{renderOtherSelect}</Field>
 
-            <div className="space-y-2">
-              <p className="text-sm font-medium">{t("links.dialog.type")}</p>
-              <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={t("links.dialog.type")}>
-                {choices.map((item) => {
-                  const checked = choice?.type === item.type && choice.forward === item.forward;
-                  return (
-                    <button
-                      key={`${item.type}-${item.forward}`}
-                      type="button"
-                      role="radio"
-                      aria-checked={checked}
-                      disabled={busy}
-                      onClick={() => setChoice(item)}
-                      className={cn(
-                        "rounded-md border px-2.5 py-1 text-xs font-medium transition-colors",
-                        "hover:border-primary/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-                        checked && "border-primary bg-primary text-primary-foreground",
-                      )}
-                    >
+            <Field label={t("links.dialog.type")}>
+              {(id) => (
+                // Une option par nature et par sens (« dirige » / « est dirigée par »).
+                <select
+                  id={id}
+                  value={choice ? choiceValue(choice) : ""}
+                  disabled={busy}
+                  onChange={(e) => setChoice(choices.find((item) => choiceValue(item) === e.target.value) ?? null)}
+                  // Même hauteur que la liste « Élément » (`WorldEntrySelect`).
+                  className={cn(fieldClass, "h-9")}
+                >
+                  {choices.map((item) => (
+                    <option key={choiceValue(item)} value={choiceValue(item)}>
                       {labels.type(item.type, item.forward)}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+                    </option>
+                  ))}
+                </select>
+              )}
+            </Field>
 
             <Field label={t("links.dialog.label")}>
               {(id) => (
