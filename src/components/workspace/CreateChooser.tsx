@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { ListTree, MapPin, NotebookText, Package, PawPrint, StickyNote, UserPlus, type LucideIcon } from "lucide-react";
+import { Flag, ListTree, MapPin, NotebookText, Package, PawPrint, StickyNote, UserPlus, type LucideIcon } from "lucide-react";
 import { Dialog, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const CHOICES: Array<{ id: string; feature: string; icon: LucideIcon; key: string }> = [
@@ -14,11 +14,12 @@ const CHOICES: Array<{ id: string; feature: string; icon: LucideIcon; key: strin
 const WORLD_CHOICES = {
   item: { id: "item", feature: "items.create", icon: Package, key: "6" },
   species: { id: "species", feature: "species.create", icon: PawPrint, key: "7" },
+  faction: { id: "faction", feature: "factions.create", icon: Flag, key: "8" },
 };
 
 interface CreateChooserProps {
-  /** Objets, faune et flore activés pour le projet. */
-  world?: { item?: boolean; species?: boolean };
+  /** Objets, faune et flore, factions activés pour le projet. */
+  world?: { item?: boolean; species?: boolean; faction?: boolean };
   open: boolean;
   onClose: () => void;
   onOpenFeature: (featureId: string) => void;
@@ -26,13 +27,14 @@ interface CreateChooserProps {
 
 /**
  * « Que voulez-vous créer ? » : Ctrl+N dans un module sans création propre
- * (Détails, Recherche, paramètres). Touches 1 à 7 pour choisir au clavier.
+ * (Détails, Recherche, paramètres). Touches 1 à 8 pour choisir au clavier.
  */
 export function CreateChooser({ world = {}, open, onClose, onOpenFeature }: CreateChooserProps) {
   const choices = [
     ...CHOICES,
     ...(world.item ? [WORLD_CHOICES.item] : []),
     ...(world.species ? [WORLD_CHOICES.species] : []),
+    ...(world.faction ? [WORLD_CHOICES.faction] : []),
   ];
   const { t } = useTranslation("menus");
   const tt = t as unknown as (key: string) => string;

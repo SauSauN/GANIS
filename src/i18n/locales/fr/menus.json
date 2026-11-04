@@ -14,6 +14,9 @@
       "locations.create": "Nouveau lieu",
       "structure.plan": "Nouvel élément du découpage",
       "notes.create": "Nouvelle note",
+      "items.create": "Nouvel objet",
+      "species.create": "Nouvelle fiche de faune et flore",
+      "factions.create": "Nouvelle faction",
       "newProject": "Nouveau projet"
     },
     "save": "Enregistrer",
@@ -81,6 +84,7 @@
     "note": "Une note",
     "sticky": "Un post-it",
     "item": "Un objet",
-    "species": "Un animal ou une plante"
+    "species": "Un animal ou une plante",
+    "faction": "Une faction"
   }
 }

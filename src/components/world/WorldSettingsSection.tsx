@@ -12,7 +12,7 @@ import { errorText } from "@/lib/errors";
 import { notifyError } from "@/lib/notify";
 import { cn } from "@/lib/utils";
 import { tutorialText, useTutorialStore } from "@/lib/tutorials";
-import { catalogOf, statusValues } from "@/lib/world";
+import { catalogOf, statusValues, WORKSPACE_MODULE } from "@/lib/world";
 import { useWorldEntries, useWorldStore } from "@/stores/worldStore";
 import type { CharacterDetailLevel, WorldModule } from "@/types";
 
@@ -86,7 +86,7 @@ export function WorldSettingsSection({ projectId, module }: { projectId: string;
               {!settings.enabled && entries.length > 0 && (
                 <p className="mt-1 text-xs text-muted-foreground">{labels.text("settings.kept", { count: entries.length })}</p>
               )}
-              <Button variant="link" size="sm" className="mt-1 h-auto p-0" onClick={() => showTutorial(module === "item" ? "items" : "species")}>
+              <Button variant="link" size="sm" className="mt-1 h-auto p-0" onClick={() => showTutorial(WORKSPACE_MODULE[module])}>
                 {tutorialText("button")}
               </Button>
             </div>

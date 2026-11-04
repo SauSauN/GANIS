@@ -4,9 +4,10 @@ import { useEnabledWorldModules } from "@/stores/worldStore";
 
 /**
  * Cartes « monde » sur la fiche d'un personnage ou d'un lieu, montrées
- * seulement si l'auteur a activé les objets ou la faune et la flore :
+ * seulement si l'auteur a activé les objets, la faune et la flore ou les factions :
  * - personnage : l'animal qu'il est peut-être (faune et flore) ;
- * - liens avec des objets et des espèces (« possède Excalibur »).
+ * - liens avec des objets, des espèces et des factions (« possède Excalibur »,
+ *   « fait partie de l'Ordre d'Aval »).
  */
 export function WorldExtras({
   projectId,
@@ -21,7 +22,7 @@ export function WorldExtras({
 }) {
   const enabled = useEnabledWorldModules(projectId);
 
-  if (!enabled.item && !enabled.species) return null;
+  if (!enabled.item && !enabled.species && !enabled.faction) return null;
 
   return (
     <>

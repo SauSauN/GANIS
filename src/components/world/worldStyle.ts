@@ -1,5 +1,6 @@
 import {
   Amphora,
+  Anchor,
   Apple,
   Axe,
   Backpack,
@@ -11,10 +12,13 @@ import {
   Bot,
   Box,
   Bug,
+  Building2,
   Bus,
   Camera,
   Car,
   Caravan,
+  Castle,
+  Church,
   Coins,
   Cpu,
   Crosshair,
@@ -22,7 +26,10 @@ import {
   CupSoda,
   Diamond,
   Drama,
+  Eye,
+  EyeOff,
   Fish,
+  Flag,
   FlaskConical,
   FlaskRound,
   Flame,
@@ -30,16 +37,24 @@ import {
   Footprints,
   Gem,
   Ghost,
+  Gavel,
   GraduationCap,
   Guitar,
+  HandCoins,
+  Handshake,
   HardHat,
   Image,
   Key,
+  KeyRound,
+  Landmark,
   Lamp,
   Laptop,
   Leaf,
+  Library,
   Mail,
   Map,
+  Megaphone,
+  Network,
   Package,
   PawPrint,
   Pill,
@@ -58,15 +73,21 @@ import {
   Skull,
   Smartphone,
   Snail,
+  Siren,
   Sparkles,
   Sprout,
+  Store,
   Sword,
   Swords,
   Target,
+  Tent,
   TrainFront,
   TreeDeciduous,
   Trophy,
   Turtle,
+  Users,
+  VenetianMask,
+  Vote,
   Utensils,
   WandSparkles,
   Watch,
@@ -79,7 +100,7 @@ import type { CSSProperties } from "react";
 import type { WorldModule } from "@/types";
 
 /*
- * Apparence des objets, de la faune et de la flore : une icône et une
+ * Apparence des objets, de la faune et de la flore, des factions : une icône et une
  * teinte par catégorie, une icône par type quand il en existe une
  * parlante (sinon celle de la catégorie). Même principe que les lieux.
  */
@@ -101,6 +122,16 @@ const CATEGORY_ICONS: Record<WorldModule, Record<string, LucideIcon>> = {
     fauna: PawPrint,
     flora: Leaf,
   },
+  faction: {
+    political: Landmark,
+    military: Swords,
+    religious: Church,
+    economic: HandCoins,
+    criminal: VenetianMask,
+    secret: EyeOff,
+    family: Castle,
+    social: Users,
+  },
 };
 
 const CATEGORY_HUES: Record<WorldModule, Record<string, number>> = {
@@ -119,6 +150,16 @@ const CATEGORY_HUES: Record<WorldModule, Record<string, number>> = {
   species: {
     fauna: 45,
     flora: 140,
+  },
+  faction: {
+    political: 220,
+    military: 10,
+    religious: 50,
+    economic: 95,
+    criminal: 330,
+    secret: 270,
+    family: 25,
+    social: 180,
   },
 };
 
@@ -211,10 +252,49 @@ const TYPE_ICONS: Record<WorldModule, Record<string, LucideIcon>> = {
     crop: Wheat,
     magicPlant: Sparkles,
   },
+  faction: {
+    government: Landmark,
+    council: Gavel,
+    party: Vote,
+    alliance: Handshake,
+    rebellion: Flag,
+    army: Swords,
+    navy: Anchor,
+    knightOrder: Shield,
+    mercenaries: Coins,
+    militia: Flag,
+    guard: Siren,
+    church: Church,
+    cult: Flame,
+    sect: Eye,
+    monasticOrder: Library,
+    guild: Wrench,
+    company: Building2,
+    tradeLeague: Store,
+    bank: HandCoins,
+    gang: Skull,
+    mafia: VenetianMask,
+    thievesGuild: KeyRound,
+    pirates: Ship,
+    smugglers: Sailboat,
+    secretSociety: EyeOff,
+    conspiracy: Drama,
+    spyNetwork: Network,
+    resistance: Flag,
+    nobleHouse: Crown,
+    clan: Castle,
+    dynasty: Crown,
+    tribe: Tent,
+    school: GraduationCap,
+    academy: Library,
+    club: Users,
+    brotherhood: Handshake,
+    movement: Megaphone,
+  },
 };
 
 /** Icône du module (barre de gauche, paramètres). */
-export const MODULE_ICONS: Record<WorldModule, LucideIcon> = { item: Package, species: PawPrint };
+export const MODULE_ICONS: Record<WorldModule, LucideIcon> = { item: Package, species: PawPrint, faction: Flag };
 
 export function categoryIcon(module: WorldModule, category: string | undefined): LucideIcon {
   return (category && CATEGORY_ICONS[module][category]) || MODULE_ICONS[module];

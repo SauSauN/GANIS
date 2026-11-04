@@ -30,6 +30,7 @@
     "mangaPanel": "Case de manga",
     "item": "Objet",
     "species": "Faune et flore",
+    "faction": "Faction",
     "worldLink": "Lien entre éléments"
   }
 }

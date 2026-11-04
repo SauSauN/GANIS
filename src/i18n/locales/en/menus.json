@@ -14,6 +14,9 @@
       "locations.create": "New location",
       "structure.plan": "New structure item",
       "notes.create": "New note",
+      "items.create": "New object",
+      "species.create": "New fauna and flora sheet",
+      "factions.create": "New faction",
       "newProject": "New project"
     },
     "save": "Save",
@@ -81,6 +84,7 @@
     "note": "A note",
     "sticky": "A sticky note",
     "item": "An object",
-    "species": "An animal or a plant"
+    "species": "An animal or a plant",
+    "faction": "A faction"
   }
 }

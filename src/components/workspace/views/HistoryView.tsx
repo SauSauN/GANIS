@@ -19,6 +19,7 @@ import {
   type LucideIcon,
   LayoutPanelTop,
   Package,
+  Flag,
   PawPrint,
   Link2,
 } from "lucide-react";
@@ -45,6 +46,7 @@ const ICONS: Record<HistoryKind, LucideIcon> = {
   placeLink: MapPin,
   item: Package,
   species: PawPrint,
+  faction: Flag,
   worldLink: Link2,
   mangaPanel: LayoutPanelTop,
   synopsis: FileText,

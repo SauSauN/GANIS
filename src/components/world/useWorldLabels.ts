@@ -8,7 +8,7 @@ type LooseT = (key: string, options?: Record<string, unknown>) => string;
 /**
  * Libellés d'un module dans la langue courante : catégories, types (par
  * défaut traduits, ajoutés par l'auteur tels quels), statuts, champs,
- * natures. Clés de `world.json`, sous `item.` ou `species.`.
+ * natures. Clés de `world.json`, sous `item.`, `species.` ou `faction.`.
  */
 export function useWorldLabels(module: WorldModule, customTypes: CustomLocationType[]) {
   const { t: typed } = useTranslation("world");

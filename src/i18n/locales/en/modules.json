@@ -40,6 +40,10 @@
     "species": {
       "label": "Fauna and flora",
       "empty": "No animals or plants yet."
+    },
+    "factions": {
+      "label": "Factions",
+      "empty": "No factions yet."
     }
   },
   "features": {
@@ -177,6 +181,16 @@
       "list": {
         "label": "Fauna and flora list",
         "description": "The species of your world and their individuals."
+      }
+    },
+    "factions": {
+      "create": {
+        "label": "Create a faction",
+        "description": "Guild, order, clan, army, cult… a sheet suited to each type."
+      },
+      "list": {
+        "label": "List of factions",
+        "description": "All the factions in your story, with their branches."
       }
     }
   }

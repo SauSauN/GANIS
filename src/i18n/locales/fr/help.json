@@ -32,7 +32,7 @@
       },
       "layout": {
         "title": "L'espace de travail",
-        "text": "À gauche, la barre des modules : Détails, Personnages, Lieux, Découpage, Trame, Notes et Recherche. Le panneau du milieu liste les fonctions et les éléments du module ; chacun s'ouvre dans un onglet. Objets et Faune et flore s'ajoutent quand vous les activez dans les paramètres du projet.",
+        "text": "À gauche, la barre des modules : Détails, Personnages, Lieux, Découpage, Trame, Notes et Recherche. Le panneau du milieu liste les fonctions et les éléments du module ; chacun s'ouvre dans un onglet. Objets, Faune et flore et Factions s'ajoutent quand vous les activez dans les paramètres du projet.",
         "points": [
           "Cliquez à nouveau sur un module pour replier son panneau.",
           "Clic droit sur un onglet : l'épingler, fermer les autres, ceux de gauche ou de droite.",
@@ -72,13 +72,14 @@
         ]
       },
       "world": {
-        "title": "Objets, faune et flore",
-        "text": "Deux modules facultatifs pour les objets de votre histoire (armes, véhicules, téléphones, objets magiques…) et les animaux et plantes de votre univers. Ils sont masqués tant que vous ne les activez pas.",
+        "title": "Objets, faune et flore, factions",
+        "text": "Trois modules facultatifs : les objets de votre histoire (armes, véhicules, téléphones, objets magiques…), les animaux et plantes de votre univers, et les factions (guildes, ordres, clans, armées, cultes…). Ils sont masqués tant que vous ne les activez pas.",
         "points": [
-          "Paramètres du projet › Objets (ou Faune et flore) : activez le module, puis gardez seulement les catégories utiles.",
+          "Paramètres du projet › Objets (ou Faune et flore, ou Factions) : activez le module, puis gardez seulement les catégories utiles.",
           "Un objet peut être rangé dans un autre (une clé dans un coffre) ; un animal précis se range sous son espèce.",
           "Un animal précis peut aussi devenir un personnage : sa fiche de personnage lui est reliée.",
-          "« Lier un élément » relie objets, espèces, personnages et lieux : « possède », « vit à », « fait partie de »…"
+          "Une faction peut avoir des branches (la section d'un ordre, la famille d'un clan).",
+          "« Lier un élément » relie objets, espèces, factions, personnages et lieux : « possède », « vit à », « dirige », « fait partie de »…"
         ]
       },
       "relations": {
@@ -336,12 +337,13 @@
         ]
       },
       "world": {
-        "title": "Objets, faune et flore",
+        "title": "Objets, faune et flore, factions",
         "intro": "Des modules facultatifs, activés dans les paramètres du projet, construits comme les lieux.",
         "items": [
           "Activez Objets ou Faune et flore dans Paramètres du projet : le module apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
           "Choisissez les catégories utiles (armes, véhicules, magie… ; faune, flore) : seules celles-ci sont proposées à la création. Vous pouvez aussi ajouter vos propres types.",
           "Faune et flore : une fiche est soit une espèce entière, soit un animal ou une plante précis, rangé sous son espèce.",
+          "Factions : guildes, ordres, clans, armées, cultes, sociétés secrètes… Une faction peut avoir des branches ; ses membres, ses alliés, ses ennemis et son siège se notent par des liens.",
           "Un animal précis peut aussi être un personnage : « Créer sa fiche de personnage » ou l'associer à un personnage existant. La fiche du personnage le montre en retour.",
           "La carte « Liens avec des objets et des espèces » relie ces fiches aux personnages, aux lieux et entre elles, avec une période du récit si besoin (un objet qui change de main)."
         ]
@@ -428,7 +430,7 @@
         "intro": "Deux niveaux de réglages.",
         "items": [
           "Paramètres du projet (en bas de la barre de gauche) : informations, statuts, niveau de détail des personnages, types de lieux, découpage et couleurs.",
-          "Objets, Faune et flore : activer ces modules facultatifs et choisir leurs catégories.",
+          "Objets, Faune et flore, Factions : activer ces modules facultatifs et choisir leurs catégories.",
           "Paramètres généraux (roue dentée en haut) : compte, mot de passe, clé de récupération, langue, thème, enregistrement automatique.",
           "Packages : des thèmes de couleurs pour toute l'application."
         ]
@@ -501,8 +503,8 @@
           "a": "Paramètres › Compte › Verrouillage automatique : choisissez un délai. Passé ce délai sans activité, votre mot de passe est demandé pour reprendre ; vos onglets restent ouverts."
         },
         {
-          "q": "Je ne trouve pas les objets ni la faune et flore.",
-          "a": "Ces modules sont masqués par défaut. Ouvrez Paramètres du projet › Objets (ou Faune et flore) et activez-les : ils apparaissent dans la barre de gauche, sous Lieux."
+          "q": "Je ne trouve pas les objets, la faune et flore ni les factions.",
+          "a": "Ces modules sont masqués par défaut. Ouvrez Paramètres du projet › Objets (ou Faune et flore, ou Factions) et activez-les : ils apparaissent dans la barre de gauche, sous Lieux."
         },
         {
           "q": "Mon animal parle et a des relations : personnage ou animal ?",

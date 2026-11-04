@@ -14,7 +14,7 @@ const ICONS: Record<CharacterDetailLevel, LucideIcon> = {
 interface LevelPickerProps {
   /** Textes des niveaux : fiches de personnages (par défaut), de lieux, ou objets / faune et flore. */
   namespace?: "characters" | "locations" | "world";
-  /** Objets, faune et flore : `item.` ou `species.` devant les clés de `world.json`. */
+  /** Objets, faune et flore, factions : `item.`, `species.` ou `faction.` devant les clés de `world.json`. */
   prefix?: string;
   value: CharacterDetailLevel | null;
   onChange: (level: CharacterDetailLevel) => void;

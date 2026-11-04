@@ -4,6 +4,7 @@ import {
   BookText,
   Columns3,
   FileText,
+  Flag,
   GalleryThumbnails,
   History,
   Info,
@@ -70,6 +71,7 @@ export type ModuleId =
   | "locations"
   | "items"
   | "species"
+  | "factions"
   | "structure"
   | "plot"
   | "notes"
@@ -120,6 +122,8 @@ type FeatureId =
   | "items.list"
   | "species.create"
   | "species.list"
+  | "factions.create"
+  | "factions.list"
   | "structure.plan"
   | "structure.read"
   | "plot.board"
@@ -138,7 +142,7 @@ type FeatureId =
   | "script.continuity";
 
 /** Modules qui ont une liste (et donc un message de liste vide). */
-type ListModuleId = "characters" | "locations" | "items" | "species" | "notes";
+type ListModuleId = "characters" | "locations" | "items" | "species" | "factions" | "notes";
 
 /** Fonctionnalité dont le libellé et la description suivent la langue. */
 function defineFeature(id: FeatureId, icon: LucideIcon): WorkspaceFeature {
@@ -259,7 +263,7 @@ export const MANGA_MODULE: WorkspaceModule = defineModule("script", Clapperboard
 export const MANGA_FEATURES = new Set(MANGA_MODULE.features.map((feature) => feature.id));
 
 /**
- * Objets, faune et flore : modules facultatifs, masqués tant que l'auteur ne
+ * Objets, faune et flore, factions : modules facultatifs, masqués tant que l'auteur ne
  * les a pas activés dans Paramètres du projet (voir `modulesFor`). Leurs
  * onglets restent reconnus partout ; ouverts alors que le module est
  * désactivé, ils le disent (rien n'est supprimé).
@@ -274,10 +278,16 @@ export const SPECIES_MODULE: WorkspaceModule = defineListModule("species", PawPr
   defineFeature("species.list", List),
 ]);
 
+export const FACTIONS_MODULE: WorkspaceModule = defineListModule("factions", Flag, [
+  defineFeature("factions.create", Plus),
+  defineFeature("factions.list", List),
+]);
+
 /** Module de la barre de gauche de chaque module du monde. */
 export const WORLD_WORKSPACE_MODULES: Record<WorldModule, WorkspaceModule> = {
   item: ITEMS_MODULE,
   species: SPECIES_MODULE,
+  faction: FACTIONS_MODULE,
 };
 
 /** Modules facultatifs activés pour le projet. */
@@ -292,8 +302,8 @@ export function modulesFor(
   projectType: string | null | undefined,
   world: EnabledWorldModules = {},
 ): WorkspaceModule[] {
-  // Objets puis Faune et flore, juste après les Lieux, s'ils sont activés.
-  const worldModules = (["item", "species"] as const)
+  // Objets, Faune et flore puis Factions, juste après les Lieux, s'ils sont activés.
+  const worldModules = (["item", "species", "faction"] as const)
     .filter((module) => world[module])
     .map((module) => WORLD_WORKSPACE_MODULES[module]);
   const after = WORKSPACE_MODULES.findIndex((module) => module.id === "locations");
@@ -344,6 +354,7 @@ const ALL_MODULES: WorkspaceModule[] = [
   ...WORKSPACE_MODULES,
   ITEMS_MODULE,
   SPECIES_MODULE,
+  FACTIONS_MODULE,
   NOVEL_MODULE,
   MANGA_MODULE,
   SETTINGS_MODULE,
@@ -397,19 +408,20 @@ function locationFeature(tabId: string, locationId: string): WorkspaceFeature {
 }
 
 /**
- * Fiche d'un objet ou d'une espèce (onglet `item:<id>`, `species:<id>`) :
+ * Fiche d'un objet, d'une espèce ou d'une faction (onglet `item:<id>`,
+ * `species:<id>`, `faction:<id>`) :
  * fonctionnalité du module, dont le libellé est le nom de la fiche.
  */
 function worldFeature(tabId: string, module: WorldModule, entryId: string): WorkspaceFeature {
   return {
     id: tabId,
-    icon: module === "item" ? Package : PawPrint,
+    icon: WORLD_WORKSPACE_MODULES[module].icon,
     get label() {
       const entry = useWorldStore.getState()[module].entries.find((item) => item.id === entryId);
       return entry?.name || i18n.t("world:tab.fallback");
     },
     get description() {
-      return i18n.t(`modules:features.${module === "item" ? "items" : "species"}.list.description`);
+      return i18n.t(`modules:features.${WORLD_WORKSPACE_MODULES[module].id as "items" | "species" | "factions"}.list.description`);
     },
   };
 }

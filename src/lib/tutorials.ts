@@ -2,6 +2,7 @@ import {
   BookOpenText,
   Clapperboard,
   FileUp,
+  Flag,
   Filter,
   FolderTree,
   GalleryThumbnails,
@@ -58,6 +59,7 @@ export type TutorialId =
   | "locations"
   | "items"
   | "species"
+  | "factions"
   | "structure"
   | "plot"
   | "notes";
@@ -151,6 +153,16 @@ export const TUTORIALS: Record<TutorialId, Tutorial> = {
       { id: "links", icon: Link2 },
     ],
   },
+  factions: {
+    icon: Flag,
+    steps: [
+      { id: "enable", icon: Power, open: "settings:factions" },
+      { id: "create", icon: Flag, open: "factions.create" },
+      { id: "branches", icon: FolderTree, open: "factions.list" },
+      { id: "members", icon: Users },
+      { id: "relations", icon: Link2 },
+    ],
+  },
   structure: {
     icon: ListTree,
     steps: [
@@ -198,6 +210,7 @@ export function tutorialForModule(moduleId: string): TutorialId | null {
     case "locations":
     case "items":
     case "species":
+    case "factions":
     case "structure":
     case "plot":
     case "notes":

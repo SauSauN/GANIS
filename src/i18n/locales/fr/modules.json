@@ -40,6 +40,10 @@
     "species": {
       "label": "Faune et flore",
       "empty": "Aucun animal ni aucune plante pour l'instant."
+    },
+    "factions": {
+      "label": "Factions",
+      "empty": "Aucune faction pour l'instant."
     }
   },
   "features": {
@@ -177,6 +181,16 @@
       "list": {
         "label": "Liste de la faune et flore",
         "description": "Les espèces de votre univers et leurs individus."
+      }
+    },
+    "factions": {
+      "create": {
+        "label": "Créer une faction",
+        "description": "Guilde, ordre, clan, armée, culte… une fiche adaptée à chaque type."
+      },
+      "list": {
+        "label": "Liste des factions",
+        "description": "Toutes les factions de votre histoire, avec leurs branches."
       }
     }
   }

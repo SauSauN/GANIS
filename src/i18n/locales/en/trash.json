@@ -13,6 +13,7 @@
     "mangaPanel": "Manga panel",
     "item": "Object",
     "species": "Fauna and flora",
+    "faction": "Faction",
     "worldLink": "Link between elements"
   },
   "deleted": {
@@ -28,6 +29,7 @@
     "mangaPanel": "Panel “{{name}}” deleted.",
     "item": "Object “{{name}}” deleted.",
     "species": "“{{name}}” deleted from fauna and flora.",
+    "faction": "“{{name}}” deleted from factions.",
     "worldLink": "Link “{{name}}” deleted."
   },
   "restored": {
@@ -43,6 +45,7 @@
     "mangaPanel": "Panel “{{name}}” restored.",
     "item": "Object “{{name}}” restored.",
     "species": "“{{name}}” restored to fauna and flora.",
+    "faction": "“{{name}}” restored to factions.",
     "worldLink": "Link “{{name}}” restored."
   },
   "untitled": {
@@ -58,6 +61,7 @@
     "mangaPanel": "Panel without action",
     "item": "Unnamed object",
     "species": "Unnamed entry",
+    "faction": "Untitled faction",
     "worldLink": "Link"
   },
   "view": {

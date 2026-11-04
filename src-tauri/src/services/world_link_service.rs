@@ -228,7 +228,9 @@ fn alive(kind: &str, id: &str) -> String {
         "(CASE {kind} WHEN 'character' THEN EXISTS (SELECT 1 FROM characters WHERE id = {id}) \
                       WHEN 'location' THEN EXISTS (SELECT 1 FROM locations WHERE id = {id}) \
                       WHEN 'item' THEN EXISTS (SELECT 1 FROM items WHERE id = {id}) \
-                      ELSE EXISTS (SELECT 1 FROM species WHERE id = {id}) END)"
+                      WHEN 'species' THEN EXISTS (SELECT 1 FROM species WHERE id = {id}) \
+                      WHEN 'faction' THEN EXISTS (SELECT 1 FROM factions WHERE id = {id}) \
+                      ELSE 0 END)"
     )
 }
 

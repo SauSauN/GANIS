@@ -198,8 +198,9 @@ export function WorldSheet({
     );
   }
 
-  // « Rangé dans » (objet), « Espèce » (animal précis), « Fait partie de » (espèce).
-  const parentKey = module === "item" ? "item" : nature === "individual" ? "individual" : "species";
+  // « Rangé dans » (objet), « Espèce » (animal précis), « Fait partie de »
+  // (espèce), « Branche de » (faction).
+  const parentKey = module === "species" ? (nature === "individual" ? "individual" : "species") : module;
   const displayName = draft.name.trim() || labels.text("profile.new");
 
   return (

@@ -16,7 +16,8 @@
     "noteFolder": "Folders",
     "sticky": "Sticky notes",
     "item": "Objects",
-    "species": "Fauna and flora"
+    "species": "Fauna and flora",
+    "faction": "Faction"
   },
   "untitled": {
     "character": "Unnamed character",
@@ -28,7 +29,8 @@
     "sticky": "Sticky note",
     "plotEvent": "Untitled event",
     "item": "Unnamed object",
-    "species": "Unnamed entry"
+    "species": "Unnamed entry",
+    "faction": "Untitled faction"
   },
   "palette": {
     "title": "Command palette",

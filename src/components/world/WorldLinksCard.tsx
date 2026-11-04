@@ -26,7 +26,7 @@ import { useProjectCharacters } from "@/stores/characterStore";
 import { useProjectLocations } from "@/stores/locationStore";
 import { useProjectWorldLinks, useWorldLinkStore } from "@/stores/worldLinkStore";
 import { useEnabledWorldModules, useWorldEntries } from "@/stores/worldStore";
-import type { WorldLink, WorldLinkInput, WorldLinkKind } from "@/types";
+import type { WorldLink, WorldLinkInput, WorldLinkKind, WorldModule } from "@/types";
 
 interface Self {
   kind: WorldLinkKind;
@@ -39,8 +39,9 @@ function useDirectory(projectId: string) {
   const { locations, settings: locationSettings } = useProjectLocations(projectId);
   const items = useWorldEntries(projectId, "item");
   const species = useWorldEntries(projectId, "species");
+  const factions = useWorldEntries(projectId, "faction");
 
-  return { characters, locations, locationSettings, items, species };
+  return { characters, locations, locationSettings, items, species, factions };
 }
 
 type Directory = ReturnType<typeof useDirectory>;
@@ -57,7 +58,14 @@ function nameOf(directory: Directory, kind: WorldLinkKind, id: string): string |
       return directory.items.entries.find((item) => item.id === id)?.name ?? null;
     case "species":
       return directory.species.entries.find((item) => item.id === id)?.name ?? null;
+    case "faction":
+      return directory.factions.entries.find((item) => item.id === id)?.name ?? null;
   }
+}
+
+/** Fiches d'un module du monde dans l'annuaire. */
+function sliceOf(directory: Directory, module: WorldModule) {
+  return module === "item" ? directory.items : module === "species" ? directory.species : directory.factions;
 }
 
 function tabOf(kind: WorldLinkKind, id: string): string {
@@ -84,7 +92,7 @@ function OtherThumb({ projectId, directory, view }: { projectId: string; directo
       <LocationThumb projectId={projectId} location={location} customTypes={directory.locationSettings.customTypes} size="sm" />
     ) : null;
   }
-  const slice = kind === "item" ? directory.items : directory.species;
+  const slice = sliceOf(directory, kind);
   const entry = slice.entries.find((item) => item.id === id);
   return entry ? (
     <WorldThumb projectId={projectId} module={kind} entry={entry} customTypes={slice.settings.customTypes} size="sm" />
@@ -254,11 +262,11 @@ function WorldLinkDialog({
 
   const initialView = link ? linksOfEntry([link], self.id)[0] : null;
 
-  /** Sortes proposées pour l'autre côté : objets et espèces seulement si leur module est activé. */
+  /** Sortes proposées pour l'autre côté : objets, espèces et factions seulement si leur module est activé. */
   const kinds = WORLD_LINK_KINDS.filter(
     (kind) =>
       canLink(self.kind, kind) &&
-      (kind === "item" || kind === "species" ? enabled[kind] || initialView?.otherKind === kind : true),
+      (kind === "item" || kind === "species" || kind === "faction" ? enabled[kind] || initialView?.otherKind === kind : true),
   );
 
   const [otherKind, setOtherKind] = useState<WorldLinkKind>(initialView?.otherKind ?? kinds[0] ?? "item");
@@ -336,7 +344,7 @@ function WorldLinkDialog({
           />
         );
       default: {
-        const entries = (otherKind === "item" ? directory.items : directory.species).entries.filter(
+        const entries = sliceOf(directory, otherKind).entries.filter(
           (entry) => entry.id !== self.id,
         );
         return (

@@ -331,6 +331,48 @@
       }
     }
   },
+  "factions": {
+    "title": "Tutorial: Factions",
+    "name": "Factions",
+    "intro": "The groups that drive your story: guilds, orders, clans, armies, cults, secret societies…",
+    "steps": {
+      "enable": {
+        "title": "Turn on the module",
+        "text": "The Factions module is optional: it appears in the left bar only once turned on in the project settings.",
+        "points": [
+          "Then choose the useful categories: politics, army, religion, crime…",
+          "Turning it off later deletes nothing."
+        ]
+      },
+      "create": {
+        "title": "Create a faction",
+        "text": "Choose its type: the sheet adapts. An army has its strength and equipment, a religion its dogmas and rites.",
+        "points": [
+          "Motto, emblem, goals and influence, from local to worldwide.",
+          "Ctrl+N in the module creates a faction."
+        ]
+      },
+      "branches": {
+        "title": "Organise its branches",
+        "text": "A faction can depend on another: a section of an order, a cell of a network, a family of a clan. The panel shows them as a tree.",
+        "points": []
+      },
+      "members": {
+        "title": "Give it members",
+        "text": "On the sheet, link characters to the faction: “leads”, “is a member of”, “founded”.",
+        "points": [
+          "The links also appear on each character's sheet."
+        ]
+      },
+      "relations": {
+        "title": "Place it in the world",
+        "text": "Allies and enemies, seat, territories and objects it controls: everything links from the links card.",
+        "points": [
+          "Give a story period when an alliance is made or broken."
+        ]
+      }
+    }
+  },
   "structure": {
     "title": "Tutorial: Structure",
     "name": "Structure",

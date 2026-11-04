@@ -58,6 +58,12 @@
       "none": "Tout en haut",
       "empty": "Rien (tout en haut)",
       "hint": "Un groupe plus large, si vous en avez un : les loups gris dans les canidés."
+    },
+    "faction": {
+      "label": "Branche de",
+      "none": "Faction indépendante",
+      "empty": "Aucune (faction indépendante)",
+      "hint": "La faction dont celle-ci dépend : une section d'un ordre, une cellule d'un réseau, une famille d'un clan."
     }
   },
   "sections": {
@@ -184,12 +190,13 @@
     "noFree": "Aucun animal précis disponible"
   },
   "links": {
-    "title": "Liens avec des objets et des espèces",
+    "title": "Liens avec des objets, des espèces et des factions",
     "description": {
       "character": "Ce qu'il possède, utilise, a fabriqué ou recherche ; ses compagnons et montures.",
       "location": "Les objets qui s'y trouvent, les animaux et les plantes qui y vivent.",
       "item": "À qui il appartient, où il se trouve, de quoi il est fait, à quoi il est lié.",
-      "species": "Où il vit, de quoi il se nourrit, à qui il appartient, ce qu'on en fait."
+      "species": "Où il vit, de quoi il se nourrit, à qui il appartient, ce qu'on en fait.",
+      "faction": "Qui la dirige, qui en fait partie, ses alliés et ses ennemis, son siège, ce qu'elle contrôle."
     },
     "add": "Lier un élément",
     "edit": "Modifier le lien",
@@ -201,7 +208,8 @@
       "character": "Personnage",
       "location": "Lieu",
       "item": "Objet",
-      "species": "Faune et flore"
+      "species": "Faune et flore",
+      "faction": "Faction"
     },
     "types": {
       "owns": {
@@ -255,6 +263,34 @@
       "other": {
         "forward": "autre lien avec",
         "backward": "autre lien avec"
+      },
+      "leads": {
+        "forward": "dirige",
+        "backward": "est dirigée par"
+      },
+      "memberOf": {
+        "forward": "fait partie de",
+        "backward": "compte parmi ses membres"
+      },
+      "founded": {
+        "forward": "a fondé",
+        "backward": "a été fondée par"
+      },
+      "allyOf": {
+        "forward": "est alliée de",
+        "backward": "est alliée de"
+      },
+      "enemyOf": {
+        "forward": "est ennemi de",
+        "backward": "est l'ennemie de"
+      },
+      "basedIn": {
+        "forward": "a son siège à",
+        "backward": "abrite le siège de"
+      },
+      "controls": {
+        "forward": "contrôle",
+        "backward": "est contrôlé par"
       }
     },
     "dialog": {
@@ -805,6 +841,242 @@
         "theme": "La profondeur",
         "goal": "Détails propres au type, habitat et légendes",
         "count": "+ 2 à 5 champs"
+      }
+    }
+  },
+  "faction": {
+    "categories": {
+      "political": {
+        "label": "Pouvoir politique",
+        "description": "Gouvernements, conseils, partis, alliances, rébellions…"
+      },
+      "military": {
+        "label": "Forces armées",
+        "description": "Armées, flottes, ordres de chevaliers, mercenaires, gardes…"
+      },
+      "religious": {
+        "label": "Religion",
+        "description": "Églises, cultes, sectes, ordres monastiques…"
+      },
+      "economic": {
+        "label": "Économie",
+        "description": "Guildes, compagnies, ligues marchandes, banques…"
+      },
+      "criminal": {
+        "label": "Crime",
+        "description": "Gangs, mafias, guildes des voleurs, pirates, contrebandiers…"
+      },
+      "secret": {
+        "label": "Sociétés secrètes",
+        "description": "Sociétés secrètes, complots, réseaux d'espions, résistances…"
+      },
+      "family": {
+        "label": "Familles et clans",
+        "description": "Maisons nobles, clans, dynasties, tribus…"
+      },
+      "social": {
+        "label": "Groupes et mouvements",
+        "description": "Écoles, académies, clubs, confréries, mouvements…"
+      }
+    },
+    "types": {
+      "government": "Gouvernement",
+      "council": "Conseil",
+      "party": "Parti",
+      "alliance": "Alliance",
+      "rebellion": "Rébellion",
+      "army": "Armée",
+      "navy": "Flotte",
+      "knightOrder": "Ordre de chevaliers",
+      "mercenaries": "Compagnie de mercenaires",
+      "militia": "Milice",
+      "guard": "Garde",
+      "church": "Église",
+      "cult": "Culte",
+      "sect": "Secte",
+      "monasticOrder": "Ordre monastique",
+      "guild": "Guilde",
+      "company": "Compagnie",
+      "tradeLeague": "Ligue marchande",
+      "bank": "Banque",
+      "gang": "Gang",
+      "mafia": "Mafia",
+      "thievesGuild": "Guilde des voleurs",
+      "pirates": "Pirates",
+      "smugglers": "Contrebandiers",
+      "secretSociety": "Société secrète",
+      "conspiracy": "Complot",
+      "spyNetwork": "Réseau d'espions",
+      "resistance": "Résistance",
+      "nobleHouse": "Maison noble",
+      "clan": "Clan",
+      "dynasty": "Dynastie",
+      "tribe": "Tribu",
+      "school": "École",
+      "academy": "Académie",
+      "club": "Club",
+      "brotherhood": "Confrérie",
+      "movement": "Mouvement"
+    },
+    "statuses": {
+      "active": "Active",
+      "rising": "En pleine ascension",
+      "declining": "En déclin",
+      "underground": "Clandestine",
+      "banned": "Interdite",
+      "dissolved": "Dissoute",
+      "destroyed": "Anéantie",
+      "unknown": "Inconnu"
+    },
+    "fields": {
+      "colorPalette": "Palette de couleurs",
+      "aliases": "Autres noms",
+      "description": "Description",
+      "firstAppearance": "Première apparition",
+      "motto": "Devise",
+      "emblem": "Emblème",
+      "size": "Taille",
+      "influence": "Influence",
+      "goals": "Objectifs",
+      "ideology": "Idéologie",
+      "founded": "Fondation",
+      "history": "Histoire",
+      "notes": "Notes de l'auteur",
+      "powers": "Pouvoirs",
+      "territory": "Territoire",
+      "strength": "Forces",
+      "equipment": "Équipement",
+      "ranks": "Rangs",
+      "deity": "Divinité",
+      "dogmas": "Dogmes",
+      "rites": "Rites",
+      "wealth": "Richesse",
+      "trade": "Commerce",
+      "activities": "Activités",
+      "recognition": "Signes de reconnaissance",
+      "membership": "Conditions d'entrée",
+      "secrets": "Secrets",
+      "lineage": "Lignée",
+      "succession": "Succession",
+      "oath": "Serment",
+      "subjects": "Enseignements",
+      "fleet": "Flotte"
+    },
+    "placeholders": {
+      "aliases": "Ex. Les Manteaux gris",
+      "description": "Ce qu'elle est, ce qu'on en voit, ce qu'on en dit…",
+      "motto": "Ex. Rien ne passe",
+      "emblem": "Ex. Une tour d'argent sur fond noir",
+      "size": "Ex. 300 membres, une poignée d'initiés",
+      "goals": "Ce qu'elle veut obtenir, à court et à long terme…",
+      "ideology": "Ce en quoi elle croit, ce qu'elle défend…",
+      "founded": "Ex. Il y a deux siècles, après la Grande Guerre",
+      "history": "Sa fondation, ses victoires, ses défaites, ses scissions…",
+      "notes": "Idées, questions en suspens…",
+      "powers": "Ce qu'elle décide, qui lui obéit…",
+      "territory": "Ex. Les quartiers du port et la côte sud",
+      "strength": "Ex. 3 000 soldats, 12 navires",
+      "equipment": "Armes, montures, machines de guerre…",
+      "ranks": "Ajouter un rang…",
+      "deity": "Ex. La Déesse aux deux visages",
+      "dogmas": "Ce que ses fidèles doivent croire et respecter…",
+      "rites": "Cérémonies, initiations, sacrifices…",
+      "wealth": "Ex. Immense, en déclin, dissimulée",
+      "trade": "Ajouter une marchandise…",
+      "activities": "Ajouter une activité…",
+      "recognition": "Ex. Un anneau de fer au petit doigt",
+      "membership": "Ex. Être parrainé par deux membres",
+      "secrets": "Ce qu'elle cache, et à qui…",
+      "lineage": "Fondateurs, héritiers, branches de la famille…",
+      "succession": "Ex. Le fils aîné, ou le plus fort au combat",
+      "oath": "Ex. Servir la reine jusqu'à la mort",
+      "subjects": "Ajouter une matière…",
+      "fleet": "Navires, équipages, ports d'attache…"
+    },
+    "options": {
+      "influence": {
+        "local": "Locale",
+        "regional": "Régionale",
+        "national": "Nationale",
+        "continental": "Continentale",
+        "worldwide": "Mondiale"
+      }
+    },
+    "profile": {
+      "new": "Nouvelle faction",
+      "contains_one": "{{count}} branche",
+      "contains_other": "{{count}} branches"
+    },
+    "sections": {
+      "identity": "Ce qui permet de reconnaître la faction et de comprendre ce qu'elle veut.",
+      "story": "Ses convictions, sa fondation, son passé, et vos notes d'auteur.",
+      "gallery": "Jusqu'à 30 images : emblèmes, bannières, uniformes, références."
+    },
+    "form": {
+      "namePlaceholder": "Ex. L'Ordre d'Aval, la Guilde des Ombres, la Maison Venn"
+    },
+    "picker": {
+      "title": "Quel genre de faction ?",
+      "description": "Choisissez un type : la fiche s'adapte (une armée n'a pas les mêmes informations qu'une secte)."
+    },
+    "create": {
+      "save": "Créer la faction",
+      "inside": "Sera une branche de « {{name}} »."
+    },
+    "list": {
+      "create": "Créer une faction",
+      "emptyTitle": "Aucune faction pour l'instant",
+      "emptyDescription": "Guildes, ordres, clans, armées, cultes, sociétés secrètes… Créez les groupes qui font bouger votre histoire.",
+      "count_one": "{{count}} faction",
+      "count_other": "{{count}} factions",
+      "addInside": "Créer une branche de « {{name}} »"
+    },
+    "children": {
+      "title": "Branches",
+      "description": "Les sections, cellules ou familles qui dépendent de « {{name}} ».",
+      "add": "Ajouter une branche",
+      "empty": "Aucune branche."
+    },
+    "sidebar": {
+      "title": "Factions",
+      "empty": "Aucune faction."
+    },
+    "disabled": {
+      "title": "Le module Factions est désactivé",
+      "description": "Vos factions sont gardées. Réactivez le module dans les paramètres du projet pour les retrouver."
+    },
+    "settings": {
+      "title": "Factions et organisations",
+      "description": "Les groupes de votre histoire : guildes, ordres, clans, armées, cultes, sociétés secrètes…",
+      "enable": "Activer les factions",
+      "enabledHint": "Le module « Factions » est dans la barre de gauche.",
+      "disabledHint": "Activez-le pour l'ajouter à la barre de gauche.",
+      "kept_one": "{{count}} faction est gardée et réapparaîtra si vous réactivez le module.",
+      "kept_other": "{{count}} factions sont gardées et réapparaîtront si vous réactivez le module.",
+      "categories": "Ne gardez que ce dont votre histoire a besoin : les autres catégories ne seront pas proposées.",
+      "types": "Ajoutez vos propres types (Conclave, Syndicat…). Chacun est rangé dans une catégorie et en reçoit les champs.",
+      "typePlaceholder": "Ex. Conclave"
+    },
+    "levels": {
+      "title": "Niveau de détail des fiches de factions",
+      "firstTime": "Choisissez le niveau de détail des fiches de factions de ce projet. Il s'applique à toutes les factions et se change dans les paramètres du projet.",
+      "basic": {
+        "label": "Basique",
+        "theme": "L'essentiel",
+        "goal": "Nommer et décrire la faction",
+        "count": "7 champs"
+      },
+      "intermediate": {
+        "label": "Moyen",
+        "theme": "Ce qu'elle veut",
+        "goal": "Objectifs, devise, emblème, influence et champs de la catégorie (forces, dogmes, richesse…)",
+        "count": "+ 8 à 13 champs"
+      },
+      "advanced": {
+        "label": "Avancé",
+        "theme": "La profondeur",
+        "goal": "Idéologie, fondation, histoire et détails propres au type",
+        "count": "+ 3 à 4 champs"
       }
     }
   }

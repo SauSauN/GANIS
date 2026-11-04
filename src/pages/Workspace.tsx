@@ -101,6 +101,7 @@ const NEW_TARGETS: Partial<Record<ModuleId, string>> = {
   notes: "notes.create",
   items: "items.create",
   species: "species.create",
+  factions: "factions.create",
 };
 
 /** En dessous : barre de gauche en icônes, panneau du milieu par-dessus. */
@@ -248,6 +249,7 @@ export default function Workspace() {
   /** Et des objets, de la faune et de la flore (nom de la fiche). */
   useWorldStore((state) => state.item.entries);
   useWorldStore((state) => state.species.entries);
+  useWorldStore((state) => state.faction.entries);
 
   /**
    * Objets, faune et flore : modules facultatifs, dans la barre de gauche
@@ -258,9 +260,13 @@ export default function Workspace() {
   useEffect(() => {
     if (!worldModules.loaded) return;
     setActiveModule((current) =>
-      (current === "items" && !worldModules.item) || (current === "species" && !worldModules.species) ? "details" : current,
+      (current === "items" && !worldModules.item) ||
+      (current === "species" && !worldModules.species) ||
+      (current === "factions" && !worldModules.faction)
+        ? "details"
+        : current,
     );
-  }, [worldModules.loaded, worldModules.item, worldModules.species]);
+  }, [worldModules.loaded, worldModules.item, worldModules.species, worldModules.faction]);
 
   /** Onglets avec des modifications non enregistrées (point ● sur l'onglet). */
   const unsavedEntries = useUnsavedStore((state) => state.entries);
@@ -458,7 +464,8 @@ export default function Workspace() {
     if (!projectType) return;
     if (activeModule === "items" && worldModules.item) showTutorialOnce("items");
     if (activeModule === "species" && worldModules.species) showTutorialOnce("species");
-  }, [projectType, activeModule, worldModules.item, worldModules.species]);
+    if (activeModule === "factions" && worldModules.faction) showTutorialOnce("factions");
+  }, [projectType, activeModule, worldModules.item, worldModules.species, worldModules.faction]);
 
   /**
    * Si le projet est inexistant ou a été supprimé,

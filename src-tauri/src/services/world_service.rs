@@ -1642,7 +1642,11 @@ mod tests {
         let pool = pool().await;
 
         for module in Module::ALL {
-            let kind = if module == Module::Item { "phone" } else { "tree" };
+            let kind = match module {
+                Module::Item => "phone",
+                Module::Species => "tree",
+                Module::Faction => "guild",
+            };
             let entry = create_entry(&pool, module, &input("Élément", kind)).await.unwrap();
             let png = BASE64.encode(PNG);
 
@@ -1681,7 +1685,11 @@ mod tests {
         let pool = pool().await;
 
         for module in Module::ALL {
-            let kind = if module == Module::Item { "hat" } else { "flower" };
+            let kind = match module {
+                Module::Item => "hat",
+                Module::Species => "flower",
+                Module::Faction => "nobleHouse",
+            };
             let mut entry = input("Avec palette", kind);
             entry.fields.insert("colorPalette".to_owned(), r##"[" #AA3366 ","#00ff00"]"##.to_owned());
             let saved = create_entry(&pool, module, &entry).await.unwrap();

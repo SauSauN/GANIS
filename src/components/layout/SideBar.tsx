@@ -250,11 +250,11 @@ export function SideBar({
           />
         )}
 
-        {/* Objets, faune et flore (modules facultatifs), en arborescence. */}
-        {(module.id === "items" || module.id === "species") && (
+        {/* Objets, faune et flore, factions (modules facultatifs), en arborescence. */}
+        {(module.id === "items" || module.id === "species" || module.id === "factions") && (
           <SideBarWorld
             projectId={projectId}
-            module={module.id === "items" ? "item" : "species"}
+            module={module.id === "items" ? "item" : module.id === "species" ? "species" : "faction"}
             activeTab={activeTab}
             onOpenFeature={onOpenFeature}
           />

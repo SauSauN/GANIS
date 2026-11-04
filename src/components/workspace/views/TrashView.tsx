@@ -16,6 +16,7 @@ import {
   type LucideIcon,
   LayoutPanelTop,
   Package,
+  Flag,
   PawPrint,
   Link2,
 } from "lucide-react";
@@ -45,6 +46,7 @@ const KIND_ICONS: Record<TrashKind, LucideIcon> = {
   placeLink: MapPin,
   item: Package,
   species: PawPrint,
+  faction: Flag,
   worldLink: Link2,
   mangaPanel: LayoutPanelTop,
 };

@@ -2,6 +2,7 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import characterFields from "@/lib/characterFields.json";
+import factionCatalog from "@/lib/factionCatalog.json";
 import itemCatalog from "@/lib/itemCatalog.json";
 import locationCatalog from "@/lib/locationCatalog.json";
 import speciesCatalog from "@/lib/speciesCatalog.json";
@@ -68,6 +69,7 @@ describe("exemples dans les champs de texte", () => {
     ["lieux", textKeys(locationCatalog.fields), frLocations.placeholders, enLocations.placeholders],
     ["objets", textKeys(itemCatalog.fields), frWorld.item.placeholders, enWorld.item.placeholders],
     ["faune et flore", textKeys(speciesCatalog.fields), frWorld.species.placeholders, enWorld.species.placeholders],
+    ["factions", textKeys(factionCatalog.fields), frWorld.faction.placeholders, enWorld.faction.placeholders],
   ])("%s : chaque champ du catalogue a son exemple, dans les deux langues", (_name, keys, fr, en) => {
     expect(keys.length).toBeGreaterThan(0);
     expect(keys.filter((key) => !(fr as Record<string, string>)[key])).toEqual([]);

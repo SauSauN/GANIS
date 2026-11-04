@@ -1,3 +1,4 @@
+import factionCatalog from "@/lib/factionCatalog.json";
 import itemCatalog from "@/lib/itemCatalog.json";
 import speciesCatalog from "@/lib/speciesCatalog.json";
 import linkCatalog from "@/lib/worldLinkCatalog.json";
@@ -14,18 +15,18 @@ import type {
 } from "@/types";
 
 /*
- * Objets, faune et flore : deux modules facultatifs construits sur le même
- * modèle que les lieux (voir `lib/locations.ts`).
+ * Objets, faune et flore, factions : trois modules facultatifs construits
+ * sur le même modèle que les lieux (voir `lib/locations.ts`).
  *
  *   champs communs  →  champs de la catégorie  →  champs du type
  *
- * Les catalogues (`itemCatalog.json`, `speciesCatalog.json`) sont lus tels
- * quels par Rust (`world_service::Module::catalog`) : les deux ne peuvent
- * pas diverger. La faune et la flore ont en plus une **nature** : une
+ * Les catalogues (`itemCatalog.json`, `speciesCatalog.json`,
+ * `factionCatalog.json`) sont lus tels quels par Rust
+ * (`world_service::Module::catalog`) : les deux côtés ne peuvent pas diverger. La faune et la flore ont en plus une **nature** : une
  * espèce entière, ou un animal / une plante précis (qui peut aussi être un
  * personnage).
  *
- * Les deux modules sont désactivés par défaut : l'auteur les active dans
+ * Les trois modules sont désactivés par défaut : l'auteur les active dans
  * Paramètres du projet et choisit ses catégories.
  */
 
@@ -99,11 +100,12 @@ function readCatalog(raw: RawCatalog): WorldCatalog {
   };
 }
 
-export const WORLD_MODULES: WorldModule[] = ["item", "species"];
+export const WORLD_MODULES: WorldModule[] = ["item", "species", "faction"];
 
 export const CATALOGS: Record<WorldModule, WorldCatalog> = {
   item: readCatalog(itemCatalog as RawCatalog),
   species: readCatalog(speciesCatalog as RawCatalog),
+  faction: readCatalog(factionCatalog as RawCatalog),
 };
 
 export function catalogOf(module: WorldModule): WorldCatalog {
@@ -187,6 +189,10 @@ const COMMON_GROUPS: Record<WorldModule, { identity: string[]; story: string[] }
   species: {
     identity: ["colorPalette", "aliases", "scientificName", "age", "markings", "firstAppearance", "description"],
     story: ["habitat", "legends", "notes"],
+  },
+  faction: {
+    identity: ["colorPalette", "aliases", "firstAppearance", "description", "goals", "motto", "emblem", "size", "influence"],
+    story: ["ideology", "founded", "history", "notes"],
   },
 };
 
@@ -532,9 +538,9 @@ export function toWorldInput(module: WorldModule, draft: WorldDraft): WorldEntry
 // Onglets, modules de l'espace de travail, paramètres
 // ----------------------------------------------------------------------------
 
-const TAB_PREFIX: Record<WorldModule, string> = { item: "item:", species: "species:" };
+const TAB_PREFIX: Record<WorldModule, string> = { item: "item:", species: "species:", faction: "faction:" };
 
-/** Onglet d'une fiche : `item:<id>` ou `species:<id>`. */
+/** Onglet d'une fiche : `item:<id>`, `species:<id>` ou `faction:<id>`. */
 export function worldTabId(module: WorldModule, id: string): string {
   return `${TAB_PREFIX[module]}${id}`;
 }
@@ -551,7 +557,11 @@ export function worldEntryOfTab(tabId: string): { module: WorldModule; id: strin
 }
 
 /** Module de la barre de gauche (et section des paramètres) d'un module. */
-export const WORKSPACE_MODULE: Record<WorldModule, "items" | "species"> = { item: "items", species: "species" };
+export const WORKSPACE_MODULE: Record<WorldModule, "items" | "species" | "factions"> = {
+  item: "items",
+  species: "species",
+  faction: "factions",
+};
 
 export function createFeatureOf(module: WorldModule): string {
   return `${WORKSPACE_MODULE[module]}.create`;
@@ -586,7 +596,7 @@ export const WORLD_LINK_KINDS = linkCatalog.kinds as WorldLinkKind[];
 
 /** Sortes qui ont des liens du monde (les autres paires ont déjà les leurs). */
 export function isWorldKind(kind: WorldLinkKind): boolean {
-  return kind === "item" || kind === "species";
+  return kind === "item" || kind === "species" || kind === "faction";
 }
 
 /** Une paire `a`/`b` peut-elle avoir un lien du monde ? */

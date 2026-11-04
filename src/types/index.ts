@@ -631,11 +631,11 @@ export interface LocationImage {
 }
 
 // ----------------------------------------------------------------------------
-// Objets, faune et flore (voir `world_service.rs`, `lib/world.ts`)
+// Objets, faune et flore, factions (voir `world_service.rs`, `lib/world.ts`)
 // ----------------------------------------------------------------------------
 
-/** Module : objets (`item`) ou faune et flore (`species`). */
-export type WorldModule = "item" | "species";
+/** Module : objets (`item`), faune et flore (`species`) ou factions (`faction`). */
+export type WorldModule = "item" | "species" | "faction";
 
 /** Faune et flore : une espèce entière, ou un animal / une plante précis. */
 export type SpeciesNature = "species" | "individual";
@@ -648,7 +648,7 @@ export interface WorldEntry {
   type: string;
   /** Faune et flore seulement ; `null` pour un objet. */
   nature: SpeciesNature | null;
-  /** Objet qui le contient ; espèce d'un animal précis. `null` : tout en haut. */
+  /** Objet qui le contient ; espèce d'un animal précis ; faction dont elle est une branche. `null` : tout en haut. */
   parentId: string | null;
   /** Faune et flore : fiche de personnage de cet animal (`null` : aucune). */
   characterId: string | null;
@@ -688,7 +688,7 @@ export interface WorldImage {
 }
 
 /** Sorte d'élément reliée par un lien du monde. */
-export type WorldLinkKind = "character" | "location" | "item" | "species";
+export type WorldLinkKind = "character" | "location" | "item" | "species" | "faction";
 
 /** Lien entre deux éléments, dont au moins un objet ou une espèce. */
 export interface WorldLink {
@@ -966,6 +966,7 @@ export type TrashKind =
   | "mangaPanel"
   | "item"
   | "species"
+  | "faction"
   | "worldLink";
 
 export interface TrashItem {
@@ -998,7 +999,7 @@ export interface Activity {
 }
 
 /** Éléments qui ont des versions. */
-export type VersionKind = "character" | "location" | "item" | "species" | "structureNode" | "note" | "synopsis" | "plot" | "editorial";
+export type VersionKind = "character" | "location" | "item" | "species" | "faction" | "structureNode" | "note" | "synopsis" | "plot" | "editorial";
 
 export interface Version {
   id: string;
@@ -1027,7 +1028,7 @@ export interface WorkCalendar {
 }
 
 /** `document` : l'identifiant est celui de l'élément du découpage qui le contient. */
-export type SearchKind = "character" | "location" | "item" | "species" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky";
+export type SearchKind = "character" | "location" | "item" | "species" | "faction" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky";
 
 export interface SearchHit {
   kind: SearchKind;

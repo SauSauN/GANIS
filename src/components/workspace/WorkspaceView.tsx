@@ -34,7 +34,7 @@ import { WorkspaceHome } from "@/components/workspace/WorkspaceHome";
 import { characterIdOfTab } from "@/lib/characters";
 import { locationIdOfTab } from "@/lib/locations";
 import { noteIdOfTab } from "@/lib/notes";
-import { worldEntryOfTab } from "@/lib/world";
+import { createFeatureOf, listFeatureOf, WORLD_MODULES, worldEntryOfTab } from "@/lib/world";
 import { structureNodeIdOfTab } from "@/lib/structure";
 import type { Project } from "@/types";
 
@@ -309,8 +309,9 @@ function WorkspaceContent({
     );
   }
 
-  if (tabId === "items.create" || tabId === "species.create") {
-    const worldModule = tabId === "items.create" ? "item" : "species";
+  const worldCreate = WORLD_MODULES.find((module) => createFeatureOf(module) === tabId);
+  if (worldCreate) {
+    const worldModule = worldCreate;
     return (
       <WorldCreateView
         key={worldModule}
@@ -322,8 +323,9 @@ function WorkspaceContent({
     );
   }
 
-  if (tabId === "items.list" || tabId === "species.list") {
-    const worldModule = tabId === "items.list" ? "item" : "species";
+  const worldList = WORLD_MODULES.find((module) => listFeatureOf(module) === tabId);
+  if (worldList) {
+    const worldModule = worldList;
     return (
       <WorldListView
         key={worldModule}

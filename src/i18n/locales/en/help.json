@@ -32,7 +32,7 @@
       },
       "layout": {
         "title": "The workspace",
-        "text": "On the left, the module bar: Details, Characters, Locations, Structure, Plot, Notes and Search. The middle panel lists the module's features and items; each opens in a tab. Objects and Fauna and flora are added when you turn them on in the project settings.",
+        "text": "On the left, the module bar: Details, Characters, Locations, Structure, Plot, Notes and Search. The middle panel lists the module's features and items; each opens in a tab. Objects, Fauna and flora and Factions are added when you turn them on in the project settings.",
         "points": [
           "Click a module again to collapse its panel.",
           "Right-click a tab to pin it, or close the others, those on the left or on the right.",
@@ -72,13 +72,14 @@
         ]
       },
       "world": {
-        "title": "Objects, fauna and flora",
-        "text": "Two optional modules for the objects in your story (weapons, vehicles, phones, magic items…) and the animals and plants of your world. They stay hidden until you turn them on.",
+        "title": "Objects, fauna and flora, factions",
+        "text": "Three optional modules: the objects in your story (weapons, vehicles, phones, magic items…), the animals and plants of your world, and factions (guilds, orders, clans, armies, cults…). They stay hidden until you turn them on.",
         "points": [
-          "Project settings › Objects (or Fauna and flora): turn the module on, then keep only the categories you need.",
+          "Project settings › Objects (or Fauna and flora, or Factions): turn the module on, then keep only the categories you need.",
           "An object can be stored in another (a key in a chest); a specific animal sits under its species.",
           "A specific animal can also become a character: its character sheet is linked to it.",
-          "“Link an element” connects objects, species, characters and locations: “owns”, “lives in”, “part of”…"
+          "A faction can have branches (a section of an order, a family of a clan).",
+          "“Link an element” connects objects, species, factions, characters and locations: “owns”, “lives in”, “leads”, “is a member of”…"
         ]
       },
       "relations": {
@@ -336,12 +337,13 @@
         ]
       },
       "world": {
-        "title": "Objects, fauna and flora",
+        "title": "Objects, fauna and flora, factions",
         "intro": "Optional modules, turned on in the project settings, built like locations.",
         "items": [
           "Turn on Objects or Fauna and flora in Project settings: the module appears in the left bar. Turning it off deletes nothing.",
           "Choose the categories you need (weapons, vehicles, magic…; fauna, flora): only those are offered when creating. You can also add your own types.",
           "Fauna and flora: an entry is either a whole species, or a specific animal or plant, placed under its species.",
+          "Factions: guilds, orders, clans, armies, cults, secret societies… A faction can have branches; its members, allies, enemies and seat are noted with links.",
           "A specific animal can also be a character: “Create its character sheet” or link it to an existing character. The character sheet shows it in return.",
           "The “Links with objects and species” card connects these entries to characters, locations and each other, with a story period if needed (an object that changes hands)."
         ]
@@ -428,7 +430,7 @@
         "intro": "Two levels of settings.",
         "items": [
           "Project settings (bottom of the left bar): information, statuses, character detail level, location types, structure and colours.",
-          "Objects, Fauna and flora: turn these optional modules on and choose their categories.",
+          "Objects, Fauna and flora, Factions: turn these optional modules on and choose their categories.",
           "General settings (gear at the top): account, password, recovery key, language, theme, autosave.",
           "Packages: colour themes for the whole app."
         ]
@@ -501,8 +503,8 @@
           "a": "Settings › Account › Automatic lock: choose a delay. After that time without activity, your password is required to resume; your tabs stay open."
         },
         {
-          "q": "I can't find objects or fauna and flora.",
-          "a": "These modules are hidden by default. Open Project settings › Objects (or Fauna and flora) and turn them on: they appear in the left bar, under Locations."
+          "q": "I can't find objects, fauna and flora or factions.",
+          "a": "These modules are hidden by default. Open Project settings › Objects (or Fauna and flora, or Factions) and turn them on: they appear in the left bar, under Locations."
         },
         {
           "q": "My animal talks and has relationships: character or animal?",

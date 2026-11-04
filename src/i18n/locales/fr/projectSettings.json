@@ -39,6 +39,10 @@
     "species": {
       "label": "Faune et flore",
       "description": "Module facultatif : activez-le et choisissez faune, flore ou les deux."
+    },
+    "factions": {
+      "label": "Factions",
+      "description": "Module facultatif : activez-le et choisissez vos catégories (politique, armée, religion…)."
     }
   },
   "info": {

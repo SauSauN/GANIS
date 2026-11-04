@@ -38,6 +38,7 @@ function useResolver() {
   const locations = useLocationStore((state) => state.locations);
   const items = useWorldStore((state) => state.item.entries);
   const species = useWorldStore((state) => state.species.entries);
+  const factions = useWorldStore((state) => state.faction.entries);
   return useCallback(
     (id: string) => {
       const character = characters.find((item) => item.id === id);
@@ -46,10 +47,11 @@ function useResolver() {
         locations.find((item) => item.id === id)?.name ??
         items.find((item) => item.id === id)?.name ??
         species.find((item) => item.id === id)?.name ??
+        factions.find((item) => item.id === id)?.name ??
         null
       );
     },
-    [characters, locations, items, species],
+    [characters, locations, items, species, factions],
   );
 }
 
@@ -64,6 +66,7 @@ async function refresh(projectId: string, kind: VersionKind) {
       break;
     case "item":
     case "species":
+    case "faction":
       await useWorldStore.getState().fetchEntries(projectId, kind);
       break;
     case "structureNode":

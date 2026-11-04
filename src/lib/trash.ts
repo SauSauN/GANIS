@@ -156,7 +156,7 @@ async function refreshAfterRestore(projectId: string, kind: TrashKind) {
     tasks.push(structure.fetchStructure(projectId), structure.fetchLinks(projectId));
   }
 
-  // Objets, faune et flore, et leurs liens. Un personnage restauré peut
+  // Objets, faune et flore, factions, et leurs liens. Un personnage restauré peut
   // redevenir un animal (faune) ; un personnage ou un lieu restauré
   // ramène ses liens avec des objets et des espèces.
   const world = useWorldStore.getState();
@@ -166,11 +166,14 @@ async function refreshAfterRestore(projectId: string, kind: TrashKind) {
   if (world.species.projectId === projectId && ["species", "character", "structureNode"].includes(kind)) {
     tasks.push(world.fetchEntries(projectId, "species"));
   }
+  if (world.faction.projectId === projectId && ["faction", "structureNode"].includes(kind)) {
+    tasks.push(world.fetchEntries(projectId, "faction"));
+  }
 
   const worldLinks = useWorldLinkStore.getState();
   if (
     worldLinks.projectId === projectId &&
-    ["character", "location", "item", "species", "worldLink", "structureNode"].includes(kind)
+    ["character", "location", "item", "species", "faction", "worldLink", "structureNode"].includes(kind)
   ) {
     tasks.push(worldLinks.fetchLinks(projectId));
   }

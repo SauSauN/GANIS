@@ -331,6 +331,48 @@
       }
     }
   },
+  "factions": {
+    "title": "Tutoriel : Factions",
+    "name": "Factions",
+    "intro": "Les groupes qui font bouger votre histoire : guildes, ordres, clans, armées, cultes, sociétés secrètes…",
+    "steps": {
+      "enable": {
+        "title": "Activez le module",
+        "text": "Le module Factions est facultatif : il n'apparaît dans la barre de gauche qu'une fois activé dans les paramètres du projet.",
+        "points": [
+          "Choisissez ensuite les catégories utiles : politique, armée, religion, crime…",
+          "Le désactiver plus tard ne supprime rien."
+        ]
+      },
+      "create": {
+        "title": "Créez une faction",
+        "text": "Choisissez son type : la fiche s'adapte. Une armée a ses forces et son équipement, une religion ses dogmes et ses rites.",
+        "points": [
+          "Devise, emblème, objectifs et influence, du local au mondial.",
+          "Ctrl+N dans le module crée une faction."
+        ]
+      },
+      "branches": {
+        "title": "Organisez ses branches",
+        "text": "Une faction peut dépendre d'une autre : la section d'un ordre, la cellule d'un réseau, la famille d'un clan. Le panneau les montre en arbre.",
+        "points": []
+      },
+      "members": {
+        "title": "Donnez-lui des membres",
+        "text": "Sur la fiche, liez des personnages à la faction : « dirige », « fait partie de », « a fondé ».",
+        "points": [
+          "Les liens apparaissent aussi sur la fiche de chaque personnage."
+        ]
+      },
+      "relations": {
+        "title": "Placez-la dans le monde",
+        "text": "Alliés et ennemis, siège, territoires et objets qu'elle contrôle : tout se relie depuis la carte des liens.",
+        "points": [
+          "Précisez une période du récit quand une alliance se noue ou se brise."
+        ]
+      }
+    }
+  },
   "structure": {
     "title": "Tutoriel : Découpage",
     "name": "Découpage",

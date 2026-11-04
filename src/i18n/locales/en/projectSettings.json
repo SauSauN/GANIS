@@ -39,6 +39,10 @@
     "species": {
       "label": "Fauna and flora",
       "description": "Optional module: turn it on and choose fauna, flora or both."
+    },
+    "factions": {
+      "label": "Factions",
+      "description": "Optional module: turn it on and choose your categories (politics, army, religion…)."
     }
   },
   "info": {

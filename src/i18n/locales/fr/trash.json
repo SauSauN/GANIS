@@ -13,6 +13,7 @@
     "mangaPanel": "Case de manga",
     "item": "Objet",
     "species": "Faune et flore",
+    "faction": "Faction",
     "worldLink": "Lien entre éléments"
   },
   "deleted": {
@@ -28,6 +29,7 @@
     "mangaPanel": "Case « {{name}} » supprimée.",
     "item": "Objet « {{name}} » supprimé.",
     "species": "« {{name}} » supprimé de la faune et flore.",
+    "faction": "« {{name}} » supprimée des factions.",
     "worldLink": "Lien « {{name}} » supprimé."
   },
   "restored": {
@@ -43,6 +45,7 @@
     "mangaPanel": "Case « {{name}} » restaurée.",
     "item": "Objet « {{name}} » restauré.",
     "species": "« {{name}} » restauré dans la faune et flore.",
+    "faction": "« {{name}} » restaurée dans les factions.",
     "worldLink": "Lien « {{name}} » restauré."
   },
   "untitled": {
@@ -58,6 +61,7 @@
     "mangaPanel": "Case sans action",
     "item": "Objet sans nom",
     "species": "Fiche sans nom",
+    "faction": "Faction sans nom",
     "worldLink": "Lien"
   },
   "view": {
