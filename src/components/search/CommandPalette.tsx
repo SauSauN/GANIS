@@ -8,9 +8,9 @@ import {
   Info,
   Keyboard,
   Loader2,
-  type LucideIcon,
+  Megaphone,
   Search,
-  Sparkles,
+  type LucideIcon,
 } from "lucide-react";
 import { SearchResults } from "@/components/search/SearchResults";
 import { Dialog, DialogTitle } from "@/components/ui/dialog";
@@ -109,7 +109,7 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature, module
       { id: "help:center", label: t("menus:help.center"), group: t("menus:menus.help"), icon: BookOpen, shortcut: "F1", run: () => showHelp("center") },
       { id: "help:guide", label: t("menus:help.guide"), group: t("menus:menus.help"), icon: CircleHelp, run: () => showHelp("guide") },
       { id: "help:about", label: t("menus:help.about"), group: t("menus:menus.help"), icon: Info, run: () => showHelp("about") },
-      { id: "help:whatsNew", label: t("menus:help.whatsNew"), group: t("menus:menus.help"), icon: Sparkles, run: () => showHelp("whatsNew") },
+      { id: "help:whatsNew", label: t("menus:help.whatsNew"), group: t("menus:menus.help"), icon: Megaphone, run: () => showHelp("whatsNew") },
       { id: "help:report", label: t("menus:help.report"), group: t("menus:menus.help"), icon: Bug, run: () => showHelp("report") },
       { id: "help:shortcuts", label: t("menus:help.shortcuts"), group: t("menus:menus.help"), icon: Keyboard, shortcut: keys("shortcuts"), run: () => showHelp("shortcuts") },
     ];
@@ -176,7 +176,7 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature, module
           aria-controls="command-palette-list"
           className="h-12 flex-1 bg-transparent text-sm outline-none"
         />
-        <kbd className="rounded border bg-muted px-1.5 py-0.5 font-mono text-[0.7rem] text-muted-foreground">{t("search:escapeKey")}</kbd>
+        <kbd className="rounded border bg-muted px-1.5 py-0.5 text-[0.7rem] text-muted-foreground">{t("search:escapeKey")}</kbd>
       </div>
 
       <div id="command-palette-list" ref={listRef} className="max-h-[60vh] overflow-y-auto p-2">
@@ -204,7 +204,7 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature, module
                       <span className="min-w-0 flex-1 truncate">{action.label}</span>
                       <span className="shrink-0 text-xs text-muted-foreground">{action.group}</span>
                       {action.shortcut && (
-                        <kbd className="shrink-0 rounded border bg-muted px-1 font-mono text-[0.65rem] text-muted-foreground">
+                        <kbd className="shrink-0 rounded border bg-muted px-1 text-[0.65rem] text-muted-foreground">
                           {action.shortcut}
                         </kbd>
                       )}

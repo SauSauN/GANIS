@@ -1,5 +1,6 @@
 import {
   Anchor,
+  Ban,
   Building,
   Building2,
   Castle,
@@ -10,10 +11,14 @@ import {
   Earth,
   Flag,
   Flame,
+  Footprints,
   Gem,
+  Ghost,
   Globe,
+  HandHeart,
   House,
   Landmark,
+  LandPlot,
   Library,
   Lock,
   Map,
@@ -24,18 +29,14 @@ import {
   School,
   Shield,
   Skull,
-  Sparkles,
+  Star,
   Store,
   Sun,
   Tent,
   TreePine,
   Trees,
-  Ban,
-  Waves,
-  Ghost,
-  Footprints,
   Warehouse,
-  LandPlot,
+  Waves,
   type LucideIcon,
 } from "lucide-react";
 import type { CSSProperties } from "react";
@@ -53,7 +54,7 @@ export const CATEGORY_ICONS: Record<LocationCategory, LucideIcon> = {
   region: Map,
   built: Castle,
   natural: Trees,
-  special: Sparkles,
+  special: Star,
 };
 
 /** Teinte (oklch) de chaque catégorie. */
@@ -117,7 +118,7 @@ const TYPE_ICONS: Record<string, LucideIcon> = {
   celestialRealm: Cloud,
   realmOfTheDead: Ghost,
   spaceStation: Rocket,
-  sacredPlace: Sparkles,
+  sacredPlace: HandHeart,
   forbiddenZone: Ban,
 };
 

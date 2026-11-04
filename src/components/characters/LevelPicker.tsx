@@ -1,6 +1,6 @@
 import { useId } from "react";
 import { useTranslation } from "react-i18next";
-import { Eye, Fingerprint, Sparkles, type LucideIcon } from "lucide-react";
+import { Brain, Eye, Fingerprint, type LucideIcon } from "lucide-react";
 import { DETAIL_LEVELS } from "@/lib/characters";
 import { cn } from "@/lib/utils";
 import type { CharacterDetailLevel } from "@/types";
@@ -8,7 +8,7 @@ import type { CharacterDetailLevel } from "@/types";
 const ICONS: Record<CharacterDetailLevel, LucideIcon> = {
   basic: Fingerprint,
   intermediate: Eye,
-  advanced: Sparkles,
+  advanced: Brain,
 };
 
 interface LevelPickerProps {

@@ -241,7 +241,7 @@
     "description": "What changed in GANIS, version by version.",
     "version": "Version {{version}}",
     "releases": {
-      "v0_1_0": {
+      "v1_0_0": {
         "title": "Clarity and safety",
         "items": [
           "A small window explains the public space (shared on this computer, not encrypted) when you click “Get started”; the “Public space” badge reopens it.",

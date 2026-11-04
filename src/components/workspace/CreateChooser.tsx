@@ -71,7 +71,7 @@ export function CreateChooser({ world = {}, open, onClose, onOpenFeature }: Crea
                 >
                   <Icon className="size-4 text-primary" />
                   <span className="flex-1">{tt(`create.${choice.id}`)}</span>
-                  <kbd className="rounded border bg-muted px-1.5 font-mono text-[0.7rem] text-muted-foreground">{choice.key}</kbd>
+                  <kbd className="rounded border bg-muted px-1.5 text-[0.7rem] text-muted-foreground">{choice.key}</kbd>
                 </button>
               </li>
             );

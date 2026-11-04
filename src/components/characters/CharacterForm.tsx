@@ -1,6 +1,6 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronDown, Eye, Fingerprint, Sparkles, WandSparkles, type LucideIcon } from "lucide-react";
+import { Brain, ChevronDown, Eye, Fingerprint, WandSparkles, type LucideIcon } from "lucide-react";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import { useProjectCharacters } from "@/stores/characterStore";
 import {
@@ -72,7 +72,7 @@ interface CharacterSheetProps {
 const LEVEL_ICONS: Record<CharacterDetailLevel, LucideIcon> = {
   basic: Fingerprint,
   intermediate: Eye,
-  advanced: Sparkles,
+  advanced: Brain,
 };
 
 /** Niveaux repliés, mémorisés sur l'appareil (pour toutes les fiches). */

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Sparkles } from "lucide-react";
+import { BookOpen, Flag } from "lucide-react";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import { cardContentClass } from "@/components/workspace/views/PageShell";
@@ -73,7 +73,7 @@ export function StoryLinksCard({ projectId, side, id, firstAppearance, onOpenFea
           onClick={() => onOpenFeature(structureNodeTabId(first.id))}
           className="inline-flex items-center gap-2 rounded-full border py-1 pr-3 pl-2 text-sm transition-colors hover:bg-muted/50"
         >
-          <Sparkles className="size-3.5 text-primary" aria-hidden="true" />
+          <Flag className="size-3.5 text-primary" aria-hidden="true" />
           <span className="text-muted-foreground">{t("story.firstAppearance")} :</span>
           <span className="font-medium">{headingOf(first).label}</span>
         </button>

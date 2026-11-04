@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import {
   ChevronRight,
   FileQuestion,
+  Flag,
   Info,
   ListTree,
   Loader2,
@@ -26,7 +27,6 @@ import {
   Network,
   Plus,
   Save,
-  Sparkles,
   Trash2,
   Users,
   X,
@@ -1099,7 +1099,7 @@ function LinkSection({
           {firstOthers.length > 0 && (
             <div className="space-y-2">
               <p className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                <Sparkles className="size-3.5" aria-hidden="true" />
+                <Flag className="size-3.5" aria-hidden="true" />
                 {texts.firstHere}
               </p>
               <ul className="flex flex-wrap gap-2">

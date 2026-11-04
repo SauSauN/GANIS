@@ -139,7 +139,7 @@ export function ActionMenu({ label, items, trigger, className }: ActionMenuProps
                   >
                     {Icon ? <Icon className="size-4 shrink-0" /> : <span className="size-4" />}
                     <span className="flex-1">{item.label}</span>
-                    {item.hint && <kbd className="font-mono text-[0.7rem] text-muted-foreground">{item.hint}</kbd>}
+                    {item.hint && <kbd className="text-[0.7rem] text-muted-foreground">{item.hint}</kbd>}
                   </button>
                 </div>
               );
