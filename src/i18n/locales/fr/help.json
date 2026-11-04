@@ -336,16 +336,37 @@
           "Palette de couleurs : comme pour les personnages, ses couleurs encadrent l'image du lieu."
         ]
       },
-      "world": {
-        "title": "Objets, faune et flore, factions",
-        "intro": "Des modules facultatifs, activés dans les paramètres du projet, construits comme les lieux.",
+      "items": {
+        "title": "Objets",
+        "intro": "Les objets de votre histoire : armes, véhicules, vêtements, téléphones, objets magiques…",
         "items": [
-          "Activez Objets ou Faune et flore dans Paramètres du projet : le module apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
-          "Choisissez les catégories utiles (armes, véhicules, magie… ; faune, flore) : seules celles-ci sont proposées à la création. Vous pouvez aussi ajouter vos propres types.",
-          "Faune et flore : une fiche est soit une espèce entière, soit un animal ou une plante précis, rangé sous son espèce.",
-          "Factions : guildes, ordres, clans, armées, cultes, sociétés secrètes… Une faction peut avoir des branches ; ses membres, ses alliés, ses ennemis et son siège se notent par des liens.",
+          "Module facultatif : activez-le dans Paramètres du projet › Objets, il apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
+          "Choisissez les catégories utiles (armes, véhicules, magie…) : seules celles-ci sont proposées à la création. Vous pouvez aussi ajouter vos propres types.",
+          "Le type choisit les champs de la fiche : une arme n'a pas les mêmes informations qu'un véhicule.",
+          "Un objet peut être rangé dans un autre (une clé dans un coffre, un moteur dans un vaisseau) : le panneau les montre en arbre.",
+          "La carte des liens relie l'objet à qui le possède, l'utilise ou le recherche, et au lieu où il se trouve, avec une période du récit si besoin (un objet qui change de main)."
+        ]
+      },
+      "species": {
+        "title": "Faune et flore",
+        "intro": "Les animaux et les plantes de votre univers, de l'espèce entière à l'individu qui a son nom.",
+        "items": [
+          "Module facultatif : activez-le dans Paramètres du projet › Faune et flore, il apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
+          "Choisissez la faune, la flore ou les deux. Vous pouvez aussi ajouter vos propres types.",
+          "Une fiche est soit une espèce entière (les loups gris), soit un animal ou une plante précis (Éclair, le cheval du héros), rangé sous son espèce.",
           "Un animal précis peut aussi être un personnage : « Créer sa fiche de personnage » ou l'associer à un personnage existant. La fiche du personnage le montre en retour.",
-          "La carte « Liens avec des objets et des espèces » relie ces fiches aux personnages, aux lieux et entre elles, avec une période du récit si besoin (un objet qui change de main)."
+          "La carte des liens indique où il vit, de quoi il se nourrit, à qui il appartient et ce qu'on en fait."
+        ]
+      },
+      "factions": {
+        "title": "Factions",
+        "intro": "Les groupes qui font bouger votre histoire : guildes, ordres, clans, armées, cultes, sociétés secrètes…",
+        "items": [
+          "Module facultatif : activez-le dans Paramètres du projet › Factions, il apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
+          "Choisissez les catégories utiles (pouvoir politique, armée, religion, crime…). Le type choisit les champs : une armée a ses forces, une religion ses dogmes et ses rites.",
+          "Une faction peut avoir des branches : la section d'un ordre, la cellule d'un réseau, la famille d'un clan.",
+          "La carte « Membres » regroupe ses chefs, ses fondateurs, ses membres et ses soutiens. Le rôle précis (capitaine, espion…) se note dans la précision du lien.",
+          "La carte des liens note ses alliés, ses ennemis, son siège, les lieux où elle est implantée et ce qu'elle contrôle, avec une période du récit si besoin."
         ]
       },
       "structure": {

@@ -336,16 +336,37 @@
           "Colour palette: as for characters, its colours frame the location's image."
         ]
       },
-      "world": {
-        "title": "Objects, fauna and flora, factions",
-        "intro": "Optional modules, turned on in the project settings, built like locations.",
+      "items": {
+        "title": "Objects",
+        "intro": "The objects in your story: weapons, vehicles, clothing, phones, magic items…",
         "items": [
-          "Turn on Objects or Fauna and flora in Project settings: the module appears in the left bar. Turning it off deletes nothing.",
-          "Choose the categories you need (weapons, vehicles, magic…; fauna, flora): only those are offered when creating. You can also add your own types.",
-          "Fauna and flora: an entry is either a whole species, or a specific animal or plant, placed under its species.",
-          "Factions: guilds, orders, clans, armies, cults, secret societies… A faction can have branches; its members, allies, enemies and seat are noted with links.",
+          "Optional module: turn it on in Project settings › Objects, and it appears in the left bar. Turning it off deletes nothing.",
+          "Choose the categories you need (weapons, vehicles, magic…): only those are offered when creating. You can also add your own types.",
+          "The type chooses the sheet's fields: a weapon doesn't have the same information as a vehicle.",
+          "An object can be stored in another (a key in a chest, an engine in a ship): the panel shows them as a tree.",
+          "The links card connects the object to whoever owns, uses or seeks it, and to where it is, with a story period if needed (an object that changes hands)."
+        ]
+      },
+      "species": {
+        "title": "Fauna and flora",
+        "intro": "The animals and plants of your world, from a whole species to the individual with a name.",
+        "items": [
+          "Optional module: turn it on in Project settings › Fauna and flora, and it appears in the left bar. Turning it off deletes nothing.",
+          "Choose fauna, flora or both. You can also add your own types.",
+          "An entry is either a whole species (grey wolves), or a specific animal or plant (Lightning, the hero's horse), placed under its species.",
           "A specific animal can also be a character: “Create its character sheet” or link it to an existing character. The character sheet shows it in return.",
-          "The “Links with objects and species” card connects these entries to characters, locations and each other, with a story period if needed (an object that changes hands)."
+          "The links card shows where it lives, what it eats, who it belongs to and what it is used for."
+        ]
+      },
+      "factions": {
+        "title": "Factions",
+        "intro": "The groups that drive your story: guilds, orders, clans, armies, cults, secret societies…",
+        "items": [
+          "Optional module: turn it on in Project settings › Factions, and it appears in the left bar. Turning it off deletes nothing.",
+          "Choose the categories you need (political power, army, religion, crime…). The type chooses the fields: an army has its strength, a religion its dogmas and rites.",
+          "A faction can have branches: a section of an order, a cell of a network, a family of a clan.",
+          "The “Members” card groups its leaders, founders, members and supporters. The exact role (captain, spy…) goes in the link's detail.",
+          "The links card notes its allies, enemies, seat, the places where it is present and what it controls, with a story period if needed."
         ]
       },
       "structure": {

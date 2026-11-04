@@ -339,7 +339,7 @@ const ABOUT_TYPES = ["novel", "manga", "film", "series", "game", "rpg", "custom"
 // Aide intégrée (une rubrique par module + questions fréquentes)
 // ----------------------------------------------------------------------------
 
-const CENTER_SECTIONS = ["workspace", "details", "characters", "locations", "world", "structure", "reading", "plot", "notes", "search", "history", "files", "settings", "about", "faq"] as const;
+const CENTER_SECTIONS = ["workspace", "details", "characters", "locations", "items", "species", "factions", "structure", "reading", "plot", "notes", "search", "history", "files", "settings", "about", "faq"] as const;
 type CenterSection = (typeof CENTER_SECTIONS)[number];
 
 interface SectionContent {
