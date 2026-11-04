@@ -654,6 +654,27 @@ export function linksOfEntry(links: WorldLink[], id: string): LinkView[] {
     );
 }
 
+/** Rôles des membres d'une faction, dans l'ordre de la carte « Membres ». */
+export const MEMBER_ROLES = ["leads", "founded", "memberOf", "supports"] as const;
+export type MemberRole = (typeof MEMBER_ROLES)[number];
+
+export interface MemberGroup {
+  role: MemberRole;
+  members: LinkView[];
+}
+
+/**
+ * Membres d'une faction, regroupés par rôle (chefs, fondateurs, membres,
+ * soutiens) : les liens dont la faction est la cible. Les groupes vides ne
+ * sont pas renvoyés.
+ */
+export function factionMembers(links: WorldLink[], factionId: string): MemberGroup[] {
+  const mine = linksOfEntry(links, factionId).filter((view) => !view.forward);
+  return MEMBER_ROLES.map((role) => ({ role, members: mine.filter((view) => view.link.type === role) })).filter(
+    (group) => group.members.length > 0,
+  );
+}
+
 /** Lien à créer depuis une fiche, orienté selon le choix. */
 export function orientLink(
   self: { kind: WorldLinkKind; id: string },

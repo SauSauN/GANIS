@@ -276,6 +276,10 @@
         "forward": "a fondé",
         "backward": "a été fondée par"
       },
+      "supports": {
+        "forward": "soutient",
+        "backward": "est soutenue par"
+      },
       "allyOf": {
         "forward": "est alliée de",
         "backward": "est alliée de"
@@ -287,6 +291,10 @@
       "basedIn": {
         "forward": "a son siège à",
         "backward": "abrite le siège de"
+      },
+      "presentIn": {
+        "forward": "est implantée à",
+        "backward": "accueille"
       },
       "controls": {
         "forward": "contrôle",
@@ -1036,6 +1044,18 @@
       "description": "Les sections, cellules ou familles qui dépendent de « {{name}} ».",
       "add": "Ajouter une branche",
       "empty": "Aucune branche."
+    },
+    "members": {
+      "title": "Membres",
+      "description": "Les personnages liés à la faction, par rôle. Le rôle précis (capitaine, espion…) se note dans la précision du lien.",
+      "empty": "Aucun membre. Liez des personnages avec « Ajouter un membre ».",
+      "add": "Ajouter un membre",
+      "groups": {
+        "leads": "Chefs",
+        "founded": "Fondateurs",
+        "memberOf": "Membres",
+        "supports": "Soutiens"
+      }
     },
     "sidebar": {
       "title": "Factions",

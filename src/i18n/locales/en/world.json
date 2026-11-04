@@ -276,6 +276,10 @@
         "forward": "founded",
         "backward": "was founded by"
       },
+      "supports": {
+        "forward": "supports",
+        "backward": "is supported by"
+      },
       "allyOf": {
         "forward": "is allied with",
         "backward": "is allied with"
@@ -287,6 +291,10 @@
       "basedIn": {
         "forward": "is based in",
         "backward": "is the seat of"
+      },
+      "presentIn": {
+        "forward": "is present in",
+        "backward": "hosts"
       },
       "controls": {
         "forward": "controls",
@@ -1036,6 +1044,18 @@
       "description": "The sections, cells or families that depend on “{{name}}”.",
       "add": "Add a branch",
       "empty": "No branches."
+    },
+    "members": {
+      "title": "Members",
+      "description": "The characters linked to the faction, by role. The exact role (captain, spy…) goes in the link's detail.",
+      "empty": "No members. Link characters with “Add a member”.",
+      "add": "Add a member",
+      "groups": {
+        "leads": "Leaders",
+        "founded": "Founders",
+        "memberOf": "Members",
+        "supports": "Supporters"
+      }
     },
     "sidebar": {
       "title": "Factions",

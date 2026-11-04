@@ -1,7 +1,7 @@
 import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { Link2, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { Link2, Loader2, Pencil, Plus, Trash2, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -21,7 +21,7 @@ import { errorText } from "@/lib/errors";
 import { notifyError } from "@/lib/notify";
 import { locationTabId } from "@/lib/locations";
 import { cn } from "@/lib/utils";
-import { WORLD_LINK_KINDS, canLink, linkChoices, linksOfEntry, orientLink, worldTabId, type LinkView } from "@/lib/world";
+import { WORLD_LINK_KINDS, canLink, factionMembers, linkChoices, linksOfEntry, orientLink, worldTabId, type LinkView } from "@/lib/world";
 import { useProjectCharacters } from "@/stores/characterStore";
 import { useProjectLocations } from "@/stores/locationStore";
 import { useProjectWorldLinks, useWorldLinkStore } from "@/stores/worldLinkStore";
@@ -218,6 +218,99 @@ export function WorldLinksCard({
           link={dialog.link}
           directory={directory}
           onClose={() => setDialog(null)}
+        />
+      )}
+    </CollapsibleCard>
+  );
+}
+
+/**
+ * Membres d'une faction, regroupés par rôle : chefs, fondateurs, membres,
+ * soutiens. Ce sont les liens de la carte « Liens », lus autrement ; le rôle
+ * précis (capitaine, espion…) est la précision du lien.
+ */
+export function FactionMembersCard({
+  projectId,
+  factionId,
+  onOpenFeature,
+}: {
+  projectId: string;
+  factionId: string;
+  onOpenFeature: (featureId: string) => void;
+}) {
+  const { t } = useTranslation("world");
+  const directory = useDirectory(projectId);
+  const { links } = useProjectWorldLinks(projectId);
+  const [open, setOpen] = useCollapsible("ganis.factionMembers.collapsed");
+  const [adding, setAdding] = useState(false);
+
+  const groups = factionMembers(links, factionId);
+  // Une personne qui dirige et a fondé la faction compte une fois.
+  const count = new Set(groups.flatMap((group) => group.members.map((view) => `${view.otherKind}:${view.otherId}`))).size;
+
+  return (
+    <CollapsibleCard
+      open={open}
+      onOpenChange={setOpen}
+      icon={Users}
+      title={t("faction.members.title")}
+      description={t("faction.members.description")}
+      count={count}
+      contentClassName={`${cardContentClass} space-y-4`}
+      actions={
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          title={t("faction.members.add")}
+          aria-label={t("faction.members.add")}
+          onClick={() => {
+            setOpen(true);
+            setAdding(true);
+          }}
+        >
+          <Plus />
+          {/* Libellé seulement en grand : le titre « Membres » garde sa place. */}
+          <span className="hidden 2xl:inline">{t("faction.members.add")}</span>
+        </Button>
+      }
+    >
+      {groups.length === 0 ? (
+        <p className="text-sm text-muted-foreground">{t("faction.members.empty")}</p>
+      ) : (
+        groups.map((group) => (
+          <section key={group.role} className="space-y-2">
+            <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
+              {t(`faction.members.groups.${group.role}`)} ({group.members.length})
+            </h3>
+            <ul className="grid gap-2 sm:grid-cols-2">
+              {group.members.map((view) => (
+                <li key={view.link.id} className="flex items-center gap-3 rounded-lg border px-3 py-2">
+                  <OtherThumb projectId={projectId} directory={directory} view={view} />
+                  <div className="min-w-0">
+                    <button
+                      type="button"
+                      onClick={() => onOpenFeature(tabOf(view.otherKind, view.otherId))}
+                      className="block max-w-full truncate text-sm font-medium underline-offset-4 hover:underline"
+                    >
+                      {nameOf(directory, view.otherKind, view.otherId) ?? t("form.deleted")}
+                    </button>
+                    {view.link.label && <p className="truncate text-xs text-muted-foreground">{view.link.label}</p>}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))
+      )}
+
+      {adding && (
+        <WorldLinkDialog
+          projectId={projectId}
+          self={{ kind: "faction", id: factionId }}
+          link={null}
+          directory={directory}
+          onClose={() => setAdding(false)}
         />
       )}
     </CollapsibleCard>
