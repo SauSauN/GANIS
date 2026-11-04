@@ -1,6 +1,8 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronDown, Eye, Fingerprint, Sparkles, type LucideIcon } from "lucide-react";
+import { ChevronDown, Eye, Fingerprint, Sparkles, WandSparkles, type LucideIcon } from "lucide-react";
+import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
+import { useProjectCharacters } from "@/stores/characterStore";
 import {
   Card,
   CardContent,
@@ -32,6 +34,7 @@ import {
   levelProgress,
   levelsUpTo,
   parseList,
+  POWER_FIELDS,
   type CharacterDraft,
   type CharacterField,
 } from "@/lib/characters";
@@ -157,6 +160,8 @@ export function CharacterSheet({
   const listLabel = useListLabel();
   const sectionId = useId();
   const [collapsed, setCollapsed] = useState<Set<CharacterDetailLevel>>(loadCollapsed);
+  const { powersEnabled } = useProjectCharacters(projectId);
+  const [powersOpen, setPowersOpen] = useCollapsible("ganis.characterPowers.collapsed");
 
   function setOpen(level: CharacterDetailLevel, open: boolean) {
     setCollapsed((current) => {
@@ -511,6 +516,20 @@ export function CharacterSheet({
             </Card>
           );
         })}
+
+        {/* Pouvoirs : hors des niveaux, si l'auteur les a activés pour le projet. */}
+        {powersEnabled && (
+          <CollapsibleCard
+            open={powersOpen}
+            onOpenChange={setPowersOpen}
+            icon={WandSparkles}
+            title={t("powers.title")}
+            description={t("powers.description")}
+            contentClassName={cn(cardContentClass, "grid gap-x-4 gap-y-5 sm:grid-cols-2")}
+          >
+            {POWER_FIELDS.map(renderField)}
+          </CollapsibleCard>
+        )}
 
         {footer}
       </div>

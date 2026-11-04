@@ -323,7 +323,8 @@
           "Image principale et galerie de références : glissez des images directement sur la fiche.",
           "Relations : liens familiaux, amicaux, rivalités… Le graphe des relations montre tout le monde d'un coup d'œil ; les personnages s'y déplacent librement.",
           "Lieux : où le personnage vit, travaille, a grandi — avec, si vous le souhaitez, la période du récit concernée.",
-          "Palette de couleurs : ses couleurs encadrent le portrait du personnage."
+          "Palette de couleurs : ses couleurs encadrent le portrait du personnage.",
+          "Pouvoirs : pour les histoires où les personnages ont des pouvoirs, des dons ou de la magie, activez la carte « Pouvoirs » dans Paramètres du projet › Personnages. Elle s'ajoute à toutes les fiches, quel que soit le niveau de détail."
         ]
       },
       "locations": {

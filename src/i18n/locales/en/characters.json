@@ -108,7 +108,9 @@
     "secret": "Secret",
     "innerConflict": "Inner conflict",
     "adversityResponse": "Response to adversity",
-    "plannedArc": "Planned development"
+    "plannedArc": "Planned development",
+    "powers": "Powers and abilities",
+    "powerLimits": "Limits and weaknesses of these powers"
   },
   "placeholders": {
     "firstName": "E.g. Aldric",
@@ -149,7 +151,9 @@
     "tags": "E.g. Stubborn, generous… (Enter to add)",
     "traits": "E.g. Loyal, impulsive… (Enter to add)",
     "strengths": "E.g. Brave, good strategist…",
-    "flaws": "E.g. Proud, resentful…"
+    "flaws": "E.g. Proud, resentful…",
+    "powers": "E.g. Reads the thoughts of those he touches, sees in the dark…",
+    "powerLimits": "E.g. One minute at most, and he loses his sight for an hour"
   },
   "choice": {
     "none": "Not specified",
@@ -260,5 +264,9 @@
   },
   "tab": {
     "fallback": "Character"
+  },
+  "powers": {
+    "title": "Powers",
+    "description": "Their powers, gifts or magic, and what it costs them."
   }
 }

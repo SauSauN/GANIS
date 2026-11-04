@@ -61,7 +61,7 @@ L'espace de travail reprend le modèle d'un éditeur de code : une barre d'activ
 | Module | Contenu |
 |---|---|
 | **Détails** | Accueil du projet, synopsis, historique, corbeille |
-| **Personnages** | Fiches à niveau de détail réglable, portrait, galerie, champs personnalisés, lieux associés |
+| **Personnages** | Fiches à niveau de détail réglable, portrait, galerie, champs personnalisés, lieux associés, carte « Pouvoirs » à activer (pouvoirs et capacités, limites et faiblesses) |
 | **Relations** | Liens entre personnages (types et couleurs), graphe interactif aux positions mémorisées |
 | **Lieux** | Fiches hiérarchiques (un lieu peut en contenir d'autres), types personnalisés, portrait, galerie légendée |
 | **Objets, Faune et flore, Factions** | Modules facultatifs, activés dans les paramètres du projet. Factions : guildes, ordres, clans, armées, cultes, sociétés secrètes… en 8 catégories et 37 types, avec des branches et des liens (« dirige », « fait partie de », « est alliée de », « a son siège à »…) |

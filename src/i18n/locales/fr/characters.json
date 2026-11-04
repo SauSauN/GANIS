@@ -108,7 +108,9 @@
     "secret": "Secret",
     "innerConflict": "Conflit intérieur",
     "adversityResponse": "Réaction face aux difficultés",
-    "plannedArc": "Évolution prévue"
+    "plannedArc": "Évolution prévue",
+    "powers": "Pouvoirs et capacités",
+    "powerLimits": "Limites et faiblesses de ces pouvoirs"
   },
   "placeholders": {
     "firstName": "Ex. Aldric",
@@ -149,7 +151,9 @@
     "tags": "Ex. Têtu, généreux… (Entrée pour ajouter)",
     "traits": "Ex. Loyal, impulsif… (Entrée pour ajouter)",
     "strengths": "Ex. Courageux, bon stratège…",
-    "flaws": "Ex. Orgueilleux, rancunier…"
+    "flaws": "Ex. Orgueilleux, rancunier…",
+    "powers": "Ex. Lit les pensées de ceux qu'il touche, voit dans le noir…",
+    "powerLimits": "Ex. Une minute au plus, et il perd la vue pendant une heure"
   },
   "choice": {
     "none": "Non précisé",
@@ -260,5 +264,9 @@
   },
   "tab": {
     "fallback": "Personnage"
+  },
+  "powers": {
+    "title": "Pouvoirs",
+    "description": "Ses pouvoirs, ses dons ou sa magie, et ce qu'il lui en coûte."
   }
 }

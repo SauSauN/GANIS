@@ -90,6 +90,13 @@
       "add": "Add",
       "remove": "Remove “{{value}}”",
       "reset": "Default values"
+    },
+    "powers": {
+      "title": "Powers",
+      "description": "For stories where characters have powers, gifts or magic.",
+      "enable": "Add a “Powers” card to the sheets",
+      "enabledHint": "Each sheet has a “Powers” card: powers and abilities, limits and weaknesses.",
+      "disabledHint": "Off: sheets have no “Powers” card. Turning it off later deletes nothing."
     }
   },
   "notes": {

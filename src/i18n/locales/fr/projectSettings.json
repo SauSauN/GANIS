@@ -90,6 +90,13 @@
       "add": "Ajouter",
       "remove": "Retirer « {{value}} »",
       "reset": "Valeurs par défaut"
+    },
+    "powers": {
+      "title": "Pouvoirs",
+      "description": "Pour les histoires où les personnages ont des pouvoirs, des dons ou de la magie.",
+      "enable": "Ajouter une carte « Pouvoirs » aux fiches",
+      "enabledHint": "Chaque fiche a une carte « Pouvoirs » : pouvoirs et capacités, limites et faiblesses.",
+      "disabledHint": "Désactivée : les fiches n'ont pas de carte « Pouvoirs ». La désactiver plus tard n'efface rien."
     }
   },
   "notes": {

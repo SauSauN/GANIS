@@ -25,6 +25,10 @@ export const charactersApi = {
   setCharacterDetailLevel: (projectId: string, level: string) =>
     call<CharacterSettings>("set_character_detail_level", { projectId, level }),
 
+  /** Affiche ou masque la carte « Pouvoirs » des fiches du projet. */
+  setCharacterPowersEnabled: (projectId: string, enabled: boolean) =>
+    call<CharacterSettings>("set_character_powers_enabled", { projectId, enabled }),
+
   /** Remplace une liste personnalisable (`null` : valeurs par défaut). */
   setCharacterList: (projectId: string, list: CharacterListKey, values: string[] | null) =>
     call<CharacterSettings>("set_character_list", { projectId, list, values }),

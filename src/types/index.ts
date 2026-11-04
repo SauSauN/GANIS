@@ -534,6 +534,8 @@ export interface CharacterSettings {
   detailLevel: CharacterDetailLevel | null;
   /** Listes personnalisées ; une liste absente : valeurs par défaut. */
   lists: Partial<Record<CharacterListKey, string[]>>;
+  /** Carte « Pouvoirs » affichée sur les fiches (désactivée par défaut). */
+  powersEnabled: boolean;
 }
 
 /** Image de la galerie, sans son contenu. */

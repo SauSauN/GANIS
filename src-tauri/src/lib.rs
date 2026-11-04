@@ -158,6 +158,7 @@ pub fn run() {
             commands::characters::get_character_settings,
             commands::characters::set_character_detail_level,
             commands::characters::set_character_list,
+            commands::characters::set_character_powers_enabled,
             commands::characters::list_character_gallery,
             commands::characters::get_character_gallery_image,
             commands::characters::add_character_gallery_image,

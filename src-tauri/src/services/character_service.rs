@@ -28,6 +28,13 @@
 //! (`src/lib/characterFields.json`) ; un test vérifie que les deux sont
 //! identiques.
 //!
+//! # Pouvoirs
+//!
+//! Deux champs hors des trois niveaux (`POWER_FIELDS`) : pouvoirs et
+//! capacités, limites et faiblesses de ces pouvoirs. Ils forment une carte
+//! que l'auteur active pour le projet (`character_settings.powers_enabled`),
+//! utile seulement aux histoires où les personnages ont des pouvoirs.
+//!
 //! # Images
 //!
 //! L'interface réduit les images avant l'envoi ; Rust vérifie leur type
@@ -187,8 +194,16 @@ pub const FIELDS: &[FieldDef] = &[
     def("plannedArc", Advanced, LongText, LONG),
 ];
 
+/// Carte « Pouvoirs » : hors des trois niveaux (leur `level` ne sert pas).
+/// Aussi dans l'interface (`src/lib/characterPowerFields.json`), vérifié par
+/// le test `power_fields_match_the_interface`.
+pub const POWER_FIELDS: &[FieldDef] = &[
+    def("powers", Basic, LongText, LONG),
+    def("powerLimits", Basic, LongText, LONG),
+];
+
 fn find_field(key: &str) -> Option<&'static FieldDef> {
-    FIELDS.iter().find(|def| def.key == key)
+    FIELDS.iter().chain(POWER_FIELDS).find(|def| def.key == key)
 }
 
 // ----------------------------------------------------------------------------
@@ -236,6 +251,8 @@ pub struct CharacterSettings {
     /// Listes personnalisées. Une liste absente : valeurs par défaut de
     /// l'interface.
     pub lists: BTreeMap<String, Vec<String>>,
+    /// Carte « Pouvoirs » affichée sur les fiches (désactivée par défaut).
+    pub powers_enabled: bool,
 }
 
 /// Image encodée en base64.
@@ -540,17 +557,34 @@ async fn touch(pool: &SqlitePool, id: &str) -> AppResult<()> {
 
 /// Réglages des personnages du projet.
 pub async fn get_settings(pool: &SqlitePool) -> AppResult<CharacterSettings> {
-    let row: Option<(Option<String>, String)> =
-        sqlx::query_as("SELECT detail_level, lists FROM character_settings WHERE id = 'default'")
-            .fetch_optional(pool)
-            .await?;
+    let row: Option<(Option<String>, String, i64)> = sqlx::query_as(
+        "SELECT detail_level, lists, powers_enabled FROM character_settings WHERE id = 'default'",
+    )
+    .fetch_optional(pool)
+    .await?;
 
-    let (level, lists) = row.unwrap_or((None, "{}".to_owned()));
+    let (level, lists, powers) = row.unwrap_or((None, "{}".to_owned(), 0));
 
     Ok(CharacterSettings {
         detail_level: level.as_deref().and_then(DetailLevel::parse),
         lists: serde_json::from_str(&lists).unwrap_or_default(),
+        powers_enabled: powers != 0,
     })
+}
+
+/// Affiche ou masque la carte « Pouvoirs » des fiches. La masquer ne
+/// supprime rien : les champs remplis réapparaissent à la réactivation.
+pub async fn set_powers_enabled(pool: &SqlitePool, enabled: bool) -> AppResult<CharacterSettings> {
+    sqlx::query(
+        "INSERT INTO character_settings (id, detail_level, powers_enabled, updated_at) VALUES ('default', NULL, ?, ?) \
+         ON CONFLICT (id) DO UPDATE SET powers_enabled = excluded.powers_enabled, updated_at = excluded.updated_at",
+    )
+    .bind(enabled)
+    .bind(now_utc())
+    .execute(pool)
+    .await?;
+
+    get_settings(pool).await
 }
 
 /// Choisit le niveau de détail de toutes les fiches du projet.
@@ -1076,6 +1110,54 @@ mod tests {
         assert!(set_list(&pool, "species", Some(&[])).await.is_err());
         let long = vec!["x".repeat(61)];
         assert!(set_list(&pool, "role", Some(&long)).await.is_err());
+    }
+
+    #[tokio::test]
+    async fn powers_card_is_a_project_setting_and_keeps_its_fields() {
+        let pool = pool().await;
+        assert!(!get_settings(&pool).await.unwrap().powers_enabled);
+
+        set_detail_level(&pool, "advanced").await.unwrap();
+        let s = set_powers_enabled(&pool, true).await.unwrap();
+        assert!(s.powers_enabled);
+        // Le niveau n'est pas touché, et inversement.
+        assert_eq!(s.detail_level, Some(DetailLevel::Advanced));
+        assert!(set_detail_level(&pool, "basic").await.unwrap().powers_enabled);
+
+        let c = create_character(&pool, &input("Lyra", "", &[("powers", "Lit les pensées"), ("powerLimits", "Pas plus d'une minute")]))
+            .await
+            .unwrap();
+        assert_eq!(c.fields["powers"], "Lit les pensées");
+
+        // Carte masquée : les champs restent.
+        assert!(!set_powers_enabled(&pool, false).await.unwrap().powers_enabled);
+        assert_eq!(get_character(&pool, &c.id).await.unwrap().fields["powerLimits"], "Pas plus d'une minute");
+
+        let long = "x".repeat(LONG + 1);
+        assert!(create_character(&pool, &input("Trop", "", &[("powers", &long)])).await.is_err());
+    }
+
+    /// Les champs de la carte « Pouvoirs » sont les mêmes dans l'interface
+    /// (`src/lib/characterPowerFields.json`) et hors des trois niveaux.
+    #[test]
+    fn power_fields_match_the_interface() {
+        #[derive(Deserialize)]
+        #[serde(rename_all = "camelCase")]
+        struct UiField {
+            key: String,
+            kind: FieldKind,
+            max_length: usize,
+        }
+
+        let ui: Vec<UiField> =
+            serde_json::from_str(include_str!("../../../src/lib/characterPowerFields.json")).unwrap();
+        assert_eq!(ui.len(), POWER_FIELDS.len());
+        for (ui, def) in ui.iter().zip(POWER_FIELDS) {
+            assert_eq!(ui.key, def.key);
+            assert_eq!(ui.kind, def.kind, "nature de {}", def.key);
+            assert_eq!(ui.max_length, def.max_chars, "longueur de {}", def.key);
+            assert!(FIELDS.iter().all(|field| field.key != def.key), "{} est déjà dans un niveau", def.key);
+        }
     }
 
     #[tokio::test]
