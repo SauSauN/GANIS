@@ -2,26 +2,28 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { doubleClickHint, onRowDoubleClick } from "@/lib/doubleClick";
 import { useTranslation } from "react-i18next";
 import {
+  Drama,
   FileText,
+  Flag,
   Folder,
+  LayoutPanelTop,
+  Link2,
   ListTree,
   MapPin,
   MapPinned,
   Megaphone,
   Network,
   NotebookText,
+  Package,
   Paperclip,
+  PawPrint,
   RefreshCw,
   RotateCcw,
   StickyNote,
   UserRound,
   Waypoints,
+  Zap,
   type LucideIcon,
-  LayoutPanelTop,
-  Package,
-  Flag,
-  PawPrint,
-  Link2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
@@ -47,6 +49,8 @@ const ICONS: Record<HistoryKind, LucideIcon> = {
   item: Package,
   species: PawPrint,
   faction: Flag,
+  people: Drama,
+  magic: Zap,
   worldLink: Link2,
   mangaPanel: LayoutPanelTop,
   synopsis: FileText,

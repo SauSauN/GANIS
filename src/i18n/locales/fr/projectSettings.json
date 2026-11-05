@@ -43,6 +43,14 @@
     "factions": {
       "label": "Factions",
       "description": "Module facultatif : activez-le et choisissez vos catégories (politique, armée, religion…)."
+    },
+    "peoples": {
+      "label": "Peuples, cultures et religions",
+      "description": "Module facultatif : activez-le et choisissez vos catégories (peuples, cultures, religions)."
+    },
+    "magic": {
+      "label": "Magie et pouvoirs",
+      "description": "Module facultatif : activez-le et choisissez vos catégories (systèmes, écoles, techniques)."
     }
   },
   "info": {

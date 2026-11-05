@@ -373,6 +373,84 @@
       }
     }
   },
+  "peoples": {
+    "title": "Tutorial: Peoples, cultures and religions",
+    "name": "Peoples, cultures and religions",
+    "intro": "The soul of your world: its peoples, their cultures, languages and beliefs.",
+    "steps": {
+      "enable": {
+        "title": "Turn on the module",
+        "text": "The module is optional: it only appears in the left bar once turned on in the project settings.",
+        "points": [
+          "Then choose the useful categories: peoples, cultures, religions.",
+          "Turning it off later deletes nothing."
+        ]
+      },
+      "create": {
+        "title": "Create a sheet",
+        "text": "Choose its type: the sheet adapts. A people has its appearance and customs, a language its writing, a deity its domains.",
+        "points": [
+          "Ctrl+N in the module creates a sheet."
+        ]
+      },
+      "branches": {
+        "title": "Organise them",
+        "text": "A sheet can depend on another: wood elves within the elves, a heresy within its religion, a goddess within her pantheon.",
+        "points": []
+      },
+      "links": {
+        "title": "Link them to the world",
+        "text": "On the sheet, link characters: “belongs to”, “practises”, “speaks”, “worships”. Record where a people lives, too.",
+        "points": [
+          "The “Who belongs” card groups them by role."
+        ]
+      },
+      "existing": {
+        "title": "With factions",
+        "text": "The church, cult or clan that organises a people or a religion stays a faction: link it with “practises” or “belongs to”, without copying anything.",
+        "points": []
+      }
+    }
+  },
+  "magic": {
+    "title": "Tutorial: Magic and powers",
+    "name": "Magic and powers",
+    "intro": "Set the rules of power in your world: its source, cost, limits, schools and techniques.",
+    "steps": {
+      "enable": {
+        "title": "Turn on the module",
+        "text": "The module is optional: it only appears in the left bar once turned on in the project settings.",
+        "points": [
+          "Then choose the useful categories: systems, schools, techniques.",
+          "Turning it off later deletes nothing."
+        ]
+      },
+      "create": {
+        "title": "Create a system",
+        "text": "Magic, inner energy, superpowers… Record its source, rules, cost and limits: that's what makes a power believable.",
+        "points": [
+          "Ctrl+N in the module creates a sheet."
+        ]
+      },
+      "branches": {
+        "title": "Add schools and techniques",
+        "text": "Put schools and elements in their system, then spells and techniques in their school. The panel shows them as a tree.",
+        "points": []
+      },
+      "links": {
+        "title": "Link it to the world",
+        "text": "Link who masters or teaches it, what its source is (a place, an object, a deity) and who forbids it.",
+        "points": [
+          "The “Who masters it” card groups them by role."
+        ]
+      },
+      "existing": {
+        "title": "With characters",
+        "text": "A character's own powers stay on their “Powers” card: simply link them to the system with “masters”.",
+        "points": []
+      }
+    }
+  },
   "structure": {
     "title": "Tutorial: Structure",
     "name": "Structure",

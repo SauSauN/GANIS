@@ -4,6 +4,7 @@ import { Navigate, useParams } from "react-router-dom";
 import { FileText, type LucideIcon } from "lucide-react";
 
 import { ActivityBar } from "@/components/layout/ActivityBar";
+import { SEARCH_INPUT_ID } from "@/components/search/SideBarSearch";
 import { ExternalDocumentsWatcher } from "@/components/documents/ExternalDocumentsWatcher";
 import { UnsavedChangesDialog } from "@/components/layout/UnsavedChangesDialog";
 import { useUnsavedQueue } from "@/components/layout/useUnsavedQueue";
@@ -102,6 +103,8 @@ const NEW_TARGETS: Partial<Record<ModuleId, string>> = {
   items: "items.create",
   species: "species.create",
   factions: "factions.create",
+  peoples: "peoples.create",
+  magic: "magic.create",
 };
 
 /** En dessous : barre de gauche en icônes, panneau du milieu par-dessus. */
@@ -250,6 +253,8 @@ export default function Workspace() {
   useWorldStore((state) => state.item.entries);
   useWorldStore((state) => state.species.entries);
   useWorldStore((state) => state.faction.entries);
+  useWorldStore((state) => state.people.entries);
+  useWorldStore((state) => state.magic.entries);
 
   /**
    * Objets, faune et flore : modules facultatifs, dans la barre de gauche
@@ -262,11 +267,13 @@ export default function Workspace() {
     setActiveModule((current) =>
       (current === "items" && !worldModules.item) ||
       (current === "species" && !worldModules.species) ||
-      (current === "factions" && !worldModules.faction)
+      (current === "factions" && !worldModules.faction) ||
+      (current === "peoples" && !worldModules.people) ||
+      (current === "magic" && !worldModules.magic)
         ? "details"
         : current,
     );
-  }, [worldModules.loaded, worldModules.item, worldModules.species, worldModules.faction]);
+  }, [worldModules.loaded, worldModules.item, worldModules.species, worldModules.faction, worldModules.people, worldModules.magic]);
 
   /** Onglets avec des modifications non enregistrées (point ● sur l'onglet). */
   const unsavedEntries = useUnsavedStore((state) => state.entries);
@@ -374,6 +381,23 @@ export default function Workspace() {
       run: () => (createTarget ? openFeature(createTarget) : setChooserOpen(true)),
     },
     palette: { run: () => setPaletteOpen(true) },
+    // Loupe de la barre de titre et Ctrl+F : la recherche s'ouvre dans le
+    // panneau du milieu (elle n'est plus dans la barre de gauche). Déjà
+    // ouverte : le curseur revient dans le champ, texte sélectionné.
+    search: {
+      active: panelOpen && !(maximized && activeTab !== null) && activeModule === "search",
+      label: t("titlebar:search"),
+      run: () => {
+        setMaximized(false);
+        setActiveModule("search");
+        setPanelOpen(true);
+        requestAnimationFrame(() => {
+          const input = document.getElementById(SEARCH_INPUT_ID) as HTMLInputElement | null;
+          input?.focus();
+          input?.select();
+        });
+      },
+    },
     openHistory: { run: () => openFeature("history") },
     save: {
       disabled: !activeDirty,
@@ -465,7 +489,9 @@ export default function Workspace() {
     if (activeModule === "items" && worldModules.item) showTutorialOnce("items");
     if (activeModule === "species" && worldModules.species) showTutorialOnce("species");
     if (activeModule === "factions" && worldModules.faction) showTutorialOnce("factions");
-  }, [projectType, activeModule, worldModules.item, worldModules.species, worldModules.faction]);
+    if (activeModule === "peoples" && worldModules.people) showTutorialOnce("peoples");
+    if (activeModule === "magic" && worldModules.magic) showTutorialOnce("magic");
+  }, [projectType, activeModule, worldModules.item, worldModules.species, worldModules.faction, worldModules.people, worldModules.magic]);
 
   /**
    * Si le projet est inexistant ou a été supprimé,
@@ -742,7 +768,7 @@ export default function Workspace() {
             ========================================================= */}
         {!isMaximized && (
         <ActivityBar
-          modules={modulesFor(project.type, worldModules)}
+          modules={modulesFor(project.type, worldModules).filter((module) => module.id !== "search")}
           active={activeModule}
           linked={linkedModule}
           panelOpen={panelOpen}

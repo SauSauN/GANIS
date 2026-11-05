@@ -10,7 +10,7 @@ import { PageShell, cardClass, cardContentClass, cardHeaderClass } from "@/compo
 import { WorldDisabledNotice } from "@/components/workspace/views/WorldListView";
 import { SpeciesCharacterCard } from "@/components/world/AnimalCharacterCards";
 import { WorldGallery } from "@/components/world/WorldGallery";
-import { FactionMembersCard, WorldLinksCard } from "@/components/world/WorldLinksCard";
+import { MembersCard, WorldLinksCard } from "@/components/world/WorldLinksCard";
 import { WorldSheet } from "@/components/world/WorldSheet";
 import { WorldThumb, WorldTypeBadge } from "@/components/world/WorldVisuals";
 import { useWorldLabels } from "@/components/world/useWorldLabels";
@@ -18,7 +18,7 @@ import { errorText } from "@/lib/errors";
 import { notifyError, notifySaved } from "@/lib/notify";
 import { GALLERY_MAX_SIDE, PortraitError, preparePortrait } from "@/lib/portraitImage";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
-import {
+import { hasMembers,
   MAX_WORLD_NAME_LENGTH,
   childrenOf,
   createFeatureOf,
@@ -282,8 +282,8 @@ export function WorldEditView({
               {module === "species" && entry.nature === "individual" && (
                 <SpeciesCharacterCard projectId={projectId} entry={entry} onOpenFeature={onOpenFeature} disabled={deleting} />
               )}
-              {module === "faction" && (
-                <FactionMembersCard projectId={projectId} factionId={entry.id} onOpenFeature={onOpenFeature} />
+              {hasMembers(module) && (
+                <MembersCard projectId={projectId} module={module} entryId={entry.id} onOpenFeature={onOpenFeature} />
               )}
               <WorldLinksCard projectId={projectId} self={{ kind: module, id: entry.id }} onOpenFeature={onOpenFeature} />
               {childrenCard}

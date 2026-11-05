@@ -1,0 +1,369 @@
+{
+  "statuses": [
+    "living",
+    "growing",
+    "declining",
+    "endangered",
+    "persecuted",
+    "extinct",
+    "legendary",
+    "unknown"
+  ],
+  "defaultStatus": "living",
+  "natures": [],
+  "categories": [
+    "people",
+    "culture",
+    "religion"
+  ],
+  "types": [
+    {
+      "id": "ethnicGroup",
+      "category": "people"
+    },
+    {
+      "id": "fantasyRace",
+      "category": "people"
+    },
+    {
+      "id": "alienCivilization",
+      "category": "people"
+    },
+    {
+      "id": "artificialBeings",
+      "category": "people"
+    },
+    {
+      "id": "spiritBeings",
+      "category": "people"
+    },
+    {
+      "id": "nomadicPeople",
+      "category": "people"
+    },
+    {
+      "id": "culture",
+      "category": "culture"
+    },
+    {
+      "id": "tradition",
+      "category": "culture"
+    },
+    {
+      "id": "language",
+      "category": "culture"
+    },
+    {
+      "id": "socialClass",
+      "category": "culture"
+    },
+    {
+      "id": "religion",
+      "category": "religion"
+    },
+    {
+      "id": "pantheon",
+      "category": "religion"
+    },
+    {
+      "id": "deity",
+      "category": "religion"
+    },
+    {
+      "id": "mythology",
+      "category": "religion"
+    },
+    {
+      "id": "philosophy",
+      "category": "religion"
+    },
+    {
+      "id": "prophecy",
+      "category": "religion"
+    }
+  ],
+  "fields": [
+    {
+      "key": "aliases",
+      "kind": "text",
+      "maxLength": 200
+    },
+    {
+      "key": "colorPalette",
+      "kind": "colors",
+      "maxLength": 200
+    },
+    {
+      "key": "description",
+      "kind": "longText",
+      "maxLength": 20000
+    },
+    {
+      "key": "firstAppearance",
+      "kind": "reference",
+      "maxLength": 200
+    },
+    {
+      "key": "symbol",
+      "kind": "text",
+      "maxLength": 1000
+    },
+    {
+      "key": "spread",
+      "kind": "choice",
+      "maxLength": 60,
+      "options": [
+        "local",
+        "regional",
+        "national",
+        "continental",
+        "worldwide"
+      ]
+    },
+    {
+      "key": "origins",
+      "kind": "longText",
+      "maxLength": 20000
+    },
+    {
+      "key": "history",
+      "kind": "longText",
+      "maxLength": 20000
+    },
+    {
+      "key": "notes",
+      "kind": "longText",
+      "maxLength": 20000
+    },
+    {
+      "key": "population",
+      "kind": "text",
+      "maxLength": 1000,
+      "categories": [
+        "people"
+      ]
+    },
+    {
+      "key": "appearance",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "people"
+      ],
+      "types": [
+        "deity"
+      ]
+    },
+    {
+      "key": "lifespan",
+      "kind": "text",
+      "maxLength": 1000,
+      "categories": [
+        "people"
+      ]
+    },
+    {
+      "key": "temperament",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "people"
+      ]
+    },
+    {
+      "key": "society",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "people",
+        "culture"
+      ]
+    },
+    {
+      "key": "customs",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "people",
+        "culture"
+      ]
+    },
+    {
+      "key": "values",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "culture",
+        "people"
+      ]
+    },
+    {
+      "key": "arts",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "culture"
+      ]
+    },
+    {
+      "key": "cuisine",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "culture"
+      ]
+    },
+    {
+      "key": "clothing",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "culture",
+        "people"
+      ]
+    },
+    {
+      "key": "beliefs",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "religion"
+      ]
+    },
+    {
+      "key": "followers",
+      "kind": "text",
+      "maxLength": 1000,
+      "categories": [
+        "religion"
+      ]
+    },
+    {
+      "key": "sacredTexts",
+      "kind": "text",
+      "maxLength": 1000,
+      "categories": [
+        "religion"
+      ]
+    },
+    {
+      "key": "rituals",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "religion"
+      ],
+      "types": [
+        "tradition"
+      ]
+    },
+    {
+      "key": "afterlife",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "religion"
+      ]
+    },
+    {
+      "key": "taboos",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "culture",
+        "religion"
+      ]
+    },
+    {
+      "key": "celebrations",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "culture",
+        "religion"
+      ]
+    },
+    {
+      "key": "writingSystem",
+      "kind": "text",
+      "maxLength": 1000,
+      "types": [
+        "language"
+      ]
+    },
+    {
+      "key": "vocabulary",
+      "kind": "longText",
+      "maxLength": 20000,
+      "types": [
+        "language"
+      ]
+    },
+    {
+      "key": "pronunciation",
+      "kind": "text",
+      "maxLength": 1000,
+      "types": [
+        "language"
+      ]
+    },
+    {
+      "key": "occasion",
+      "kind": "text",
+      "maxLength": 1000,
+      "types": [
+        "tradition"
+      ]
+    },
+    {
+      "key": "privileges",
+      "kind": "longText",
+      "maxLength": 20000,
+      "types": [
+        "socialClass"
+      ]
+    },
+    {
+      "key": "domains",
+      "kind": "tags",
+      "maxLength": 20000,
+      "types": [
+        "deity",
+        "pantheon"
+      ]
+    },
+    {
+      "key": "myths",
+      "kind": "longText",
+      "maxLength": 20000,
+      "types": [
+        "mythology",
+        "pantheon"
+      ]
+    },
+    {
+      "key": "principles",
+      "kind": "longText",
+      "maxLength": 20000,
+      "types": [
+        "philosophy"
+      ]
+    },
+    {
+      "key": "prophecyText",
+      "kind": "longText",
+      "maxLength": 20000,
+      "types": [
+        "prophecy"
+      ]
+    },
+    {
+      "key": "fulfilment",
+      "kind": "longText",
+      "maxLength": 20000,
+      "types": [
+        "prophecy"
+      ]
+    }
+  ]
+}

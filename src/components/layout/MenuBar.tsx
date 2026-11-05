@@ -90,6 +90,7 @@ export function MenuBar() {
     readStory: useCommand("readStory"),
     openTutorial: useCommand("openTutorial"),
     palette: useCommand("palette"),
+    search: useCommand("search"),
   };
 
   const command = (id: CommandId, fallbackLabel: string, shortcut?: AppAction): Entry => ({
@@ -168,6 +169,7 @@ export function MenuBar() {
       SEPARATOR,
       edit("selectAll", t("edit.selectAll"), "Ctrl+A"),
       SEPARATOR,
+      command("search", t("edit.searchProject"), "search"),
       command("palette", t("edit.search"), "palette"),
       SEPARATOR,
       command("openHistory", t("edit.history")),

@@ -124,7 +124,7 @@
         "title": "Search",
         "text": "Find anything in the project: characters, locations, structure, documents, plot, notes and sticky notes.",
         "points": [
-          "The Search module looks through the whole project, ignoring accents and case.",
+          "The magnifier at the top right (or Ctrl+F) opens search in the middle panel: it looks through the whole project, ignoring accents and case.",
           "Ctrl+K opens the palette: type to jump to an item or run a command.",
           "Click a result to open it in a tab."
         ]
@@ -198,6 +198,7 @@
       "guide": "Getting started",
       "shortcuts": "Keyboard shortcuts",
       "palette": "Palette: pages, actions, search",
+      "search": "Search the project (magnifier)",
       "center": "GANIS Help",
       "readStory": "Read the whole story / exit reading"
     },
@@ -298,7 +299,7 @@
         "title": "The workspace",
         "intro": "A project opens in the workspace: modules on the left, panel in the middle, tabs in the centre.",
         "items": [
-          "The left bar gives access to the modules: Details, Characters, Locations, Structure, Notes, Search, and the project settings at the bottom.",
+          "The left bar gives access to the modules: Details, Characters, Locations, Structure, Notes, and the project settings at the bottom. The magnifier at the top right (Ctrl+F) opens search.",
           "The middle panel lists the module's features and items; a click opens a tab. Drag its right edge to widen it, or to the left to close it.",
           "Tabs can be dragged. Right-click a tab to pin it, close the others, those to the right…",
           "A ● dot on a tab means unsaved changes. The status bar at the bottom always shows whether everything is saved.",
@@ -370,6 +371,28 @@
           "The links card notes its allies, enemies, seat, the places where it is present and what it controls, with a story period if needed."
         ]
       },
+      "peoples": {
+        "title": "Peoples, cultures and religions",
+        "intro": "The soul of your world: its peoples and races, their cultures, languages and beliefs.",
+        "items": [
+          "Optional module: turn it on in Project settings › Peoples, cultures and religions, and it appears in the left bar. Turning it off deletes nothing.",
+          "Three categories: peoples and races, cultures and traditions (including languages), religions and beliefs (pantheons, deities, mythologies, prophecies). The type chooses the fields.",
+          "A sheet can contain others: a sub-people in its people, a branch in its religion, a deity in its pantheon.",
+          "The “Who belongs” card groups members, practitioners, speakers and worshippers; the links card also records where a people lives and the powers it masters.",
+          "No duplicates with Factions: a religion (its beliefs, its rites) lives here, while the church or cult that organises it stays a faction, linked with “practises”."
+        ]
+      },
+      "magic": {
+        "title": "Magic and powers",
+        "intro": "The shared rules of power in your world: where it comes from, what it costs, its limits, its schools and techniques.",
+        "items": [
+          "Optional module: turn it on in Project settings › Magic and powers, and it appears in the left bar. Turning it off deletes nothing.",
+          "Three levels: the system (magic, inner energy, superpowers, divine power, psionics, alchemy), its schools and branches (elements, bloodlines), then its spells and techniques.",
+          "The type chooses the fields: a system has its source, rules, cost and limits; a technique its effects, power, range and risks.",
+          "The “Who masters it” card groups those who master it and those who teach it; the links card records its sources and who forbids it.",
+          "No duplicates: a character's own powers stay on their “Powers” card; link them to the system with “masters”."
+        ]
+      },
       "structure": {
         "title": "Story structure",
         "intro": "Your story's outline, adapted to the project type.",
@@ -421,9 +444,9 @@
         "title": "Search",
         "intro": "Find anything in the project.",
         "items": [
-          "The Search module looks through characters, locations, structure, notes (including their content) and sticky notes.",
+          "The magnifier at the top right, or Ctrl+F, opens search in the middle panel. It looks through characters, locations, structure, notes (including their content) and sticky notes.",
           "Accents and capitals don't matter: “chateau” finds “Château”. Several words: all must appear.",
-          "Ctrl+K does the same from anywhere, and also offers pages and actions."
+          "Ctrl+K opens the palette, which also offers pages and actions."
         ]
       },
       "history": {

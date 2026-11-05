@@ -1,16 +1,18 @@
 import { useTranslation } from "react-i18next";
 import {
+  Drama,
+  Flag,
   Folder,
   ListTree,
   MapPinned,
   NotebookText,
   Package,
   Paperclip,
-  Flag,
   PawPrint,
   StickyNote,
   UserRound,
   Waypoints,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 import { findFeature } from "@/components/workspace/modules";
@@ -25,6 +27,8 @@ export const SEARCH_ICONS: Record<SearchHit["kind"], LucideIcon> = {
   item: Package,
   species: PawPrint,
   faction: Flag,
+  people: Drama,
+  magic: Zap,
   structureNode: ListTree,
   document: Paperclip,
   plotEvent: Waypoints,

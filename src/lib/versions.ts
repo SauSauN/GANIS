@@ -155,7 +155,9 @@ export function readableFields(kind: VersionKind, row: Row, resolve: (id: string
     }
     case "item":
     case "species":
-    case "faction": {
+    case "faction":
+    case "people":
+    case "magic": {
       const fields = fieldsOf(row.fields);
       return [
         { key: "name", label: "versions:fields.name", text: str(row.name) },

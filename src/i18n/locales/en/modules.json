@@ -44,6 +44,14 @@
     "factions": {
       "label": "Factions",
       "empty": "No factions yet."
+    },
+    "peoples": {
+      "label": "Peoples",
+      "empty": "No peoples, cultures or religions yet."
+    },
+    "magic": {
+      "label": "Magic",
+      "empty": "No magic or powers yet."
     }
   },
   "features": {
@@ -191,6 +199,26 @@
       "list": {
         "label": "List of factions",
         "description": "All the factions in your story, with their branches."
+      }
+    },
+    "peoples": {
+      "create": {
+        "label": "Create a sheet",
+        "description": "People, culture, language, religion, deity… a sheet suited to each type."
+      },
+      "list": {
+        "label": "Peoples, cultures and religions",
+        "description": "All the peoples, cultures and beliefs of your world, with what depends on them."
+      }
+    },
+    "magic": {
+      "create": {
+        "label": "Create a sheet",
+        "description": "System, school, spell, technique… a sheet suited to each type."
+      },
+      "list": {
+        "label": "Magic and powers",
+        "description": "All the rules of power in your world, with their schools and techniques."
       }
     }
   }

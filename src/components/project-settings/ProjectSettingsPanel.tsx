@@ -223,6 +223,10 @@ export function ProjectSettingsPanel({
 
         {section === "factions" && <WorldSettingsSection projectId={project.id} module="faction" />}
 
+        {section === "peoples" && <WorldSettingsSection projectId={project.id} module="people" />}
+
+        {section === "magic" && <WorldSettingsSection projectId={project.id} module="magic" />}
+
         {section === "structure" && (
           <StructureSettingsSection project={project} />
         )}

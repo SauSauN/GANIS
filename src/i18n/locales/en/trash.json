@@ -14,6 +14,8 @@
     "item": "Object",
     "species": "Fauna and flora",
     "faction": "Faction",
+    "people": "People, culture or religion",
+    "magic": "Magic or power",
     "worldLink": "Link between elements"
   },
   "deleted": {
@@ -30,6 +32,8 @@
     "item": "Object “{{name}}” deleted.",
     "species": "“{{name}}” deleted from fauna and flora.",
     "faction": "“{{name}}” deleted from factions.",
+    "people": "“{{name}}” removed from peoples, cultures and religions.",
+    "magic": "“{{name}}” removed from magic and powers.",
     "worldLink": "Link “{{name}}” deleted."
   },
   "restored": {
@@ -46,6 +50,8 @@
     "item": "Object “{{name}}” restored.",
     "species": "“{{name}}” restored to fauna and flora.",
     "faction": "“{{name}}” restored to factions.",
+    "people": "“{{name}}” restored to peoples, cultures and religions.",
+    "magic": "“{{name}}” restored to magic and powers.",
     "worldLink": "Link “{{name}}” restored."
   },
   "untitled": {
@@ -62,6 +68,8 @@
     "item": "Unnamed object",
     "species": "Unnamed entry",
     "faction": "Untitled faction",
+    "people": "Untitled sheet",
+    "magic": "Untitled sheet",
     "worldLink": "Link"
   },
   "view": {

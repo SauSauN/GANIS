@@ -44,6 +44,14 @@
     "factions": {
       "label": "Factions",
       "empty": "Aucune faction pour l'instant."
+    },
+    "peoples": {
+      "label": "Peuples",
+      "empty": "Aucun peuple, aucune culture ni religion pour l'instant."
+    },
+    "magic": {
+      "label": "Magie",
+      "empty": "Aucune magie ni aucun pouvoir pour l'instant."
     }
   },
   "features": {
@@ -191,6 +199,26 @@
       "list": {
         "label": "Liste des factions",
         "description": "Toutes les factions de votre histoire, avec leurs branches."
+      }
+    },
+    "peoples": {
+      "create": {
+        "label": "Créer une fiche",
+        "description": "Peuple, culture, langue, religion, divinité… une fiche adaptée à chaque type."
+      },
+      "list": {
+        "label": "Liste des peuples, cultures et religions",
+        "description": "Tous les peuples, cultures et croyances de votre univers, avec ce qui en dépend."
+      }
+    },
+    "magic": {
+      "create": {
+        "label": "Créer une fiche",
+        "description": "Système, école, sort, technique… une fiche adaptée à chaque type."
+      },
+      "list": {
+        "label": "Liste de la magie et des pouvoirs",
+        "description": "Toutes les règles du pouvoir de votre univers, avec leurs écoles et techniques."
       }
     }
   }

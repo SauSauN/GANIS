@@ -62,13 +62,15 @@ fn table_of(kind: &str) -> Option<&'static str> {
         "item" => Some("items"),
         "species" => Some("species"),
         "faction" => Some("factions"),
+        "people" => Some("peoples"),
+        "magic" => Some("magic_systems"),
         _ => None,
     }
 }
 
 /// Sortes qui ont besoin d'un lien du monde (les autres paires ont déjà les leurs).
 fn is_world_kind(kind: &str) -> bool {
-    matches!(kind, "item" | "species" | "faction")
+    matches!(kind, "item" | "species" | "faction" | "people" | "magic")
 }
 
 // ----------------------------------------------------------------------------
@@ -158,7 +160,9 @@ fn known_kind(kind: &str) -> AppResult<(&'static str, &'static str)> {
         "location" => "location",
         "item" => "item",
         "species" => "species",
-        _ => "faction",
+        "faction" => "faction",
+        "people" => "people",
+        _ => "magic",
     };
     Ok((name, table))
 }
@@ -230,6 +234,8 @@ fn alive(kind: &str, id: &str) -> String {
                       WHEN 'item' THEN EXISTS (SELECT 1 FROM items WHERE id = {id}) \
                       WHEN 'species' THEN EXISTS (SELECT 1 FROM species WHERE id = {id}) \
                       WHEN 'faction' THEN EXISTS (SELECT 1 FROM factions WHERE id = {id}) \
+                      WHEN 'people' THEN EXISTS (SELECT 1 FROM peoples WHERE id = {id}) \
+                      WHEN 'magic' THEN EXISTS (SELECT 1 FROM magic_systems WHERE id = {id}) \
                       ELSE 0 END)"
     )
 }
@@ -316,7 +322,9 @@ async fn name_of(conn: &mut SqliteConnection, kind: &str, id: &str) -> String {
         "location" => "SELECT name FROM locations WHERE id = ?",
         "item" => "SELECT name FROM items WHERE id = ?",
         "species" => "SELECT name FROM species WHERE id = ?",
-        _ => "SELECT name FROM factions WHERE id = ?",
+        "faction" => "SELECT name FROM factions WHERE id = ?",
+        "people" => "SELECT name FROM peoples WHERE id = ?",
+        _ => "SELECT name FROM magic_systems WHERE id = ?",
     };
     sqlx::query_scalar::<_, String>(sql)
         .bind(id)
@@ -558,6 +566,71 @@ mod tests {
         assert_eq!(list_links(&pool).await.unwrap().len(), 1);
         trash_service::restore(&pool, &trash).await.unwrap();
         assert_eq!(list_links(&pool).await.unwrap().len(), 4);
+    }
+
+    #[tokio::test]
+    async fn peoples_and_magic_link_to_characters_factions_and_places() {
+        let pool = pool().await;
+        let aldric = character(&pool, "Aldric").await;
+        let forest = location(&pool, "Forêt d'Ébène").await;
+        let order = entry(&pool, Module::Faction, "Ordre d'Aval", "knightOrder").await;
+        let elves = entry(&pool, Module::People, "Elfes", "fantasyRace").await;
+        let faith = entry(&pool, Module::People, "Culte de la Lune", "religion").await;
+        let tongue = entry(&pool, Module::People, "Sylvain", "language").await;
+        let nen = entry(&pool, Module::Magic, "Nen", "energySystem").await;
+
+        create_link(&pool, &link(("character", &aldric), ("people", &elves), "belongsTo")).await.unwrap();
+        create_link(&pool, &link(("character", &aldric), ("people", &tongue), "speaks")).await.unwrap();
+        create_link(&pool, &link(("faction", &order), ("people", &faith), "practices")).await.unwrap();
+        create_link(&pool, &link(("people", &elves), ("location", &forest), "livesIn")).await.unwrap();
+        create_link(&pool, &link(("character", &aldric), ("magic", &nen), "masters")).await.unwrap();
+        create_link(&pool, &link(("location", &forest), ("magic", &nen), "sourceOf")).await.unwrap();
+        create_link(&pool, &link(("faction", &order), ("magic", &nen), "forbids")).await.unwrap();
+        assert_eq!(list_links(&pool).await.unwrap().len(), 7);
+
+        // Dans le mauvais sens ou entre des sortes qui ne s'y prêtent pas : refusé.
+        assert!(create_link(&pool, &link(("magic", &nen), ("character", &aldric), "masters")).await.is_err());
+        assert!(create_link(&pool, &link(("character", &aldric), ("magic", &nen), "belongsTo")).await.is_err());
+
+        // Un peuple supprimé : ses liens partent avec lui, puis reviennent.
+        let trash = world_service::delete_entry(&pool, Module::People, &elves).await.unwrap();
+        assert_eq!(list_links(&pool).await.unwrap().len(), 5);
+        trash_service::restore(&pool, &trash).await.unwrap();
+        assert_eq!(list_links(&pool).await.unwrap().len(), 7);
+    }
+
+    #[tokio::test]
+    async fn links_survive_the_migration_that_adds_peoples_and_magic() {
+        use sqlx::migrate::Migrator;
+        use std::borrow::Cow;
+
+        let pool = SqlitePoolOptions::new().max_connections(1).connect("sqlite::memory:").await.unwrap();
+        sqlx::query("PRAGMA foreign_keys = ON").execute(&pool).await.unwrap();
+        let before = Migrator {
+            migrations: Cow::Owned(PROJECT_MIGRATOR.migrations.iter().filter(|m| m.version < 29).cloned().collect()),
+            ignore_missing: false,
+            locking: true,
+            no_tx: false,
+        };
+        run_migrations(&pool, &before).await.unwrap();
+
+        for sql in [
+            "INSERT INTO characters (id, first_name, last_name, fields, created_at, updated_at) VALUES ('c1', 'Aldric', '', '{}', 'x', 'x')",
+            "INSERT INTO factions (id, name, type, created_at, updated_at) VALUES ('f1', 'Ordre', 'guild', 'x', 'x')",
+            "INSERT INTO world_links (id, source_kind, source_id, target_kind, target_id, type, label, created_at, updated_at) 
+             VALUES ('l1', 'character', 'c1', 'faction', 'f1', 'memberOf', 'depuis toujours', 'x', 'x')",
+        ] {
+            sqlx::query(sql).execute(&pool).await.unwrap();
+        }
+
+        run_migrations(&pool, &PROJECT_MIGRATOR).await.unwrap();
+        let links = list_links(&pool).await.unwrap();
+        assert_eq!(links.len(), 1);
+        assert_eq!((links[0].id.as_str(), links[0].label.as_str()), ("l1", "depuis toujours"));
+
+        let elves = entry(&pool, Module::People, "Elfes", "fantasyRace").await;
+        create_link(&pool, &link(("character", "c1"), ("people", &elves), "belongsTo")).await.unwrap();
+        assert_eq!(list_links(&pool).await.unwrap().len(), 2);
     }
 
     #[tokio::test]

@@ -17,6 +17,8 @@
       "items.create": "Nouvel objet",
       "species.create": "Nouvelle fiche de faune et flore",
       "factions.create": "Nouvelle faction",
+      "peoples.create": "Nouvelle fiche de peuple, culture ou religion",
+      "magic.create": "Nouvelle fiche de magie",
       "newProject": "Nouveau projet"
     },
     "save": "Enregistrer",
@@ -39,6 +41,7 @@
     "trash": "Corbeille…",
     "nothing": "Rien à annuler ici : placez d'abord le curseur dans un champ.",
     "pasteEmpty": "Rien à coller : le presse-papiers ne contient pas de texte.",
+    "searchProject": "Rechercher dans le projet",
     "search": "Rechercher…",
     "history": "Historique…"
   },
@@ -85,6 +88,8 @@
     "sticky": "Un post-it",
     "item": "Un objet",
     "species": "Un animal ou une plante",
-    "faction": "Une faction"
+    "faction": "Une faction",
+    "people": "Un peuple, une culture ou une religion",
+    "magic": "Une magie ou un pouvoir"
   }
 }

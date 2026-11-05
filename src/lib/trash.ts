@@ -166,14 +166,16 @@ async function refreshAfterRestore(projectId: string, kind: TrashKind) {
   if (world.species.projectId === projectId && ["species", "character", "structureNode"].includes(kind)) {
     tasks.push(world.fetchEntries(projectId, "species"));
   }
-  if (world.faction.projectId === projectId && ["faction", "structureNode"].includes(kind)) {
-    tasks.push(world.fetchEntries(projectId, "faction"));
+  for (const module of ["faction", "people", "magic"] as const) {
+    if (world[module].projectId === projectId && [module, "structureNode"].includes(kind)) {
+      tasks.push(world.fetchEntries(projectId, module));
+    }
   }
 
   const worldLinks = useWorldLinkStore.getState();
   if (
     worldLinks.projectId === projectId &&
-    ["character", "location", "item", "species", "faction", "worldLink", "structureNode"].includes(kind)
+    ["character", "location", "item", "species", "faction", "people", "magic", "worldLink", "structureNode"].includes(kind)
   ) {
     tasks.push(worldLinks.fetchLinks(projectId));
   }

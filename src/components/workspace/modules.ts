@@ -2,8 +2,11 @@ import {
   BookOpen,
   BookOpenText,
   BookText,
+  Clapperboard,
   Columns3,
+  Drama,
   FileText,
+  FileUp,
   Flag,
   GalleryThumbnails,
   History,
@@ -11,15 +14,18 @@ import {
   LayoutGrid,
   List,
   ListTree,
-  Megaphone,
   MapPin,
-  Package,
-  PawPrint,
   MapPinned,
+  Megaphone,
   Network,
   NotebookText,
+  Package,
+  PawPrint,
   PenLine,
+  Play,
   Plus,
+  Replace,
+  Route,
   Search,
   Settings,
   StickyNote,
@@ -29,18 +35,14 @@ import {
   UserRound,
   Users,
   Waypoints,
+  Zap,
   type LucideIcon,
-  Replace,
-  FileUp,
-  Clapperboard,
-  Route,
-  Play,
 } from "lucide-react";
 import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/sections";
 import i18n from "@/i18n";
 import { characterIdOfTab, fullName } from "@/lib/characters";
 import { locationIdOfTab } from "@/lib/locations";
-import { worldEntryOfTab } from "@/lib/world";
+import { worldEntryOfTab, type WorldWorkspaceModuleId } from "@/lib/world";
 import { noteIdOfTab } from "@/lib/notes";
 import { nodeHeading, numberNodes, resolveLevels, structureNodeIdOfTab } from "@/lib/structure";
 import { useCharacterStore } from "@/stores/characterStore";
@@ -72,6 +74,8 @@ export type ModuleId =
   | "items"
   | "species"
   | "factions"
+  | "peoples"
+  | "magic"
   | "structure"
   | "plot"
   | "notes"
@@ -124,6 +128,10 @@ type FeatureId =
   | "species.list"
   | "factions.create"
   | "factions.list"
+  | "peoples.create"
+  | "peoples.list"
+  | "magic.create"
+  | "magic.list"
   | "structure.plan"
   | "structure.read"
   | "plot.board"
@@ -142,7 +150,7 @@ type FeatureId =
   | "script.continuity";
 
 /** Modules qui ont une liste (et donc un message de liste vide). */
-type ListModuleId = "characters" | "locations" | "items" | "species" | "factions" | "notes";
+type ListModuleId = "characters" | "locations" | "items" | "species" | "factions" | "peoples" | "magic" | "notes";
 
 /** Fonctionnalité dont le libellé et la description suivent la langue. */
 function defineFeature(id: FeatureId, icon: LucideIcon): WorkspaceFeature {
@@ -283,11 +291,23 @@ export const FACTIONS_MODULE: WorkspaceModule = defineListModule("factions", Fla
   defineFeature("factions.list", List),
 ]);
 
+export const PEOPLES_MODULE: WorkspaceModule = defineListModule("peoples", Drama, [
+  defineFeature("peoples.create", Plus),
+  defineFeature("peoples.list", List),
+]);
+
+export const MAGIC_MODULE: WorkspaceModule = defineListModule("magic", Zap, [
+  defineFeature("magic.create", Plus),
+  defineFeature("magic.list", List),
+]);
+
 /** Module de la barre de gauche de chaque module du monde. */
 export const WORLD_WORKSPACE_MODULES: Record<WorldModule, WorkspaceModule> = {
   item: ITEMS_MODULE,
   species: SPECIES_MODULE,
   faction: FACTIONS_MODULE,
+  people: PEOPLES_MODULE,
+  magic: MAGIC_MODULE,
 };
 
 /** Modules facultatifs activés pour le projet. */
@@ -302,8 +322,9 @@ export function modulesFor(
   projectType: string | null | undefined,
   world: EnabledWorldModules = {},
 ): WorkspaceModule[] {
-  // Objets, Faune et flore puis Factions, juste après les Lieux, s'ils sont activés.
-  const worldModules = (["item", "species", "faction"] as const)
+  // Objets, Faune et flore, Factions, Peuples puis Magie, juste après les
+  // Lieux, s'ils sont activés.
+  const worldModules = (["item", "species", "faction", "people", "magic"] as const)
     .filter((module) => world[module])
     .map((module) => WORLD_WORKSPACE_MODULES[module]);
   const after = WORKSPACE_MODULES.findIndex((module) => module.id === "locations");
@@ -355,6 +376,8 @@ const ALL_MODULES: WorkspaceModule[] = [
   ITEMS_MODULE,
   SPECIES_MODULE,
   FACTIONS_MODULE,
+  PEOPLES_MODULE,
+  MAGIC_MODULE,
   NOVEL_MODULE,
   MANGA_MODULE,
   SETTINGS_MODULE,
@@ -421,7 +444,7 @@ function worldFeature(tabId: string, module: WorldModule, entryId: string): Work
       return entry?.name || i18n.t("world:tab.fallback");
     },
     get description() {
-      return i18n.t(`modules:features.${WORLD_WORKSPACE_MODULES[module].id as "items" | "species" | "factions"}.list.description`);
+      return i18n.t(`modules:features.${WORLD_WORKSPACE_MODULES[module].id as WorldWorkspaceModuleId}.list.description`);
     },
   };
 }

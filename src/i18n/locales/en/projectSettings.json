@@ -43,6 +43,14 @@
     "factions": {
       "label": "Factions",
       "description": "Optional module: turn it on and choose your categories (politics, army, religion…)."
+    },
+    "peoples": {
+      "label": "Peoples, cultures and religions",
+      "description": "Optional module: turn it on and choose your categories (peoples, cultures, religions)."
+    },
+    "magic": {
+      "label": "Magic and powers",
+      "description": "Optional module: turn it on and choose your categories (systems, schools, techniques)."
     }
   },
   "info": {

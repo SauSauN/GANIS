@@ -22,7 +22,7 @@ export function WorldExtras({
 }) {
   const enabled = useEnabledWorldModules(projectId);
 
-  if (!enabled.item && !enabled.species && !enabled.faction) return null;
+  if (!enabled.item && !enabled.species && !enabled.faction && !enabled.people && !enabled.magic) return null;
 
   return (
     <>

@@ -1,13 +1,13 @@
 {
-  "kinds": ["character", "location", "item", "species", "faction"],
+  "kinds": ["character", "location", "item", "species", "faction", "people", "magic"],
   "types": [
     {"id": "owns", "from": ["character", "faction"], "to": ["item", "species"]},
     {"id": "uses", "from": ["character", "species"], "to": ["item"]},
     {"id": "made", "from": ["character"], "to": ["item"]},
-    {"id": "seeks", "from": ["character", "faction"], "to": ["item", "species"]},
+    {"id": "seeks", "from": ["character", "faction"], "to": ["item", "species", "magic"]},
     {"id": "companion", "from": ["character"], "to": ["species"]},
     {"id": "locatedIn", "from": ["item"], "to": ["location"]},
-    {"id": "livesIn", "from": ["species"], "to": ["location"]},
+    {"id": "livesIn", "from": ["species", "people"], "to": ["location"]},
     {"id": "partOf", "from": ["item"], "to": ["item"]},
     {"id": "madeFrom", "from": ["item"], "to": ["item", "species"]},
     {"id": "eats", "from": ["character", "species"], "to": ["species"]},
@@ -20,8 +20,17 @@
     {"id": "basedIn", "from": ["faction"], "to": ["location"]},
     {"id": "presentIn", "from": ["faction"], "to": ["location"]},
     {"id": "controls", "from": ["faction"], "to": ["location", "item"]},
-    {"id": "protects", "from": ["character", "species", "item", "faction"], "to": ["character", "location", "item", "species", "faction"]},
-    {"id": "related", "from": ["character", "location", "item", "species", "faction"], "to": ["character", "location", "item", "species", "faction"]},
-    {"id": "other", "from": ["character", "location", "item", "species", "faction"], "to": ["character", "location", "item", "species", "faction"]}
+    {"id": "belongsTo", "from": ["character", "faction"], "to": ["people"]},
+    {"id": "practices", "from": ["character", "people", "faction"], "to": ["people"]},
+    {"id": "speaks", "from": ["character", "people"], "to": ["people"]},
+    {"id": "worships", "from": ["character", "people", "faction"], "to": ["people"]},
+    {"id": "masters", "from": ["character", "species", "people", "faction"], "to": ["magic"]},
+    {"id": "teaches", "from": ["character", "faction", "people"], "to": ["magic"]},
+    {"id": "sourceOf", "from": ["location", "item", "species", "people"], "to": ["magic"]},
+    {"id": "grants", "from": ["people", "item"], "to": ["magic"]},
+    {"id": "forbids", "from": ["faction", "people"], "to": ["magic"]},
+    {"id": "protects", "from": ["character", "species", "item", "faction", "people"], "to": ["character", "location", "item", "species", "faction", "people", "magic"]},
+    {"id": "related", "from": ["character", "location", "item", "species", "faction", "people", "magic"], "to": ["character", "location", "item", "species", "faction", "people", "magic"]},
+    {"id": "other", "from": ["character", "location", "item", "species", "faction", "people", "magic"], "to": ["character", "location", "item", "species", "faction", "people", "magic"]}
   ]
 }

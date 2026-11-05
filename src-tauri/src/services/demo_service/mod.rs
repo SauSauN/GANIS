@@ -137,6 +137,14 @@ struct Data {
     #[serde(default)]
     species: Vec<Value>,
     #[serde(default)]
+    factions: Vec<Value>,
+    /// Peuples, cultures et religions.
+    #[serde(default)]
+    peoples: Vec<Value>,
+    /// Systèmes de magie et de pouvoirs.
+    #[serde(default)]
+    magic: Vec<Value>,
+    #[serde(default)]
     relations: Vec<Value>,
     #[serde(default)]
     graph: Vec<Value>,
@@ -228,6 +236,9 @@ struct SynopsisDef {
 struct ListSettingsDef {
     #[serde(default)]
     enabled: Option<bool>,
+    /// Personnages : carte « Pouvoirs » affichée sur les fiches.
+    #[serde(default)]
+    powers_enabled: Option<bool>,
     #[serde(default)]
     categories: Option<Vec<String>>,
     #[serde(default)]
@@ -732,7 +743,7 @@ impl<'a> Builder<'a> {
                 "char" => drop(characters::delete_character(pool, &id).await?),
                 "loc" => drop(locations::delete_location(pool, &id).await?),
                 "item" => drop(world::delete_entry(pool, Module::Item, &id).await?),
-                "species" => drop(world::delete_entry(pool, Module::Species, &id).await?),
+                "species" | "faction" | "people" | "magic" => drop(world::delete_entry(pool, world_module(kind)?, &id).await?),
                 "note" => drop(notes::delete_note(pool, &id).await?),
                 other => return Err(invalid(format!("corbeille : sorte inconnue « {other} »"))),
             }
@@ -753,12 +764,18 @@ impl<'a> Builder<'a> {
             for (list, values) in &s.lists {
                 characters::set_list(pool, list, Some(values)).await?;
             }
+            if let Some(enabled) = s.powers_enabled {
+                characters::set_powers_enabled(pool, enabled).await?;
+            }
             if !s.custom_types.is_empty() || s.enabled.is_some() || s.categories.is_some() {
                 return Err(invalid("personnages : types, activation et catégories ne s'appliquent pas"));
             }
         }
 
         if let Some(s) = &data.location_settings {
+            if s.powers_enabled.is_some() {
+                return Err(invalid("la carte « Pouvoirs » ne concerne que les personnages"));
+            }
             if let Some(level) = &s.detail_level {
                 locations::set_detail_level(pool, level).await?;
             }
@@ -778,7 +795,10 @@ impl<'a> Builder<'a> {
 
         for (name, s) in &data.world {
             let module = world_module(name)?;
-            let kind = if module == Module::Item { "itype" } else { "stype" };
+            if s.powers_enabled.is_some() {
+                return Err(invalid("la carte « Pouvoirs » ne concerne que les personnages"));
+            }
+            let kind = custom_type_kind(module);
             if let Some(enabled) = s.enabled {
                 world::set_enabled(pool, module, enabled).await?;
             }
@@ -866,14 +886,19 @@ impl<'a> Builder<'a> {
         let pool = self.pool;
 
         // Les lieux d'abord ; un champ qui désigne un personnage (souverain…)
-        // est complété une fois les personnages créés.
+        // ou un autre lieu (capitale d'un royaume, créée après lui) est
+        // complété une fois les personnages et tous les lieux créés.
         let mut deferred: Vec<(String, LocationInput, BTreeMap<String, String>)> = Vec::new();
         for value in &data.locations {
             let mut e = entry(value, "lieu")?;
             let mut later = BTreeMap::new();
             if let Some(fields) = e.body.get_mut("fields").and_then(Value::as_object_mut) {
                 let keys: Vec<String> =
-                    fields.iter().filter(|(_, v)| v.as_str().is_some_and(|s| s.starts_with("@char:"))).map(|(k, _)| k.clone()).collect();
+                    fields
+                        .iter()
+                        .filter(|(_, v)| v.as_str().is_some_and(|s| s.starts_with("@char:") || s.starts_with("@loc:")))
+                        .map(|(k, _)| k.clone())
+                        .collect();
                 for k in keys {
                     if let Some(Value::String(v)) = fields.remove(&k) {
                         later.insert(k, v);
@@ -923,7 +948,13 @@ impl<'a> Builder<'a> {
 
     async fn world_entries(&mut self) -> AppResult<()> {
         let data = &self.parsed.data;
-        for (module, list, kind) in [(Module::Item, &data.items, "item"), (Module::Species, &data.species, "species")] {
+        for (module, list, kind) in [
+            (Module::Item, &data.items, "item"),
+            (Module::Species, &data.species, "species"),
+            (Module::Faction, &data.factions, "faction"),
+            (Module::People, &data.peoples, "people"),
+            (Module::Magic, &data.magic, "magic"),
+        ] {
             for value in list {
                 let e = entry(value, kind)?;
                 let input: WorldEntryInput = self.refs.resolve_as(&e.body, &format!("{kind} {}", e.key))?;
@@ -1213,10 +1244,25 @@ impl Builder<'_> {
     }
 }
 
+/// Sorte des références vers les types ajoutés par l'auteur d'un module
+/// (`@itype:…`, `@stype:…`, `@ftype:…`, `@ptype:…`, `@mtype:…`).
+fn custom_type_kind(module: Module) -> &'static str {
+    match module {
+        Module::Item => "itype",
+        Module::Species => "stype",
+        Module::Faction => "ftype",
+        Module::People => "ptype",
+        Module::Magic => "mtype",
+    }
+}
+
 fn world_module(name: &str) -> AppResult<Module> {
     match name {
         "item" => Ok(Module::Item),
         "species" => Ok(Module::Species),
+        "faction" => Ok(Module::Faction),
+        "people" => Ok(Module::People),
+        "magic" => Ok(Module::Magic),
         other => Err(invalid(format!("module inconnu : {other}"))),
     }
 }

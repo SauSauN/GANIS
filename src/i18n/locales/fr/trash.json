@@ -14,6 +14,8 @@
     "item": "Objet",
     "species": "Faune et flore",
     "faction": "Faction",
+    "people": "Peuple, culture ou religion",
+    "magic": "Magie ou pouvoir",
     "worldLink": "Lien entre éléments"
   },
   "deleted": {
@@ -30,6 +32,8 @@
     "item": "Objet « {{name}} » supprimé.",
     "species": "« {{name}} » supprimé de la faune et flore.",
     "faction": "« {{name}} » supprimée des factions.",
+    "people": "« {{name}} » supprimée des peuples, cultures et religions.",
+    "magic": "« {{name}} » supprimée de la magie et des pouvoirs.",
     "worldLink": "Lien « {{name}} » supprimé."
   },
   "restored": {
@@ -46,6 +50,8 @@
     "item": "Objet « {{name}} » restauré.",
     "species": "« {{name}} » restauré dans la faune et flore.",
     "faction": "« {{name}} » restaurée dans les factions.",
+    "people": "« {{name}} » restaurée dans les peuples, cultures et religions.",
+    "magic": "« {{name}} » restaurée dans la magie et les pouvoirs.",
     "worldLink": "Lien « {{name}} » restauré."
   },
   "untitled": {
@@ -62,6 +68,8 @@
     "item": "Objet sans nom",
     "species": "Fiche sans nom",
     "faction": "Faction sans nom",
+    "people": "Fiche sans nom",
+    "magic": "Fiche sans nom",
     "worldLink": "Lien"
   },
   "view": {

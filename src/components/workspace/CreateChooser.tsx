@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { Flag, ListTree, MapPin, NotebookText, Package, PawPrint, StickyNote, UserPlus, type LucideIcon } from "lucide-react";
+import { Drama, Flag, ListTree, MapPin, NotebookText, Package, PawPrint, StickyNote, UserPlus, Zap, type LucideIcon } from "lucide-react";
 import { Dialog, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const CHOICES: Array<{ id: string; feature: string; icon: LucideIcon; key: string }> = [
@@ -15,11 +15,13 @@ const WORLD_CHOICES = {
   item: { id: "item", feature: "items.create", icon: Package, key: "6" },
   species: { id: "species", feature: "species.create", icon: PawPrint, key: "7" },
   faction: { id: "faction", feature: "factions.create", icon: Flag, key: "8" },
+  people: { id: "people", feature: "peoples.create", icon: Drama, key: "9" },
+  magic: { id: "magic", feature: "magic.create", icon: Zap, key: "0" },
 };
 
 interface CreateChooserProps {
   /** Objets, faune et flore, factions activés pour le projet. */
-  world?: { item?: boolean; species?: boolean; faction?: boolean };
+  world?: { item?: boolean; species?: boolean; faction?: boolean; people?: boolean; magic?: boolean };
   open: boolean;
   onClose: () => void;
   onOpenFeature: (featureId: string) => void;
@@ -27,7 +29,7 @@ interface CreateChooserProps {
 
 /**
  * « Que voulez-vous créer ? » : Ctrl+N dans un module sans création propre
- * (Détails, Recherche, paramètres). Touches 1 à 8 pour choisir au clavier.
+ * (Détails, Recherche, paramètres). Touches 1 à 9, puis 0, pour choisir au clavier.
  */
 export function CreateChooser({ world = {}, open, onClose, onOpenFeature }: CreateChooserProps) {
   const choices = [
@@ -35,6 +37,8 @@ export function CreateChooser({ world = {}, open, onClose, onOpenFeature }: Crea
     ...(world.item ? [WORLD_CHOICES.item] : []),
     ...(world.species ? [WORLD_CHOICES.species] : []),
     ...(world.faction ? [WORLD_CHOICES.faction] : []),
+    ...(world.people ? [WORLD_CHOICES.people] : []),
+    ...(world.magic ? [WORLD_CHOICES.magic] : []),
   ];
   const { t } = useTranslation("menus");
   const tt = t as unknown as (key: string) => string;

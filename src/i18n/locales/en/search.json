@@ -17,7 +17,9 @@
     "sticky": "Sticky notes",
     "item": "Objects",
     "species": "Fauna and flora",
-    "faction": "Faction"
+    "faction": "Faction",
+    "people": "People, culture or religion",
+    "magic": "Magic or power"
   },
   "untitled": {
     "character": "Unnamed character",
@@ -30,7 +32,9 @@
     "plotEvent": "Untitled event",
     "item": "Unnamed object",
     "species": "Unnamed entry",
-    "faction": "Untitled faction"
+    "faction": "Untitled faction",
+    "people": "Untitled sheet",
+    "magic": "Untitled sheet"
   },
   "palette": {
     "title": "Command palette",

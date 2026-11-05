@@ -124,7 +124,7 @@
         "title": "Rechercher",
         "text": "Retrouvez n'importe quoi dans le projet : personnages, lieux, découpage, documents, trame, notes et post-it.",
         "points": [
-          "Le module Recherche fouille tout le projet, sans tenir compte des accents ni des majuscules.",
+          "La loupe en haut à droite (ou Ctrl+F) ouvre la recherche dans le panneau du milieu : elle fouille tout le projet, sans tenir compte des accents ni des majuscules.",
           "Ctrl+K ouvre la palette : tapez pour aller à un élément ou lancer une commande.",
           "Un clic sur un résultat l'ouvre dans un onglet."
         ]
@@ -198,6 +198,7 @@
       "guide": "Guide de démarrage",
       "shortcuts": "Raccourcis clavier",
       "palette": "Palette : pages, actions, recherche",
+      "search": "Rechercher dans le projet (loupe)",
       "center": "Aide de GANIS",
       "readStory": "Lire toute l'histoire / quitter la lecture"
     },
@@ -298,7 +299,7 @@
         "title": "L'espace de travail",
         "intro": "Un projet s'ouvre dans l'espace de travail : modules à gauche, panneau au milieu, onglets au centre.",
         "items": [
-          "La barre de gauche donne accès aux modules : Détails, Personnages, Lieux, Découpage, Notes, Recherche, et les paramètres du projet en bas.",
+          "La barre de gauche donne accès aux modules : Détails, Personnages, Lieux, Découpage, Notes, et les paramètres du projet en bas. La loupe, en haut à droite (Ctrl+F), ouvre la recherche.",
           "Le panneau du milieu liste les fonctions du module et ses éléments ; un clic ouvre un onglet. Glissez son bord droit pour l'élargir, ou vers la gauche pour le fermer.",
           "Les onglets se déplacent par glisser-déposer. Clic droit sur un onglet : l'épingler, fermer les autres, ceux à droite…",
           "Un point ● sur un onglet signale des modifications non enregistrées. La barre d'état, en bas, indique toujours si tout est enregistré.",
@@ -370,6 +371,28 @@
           "La carte des liens note ses alliés, ses ennemis, son siège, les lieux où elle est implantée et ce qu'elle contrôle, avec une période du récit si besoin."
         ]
       },
+      "peoples": {
+        "title": "Peuples, cultures et religions",
+        "intro": "L'âme de votre univers : ses peuples et ses races, leurs cultures, leurs langues et leurs croyances.",
+        "items": [
+          "Module facultatif : activez-le dans Paramètres du projet › Peuples, cultures et religions, il apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
+          "Trois catégories : peuples et races, cultures et traditions (dont les langues), religions et croyances (panthéons, divinités, mythologies, prophéties). Le type choisit les champs.",
+          "Une fiche peut en contenir d'autres : un sous-peuple dans son peuple, une branche dans sa religion, une divinité dans son panthéon.",
+          "La carte « Qui en fait partie » regroupe les membres, les pratiquants, les locuteurs et les fidèles ; la carte des liens note aussi où vit un peuple et les pouvoirs qu'il maîtrise.",
+          "Pas de doublon avec les Factions : une religion (ses croyances, ses rites) est ici, l'église ou le culte qui l'organise reste une faction, reliée par « pratique »."
+        ]
+      },
+      "magic": {
+        "title": "Magie et pouvoirs",
+        "intro": "Les règles communes du pouvoir dans votre univers : d'où il vient, ce qu'il coûte, ses limites, ses écoles et ses techniques.",
+        "items": [
+          "Module facultatif : activez-le dans Paramètres du projet › Magie et pouvoirs, il apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
+          "Trois niveaux : le système (magie, énergie intérieure, super-pouvoirs, pouvoir divin, psychisme, alchimie), ses écoles et branches (éléments, lignées), puis ses sorts et techniques.",
+          "Le type choisit les champs : un système a sa source, ses règles, son coût et ses limites ; une technique ses effets, sa puissance, sa portée et ses risques.",
+          "La carte « Qui la maîtrise » regroupe ceux qui la maîtrisent et ceux qui l'enseignent ; la carte des liens note ce qui en est la source et qui l'interdit.",
+          "Pas de doublon : les pouvoirs propres d'un personnage restent sur sa carte « Pouvoirs » ; reliez-le au système par « maîtrise »."
+        ]
+      },
       "structure": {
         "title": "Découpage du récit",
         "intro": "Le plan de votre histoire, adapté au type de projet.",
@@ -421,9 +444,9 @@
         "title": "Recherche",
         "intro": "Retrouvez n'importe quoi dans le projet.",
         "items": [
-          "Le module Recherche cherche dans les personnages, les lieux, le découpage, les notes (contenu compris) et les post-it.",
+          "La loupe en haut à droite, ou Ctrl+F, ouvre la recherche dans le panneau du milieu. Elle cherche dans les personnages, les lieux, le découpage, les notes (contenu compris) et les post-it.",
           "Les accents et les majuscules ne comptent pas : « chateau » trouve « Château ». Plusieurs mots : tous doivent apparaître.",
-          "Ctrl+K fait la même chose depuis n'importe où, et propose aussi les pages et les actions."
+          "Ctrl+K ouvre la palette, qui propose aussi les pages et les actions."
         ]
       },
       "history": {

@@ -31,6 +31,8 @@
     "item": "Objet",
     "species": "Faune et flore",
     "faction": "Faction",
+    "people": "Peuple, culture ou religion",
+    "magic": "Magie ou pouvoir",
     "worldLink": "Lien entre éléments"
   }
 }

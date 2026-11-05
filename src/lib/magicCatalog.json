@@ -1,0 +1,317 @@
+{
+  "statuses": [
+    "active",
+    "rare",
+    "secret",
+    "forbidden",
+    "forgotten",
+    "lost",
+    "legendary",
+    "unknown"
+  ],
+  "defaultStatus": "active",
+  "natures": [],
+  "categories": [
+    "system",
+    "branch",
+    "technique"
+  ],
+  "types": [
+    {
+      "id": "magicSystem",
+      "category": "system"
+    },
+    {
+      "id": "energySystem",
+      "category": "system"
+    },
+    {
+      "id": "superpowers",
+      "category": "system"
+    },
+    {
+      "id": "divinePower",
+      "category": "system"
+    },
+    {
+      "id": "psionics",
+      "category": "system"
+    },
+    {
+      "id": "alchemy",
+      "category": "system"
+    },
+    {
+      "id": "school",
+      "category": "branch"
+    },
+    {
+      "id": "element",
+      "category": "branch"
+    },
+    {
+      "id": "bloodline",
+      "category": "branch"
+    },
+    {
+      "id": "spell",
+      "category": "technique"
+    },
+    {
+      "id": "technique",
+      "category": "technique"
+    },
+    {
+      "id": "ritual",
+      "category": "technique"
+    },
+    {
+      "id": "transformation",
+      "category": "technique"
+    },
+    {
+      "id": "summoning",
+      "category": "technique"
+    },
+    {
+      "id": "forbiddenArt",
+      "category": "technique"
+    }
+  ],
+  "fields": [
+    {
+      "key": "aliases",
+      "kind": "text",
+      "maxLength": 200
+    },
+    {
+      "key": "colorPalette",
+      "kind": "colors",
+      "maxLength": 200
+    },
+    {
+      "key": "description",
+      "kind": "longText",
+      "maxLength": 20000
+    },
+    {
+      "key": "firstAppearance",
+      "kind": "reference",
+      "maxLength": 200
+    },
+    {
+      "key": "manifestation",
+      "kind": "longText",
+      "maxLength": 20000
+    },
+    {
+      "key": "rarity",
+      "kind": "choice",
+      "maxLength": 60,
+      "options": [
+        "common",
+        "uncommon",
+        "rare",
+        "veryRare",
+        "unique"
+      ]
+    },
+    {
+      "key": "origins",
+      "kind": "longText",
+      "maxLength": 20000
+    },
+    {
+      "key": "history",
+      "kind": "longText",
+      "maxLength": 20000
+    },
+    {
+      "key": "notes",
+      "kind": "longText",
+      "maxLength": 20000
+    },
+    {
+      "key": "source",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "system",
+        "branch"
+      ]
+    },
+    {
+      "key": "rules",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "system"
+      ]
+    },
+    {
+      "key": "cost",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "system",
+        "technique"
+      ]
+    },
+    {
+      "key": "limits",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "system",
+        "technique"
+      ]
+    },
+    {
+      "key": "ranks",
+      "kind": "tags",
+      "maxLength": 20000,
+      "categories": [
+        "system",
+        "branch"
+      ]
+    },
+    {
+      "key": "learning",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "system",
+        "branch"
+      ]
+    },
+    {
+      "key": "whoCanUse",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "system",
+        "branch"
+      ]
+    },
+    {
+      "key": "taboos",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "system"
+      ]
+    },
+    {
+      "key": "principles",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "branch"
+      ]
+    },
+    {
+      "key": "affinities",
+      "kind": "text",
+      "maxLength": 1000,
+      "categories": [
+        "branch"
+      ]
+    },
+    {
+      "key": "power",
+      "kind": "choice",
+      "maxLength": 60,
+      "options": [
+        "minor",
+        "moderate",
+        "major",
+        "devastating",
+        "cataclysmic"
+      ],
+      "categories": [
+        "technique"
+      ]
+    },
+    {
+      "key": "effects",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "technique"
+      ]
+    },
+    {
+      "key": "requirements",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "technique"
+      ]
+    },
+    {
+      "key": "activation",
+      "kind": "text",
+      "maxLength": 1000,
+      "categories": [
+        "technique"
+      ]
+    },
+    {
+      "key": "duration",
+      "kind": "text",
+      "maxLength": 1000,
+      "categories": [
+        "technique"
+      ]
+    },
+    {
+      "key": "range",
+      "kind": "text",
+      "maxLength": 1000,
+      "categories": [
+        "technique"
+      ]
+    },
+    {
+      "key": "risks",
+      "kind": "longText",
+      "maxLength": 20000,
+      "categories": [
+        "technique"
+      ]
+    },
+    {
+      "key": "materials",
+      "kind": "longText",
+      "maxLength": 20000,
+      "types": [
+        "alchemy",
+        "ritual"
+      ]
+    },
+    {
+      "key": "inheritance",
+      "kind": "text",
+      "maxLength": 1000,
+      "types": [
+        "bloodline"
+      ]
+    },
+    {
+      "key": "summoned",
+      "kind": "text",
+      "maxLength": 1000,
+      "types": [
+        "summoning"
+      ]
+    },
+    {
+      "key": "forms",
+      "kind": "text",
+      "maxLength": 1000,
+      "types": [
+        "transformation"
+      ]
+    }
+  ]
+}

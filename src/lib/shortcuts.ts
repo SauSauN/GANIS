@@ -40,6 +40,9 @@ export const SHORTCUTS: Shortcut[] = [
     inFields: true,
   },
   { action: "palette", combos: [{ ctrl: true, key: "k" }], inFields: true },
+  // Ctrl+F : la recherche du projet (loupe de la barre de titre), même
+  // depuis un champ ; le moteur web n'ouvre pas sa propre recherche.
+  { action: "search", combos: [{ ctrl: true, key: "f" }], inFields: true },
   { action: "center", combos: [{ key: "f1" }], inFields: true },
   // F5 : « lancer » le projet, comme le bouton ▶ de la barre de titre.
   { action: "readStory", combos: [{ key: "f5" }], inFields: true },

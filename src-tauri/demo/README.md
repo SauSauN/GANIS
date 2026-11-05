@@ -7,7 +7,7 @@ aucun texte d'exemple.
 | Dossier | Projet | Fichiers |
 |---|---|---|
 | `roman/` | *Les Plaques de verre* (roman) | `projet.json`, `manuscrit.md`, `notes.md`, `documents.md` |
-| `manga/` | *Kodama-sen* (manga) | `projet.json`, `scenario.md`, `notes.md`, `documents.md` |
+| `manga/` | *Hanaori — L'Archipel des sept lunes* (manga) | `projet.json`, `scenario.md`, `notes.md`, `documents.md` |
 
 Les fichiers sont intégrés au binaire à la compilation (`include_str!`) : une
 modification est prise en compte au prochain `cargo build`. Pour ajouter un
@@ -42,11 +42,11 @@ Objet JSON, clés en camelCase. Toute clé inconnue est refusée.
 | `project` | `name`, `description`, `type` (`novel`, `manga`…), `status` (statut final du projet) |
 | `card` | Présentation de l'exemple : `pitch`, `highlights` (lignes courtes) |
 | `synopsis` | `text` (clé de la section du synopsis), `genres`, `subgenres`, `tones` |
-| `characterSettings`, `locationSettings` | `detailLevel`, `customTypes` (`key`, `name`, `category`), `lists` |
-| `world` | Par module (`item`, `species`) : `enabled`, `categories`, `detailLevel`, `customTypes`, `lists` |
+| `characterSettings`, `locationSettings` | `detailLevel`, `customTypes` (`key`, `name`, `category`), `lists` ; personnages : `powersEnabled` (carte « Pouvoirs ») |
+| `world` | Par module (`item`, `species`, `faction`, `people`, `magic`) : `enabled`, `categories`, `detailLevel`, `customTypes`, `lists` |
 | `mangaSettings` | Seuils d'alerte : `panelWordsMax`, `pageWordsMax` |
 | `structure` | `levels` (facultatif : niveaux personnalisés), `autoNumbering`, `nodes` (arbre) |
-| `locations`, `characters`, `items`, `species` | Fiches (voir ci-dessous) |
+| `locations`, `characters`, `items`, `species`, `factions`, `peoples`, `magic` | Fiches (voir ci-dessous) |
 | `relations`, `graph` | Relations entre personnages ; positions dans le graphe |
 | `characterLocations`, `worldLinks` | Liens personnage-lieu ; liens entre fiches de l'univers |
 | `nodeLinks` | Personnages et lieux d'un élément du découpage (`node`, `characters`, `locations` : clé → rôle) |
@@ -72,9 +72,10 @@ créé :
 | `@char:clé` | Un personnage |
 | `@loc:clé` | Un lieu |
 | `@item:clé`, `@species:clé` | Un objet, un animal ou une plante |
+| `@faction:clé`, `@people:clé`, `@magic:clé` | Une faction ; un peuple, une culture ou une religion ; une magie ou un pouvoir |
 | `@node:clé` | Un élément du découpage (partie, chapitre, scène, page…) |
 | `@note:clé`, `@folder:clé` | Une note, un dossier de notes |
-| `@ltype:clé`, `@itype:clé`, `@stype:clé` | Un type de lieu, d'objet, d'espèce ajouté par l'auteur |
+| `@ltype:clé`, `@itype:clé`, `@stype:clé`, `@ftype:clé`, `@ptype:clé`, `@mtype:clé` | Un type ajouté par l'auteur (lieu, objet, espèce, faction, peuple, magie) |
 
 Dans `nodeLinks`, les clés de personnages et de lieux s'écrivent sans `@`.
 
@@ -87,8 +88,9 @@ Une fiche reprend les champs du service correspondant, plus :
 - `gallery` (facultatif) : liste de `{ "image": …, "caption": … }` (pas de légende pour les personnages).
 
 Lieux : `name`, `type`, `parentId` (lieu parent, `@loc:…`), `status`, `fields`.
-Personnages : `firstName`, `lastName`, `role`, `status`, `fields`. Objets et
-faune : `name`, `type`, `nature`, `parentId`, `status`, `fields`.
+Personnages : `firstName`, `lastName`, `role`, `status`, `fields`. Objets,
+faune, factions, peuples et magie : `name`, `type`, `nature`, `parentId`,
+`status`, `fields`.
 
 Les champs « étiquettes » et « couleurs » s'écrivent en listes JSON. Un champ
 de lieu qui désigne un personnage (`ruler`…) est rempli une fois les

@@ -1,9 +1,10 @@
 import {
   BookOpenText,
   Clapperboard,
+  Drama,
   FileUp,
-  Flag,
   Filter,
+  Flag,
   FolderTree,
   GalleryThumbnails,
   Image,
@@ -28,6 +29,7 @@ import {
   UserRound,
   Users,
   Waypoints,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 import { create } from "zustand";
@@ -60,6 +62,8 @@ export type TutorialId =
   | "items"
   | "species"
   | "factions"
+  | "peoples"
+  | "magic"
   | "structure"
   | "plot"
   | "notes";
@@ -163,6 +167,26 @@ export const TUTORIALS: Record<TutorialId, Tutorial> = {
       { id: "relations", icon: Link2 },
     ],
   },
+  peoples: {
+    icon: Drama,
+    steps: [
+      { id: "enable", icon: Power, open: "settings:peoples" },
+      { id: "create", icon: Drama, open: "peoples.create" },
+      { id: "branches", icon: FolderTree, open: "peoples.list" },
+      { id: "links", icon: Link2 },
+      { id: "existing", icon: Flag },
+    ],
+  },
+  magic: {
+    icon: Zap,
+    steps: [
+      { id: "enable", icon: Power, open: "settings:magic" },
+      { id: "create", icon: Zap, open: "magic.create" },
+      { id: "branches", icon: FolderTree, open: "magic.list" },
+      { id: "links", icon: Link2 },
+      { id: "existing", icon: UserRound },
+    ],
+  },
   structure: {
     icon: ListTree,
     steps: [
@@ -211,6 +235,8 @@ export function tutorialForModule(moduleId: string): TutorialId | null {
     case "items":
     case "species":
     case "factions":
+    case "peoples":
+    case "magic":
     case "structure":
     case "plot":
     case "notes":

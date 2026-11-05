@@ -21,7 +21,7 @@ import { errorText } from "@/lib/errors";
 import { notifyError } from "@/lib/notify";
 import { locationTabId } from "@/lib/locations";
 import { cn } from "@/lib/utils";
-import { WORLD_LINK_KINDS, canLink, factionMembers, linkChoices, linksOfEntry, orientLink, worldTabId, type LinkView } from "@/lib/world";
+import { WORLD_LINK_KINDS, canLink, isWorldKind, membersOf, type MembersModule, linkChoices, linksOfEntry, orientLink, worldTabId, type LinkView } from "@/lib/world";
 import { useProjectCharacters } from "@/stores/characterStore";
 import { useProjectLocations } from "@/stores/locationStore";
 import { useProjectWorldLinks, useWorldLinkStore } from "@/stores/worldLinkStore";
@@ -40,8 +40,10 @@ function useDirectory(projectId: string) {
   const items = useWorldEntries(projectId, "item");
   const species = useWorldEntries(projectId, "species");
   const factions = useWorldEntries(projectId, "faction");
+  const peoples = useWorldEntries(projectId, "people");
+  const magic = useWorldEntries(projectId, "magic");
 
-  return { characters, locations, locationSettings, items, species, factions };
+  return { characters, locations, locationSettings, items, species, factions, peoples, magic };
 }
 
 type Directory = ReturnType<typeof useDirectory>;
@@ -59,13 +61,22 @@ function nameOf(directory: Directory, kind: WorldLinkKind, id: string): string |
     case "species":
       return directory.species.entries.find((item) => item.id === id)?.name ?? null;
     case "faction":
-      return directory.factions.entries.find((item) => item.id === id)?.name ?? null;
+    case "people":
+    case "magic":
+      return sliceOf(directory, kind).entries.find((item) => item.id === id)?.name ?? null;
   }
 }
 
 /** Fiches d'un module du monde dans l'annuaire. */
 function sliceOf(directory: Directory, module: WorldModule) {
-  return module === "item" ? directory.items : module === "species" ? directory.species : directory.factions;
+  const slices: Record<WorldModule, Directory["items"]> = {
+    item: directory.items,
+    species: directory.species,
+    faction: directory.factions,
+    people: directory.peoples,
+    magic: directory.magic,
+  };
+  return slices[module];
 }
 
 function tabOf(kind: WorldLinkKind, id: string): string {
@@ -225,26 +236,32 @@ export function WorldLinksCard({
 }
 
 /**
- * Membres d'une faction, regroupés par rôle : chefs, fondateurs, membres,
- * soutiens. Ce sont les liens de la carte « Liens », lus autrement ; le rôle
- * précis (capitaine, espion…) est la précision du lien.
+ * Membres d'une fiche, regroupés par rôle : chefs et membres d'une faction ;
+ * membres, pratiquants, locuteurs et fidèles d'un peuple, d'une culture ou
+ * d'une religion ; ceux qui maîtrisent ou enseignent une magie. Ce sont les
+ * liens de la carte « Liens », lus autrement ; le rôle précis (capitaine,
+ * grande prêtresse…) est la précision du lien.
  */
-export function FactionMembersCard({
+export function MembersCard({
   projectId,
-  factionId,
+  module,
+  entryId,
   onOpenFeature,
 }: {
   projectId: string;
-  factionId: string;
+  module: MembersModule;
+  entryId: string;
   onOpenFeature: (featureId: string) => void;
 }) {
-  const { t } = useTranslation("world");
+  const { t: typed } = useTranslation("world");
+  const t = typed as unknown as (key: string, options?: Record<string, unknown>) => string;
   const directory = useDirectory(projectId);
   const { links } = useProjectWorldLinks(projectId);
-  const [open, setOpen] = useCollapsible("ganis.factionMembers.collapsed");
+  // Clé de la faction gardée : l'état replié déjà mémorisé reste valable.
+  const [open, setOpen] = useCollapsible(module === "faction" ? "ganis.factionMembers.collapsed" : `ganis.${module}Members.collapsed`);
   const [adding, setAdding] = useState(false);
 
-  const groups = factionMembers(links, factionId);
+  const groups = membersOf(links, module, entryId);
   // Une personne qui dirige et a fondé la faction compte une fois.
   const count = new Set(groups.flatMap((group) => group.members.map((view) => `${view.otherKind}:${view.otherId}`))).size;
 
@@ -253,8 +270,8 @@ export function FactionMembersCard({
       open={open}
       onOpenChange={setOpen}
       icon={Users}
-      title={t("faction.members.title")}
-      description={t("faction.members.description")}
+      title={t(`${module}.members.title`)}
+      description={t(`${module}.members.description`)}
       count={count}
       contentClassName={`${cardContentClass} space-y-4`}
       actions={
@@ -262,8 +279,8 @@ export function FactionMembersCard({
           type="button"
           size="sm"
           variant="outline"
-          title={t("faction.members.add")}
-          aria-label={t("faction.members.add")}
+          title={t(`${module}.members.add`)}
+          aria-label={t(`${module}.members.add`)}
           onClick={() => {
             setOpen(true);
             setAdding(true);
@@ -271,17 +288,17 @@ export function FactionMembersCard({
         >
           <Plus />
           {/* Libellé seulement en grand : le titre « Membres » garde sa place. */}
-          <span className="hidden 2xl:inline">{t("faction.members.add")}</span>
+          <span className="hidden 2xl:inline">{t(`${module}.members.add`)}</span>
         </Button>
       }
     >
       {groups.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("faction.members.empty")}</p>
+        <p className="text-sm text-muted-foreground">{t(`${module}.members.empty`)}</p>
       ) : (
         groups.map((group) => (
           <section key={group.role} className="space-y-2">
             <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
-              {t(`faction.members.groups.${group.role}`)} ({group.members.length})
+              {t(`${module}.members.groups.${group.role}`)} ({group.members.length})
             </h3>
             <ul className="grid gap-2 sm:grid-cols-2">
               {group.members.map((view) => (
@@ -307,7 +324,7 @@ export function FactionMembersCard({
       {adding && (
         <WorldLinkDialog
           projectId={projectId}
-          self={{ kind: "faction", id: factionId }}
+          self={{ kind: module, id: entryId }}
           link={null}
           directory={directory}
           onClose={() => setAdding(false)}
@@ -362,7 +379,7 @@ function WorldLinkDialog({
   const kinds = WORLD_LINK_KINDS.filter(
     (kind) =>
       canLink(self.kind, kind) &&
-      (kind === "item" || kind === "species" || kind === "faction" ? enabled[kind] || initialView?.otherKind === kind : true),
+      (isWorldKind(kind) ? enabled[kind as WorldModule] || initialView?.otherKind === kind : true),
   );
 
   const [otherKind, setOtherKind] = useState<WorldLinkKind>(initialView?.otherKind ?? kinds[0] ?? "item");

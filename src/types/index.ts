@@ -636,8 +636,12 @@ export interface LocationImage {
 // Objets, faune et flore, factions (voir `world_service.rs`, `lib/world.ts`)
 // ----------------------------------------------------------------------------
 
-/** Module : objets (`item`), faune et flore (`species`) ou factions (`faction`). */
-export type WorldModule = "item" | "species" | "faction";
+/**
+ * Module : objets (`item`), faune et flore (`species`), factions
+ * (`faction`), peuples, cultures et religions (`people`) ou systèmes de
+ * magie et de pouvoirs (`magic`).
+ */
+export type WorldModule = "item" | "species" | "faction" | "people" | "magic";
 
 /** Faune et flore : une espèce entière, ou un animal / une plante précis. */
 export type SpeciesNature = "species" | "individual";
@@ -690,7 +694,7 @@ export interface WorldImage {
 }
 
 /** Sorte d'élément reliée par un lien du monde. */
-export type WorldLinkKind = "character" | "location" | "item" | "species" | "faction";
+export type WorldLinkKind = "character" | "location" | "item" | "species" | "faction" | "people" | "magic";
 
 /** Lien entre deux éléments, dont au moins un objet ou une espèce. */
 export interface WorldLink {
@@ -969,6 +973,8 @@ export type TrashKind =
   | "item"
   | "species"
   | "faction"
+  | "people"
+  | "magic"
   | "worldLink";
 
 export interface TrashItem {
@@ -1001,7 +1007,7 @@ export interface Activity {
 }
 
 /** Éléments qui ont des versions. */
-export type VersionKind = "character" | "location" | "item" | "species" | "faction" | "structureNode" | "note" | "synopsis" | "plot" | "editorial";
+export type VersionKind = "character" | "location" | "item" | "species" | "faction" | "people" | "magic" | "structureNode" | "note" | "synopsis" | "plot" | "editorial";
 
 export interface Version {
   id: string;
@@ -1030,7 +1036,7 @@ export interface WorkCalendar {
 }
 
 /** `document` : l'identifiant est celui de l'élément du découpage qui le contient. */
-export type SearchKind = "character" | "location" | "item" | "species" | "faction" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky";
+export type SearchKind = "character" | "location" | "item" | "species" | "faction" | "people" | "magic" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky";
 
 export interface SearchHit {
   kind: SearchKind;

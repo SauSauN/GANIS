@@ -30,6 +30,7 @@ import {
 } from "@/lib/preferences";
 import { tutorialForModule, tutorialText, useTutorialStore } from "@/lib/tutorials";
 import { cn } from "@/lib/utils";
+import { worldModuleOfWorkspace } from "@/lib/world";
 import { useProjectStore } from "@/stores/projectStore";
 
 interface SideBarProps {
@@ -251,10 +252,10 @@ export function SideBar({
         )}
 
         {/* Objets, faune et flore, factions (modules facultatifs), en arborescence. */}
-        {(module.id === "items" || module.id === "species" || module.id === "factions") && (
+        {worldModuleOfWorkspace(module.id) && (
           <SideBarWorld
             projectId={projectId}
-            module={module.id === "items" ? "item" : module.id === "species" ? "species" : "faction"}
+            module={worldModuleOfWorkspace(module.id)!}
             activeTab={activeTab}
             onOpenFeature={onOpenFeature}
           />
