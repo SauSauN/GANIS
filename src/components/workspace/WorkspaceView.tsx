@@ -45,6 +45,7 @@ import type { Project } from "@/types";
  */
 const NoteEditView = lazy(() => import("@/components/workspace/views/NoteEditView").then((module) => ({ default: module.NoteEditView })));
 const RelationsView = lazy(() => import("@/components/workspace/views/RelationsView").then((module) => ({ default: module.RelationsView })));
+const FamilyTreeView = lazy(() => import("@/components/workspace/views/FamilyTreeView").then((module) => ({ default: module.FamilyTreeView })));
 const StickyWallView = lazy(() => import("@/components/workspace/views/StickyWallView").then((module) => ({ default: module.StickyWallView })));
 const HistoryView = lazy(() => import("@/components/workspace/views/HistoryView").then((module) => ({ default: module.HistoryView })));
 const StructureNodeView = lazy(() => import("@/components/workspace/views/StructureNodeView").then((module) => ({ default: module.StructureNodeView })));
@@ -250,6 +251,10 @@ function WorkspaceContent({
         onOpenFeature={onOpenFeature}
       />
     );
+  }
+
+  if (tabId === "characters.family") {
+    return <FamilyTreeView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
   if (tabId === "characters.relations") {

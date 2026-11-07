@@ -77,6 +77,10 @@
       "relations": {
         "label": "Character relationships",
         "description": "Family ties, friendships, rivalries and alliances."
+      },
+      "family": {
+        "label": "Family tree",
+        "description": "Your characters' families, generation by generation."
       }
     },
     "locations": {

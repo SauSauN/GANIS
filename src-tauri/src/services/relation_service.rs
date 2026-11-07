@@ -34,6 +34,12 @@ pub const TYPES: [&str; 12] = [
 /// Tonalités d'une relation.
 pub const SENTIMENTS: [&str; 3] = ["positive", "neutral", "negative"];
 
+/// Liens familiaux précis d'une relation « family » (arbre généalogique) :
+/// parent (la source est le parent de la cible), couple, frères et sœurs ;
+/// et, sans créer les personnes d'entre eux : grand-parent, oncle ou tante
+/// (la source est l'aînée), cousins.
+pub const FAMILY_LINKS: [&str; 6] = ["parent", "partner", "sibling", "grandparent", "auntUncle", "cousin"];
+
 const MAX_LABEL_CHARS: usize = 100;
 const MAX_DESCRIPTION_CHARS: usize = 5_000;
 
@@ -54,6 +60,8 @@ pub struct Relation {
     pub sentiment: String,
     pub since_node: Option<String>,
     pub until_node: Option<String>,
+    /// Lien familial précis (`FAMILY_LINKS`) ; `None` : non précisé.
+    pub family_link: Option<String>,
     pub created_at: String,
     pub updated_at: String,
 }
@@ -78,6 +86,9 @@ pub struct RelationInput {
     pub since_node: Option<String>,
     #[serde(default)]
     pub until_node: Option<String>,
+    /// Lien familial précis, seulement pour une relation « family ».
+    #[serde(default)]
+    pub family_link: Option<String>,
 }
 
 /// Position d'un personnage dans la disposition libre du graphe.
@@ -105,6 +116,7 @@ struct CleanInput {
     sentiment: &'static str,
     since_node: Option<String>,
     until_node: Option<String>,
+    family_link: Option<&'static str>,
 }
 
 async fn character_exists(pool: &SqlitePool, id: &str) -> AppResult<bool> {
@@ -169,14 +181,40 @@ async fn clean_input(pool: &SqlitePool, input: &RelationInput) -> AppResult<Clea
             .with_param("max", MAX_DESCRIPTION_CHARS));
     }
 
+    // Lien familial : seulement pour une relation « family ». Un parent, un
+    // grand-parent, un oncle ou une tante est toujours la source d'une
+    // relation orientée (de l'aîné vers le cadet) ; un couple, des frères et
+    // sœurs ou des cousins, jamais orientés.
+    let family_link = match input.family_link.as_deref().map(str::trim).filter(|v| !v.is_empty()) {
+        None => None,
+        Some(link) => {
+            if kind != "family" {
+                return Err(AppError::validation("Un lien familial ne se précise que pour une relation de famille.")
+                    .with_key("relation.familyLinkNotFamily"));
+            }
+            Some(
+                FAMILY_LINKS
+                    .into_iter()
+                    .find(|known| *known == link)
+                    .ok_or_else(|| AppError::validation("Lien familial inconnu.").with_key("relation.invalidFamilyLink"))?,
+            )
+        }
+    };
+    let directed = match family_link {
+        Some("parent" | "grandparent" | "auntUncle") => true,
+        Some(_) => false,
+        None => input.directed,
+    };
+
     Ok(CleanInput {
         source_id: input.source_id.clone(),
         target_id: input.target_id.clone(),
         kind,
         label: label.to_owned(),
         description: description.to_owned(),
-        directed: input.directed,
+        directed,
         intensity: input.intensity,
+        family_link,
         sentiment,
         since_node: clean_node(pool, &input.since_node).await?,
         until_node: clean_node(pool, &input.until_node).await?,
@@ -184,7 +222,7 @@ async fn clean_input(pool: &SqlitePool, input: &RelationInput) -> AppResult<Clea
 }
 
 const COLUMNS: &str = "id, source_id, target_id, type, label, description, directed, intensity, \
-                       sentiment, since_node, until_node, created_at, updated_at";
+                       sentiment, since_node, until_node, family_link, created_at, updated_at";
 
 async fn find(pool: &SqlitePool, id: &str) -> AppResult<Relation> {
     let sql = format!("SELECT {COLUMNS} FROM character_relations WHERE id = ?");
@@ -212,8 +250,8 @@ pub async fn create_relation(pool: &SqlitePool, input: &RelationInput) -> AppRes
         r#"
         INSERT INTO character_relations
             (id, source_id, target_id, type, label, description, directed, intensity,
-             sentiment, since_node, until_node, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             sentiment, since_node, until_node, family_link, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         "#,
     )
     .bind(&id)
@@ -227,6 +265,7 @@ pub async fn create_relation(pool: &SqlitePool, input: &RelationInput) -> AppRes
     .bind(clean.sentiment)
     .bind(&clean.since_node)
     .bind(&clean.until_node)
+    .bind(clean.family_link)
     .bind(&now)
     .bind(&now)
     .execute(pool)
@@ -247,7 +286,7 @@ pub async fn update_relation(
         r#"
         UPDATE character_relations
         SET source_id = ?, target_id = ?, type = ?, label = ?, description = ?, directed = ?,
-            intensity = ?, sentiment = ?, since_node = ?, until_node = ?, updated_at = ?
+            intensity = ?, sentiment = ?, since_node = ?, until_node = ?, family_link = ?, updated_at = ?
         WHERE id = ?
         "#,
     )
@@ -261,6 +300,7 @@ pub async fn update_relation(
     .bind(clean.sentiment)
     .bind(&clean.since_node)
     .bind(&clean.until_node)
+    .bind(clean.family_link)
     .bind(now_utc())
     .bind(id)
     .execute(pool)
@@ -388,7 +428,74 @@ mod tests {
             sentiment: "positive".to_owned(),
             since_node: None,
             until_node: None,
+            family_link: None,
         }
+    }
+
+    #[tokio::test]
+    async fn family_links_shape_the_family_tree() {
+        let pool = pool().await;
+        let mother = character(&pool, "Rei").await;
+        let daughter = character(&pool, "Sora").await;
+        let sister = character(&pool, "Yuzu").await;
+
+        // Parent : toujours orienté parent → enfant, même si on oublie de l'orienter.
+        let parent = RelationInput { family_link: Some("parent".to_owned()), ..input(&mother, &daughter) };
+        let saved = create_relation(&pool, &parent).await.unwrap();
+        assert_eq!(saved.family_link.as_deref(), Some("parent"));
+        assert!(saved.directed);
+
+        // Frères et sœurs : jamais orientés.
+        let siblings = RelationInput { family_link: Some("sibling".to_owned()), directed: true, ..input(&daughter, &sister) };
+        let saved = create_relation(&pool, &siblings).await.unwrap();
+        assert!(!saved.directed);
+
+        // Lien inconnu, ou lien familial sur une relation qui n'est pas de famille : refusé.
+        assert!(create_relation(&pool, &RelationInput { family_link: Some("arrièreCousin".to_owned()), ..input(&mother, &sister) }).await.is_err());
+        let friends = RelationInput { kind: "friendship".to_owned(), family_link: Some("partner".to_owned()), ..input(&mother, &sister) };
+        assert!(create_relation(&pool, &friends).await.is_err());
+
+        // Grand-parent et cousins, sans les parents entre eux.
+        let gp = create_relation(&pool, &RelationInput { family_link: Some("grandparent".to_owned()), ..input(&mother, &sister) }).await.unwrap();
+        assert!(gp.directed);
+        let cousins = create_relation(&pool, &RelationInput { family_link: Some("cousin".to_owned()), directed: true, ..input(&daughter, &mother) }).await.unwrap();
+        assert!(!cousins.directed);
+
+        // Sans lien précis : comme avant.
+        let plain = create_relation(&pool, &input(&mother, &sister)).await.unwrap();
+        assert_eq!(plain.family_link, None);
+    }
+
+    #[tokio::test]
+    async fn relations_survive_the_migration_that_extends_family_links() {
+        use sqlx::migrate::Migrator;
+        use std::borrow::Cow;
+
+        let pool = SqlitePoolOptions::new().max_connections(1).connect("sqlite::memory:").await.unwrap();
+        sqlx::query("PRAGMA foreign_keys = ON").execute(&pool).await.unwrap();
+        let before = Migrator {
+            migrations: Cow::Owned(PROJECT_MIGRATOR.migrations.iter().filter(|m| m.version < 31).cloned().collect()),
+            ignore_missing: false,
+            locking: true,
+            no_tx: false,
+        };
+        run_migrations(&pool, &before).await.unwrap();
+        for sql in [
+            "INSERT INTO characters (id, first_name, last_name, fields, created_at, updated_at) VALUES ('a', 'Rei', '', '{}', 'x', 'x')",
+            "INSERT INTO characters (id, first_name, last_name, fields, created_at, updated_at) VALUES ('b', 'Sora', '', '{}', 'x', 'x')",
+            "INSERT INTO character_relations (id, source_id, target_id, type, label, directed, family_link, created_at, updated_at) VALUES ('r1', 'a', 'b', 'family', 'Mère et fille', 1, 'parent', 'x', 'x')",
+        ] {
+            sqlx::query(sql).execute(&pool).await.unwrap();
+        }
+
+        run_migrations(&pool, &PROJECT_MIGRATOR).await.unwrap();
+        let kept = list_relations(&pool).await.unwrap();
+        assert_eq!(kept.len(), 1);
+        assert_eq!((kept[0].label.as_str(), kept[0].family_link.as_deref()), ("Mère et fille", Some("parent")));
+
+        // Les nouveaux liens sont acceptés par la base.
+        let gp = RelationInput { family_link: Some("grandparent".to_owned()), ..input("a", "b") };
+        assert!(create_relation(&pool, &gp).await.is_ok());
     }
 
     #[tokio::test]

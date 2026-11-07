@@ -129,7 +129,12 @@
     "modes": {
       "structure": "Par plan",
       "lane": "Par trame"
-    }
+    },
+    "edit": "Modifier",
+    "editHint": "Modifier l'événement lu : trame, moment, date, statut, personnages…",
+    "editPanel": "Modifier l'événement",
+    "newEvent": "Événement",
+    "newEventHint": "Nouvel événement juste après celui-ci, dans la même trame"
   },
   "issues": {
     "title": "Repères automatiques",

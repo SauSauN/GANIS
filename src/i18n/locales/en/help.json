@@ -325,7 +325,8 @@
           "Relationships: family, friends, rivals… The relationship graph shows everyone at a glance; characters can be moved freely.",
           "Locations: where the character lives, works, grew up — optionally with the part of the story concerned.",
           "Colour palette: its colours frame the character's portrait.",
-          "Powers: for stories where characters have powers, gifts or magic, turn on the “Powers” card in Project settings › Characters. It is added to every sheet, whatever the level of detail."
+          "Powers: for stories where characters have powers, gifts or magic, turn on the “Powers” card in Project settings › Characters. It is added to every sheet, whatever the level of detail.",
+          "Family tree: in Characters › Family tree, “Family” relations whose link is specified (parent, partners, siblings) are arranged generation by generation, including a grandparent, uncle, aunt or cousins linked directly, without creating the people in between. Click a person to open their sheet."
         ]
       },
       "locations": {

@@ -325,7 +325,8 @@
           "Relations : liens familiaux, amicaux, rivalités… Le graphe des relations montre tout le monde d'un coup d'œil ; les personnages s'y déplacent librement.",
           "Lieux : où le personnage vit, travaille, a grandi — avec, si vous le souhaitez, la période du récit concernée.",
           "Palette de couleurs : ses couleurs encadrent le portrait du personnage.",
-          "Pouvoirs : pour les histoires où les personnages ont des pouvoirs, des dons ou de la magie, activez la carte « Pouvoirs » dans Paramètres du projet › Personnages. Elle s'ajoute à toutes les fiches, quel que soit le niveau de détail."
+          "Pouvoirs : pour les histoires où les personnages ont des pouvoirs, des dons ou de la magie, activez la carte « Pouvoirs » dans Paramètres du projet › Personnages. Elle s'ajoute à toutes les fiches, quel que soit le niveau de détail.",
+          "Arbre généalogique : dans Personnages › Arbre généalogique, les relations « Famille » dont le lien est précisé (parent, couple, frères et sœurs) se rangent génération par génération, y compris un grand-parent, un oncle, une tante ou des cousins reliés directement, sans créer les personnes d'entre eux. Un clic sur une personne ouvre sa fiche."
         ]
       },
       "locations": {

@@ -8,6 +8,7 @@ import {
   FileText,
   FileUp,
   Flag,
+  GitFork,
   GalleryThumbnails,
   History,
   Info,
@@ -120,6 +121,7 @@ type FeatureId =
   | "characters.create"
   | "characters.list"
   | "characters.relations"
+  | "characters.family"
   | "locations.create"
   | "locations.list"
   | "items.create"
@@ -210,6 +212,7 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
     defineFeature("characters.create", UserPlus),
     defineFeature("characters.list", List),
     defineFeature("characters.relations", Network),
+    defineFeature("characters.family", GitFork),
   ]),
   defineListModule("locations", MapPin, [
     defineFeature("locations.create", Plus),

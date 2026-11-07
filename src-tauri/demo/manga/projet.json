@@ -2346,39 +2346,43 @@
    "description": "Sora l'élève depuis le départ de leur mère.",
    "directed": false,
    "intensity": 5,
-   "sentiment": "positive"
+   "sentiment": "positive",
+   "familyLink": "sibling"
   },
   {
-   "sourceId": "@char:sora",
-   "targetId": "@char:haruo",
+   "sourceId": "@char:haruo",
+   "targetId": "@char:sora",
    "type": "family",
    "label": "Petite-fille",
    "description": "Il lui a appris à dessiner les marées.",
-   "directed": false,
+   "directed": true,
    "intensity": 5,
    "sentiment": "positive",
-   "untilNode": "@node:c1p03"
+   "untilNode": "@node:c1p03",
+   "familyLink": "grandparent"
   },
   {
-   "sourceId": "@char:sora",
-   "targetId": "@char:rei",
+   "sourceId": "@char:rei",
+   "targetId": "@char:sora",
    "type": "family",
    "label": "Mère et fille",
    "description": "Huit ans de silence.",
-   "directed": false,
+   "directed": true,
    "intensity": 4,
    "sentiment": "negative",
-   "sinceNode": "@node:c6p04"
+   "sinceNode": "@node:c6p04",
+   "familyLink": "parent"
   },
   {
-   "sourceId": "@char:yuzu",
-   "targetId": "@char:rei",
+   "sourceId": "@char:rei",
+   "targetId": "@char:yuzu",
    "type": "family",
    "label": "Mère et fille",
    "description": "Yuzu ne se souvient pas d'elle.",
-   "directed": false,
+   "directed": true,
    "intensity": 3,
-   "sentiment": "neutral"
+   "sentiment": "neutral",
+   "familyLink": "parent"
   },
   {
    "sourceId": "@char:haruo",
@@ -2386,9 +2390,10 @@
    "type": "family",
    "label": "Père et fille",
    "description": "Il savait où elle était partie.",
-   "directed": false,
+   "directed": true,
    "intensity": 4,
-   "sentiment": "positive"
+   "sentiment": "positive",
+   "familyLink": "parent"
   },
   {
    "sourceId": "@char:kaede",
@@ -2446,15 +2451,16 @@
    "sinceNode": "@node:c4p06"
   },
   {
-   "sourceId": "@char:jin",
-   "targetId": "@char:masaru",
+   "sourceId": "@char:masaru",
+   "targetId": "@char:jin",
    "type": "family",
    "label": "Père et fils",
    "description": "Jin découvre la trahison de son père.",
-   "directed": false,
+   "directed": true,
    "intensity": 5,
    "sentiment": "negative",
-   "sinceNode": "@node:c4p05"
+   "sinceNode": "@node:c4p05",
+   "familyLink": "parent"
   },
   {
    "sourceId": "@char:kiyoshi",
@@ -2474,7 +2480,8 @@
    "description": "Elle tient la barre, il tient les discours.",
    "directed": false,
    "intensity": 5,
-   "sentiment": "positive"
+   "sentiment": "positive",
+   "familyLink": "sibling"
   },
   {
    "sourceId": "@char:daisuke",
@@ -2498,14 +2505,15 @@
    "sentiment": "positive"
   },
   {
-   "sourceId": "@char:mika",
-   "targetId": "@char:tamaki",
+   "sourceId": "@char:tamaki",
+   "targetId": "@char:mika",
    "type": "family",
    "label": "Petite-fille",
    "description": "",
-   "directed": false,
+   "directed": true,
    "intensity": 4,
-   "sentiment": "positive"
+   "sentiment": "positive",
+   "familyLink": "grandparent"
   },
   {
    "sourceId": "@char:mika",

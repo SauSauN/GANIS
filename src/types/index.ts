@@ -754,9 +754,17 @@ export interface Relation {
   sinceNode: string | null;
   /** Élément du découpage où elle finit (`null` : jusqu'à la fin). */
   untilNode: string | null;
+  /**
+   * Relation « family » : lien précis pour l'arbre généalogique
+   * (`parent` : la source est le parent de la cible). `null` : non précisé.
+   */
+  familyLink: FamilyLink | null;
   createdAt: string;
   updatedAt: string;
 }
+
+/** Lien familial précis (voir `relation_service::FAMILY_LINKS`). */
+export type FamilyLink = "parent" | "partner" | "sibling" | "grandparent" | "auntUncle" | "cousin";
 
 export type RelationInput = Omit<Relation, "id" | "createdAt" | "updatedAt">;
 

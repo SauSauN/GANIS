@@ -129,7 +129,12 @@
     "modes": {
       "structure": "By outline",
       "lane": "By storyline"
-    }
+    },
+    "edit": "Edit",
+    "editHint": "Edit the event you are reading: plotline, moment, date, status, characters…",
+    "editPanel": "Edit the event",
+    "newEvent": "Event",
+    "newEventHint": "New event right after this one, in the same plotline"
   },
   "issues": {
     "title": "Automatic checks",

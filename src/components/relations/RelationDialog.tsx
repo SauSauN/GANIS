@@ -125,6 +125,7 @@ export function RelationDialog({
   const panelRef = useRef<HTMLDivElement>(null);
   const relationColors = useRelationColors();
 
+  const { characters: cast } = useProjectCharacters(projectId);
   const [draft, setDraft] = useState<RelationInput>(emptyRelation());
   const [showDetails, setShowDetails] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -158,6 +159,12 @@ export function RelationDialog({
   }, [open, busy, onClose]);
 
   if (!open) return null;
+
+  /** Nom d'un personnage, pour les choix du lien familial. */
+  const nameOf = (id: string) => {
+    const found = cast.find((c) => c.id === id);
+    return found ? fullName(found) : t("family.someone");
+  };
 
   const set = <K extends keyof RelationInput>(key: K, value: RelationInput[K]) =>
     setDraft((current) => ({ ...current, [key]: value }));
@@ -317,10 +324,56 @@ export function RelationDialog({
               <RelationTypeSelect
                 id="relation-type"
                 value={draft.type}
-                onChange={(type) => set("type", type)}
+                onChange={(type) => setDraft((current) => ({ ...current, type, familyLink: type === "family" ? current.familyLink : null }))}
                 disabled={busy}
               />
             </div>
+
+            {/* Famille : lien précis, pour l'arbre généalogique. « Enfant de »
+                inverse les deux personnages : le parent est toujours la source. */}
+            {draft.type === "family" && (
+              <div className="space-y-1.5">
+                <Label htmlFor="relation-family" className="text-sm font-semibold">
+                  {t("family.label")}
+                </Label>
+                <select
+                  id="relation-family"
+                  value={draft.familyLink ?? ""}
+                  disabled={busy}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    // « Enfant de », « petit-enfant de », « neveu de » : on inverse
+                    // les deux personnages, l'aîné est toujours la source.
+                    const reversed: Record<string, RelationInput["familyLink"]> = { child: "parent", grandchild: "grandparent", nephew: "auntUncle" };
+                    const oriented = ["parent", "grandparent", "auntUncle"];
+                    setDraft((current) =>
+                      reversed[value]
+                        ? { ...current, sourceId: current.targetId, targetId: current.sourceId, familyLink: reversed[value], directed: true }
+                        : {
+                            ...current,
+                            familyLink: (value || null) as RelationInput["familyLink"],
+                            directed: oriented.includes(value) ? true : value ? false : current.directed,
+                          },
+                    );
+                  }}
+                  className={cn(fieldClass, "h-9")}
+                >
+                  <option value="">{t("family.none")}</option>
+                  <option value="parent">{t("family.parent", { source: nameOf(draft.sourceId), target: nameOf(draft.targetId) })}</option>
+                  <option value="child">{t("family.child", { source: nameOf(draft.sourceId), target: nameOf(draft.targetId) })}</option>
+                  <option value="partner">{t("family.partner")}</option>
+                  <option value="sibling">{t("family.sibling")}</option>
+                  <optgroup label={t("family.direct")}>
+                    <option value="grandparent">{t("family.grandparent", { source: nameOf(draft.sourceId), target: nameOf(draft.targetId) })}</option>
+                    <option value="grandchild">{t("family.grandchild", { source: nameOf(draft.sourceId), target: nameOf(draft.targetId) })}</option>
+                    <option value="auntUncle">{t("family.auntUncle", { source: nameOf(draft.sourceId), target: nameOf(draft.targetId) })}</option>
+                    <option value="nephew">{t("family.nephew", { source: nameOf(draft.sourceId), target: nameOf(draft.targetId) })}</option>
+                    <option value="cousin">{t("family.cousin")}</option>
+                  </optgroup>
+                </select>
+                <p className="text-xs text-muted-foreground">{t("family.hint")}</p>
+              </div>
+            )}
 
             {/* Nom */}
             <div className="space-y-1.5">

@@ -28,6 +28,7 @@ const relation = (id: string, sourceId: string, targetId: string, extra: Partial
   sentiment: "neutral",
   sinceNode: null,
   untilNode: null,
+  familyLink: null,
   createdAt: "2026-10-10T00:00:00Z",
   updatedAt: "2026-10-10T00:00:00Z",
   ...extra,

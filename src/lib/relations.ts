@@ -66,6 +66,7 @@ export function emptyRelation(sourceId = "", targetId = ""): RelationInput {
     sentiment: "neutral",
     sinceNode: null,
     untilNode: null,
+    familyLink: null,
   };
 }
 

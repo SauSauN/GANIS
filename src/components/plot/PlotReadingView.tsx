@@ -13,10 +13,12 @@ import {
   Loader2,
   MapPin,
   NotebookPen,
+  Pencil,
   PanelLeftClose,
   PanelLeftOpen,
   PenLine,
   Repeat2,
+  Plus,
   Rows3,
   StepForward,
   Users,
@@ -44,12 +46,15 @@ import {
   type PlotData,
   type PlotEvent,
   type TourMode,
+  EMPTY_FILTER,
 } from "@/lib/plot";
 import { ancestorsOf, structureNodeTabId } from "@/lib/structure";
 import { cn } from "@/lib/utils";
 import { useProjectLocations } from "@/stores/locationStore";
 import { useNoteStore } from "@/stores/noteStore";
 import { usePlotStore, useProjectPlot } from "@/stores/plotStore";
+import { PlotPanel } from "@/components/plot/PlotPanel";
+import { addEventSmart } from "@/components/plot/actions";
 import { useProjectRelations } from "@/stores/relationStore";
 import { useStructureStore } from "@/stores/structureStore";
 import type { StructureNode } from "@/types";
@@ -57,6 +62,7 @@ import { toast } from "@/stores/toastStore";
 
 const TOC_KEY = "ganis.plot.reading.toc";
 const MODE_KEY = "ganis.plot.reading.mode";
+const EDIT_KEY = "ganis.plot.reading.edit";
 
 interface PlotReadingViewProps {
   projectId: string;
@@ -93,6 +99,16 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
   const links = usePlotLinks(projectId);
   const focusRequest = usePlotStore((s) => s.focusRequest);
   const requestFocus = usePlotStore((s) => s.requestFocus);
+  const select = usePlotStore((s) => s.select);
+  const selection = usePlotStore((s) => s.selection);
+  // Panneau de modification à droite : le même que sur le plateau.
+  const [editing, setEditing] = useState(() => {
+    try {
+      return localStorage.getItem(EDIT_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
 
   // Deux lectures : par plan (ordre du plateau, moment par moment) ou
   // par trame (une seule trame du début à la fin).
@@ -135,6 +151,21 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
     list.findIndex((e) => e.id === currentId),
   );
   const current = list[index];
+
+  // Le panneau montre l'événement qu'on lit.
+  useEffect(() => {
+    if (editing && current && !(selection?.type === "event" && selection.id === current.id)) select({ type: "event", id: current.id });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editing, current?.id]);
+
+  // Déplacé dans une autre trame (lecture par trame) : la lecture le suit.
+  const edited = editing && selection?.type === "event" ? data?.events.find((e) => e.id === selection.id) : undefined;
+  useEffect(() => {
+    if (!edited) return;
+    if (mode === "lane" && edited.laneId !== effectiveLane) setLaneId(edited.laneId);
+    if (currentId !== edited.id) setCurrentId(edited.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [edited?.id, edited?.laneId]);
 
   const go = useCallback(
     (id: string) => {
@@ -323,6 +354,38 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
               {t("reading.showOnBoard")}
             </Button>
           )}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              // Juste après l'événement lu, dans sa trame (comme sur le plateau).
+              if (current) select({ type: "event", id: current.id });
+              const id = addEventSmart(projectId);
+              if (!id) return;
+              setCurrentId(id);
+              setEditing(true);
+              setPref(EDIT_KEY, "1");
+            }}
+            title={t("reading.newEventHint")}
+          >
+            <Plus />
+            {t("reading.newEvent")}
+          </Button>
+          {current && (
+            <Button
+              variant={editing ? "secondary" : "outline"}
+              size="sm"
+              aria-pressed={editing}
+              onClick={() => {
+                setEditing(!editing);
+                setPref(EDIT_KEY, editing ? "0" : "1");
+              }}
+              title={t("reading.editHint")}
+            >
+              <Pencil />
+              {t("reading.edit")}
+            </Button>
+          )}
         </div>
       </div>
 
@@ -384,6 +447,22 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
             )
           )}
         </div>
+
+        {/* Modifier l'événement lu : trame, moment, date, statut, personnages… */}
+        {editing && current && selection?.type === "event" && (
+          <aside className="w-[320px] shrink-0 overflow-y-auto border-l bg-card/40" aria-label={t("reading.editPanel")}>
+            <PlotPanel
+              projectId={projectId}
+              data={data}
+              links={links}
+              onOpenFeature={onOpenFeature}
+              onStartTour={() => onOpenFeature("plot.board")}
+              filter={EMPTY_FILTER}
+              onFilter={() => {}}
+              placementOpen
+            />
+          </aside>
+        )}
       </div>
     </main>
   );

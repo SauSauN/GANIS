@@ -77,6 +77,10 @@
       "relations": {
         "label": "Relations entre personnages",
         "description": "Liens familiaux, amicaux, rivalités et alliances."
+      },
+      "family": {
+        "label": "Arbre généalogique",
+        "description": "Les familles de vos personnages, génération par génération."
       }
     },
     "locations": {
