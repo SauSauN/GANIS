@@ -46,6 +46,7 @@
         "text": "Every project starts with its sheet: synopsis, genres, tone and general information about the story.",
         "points": [
           "Details › Project synopsis to write the summary.",
+          "Details › Glossary to define the words of your world and link them to sheets.",
           "Name, description and type are edited in the project settings.",
           "The status (preparing, in progress, paused, done) helps track progress."
         ]
@@ -312,6 +313,7 @@
         "items": [
           "Project home: description, type, status and synopsis preview.",
           "Synopsis: the story summary, with its genres, subgenres and tone.",
+          "Glossary: the words of your story (invented terms, places, concepts, titles…), in alphabetical order, with their definition, a category and links to sheets.",
           "History: everything created, edited, deleted or restored in the project, day by day.",
           "Trash: items deleted less than 30 days ago, ready to restore."
         ]

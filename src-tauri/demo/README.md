@@ -50,6 +50,7 @@ Objet JSON, clés en camelCase. Toute clé inconnue est refusée.
 | `relations`, `graph` | Relations entre personnages ; positions dans le graphe |
 | `characterLocations`, `worldLinks` | Liens personnage-lieu ; liens entre fiches de l'univers |
 | `nodeLinks` | Personnages et lieux d'un élément du découpage (`node`, `characters`, `locations` : clé → rôle) |
+| `glossary` | Termes du glossaire : `term`, `definition`, `category`, `links` (`kind` : `character`, `location`, `item`, `species`, `faction`, `people`, `magic` ; `id` : référence `@sorte:clé`) |
 | `manuscript` | Roman : `goal` (mots du manuscrit), `dailyGoal` |
 | `editorial` | Roman : `pitch`, `summaryShort`, `summaryLong` (clés de sections) |
 | `documents` | Documents rangés dans le découpage (voir ci-dessous) |

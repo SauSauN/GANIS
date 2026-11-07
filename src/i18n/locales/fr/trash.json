@@ -16,7 +16,8 @@
     "faction": "Faction",
     "people": "Peuple, culture ou religion",
     "magic": "Magie ou pouvoir",
-    "worldLink": "Lien entre éléments"
+    "worldLink": "Lien entre éléments",
+    "glossaryTerm": "Terme du glossaire"
   },
   "deleted": {
     "character": "Personnage « {{name}} » supprimé.",
@@ -34,7 +35,8 @@
     "faction": "« {{name}} » supprimée des factions.",
     "people": "« {{name}} » supprimée des peuples, cultures et religions.",
     "magic": "« {{name}} » supprimée de la magie et des pouvoirs.",
-    "worldLink": "Lien « {{name}} » supprimé."
+    "worldLink": "Lien « {{name}} » supprimé.",
+    "glossaryTerm": "Terme « {{name}} » supprimé du glossaire."
   },
   "restored": {
     "character": "Personnage « {{name}} » restauré.",
@@ -52,7 +54,8 @@
     "faction": "« {{name}} » restaurée dans les factions.",
     "people": "« {{name}} » restaurée dans les peuples, cultures et religions.",
     "magic": "« {{name}} » restaurée dans la magie et les pouvoirs.",
-    "worldLink": "Lien « {{name}} » restauré."
+    "worldLink": "Lien « {{name}} » restauré.",
+    "glossaryTerm": "Terme « {{name}} » restauré dans le glossaire."
   },
   "untitled": {
     "character": "Personnage sans nom",
@@ -70,7 +73,8 @@
     "faction": "Faction sans nom",
     "people": "Fiche sans nom",
     "magic": "Fiche sans nom",
-    "worldLink": "Lien"
+    "worldLink": "Lien",
+    "glossaryTerm": "Terme sans nom"
   },
   "view": {
     "description": "Les éléments supprimés restent ici 30 jours. En les restaurant, tout ce qui avait disparu avec eux revient aussi (images, relations, sous-éléments…).",

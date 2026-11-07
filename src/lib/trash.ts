@@ -12,6 +12,7 @@ import { useWorldLinkStore } from "@/stores/worldLinkStore";
 import { useWorldStore } from "@/stores/worldStore";
 import { fullName } from "@/lib/characters";
 import { useDocumentStore } from "@/lib/documents";
+import { useGlossaryStore } from "@/stores/glossaryStore";
 import { notifyMangaScriptChanged } from "@/lib/mangaEvents";
 import type { CharacterLocation, Relation, TrashKind, WorldLink, WorldLinkKind } from "@/types";
 import { errorText } from "@/lib/errors";
@@ -188,6 +189,9 @@ async function refreshAfterRestore(projectId: string, kind: TrashKind) {
     if (kind === "note" || kind === "noteFolder") tasks.push(notes.fetchNotes(projectId));
     if (kind === "sticky") tasks.push(notes.fetchStickies(projectId));
   }
+
+  const glossary = useGlossaryStore.getState();
+  if (glossary.projectId === projectId && kind === "glossaryTerm") tasks.push(glossary.fetchTerms(projectId));
 
   // Scénario de manga : les pages ouvertes et les vues du scénario se relisent.
   if (kind === "mangaPanel" || kind === "structureNode" || kind === "character" || kind === "location") notifyMangaScriptChanged(projectId);

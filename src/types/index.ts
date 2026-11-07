@@ -983,7 +983,8 @@ export type TrashKind =
   | "faction"
   | "people"
   | "magic"
-  | "worldLink";
+  | "worldLink"
+  | "glossaryTerm";
 
 export interface TrashItem {
   id: string;
@@ -1114,4 +1115,34 @@ export interface ExternalSync {
   status: ExternalStatus;
   /** Document mis à jour : ses modifications viennent d'être reprises. */
   document: StructureDocument | null;
+}
+
+// ----------------------------------------------------------------------------
+// Glossaire (voir `glossary_service.rs`)
+// ----------------------------------------------------------------------------
+
+/** Sortes de fiches qu'un terme du glossaire peut citer. */
+export type GlossaryLinkKind = "character" | "location" | WorldModule;
+
+export interface GlossaryLink {
+  kind: GlossaryLinkKind;
+  id: string;
+}
+
+export interface GlossaryTerm {
+  id: string;
+  term: string;
+  definition: string;
+  /** Catégorie libre ; vide si aucune. */
+  category: string;
+  links: GlossaryLink[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GlossaryInput {
+  term: string;
+  definition: string;
+  category: string;
+  links: GlossaryLink[];
 }

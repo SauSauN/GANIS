@@ -221,6 +221,16 @@
     "invalidGeometry": "Position ou taille du post-it invalide.",
     "folderCycle": "Un dossier ne peut pas être déplacé dans l'un de ses sous-dossiers."
   },
+  "glossary": {
+    "notFound": "Ce terme n'existe plus.",
+    "termEmpty": "Le terme ne peut pas être vide.",
+    "termTooLong": "Le terme ne doit pas dépasser {{max}} caractères.",
+    "categoryTooLong": "La catégorie ne doit pas dépasser {{max}} caractères.",
+    "definitionTooLong": "La définition ne doit pas dépasser {{max}} caractères.",
+    "tooManyLinks": "Un terme peut citer {{max}} fiches au plus.",
+    "invalidLink": "Sorte de fiche inconnue.",
+    "linkNotFound": "Une des fiches liées n'existe plus."
+  },
   "trash": {
     "notFound": "Cet élément n'est plus dans la corbeille.",
     "unreadable": "Cet élément de la corbeille est illisible.",
@@ -337,7 +347,8 @@
     "search": "La recherche a échoué.",
     "manuscript": "Impossible d'assembler le manuscrit.",
     "world": "Impossible de charger les objets ou la faune et flore.",
-    "worldLinks": "Impossible de charger les liens entre éléments."
+    "worldLinks": "Impossible de charger les liens entre éléments.",
+    "glossary": "Impossible de charger le glossaire."
   },
   "novel": {
     "contentTooLong": "Ce texte est trop long ({{max}} caractères au maximum).",

@@ -44,6 +44,7 @@ use crate::models::project::{Project, ProjectStatus, ProjectType};
 use crate::services::character_location_service::{self as character_places, CharacterLocationInput};
 use crate::services::character_service::{self as characters, CharacterInput};
 use crate::services::document_service as documents;
+use crate::services::glossary_service::{self as glossary, GlossaryInput};
 use crate::services::history_service as history;
 use crate::services::location_service::{self as locations, CustomTypeInput, LocationInput};
 use crate::services::manga_service::{self as manga, ChapterFields, MangaSettings, PageScriptInput, PanelCharacter, PanelInput, TextInput};
@@ -154,6 +155,9 @@ struct Data {
     world_links: Vec<Value>,
     #[serde(default)]
     node_links: Vec<NodeLinksDef>,
+    /// Termes du glossaire (`term`, `definition`, `category`, `links`).
+    #[serde(default)]
+    glossary: Vec<Value>,
     #[serde(default)]
     manuscript: Option<ManuscriptDef>,
     #[serde(default)]
@@ -694,6 +698,7 @@ impl<'a> Builder<'a> {
         self.places_and_people().await?;
         self.world_entries().await?;
         self.links().await?;
+        self.glossary().await?;
         self.texts().await?;
         self.manuscript().await?;
         self.documents().await?;
@@ -1007,6 +1012,16 @@ impl<'a> Builder<'a> {
             for (location, role) in &def.locations {
                 node_links::link_location(pool, &node, &self.refs.id("loc", location)?, role).await?;
             }
+        }
+        Ok(())
+    }
+
+    // -------------------------------------------------------------- Glossaire
+
+    async fn glossary(&mut self) -> AppResult<()> {
+        for value in &self.parsed.data.glossary {
+            let input: GlossaryInput = self.refs.resolve_as(value, "terme du glossaire")?;
+            glossary::create(self.pool, &input).await?;
         }
         Ok(())
     }

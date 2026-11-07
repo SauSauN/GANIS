@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  BookA,
   Drama,
   Flag,
   Folder,
@@ -53,6 +54,7 @@ const KIND_ICONS: Record<TrashKind, LucideIcon> = {
   magic: Zap,
   worldLink: Link2,
   mangaPanel: LayoutPanelTop,
+  glossaryTerm: BookA,
 };
 
 interface TrashViewProps {
@@ -108,7 +110,7 @@ export function TrashView({ projectId, feature }: TrashViewProps) {
   return (
     <PageShell
       title={feature.label}
-      description={t("view.description")}
+      info={t("view.description")}
       actions={
         items.length > 0 ? (
           <Button variant="destructive" onClick={() => setConfirmEmpty(true)}>

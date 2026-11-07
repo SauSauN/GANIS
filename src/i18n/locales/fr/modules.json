@@ -65,6 +65,12 @@
         "description": "Résumé, genres, ton et informations générales de votre histoire."
       }
     },
+    "glossary": {
+      "list": {
+        "label": "Glossaire",
+        "description": "Les termes propres à votre histoire : mots inventés, lieux, concepts, titres…"
+      }
+    },
     "characters": {
       "create": {
         "label": "Créer un personnage",

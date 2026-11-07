@@ -3577,6 +3577,150 @@
    }
   }
  ],
+ "glossary": [
+  {
+   "term": "Lunéa",
+   "category": "Magie",
+   "definition": "La force que chaque lune donne aux marées et à ceux qui naissent sous elle. Se dit aussi de la personne qui la porte : « une lunéa d'argent ».",
+   "links": [
+    {
+     "kind": "magic",
+     "id": "@magic:lunea"
+    }
+   ]
+  },
+  {
+   "term": "Sans-lune",
+   "category": "Peuple",
+   "definition": "Personne née sans Lunéa : une sur vingt. Les sans-lune n'ont ni droit de vote ni droit de propriété, et le temple leur est fermé.",
+   "links": [
+    {
+     "kind": "people",
+     "id": "@people:sans-lune"
+    },
+    {
+     "kind": "character",
+     "id": "@char:sora"
+    },
+    {
+     "kind": "faction",
+     "id": "@faction:mouvement"
+    }
+   ]
+  },
+  {
+   "term": "Conjonction",
+   "category": "Événement",
+   "definition": "Nuit où les sept lunes s'alignent au-dessus de l'archipel. La prophétie gardée aux Archives englouties annonce ce qu'il adviendra de « l'enfant du sang ».",
+   "links": [
+    {
+     "kind": "people",
+     "id": "@people:prophetie"
+    },
+    {
+     "kind": "magic",
+     "id": "@magic:rite"
+    }
+   ]
+  },
+  {
+   "term": "Septième lune",
+   "category": "Concept",
+   "definition": "Lune disparue du ciel d'Hanaori. Sa Lunéa ne se transmet que par le sang, à une seule enfant par siècle.",
+   "links": [
+    {
+     "kind": "magic",
+     "id": "@magic:septieme"
+    },
+    {
+     "kind": "item",
+     "id": "@item:larme"
+    }
+   ]
+  },
+  {
+   "term": "Ressac",
+   "category": "Titre",
+   "definition": "Premier des quatre rangs de la Lunéa : on sent la marée, sans encore la plier. Viennent ensuite Courant, Houle et Raz.",
+   "links": [
+    {
+     "kind": "magic",
+     "id": "@magic:lunea"
+    }
+   ]
+  },
+  {
+   "term": "Raz",
+   "category": "Titre",
+   "definition": "Rang le plus haut de la Lunéa : une seule personne par génération sait soulever la mer entière.",
+   "links": [
+    {
+     "kind": "magic",
+     "id": "@magic:lunea"
+    }
+   ]
+  },
+  {
+   "term": "Veilleur",
+   "category": "Titre",
+   "definition": "Épéiste de l'ordre qui veille depuis mille ans sur la Fosse de Kagami. Devise : « Nous veillons pour que vous dormiez ».",
+   "links": [
+    {
+     "kind": "faction",
+     "id": "@faction:veilleurs"
+    },
+    {
+     "kind": "location",
+     "id": "@loc:fosse"
+    },
+    {
+     "kind": "magic",
+     "id": "@magic:sceau"
+    }
+   ]
+  },
+  {
+   "term": "Kaze-no-Mura",
+   "category": "Lieu",
+   "definition": "« Le village du vent », sur Kazeshima, où Sora a grandi dans l'atelier de son grand-père.",
+   "links": [
+    {
+     "kind": "location",
+     "id": "@loc:village"
+    },
+    {
+     "kind": "location",
+     "id": "@loc:atelier"
+    }
+   ]
+  },
+  {
+   "term": "Marée haute",
+   "category": "Expression",
+   "definition": "« Être à marée haute » : être au sommet de sa force, ou de sa colère. Expression courante du parler des ports.",
+   "links": [
+    {
+     "kind": "people",
+     "id": "@people:parler"
+    }
+   ]
+  },
+  {
+   "term": "Tsukuyo",
+   "category": "Divinité",
+   "definition": "« La septième sœur » : déesse de la septième lune, celle qui relie les six autres.",
+   "links": [
+    {
+     "kind": "people",
+     "id": "@people:tsukuyo"
+    },
+    {
+     "kind": "people",
+     "id": "@people:soeurs"
+    }
+   ]
+  }
+ ],
  "documents": [
   {
    "node": "@node:t1",

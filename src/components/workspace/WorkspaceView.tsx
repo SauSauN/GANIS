@@ -47,6 +47,7 @@ const NoteEditView = lazy(() => import("@/components/workspace/views/NoteEditVie
 const RelationsView = lazy(() => import("@/components/workspace/views/RelationsView").then((module) => ({ default: module.RelationsView })));
 const FamilyTreeView = lazy(() => import("@/components/workspace/views/FamilyTreeView").then((module) => ({ default: module.FamilyTreeView })));
 const StickyWallView = lazy(() => import("@/components/workspace/views/StickyWallView").then((module) => ({ default: module.StickyWallView })));
+const GlossaryView = lazy(() => import("@/components/workspace/views/GlossaryView").then((module) => ({ default: module.GlossaryView })));
 const HistoryView = lazy(() => import("@/components/workspace/views/HistoryView").then((module) => ({ default: module.HistoryView })));
 const StructureNodeView = lazy(() => import("@/components/workspace/views/StructureNodeView").then((module) => ({ default: module.StructureNodeView })));
 const PlotBoard = lazy(() => import("@/components/plot/PlotBoard").then((module) => ({ default: module.PlotBoard })));
@@ -137,6 +138,10 @@ function WorkspaceContent({
 
   if (tabId === "synopsis.edit") {
     return <SynopsisEditView projectId={project.id} feature={feature} />;
+  }
+
+  if (tabId === "glossary.list") {
+    return <GlossaryView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
   // ---------------------------------------------------------------------------

@@ -65,6 +65,12 @@
         "description": "Summary, genres, tone and general information about your story."
       }
     },
+    "glossary": {
+      "list": {
+        "label": "Glossary",
+        "description": "The words of your story: invented terms, places, concepts, titles…"
+      }
+    },
     "characters": {
       "create": {
         "label": "Create a character",

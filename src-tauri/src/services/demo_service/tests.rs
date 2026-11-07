@@ -201,6 +201,11 @@ async fn the_manga_is_complete_with_its_script() {
     }
     assert!(characters::get_settings(&pool).await.unwrap().powers_enabled, "carte « Pouvoirs » activée");
 
+    // Glossaire : tous les termes créés, liés à des fiches.
+    let terms = crate::services::glossary_service::list(&pool).await.unwrap();
+    assert_eq!(terms.len(), parsed.data.glossary.len());
+    assert!(!terms.is_empty() && terms.iter().all(|t| !t.links.is_empty() && !t.links[0].id.starts_with('@')));
+
     // Le synopsis garde la version envoyée à l'éditrice, plus courte que l'actuelle.
     let synopsis = synopsis_service::get_synopsis(&pool).await.unwrap();
     let versions = history::list_versions(&pool, "synopsis", &synopsis.id).await.unwrap();

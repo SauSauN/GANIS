@@ -7,6 +7,7 @@ import { usePlaceLinkStore } from "@/stores/placeLinkStore";
 import { useWorldLinkStore } from "@/stores/worldLinkStore";
 import { useWorldStore } from "@/stores/worldStore";
 import { useRelationStore } from "@/stores/relationStore";
+import { useGlossaryStore } from "@/stores/glossaryStore";
 import { usePlotStore } from "@/stores/plotStore";
 import { useNoteStore } from "@/stores/noteStore";
 import { useToastStore } from "@/stores/toastStore";
@@ -325,6 +326,7 @@ export const useProjectStore =
           useStructureStore.getState().reset();
           useNoteStore.getState().reset();
           usePlotStore.getState().reset();
+          useGlossaryStore.getState().reset();
           useTrashStore.getState().reset();
           useToastStore.getState().clear();
         }
@@ -447,6 +449,7 @@ export const useProjectStore =
         useStructureStore.getState().reset();
         useNoteStore.getState().reset();
         usePlotStore.getState().reset();
+        useGlossaryStore.getState().reset();
         useTrashStore.getState().reset();
         useToastStore.getState().clear();
 
@@ -469,6 +472,7 @@ export const useProjectStore =
         useStructureStore.getState().reset();
         useNoteStore.getState().reset();
         usePlotStore.getState().reset();
+        useGlossaryStore.getState().reset();
         useTrashStore.getState().reset();
         useToastStore.getState().clear();
 

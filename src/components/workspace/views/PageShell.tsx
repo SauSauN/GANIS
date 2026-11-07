@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { InfoTip } from "@/components/common/InfoTip";
 
 /*
  * Mise en page commune des pages de l'espace de travail (accueil du projet,
@@ -50,12 +51,17 @@ interface PageShellProps {
   /** Facultatif : sans titre ni actions, la page commence directement par son contenu. */
   title?: string;
   description?: ReactNode;
+  /**
+   * Explication de la page, cachée derrière un petit « i » (survol ou clic)
+   * au lieu d'un long texte en haut de la page.
+   */
+  info?: ReactNode;
   /** Éléments à droite du titre (bouton…). */
   actions?: ReactNode;
   children: ReactNode;
 }
 
-export function PageShell({ title, description, actions, children }: PageShellProps) {
+export function PageShell({ title, description, info, actions, children }: PageShellProps) {
   return (
     <main className="relative flex min-h-0 flex-1 overflow-y-auto overscroll-contain">
       {/* `@container` : les fiches s'organisent selon la place de la page
@@ -65,9 +71,10 @@ export function PageShell({ title, description, actions, children }: PageShellPr
             onglet. Il reste lisible par les lecteurs d'écran. */}
         {title && <h1 className="sr-only">{title}</h1>}
 
-        {(description || actions) && (
+        {(description || info || actions) && (
           <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
-            <div className="min-w-0">
+            <div className="flex min-w-0 items-center gap-2">
+              {info && <InfoTip className="size-7">{info}</InfoTip>}
               {description && (
                 <p className="max-w-3xl text-sm leading-6 text-muted-foreground">{description}</p>
               )}

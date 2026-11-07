@@ -41,6 +41,8 @@ export function itemTabId(kind: HistoryKind | SearchHit["kind"], id: string): st
       return "plot.board";
     case "editorial":
       return "manuscript.editorial";
+    case "glossaryTerm":
+      return "glossary.list";
     default:
       return null;
   }

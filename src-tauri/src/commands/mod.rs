@@ -10,6 +10,7 @@ pub mod demo;
 pub mod diagnostics;
 pub mod documents;
 pub mod ganix;
+pub mod glossary;
 pub mod history;
 pub mod locations;
 pub mod notes;

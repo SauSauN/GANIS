@@ -46,6 +46,7 @@
         "text": "Chaque projet commence par sa fiche : synopsis, genres, ton et informations générales de l'histoire.",
         "points": [
           "Détails › Synopsis du projet pour écrire le résumé.",
+          "Détails › Glossaire pour définir les mots de votre univers et les relier aux fiches.",
           "Le nom, la description et le type se modifient dans les paramètres du projet.",
           "Le statut (en préparation, en cours, en pause, terminé) aide à suivre l'avancement."
         ]
@@ -312,6 +313,7 @@
         "items": [
           "Accueil du projet : description, type, statut et aperçu du synopsis.",
           "Synopsis : le résumé de l'histoire, avec ses genres, sous-genres et son ton.",
+          "Glossaire : les termes propres à l'histoire (mots inventés, lieux, concepts, titres…), par ordre alphabétique, avec leur définition, une catégorie et des liens vers les fiches.",
           "Historique : tout ce qui a été créé, modifié, supprimé ou restauré dans le projet, jour par jour.",
           "Corbeille : les éléments supprimés depuis moins de 30 jours, à restaurer."
         ]

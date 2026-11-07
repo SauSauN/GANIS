@@ -33,6 +33,7 @@
     "faction": "Faction",
     "people": "Peuple, culture ou religion",
     "magic": "Magie ou pouvoir",
-    "worldLink": "Lien entre éléments"
+    "worldLink": "Lien entre éléments",
+    "glossaryTerm": "Terme du glossaire"
   }
 }

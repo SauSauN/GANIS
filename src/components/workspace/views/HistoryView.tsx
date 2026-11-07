@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { doubleClickHint, onRowDoubleClick } from "@/lib/doubleClick";
 import { useTranslation } from "react-i18next";
 import {
+  BookA,
   Drama,
   FileText,
   Flag,
@@ -56,6 +57,7 @@ const ICONS: Record<HistoryKind, LucideIcon> = {
   synopsis: FileText,
   plot: Waypoints,
   editorial: Megaphone,
+  glossaryTerm: BookA,
 };
 
 const KINDS = Object.keys(ICONS) as HistoryKind[];
@@ -133,7 +135,7 @@ export function HistoryView({ projectId, feature, onOpenFeature }: HistoryViewPr
   return (
     <PageShell
       title={feature.label}
-      description={t("description")}
+      info={t("description")}
       actions={
         <div className="flex items-center gap-2">
           <select

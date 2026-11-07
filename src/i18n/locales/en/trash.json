@@ -16,7 +16,8 @@
     "faction": "Faction",
     "people": "People, culture or religion",
     "magic": "Magic or power",
-    "worldLink": "Link between elements"
+    "worldLink": "Link between elements",
+    "glossaryTerm": "Glossary term"
   },
   "deleted": {
     "character": "Character “{{name}}” deleted.",
@@ -34,7 +35,8 @@
     "faction": "“{{name}}” deleted from factions.",
     "people": "“{{name}}” removed from peoples, cultures and religions.",
     "magic": "“{{name}}” removed from magic and powers.",
-    "worldLink": "Link “{{name}}” deleted."
+    "worldLink": "Link “{{name}}” deleted.",
+    "glossaryTerm": "Term “{{name}}” deleted from the glossary."
   },
   "restored": {
     "character": "Character “{{name}}” restored.",
@@ -52,7 +54,8 @@
     "faction": "“{{name}}” restored to factions.",
     "people": "“{{name}}” restored to peoples, cultures and religions.",
     "magic": "“{{name}}” restored to magic and powers.",
-    "worldLink": "Link “{{name}}” restored."
+    "worldLink": "Link “{{name}}” restored.",
+    "glossaryTerm": "Term “{{name}}” restored to the glossary."
   },
   "untitled": {
     "character": "Unnamed character",
@@ -70,7 +73,8 @@
     "faction": "Untitled faction",
     "people": "Untitled sheet",
     "magic": "Untitled sheet",
-    "worldLink": "Link"
+    "worldLink": "Link",
+    "glossaryTerm": "Untitled term"
   },
   "view": {
     "description": "Deleted items stay here for 30 days. Restoring one also brings back everything that went with it (images, relationships, sub-items…).",

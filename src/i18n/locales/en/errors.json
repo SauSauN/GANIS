@@ -221,6 +221,16 @@
     "invalidGeometry": "Invalid sticky note position or size.",
     "folderCycle": "A folder cannot be moved into one of its own subfolders."
   },
+  "glossary": {
+    "notFound": "This term no longer exists.",
+    "termEmpty": "The term cannot be empty.",
+    "termTooLong": "The term must not exceed {{max}} characters.",
+    "categoryTooLong": "The category must not exceed {{max}} characters.",
+    "definitionTooLong": "The definition must not exceed {{max}} characters.",
+    "tooManyLinks": "A term can link to {{max}} sheets at most.",
+    "invalidLink": "Unknown sheet type.",
+    "linkNotFound": "One of the linked sheets no longer exists."
+  },
   "trash": {
     "notFound": "This item is no longer in the trash.",
     "unreadable": "This trash item cannot be read.",
@@ -337,7 +347,8 @@
     "search": "Search failed.",
     "manuscript": "Unable to assemble the manuscript.",
     "world": "Couldn’t load objects or fauna and flora.",
-    "worldLinks": "Couldn’t load links between elements."
+    "worldLinks": "Couldn’t load links between elements.",
+    "glossary": "Couldn’t load the glossary."
   },
   "novel": {
     "contentTooLong": "This text is too long (at most {{max}} characters).",

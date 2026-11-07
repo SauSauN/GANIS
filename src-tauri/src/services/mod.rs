@@ -10,6 +10,7 @@ pub mod demo_service;
 pub mod diagnostics_service;
 pub mod document_service;
 pub mod ganix_service;
+pub mod glossary_service;
 pub mod history_service;
 pub mod keyring_service;
 pub mod location_service;

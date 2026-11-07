@@ -1,4 +1,5 @@
 import {
+  BookA,
   BookOpen,
   BookOpenText,
   BookText,
@@ -116,6 +117,7 @@ export const SETTINGS_PREFIX = "settings:";
 type FeatureId =
   | typeof HOME_TAB
   | "synopsis.edit"
+  | "glossary.list"
   | "trash"
   | "history"
   | "characters.create"
@@ -205,6 +207,7 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
   defineModule("details", FileText, [
     defineFeature(HOME_TAB, Info),
     defineFeature("synopsis.edit", PenLine),
+    defineFeature("glossary.list", BookA),
     defineFeature("history", History),
     defineFeature("trash", Trash2),
   ]),
