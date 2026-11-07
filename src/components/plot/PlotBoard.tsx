@@ -1038,7 +1038,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                     )}
                     {m.zoom >= 0.75 && (
                       <p className="mt-0.5 flex min-w-0 items-center gap-1.5 text-muted-foreground" style={{ fontSize: Math.max(8, 10.5 * m.zoom) }}>
-                        <span className="size-[7px] shrink-0 rounded-full" style={{ backgroundColor: STATUS_COLORS[event.status] }} title={t(`status.${event.status}`)} />
+                        <span className="size-[0.4375rem] shrink-0 rounded-full" style={{ backgroundColor: STATUS_COLORS[event.status] }} title={t(`status.${event.status}`)} />
                         <span className="min-w-0 truncate">
                           {pov && <b className="font-semibold text-foreground">{pov}</b>}
                           {people.filter((p) => p.id !== event.povId).map((p, i) => (
@@ -1067,7 +1067,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                       onPointerDown={(e) => startLink(e, event)}
                       title={t("board.handle")}
                       className={cn(
-                        "absolute top-1/2 -right-2.5 size-[18px] -translate-y-1/2 cursor-crosshair touch-none rounded-full border-[2.5px] border-card opacity-0 transition-opacity group-hover/card:opacity-100 after:absolute after:-inset-2",
+                        "absolute top-1/2 -right-2.5 size-[1.125rem] -translate-y-1/2 cursor-crosshair touch-none rounded-full border-[2.5px] border-card opacity-0 transition-opacity group-hover/card:opacity-100 after:absolute after:-inset-2",
                         (selected || (drag?.type === "link" && drag.from === event.id)) && "opacity-100",
                       )}
                       style={{ backgroundColor: lane.color }}

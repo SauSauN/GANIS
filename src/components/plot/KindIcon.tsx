@@ -4,7 +4,7 @@ import type { PlotLinkKind } from "@/lib/plot";
 /** Trait d'un lien selon son type. */
 export function KindIcon({ kind, className }: { kind: PlotLinkKind; className?: string }) {
   return (
-    <svg viewBox="0 0 34 12" aria-hidden="true" className={cn("h-3 w-[34px] shrink-0", className)}>
+    <svg viewBox="0 0 34 12" aria-hidden="true" className={cn("h-3 w-[2.125rem] shrink-0", className)}>
       <circle cx="4" cy="6" r="3" fill="currentColor" />
       {kind === "meeting" ? (
         <>

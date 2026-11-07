@@ -5,7 +5,7 @@ import { isTauri } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
 const base =
-  "flex h-full w-[46px] items-center justify-center text-foreground transition-colors";
+  "flex h-full w-[2.875rem] items-center justify-center text-foreground transition-colors";
 
 /** Boutons Réduire / Agrandir-Restaurer / Fermer, style Windows. */
 export function WindowControls() {
@@ -66,7 +66,7 @@ export function WindowControls() {
         onClick={run((w) => w.minimize())}
         className={cn(base, "hover:bg-secondary")}
       >
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor">
+        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" aria-hidden="true" className="size-[0.625rem]">
           <path d="M0 5.5h10" />
         </svg>
       </button>
@@ -80,12 +80,12 @@ export function WindowControls() {
         className={cn(base, "hover:bg-secondary")}
       >
         {maximized ? (
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor">
+          <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" aria-hidden="true" className="size-[0.625rem]">
             <rect x="0.5" y="2.5" width="7" height="7" />
             <path d="M2.5 2.5V0.5h7v7h-2" />
           </svg>
         ) : (
-          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor">
+          <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" aria-hidden="true" className="size-[0.625rem]">
             <rect x="0.5" y="0.5" width="9" height="9" />
           </svg>
         )}
@@ -99,7 +99,7 @@ export function WindowControls() {
         onClick={run((w) => w.close())}
         className={cn(base, "hover:bg-[#E81123] hover:text-white")}
       >
-        <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor">
+        <svg viewBox="0 0 10 10" fill="none" stroke="currentColor" aria-hidden="true" className="size-[0.625rem]">
           <path d="M0 0l10 10M10 0L0 10" />
         </svg>
       </button>

@@ -99,11 +99,13 @@ export function ActivityBar({
     <aside
       aria-label={t("label")}
       className={cn(
-        "flex shrink-0 flex-col justify-between border-r border-sidebar-border bg-sidebar transition-[width] duration-150",
+        "flex min-h-0 shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-150",
         expanded ? "w-48" : "w-12",
       )}
     >
-      <div>
+      {/* Les modules défilent s'ils ne tiennent pas (texte en grand, tous les
+          modules facultatifs activés) ; les paramètres restent en bas. */}
+      <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
         {/* Pas de séparation sous ce bouton : il s'enchaîne directement avec les modules. */}
         {onToggleExpanded && (
         <button
@@ -132,7 +134,7 @@ export function ActivityBar({
         {modules.map(renderModule)}
       </div>
 
-      <div>{renderModule(SETTINGS_MODULE)}</div>
+      <div className="shrink-0">{renderModule(SETTINGS_MODULE)}</div>
     </aside>
   );
 }
