@@ -6,6 +6,7 @@ import {
   type ModuleId,
   type WorkspaceModule,
 } from "@/components/workspace/modules";
+import { useTextSize } from "@/lib/preferences";
 import { cn } from "@/lib/utils";
 
 interface ActivityBarProps {
@@ -50,6 +51,10 @@ export function ActivityBar({
   modules = WORKSPACE_MODULES,
 }: ActivityBarProps) {
   const { t } = useTranslation("activitybar");
+  // Texte en grand : la liste des modules peut dépasser la fenêtre (tous les
+  // modules facultatifs activés) ; elle défile alors. En petit et en moyen,
+  // elle tient : pas de défilement.
+  const scrollable = useTextSize() === "large";
 
   const renderModule = (module: WorkspaceModule) => {
     const selected = panelOpen && active === module.id;
@@ -99,13 +104,12 @@ export function ActivityBar({
     <aside
       aria-label={t("label")}
       className={cn(
-        "flex min-h-0 shrink-0 flex-col border-r border-sidebar-border bg-sidebar transition-[width] duration-150",
+        "flex min-h-0 shrink-0 flex-col justify-between border-r border-sidebar-border bg-sidebar transition-[width] duration-150",
         expanded ? "w-48" : "w-12",
       )}
     >
-      {/* Les modules défilent s'ils ne tiennent pas (texte en grand, tous les
-          modules facultatifs activés) ; les paramètres restent en bas. */}
-      <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
+      {/* En grand, les modules défilent s'ils ne tiennent pas ; les paramètres restent en bas. */}
+      <div className={cn(scrollable && "min-h-0 flex-1 overflow-x-hidden overflow-y-auto")}>
         {/* Pas de séparation sous ce bouton : il s'enchaîne directement avec les modules. */}
         {onToggleExpanded && (
         <button

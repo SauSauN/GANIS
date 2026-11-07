@@ -292,7 +292,7 @@ export function LocationListView({ projectId, feature, onOpenFeature }: Location
           ))}
         </ul>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 min-[112.5rem]:grid-cols-4">
           {matching.map((location) => (
             <GridCard
               key={location.id}

@@ -24,4 +24,5 @@ pub mod structure_links;
 pub mod synopsis;
 pub mod trash;
 pub mod users;
+pub mod window;
 pub mod world;

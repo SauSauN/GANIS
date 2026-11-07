@@ -300,9 +300,9 @@ export function MembersCard({
             <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">
               {t(`${module}.members.groups.${group.role}`)} ({group.members.length})
             </h3>
-            <ul className="grid gap-2 sm:grid-cols-2">
+            <ul className="divide-y rounded-lg border">
               {group.members.map((view) => (
-                <li key={view.link.id} className="flex items-center gap-3 rounded-lg border px-3 py-2">
+                <li key={view.link.id} className="flex items-center gap-3 px-3 py-2.5">
                   <OtherThumb projectId={projectId} directory={directory} view={view} />
                   <div className="min-w-0">
                     <button

@@ -32,6 +32,7 @@ import {
 } from "@/components/workspace/views/PageShell";
 import {
   MAX_NAME_LENGTH,
+  characterTabId,
   draftFromCharacter,
   fullName,
   nameError,
@@ -276,6 +277,7 @@ export function CharacterEditView({
               projectId={projectId}
               characterId={character.id}
               onOpenGraph={() => onOpenFeature("characters.relations")}
+              onOpenCharacter={(id) => onOpenFeature(characterTabId(id))}
             />
             <PlaceLinksCard
               projectId={projectId}

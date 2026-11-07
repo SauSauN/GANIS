@@ -110,6 +110,9 @@ const NEW_TARGETS: Partial<Record<ModuleId, string>> = {
 /** En dessous : barre de gauche en icônes, panneau du milieu par-dessus. */
 const NARROW_QUERY = "(max-width: 899px)";
 
+/** En dessous (demi-écran…) : barre de gauche en icônes, pour laisser la place à la page. */
+const COMPACT_QUERY = "(max-width: 1279px)";
+
 export default function Workspace() {
   const { t } = useTranslation(["workspace", "unsaved", "menus", "projects", "titlebar"]);
 
@@ -182,6 +185,7 @@ export default function Workspace() {
    * Revenue à une largeur normale, la disposition habituelle revient.
    */
   const narrow = useMediaQuery(NARROW_QUERY);
+  const compact = useMediaQuery(COMPACT_QUERY);
   useEffect(() => {
     setPanelOpen(!narrow);
   }, [narrow]);
@@ -772,8 +776,8 @@ export default function Workspace() {
           active={activeModule}
           linked={linkedModule}
           panelOpen={panelOpen}
-          expanded={railExpanded && !narrow}
-          onToggleExpanded={narrow ? undefined : () =>
+          expanded={railExpanded && !compact}
+          onToggleExpanded={compact ? undefined : () =>
             setRailExpanded(!railExpanded)
           }
           onSelect={selectModule}

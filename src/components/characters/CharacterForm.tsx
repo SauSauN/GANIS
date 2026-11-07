@@ -22,11 +22,14 @@ import {
   useListLabel,
 } from "@/components/characters/fields/SpecialFields";
 import {
+  profileCardClass,
+  profileImageClass,
   cardClass,
   cardContentClass,
   cardHeaderClass,
   fieldClass,
 } from "@/components/workspace/views/PageShell";
+import { SheetProgress } from "@/components/common/SheetProgress";
 import {
   MAX_NAME_LENGTH,
   fieldsOfLevel,
@@ -119,22 +122,10 @@ function Field({
   const id = useId();
 
   return (
-    <div className={cn("space-y-2", wide && "sm:col-span-2")}>
+    <div className={cn("space-y-2", wide && "@md:col-span-2")}>
       <Label htmlFor={id}>{label}</Label>
       {children(id)}
     </div>
-  );
-}
-
-/** Barre de progression d'un niveau. */
-function ProgressBar({ filled, total }: { filled: number; total: number }) {
-  return (
-    <span className="block h-1.5 overflow-hidden rounded-full bg-muted">
-      <span
-        className="block h-full rounded-full bg-primary transition-[width]"
-        style={{ width: `${Math.round((filled / total) * 100)}%` }}
-      />
-    </span>
   );
 }
 
@@ -310,9 +301,9 @@ export function CharacterSheet({
 
     return (
       <>
-        <div className="space-y-2 sm:col-span-2">
+        <div className="space-y-2 @md:col-span-2">
           <p className="text-sm font-medium">{label("fullName")}</p>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 @md:grid-cols-2">
             <Input
               aria-label={label("firstName")}
               placeholder={example("firstName")}
@@ -381,12 +372,13 @@ export function CharacterSheet({
   }
 
   return (
-    <div className="grid items-start gap-8 lg:grid-cols-[17rem_minmax(0,1fr)]">
+    <div className="grid items-start gap-8 @xl:grid-cols-[17rem_minmax(0,1fr)]">
       {/* ================================================================
           CARTE DE PROFIL
           ================================================================ */}
-      <Card className={cn(cardClass, "lg:sticky lg:top-0")}>
+      <Card className={cn(cardClass, profileCardClass)}>
         <CardContent className="flex flex-col items-center gap-4 px-5 py-5 text-center">
+          <div className={profileImageClass}>
           <PortraitPicker
             colorKey={portrait.colorKey}
             name={name}
@@ -399,6 +391,7 @@ export function CharacterSheet({
             onPick={portrait.onPick}
             onRemove={portrait.onRemove}
           />
+          </div>
 
           <div className="w-full min-w-0 space-y-1">
             <p className={cn("break-words text-lg font-semibold", !name && "text-muted-foreground")}>
@@ -416,39 +409,22 @@ export function CharacterSheet({
             </span>
           </div>
 
-          <div className="w-full space-y-3 border-t pt-4 text-left">
-            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-              {t("profile.progress")}
-            </p>
-
-            {levels.map((item) => {
-              const progress = levelProgress(draft, item, images);
-
-              return (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => goTo(item)}
-                  className="block w-full space-y-1.5 rounded-md text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                >
-                  <span className="flex items-baseline justify-between gap-2 text-sm">
-                    <span>{t(`levels.${item}.theme`)}</span>
-                    <span className="text-xs text-muted-foreground tabular-nums">
-                      {progress.filled} / {progress.total}
-                    </span>
-                  </span>
-                  <ProgressBar {...progress} />
-                </button>
-              );
-            })}
-          </div>
+          <SheetProgress
+            title={t("profile.progress")}
+            rows={levels.map((item) => ({
+              key: item,
+              label: t(`levels.${item}.theme`),
+              ...levelProgress(draft, item, images),
+              onClick: () => goTo(item),
+            }))}
+          />
         </CardContent>
       </Card>
 
       {/* ================================================================
           SECTIONS PAR NIVEAU
           ================================================================ */}
-      <div className="min-w-0 space-y-8">
+      <div className="@container min-w-0 space-y-8">
         {levels.map((item) => {
           const Icon = LEVEL_ICONS[item];
           const progress = levelProgress(draft, item, images);
@@ -501,7 +477,7 @@ export function CharacterSheet({
                 )}
               >
                 <div className="min-h-0 overflow-hidden">
-                  <CardContent className={cn(cardContentClass, "grid gap-x-4 gap-y-5 sm:grid-cols-2")}>
+                  <CardContent className={cn(cardContentClass, "grid gap-x-4 gap-y-5 @md:grid-cols-2")}>
                     {item === "basic" && renderIdentity()}
                     {item === "intermediate" && (
                       <>
@@ -525,7 +501,7 @@ export function CharacterSheet({
             icon={WandSparkles}
             title={t("powers.title")}
             description={t("powers.description")}
-            contentClassName={cn(cardContentClass, "grid gap-x-4 gap-y-5 sm:grid-cols-2")}
+            contentClassName={cn(cardContentClass, "grid gap-x-4 gap-y-5 @md:grid-cols-2")}
           >
             {POWER_FIELDS.map(renderField)}
           </CollapsibleCard>

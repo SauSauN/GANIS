@@ -33,7 +33,6 @@
   "picker": {
     "search": "Search for a type…",
     "noResult": "No type matches.",
-    "manage": "Categories and custom types",
     "change": "Change",
     "changeTitle": "Change the type of “{{name}}”",
     "changeDescription": "Information already entered is kept, even what no longer applies to the new type.",

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Search, Settings2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { categoryIcon, categoryTint } from "@/components/world/worldStyle";
 import type { WorldLabels } from "@/components/world/useWorldLabels";
@@ -37,6 +38,7 @@ export function WorldTypePicker({
   disabled?: boolean;
 }) {
   const { t } = useTranslation("world");
+  const { t: tc } = useTranslation("common");
   const [query, setQuery] = useState("");
   const needle = normalize(query.trim());
 
@@ -69,14 +71,10 @@ export function WorldTypePicker({
         </div>
 
         {onManage && (
-          <button
-            type="button"
-            onClick={onManage}
-            className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
-          >
-            <Settings2 className="size-3.5" aria-hidden="true" />
-            {t("picker.manage")}
-          </button>
+          <Button type="button" variant="outline" size="lg" onClick={onManage}>
+            <Settings2 aria-hidden="true" />
+            {tc("panelActions.customize")}
+          </Button>
         )}
       </div>
 

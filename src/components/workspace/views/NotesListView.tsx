@@ -158,7 +158,7 @@ export function NotesListView({ projectId, feature, onOpenFeature }: NotesListVi
           {notes.length === 0 ? t("list.empty") : t("list.noMatch")}
         </div>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 min-[112.5rem]:grid-cols-4">
           {visible.map((note) => {
             const path = folderPath(folders, note.folderId);
             return (

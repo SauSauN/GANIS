@@ -55,7 +55,9 @@ export function MenuBar() {
   // paramètres généraux.
   const signedIn = useAuthStore((state) => state.user !== null);
 
-  const wide = useMediaQuery("(min-width: 768px)");
+  // En dessous (demi-écran, Windows à 125 %…) : un seul menu ☰, pour que la
+  // barre de titre garde toujours ses boutons de fenêtre visibles.
+  const wide = useMediaQuery("(min-width: 1024px)");
   const [open, setOpen] = useState<MenuId | null>(null);
   const [active, setActive] = useState(-1);
   const barRef = useRef<HTMLDivElement>(null);

@@ -34,6 +34,7 @@ import {
 import type { LocationLabels } from "@/components/locations/useLocationLabels";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import {
+  profileCardClass,
   cardClass,
   cardContentClass,
 } from "@/components/workspace/views/PageShell";
@@ -103,7 +104,7 @@ function Field({
   const id = useId();
 
   return (
-    <div className={cn("space-y-2", wide && "sm:col-span-2")}>
+    <div className={cn("space-y-2", wide && "@md:col-span-2")}>
       <Label htmlFor={id}>{label}</Label>
       {children(id)}
       {hint && <p className="text-xs leading-5 text-muted-foreground">{hint}</p>}
@@ -145,7 +146,7 @@ function Section({
       title={title}
       description={description}
       tint={tint}
-      contentClassName={cn(cardContentClass, "grid gap-x-4 gap-y-5 sm:grid-cols-2")}
+      contentClassName={cn(cardContentClass, "grid gap-x-4 gap-y-5 @md:grid-cols-2")}
     >
       {children}
     </CollapsibleCard>
@@ -243,13 +244,15 @@ export function LocationSheet({
   }
 
   return (
-    <div className="grid items-start gap-8 lg:grid-cols-[17rem_minmax(0,1fr)]">
+    <div className="grid items-start gap-8 @xl:grid-cols-[17rem_minmax(0,1fr)]">
       {/* ================================================================
           CARTE DE PRÉSENTATION
           ================================================================ */}
-      <Card className={cn(cardClass, "lg:sticky lg:top-0")}>
+      <Card className={cn(cardClass, profileCardClass)}>
         <CardContent className="flex flex-col items-center gap-4 px-5 py-5 text-center">
+          <div className="w-full">
           <BannerPicker
+            tall
             url={banner.url}
             type={draft.type}
             category={category}
@@ -260,6 +263,7 @@ export function LocationSheet({
             onPick={banner.onPick}
             onRemove={banner.onRemove}
           />
+          </div>
 
           <div className="w-full min-w-0 space-y-2">
             <p className={cn("break-words text-lg font-semibold", !draft.name.trim() && "text-muted-foreground")}>
@@ -274,11 +278,11 @@ export function LocationSheet({
             </div>
           </div>
 
-          <div className="w-full space-y-2 border-t pt-4 text-left text-sm">
+          <div className="w-full space-y-1 text-sm">
             {path.length === 0 ? (
               <p className="text-xs text-muted-foreground">{t("profile.topLevel")}</p>
             ) : (
-              <nav aria-label={t("form.parent")} className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-xs">
+              <nav aria-label={t("form.parent")} className="flex flex-wrap items-center justify-center gap-x-1 gap-y-0.5 text-xs">
                 {path.map((item, index) => (
                   <span key={item.id} className="inline-flex items-center gap-1">
                     {index > 0 && <ChevronRight className="size-3 text-muted-foreground" aria-hidden="true" />}
@@ -308,7 +312,7 @@ export function LocationSheet({
       {/* ================================================================
           SECTIONS
           ================================================================ */}
-      <div className="min-w-0 space-y-8">
+      <div className="@container min-w-0 space-y-8">
         <Section
           sectionKey="identity"
           forceOpen={Boolean(nameError)}

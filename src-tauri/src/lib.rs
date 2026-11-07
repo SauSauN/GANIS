@@ -100,6 +100,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             app_info,
+            commands::window::show_snap_layouts,
             commands::auth::setup_admin,
             commands::auth::has_any_user,
             commands::auth::register,

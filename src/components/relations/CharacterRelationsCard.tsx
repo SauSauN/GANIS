@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronDown, Network, Plus, Waypoints } from "lucide-react";
+import { ChevronDown, Network, Pencil, Plus, Waypoints } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -27,6 +27,8 @@ interface CharacterRelationsCardProps {
   projectId: string;
   characterId: string;
   onOpenGraph: () => void;
+  /** Ouvre la fiche de l'autre personnage (clic sur son nom). */
+  onOpenCharacter?: (id: string) => void;
 }
 
 /** Carte repliée ou non, mémorisée sur l'appareil (pour toutes les fiches). */
@@ -49,7 +51,7 @@ function saveCollapsed(collapsed: boolean) {
 }
 
 /** Relations d'un personnage, dans sa fiche : liste, ajout, modification. */
-export function CharacterRelationsCard({ projectId, characterId, onOpenGraph }: CharacterRelationsCardProps) {
+export function CharacterRelationsCard({ projectId, characterId, onOpenGraph, onOpenCharacter }: CharacterRelationsCardProps) {
   const { t } = useTranslation(["relations", "characters"]);
   const { characters } = useProjectCharacters(projectId);
   const { relations } = useProjectRelations(projectId);
@@ -67,7 +69,7 @@ export function CharacterRelationsCard({ projectId, characterId, onOpenGraph }: 
   const toggleTitle = open ? t("characters:levels.collapse") : t("characters:levels.expand");
 
   return (
-    <Card className={cardClass}>
+    <Card className={cn(cardClass, "@container")}>
       {/* En-tête cliquable, comme les niveaux de la fiche : replie ou déplie la carte. */}
       <CardHeader
         className={cn(
@@ -92,22 +94,25 @@ export function CharacterRelationsCard({ projectId, characterId, onOpenGraph }: 
         </button>
 
         <div className="flex shrink-0 items-center gap-2">
-          <Button type="button" size="sm" variant="ghost" onClick={onOpenGraph}>
+          {/* Libellés seulement si la carte est large : le titre ne se coupe plus. */}
+          <Button type="button" size="sm" variant="ghost" onClick={onOpenGraph} title={t("sheet.graph")} aria-label={t("sheet.graph")}>
             <Network />
-            <span className="hidden sm:inline">{t("sheet.graph")}</span>
+            <span className="hidden @xl:inline">{t("sheet.graph")}</span>
           </Button>
           <Button
             type="button"
             size="sm"
             variant="outline"
             disabled={characters.length < 2}
+            title={t("sheet.add")}
+            aria-label={t("sheet.add")}
             onClick={() => {
               setOpen(true);
               setDialog({ relationId: null, initial: emptyRelation(characterId) });
             }}
           >
             <Plus />
-            <span className="hidden sm:inline">{t("sheet.add")}</span>
+            <span className="hidden @xl:inline">{t("sheet.add")}</span>
           </Button>
         </div>
 
@@ -146,30 +151,45 @@ export function CharacterRelationsCard({ projectId, characterId, onOpenGraph }: 
             {mine.length === 0 ? (
               <p className="text-sm text-muted-foreground">{t("sheet.empty")}</p>
             ) : (
-              <ul className="grid gap-2 sm:grid-cols-2">
+              <ul className="divide-y rounded-lg border">
                 {mine.map((relation) => {
                   const other = characters.find((c) => c.id === otherEnd(relation, characterId));
                   if (!other) return null;
                   const outgoing = relation.sourceId === characterId;
+                  const edit = () => setDialog({ relationId: relation.id, initial: inputFromRelation(relation) });
 
                   return (
-                    <li key={relation.id}>
-                      <button
-                        type="button"
-                        onClick={() => setDialog({ relationId: relation.id, initial: inputFromRelation(relation) })}
-                        className="flex w-full items-center gap-3 rounded-lg border px-3 py-2 text-left transition-colors hover:bg-muted/50"
-                        style={{ borderLeftColor: relationColors[relation.type], borderLeftWidth: 3 }}
-                      >
-                        <CharacterAvatar projectId={projectId} character={other} size="sm" />
-                        <span className="min-w-0 flex-1">
-                          <span className="block truncate text-sm font-medium">{fullName(other)}</span>
-                          <span className="block truncate text-xs text-muted-foreground">
+                    <li key={relation.id} className="flex items-center gap-3 px-3 py-2.5">
+                      <CharacterAvatar projectId={projectId} character={other} size="sm" />
+                      <div className="min-w-0 flex-1">
+                        <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
+                          <span className="font-medium" style={{ color: relationColors[relation.type] }}>
                             {relation.directed ? (outgoing ? "→ " : "← ") : "↔ "}
-                            {relation.label || t(`types.${relation.type}`)}
-                            {relation.label && ` · ${t(`types.${relation.type}`)}`}
+                            {t(`types.${relation.type}`)}
                           </span>
-                        </span>
-                      </button>
+                          <button
+                            type="button"
+                            onClick={() => (onOpenCharacter ? onOpenCharacter(other.id) : edit())}
+                            className="truncate font-medium underline-offset-4 hover:underline"
+                          >
+                            {fullName(other)}
+                          </button>
+                          {relation.label && <span className="text-muted-foreground">· {relation.label}</span>}
+                        </p>
+                        {relation.description && (
+                          <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">{relation.description}</p>
+                        )}
+                      </div>
+                      <Button
+                        type="button"
+                        size="icon-sm"
+                        variant="ghost"
+                        onClick={edit}
+                        aria-label={t("list.edit")}
+                        title={t("list.edit")}
+                      >
+                        <Pencil />
+                      </Button>
                     </li>
                   );
                 })}

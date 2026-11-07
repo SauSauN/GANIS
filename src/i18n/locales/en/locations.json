@@ -368,7 +368,6 @@
     "description": "Pick a type: the sheet adapts (a capital doesn't need the same information as a forest).",
     "search": "Search a type…",
     "noResult": "No matching type.",
-    "manage": "Add your own types",
     "changeTitle": "Change the type of “{{name}}”",
     "changeDescription": "Information already entered is kept, even what no longer applies to the new type.",
     "change": "Change",

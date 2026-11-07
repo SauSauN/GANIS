@@ -308,7 +308,7 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
           {characters.length === 0 ? t("list.emptyTitle") : t("list.noMatch")}
         </div>
       ) : prefs.layout === "grid" ? (
-        <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 min-[112.5rem]:grid-cols-4">
           {visible.map((character) => (
             <li key={character.id}>
               <CharacterCard

@@ -207,7 +207,7 @@ export function WorkspaceHome({ project }: { project: Project }) {
 
   return (
     <main className="flex min-h-0 flex-1 overflow-y-auto">
-      <div className="mx-auto w-full max-w-5xl px-6 py-8 pb-24 lg:px-10">
+      <div className="mx-auto w-full max-w-5xl 2xl:max-w-7xl min-[137.5rem]:max-w-[100rem] px-6 py-8 pb-24 lg:px-10">
         {/* ================================================================
             1. IDENTITÉ DU PROJET
             ================================================================ */}

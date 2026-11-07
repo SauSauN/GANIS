@@ -216,31 +216,35 @@ export function PlaceLinksCard({ projectId, side, id, onOpenFeature }: PlaceLink
               <Link2 className="size-3.5" aria-hidden="true" />
               {t("links.mentions")}
             </p>
-            <ul className="flex flex-wrap gap-2">
+            <ul className="divide-y rounded-lg border">
               {mentions.locations.map((mention) => (
-                <li key={mention.key}>
-                  <button
-                    type="button"
-                    onClick={() => onOpenFeature(locationTabId(mention.location.id))}
-                    className="inline-flex items-center gap-2 rounded-full border py-1 pr-3 pl-1 text-sm transition-colors hover:bg-muted/50"
-                  >
-                    <LocationThumb projectId={projectId} location={mention.location} customTypes={settings.customTypes} size="xs" className="rounded-full" />
-                    <span className="text-muted-foreground">{mention.label} :</span>
-                    <span className="font-medium">{mention.location.name}</span>
-                  </button>
+                <li key={mention.key} className="flex items-center gap-3 px-3 py-2.5">
+                  <LocationThumb projectId={projectId} location={mention.location} customTypes={settings.customTypes} size="sm" />
+                  <p className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 text-sm">
+                    <span className="font-medium text-primary">{mention.label}</span>
+                    <button
+                      type="button"
+                      onClick={() => onOpenFeature(locationTabId(mention.location.id))}
+                      className="truncate font-medium underline-offset-4 hover:underline"
+                    >
+                      {mention.location.name}
+                    </button>
+                  </p>
                 </li>
               ))}
               {mentions.characters.map((mention) => (
-                <li key={mention.key}>
-                  <button
-                    type="button"
-                    onClick={() => onOpenFeature(characterTabId(mention.character.id))}
-                    className="inline-flex items-center gap-2 rounded-full border py-1 pr-3 pl-1 text-sm transition-colors hover:bg-muted/50"
-                  >
-                    <CharacterAvatar projectId={projectId} character={mention.character} size="xs" />
-                    <span className="text-muted-foreground">{mention.label} :</span>
-                    <span className="font-medium">{fullName(mention.character)}</span>
-                  </button>
+                <li key={mention.key} className="flex items-center gap-3 px-3 py-2.5">
+                  <CharacterAvatar projectId={projectId} character={mention.character} size="sm" />
+                  <p className="flex min-w-0 flex-1 flex-wrap items-baseline gap-x-2 text-sm">
+                    <span className="font-medium text-primary">{mention.label}</span>
+                    <button
+                      type="button"
+                      onClick={() => onOpenFeature(characterTabId(mention.character.id))}
+                      className="truncate font-medium underline-offset-4 hover:underline"
+                    >
+                      {fullName(mention.character)}
+                    </button>
+                  </p>
                 </li>
               ))}
             </ul>

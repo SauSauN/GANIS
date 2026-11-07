@@ -61,7 +61,7 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
   }
 
   return (
-    <div className="space-y-2 sm:col-span-2">
+    <div className="space-y-2 @md:col-span-2">
       <p className="text-sm font-medium">{label}</p>
 
       <div

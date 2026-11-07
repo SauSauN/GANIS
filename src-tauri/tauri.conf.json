@@ -18,7 +18,7 @@
         "title": "GANIS",
         "width": 1280,
         "height": 800,
-        "minWidth": 960,
+        "minWidth": 768,
         "minHeight": 600,
         "center": true,
         "decorations": false,
