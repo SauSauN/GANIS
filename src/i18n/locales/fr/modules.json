@@ -172,6 +172,10 @@
         "label": "Chemin de fer",
         "description": "Toutes les pages d'un tome en planches : ce qui est écrit, dessiné, et les tournés de page."
       },
+      "production": {
+        "label": "Suivi de fabrication",
+        "description": "Storyboard, crayonné, encrage, trames, lettrage : où en est chaque page."
+      },
       "progress": {
         "label": "Suivi du scénario",
         "description": "Pages prévues et écrites, statuts, volume de texte."

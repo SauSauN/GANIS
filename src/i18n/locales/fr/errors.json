@@ -377,7 +377,20 @@
     "invalidThreshold": "Seuil invalide.",
     "unknownCharacter": "Un personnage de cette page n'existe plus.",
     "unknownLocation": "Le lieu choisi n'existe plus.",
-    "panelNotFound": "Cette case n'existe plus."
+    "panelNotFound": "Cette case n'existe plus.",
+    "invalidStage": "Étape de fabrication inconnue.",
+    "invalidExtraKind": "Sorte de page inconnue.",
+    "invalidPlacement": "Place invalide : avant ou après le récit.",
+    "coverPlacement": "La couverture va avant le récit, la 4e de couverture après.",
+    "coverExists": "Ce tome a déjà cette couverture.",
+    "extraNotFound": "Cette page n'existe plus.",
+    "extraTitleTooLong": "Le titre ne doit pas dépasser {{max}} caractères.",
+    "tooManyExtras": "Un tome peut avoir {{max}} pages hors récit au plus.",
+    "extraOtherVolume": "Cette page appartient à un autre tome.",
+    "tooManyPages": "Trop de pages à la fois ({{max}} au plus).",
+    "artTooLarge": "L'image est trop lourde ({{max}} Mo au plus).",
+    "artNotImage": "Ce fichier n'est pas une image (PNG, JPEG, GIF ou WebP).",
+    "noArt": "Cette page n'a pas de dessin."
   },
   "world": {
     "notFound": "Fiche introuvable.",
@@ -422,5 +435,8 @@
   },
   "demo": {
     "unknown": "Ce projet d'exemple n'existe pas."
+  },
+  "sheets": {
+    "invalidModule": "Module inconnu."
   }
 }

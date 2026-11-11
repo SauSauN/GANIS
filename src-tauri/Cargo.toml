@@ -103,3 +103,13 @@ strip = true
 # voir commands/window.rs). Même version que celle déjà tirée par Tauri.
 [target.'cfg(windows)'.dependencies]
 windows-sys = { version = "0.59", features = ["Win32_UI_Input_KeyboardAndMouse"] }
+
+# Argon2id (mots de passe) et son hachage BLAKE2 : sans optimisation, la
+# création d'un compte ou une connexion prend plusieurs minutes en mode
+# développement (`tauri dev`, tests de bout en bout). Seuls ces paquets sont
+# optimisés ; le reste garde une compilation rapide.
+[profile.dev.package.argon2]
+opt-level = 3
+
+[profile.dev.package.blake2]
+opt-level = 3

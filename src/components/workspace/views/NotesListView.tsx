@@ -85,7 +85,7 @@ export function NotesListView({ projectId, feature, onOpenFeature }: NotesListVi
       description={loaded ? t("list.count", { count: notes.length }) : undefined}
       actions={
         <Button onClick={newNote}>
-          <Plus className="mr-1.5 size-4" />
+          <Plus className="size-4" />
           {t("list.newNote")}
         </Button>
       }

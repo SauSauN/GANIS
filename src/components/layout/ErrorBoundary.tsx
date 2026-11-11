@@ -98,7 +98,7 @@ function CrashScreen({
 
         <div className="flex flex-wrap gap-2">
           <Button onClick={onRetry} disabled={reloading}>
-            <RotateCcw className="mr-1.5 size-4" />
+            <RotateCcw className="size-4" />
             {t("crash.retry")}
           </Button>
           <Button

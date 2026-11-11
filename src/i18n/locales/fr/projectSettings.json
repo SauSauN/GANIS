@@ -138,5 +138,24 @@
       "createAccount": "Créer un compte",
       "setupFirst": "Créer le premier compte"
     }
+  },
+  "sheetDisplay": {
+    "title": "Sections des fiches",
+    "description": {
+      "character": "Afficher les sections « Trame » et « Récit » sur les fiches des personnages (masquées par défaut).",
+      "location": "Afficher les sections « Récit » et « Trame » sur les fiches des lieux (masquées par défaut).",
+      "item": "Afficher les sections « Trame » et « Récit » sur les fiches des objets (masquées par défaut).",
+      "species": "Afficher les sections « Trame » et « Récit » sur les fiches de la faune et flore (masquées par défaut).",
+      "faction": "Afficher les sections « Trame » et « Récit » sur les fiches des factions (masquées par défaut).",
+      "people": "Afficher les sections « Trame » et « Récit » sur les fiches des peuples, cultures et religions (masquées par défaut).",
+      "magic": "Afficher les sections « Trame » et « Récit » sur les fiches de magie et de pouvoirs (masquées par défaut)."
+    },
+    "plot": "Trame",
+    "story": "Récit",
+    "shown": "Affichée sur les fiches.",
+    "hidden": "Masquée sur les fiches.",
+    "note": "Seul l'affichage change : les liens avec le plan et les événements de la trame sont gardés et restent utilisés partout ailleurs (plan, plateau, lecture, recherche).",
+    "saved": "Affichage des fiches enregistré.",
+    "failed": "Impossible d'enregistrer l'affichage des fiches."
   }
 }

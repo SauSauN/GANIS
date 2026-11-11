@@ -143,7 +143,18 @@
         "points": [
           "Droite à gauche pour un manga, gauche à droite pour une BD.",
           "Le numéro de la première page décide des pages en vis-à-vis.",
-          "Une révélation mal placée par rapport au tourné de page est signalée."
+          "Une révélation mal placée par rapport au tourné de page est signalée.",
+          "Les pages hors récit (couverture, page de titre, bonus…) s'ajoutent sous les planches.",
+          "« Exporter le scénario » prépare le script du tome pour le dessinateur."
+        ]
+      },
+      "production": {
+        "title": "Suivez la fabrication",
+        "text": "L'étape de chaque page : storyboard, crayonné, encrage, trames, lettrage, puis validation.",
+        "points": [
+          "L'étape choisie est la dernière terminée.",
+          "Cochez plusieurs pages pour les faire avancer d'un coup.",
+          "Le chemin de fer peut montrer les étapes en couleur."
         ]
       },
       "progress": {
@@ -496,7 +507,7 @@
       "connect": {
         "title": "Rattachez-les au projet",
         "text": "Point de vue, personnages présents, lieu, chapitre du découpage et notes : tout se relie depuis l'événement.",
-        "points": ["Les fiches liées montrent ces événements dans « Dans la trame »."]
+        "points": ["Les fiches liées montrent ces événements dans leur section « Trame »."]
       },
       "reading": {
         "title": "Lisez dans l'ordre du lecteur",

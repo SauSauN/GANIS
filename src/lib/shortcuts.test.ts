@@ -21,6 +21,13 @@ describe("raccourcis", () => {
     expect(findShortcut(key("F5"))?.action).toBe("readStory");
   });
 
+  it("Ctrl+B replie le panneau, mais pas pendant la saisie (« Gras » dans l'éditeur)", () => {
+    const shortcut = findShortcut(key("b", { ctrlKey: true }));
+    expect(shortcut?.action).toBe("togglePanel");
+    expect(shortcut?.inFields).toBe(false);
+    expect(findShortcut(key("B", { ctrlKey: true, shiftKey: true }))).toBeUndefined();
+  });
+
   it("Ctrl+Maj+S reste libre pour « Barré » dans l'éditeur", () => {
     expect(findShortcut(key("S", { ctrlKey: true, shiftKey: true }))).toBeUndefined();
     expect(findShortcut(key("s"))).toBeUndefined();

@@ -53,6 +53,7 @@ const node = (id: string, parentId: string | null, level: number, position: numb
   scriptStatus: null,
   rhythm: null,
   pageTurn: false,
+  productionStage: null,
   createdAt: "2026-10-10T00:00:00Z",
   updatedAt: "2026-10-10T00:00:00Z",
 });

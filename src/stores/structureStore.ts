@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { create } from "zustand";
 import { api } from "@/lib/api";
-import type { NodeCharacterRole, NodeLocationRole, Structure, StructureLinks, StructureNode } from "@/types";
+import type { NodeCharacterRole, NodeEntryRole, NodeLocationRole, Structure, StructureLinks, StructureNode, WorldModule } from "@/types";
 import { errorText } from "@/lib/errors";
 
 /*
@@ -33,6 +33,8 @@ interface StructureState {
   unlinkCharacter: (projectId: string, nodeId: string, characterId: string) => Promise<void>;
   linkLocation: (projectId: string, nodeId: string, locationId: string, role: NodeLocationRole) => Promise<void>;
   unlinkLocation: (projectId: string, nodeId: string, locationId: string) => Promise<void>;
+  linkEntry: (projectId: string, nodeId: string, kind: WorldModule, entryId: string, role: NodeEntryRole) => Promise<void>;
+  unlinkEntry: (projectId: string, nodeId: string, kind: WorldModule, entryId: string) => Promise<void>;
   /**
    * Remplace un élément par sa version enregistrée (texte d'une scène,
    * réglages du romancier) sans tout recharger.
@@ -115,6 +117,16 @@ export const useStructureStore = create<StructureState>()((set, get) => ({
 
   unlinkLocation: async (projectId, nodeId, locationId) => {
     await api.unlinkStructureLocation(projectId, nodeId, locationId);
+    await get().fetchLinks(projectId);
+  },
+
+  linkEntry: async (projectId, nodeId, kind, entryId, role) => {
+    await api.linkStructureEntry(projectId, nodeId, kind, entryId, role);
+    await get().fetchLinks(projectId);
+  },
+
+  unlinkEntry: async (projectId, nodeId, kind, entryId) => {
+    await api.unlinkStructureEntry(projectId, nodeId, kind, entryId);
     await get().fetchLinks(projectId);
   },
 

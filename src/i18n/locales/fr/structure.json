@@ -271,6 +271,16 @@
         "noItems": "Le projet n'a pas encore de lieu.",
         "firstAppearance": "Première apparition ici"
       },
+      "entries": {
+        "title": "Univers",
+        "description": "Les objets, la faune et la flore, les factions, les peuples et la magie de « {{name}} ».",
+        "add": "Lier une fiche",
+        "choose": "Choisir un objet, une faction…",
+        "empty": "Aucune fiche de l'univers liée.",
+        "noneLeft": "Toutes les fiches sont déjà liées.",
+        "noItems": "Aucune fiche dans les modules activés.",
+        "firstAppearance": "Première apparition ici"
+      },
       "children": {
         "title": "Contenu",
         "description": "Ce que contient « {{name}} ».",
@@ -291,17 +301,34 @@
       "location": {
         "setting": "Lieu de l'action",
         "mentioned": "Cité"
+      },
+      "entry": {
+        "central": "Au cœur de l'action",
+        "present": "Présent",
+        "mentioned": "Cité"
       }
     },
     "saved": "Enregistré.",
     "delete": "Supprimer"
   },
   "story": {
-    "title": "Dans le récit",
+    "title": "Récit",
     "characterDescription": "Les éléments du plan où apparaît ce personnage.",
     "locationDescription": "Les éléments du plan qui se déroulent dans ce lieu ou le citent.",
     "empty": "Pas encore lié au plan : liez-le depuis la fiche d'un chapitre, d'une scène…",
-    "firstAppearance": "Première apparition"
+    "firstAppearance": "Première apparition",
+    "link": "Lier à un élément du plan",
+    "editLink": "Modifier le lien",
+    "entryDescription": "Les éléments du plan (chapitres, scènes…) où cette fiche est au cœur de l'action, présente ou citée.",
+    "entryEmpty": "Pas encore liée au plan : liez-la d'ici ou depuis la fiche d'un chapitre, d'une scène…",
+    "dialog": {
+      "newTitle": "Lier à un élément du plan",
+      "editTitle": "Modifier le lien avec le plan",
+      "description": "Le lien apparaît dans le Récit de cette fiche et sur la fiche de l'élément.",
+      "node": "Élément du plan",
+      "role": "Rôle",
+      "remove": "Retirer le lien"
+    }
   },
   "colors": {
     "custom": "Autre couleur…",

@@ -8,9 +8,11 @@ import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } fr
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import { PageShell, cardClass, cardContentClass, cardHeaderClass } from "@/components/workspace/views/PageShell";
 import { WorldDisabledNotice } from "@/components/workspace/views/WorldListView";
-import { SpeciesCharacterCard } from "@/components/world/AnimalCharacterCards";
 import { WorldGallery } from "@/components/world/WorldGallery";
-import { MembersCard, WorldLinksCard } from "@/components/world/WorldLinksCard";
+import { UniverseLinksCard } from "@/components/links/UniverseLinksCard";
+import { PlotInStoryCard } from "@/components/plot/PlotInStoryCard";
+import { StoryLinksCard } from "@/components/structure/StoryLinksCard";
+import { useSheetDisplay } from "@/stores/sheetDisplayStore";
 import { WorldSheet } from "@/components/world/WorldSheet";
 import { WorldThumb, WorldTypeBadge } from "@/components/world/WorldVisuals";
 import { useWorldLabels } from "@/components/world/useWorldLabels";
@@ -18,7 +20,7 @@ import { errorText } from "@/lib/errors";
 import { notifyError, notifySaved } from "@/lib/notify";
 import { GALLERY_MAX_SIDE, PortraitError, preparePortrait } from "@/lib/portraitImage";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
-import { hasMembers,
+import {
   MAX_WORLD_NAME_LENGTH,
   childrenOf,
   createFeatureOf,
@@ -54,6 +56,7 @@ export function WorldEditView({
   onOpenFeature: (featureId: string) => void;
 }) {
   const { t } = useTranslation(["world", "common", "characters"]);
+  const sheetDisplay = useSheetDisplay(projectId, module);
   const { entries, settings, loaded, error: loadError, reload } = useWorldEntries(projectId, module);
   const entry = useWorldEntry(projectId, module, entryId);
   const imageUrl = useWorldImageUrl(projectId, module, entry);
@@ -279,13 +282,14 @@ export function WorldEditView({
           }
           extra={
             <>
-              {module === "species" && entry.nature === "individual" && (
-                <SpeciesCharacterCard projectId={projectId} entry={entry} onOpenFeature={onOpenFeature} disabled={deleting} />
+              <UniverseLinksCard projectId={projectId} self={{ kind: module, id: entry.id }} onOpenFeature={onOpenFeature} />
+              {/* « Trame » et « Récit » : masquables dans les paramètres du module. */}
+              {sheetDisplay.showPlot && (
+                <PlotInStoryCard projectId={projectId} target={{ type: module, id: entry.id }} name={entry.name} onOpenFeature={onOpenFeature} />
               )}
-              {hasMembers(module) && (
-                <MembersCard projectId={projectId} module={module} entryId={entry.id} onOpenFeature={onOpenFeature} />
+              {sheetDisplay.showStory && (
+                <StoryLinksCard projectId={projectId} side={module} id={entry.id} firstAppearance={entry.fields.firstAppearance} onOpenFeature={onOpenFeature} />
               )}
-              <WorldLinksCard projectId={projectId} self={{ kind: module, id: entry.id }} onOpenFeature={onOpenFeature} />
               {childrenCard}
             </>
           }

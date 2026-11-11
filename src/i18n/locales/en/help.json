@@ -59,7 +59,9 @@
           "The level of detail of the sheets is set in the project settings.",
           "Add a portrait and an image gallery to each sheet.",
           "Each sheet opens in its own tab, named after the character.",
-          "Colour palette: its colours frame the character's portrait."
+          "Colour palette: its colours frame the character's portrait.",
+          "Below the sheet, three link sections: “Links with the world” (relationships, places, fauna and flora, items, factions, peoples, magic, grouped by type, with a single “Add a link” button), “Plot” and “Story”.",
+          "“Plot” and “Story” are hidden on sheets by default; show them in Project settings › Characters (or › Locations, › Items…). Only the display changes: the links are still used everywhere else."
         ]
       },
       "locations": {
@@ -199,6 +201,7 @@
       "guide": "Getting started",
       "shortcuts": "Keyboard shortcuts",
       "palette": "Palette: pages, actions, search",
+      "togglePanel": "Collapse or expand the middle panel (outside the editor)",
       "search": "Search the project (magnifier)",
       "center": "GANIS Help",
       "readStory": "Read the whole story / exit reading"
@@ -253,8 +256,8 @@
           "Messages use real singular and plural forms.",
           "Edit › Paste works from the menu.",
           "New: Help › Report a problem, to copy useful technical information.",
-        "Save messages (success or failure) appear as notifications at the bottom of the screen: the page no longer moves.",
-        "Double-click: on a row of the outline, progress or history, and in the reading table of contents, it opens the sheet; on a plot lane header, it renames the lane."
+          "Save messages (success or failure) appear as notifications at the bottom of the screen: the page no longer moves.",
+          "Double-click: on a row of the outline, progress or history, and in the reading table of contents, it opens the sheet; on a plot lane header, it renames the lane."
         ]
       }
     }
@@ -349,7 +352,7 @@
           "Choose the categories you need (weapons, vehicles, magic…): only those are offered when creating. You can also add your own types.",
           "The type chooses the sheet's fields: a weapon doesn't have the same information as a vehicle.",
           "An object can be stored in another (a key in a chest, an engine in a ship): the panel shows them as a tree.",
-          "The links card connects the object to whoever owns, uses or seeks it, and to where it is, with a story period if needed (an object that changes hands)."
+          "“Links with the world” connects the object to whoever owns, uses or seeks it, and to where it is, with a story period if needed (an object that changes hands)."
         ]
       },
       "species": {
@@ -360,7 +363,7 @@
           "Choose fauna, flora or both. You can also add your own types.",
           "An entry is either a whole species (grey wolves), or a specific animal or plant (Lightning, the hero's horse), placed under its species.",
           "A specific animal can also be a character: “Create its character sheet” or link it to an existing character. The character sheet shows it in return.",
-          "The links card shows where it lives, what it eats, who it belongs to and what it is used for."
+          "“Links with the world” shows where it lives, what it eats, who it belongs to and what it is used for."
         ]
       },
       "factions": {
@@ -370,8 +373,8 @@
           "Optional module: turn it on in Project settings › Factions, and it appears in the left bar. Turning it off deletes nothing.",
           "Choose the categories you need (political power, army, religion, crime…). The type chooses the fields: an army has its strength, a religion its dogmas and rites.",
           "A faction can have branches: a section of an order, a cell of a network, a family of a clan.",
-          "The “Members” card groups its leaders, founders, members and supporters. The exact role (captain, spy…) goes in the link's detail.",
-          "The links card notes its allies, enemies, seat, the places where it is present and what it controls, with a story period if needed."
+          "Its leaders, founders, members and supporters are in “Links with the world”, with the characters. The exact role (captain, spy…) goes in the link's detail.",
+          "“Links with the world” also notes its allies, enemies, seat, the places where it is present and what it controls, with a story period if needed."
         ]
       },
       "peoples": {
@@ -381,7 +384,7 @@
           "Optional module: turn it on in Project settings › Peoples, cultures and religions, and it appears in the left bar. Turning it off deletes nothing.",
           "Three categories: peoples and races, cultures and traditions (including languages), religions and beliefs (pantheons, deities, mythologies, prophecies). The type chooses the fields.",
           "A sheet can contain others: a sub-people in its people, a branch in its religion, a deity in its pantheon.",
-          "The “Who belongs” card groups members, practitioners, speakers and worshippers; the links card also records where a people lives and the powers it masters.",
+          "“Links with the world” groups members, practitioners, speakers and worshippers, where a people lives and the powers it masters.",
           "No duplicates with Factions: a religion (its beliefs, its rites) lives here, while the church or cult that organises it stays a faction, linked with “practises”."
         ]
       },
@@ -392,7 +395,7 @@
           "Optional module: turn it on in Project settings › Magic and powers, and it appears in the left bar. Turning it off deletes nothing.",
           "Three levels: the system (magic, inner energy, superpowers, divine power, psionics, alchemy), its schools and branches (elements, bloodlines), then its spells and techniques.",
           "The type chooses the fields: a system has its source, rules, cost and limits; a technique its effects, power, range and risks.",
-          "The “Who masters it” card groups those who master it and those who teach it; the links card records its sources and who forbids it.",
+          "“Links with the world” groups those who master it and those who teach it, its sources and who forbids it.",
           "No duplicates: a character's own powers stay on their “Powers” card; link them to the system with “masters”."
         ]
       },
@@ -402,11 +405,15 @@
         "items": [
           "Novel: parts, chapters, scenes. Film: acts, sequences, scenes. Manga: volumes, chapters, pages… Names can be changed in the project settings.",
           "Numbers are computed for you; an item can be left out of the numbering (prologue, interlude).",
+          "A structure item sheet also links world entries (“World” section): an item at the heart of the scene, a faction present, a magic mentioned. A world entry can also be linked to an item from its “Story” section.",
           "Automatic numbering (renumbering on every move) is turned on in the project settings, as is each level's colour.",
           "An item's sheet shows its summary, its characters (point of view, present…) and its locations.",
           "Documents: in an item's sheet, keep its files (manga pages, PDFs, Word files, images, sounds…) with “Add files” or by drag and drop. They are stored in the project (encrypted if the project is private) and exported in the .ganix.",
           "Click a document to read it in GANIS; “Read the pages” chains a chapter's images. “Edit in its application” opens it in Word, Acrobat, Clip Studio…: every save comes back, the previous content stays in the versions.",
           "Manga / comic: Script › Flatplan shows a volume's pages as spreads, in the chosen reading direction. A page shows the art filed on its sheet; otherwise, art filed on the chapter is shared out in order. The first printed page decides which pages face each other: a reveal planned at the page turn on an even page is flagged.",
+          "Manga / comic: non-story pages (cover, title page, contents, credits, bonus, afterword…) are added below the flatplan. They take their place in the spreads and the page numbers; covers stand apart, without a page number.",
+          "Manga / comic: Script › Production tracking gives each page its step (storyboard, pencils, inks, screentones, lettering, approved), one page or a whole selection at a time. The flatplan can show these steps in colour (“Show: Production”).",
+          "Manga / comic: “Export the script”, in the flatplan, saves the volume script for the artist (Word, PDF or text): characters and locations first, non-story pages, each page's number, panels and texts.",
           "Manga / comic: a chapter's sheet creates its pages in one go (“Add pages”). File each piece of art on its page's sheet: it shows next to the panels, and the chapter's “Read the pages” chains them. Panels are found by the search and kept in the page's versions."
         ]
       },
@@ -429,7 +436,7 @@
           "Drag a card's round handle onto another to create a link: impact, influence or crossing.",
           "Link each event to the project: point of view, characters present, location, structure chapter and notes.",
           "“Story reading” shows the events in reading order (by default the structure's) with everything attached, chapter documents included.",
-          "Character, location and structure item sheets show their events under “In the plot”.",
+          "Character, location, structure item and world sheets (items, factions…) show their events in their “Plot” section. In an event’s panel, “Items, fauna and flora, factions…” adds world entries to it.",
           "Ctrl+Z undoes each action on the board. The “Tension” button shows the tension curve; plot colours are set in Project settings › Plot."
         ]
       },

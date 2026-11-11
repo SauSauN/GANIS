@@ -143,7 +143,18 @@
         "points": [
           "Right to left for a manga, left to right for a comic.",
           "The number of the first page decides which pages face each other.",
-          "A reveal badly placed relative to the page turn is flagged."
+          "A reveal badly placed relative to the page turn is flagged.",
+          "Non-story pages (cover, title page, bonus…) are added below the spreads.",
+          "“Export the script” prepares the volume script for the artist."
+        ]
+      },
+      "production": {
+        "title": "Track production",
+        "text": "Each page's step: storyboard, pencils, inks, screentones, lettering, then approval.",
+        "points": [
+          "The chosen step is the last one finished.",
+          "Tick several pages to move them forward at once.",
+          "The flatplan can show the steps in colour."
         ]
       },
       "progress": {
@@ -496,7 +507,7 @@
       "connect": {
         "title": "Attach them to the project",
         "text": "Point of view, characters present, location, outline chapter and notes: everything links from the event.",
-        "points": ["Linked sheets show these events under “In the plot”."]
+        "points": ["Linked sheets show these events in their “Plot” section."]
       },
       "reading": {
         "title": "Read in the reader's order",

@@ -178,7 +178,7 @@ export function MenuBar() {
       command("openTrash", t("edit.trash")),
     ],
     view: [
-      command("togglePanel", t("view.togglePanel")),
+      command("togglePanel", t("view.togglePanel"), "togglePanel"),
       command("toggleRail", t("view.toggleRail")),
       SEPARATOR,
       command("nextTab", t("view.nextTab"), "nextTab"),

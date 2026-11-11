@@ -71,7 +71,12 @@ pub fn run() {
             // -----------------------------------------------------------------
             // 2. Base de données de l'application
             // -----------------------------------------------------------------
-            let data_dir = app.path().app_data_dir()?;
+            // `GANIS_DATA_DIR` : autre dossier de données (tests de bout en
+            // bout, démonstration), comme pour `seed_demo`.
+            let data_dir = match std::env::var_os("GANIS_DATA_DIR") {
+                Some(dir) if !dir.is_empty() => std::path::PathBuf::from(dir),
+                _ => app.path().app_data_dir()?,
+            };
 
             let app_db = tauri::async_runtime::block_on(async {
                 db::init_app_db(&data_dir).await
@@ -154,6 +159,15 @@ pub fn run() {
             commands::manga::set_manga_chapter,
             commands::manga::get_manga_settings,
             commands::manga::set_manga_settings,
+            commands::manga::list_manga_extra_pages,
+            commands::manga::create_manga_extra_page,
+            commands::manga::update_manga_extra_page,
+            commands::manga::reorder_manga_extra_pages,
+            commands::manga::delete_manga_extra_page,
+            commands::manga::set_manga_production_stage,
+            commands::manga::set_manga_extra_art,
+            commands::manga::remove_manga_extra_art,
+            commands::manga::get_manga_extra_art,
             commands::novel::update_editorial,
             commands::novel::save_export_file,
             commands::characters::get_character_settings,
@@ -262,12 +276,16 @@ pub fn run() {
             commands::structure_links::unlink_structure_character,
             commands::structure_links::link_structure_location,
             commands::structure_links::unlink_structure_location,
+            commands::structure_links::link_structure_entry,
+            commands::structure_links::unlink_structure_entry,
             commands::structure::create_structure_node,
             commands::structure::update_structure_node,
             commands::structure::move_structure_node,
             commands::structure::delete_structure_node,
             commands::plot::get_plot,
             commands::plot::update_plot,
+            commands::sheets::get_sheet_display,
+            commands::sheets::set_sheet_display,
             commands::glossary::list_glossary_terms,
             commands::glossary::create_glossary_term,
             commands::glossary::update_glossary_term,

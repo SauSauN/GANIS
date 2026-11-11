@@ -102,7 +102,7 @@ export default function Welcome() {
               className="bg-background/70 backdrop-blur sm:min-w-36"
               onClick={handleSignIn}
             >
-              <LogIn className="mr-2 h-4 w-4" />
+              <LogIn />
               {t("actions.signIn")}
             </Button>
           </div>

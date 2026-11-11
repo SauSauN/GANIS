@@ -59,7 +59,9 @@
           "Le niveau de détail des fiches se règle dans les paramètres du projet.",
           "Ajoutez un portrait et une galerie d'images à chaque fiche.",
           "Chaque fiche s'ouvre dans son propre onglet, au nom du personnage.",
-          "Palette de couleurs : ses couleurs encadrent le portrait du personnage."
+          "Palette de couleurs : ses couleurs encadrent le portrait du personnage.",
+          "Sous la fiche, trois sections de liens : « Liens avec l'univers » (relations, lieux, faune et flore, objets, factions, peuples, magie, rangés par sorte, avec un seul bouton « Ajouter un lien »), « Trame » et « Récit ».",
+          "« Trame » et « Récit » sont masquées par défaut sur les fiches ; affichez-les dans Paramètres du projet › Personnages (ou › Lieux, › Objets…). Seul l'affichage change : les liens restent utilisés partout ailleurs."
         ]
       },
       "locations": {
@@ -199,6 +201,7 @@
       "guide": "Guide de démarrage",
       "shortcuts": "Raccourcis clavier",
       "palette": "Palette : pages, actions, recherche",
+      "togglePanel": "Replier ou déplier le panneau du milieu (hors de l'éditeur)",
       "search": "Rechercher dans le projet (loupe)",
       "center": "Aide de GANIS",
       "readStory": "Lire toute l'histoire / quitter la lecture"
@@ -253,8 +256,8 @@
           "Les messages distinguent vraiment le singulier et le pluriel.",
           "Édition › Coller fonctionne depuis le menu.",
           "Nouveau : Aide › Signaler un problème, pour copier les informations techniques utiles.",
-        "Les messages d'enregistrement (réussite ou échec) s'affichent en notification en bas de l'écran : la page ne bouge plus.",
-        "Double-clic : sur une ligne du plan, de l'avancement ou de l'historique, et dans le sommaire de lecture, il ouvre la fiche ; sur l'en-tête d'une piste de la trame, il la renomme."
+          "Les messages d'enregistrement (réussite ou échec) s'affichent en notification en bas de l'écran : la page ne bouge plus.",
+          "Double-clic : sur une ligne du plan, de l'avancement ou de l'historique, et dans le sommaire de lecture, il ouvre la fiche ; sur l'en-tête d'une piste de la trame, il la renomme."
         ]
       }
     }
@@ -349,7 +352,7 @@
           "Choisissez les catégories utiles (armes, véhicules, magie…) : seules celles-ci sont proposées à la création. Vous pouvez aussi ajouter vos propres types.",
           "Le type choisit les champs de la fiche : une arme n'a pas les mêmes informations qu'un véhicule.",
           "Un objet peut être rangé dans un autre (une clé dans un coffre, un moteur dans un vaisseau) : le panneau les montre en arbre.",
-          "La carte des liens relie l'objet à qui le possède, l'utilise ou le recherche, et au lieu où il se trouve, avec une période du récit si besoin (un objet qui change de main)."
+          "« Liens avec l'univers » relie l'objet à qui le possède, l'utilise ou le recherche, et au lieu où il se trouve, avec une période du récit si besoin (un objet qui change de main)."
         ]
       },
       "species": {
@@ -360,7 +363,7 @@
           "Choisissez la faune, la flore ou les deux. Vous pouvez aussi ajouter vos propres types.",
           "Une fiche est soit une espèce entière (les loups gris), soit un animal ou une plante précis (Éclair, le cheval du héros), rangé sous son espèce.",
           "Un animal précis peut aussi être un personnage : « Créer sa fiche de personnage » ou l'associer à un personnage existant. La fiche du personnage le montre en retour.",
-          "La carte des liens indique où il vit, de quoi il se nourrit, à qui il appartient et ce qu'on en fait."
+          "« Liens avec l'univers » indique où il vit, de quoi il se nourrit, à qui il appartient et ce qu'on en fait."
         ]
       },
       "factions": {
@@ -370,8 +373,8 @@
           "Module facultatif : activez-le dans Paramètres du projet › Factions, il apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
           "Choisissez les catégories utiles (pouvoir politique, armée, religion, crime…). Le type choisit les champs : une armée a ses forces, une religion ses dogmes et ses rites.",
           "Une faction peut avoir des branches : la section d'un ordre, la cellule d'un réseau, la famille d'un clan.",
-          "La carte « Membres » regroupe ses chefs, ses fondateurs, ses membres et ses soutiens. Le rôle précis (capitaine, espion…) se note dans la précision du lien.",
-          "La carte des liens note ses alliés, ses ennemis, son siège, les lieux où elle est implantée et ce qu'elle contrôle, avec une période du récit si besoin."
+          "Ses chefs, ses fondateurs, ses membres et ses soutiens sont dans « Liens avec l'univers », avec les personnages. Le rôle précis (capitaine, espion…) se note dans la précision du lien.",
+          "« Liens avec l'univers » note aussi ses alliés, ses ennemis, son siège, les lieux où elle est implantée et ce qu'elle contrôle, avec une période du récit si besoin."
         ]
       },
       "peoples": {
@@ -381,7 +384,7 @@
           "Module facultatif : activez-le dans Paramètres du projet › Peuples, cultures et religions, il apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
           "Trois catégories : peuples et races, cultures et traditions (dont les langues), religions et croyances (panthéons, divinités, mythologies, prophéties). Le type choisit les champs.",
           "Une fiche peut en contenir d'autres : un sous-peuple dans son peuple, une branche dans sa religion, une divinité dans son panthéon.",
-          "La carte « Qui en fait partie » regroupe les membres, les pratiquants, les locuteurs et les fidèles ; la carte des liens note aussi où vit un peuple et les pouvoirs qu'il maîtrise.",
+          "« Liens avec l'univers » regroupe les membres, les pratiquants, les locuteurs et les fidèles, où vit un peuple et les pouvoirs qu'il maîtrise.",
           "Pas de doublon avec les Factions : une religion (ses croyances, ses rites) est ici, l'église ou le culte qui l'organise reste une faction, reliée par « pratique »."
         ]
       },
@@ -392,7 +395,7 @@
           "Module facultatif : activez-le dans Paramètres du projet › Magie et pouvoirs, il apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
           "Trois niveaux : le système (magie, énergie intérieure, super-pouvoirs, pouvoir divin, psychisme, alchimie), ses écoles et branches (éléments, lignées), puis ses sorts et techniques.",
           "Le type choisit les champs : un système a sa source, ses règles, son coût et ses limites ; une technique ses effets, sa puissance, sa portée et ses risques.",
-          "La carte « Qui la maîtrise » regroupe ceux qui la maîtrisent et ceux qui l'enseignent ; la carte des liens note ce qui en est la source et qui l'interdit.",
+          "« Liens avec l'univers » regroupe ceux qui la maîtrisent et ceux qui l'enseignent, ce qui en est la source et qui l'interdit.",
           "Pas de doublon : les pouvoirs propres d'un personnage restent sur sa carte « Pouvoirs » ; reliez-le au système par « maîtrise »."
         ]
       },
@@ -402,11 +405,15 @@
         "items": [
           "Roman : parties, chapitres, scènes. Film : actes, séquences, scènes. Manga : tomes, chapitres, pages… Les noms se changent dans les paramètres du projet.",
           "Les numéros se calculent seuls ; vous pouvez sortir un élément de la numérotation (prologue, interlude).",
+          "La fiche d'un élément lie aussi les fiches du monde (section « Univers ») : un objet au cœur de la scène, une faction présente, une magie citée. Une fiche du monde peut aussi se lier à un élément depuis sa section « Récit ».",
           "La numérotation automatique (renumérotation à chaque déplacement) s'active dans les paramètres du projet, tout comme la couleur de chaque niveau.",
           "La fiche d'un élément montre son résumé, ses personnages (point de vue, présents…) et ses lieux.",
           "Documents : dans la fiche d'un élément, rangez ses fichiers (pages de manga, PDF, Word, images, sons…) avec « Ajouter des fichiers » ou par glisser-déposer. Ils sont rangés dans le projet (chiffrés si le projet est privé) et exportés dans le .ganix.",
           "Cliquez sur un document pour le lire dans GANIS ; « Lire les pages » enchaîne les images d'un chapitre. « Modifier dans l'application » l'ouvre dans Word, Acrobat, Clip Studio… : chaque enregistrement est repris, l'ancien contenu reste dans les versions.",
           "Manga / BD : Scénario › Chemin de fer montre les pages d'un tome en planches, dans le sens de lecture choisi. Une page affiche le dessin rangé sur sa fiche ; à défaut, les dessins rangés sur le chapitre sont répartis dans l'ordre. La première page imprimée décide des vis-à-vis : une révélation prévue au tourné sur une page paire est signalée.",
+          "Manga / BD : les pages hors récit (couverture, page de titre, sommaire, crédits, bonus, postface…) s'ajoutent sous le chemin de fer. Elles prennent leur place dans les planches et dans les folios ; les couvertures sont à part, sans folio.",
+          "Manga / BD : Scénario › Suivi de fabrication donne l'étape de chaque page (storyboard, crayonné, encrage, trames, lettrage, validée), une page ou toute une sélection à la fois. Le chemin de fer peut afficher ces étapes en couleur (« Afficher : Fabrication »).",
+          "Manga / BD : « Exporter le scénario », dans le chemin de fer, enregistre le scénario du tome pour le dessinateur (Word, PDF ou texte) : personnages et lieux en tête, pages hors récit, folio de chaque page, cases et textes.",
           "Manga / BD : la fiche d'un chapitre crée ses pages en une fois (« Ajouter des pages »). Rangez chaque dessin sur la fiche de sa page : il s'affiche à côté des cases, et « Lire les pages » du chapitre les enchaîne. Les cases sont trouvées par la recherche et gardées dans les versions de la page."
         ]
       },
@@ -429,7 +436,7 @@
           "Tirez la poignée ronde d'une carte vers une autre pour créer un lien : impact, influence ou croisement.",
           "Reliez chaque événement au projet : point de vue, personnages présents, lieu, chapitre du découpage et notes.",
           "« Lecture de l'histoire » affiche les événements dans l'ordre du lecteur (par défaut celui du découpage) avec tout ce qui s'y rattache, documents du chapitre compris.",
-          "Les fiches des personnages, des lieux et des éléments du découpage montrent leurs événements dans « Dans la trame ».",
+          "Les fiches des personnages, des lieux, des éléments du découpage et du monde (objets, factions…) montrent leurs événements dans leur section « Trame ». Dans le panneau d'un événement, « Objets, faune et flore, factions… » y ajoute des fiches du monde.",
           "Ctrl+Z annule chaque geste sur le plateau. Le bouton « Tension » affiche la courbe de tension ; les couleurs des trames se règlent dans Paramètres du projet › Trame."
         ]
       },

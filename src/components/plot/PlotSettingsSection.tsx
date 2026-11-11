@@ -1,9 +1,10 @@
 import { useTranslation } from "react-i18next";
 import { ColorSwatches } from "@/components/structure/ColorSwatches";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cardClass, cardContentClass, cardHeaderClass } from "@/components/workspace/views/PageShell";
 import { PLOT_PALETTE } from "@/lib/plot";
 import { usePlotStore, useProjectPlot } from "@/stores/plotStore";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 /**
  * Paramètres du projet › Trame : couleur de chaque trame (comme les
@@ -17,8 +18,7 @@ export function PlotSettingsSection({ projectId }: { projectId: string }) {
   return (
     <Card className={cardClass}>
       <CardHeader className={cardHeaderClass}>
-        <CardTitle>{t("settings.colors")}</CardTitle>
-        <CardDescription>{t("settings.colorsHint")}</CardDescription>
+        <TitleWithInfo info={t("settings.colorsHint")}>{t("settings.colors")}</TitleWithInfo>
       </CardHeader>
       <CardContent className={cardContentClass}>
         {error && (

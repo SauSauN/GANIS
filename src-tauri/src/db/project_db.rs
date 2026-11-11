@@ -181,7 +181,7 @@ mod tests {
         assert_eq!(content, "Un secret bien gardé");
         pool.close().await;
 
-        std::fs::remove_dir_all(dir).unwrap();
+        crate::utils::remove_dir_eventually(dir).await;
     }
 
     #[tokio::test]
@@ -197,7 +197,7 @@ mod tests {
         let pool = init_project_db(&dir, &key).await.unwrap();
         pool.close().await;
 
-        std::fs::remove_dir_all(dir.parent().unwrap()).unwrap();
+        crate::utils::remove_dir_eventually(dir.parent().unwrap()).await;
     }
 
     #[tokio::test]
@@ -228,7 +228,7 @@ mod tests {
         assert_eq!(content, "Avant");
         pool.close().await;
 
-        std::fs::remove_dir_all(dir).unwrap();
+        crate::utils::remove_dir_eventually(dir).await;
     }
 
     #[tokio::test]
@@ -263,6 +263,6 @@ mod tests {
         assert_eq!(content, "Copie");
         copy.close().await;
 
-        std::fs::remove_dir_all(dir).unwrap();
+        crate::utils::remove_dir_eventually(dir).await;
     }
 }

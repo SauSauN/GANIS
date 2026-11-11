@@ -3,6 +3,7 @@ import { doubleClickHint, onRowDoubleClick } from "@/lib/doubleClick";
 import { useTranslation } from "react-i18next";
 import {
   BookA,
+  BookImage,
   Drama,
   FileText,
   Flag,
@@ -31,7 +32,7 @@ import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { fieldClass, PageShell } from "@/components/workspace/views/PageShell";
 import { api } from "@/lib/api";
 import { itemTabId } from "@/lib/search";
-import { restoreFromTrash } from "@/lib/trash";
+import { restoreFromTrash, trashLabel } from "@/lib/trash";
 import { cn } from "@/lib/utils";
 import { useTrashStore } from "@/stores/trashStore";
 import type { Activity, HistoryKind } from "@/types";
@@ -58,6 +59,7 @@ const ICONS: Record<HistoryKind, LucideIcon> = {
   plot: Waypoints,
   editorial: Megaphone,
   glossaryTerm: BookA,
+  mangaExtraPage: BookImage,
 };
 
 const KINDS = Object.keys(ICONS) as HistoryKind[];
@@ -130,7 +132,11 @@ export function HistoryView({ projectId, feature, onOpenFeature }: HistoryViewPr
   }
 
   const name = (item: Activity) =>
-    item.kind === "synopsis" || item.kind === "editorial" ? tt(`kinds.${item.kind}`) : item.label.trim() || tt(`trash:untitled.${item.kind}`);
+    item.kind === "synopsis" || item.kind === "editorial"
+      ? tt(`kinds.${item.kind}`)
+      : item.kind === "mangaExtraPage"
+        ? trashLabel(item.kind, item.label)
+        : item.label.trim() || tt(`trash:untitled.${item.kind}`);
 
   return (
     <PageShell

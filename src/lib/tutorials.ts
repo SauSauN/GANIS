@@ -1,5 +1,6 @@
 import {
   BookOpenText,
+  Brush,
   Clapperboard,
   Drama,
   FileUp,
@@ -104,6 +105,7 @@ export const TUTORIALS: Record<TutorialId, Tutorial> = {
       { id: "art", icon: Image },
       { id: "read", icon: BookOpenText, open: "script.read" },
       { id: "flatplan", icon: GalleryThumbnails, open: "script.flatplan" },
+      { id: "production", icon: Brush, open: "script.production" },
       { id: "progress", icon: Target, open: "script.progress" },
       { id: "continuity", icon: Route, open: "script.continuity" },
     ],

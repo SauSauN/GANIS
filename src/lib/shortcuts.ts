@@ -40,6 +40,9 @@ export const SHORTCUTS: Shortcut[] = [
     inFields: true,
   },
   { action: "palette", combos: [{ ctrl: true, key: "k" }], inFields: true },
+  // Ctrl+B : replier ou déplier le panneau du milieu. Hors des champs de
+  // saisie seulement : dans l'éditeur, Ctrl+B reste « Gras ».
+  { action: "togglePanel", combos: [{ ctrl: true, key: "b" }], inFields: false },
   // Ctrl+F : la recherche du projet (loupe de la barre de titre), même
   // depuis un champ ; le moteur web n'ouvre pas sa propre recherche.
   { action: "search", combos: [{ ctrl: true, key: "f" }], inFields: true },

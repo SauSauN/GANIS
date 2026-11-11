@@ -242,6 +242,8 @@ export interface StructureNode {
   rhythm: Rhythm | null;
   /** Vrai : révélation après le tourné de page (manga). */
   pageTurn: boolean;
+  /** Dernière étape de fabrication terminée d'une page (manga) ; `null` : rien de commencé. */
+  productionStage: ProductionStage | null;
   createdAt: string; // RFC 3339, UTC
   updatedAt: string; // RFC 3339, UTC
 }
@@ -328,6 +330,63 @@ export interface PageScriptInput {
 export interface MangaSettings {
   panelWordsMax: number | null;
   pageWordsMax: number | null;
+}
+
+/**
+ * Étapes de fabrication d'une page, dans l'ordre (voir
+ * `manga_production_service.rs`). La valeur est la dernière étape terminée.
+ */
+export type ProductionStage = "storyboard" | "pencils" | "inks" | "tones" | "lettering" | "done";
+
+/** Sorte de page hors récit d'un tome. */
+export type ExtraPageKind =
+  | "cover"
+  | "title"
+  | "toc"
+  | "credits"
+  | "cast"
+  | "foreword"
+  | "bonus"
+  | "afterword"
+  | "preview"
+  | "blank"
+  | "backCover"
+  | "other";
+
+/** Avant (`front`) ou après (`back`) le récit. */
+export type ExtraPagePlacement = "front" | "back";
+
+/** Page d'un tome qui n'est pas l'histoire (couverture, page de titre, bonus…). */
+export interface MangaExtraPage {
+  id: string;
+  /** Tome ; `null` si le projet n'a pas de tomes. */
+  volumeId: string | null;
+  placement: ExtraPagePlacement;
+  position: number;
+  kind: ExtraPageKind;
+  title: string;
+  notes: string;
+  productionStage: ProductionStage | null;
+  /** Vrai : la page a un dessin (lu à part, voir `getMangaExtraArt`). */
+  hasArt: boolean;
+  /** Date du dernier changement du dessin (rafraîchit la vignette). */
+  artUpdatedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExtraPageInput {
+  volumeId: string | null;
+  placement: ExtraPagePlacement;
+  kind: ExtraPageKind;
+  title: string;
+  notes: string;
+}
+
+export interface ExtraPageUpdate {
+  kind: ExtraPageKind;
+  title: string;
+  notes: string;
 }
 
 export interface MangaChapterFields {
@@ -460,9 +519,23 @@ export interface NodeLocationLink {
 }
 
 /** Personnages et lieux liés aux éléments du découpage. */
+/** Rôle d'une fiche du monde (objet, faune et flore…) dans un élément du découpage. */
+export type NodeEntryRole = "central" | "present" | "mentioned";
+
+/** Fiche du monde liée à un élément du découpage. */
+export interface NodeEntryLink {
+  nodeId: string;
+  kind: WorldModule;
+  entryId: string;
+  role: NodeEntryRole;
+  createdAt: string; // RFC 3339, UTC
+}
+
 export interface StructureLinks {
   characters: NodeCharacterLink[];
   locations: NodeLocationLink[];
+  /** Fiches du monde ; un lien vers une fiche supprimée peut y rester (à ignorer). */
+  entries: NodeEntryLink[];
 }
 
 /** Découpage complet d'un projet. */
@@ -984,7 +1057,8 @@ export type TrashKind =
   | "people"
   | "magic"
   | "worldLink"
-  | "glossaryTerm";
+  | "glossaryTerm"
+  | "mangaExtraPage";
 
 export interface TrashItem {
   id: string;
@@ -1045,7 +1119,7 @@ export interface WorkCalendar {
 }
 
 /** `document` : l'identifiant est celui de l'élément du découpage qui le contient. */
-export type SearchKind = "character" | "location" | "item" | "species" | "faction" | "people" | "magic" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky";
+export type SearchKind = "character" | "location" | "item" | "species" | "faction" | "people" | "magic" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky" | "glossaryTerm";
 
 export interface SearchHit {
   kind: SearchKind;
@@ -1120,6 +1194,16 @@ export interface ExternalSync {
 // ----------------------------------------------------------------------------
 // Glossaire (voir `glossary_service.rs`)
 // ----------------------------------------------------------------------------
+
+/** Modules dont les fiches ont les sections « Récit » et « Trame ». */
+export type SheetModule = "character" | "location" | WorldModule;
+
+/** Sections « Récit » et « Trame » visibles sur les fiches d'un module (réglage du projet). */
+export interface SheetDisplay {
+  module: SheetModule;
+  showStory: boolean;
+  showPlot: boolean;
+}
 
 /** Sortes de fiches qu'un terme du glossaire peut citer. */
 export type GlossaryLinkKind = "character" | "location" | WorldModule;

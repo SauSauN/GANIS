@@ -23,6 +23,7 @@ import {
   type NovelFields,
   type StructureNode,
 } from "@/types";
+import { InfoTip } from "@/components/common/InfoTip";
 
 const fieldClass =
   "h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring disabled:opacity-50";
@@ -303,7 +304,7 @@ export function NovelWritingCard({ projectId, node, totalWords, isChapter, isSce
                   ))}
                 </select>
               </Field>
-              <Field label={t("writing.person")} htmlFor={`novel-person-${node.id}`}>
+              <Field label={t("writing.person")} hint={t("writing.narrationHint")} htmlFor={`novel-person-${node.id}`}>
                 <select
                   id={`novel-person-${node.id}`}
                   value={node.narrativePerson ?? ""}
@@ -336,7 +337,6 @@ export function NovelWritingCard({ projectId, node, totalWords, isChapter, isSce
                 </select>
               </Field>
             </div>
-            <p className="text-xs text-muted-foreground">{t("writing.narrationHint")}</p>
           </div>
         )}
 
@@ -348,15 +348,18 @@ export function NovelWritingCard({ projectId, node, totalWords, isChapter, isSce
 function Field({ label, hint, htmlFor, children }: { label: string; hint?: string; htmlFor?: string; children: ReactNode }) {
   return (
     <div className="space-y-1.5">
-      {htmlFor ? (
-        <label htmlFor={htmlFor} className="block text-sm font-medium">
-          {label}
-        </label>
-      ) : (
-        <p className="text-sm font-medium">{label}</p>
-      )}
+      {/* L'aide du champ est derrière un « i », à côté du libellé. */}
+      <div className="flex items-center gap-1.5">
+        {htmlFor ? (
+          <label htmlFor={htmlFor} className="block text-sm font-medium">
+            {label}
+          </label>
+        ) : (
+          <p className="text-sm font-medium">{label}</p>
+        )}
+        {hint && <InfoTip>{hint}</InfoTip>}
+      </div>
       {children}
-      {hint && <p className="text-xs text-muted-foreground">{hint}</p>}
     </div>
   );
 }

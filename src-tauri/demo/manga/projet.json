@@ -3721,6 +3721,152 @@
    ]
   }
  ],
+ "extraPages": [
+  {
+   "volume": "@node:t1",
+   "placement": "front",
+   "kind": "cover",
+   "title": "Sora sur la falaise, la carte au vent",
+   "notes": "Sora de dos, six lunes dans le ciel, la place de la septième laissée vide. Titre en haut, numéro du tome en bas à droite.",
+   "stage": "done"
+  },
+  {
+   "volume": "@node:t1",
+   "placement": "front",
+   "kind": "title",
+   "title": "Hanaori — La sans-lune",
+   "stage": "done"
+  },
+  {
+   "volume": "@node:t1",
+   "placement": "front",
+   "kind": "cast",
+   "title": "Les personnages",
+   "notes": "Sora, Yuzu, Haruo et Rei en buste, une phrase chacun. Pas de révélation sur Rei.",
+   "stage": "lettering"
+  },
+  {
+   "volume": "@node:t1",
+   "placement": "back",
+   "kind": "bonus",
+   "title": "Croquis : Sora et le renard d'écume",
+   "notes": "Recherches de personnages du carnet de l'auteur, avec annotations manuscrites.",
+   "stage": "inks"
+  },
+  {
+   "volume": "@node:t1",
+   "placement": "back",
+   "kind": "afterword",
+   "title": "Le mot de l'autrice",
+   "notes": "Une demi-page de texte et un autoportrait en chibi."
+  },
+  {
+   "volume": "@node:t1",
+   "placement": "back",
+   "kind": "preview",
+   "title": "Dans le prochain tome",
+   "notes": "Le temple des Sept Lunes en silhouette, une seule réplique de Yuzu."
+  },
+  {
+   "volume": "@node:t1",
+   "placement": "back",
+   "kind": "backCover",
+   "title": "Résumé et accroche",
+   "stage": "storyboard"
+  },
+  {
+   "volume": "@node:t2",
+   "placement": "front",
+   "kind": "cover",
+   "title": "Yuzu sous la septième lune",
+   "stage": "storyboard"
+  },
+  {
+   "volume": "@node:t2",
+   "placement": "front",
+   "kind": "title",
+   "title": "Hanaori — La septième lune"
+  },
+  {
+   "volume": "@node:t2",
+   "placement": "front",
+   "kind": "toc",
+   "title": "Sommaire"
+  },
+  {
+   "volume": "@node:t2",
+   "placement": "back",
+   "kind": "afterword",
+   "title": "Le mot de l'autrice"
+  }
+ ],
+ "production": [
+  {
+   "stage": "done",
+   "pages": [
+    "pr01",
+    "pr02",
+    "pr03",
+    "c1p01",
+    "c1p02",
+    "c1p03",
+    "c1p04",
+    "c1p05",
+    "c1p06",
+    "c2p01",
+    "c2p02",
+    "c2p03",
+    "c2p04",
+    "c2p05",
+    "c2p06",
+    "c3p01",
+    "c3p02",
+    "c3p03",
+    "c3p04"
+   ]
+  },
+  {
+   "stage": "lettering",
+   "pages": [
+    "c3p05",
+    "c3p06"
+   ]
+  },
+  {
+   "stage": "tones",
+   "pages": [
+    "c4p01",
+    "c4p02",
+    "c4p03"
+   ]
+  },
+  {
+   "stage": "inks",
+   "pages": [
+    "c4p04",
+    "c4p05",
+    "c4p06"
+   ]
+  },
+  {
+   "stage": "pencils",
+   "pages": [
+    "c5p01",
+    "c5p02",
+    "c5p03"
+   ]
+  },
+  {
+   "stage": "storyboard",
+   "pages": [
+    "c5p04",
+    "c5p05",
+    "c5p06",
+    "c6p01",
+    "c6p02"
+   ]
+  }
+ ],
  "documents": [
   {
    "node": "@node:t1",

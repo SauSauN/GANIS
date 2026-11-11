@@ -721,14 +721,14 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
           <span className="h-5 w-px bg-border" aria-hidden="true" />
           <Button
             variant="ghost"
-            size="sm"
+            size="icon-sm"
             aria-pressed={view.tension}
             onClick={() => setView({ ...view, tension: !view.tension })}
+            aria-label={t("board.tension")}
             title={view.tension ? t("toolbar.tensionHide") : t("toolbar.tensionShow")}
             className={cn(view.tension && "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary")}
           >
             <Activity />
-            {t("board.tension")}
           </Button>
 
           <div className="ml-auto flex items-center gap-1.5">
@@ -739,10 +739,6 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
             <Button size="sm" onClick={() => void addLane(projectId)} title={t("toolbar.newLaneHint")}>
               <Plus />
               {t("toolbar.newLaneShort")}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => onOpenFeature("plot.reading")} title={t("toolbar.readingHint")}>
-              <BookOpen />
-              {t("toolbar.reading")}
             </Button>
             <Button
               ref={viewButtonRef}
@@ -761,6 +757,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
               label={t("toolbar.more")}
               trigger={<MoreHorizontal className="size-4" />}
               items={[
+                { id: "reading", label: t("toolbar.reading"), icon: BookOpen, run: () => onOpenFeature("plot.reading") },
                 { id: "tour", label: t("toolbar.tour"), icon: Footprints, disabled: !data.events.length, run: () => startTour() },
                 { id: "import", label: t("project.fromStructure"), icon: ListTree, separated: true, run: () => setDialog("import") },
                 { id: "templates", label: t("project.templates"), icon: LayoutTemplate, run: () => setDialog("templates") },

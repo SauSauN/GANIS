@@ -201,6 +201,15 @@ async fn the_manga_is_complete_with_its_script() {
     }
     assert!(characters::get_settings(&pool).await.unwrap().powers_enabled, "carte « Pouvoirs » activée");
 
+    // Fabrication : pages hors récit des deux tomes, pages à toutes les étapes.
+    let extras = crate::services::manga_production_service::list_extra_pages(&pool).await.unwrap();
+    assert_eq!(extras.len(), parsed.data.extra_pages.len());
+    assert!(extras.iter().all(|e| e.volume_id.is_some()));
+    let nodes = structure::get_structure(&pool, ProjectType::Manga).await.unwrap().nodes;
+    for stage in crate::services::manga_production_service::PRODUCTION_STAGES {
+        assert!(nodes.iter().any(|n| n.production_stage.as_deref() == Some(stage)), "étape {stage} inutilisée");
+    }
+
     // Glossaire : tous les termes créés, liés à des fiches.
     let terms = crate::services::glossary_service::list(&pool).await.unwrap();
     assert_eq!(terms.len(), parsed.data.glossary.len());

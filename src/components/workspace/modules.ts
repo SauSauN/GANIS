@@ -1,5 +1,6 @@
 import {
   BookA,
+  Brush,
   BookOpen,
   BookOpenText,
   BookText,
@@ -150,6 +151,7 @@ type FeatureId =
   | "manuscript.editorial"
   | "script.read"
   | "script.flatplan"
+  | "script.production"
   | "script.progress"
   | "script.continuity";
 
@@ -269,6 +271,7 @@ export const NOVEL_FEATURES = new Set(NOVEL_MODULE.features.map((feature) => fea
 export const MANGA_MODULE: WorkspaceModule = defineModule("script", Clapperboard, [
   defineFeature("script.read", BookOpenText),
   defineFeature("script.flatplan", GalleryThumbnails),
+  defineFeature("script.production", Brush),
   defineFeature("script.progress", Target),
   defineFeature("script.continuity", Route),
 ]);

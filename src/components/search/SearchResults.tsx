@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import {
+  BookA,
   Drama,
   Flag,
   Folder,
@@ -35,6 +36,7 @@ export const SEARCH_ICONS: Record<SearchHit["kind"], LucideIcon> = {
   note: NotebookText,
   noteFolder: Folder,
   sticky: StickyNote,
+  glossaryTerm: BookA,
 };
 
 /** Met en évidence les mots cherchés (sans tenir compte des accents). */

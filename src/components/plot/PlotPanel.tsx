@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowLeftRight, ArrowRight, BookOpen, Copy, ExternalLink, ListTree, MapPin, NotebookPen, Palette, Plus, Trash2, X } from "lucide-react";
 import { addEvent, createLink, deleteEvent, deleteLane, deleteLink, duplicateEvent, duplicateLane, moveEvent } from "@/components/plot/actions";
+import { EventEntries } from "@/components/plot/EventEntries";
 import { KindIcon } from "@/components/plot/KindIcon";
 import { area, Field, Fold, Head, input, useMutate, type PlotPanelProps } from "@/components/plot/panelParts";
 import { Button } from "@/components/ui/button";
@@ -318,6 +319,8 @@ function EventPanel({ projectId, data, links, onOpenFeature, event, placementOpe
             )}
           </div>
         </Field>
+
+        <EventEntries projectId={projectId} event={event} onChange={(entries) => set("entries", entries)} onOpenFeature={onOpenFeature} />
 
         <Field label={t("event.node")}>
           <div className="flex gap-1.5">

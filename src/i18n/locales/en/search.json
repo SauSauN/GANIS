@@ -19,7 +19,8 @@
     "species": "Fauna and flora",
     "faction": "Faction",
     "people": "People, culture or religion",
-    "magic": "Magic or power"
+    "magic": "Magic or power",
+    "glossaryTerm": "Glossary"
   },
   "untitled": {
     "character": "Unnamed character",
@@ -34,7 +35,8 @@
     "species": "Unnamed entry",
     "faction": "Untitled faction",
     "people": "Untitled sheet",
-    "magic": "Untitled sheet"
+    "magic": "Untitled sheet",
+    "glossaryTerm": "Untitled term"
   },
   "palette": {
     "title": "Command palette",

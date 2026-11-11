@@ -19,7 +19,8 @@
     "species": "Faune et flore",
     "faction": "Faction",
     "people": "Peuple, culture ou religion",
-    "magic": "Magie ou pouvoir"
+    "magic": "Magie ou pouvoir",
+    "glossaryTerm": "Glossaire"
   },
   "untitled": {
     "character": "Personnage sans nom",
@@ -34,7 +35,8 @@
     "species": "Fiche sans nom",
     "faction": "Faction sans nom",
     "people": "Fiche sans nom",
-    "magic": "Fiche sans nom"
+    "magic": "Fiche sans nom",
+    "glossaryTerm": "Terme sans nom"
   },
   "palette": {
     "title": "Palette de commandes",

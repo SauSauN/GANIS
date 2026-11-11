@@ -8,6 +8,7 @@ import { useWorldLinkStore } from "@/stores/worldLinkStore";
 import { useWorldStore } from "@/stores/worldStore";
 import { useRelationStore } from "@/stores/relationStore";
 import { useGlossaryStore } from "@/stores/glossaryStore";
+import { useSheetDisplayStore } from "@/stores/sheetDisplayStore";
 import { usePlotStore } from "@/stores/plotStore";
 import { useNoteStore } from "@/stores/noteStore";
 import { useToastStore } from "@/stores/toastStore";
@@ -142,7 +143,7 @@ function upsert(projects: Project[], project: Project): Project[] {
 }
 
 export const useProjectStore =
-  create<ProjectState>((set) => {
+  create<ProjectState>((set, get) => {
     /** Enregistre l'erreur dans le store puis la relance. */
     function fail(error: unknown, fallback: string): never {
       const message = messageOf(error, fallback);
@@ -327,6 +328,7 @@ export const useProjectStore =
           useNoteStore.getState().reset();
           usePlotStore.getState().reset();
           useGlossaryStore.getState().reset();
+          useSheetDisplayStore.getState().reset();
           useTrashStore.getState().reset();
           useToastStore.getState().clear();
         }
@@ -358,11 +360,11 @@ export const useProjectStore =
                 : state.currentProjectId,
             lastProjectId:
               state.lastProjectId === id ? null : state.lastProjectId,
-            // La corbeille sera relue à sa prochaine ouverture.
-            trash: [],
             loading: false,
             error: null,
           }));
+          // Le projet est maintenant dans la corbeille : son compteur suit.
+          void get().fetchTrash().catch(() => {});
         } catch (error) {
           fail(
             error,
@@ -450,6 +452,7 @@ export const useProjectStore =
         useNoteStore.getState().reset();
         usePlotStore.getState().reset();
         useGlossaryStore.getState().reset();
+        useSheetDisplayStore.getState().reset();
         useTrashStore.getState().reset();
         useToastStore.getState().clear();
 
@@ -473,6 +476,7 @@ export const useProjectStore =
         useNoteStore.getState().reset();
         usePlotStore.getState().reset();
         useGlossaryStore.getState().reset();
+        useSheetDisplayStore.getState().reset();
         useTrashStore.getState().reset();
         useToastStore.getState().clear();
 

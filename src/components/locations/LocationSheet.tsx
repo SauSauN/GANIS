@@ -55,6 +55,7 @@ import {
 import { parseList } from "@/lib/characters";
 import { cn } from "@/lib/utils";
 import type { Location, LocationSettings } from "@/types";
+import { InfoTip } from "@/components/common/InfoTip";
 
 export interface BannerControls {
   url: string | null;
@@ -105,9 +106,12 @@ function Field({
 
   return (
     <div className={cn("space-y-2", wide && "@md:col-span-2")}>
-      <Label htmlFor={id}>{label}</Label>
+      {/* L'aide du champ est derrière un « i », à côté du libellé. */}
+      <div className="flex items-center gap-1.5">
+        <Label htmlFor={id}>{label}</Label>
+        {hint && <InfoTip>{hint}</InfoTip>}
+      </div>
       {children(id)}
-      {hint && <p className="text-xs leading-5 text-muted-foreground">{hint}</p>}
     </div>
   );
 }

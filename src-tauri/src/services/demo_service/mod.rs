@@ -45,6 +45,7 @@ use crate::services::character_location_service::{self as character_places, Char
 use crate::services::character_service::{self as characters, CharacterInput};
 use crate::services::document_service as documents;
 use crate::services::glossary_service::{self as glossary, GlossaryInput};
+use crate::services::manga_production_service::{self as production, ExtraPageInput};
 use crate::services::history_service as history;
 use crate::services::location_service::{self as locations, CustomTypeInput, LocationInput};
 use crate::services::manga_service::{self as manga, ChapterFields, MangaSettings, PageScriptInput, PanelCharacter, PanelInput, TextInput};
@@ -158,6 +159,12 @@ struct Data {
     /// Termes du glossaire (`term`, `definition`, `category`, `links`).
     #[serde(default)]
     glossary: Vec<Value>,
+    /// Manga : pages hors récit des tomes (couverture, page de titre…).
+    #[serde(default)]
+    extra_pages: Vec<ExtraPageDef>,
+    /// Manga : étape de fabrication des pages (`stage` → clés de pages).
+    #[serde(default)]
+    production: Vec<ProductionDef>,
     #[serde(default)]
     manuscript: Option<ManuscriptDef>,
     #[serde(default)]
@@ -182,6 +189,30 @@ struct Data {
     /// Jours du calendrier de travail.
     #[serde(default)]
     work_days: Vec<WorkDayDef>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct ExtraPageDef {
+    /// Tome (`@node:clé`) ; absent si le projet n'a pas de tomes.
+    #[serde(default)]
+    volume: Option<String>,
+    placement: String,
+    kind: String,
+    #[serde(default)]
+    title: String,
+    #[serde(default)]
+    notes: String,
+    #[serde(default)]
+    stage: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct ProductionDef {
+    stage: String,
+    /// Clés des pages (sans `@`).
+    pages: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -699,6 +730,7 @@ impl<'a> Builder<'a> {
         self.world_entries().await?;
         self.links().await?;
         self.glossary().await?;
+        self.production().await?;
         self.texts().await?;
         self.manuscript().await?;
         self.documents().await?;
@@ -1012,6 +1044,31 @@ impl<'a> Builder<'a> {
             for (location, role) in &def.locations {
                 node_links::link_location(pool, &node, &self.refs.id("loc", location)?, role).await?;
             }
+        }
+        Ok(())
+    }
+
+    // ------------------------------------------------------------ Fabrication
+
+    async fn production(&mut self) -> AppResult<()> {
+        let data = &self.parsed.data;
+        for def in &data.extra_pages {
+            let volume_id = def.volume.as_deref().map(|v| self.refs.id("node", v)).transpose()?;
+            let input = ExtraPageInput {
+                volume_id,
+                placement: def.placement.clone(),
+                kind: def.kind.clone(),
+                title: def.title.clone(),
+                notes: def.notes.clone(),
+            };
+            let created = production::create_extra_page(self.pool, &input).await?;
+            if def.stage.is_some() {
+                production::set_production_stage(self.pool, &[], &[created.id], def.stage.as_deref()).await?;
+            }
+        }
+        for def in &data.production {
+            let pages = def.pages.iter().map(|key| self.refs.id("node", key)).collect::<AppResult<Vec<_>>>()?;
+            production::set_production_stage(self.pool, &pages, &[], Some(&def.stage)).await?;
         }
         Ok(())
     }

@@ -18,6 +18,7 @@ import { usePortraitUrl, useProjectCharacters } from "@/stores/characterStore";
 import { useRelationStore } from "@/stores/relationStore";
 import type { RelationInput } from "@/types";
 import { errorText } from "@/lib/errors";
+import { InfoTip } from "@/components/common/InfoTip";
 
 interface RelationDialogProps {
   projectId: string;
@@ -333,9 +334,12 @@ export function RelationDialog({
                 inverse les deux personnages : le parent est toujours la source. */}
             {draft.type === "family" && (
               <div className="space-y-1.5">
-                <Label htmlFor="relation-family" className="text-sm font-semibold">
-                  {t("family.label")}
-                </Label>
+                <div className="flex items-center gap-1.5">
+                  <Label htmlFor="relation-family" className="text-sm font-semibold">
+                    {t("family.label")}
+                  </Label>
+                  <InfoTip>{t("family.hint")}</InfoTip>
+                </div>
                 <select
                   id="relation-family"
                   value={draft.familyLink ?? ""}
@@ -371,7 +375,6 @@ export function RelationDialog({
                     <option value="cousin">{t("family.cousin")}</option>
                   </optgroup>
                 </select>
-                <p className="text-xs text-muted-foreground">{t("family.hint")}</p>
               </div>
             )}
 

@@ -8,6 +8,7 @@ import { locationsApi } from "./locations";
 import { packagesApi } from "./packages";
 import { worldApi } from "./world";
 import { glossaryApi } from "./glossary";
+import { sheetsApi } from "./sheets";
 
 export { ApiError, isTauri, translateApiError } from "./client";
 
@@ -25,4 +26,5 @@ export const api = {
   ...packagesApi,
   ...worldApi,
   ...glossaryApi,
+  ...sheetsApi,
 };

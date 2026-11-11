@@ -279,6 +279,10 @@ pub struct StructureNode {
     /// Vrai : la révélation de cette page doit tomber après le tourné de
     /// page (manga).
     pub page_turn: bool,
+    /// Dernière étape de fabrication terminée d'une page (manga) :
+    /// storyboard, pencils, inks, tones, lettering, done ; `None` : rien de
+    /// commencé (voir `manga_production_service`).
+    pub production_stage: Option<String>,
     pub created_at: String,
     pub updated_at: String,
 }
@@ -366,7 +370,7 @@ fn check_level(level: i64, count: usize) -> AppResult<()> {
 
 const NODE_COLUMNS: &str = "id, parent_id, level, title, summary, position, numbered, number, \
      content_words, word_goal, writing_status, narrative_person, narrative_tense, \
-     narrative_goal, page_goal, script_status, rhythm, page_turn, created_at, updated_at";
+     narrative_goal, page_goal, script_status, rhythm, page_turn, production_stage, created_at, updated_at";
 
 pub(crate) async fn find_node(pool: &SqlitePool, id: &str) -> AppResult<Option<StructureNode>> {
     let sql = format!("SELECT {NODE_COLUMNS} FROM structure_nodes WHERE id = ?");

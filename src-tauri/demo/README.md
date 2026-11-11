@@ -51,6 +51,8 @@ Objet JSON, clés en camelCase. Toute clé inconnue est refusée.
 | `characterLocations`, `worldLinks` | Liens personnage-lieu ; liens entre fiches de l'univers |
 | `nodeLinks` | Personnages et lieux d'un élément du découpage (`node`, `characters`, `locations` : clé → rôle) |
 | `glossary` | Termes du glossaire : `term`, `definition`, `category`, `links` (`kind` : `character`, `location`, `item`, `species`, `faction`, `people`, `magic` ; `id` : référence `@sorte:clé`) |
+| `extraPages` | Manga : pages hors récit d'un tome : `volume` (`@node:clé`, absent sans tomes), `placement` (`front`, `back`), `kind` (`cover`, `title`, `toc`, `credits`, `cast`, `foreword`, `bonus`, `afterword`, `preview`, `blank`, `backCover`, `other`), `title`, `notes`, `stage` |
+| `production` | Manga : étape de fabrication des pages : `stage` (`storyboard`, `pencils`, `inks`, `tones`, `lettering`, `done`), `pages` (clés des pages, sans `@`) |
 | `manuscript` | Roman : `goal` (mots du manuscrit), `dailyGoal` |
 | `editorial` | Roman : `pitch`, `summaryShort`, `summaryLong` (clés de sections) |
 | `documents` | Documents rangés dans le découpage (voir ci-dessous) |

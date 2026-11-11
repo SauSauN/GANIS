@@ -34,6 +34,7 @@ import {
   useThemeMode,
   type ThemeMode,
 } from "@/lib/theme";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 /** Thèmes proposés (libellés dans `settings.json`). */
 const THEME_OPTIONS: { id: ThemeMode; icon: LucideIcon }[] = [
@@ -312,8 +313,7 @@ function PanelMenuCard() {
   return (
     <Card className={cardClass}>
       <CardHeader className={cardHeaderClass}>
-        <CardTitle>{t("appearance.panelMenu.title")}</CardTitle>
-        <CardDescription>{t("appearance.panelMenu.description")}</CardDescription>
+        <TitleWithInfo info={t("appearance.panelMenu.description")}>{t("appearance.panelMenu.title")}</TitleWithInfo>
       </CardHeader>
 
       <CardContent className="px-6 py-6">
@@ -367,9 +367,7 @@ function PanelImageCard() {
   return (
     <Card className={cardClass}>
       <CardHeader className={cardHeaderClass}>
-        <CardTitle>{t("appearance.panelImage.title")}</CardTitle>
-
-        <CardDescription>{t("appearance.panelImage.description")}</CardDescription>
+        <TitleWithInfo info={t("appearance.panelImage.description")}>{t("appearance.panelImage.title")}</TitleWithInfo>
       </CardHeader>
 
       <CardContent className="grid gap-6 px-6 py-6 sm:grid-cols-[1fr_14rem]">

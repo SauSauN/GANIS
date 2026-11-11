@@ -1,5 +1,6 @@
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { SheetDisplayCard } from "@/components/project-settings/SheetDisplayCard";
 import { Loader2, Plus, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +16,7 @@ import { tutorialText, useTutorialStore } from "@/lib/tutorials";
 import { catalogOf, statusValues, WORKSPACE_MODULE } from "@/lib/world";
 import { useWorldEntries, useWorldStore } from "@/stores/worldStore";
 import type { CharacterDetailLevel, WorldModule } from "@/types";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 /**
  * Paramètres du projet › Objets (ou Faune et flore).
@@ -68,8 +70,7 @@ export function WorldSettingsSection({ projectId, module }: { projectId: string;
       {/* Activation */}
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{labels.text("settings.title")}</CardTitle>
-          <CardDescription>{labels.text("settings.description")}</CardDescription>
+          <TitleWithInfo info={labels.text("settings.description")}>{labels.text("settings.title")}</TitleWithInfo>
         </CardHeader>
         <CardContent className={`${cardContentClass} space-y-3`}>
           <div className="flex items-start gap-4 rounded-lg border p-4">
@@ -120,8 +121,7 @@ export function WorldSettingsSection({ projectId, module }: { projectId: string;
           {/* Catégories */}
           <Card className={cardClass}>
             <CardHeader className={cardHeaderClass}>
-              <CardTitle>{t("settings.categories.title")}</CardTitle>
-              <CardDescription>{labels.text("settings.categories")}</CardDescription>
+              <TitleWithInfo info={labels.text("settings.categories")}>{t("settings.categories.title")}</TitleWithInfo>
             </CardHeader>
             <CardContent className={cardContentClass}>
               <div className="grid gap-2 sm:grid-cols-2">
@@ -165,8 +165,7 @@ export function WorldSettingsSection({ projectId, module }: { projectId: string;
           {/* Niveau de détail */}
           <Card className={cardClass}>
             <CardHeader className={cardHeaderClass}>
-              <CardTitle>{t("settings.level.title")}</CardTitle>
-              <CardDescription>{t("settings.level.description")}</CardDescription>
+              <TitleWithInfo info={t("settings.level.description")}>{t("settings.level.title")}</TitleWithInfo>
             </CardHeader>
             <CardContent className={cardContentClass}>
               <LevelPicker
@@ -181,6 +180,7 @@ export function WorldSettingsSection({ projectId, module }: { projectId: string;
 
           <CustomTypesCard projectId={projectId} module={module} />
           <StatusListCard projectId={projectId} module={module} />
+          <SheetDisplayCard projectId={projectId} module={module} />
         </>
       )}
     </div>
@@ -228,8 +228,7 @@ function CustomTypesCard({ projectId, module }: { projectId: string; module: Wor
   return (
     <Card className={cardClass}>
       <CardHeader className={cardHeaderClass}>
-        <CardTitle>{t("settings.types.title")}</CardTitle>
-        <CardDescription>{labels.text("settings.types")}</CardDescription>
+        <TitleWithInfo info={labels.text("settings.types")}>{t("settings.types.title")}</TitleWithInfo>
       </CardHeader>
       <CardContent className={`${cardContentClass} space-y-5`}>
         {types.length === 0 ? (

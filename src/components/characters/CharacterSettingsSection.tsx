@@ -1,13 +1,12 @@
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { SheetDisplayCard } from "@/components/project-settings/SheetDisplayCard";
 import { Loader2, Plus, RotateCcw, WandSparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { LevelPicker } from "@/components/characters/LevelPicker";
@@ -23,6 +22,7 @@ import type { CharacterDetailLevel, CharacterListKey } from "@/types";
 import { errorText } from "@/lib/errors";
 import { notifyError, notifySaved } from "@/lib/notify";
 import { cn } from "@/lib/utils";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 /**
  * Paramètres du projet › Personnages : niveau de détail de toutes les
@@ -58,8 +58,7 @@ export function CharacterSettingsSection({ projectId }: { projectId: string }) {
     <div className="space-y-8">
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("characters.title")}</CardTitle>
-          <CardDescription>{t("characters.description")}</CardDescription>
+          <TitleWithInfo info={t("characters.description")}>{t("characters.title")}</TitleWithInfo>
         </CardHeader>
 
         <CardContent className={`${cardContentClass} space-y-4`}>
@@ -73,10 +72,11 @@ export function CharacterSettingsSection({ projectId }: { projectId: string }) {
 
       <PowersCard projectId={projectId} />
 
+      <SheetDisplayCard projectId={projectId} module="character" />
+
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("characters.lists.title")}</CardTitle>
-          <CardDescription>{t("characters.lists.description")}</CardDescription>
+          <TitleWithInfo info={t("characters.lists.description")}>{t("characters.lists.title")}</TitleWithInfo>
         </CardHeader>
 
         <CardContent className={`${cardContentClass} grid gap-x-8 gap-y-6 md:grid-cols-2`}>
@@ -228,8 +228,7 @@ function PowersCard({ projectId }: { projectId: string }) {
   return (
     <Card className={cardClass}>
       <CardHeader className={cardHeaderClass}>
-        <CardTitle>{t("characters.powers.title")}</CardTitle>
-        <CardDescription>{t("characters.powers.description")}</CardDescription>
+        <TitleWithInfo info={t("characters.powers.description")}>{t("characters.powers.title")}</TitleWithInfo>
       </CardHeader>
       <CardContent className={cardContentClass}>
         <div className="flex items-start gap-4 rounded-lg border p-4">

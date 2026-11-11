@@ -53,6 +53,7 @@ import {
   type ProjectType,
 } from "@/types";
 import { errorText } from "@/lib/errors";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 // Les libellés français de `@/types` ne servent plus qu'à lister les valeurs ;
 // le texte affiché vient de `projects.json` (types.* et statuses.*).
@@ -487,9 +488,7 @@ function StatusSection({ project }: { project: Project }) {
       {/* Organisation */}
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("organization.title")}</CardTitle>
-
-          <CardDescription>{t("organization.description")}</CardDescription>
+          <TitleWithInfo info={t("organization.description")}>{t("organization.title")}</TitleWithInfo>
         </CardHeader>
 
         <CardContent className="flex flex-wrap gap-3 px-6 py-6">
@@ -644,9 +643,7 @@ function DangerSection({ project }: { project: Project }) {
       {/* Export .ganix */}
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("danger.exportTitle")}</CardTitle>
-
-          <CardDescription>{t("danger.exportDescription")}</CardDescription>
+          <TitleWithInfo info={t("danger.exportDescription")}>{t("danger.exportTitle")}</TitleWithInfo>
         </CardHeader>
 
         <CardContent className="space-y-3 px-6 py-6">
@@ -672,9 +669,7 @@ function DangerSection({ project }: { project: Project }) {
       {/* Duplication */}
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("danger.duplicateTitle")}</CardTitle>
-
-          <CardDescription>{t("danger.duplicateDescription")}</CardDescription>
+          <TitleWithInfo info={t("danger.duplicateDescription")}>{t("danger.duplicateTitle")}</TitleWithInfo>
         </CardHeader>
 
         <CardContent className="space-y-3 px-6 py-6">

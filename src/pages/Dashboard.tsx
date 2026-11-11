@@ -575,7 +575,7 @@ export default function Dashboard() {
               )}
 
               <Button onClick={openCreateDialog}>
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus />
                 {t("newProject")}
               </Button>
             </div>
@@ -712,7 +712,7 @@ export default function Dashboard() {
                         <CardContent>
                           <div className="flex flex-wrap gap-2">
                             <Button onClick={openCreateDialog}>
-                              <Plus className="mr-2 h-4 w-4" />
+                              <Plus />
                               {t("empty.createFirst")}
                             </Button>
                             {signedIn && (

@@ -377,7 +377,20 @@
     "invalidThreshold": "Invalid threshold.",
     "unknownCharacter": "A character on this page no longer exists.",
     "unknownLocation": "The chosen location no longer exists.",
-    "panelNotFound": "This panel no longer exists."
+    "panelNotFound": "This panel no longer exists.",
+    "invalidStage": "Unknown production step.",
+    "invalidExtraKind": "Unknown page type.",
+    "invalidPlacement": "Invalid position: before or after the story.",
+    "coverPlacement": "The cover goes before the story, the back cover after it.",
+    "coverExists": "This volume already has this cover.",
+    "extraNotFound": "This page no longer exists.",
+    "extraTitleTooLong": "The title must not exceed {{max}} characters.",
+    "tooManyExtras": "A volume can have at most {{max}} non-story pages.",
+    "extraOtherVolume": "This page belongs to another volume.",
+    "tooManyPages": "Too many pages at once (at most {{max}}).",
+    "artTooLarge": "The image is too large (at most {{max}} MB).",
+    "artNotImage": "This file is not an image (PNG, JPEG, GIF or WebP).",
+    "noArt": "This page has no art."
   },
   "world": {
     "notFound": "Entry not found.",
@@ -422,5 +435,8 @@
   },
   "demo": {
     "unknown": "This example project does not exist."
+  },
+  "sheets": {
+    "invalidModule": "Unknown module."
   }
 }

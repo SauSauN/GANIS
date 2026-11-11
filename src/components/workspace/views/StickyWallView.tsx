@@ -16,6 +16,7 @@ import { useNoteStore, useProjectStickies } from "@/stores/noteStore";
 import type { StickyColor, StickyNote } from "@/types";
 import { errorText } from "@/lib/errors";
 import { notifyError } from "@/lib/notify";
+import { InfoTip } from "@/components/common/InfoTip";
 
 interface StickyWallViewProps {
   projectId: string;
@@ -280,7 +281,8 @@ export function StickyWallView({ projectId, feature }: StickyWallViewProps) {
             </button>
           ))}
         </div>
-        <p className="hidden flex-1 text-xs text-muted-foreground md:block">{t("wall.hint")}</p>
+        {/* Mode d'emploi du mur derrière un « i », à côté des boutons d'ajout. */}
+        <InfoTip>{t("wall.hint")}</InfoTip>
         {loaded && (
           <span className="ml-auto text-xs text-muted-foreground">{t("wall.count", { count: stickies.length })}</span>
         )}

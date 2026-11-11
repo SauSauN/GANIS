@@ -181,9 +181,7 @@
   },
   "animalCharacter": {
     "title": "Personnage",
-    "description": "Cet animal est-il aussi un personnage de l'histoire ?",
     "linked": "Cet animal est aussi un personnage : relations, scènes et psychologie sont sur sa fiche de personnage.",
-    "open": "Fiche personnage",
     "unlink": "Retirer le lien",
     "unlinkHint": "Redevient un animal tout court ; la fiche de personnage est gardée.",
     "notLinked": "Pour l'instant, c'est un animal tout court. S'il agit dans l'histoire (il a des relations, il apparaît dans des scènes), faites-en aussi un personnage.",
@@ -195,13 +193,11 @@
   },
   "characterAnimal": {
     "title": "Animal",
-    "description": "Ce personnage est-il un animal (ou une plante) de la faune et flore ?",
     "none": "Si ce personnage est un animal, associez-le à sa fiche (un animal précis de la faune et flore).",
     "pickLabel": "Animal ou plante précis",
     "noFree": "Aucun animal précis disponible"
   },
   "links": {
-    "title": "Liens dans l'univers",
     "description": {
       "character": "Ce qu'il possède, utilise, a fabriqué ou recherche ; ses compagnons et montures.",
       "location": "Les objets qui s'y trouvent, les animaux et les plantes qui y vivent.",
@@ -211,9 +207,7 @@
       "people": "Qui en fait partie, qui la pratique ou la parle, où ils vivent, les pouvoirs qu'ils maîtrisent.",
       "magic": "Qui la maîtrise ou l'enseigne, ce qui en est la source, qui l'interdit."
     },
-    "add": "Lier un élément",
     "edit": "Modifier le lien",
-    "empty": "Aucun lien pour l'instant.",
     "periodBoth": "de {{since}} à {{until}}",
     "periodFrom": "à partir de {{since}}",
     "periodUntil": "jusqu'à {{until}}",
@@ -373,6 +367,30 @@
       "save": "Enregistrer",
       "create": "Créer le lien"
     }
+  },
+  "universe": {
+    "title": "Liens avec l'univers",
+    "description": {
+      "character": "Tout ce qui relie ce personnage au monde : ses relations, ses lieux, les objets, la faune et la flore, les factions, les peuples et la magie.",
+      "location": "Qui y vit, y règne ou en est originaire ; les objets qui s'y trouvent, la faune et la flore qui y vivent, les factions et les peuples qui y sont."
+    },
+    "add": "Ajouter un lien",
+    "empty": "Aucun lien pour l'instant.",
+    "animalLabel": "est l'animal",
+    "animalAdd": "Ce personnage est un animal…",
+    "animalEdit": "Modifier le lien avec la faune et flore",
+    "groups": {
+      "character": "Personnages",
+      "location": "Lieux",
+      "species": "Faune et flore",
+      "item": "Objets",
+      "faction": "Factions",
+      "people": "Peuples, cultures et religions",
+      "magic": "Magie et pouvoirs"
+    },
+    "characterLabel": "est le personnage",
+    "characterEdit": "Modifier le lien avec le personnage",
+    "characterAdd": "Cet animal est un personnage…"
   },
   "item": {
     "categories": {
@@ -1096,18 +1114,6 @@
       "add": "Ajouter une branche",
       "empty": "Aucune branche."
     },
-    "members": {
-      "title": "Membres",
-      "description": "Les personnages liés à la faction, par rôle. Le rôle précis (capitaine, espion…) se note dans la précision du lien.",
-      "empty": "Aucun membre. Liez des personnages avec « Ajouter un membre ».",
-      "add": "Ajouter un membre",
-      "groups": {
-        "leads": "Chefs",
-        "founded": "Fondateurs",
-        "memberOf": "Membres",
-        "supports": "Soutiens"
-      }
-    },
     "sidebar": {
       "title": "Factions",
       "empty": "Aucune faction."
@@ -1311,18 +1317,6 @@
       "add": "Rattacher une fiche",
       "empty": "Aucune fiche rattachée."
     },
-    "members": {
-      "title": "Qui en fait partie",
-      "description": "Les personnages et factions liés à cette fiche, par rôle. Le rôle précis (grande prêtresse, interprète…) va dans la précision du lien.",
-      "empty": "Personne pour l'instant. Liez des personnages avec « Ajouter quelqu'un ».",
-      "add": "Ajouter quelqu'un",
-      "groups": {
-        "belongsTo": "Membres",
-        "practices": "Pratiquants",
-        "speaks": "Locuteurs",
-        "worships": "Fidèles"
-      }
-    },
     "sidebar": {
       "title": "Peuples, cultures et religions",
       "empty": "Aucune fiche."
@@ -1518,16 +1512,6 @@
       "description": "Les écoles, éléments ou techniques qui dépendent de « {{name}} ».",
       "add": "Rattacher une fiche",
       "empty": "Aucune fiche rattachée."
-    },
-    "members": {
-      "title": "Qui la maîtrise",
-      "description": "Les personnages, peuples et factions liés à ce pouvoir, par rôle. Le niveau précis (apprenti, maître…) va dans la précision du lien ; les pouvoirs propres d'un personnage restent sur sa carte « Pouvoirs ».",
-      "empty": "Personne pour l'instant. Liez des personnages avec « Ajouter quelqu'un ».",
-      "add": "Ajouter quelqu'un",
-      "groups": {
-        "masters": "Maîtrisent",
-        "teaches": "Enseignent"
-      }
     },
     "sidebar": {
       "title": "Magie et pouvoirs",

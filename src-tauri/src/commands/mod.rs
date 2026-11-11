@@ -20,6 +20,7 @@ pub mod packages;
 pub mod plot;
 pub mod projects;
 pub mod relations;
+pub mod sheets;
 pub mod structure;
 pub mod structure_links;
 pub mod synopsis;

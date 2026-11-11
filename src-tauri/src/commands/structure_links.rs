@@ -75,3 +75,31 @@ pub async fn unlink_structure_location(
     let pool = project_pool(&state, &project_id).await?;
     structure_link_service::unlink_location(&pool, &node_id, &location_id).await
 }
+
+/// Lie une fiche du monde (objet, faune et flore, faction, peuple, magie)
+/// à un élément (ou change son rôle).
+#[tauri::command(rename_all = "camelCase")]
+pub async fn link_structure_entry(
+    state: State<'_, AppState>,
+    project_id: String,
+    node_id: String,
+    kind: String,
+    entry_id: String,
+    role: String,
+) -> AppResult<()> {
+    let pool = project_pool(&state, &project_id).await?;
+    structure_link_service::link_entry(&pool, &node_id, &kind, &entry_id, &role).await
+}
+
+/// Retire une fiche du monde d'un élément.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn unlink_structure_entry(
+    state: State<'_, AppState>,
+    project_id: String,
+    node_id: String,
+    kind: String,
+    entry_id: String,
+) -> AppResult<()> {
+    let pool = project_pool(&state, &project_id).await?;
+    structure_link_service::unlink_entry(&pool, &node_id, &kind, &entry_id).await
+}

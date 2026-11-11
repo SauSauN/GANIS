@@ -19,10 +19,10 @@ import {
 } from "@/components/ui/dialog";
 import { LocationGallery } from "@/components/locations/LocationGallery";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
-import { PlaceLinksCard } from "@/components/locations/PlaceLinksCard";
-import { WorldExtras } from "@/components/world/WorldExtras";
+import { UniverseLinksCard } from "@/components/links/UniverseLinksCard";
 import { StoryLinksCard } from "@/components/structure/StoryLinksCard";
 import { PlotInStoryCard } from "@/components/plot/PlotInStoryCard";
+import { useSheetDisplay } from "@/stores/sheetDisplayStore";
 import { LocationSheet } from "@/components/locations/LocationSheet";
 import { LocationThumb, TypeBadge } from "@/components/locations/LocationVisuals";
 import { useLocationLabels } from "@/components/locations/useLocationLabels";
@@ -69,6 +69,7 @@ interface LocationEditViewProps {
  */
 export function LocationEditView({ projectId, locationId, onClose, onOpenFeature }: LocationEditViewProps) {
   const { t } = useTranslation(["locations", "common", "characters", "errors"]);
+  const sheetDisplay = useSheetDisplay(projectId, "location");
 
   const { locations, settings, loaded, error: loadError, reload } = useProjectLocations(projectId);
   const location = useProjectLocation(projectId, locationId);
@@ -325,21 +326,20 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
           }
           extra={
             <>
-              <PlaceLinksCard
-                projectId={projectId}
-                side="location"
-                id={location.id}
-                onOpenFeature={onOpenFeature}
-              />
-              <WorldExtras projectId={projectId} kind="location" id={location.id} onOpenFeature={onOpenFeature} />
-              <StoryLinksCard
-                projectId={projectId}
-                side="location"
-                id={location.id}
-                firstAppearance={location.fields.firstAppearance}
-                onOpenFeature={onOpenFeature}
-              />
-              <PlotInStoryCard projectId={projectId} target={{ type: "location", id: location.id }} name={location.name} onOpenFeature={onOpenFeature} />
+              <UniverseLinksCard projectId={projectId} self={{ kind: "location", id: location.id }} onOpenFeature={onOpenFeature} />
+              {/* « Récit » et « Trame » : masquables dans Paramètres du projet › Lieux. */}
+              {sheetDisplay.showStory && (
+                <StoryLinksCard
+                  projectId={projectId}
+                  side="location"
+                  id={location.id}
+                  firstAppearance={location.fields.firstAppearance}
+                  onOpenFeature={onOpenFeature}
+                />
+              )}
+              {sheetDisplay.showPlot && (
+                <PlotInStoryCard projectId={projectId} target={{ type: "location", id: location.id }} name={location.name} onOpenFeature={onOpenFeature} />
+              )}
               {childrenCard}
             </>
           }

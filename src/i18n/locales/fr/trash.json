@@ -17,7 +17,8 @@
     "people": "Peuple, culture ou religion",
     "magic": "Magie ou pouvoir",
     "worldLink": "Lien entre éléments",
-    "glossaryTerm": "Terme du glossaire"
+    "glossaryTerm": "Terme du glossaire",
+    "mangaExtraPage": "Page hors récit"
   },
   "deleted": {
     "character": "Personnage « {{name}} » supprimé.",
@@ -36,7 +37,8 @@
     "people": "« {{name}} » supprimée des peuples, cultures et religions.",
     "magic": "« {{name}} » supprimée de la magie et des pouvoirs.",
     "worldLink": "Lien « {{name}} » supprimé.",
-    "glossaryTerm": "Terme « {{name}} » supprimé du glossaire."
+    "glossaryTerm": "Terme « {{name}} » supprimé du glossaire.",
+    "mangaExtraPage": "Page « {{name}} » supprimée."
   },
   "restored": {
     "character": "Personnage « {{name}} » restauré.",
@@ -55,7 +57,8 @@
     "people": "« {{name}} » restaurée dans les peuples, cultures et religions.",
     "magic": "« {{name}} » restaurée dans la magie et les pouvoirs.",
     "worldLink": "Lien « {{name}} » restauré.",
-    "glossaryTerm": "Terme « {{name}} » restauré dans le glossaire."
+    "glossaryTerm": "Terme « {{name}} » restauré dans le glossaire.",
+    "mangaExtraPage": "Page « {{name}} » restaurée."
   },
   "untitled": {
     "character": "Personnage sans nom",
@@ -74,7 +77,8 @@
     "people": "Fiche sans nom",
     "magic": "Fiche sans nom",
     "worldLink": "Lien",
-    "glossaryTerm": "Terme sans nom"
+    "glossaryTerm": "Terme sans nom",
+    "mangaExtraPage": "Page hors récit"
   },
   "view": {
     "description": "Les éléments supprimés restent ici 30 jours. En les restaurant, tout ce qui avait disparu avec eux revient aussi (images, relations, sous-éléments…).",

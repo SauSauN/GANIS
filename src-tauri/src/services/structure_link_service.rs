@@ -1,4 +1,5 @@
-//! Personnages et lieux liés aux éléments du découpage (base du projet).
+//! Personnages, lieux et fiches du monde (objets, faune et flore, factions,
+//! peuples, magie) liés aux éléments du découpage (base du projet).
 //!
 //! Un personnage ou un lieu est lié au plus une fois à un même élément
 //! (chapitre, scène…), avec un rôle. Les liens servent à la fiche de
@@ -15,6 +16,29 @@ pub const CHARACTER_ROLES: [&str; 3] = ["present", "pov", "mentioned"];
 
 /// Rôles d'un lieu dans un élément.
 pub const LOCATION_ROLES: [&str; 2] = ["setting", "mentioned"];
+
+/// Rôles d'une fiche du monde dans un élément (migration 036).
+pub const ENTRY_ROLES: [&str; 3] = ["central", "present", "mentioned"];
+
+/// Sortes de fiches du monde, avec leur table.
+const ENTRY_KINDS: [(&str, &str); 5] = [
+    ("item", "items"),
+    ("species", "species"),
+    ("faction", "factions"),
+    ("people", "peoples"),
+    ("magic", "magic_systems"),
+];
+
+/// Fiche du monde liée à un élément.
+#[derive(Debug, Clone, Serialize, sqlx::FromRow)]
+#[serde(rename_all = "camelCase")]
+pub struct NodeEntry {
+    pub node_id: String,
+    pub kind: String,
+    pub entry_id: String,
+    pub role: String,
+    pub created_at: String,
+}
 
 /// Personnage lié à un élément.
 #[derive(Debug, Clone, Serialize, sqlx::FromRow)]
@@ -42,6 +66,9 @@ pub struct NodeLocation {
 pub struct StructureLinks {
     pub characters: Vec<NodeCharacter>,
     pub locations: Vec<NodeLocation>,
+    /// Fiches du monde ; un lien vers une fiche supprimée peut y rester
+    /// (l'interface l'ignore).
+    pub entries: Vec<NodeEntry>,
 }
 
 fn invalid_role() -> AppError {
@@ -85,7 +112,13 @@ pub async fn list_links(pool: &SqlitePool) -> AppResult<StructureLinks> {
     .fetch_all(pool)
     .await?;
 
-    Ok(StructureLinks { characters, locations })
+    let entries = sqlx::query_as::<_, NodeEntry>(
+        "SELECT node_id, kind, entry_id, role, created_at FROM structure_node_entries          ORDER BY created_at, entry_id",
+    )
+    .fetch_all(pool)
+    .await?;
+
+    Ok(StructureLinks { characters, locations, entries })
 }
 
 /// Lie un personnage à un élément, ou change son rôle s'il l'est déjà.
@@ -158,6 +191,47 @@ pub async fn unlink_location(pool: &SqlitePool, node_id: &str, location_id: &str
     Ok(())
 }
 
+/// Lie une fiche du monde à un élément, ou change son rôle si elle l'est déjà.
+pub async fn link_entry(pool: &SqlitePool, node_id: &str, kind: &str, entry_id: &str, role: &str) -> AppResult<()> {
+    if !ENTRY_ROLES.contains(&role) {
+        return Err(invalid_role());
+    }
+    let table = ENTRY_KINDS
+        .iter()
+        .find(|(k, _)| *k == kind)
+        .map(|(_, table)| *table)
+        .ok_or_else(|| AppError::validation("Sorte de fiche inconnue.").with_key("structureLink.invalidKind"))?;
+    check_node(pool, node_id).await?;
+    if !exists(pool, table, entry_id).await? {
+        return Err(not_found("world.notFound", "Fiche introuvable."));
+    }
+
+    sqlx::query(
+        "INSERT INTO structure_node_entries (node_id, kind, entry_id, role, created_at) VALUES (?, ?, ?, ?, ?)          ON CONFLICT (node_id, kind, entry_id) DO UPDATE SET role = excluded.role",
+    )
+    .bind(node_id)
+    .bind(kind)
+    .bind(entry_id)
+    .bind(role)
+    .bind(now_utc())
+    .execute(pool)
+    .await?;
+
+    Ok(())
+}
+
+/// Retire une fiche du monde d'un élément (rien à faire si elle n'y est pas).
+pub async fn unlink_entry(pool: &SqlitePool, node_id: &str, kind: &str, entry_id: &str) -> AppResult<()> {
+    sqlx::query("DELETE FROM structure_node_entries WHERE node_id = ? AND kind = ? AND entry_id = ?")
+        .bind(node_id)
+        .bind(kind)
+        .bind(entry_id)
+        .execute(pool)
+        .await?;
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -214,5 +288,30 @@ mod tests {
         assert!(list_links(&pool).await.unwrap().locations.is_empty());
         structure_service::delete_node(&pool, &scene.id).await.unwrap();
         assert!(list_links(&pool).await.unwrap().characters.is_empty());
+    }
+
+    #[tokio::test]
+    async fn world_entries_are_linked_with_a_role() {
+        let pool = pool().await;
+        add(&pool, "INSERT INTO items (id, name, type, parent_id, status, fields, created_at, updated_at) VALUES ('i1', 'Excalibur', 'weapon', NULL, 'existing', '{}', 'x', 'x')").await;
+        let scene = structure_service::create_node(&pool, ProjectType::Novel, None, 2, "", None).await.unwrap();
+
+        link_entry(&pool, &scene.id, "item", "i1", "present").await.unwrap();
+        link_entry(&pool, &scene.id, "item", "i1", "central").await.unwrap(); // rôle changé
+        let links = list_links(&pool).await.unwrap();
+        assert_eq!(links.entries.len(), 1);
+        assert_eq!((links.entries[0].kind.as_str(), links.entries[0].role.as_str()), ("item", "central"));
+
+        assert!(link_entry(&pool, &scene.id, "item", "i1", "pov").await.is_err());
+        assert!(link_entry(&pool, &scene.id, "plot", "i1", "present").await.is_err());
+        assert!(link_entry(&pool, &scene.id, "faction", "i1", "present").await.is_err()); // pas une faction
+
+        unlink_entry(&pool, &scene.id, "item", "i1").await.unwrap();
+        assert!(list_links(&pool).await.unwrap().entries.is_empty());
+
+        // Supprimer l'élément supprime ses liens.
+        link_entry(&pool, &scene.id, "item", "i1", "mentioned").await.unwrap();
+        structure_service::delete_node(&pool, &scene.id).await.unwrap();
+        assert!(list_links(&pool).await.unwrap().entries.is_empty());
     }
 }

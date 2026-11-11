@@ -17,7 +17,8 @@
     "people": "People, culture or religion",
     "magic": "Magic or power",
     "worldLink": "Link between elements",
-    "glossaryTerm": "Glossary term"
+    "glossaryTerm": "Glossary term",
+    "mangaExtraPage": "Non-story page"
   },
   "deleted": {
     "character": "Character “{{name}}” deleted.",
@@ -36,7 +37,8 @@
     "people": "“{{name}}” removed from peoples, cultures and religions.",
     "magic": "“{{name}}” removed from magic and powers.",
     "worldLink": "Link “{{name}}” deleted.",
-    "glossaryTerm": "Term “{{name}}” deleted from the glossary."
+    "glossaryTerm": "Term “{{name}}” deleted from the glossary.",
+    "mangaExtraPage": "Page “{{name}}” deleted."
   },
   "restored": {
     "character": "Character “{{name}}” restored.",
@@ -55,7 +57,8 @@
     "people": "“{{name}}” restored to peoples, cultures and religions.",
     "magic": "“{{name}}” restored to magic and powers.",
     "worldLink": "Link “{{name}}” restored.",
-    "glossaryTerm": "Term “{{name}}” restored to the glossary."
+    "glossaryTerm": "Term “{{name}}” restored to the glossary.",
+    "mangaExtraPage": "Page “{{name}}” restored."
   },
   "untitled": {
     "character": "Unnamed character",
@@ -74,7 +77,8 @@
     "people": "Untitled sheet",
     "magic": "Untitled sheet",
     "worldLink": "Link",
-    "glossaryTerm": "Untitled term"
+    "glossaryTerm": "Untitled term",
+    "mangaExtraPage": "Non-story page"
   },
   "view": {
     "description": "Deleted items stay here for 30 days. Restoring one also brings back everything that went with it (images, relationships, sub-items…).",

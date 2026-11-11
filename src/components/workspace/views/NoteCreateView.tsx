@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Plus } from "lucide-react";
 import { FolderSelect } from "@/components/notes/FolderSelect";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
@@ -12,6 +12,7 @@ import { MAX_NOTE_TITLE, noteTabId } from "@/lib/notes";
 import { useNoteStore, useProjectNotes } from "@/stores/noteStore";
 import { errorText } from "@/lib/errors";
 import { notifyError } from "@/lib/notify";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 interface NoteCreateViewProps {
   projectId: string;
@@ -67,8 +68,7 @@ export function NoteCreateView({ projectId, feature, onOpenFeature }: NoteCreate
     <PageShell title={feature.label} description={feature.description}>
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle className="text-base">{t("create.card")}</CardTitle>
-          <CardDescription>{t("create.cardDescription")}</CardDescription>
+          <TitleWithInfo className="text-base" info={t("create.cardDescription")}>{t("create.card")}</TitleWithInfo>
         </CardHeader>
         <CardContent className={cardContentClass}>
           <form onSubmit={(event) => void submit(event)} className="grid gap-5 sm:grid-cols-2">
@@ -91,7 +91,7 @@ export function NoteCreateView({ projectId, feature, onOpenFeature }: NoteCreate
 
             <div className="sm:col-span-2">
               <Button type="submit" disabled={busy}>
-                <Plus className="mr-1.5 size-4" />
+                <Plus className="size-4" />
                 {busy ? t("create.creating") : t("create.submit")}
               </Button>
             </div>

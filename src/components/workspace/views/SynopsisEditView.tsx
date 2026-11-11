@@ -151,7 +151,7 @@ function TagList({
           onClick={addTag}
           disabled={disabled || full || !draft.trim()}
         >
-          <Plus className="mr-1 h-4 w-4" />
+          <Plus />
           {t("tags.add")}
         </Button>
       </div>

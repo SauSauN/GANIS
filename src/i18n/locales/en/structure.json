@@ -271,6 +271,16 @@
         "noItems": "The project has no location yet.",
         "firstAppearance": "First appearance here"
       },
+      "entries": {
+        "title": "World",
+        "description": "The items, fauna and flora, factions, peoples and magic of “{{name}}”.",
+        "add": "Link an entry",
+        "choose": "Choose an item, a faction…",
+        "empty": "No world entry linked.",
+        "noneLeft": "All entries are already linked.",
+        "noItems": "No entries in the enabled modules.",
+        "firstAppearance": "First appearance here"
+      },
       "children": {
         "title": "Contents",
         "description": "What “{{name}}” contains.",
@@ -291,17 +301,34 @@
       "location": {
         "setting": "Setting",
         "mentioned": "Mentioned"
+      },
+      "entry": {
+        "central": "Central",
+        "present": "Present",
+        "mentioned": "Mentioned"
       }
     },
     "saved": "Saved.",
     "delete": "Delete"
   },
   "story": {
-    "title": "In the story",
+    "title": "Story",
     "characterDescription": "The plan elements where this character appears.",
     "locationDescription": "The plan elements that take place in this location or mention it.",
     "empty": "Not linked to the plan yet: link it from the profile of a chapter, a scene…",
-    "firstAppearance": "First appearance"
+    "firstAppearance": "First appearance",
+    "link": "Link to a structure item",
+    "editLink": "Edit the link",
+    "entryDescription": "The structure items (chapters, scenes…) where this entry is central, present or mentioned.",
+    "entryEmpty": "Not linked to the structure yet: link it from here or from a chapter, scene… sheet.",
+    "dialog": {
+      "newTitle": "Link to a structure item",
+      "editTitle": "Edit the structure link",
+      "description": "The link appears in this sheet's Story and on the structure item's sheet.",
+      "node": "Structure item",
+      "role": "Role",
+      "remove": "Remove the link"
+    }
   },
   "colors": {
     "custom": "Other color…",

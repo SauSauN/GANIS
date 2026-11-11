@@ -59,6 +59,7 @@ const ReplaceView = lazy(() => import("@/components/novel/ReplaceView").then((mo
 const ImportView = lazy(() => import("@/components/novel/ImportView").then((module) => ({ default: module.ImportView })));
 const FlatplanView = lazy(() => import("@/components/manga/FlatplanView").then((module) => ({ default: module.FlatplanView })));
 const ScriptProgressView = lazy(() => import("@/components/manga/ScriptProgressView").then((module) => ({ default: module.ScriptProgressView })));
+const ProductionView = lazy(() => import("@/components/manga/ProductionView").then((module) => ({ default: module.ProductionView })));
 const ContinuityView = lazy(() => import("@/components/manga/ContinuityView").then((module) => ({ default: module.ContinuityView })));
 // Lecture complète (film, série, jeu vidéo, JDR, projet libre).
 const StoryReadView = lazy(() => import("@/components/structure/StoryReadView").then((module) => ({ default: module.StoryReadView })));
@@ -208,6 +209,10 @@ function WorkspaceContent({
 
   if (tabId === "script.progress") {
     return <ScriptProgressView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "script.production") {
+    return <ProductionView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
   if (tabId === "script.continuity") {

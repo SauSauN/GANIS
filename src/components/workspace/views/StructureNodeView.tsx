@@ -20,6 +20,7 @@ import {
   ChevronRight,
   FileQuestion,
   Flag,
+  Globe,
   Info,
   ListTree,
   Loader2,
@@ -78,7 +79,8 @@ import { cn } from "@/lib/utils";
 import { useProjectCharacters } from "@/stores/characterStore";
 import { useProjectLocations } from "@/stores/locationStore";
 import { useProjectStructureLinks, useStructureStore } from "@/stores/structureStore";
-import type { NodeCharacterRole, NodeLocationRole, StructureNode } from "@/types";
+import type { NodeCharacterRole, NodeEntryRole, NodeLocationRole, StructureNode } from "@/types";
+import { ENTRY_ROLES, splitEntryKey, useNodeEntryItems } from "@/components/structure/nodeEntries";
 import { errorText } from "@/lib/errors";
 
 const CHARACTER_ROLES: NodeCharacterRole[] = ["present", "pov", "mentioned"];
@@ -127,6 +129,10 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   const unlinkCharacter = useStructureStore((state) => state.unlinkCharacter);
   const linkLocation = useStructureStore((state) => state.linkLocation);
   const unlinkLocation = useStructureStore((state) => state.unlinkLocation);
+  const linkEntry = useStructureStore((state) => state.linkEntry);
+  const unlinkEntry = useStructureStore((state) => state.unlinkEntry);
+  // Fiches du monde (objets, faune et flore, factions, peuples, magie).
+  const worldEntries = useNodeEntryItems(projectId, nodeId, links ? links.entries ?? [] : null);
   const focusNode = useStructureStore((state) => state.focusNode);
 
   const node = structure?.nodes.find((item) => item.id === nodeId) ?? null;
@@ -277,6 +283,14 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
       setDraft(base);
     }
   }, [base]);
+
+  // Brouillon vidé après un enregistrement : il repart de l'élément tel
+  // qu'il est maintenant. Sans cela, si le rechargement a déjà eu lieu
+  // (numérotation activée ou retirée, numéro recalculé), rien ne le
+  // remplirait et la fiche resterait sur « Chargement ».
+  useEffect(() => {
+    if (draft === null && base) setDraft(base);
+  }, [draft, base]);
 
   const infoDirty = draft !== null && base !== null && !sameDraft(draft, base);
   const dirty = infoDirty || textDirty || script.dirty;
@@ -803,6 +817,41 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             onLink={(id, role) => runLink(() => linkLocation(projectId, nodeId, id, role as NodeLocationRole))}
             onUnlink={(id) => runLink(() => unlinkLocation(projectId, nodeId, id))}
           />
+
+          {/* Univers : objets, faune et flore, factions, peuples, magie (modules activés). */}
+          {worldEntries.anyModule && (
+            <LinkSection
+              storageKey="ganis.nodeSheet.entries.collapsed"
+              icon={Globe}
+              title={t("node.sections.entries.title")}
+              description={t("node.sections.entries.description", { name })}
+              loading={!related}
+              items={worldEntries.items}
+              direct={worldEntries.direct}
+              indirect={[]}
+              firstHere={worldEntries.firstHere}
+              roles={ENTRY_ROLES}
+              roleLabel={(role) => t(`node.roles.entry.${role as NodeEntryRole}`)}
+              texts={{
+                add: t("node.sections.entries.add"),
+                choose: t("node.sections.entries.choose"),
+                empty: t("node.sections.entries.empty"),
+                noneLeft: t("node.sections.entries.noneLeft"),
+                noItems: t("node.sections.entries.noItems"),
+                firstHere: t("node.sections.entries.firstAppearance"),
+              }}
+              labelOfNode={labelOfNode}
+              onOpenFeature={onOpenFeature}
+              onLink={(key, role) => {
+                const { kind, id } = splitEntryKey(key);
+                return runLink(() => linkEntry(projectId, nodeId, kind, id, role as NodeEntryRole));
+              }}
+              onUnlink={(key) => {
+                const { kind, id } = splitEntryKey(key);
+                return runLink(() => unlinkEntry(projectId, nodeId, kind, id));
+              }}
+            />
+          )}
 
           <ChildrenCard
             name={name}

@@ -52,6 +52,7 @@ export function blankEvent(laneId: string, title: string): PlotEvent {
     characterIds: [],
     povId: null,
     locationId: null,
+    entries: [],
     nodeId: null,
     alsoNodeIds: [],
     noteIds: [],

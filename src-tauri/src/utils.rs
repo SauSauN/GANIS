@@ -34,6 +34,25 @@ where
         .map_err(|e| AppError::internal(e).with_detail("Calcul interrompu"))?
 }
 
+/// Tests : supprime un dossier de test. Sous Windows, un fichier de base
+/// peut rester verrouillé un court instant après la fermeture des
+/// connexions (fin de leurs fils, antivirus, surtout quand tous les tests
+/// tournent en même temps) : on réessaie pendant cinq secondes au plus.
+#[cfg(test)]
+pub async fn remove_dir_eventually(path: impl AsRef<std::path::Path>) {
+    let path = path.as_ref();
+    for attempt in 1..=100 {
+        match std::fs::remove_dir_all(path) {
+            Ok(()) => return,
+            Err(e) if e.kind() == std::io::ErrorKind::NotFound => return,
+            Err(e) if attempt == 100 => panic!("Dossier de test impossible à supprimer ({}) : {e}", path.display()),
+            // Attente asynchrone : les connexions libérées juste avant
+            // doivent pouvoir finir de se fermer pendant ce temps.
+            Err(_) => tokio::time::sleep(std::time::Duration::from_millis(50)).await,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -60,6 +60,11 @@ export interface PlotEvent {
   /** Point de vue (personnage du projet). */
   povId: string | null;
   locationId: string | null;
+  /**
+   * Fiches du monde présentes dans l'événement (objets, faune et flore,
+   * factions, peuples, magie). Une fiche supprimée depuis est ignorée.
+   */
+  entries: PlotEntryRef[];
   /** Élément du découpage où l'événement est raconté (chapitre, scène…) : il fixe sa place dans la lecture. */
   nodeId: string | null;
   /** Autres scènes où l'événement est raconté à nouveau (souvenir, autre point de vue…). */
@@ -68,6 +73,31 @@ export interface PlotEvent {
   /** Date dans l'histoire (libre), pour la chronologie. */
   date: string;
   words: number;
+}
+
+/** Fiche du monde citée par un événement. */
+export interface PlotEntryRef {
+  kind: "item" | "species" | "faction" | "people" | "magic";
+  id: string;
+}
+
+const ENTRY_KINDS: ReadonlySet<string> = new Set(["item", "species", "faction", "people", "magic"]);
+
+/** Fiches du monde d'un événement enregistré : sortes connues, sans doublon, 50 au plus. */
+function cleanEntries(value: unknown): PlotEntryRef[] {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  const out: PlotEntryRef[] = [];
+  for (const item of value) {
+    const ref = (item ?? {}) as Record<string, unknown>;
+    if (typeof ref.kind !== "string" || !ENTRY_KINDS.has(ref.kind) || typeof ref.id !== "string" || !ref.id) continue;
+    const key = `${ref.kind}:${ref.id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ kind: ref.kind as PlotEntryRef["kind"], id: ref.id });
+    if (out.length >= 50) break;
+  }
+  return out;
 }
 
 export interface PlotLink {
@@ -312,6 +342,7 @@ export function normalizePlot(raw: unknown, mainName: string): PlotData {
       characterIds: ids(e.characterIds),
       povId: idOrNull(e.povId),
       locationId: idOrNull(e.locationId),
+      entries: cleanEntries(e.entries),
       nodeId: idOrNull(e.nodeId),
       alsoNodeIds: ids(e.alsoNodeIds)
         .filter((x) => x !== idOrNull(e.nodeId))
@@ -910,6 +941,11 @@ export function eventsOfCharacter(data: PlotData, characterId: string): PlotEven
 
 export function eventsOfLocation(data: PlotData, locationId: string): PlotEvent[] {
   return planOrder(data).filter((e) => e.locationId === locationId);
+}
+
+/** Événements où apparaît une fiche du monde (objet, faction…), dans l'ordre du plan. */
+export function eventsOfEntry(data: PlotData, kind: PlotEntryRef["kind"], id: string): PlotEvent[] {
+  return planOrder(data).filter((e) => e.entries.some((ref) => ref.kind === kind && ref.id === id));
 }
 
 /** Événements racontés dans un élément (scène principale), dans l'ordre de la scène. */

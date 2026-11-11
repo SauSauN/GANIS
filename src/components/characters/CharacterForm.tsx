@@ -6,7 +6,6 @@ import { useProjectCharacters } from "@/stores/characterStore";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -43,6 +42,7 @@ import {
 } from "@/lib/characters";
 import { cn } from "@/lib/utils";
 import type { CharacterDetailLevel } from "@/types";
+import { InfoTip } from "@/components/common/InfoTip";
 
 export interface PortraitControls {
   /** Clé de couleur des initiales (identifiant du personnage, ou provisoire). */
@@ -433,36 +433,48 @@ export function CharacterSheet({
           return (
             <Card key={item} id={`${sectionId}-${item}`} className={cn(cardClass, "scroll-mt-4")}>
               {/* En-tête cliquable : replie ou déplie le niveau. */}
-              <CardHeader className={cn(cardHeaderClass, "p-0", !open && "border-b-0")}>
+              {/* En-tête : le titre replie ou déplie le niveau ; son objectif est
+                  derrière le « i » (hors du bouton) ; le reste de l'en-tête
+                  replie aussi. */}
+              <CardHeader
+                className={cn(
+                  cardHeaderClass,
+                  "flex flex-row items-center gap-2 rounded-t-xl p-0 transition-colors hover:bg-muted/40",
+                  !open && "border-b-0",
+                )}
+              >
                 <button
                   type="button"
                   aria-expanded={open}
                   aria-controls={`${sectionId}-${item}-content`}
                   title={open ? t("levels.collapse") : t("levels.expand")}
                   onClick={() => setOpen(item, !open)}
-                  className="flex w-full items-center gap-4 rounded-t-xl px-6 py-5 text-left transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                  className="flex min-w-0 items-center gap-4 rounded-tl-xl py-5 pl-6 text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                 >
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
+                  <CardTitle className="min-w-0 truncate">{t(`levels.${item}.theme`)}</CardTitle>
+                </button>
 
-                  <span className="min-w-0 flex-1">
-                    <CardTitle>
-                      {t(`levels.${item}.theme`)}
-                    </CardTitle>
-                    <CardDescription>{t(`levels.${item}.goal`)}</CardDescription>
-                  </span>
+                <InfoTip>{t(`levels.${item}.goal`)}</InfoTip>
 
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  title={open ? t("levels.collapse") : t("levels.expand")}
+                  onClick={() => setOpen(item, !open)}
+                  className="flex min-w-4 flex-1 items-center justify-end gap-4 self-stretch rounded-tr-xl py-5 pr-6 pl-2"
+                >
                   <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground tabular-nums">
                     {progress.filled} / {progress.total}
                   </span>
-
                   <ChevronDown
                     className={cn(
                       "size-5 shrink-0 text-muted-foreground transition-transform duration-300",
                       !open && "-rotate-90",
                     )}
-                    aria-hidden="true"
                   />
                 </button>
               </CardHeader>

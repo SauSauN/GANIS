@@ -308,7 +308,7 @@ GANIS/
 │   │   └── services/             Logique métier
 │   ├── Cargo.toml
 │   └── tauri.conf.json
-├── tests/                        Tests Playwright
+├── tests/                        Tests de bout en bout (Playwright sur l'application Tauri)
 ├── LISEZ-MOI-chiffrement.md      Notes sur le chiffrement
 └── package.json
 ```
@@ -371,9 +371,9 @@ mon-projet.ganix
 |---|---|---|
 | Rust | `cd src-tauri && cargo test --lib` | Services sur base SQLite en mémoire, chiffrement (`encryption_tests.rs`), limitation des connexions, validation des packages |
 | Front-end | `npm test` | Logique de `src/lib/` (structure, notes, relations, trame, raccourcis, nettoyage HTML, clé de récupération…) |
-| Bout en bout | `npx playwright test` | Configuré pour Chromium, Firefox et WebKit |
+| Bout en bout | `npm run test:e2e` | La vraie application (Rust + interface) : premier lancement, comptes et espaces, tableau de bord, chaque module, roman, manga, recherche, corbeille, historique, paramètres, persistance après redémarrage |
 
-> **À faire** : `tests/example.spec.ts` est encore l'exemple fourni par Playwright (il visite `playwright.dev`). Il doit être remplacé par de vrais scénarios GANIS, par exemple en lançant `npm run dev` via l'option `webServer` de `playwright.config.ts`, ou en pilotant l'application Tauri avec `tauri-driver`.
+> Les tests de bout en bout (`tests/ganis.spec.ts`, Windows) pilotent l'exécutable de `src-tauri/target/debug` : WebView2 ouvre un port de débogage auquel Playwright se connecte (`tests/ganis-app.ts`). Chaque lancement utilise un dossier de données temporaire (`GANIS_DATA_DIR`) : vos comptes et projets ne sont pas touchés. Compilez d'abord (`cd src-tauri && cargo build`) ; le serveur Vite est lancé, ou réutilisé, par `playwright.config.ts`. En cas d'échec, le rapport (`npx playwright show-report`) contient une capture et l'arbre d'accessibilité de la fenêtre.
 
 ---
 

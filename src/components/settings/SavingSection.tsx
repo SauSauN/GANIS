@@ -4,9 +4,7 @@ import { cardClass, cardHeaderClass } from "@/components/settings/styles";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import {
   AUTO_SAVE_DELAYS,
@@ -14,6 +12,7 @@ import {
   useAutoSave,
 } from "@/lib/preferences";
 import { cn } from "@/lib/utils";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 const tileClass = (selected: boolean) =>
   cn(
@@ -42,8 +41,7 @@ export function SavingSection() {
     <div className="space-y-8">
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("saving.autoSave.title")}</CardTitle>
-          <CardDescription>{t("saving.autoSave.description")}</CardDescription>
+          <TitleWithInfo info={t("saving.autoSave.description")}>{t("saving.autoSave.title")}</TitleWithInfo>
         </CardHeader>
 
         <CardContent className="space-y-6 px-6 py-6">

@@ -7,17 +7,17 @@
     "countMore": "+ 15 champs",
     "basic": {
       "label": "Basique",
-      "theme": "L'identité",
+      "theme": "Identité",
       "goal": "Identifier le personnage"
     },
     "intermediate": {
       "label": "Moyen",
-      "theme": "L'apparence",
+      "theme": "Apparence",
       "goal": "Visualiser et reconnaître le personnage"
     },
     "advanced": {
       "label": "Avancé",
-      "theme": "La personnalité",
+      "theme": "Personnalité",
       "goal": "Construire un personnage crédible et évolutif"
     },
     "collapse": "Replier",

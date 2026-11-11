@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useParams } from "react-router-dom";
 import { FileText, type LucideIcon } from "lucide-react";
+import { GanisMark } from "@/components/common/GanisMark";
 
 import { ActivityBar } from "@/components/layout/ActivityBar";
 import { SEARCH_INPUT_ID } from "@/components/search/SideBarSearch";
@@ -850,6 +851,8 @@ export default function Workspace() {
             contentIds.map((tabId) => (
               <div
                 key={tabId}
+                role="tabpanel"
+                aria-label={tabMeta(tabId)?.label ?? tabId}
                 className={cn(
                   "flex min-h-0 flex-1 flex-col",
                   activeTab !== tabId && "hidden",
@@ -875,17 +878,15 @@ export default function Workspace() {
             /* -----------------------------------------------------
                AUCUN ONGLET OUVERT
                ----------------------------------------------------- */
-            <div className="flex flex-1 items-center justify-center">
-              <div className="flex flex-col items-center gap-2 text-center">
-                <FileText className="h-8 w-8 text-muted-foreground/50" />
-
-                <p className="text-sm text-muted-foreground">
-                  {t("empty.title")}
-                </p>
-
-                <p className="text-xs text-muted-foreground">
-                  {t("empty.description")}
-                </p>
+            <div className="flex flex-1 items-center justify-center p-6">
+              {/* Le logo de GANIS au trait (sans le « G »), et dessous la
+                  consigne pour commencer. */}
+              <div className="flex select-none flex-col items-center gap-4 text-center">
+                {/* Couleur des icônes de la barre de gauche, un tout petit peu plus
+                    foncée ; elle suit le thème. */}
+                <GanisMark letter={false} className="size-32 text-[color-mix(in_oklab,var(--muted-foreground)_88%,black)] sm:size-40" />
+                <p className="sr-only">{t("empty.title")}</p>
+                <p className="max-w-xs text-sm text-muted-foreground">{t("empty.description")}</p>
               </div>
             </div>
           )}

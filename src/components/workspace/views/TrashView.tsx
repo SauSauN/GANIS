@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   BookA,
+  BookImage,
   Drama,
   Flag,
   Folder,
@@ -55,6 +56,7 @@ const KIND_ICONS: Record<TrashKind, LucideIcon> = {
   worldLink: Link2,
   mangaPanel: LayoutPanelTop,
   glossaryTerm: BookA,
+  mangaExtraPage: BookImage,
 };
 
 interface TrashViewProps {

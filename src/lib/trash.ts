@@ -13,6 +13,7 @@ import { useWorldStore } from "@/stores/worldStore";
 import { fullName } from "@/lib/characters";
 import { useDocumentStore } from "@/lib/documents";
 import { useGlossaryStore } from "@/stores/glossaryStore";
+import { useMangaStore } from "@/stores/mangaStore";
 import { notifyMangaScriptChanged } from "@/lib/mangaEvents";
 import type { CharacterLocation, Relation, TrashKind, WorldLink, WorldLinkKind } from "@/types";
 import { errorText } from "@/lib/errors";
@@ -32,6 +33,8 @@ const t = i18n.t.bind(i18n) as unknown as (key: string, options?: Record<string,
 
 /** Nom à afficher pour un élément (« Sans titre » si vide). */
 export function trashLabel(kind: TrashKind, label: string): string {
+  // Page hors récit sans titre : Rust envoie sa sorte (« @cover »).
+  if (kind === "mangaExtraPage" && label.startsWith("@")) return t(`manga:extras.kinds.${label.slice(1)}`);
   return label.trim() || t(`trash:untitled.${kind}`);
 }
 
@@ -189,6 +192,10 @@ async function refreshAfterRestore(projectId: string, kind: TrashKind) {
     if (kind === "note" || kind === "noteFolder") tasks.push(notes.fetchNotes(projectId));
     if (kind === "sticky") tasks.push(notes.fetchStickies(projectId));
   }
+
+  // Pages hors récit (et celles d'un tome restauré).
+  const manga = useMangaStore.getState();
+  if (manga.projectId === projectId && manga.extras && (kind === "mangaExtraPage" || kind === "structureNode")) tasks.push(manga.fetchExtras(projectId));
 
   const glossary = useGlossaryStore.getState();
   if (glossary.projectId === projectId && kind === "glossaryTerm") tasks.push(glossary.fetchTerms(projectId));

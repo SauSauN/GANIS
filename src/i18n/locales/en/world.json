@@ -181,9 +181,7 @@
   },
   "animalCharacter": {
     "title": "Character",
-    "description": "Is this animal also a character in the story?",
     "linked": "This animal is also a character: relationships, scenes and psychology live on its character sheet.",
-    "open": "Character sheet",
     "unlink": "Remove the link",
     "unlinkHint": "Becomes just an animal again; the character sheet is kept.",
     "notLinked": "For now, it's just an animal. If it acts in the story (it has relationships, it appears in scenes), make it a character too.",
@@ -195,13 +193,11 @@
   },
   "characterAnimal": {
     "title": "Animal",
-    "description": "Is this character an animal (or a plant) from the fauna and flora?",
     "none": "If this character is an animal, link it to its entry (a specific animal from the fauna and flora).",
     "pickLabel": "Specific animal or plant",
     "noFree": "No specific animal available"
   },
   "links": {
-    "title": "Links across the world",
     "description": {
       "character": "What they own, use, made or seek; their companions and mounts.",
       "location": "The objects found there, the animals and plants that live there.",
@@ -211,9 +207,7 @@
       "people": "Who belongs to it, who practises or speaks it, where they live, the powers they master.",
       "magic": "Who masters or teaches it, what its source is, who forbids it."
     },
-    "add": "Link an element",
     "edit": "Edit the link",
-    "empty": "No link yet.",
     "periodBoth": "from {{since}} to {{until}}",
     "periodFrom": "from {{since}}",
     "periodUntil": "until {{until}}",
@@ -373,6 +367,30 @@
       "save": "Save",
       "create": "Create the link"
     }
+  },
+  "universe": {
+    "title": "Links with the world",
+    "description": {
+      "character": "Everything that ties this character to the world: relationships, places, items, fauna and flora, factions, peoples and magic.",
+      "location": "Who lives, rules or comes from here; the items found here, the fauna and flora living here, the factions and peoples present."
+    },
+    "add": "Add a link",
+    "empty": "No links yet.",
+    "animalLabel": "is the animal",
+    "animalAdd": "This character is an animal…",
+    "animalEdit": "Edit the fauna and flora link",
+    "groups": {
+      "character": "Characters",
+      "location": "Places",
+      "species": "Fauna and flora",
+      "item": "Items",
+      "faction": "Factions",
+      "people": "Peoples, cultures and religions",
+      "magic": "Magic and powers"
+    },
+    "characterLabel": "is the character",
+    "characterEdit": "Edit the link with the character",
+    "characterAdd": "This animal is a character…"
   },
   "item": {
     "categories": {
@@ -1096,18 +1114,6 @@
       "add": "Add a branch",
       "empty": "No branches."
     },
-    "members": {
-      "title": "Members",
-      "description": "The characters linked to the faction, by role. The exact role (captain, spy…) goes in the link's detail.",
-      "empty": "No members. Link characters with “Add a member”.",
-      "add": "Add a member",
-      "groups": {
-        "leads": "Leaders",
-        "founded": "Founders",
-        "memberOf": "Members",
-        "supports": "Supporters"
-      }
-    },
     "sidebar": {
       "title": "Factions",
       "empty": "No factions."
@@ -1311,18 +1317,6 @@
       "add": "Attach a sheet",
       "empty": "No attached sheets."
     },
-    "members": {
-      "title": "Who belongs",
-      "description": "The characters and factions linked to this sheet, by role. The exact role (high priestess, interpreter…) goes in the link's detail.",
-      "empty": "No one yet. Link characters with “Add someone”.",
-      "add": "Add someone",
-      "groups": {
-        "belongsTo": "Members",
-        "practices": "Practitioners",
-        "speaks": "Speakers",
-        "worships": "Worshippers"
-      }
-    },
     "sidebar": {
       "title": "Peoples, cultures and religions",
       "empty": "No sheets."
@@ -1518,16 +1512,6 @@
       "description": "The schools, elements or techniques that depend on “{{name}}”.",
       "add": "Attach a sheet",
       "empty": "No attached sheets."
-    },
-    "members": {
-      "title": "Who masters it",
-      "description": "The characters, peoples and factions linked to this power, by role. The exact level (apprentice, master…) goes in the link's detail; a character's own powers stay on their “Powers” card.",
-      "empty": "No one yet. Link characters with “Add someone”.",
-      "add": "Add someone",
-      "groups": {
-        "masters": "Master it",
-        "teaches": "Teach it"
-      }
     },
     "sidebar": {
       "title": "Magic and powers",

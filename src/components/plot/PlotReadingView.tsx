@@ -59,6 +59,7 @@ import { useProjectRelations } from "@/stores/relationStore";
 import { useStructureStore } from "@/stores/structureStore";
 import type { StructureNode } from "@/types";
 import { toast } from "@/stores/toastStore";
+import { ActionMenu } from "@/components/documents/ActionMenu";
 
 const TOC_KEY = "ganis.plot.reading.toc";
 const MODE_KEY = "ganis.plot.reading.mode";
@@ -306,26 +307,28 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
           <button
             type="button"
             aria-pressed={!continuous}
+            aria-label={t("reading.step")}
+            title={t("reading.step")}
             onClick={() => {
               setContinuous(false);
               setPref(MODE_KEY, "step");
             }}
-            className={cn("inline-flex min-h-8 items-center gap-1.5 px-3 font-medium hover:bg-muted", !continuous && "bg-muted")}
+            className={cn("inline-flex min-h-8 items-center px-2.5 hover:bg-muted", !continuous && "bg-muted")}
           >
-            <StepForward className="size-3.5" />
-            {t("reading.step")}
+            <StepForward className="size-4" />
           </button>
           <button
             type="button"
             aria-pressed={continuous}
+            aria-label={t("reading.continuous")}
+            title={t("reading.continuous")}
             onClick={() => {
               setContinuous(true);
               setPref(MODE_KEY, "continuous");
             }}
-            className={cn("inline-flex min-h-8 items-center gap-1.5 px-3 font-medium hover:bg-muted", continuous && "bg-muted")}
+            className={cn("inline-flex min-h-8 items-center px-2.5 hover:bg-muted", continuous && "bg-muted")}
           >
-            <Rows3 className="size-3.5" />
-            {t("reading.continuous")}
+            <Rows3 className="size-4" />
           </button>
         </div>
 
@@ -343,36 +346,6 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
           </Button>
           {current && (
             <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                requestFocus(current.id);
-                onOpenFeature("plot.board");
-              }}
-            >
-              <Eye />
-              {t("reading.showOnBoard")}
-            </Button>
-          )}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              // Juste après l'événement lu, dans sa trame (comme sur le plateau).
-              if (current) select({ type: "event", id: current.id });
-              const id = addEventSmart(projectId);
-              if (!id) return;
-              setCurrentId(id);
-              setEditing(true);
-              setPref(EDIT_KEY, "1");
-            }}
-            title={t("reading.newEventHint")}
-          >
-            <Plus />
-            {t("reading.newEvent")}
-          </Button>
-          {current && (
-            <Button
               variant={editing ? "secondary" : "outline"}
               size="sm"
               aria-pressed={editing}
@@ -386,6 +359,37 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
               {t("reading.edit")}
             </Button>
           )}
+          {/* Actions moins courantes : rangées dans « … ». */}
+          <ActionMenu
+            label={t("toolbar.more")}
+            items={[
+              {
+                id: "new",
+                label: t("reading.newEvent"),
+                icon: Plus,
+                run: () => {
+                  // Juste après l'événement lu, dans sa trame (comme sur le plateau).
+                  if (current) select({ type: "event", id: current.id });
+                  const id = addEventSmart(projectId);
+                  if (!id) return;
+                  setCurrentId(id);
+                  setEditing(true);
+                  setPref(EDIT_KEY, "1");
+                },
+              },
+              {
+                id: "board",
+                label: t("reading.showOnBoard"),
+                icon: Eye,
+                disabled: !current,
+                run: () => {
+                  if (!current) return;
+                  requestFocus(current.id);
+                  onOpenFeature("plot.board");
+                },
+              },
+            ]}
+          />
         </div>
       </div>
 
