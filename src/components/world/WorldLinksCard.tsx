@@ -1,7 +1,8 @@
 import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { Link2, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
+import { LinkRow } from "@/components/links/LinkRow";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -11,8 +12,7 @@ import { ReferenceField } from "@/components/characters/fields/SpecialFields";
 import { CharacterSelect, LocationSelect } from "@/components/locations/LocationFields";
 import { LocationThumb } from "@/components/locations/LocationVisuals";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
-import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
-import { cardContentClass, fieldClass } from "@/components/workspace/views/PageShell";
+import { fieldClass } from "@/components/workspace/views/PageShell";
 import { WorldEntrySelect } from "@/components/world/WorldFields";
 import { WorldThumb } from "@/components/world/WorldVisuals";
 import { useWorldLinkLabels } from "@/components/world/useWorldLabels";
@@ -21,12 +21,12 @@ import { errorText } from "@/lib/errors";
 import { notifyError } from "@/lib/notify";
 import { locationTabId } from "@/lib/locations";
 import { cn } from "@/lib/utils";
-import { WORLD_LINK_KINDS, canLink, linkChoices, linksOfEntry, orientLink, worldTabId, type LinkView } from "@/lib/world";
+import { WORLD_LINK_KINDS, canLink, isWorldKind, linkChoices, linksOfEntry, orientLink, worldTabId, type LinkView } from "@/lib/world";
 import { useProjectCharacters } from "@/stores/characterStore";
 import { useProjectLocations } from "@/stores/locationStore";
-import { useProjectWorldLinks, useWorldLinkStore } from "@/stores/worldLinkStore";
+import { useWorldLinkStore } from "@/stores/worldLinkStore";
 import { useEnabledWorldModules, useWorldEntries } from "@/stores/worldStore";
-import type { WorldLink, WorldLinkInput, WorldLinkKind } from "@/types";
+import type { WorldLink, WorldLinkInput, WorldLinkKind, WorldModule } from "@/types";
 
 interface Self {
   kind: WorldLinkKind;
@@ -34,18 +34,21 @@ interface Self {
 }
 
 /** Tous les éléments du projet, pour afficher l'autre côté d'un lien. */
-function useDirectory(projectId: string) {
+export function useDirectory(projectId: string) {
   const { characters } = useProjectCharacters(projectId);
   const { locations, settings: locationSettings } = useProjectLocations(projectId);
   const items = useWorldEntries(projectId, "item");
   const species = useWorldEntries(projectId, "species");
+  const factions = useWorldEntries(projectId, "faction");
+  const peoples = useWorldEntries(projectId, "people");
+  const magic = useWorldEntries(projectId, "magic");
 
-  return { characters, locations, locationSettings, items, species };
+  return { characters, locations, locationSettings, items, species, factions, peoples, magic };
 }
 
-type Directory = ReturnType<typeof useDirectory>;
+export type Directory = ReturnType<typeof useDirectory>;
 
-function nameOf(directory: Directory, kind: WorldLinkKind, id: string): string | null {
+export function nameOf(directory: Directory, kind: WorldLinkKind, id: string): string | null {
   switch (kind) {
     case "character": {
       const character = directory.characters.find((item) => item.id === id);
@@ -57,10 +60,26 @@ function nameOf(directory: Directory, kind: WorldLinkKind, id: string): string |
       return directory.items.entries.find((item) => item.id === id)?.name ?? null;
     case "species":
       return directory.species.entries.find((item) => item.id === id)?.name ?? null;
+    case "faction":
+    case "people":
+    case "magic":
+      return sliceOf(directory, kind).entries.find((item) => item.id === id)?.name ?? null;
   }
 }
 
-function tabOf(kind: WorldLinkKind, id: string): string {
+/** Fiches d'un module du monde dans l'annuaire. */
+function sliceOf(directory: Directory, module: WorldModule) {
+  const slices: Record<WorldModule, Directory["items"]> = {
+    item: directory.items,
+    species: directory.species,
+    faction: directory.factions,
+    people: directory.peoples,
+    magic: directory.magic,
+  };
+  return slices[module];
+}
+
+export function tabOf(kind: WorldLinkKind, id: string): string {
   switch (kind) {
     case "character":
       return characterTabId(id);
@@ -71,7 +90,7 @@ function tabOf(kind: WorldLinkKind, id: string): string {
   }
 }
 
-function OtherThumb({ projectId, directory, view }: { projectId: string; directory: Directory; view: LinkView }) {
+export function OtherThumb({ projectId, directory, view }: { projectId: string; directory: Directory; view: Pick<LinkView, "otherKind" | "otherId"> }) {
   const { otherKind: kind, otherId: id } = view;
 
   if (kind === "character") {
@@ -84,137 +103,67 @@ function OtherThumb({ projectId, directory, view }: { projectId: string; directo
       <LocationThumb projectId={projectId} location={location} customTypes={directory.locationSettings.customTypes} size="sm" />
     ) : null;
   }
-  const slice = kind === "item" ? directory.items : directory.species;
+  const slice = sliceOf(directory, kind);
   const entry = slice.entries.find((item) => item.id === id);
   return entry ? (
     <WorldThumb projectId={projectId} module={kind} entry={entry} customTypes={slice.settings.customTypes} size="sm" />
   ) : null;
 }
 
-/**
- * Liens d'un élément avec des objets et des espèces (« possède
- * Excalibur », « vit dans la Forêt d'Ébène »). Sur la fiche d'un objet ou
- * d'une espèce, ou sur celle d'un personnage ou d'un lieu quand un des deux
- * modules est activé.
- */
-export function WorldLinksCard({
-  projectId,
-  self,
-  onOpenFeature,
-}: {
-  projectId: string;
-  self: Self;
-  onOpenFeature: (featureId: string) => void;
-}) {
+/** Période d'un lien (« de Chapitre 2 à Chapitre 5 »), d'après les titres du plan. */
+export function useLinkPeriod(projectId: string) {
   const { t } = useTranslation("world");
-  const labels = useWorldLinkLabels();
-  const directory = useDirectory(projectId);
-  const { links } = useProjectWorldLinks(projectId);
   const { structure, labelOf } = useProjectStructure(projectId);
-  const [open, setOpen] = useCollapsible(`ganis.worldLinks.${self.kind}.collapsed`);
-  const [dialog, setDialog] = useState<{ link: WorldLink | null } | null>(null);
-
-  const titles = useMemo(
-    () => new Map((structure?.nodes ?? []).map((node) => [node.id, labelOf(node)])),
-    [structure, labelOf],
-  );
-
-  const mine = linksOfEntry(links, self.id);
-
-  function period(link: WorldLink): string | null {
+  const titles = useMemo(() => new Map((structure?.nodes ?? []).map((node) => [node.id, labelOf(node)])), [structure, labelOf]);
+  return (link: Pick<WorldLink, "sinceNode" | "untilNode">): string | null => {
     const since = link.sinceNode ? titles.get(link.sinceNode) : undefined;
     const until = link.untilNode ? titles.get(link.untilNode) : undefined;
     if (since && until) return t("links.periodBoth", { since, until });
     if (since) return t("links.periodFrom", { since });
     if (until) return t("links.periodUntil", { until });
     return null;
-  }
+  };
+}
 
+/** Ligne d'un lien du monde (« possède Excalibur · Épée de famille »). */
+export function WorldLinkRow({
+  projectId,
+  directory,
+  view,
+  period,
+  onOpenFeature,
+  onEdit,
+  showKind = true,
+}: {
+  projectId: string;
+  directory: Directory;
+  view: LinkView;
+  period: string | null;
+  onOpenFeature: (featureId: string) => void;
+  onEdit: () => void;
+  /** Faux : la sorte de l'autre élément est déjà le titre du groupe. */
+  showKind?: boolean;
+}) {
+  const { t } = useTranslation("world");
+  const labels = useWorldLinkLabels();
+  const { link } = view;
   return (
-    <CollapsibleCard
-      open={open}
-      onOpenChange={setOpen}
-      icon={Link2}
-      title={t("links.title")}
-      description={t(`links.description.${self.kind}`)}
-      count={mine.length}
-      contentClassName={`${cardContentClass} space-y-4`}
-      actions={
-        <Button
-          type="button"
-          size="sm"
-          variant="outline"
-          onClick={() => {
-            setOpen(true);
-            setDialog({ link: null });
-          }}
-        >
-          <Plus />
-          <span className="hidden sm:inline">{t("links.add")}</span>
-        </Button>
-      }
-    >
-      {mine.length === 0 ? (
-        <p className="text-sm text-muted-foreground">{t("links.empty")}</p>
-      ) : (
-        <ul className="divide-y rounded-lg border">
-          {mine.map((view) => {
-            const { link } = view;
-            const name = nameOf(directory, view.otherKind, view.otherId) ?? t("form.deleted");
-            const when = period(link);
-
-            return (
-              <li key={link.id} className="flex items-center gap-3 px-3 py-2.5">
-                <OtherThumb projectId={projectId} directory={directory} view={view} />
-                <div className="min-w-0 flex-1">
-                  <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
-                    <span className="font-medium text-primary">{labels.type(link.type, view.forward)}</span>
-                    <button
-                      type="button"
-                      onClick={() => onOpenFeature(tabOf(view.otherKind, view.otherId))}
-                      className="truncate font-medium underline-offset-4 hover:underline"
-                    >
-                      {name}
-                    </button>
-                    {link.label && <span className="text-muted-foreground">· {link.label}</span>}
-                  </p>
-                  {(when || link.description) && (
-                    <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
-                      {[when, link.description].filter(Boolean).join(" — ")}
-                    </p>
-                  )}
-                </div>
-                <span className="hidden rounded-full border px-2 py-0.5 text-xs text-muted-foreground sm:inline">
-                  {labels.kind(view.otherKind)}
-                </span>
-                <Button
-                  type="button"
-                  size="icon-sm"
-                  variant="ghost"
-                  onClick={() => setDialog({ link })}
-                  aria-label={t("links.edit")}
-                  title={t("links.edit")}
-                >
-                  <Pencil />
-                </Button>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-
-      {dialog && (
-        <WorldLinkDialog
-          projectId={projectId}
-          self={self}
-          link={dialog.link}
-          directory={directory}
-          onClose={() => setDialog(null)}
-        />
-      )}
-    </CollapsibleCard>
+    <LinkRow
+      thumb={<OtherThumb projectId={projectId} directory={directory} view={view} />}
+      label={labels.type(link.type, view.forward)}
+      name={nameOf(directory, view.otherKind, view.otherId) ?? t("form.deleted")}
+      onOpen={() => onOpenFeature(tabOf(view.otherKind, view.otherId))}
+      detail={link.label || undefined}
+      hint={[period, link.description].filter(Boolean).join(" — ") || undefined}
+      badge={showKind ? labels.kind(view.otherKind) : undefined}
+      onEdit={onEdit}
+      editLabel={t("links.edit")}
+    />
   );
 }
+
+/** Valeur d'une nature de lien dans la liste : sa clé et son sens. */
+const choiceValue = (item: { type: string; forward: boolean }) => `${item.type}:${item.forward ? "forward" : "backward"}`;
 
 function Field({ label, children }: { label: string; children: (id: string) => ReactNode }) {
   const id = useId();
@@ -232,17 +181,20 @@ function Field({ label, children }: { label: string; children: (id: string) => R
  * de la fiche : « possède » / « appartient à »), une précision, une
  * description et une période facultative.
  */
-function WorldLinkDialog({
+export function WorldLinkDialog({
   projectId,
   self,
   link,
   directory,
+  initialKind,
   onClose,
 }: {
   projectId: string;
   self: Self;
   link: WorldLink | null;
   directory: Directory;
+  /** Nouveau lien : sorte de l'autre élément choisie d'avance. */
+  initialKind?: WorldLinkKind;
   onClose: () => void;
 }) {
   const { t } = useTranslation("world");
@@ -254,14 +206,16 @@ function WorldLinkDialog({
 
   const initialView = link ? linksOfEntry([link], self.id)[0] : null;
 
-  /** Sortes proposées pour l'autre côté : objets et espèces seulement si leur module est activé. */
+  /** Sortes proposées pour l'autre côté : objets, espèces et factions seulement si leur module est activé. */
   const kinds = WORLD_LINK_KINDS.filter(
     (kind) =>
       canLink(self.kind, kind) &&
-      (kind === "item" || kind === "species" ? enabled[kind] || initialView?.otherKind === kind : true),
+      (isWorldKind(kind) ? enabled[kind as WorldModule] || initialView?.otherKind === kind : true),
   );
 
-  const [otherKind, setOtherKind] = useState<WorldLinkKind>(initialView?.otherKind ?? kinds[0] ?? "item");
+  const [otherKind, setOtherKind] = useState<WorldLinkKind>(
+    initialView?.otherKind ?? (initialKind && kinds.includes(initialKind) ? initialKind : kinds[0]) ?? "item",
+  );
   const [otherId, setOtherId] = useState(initialView?.otherId ?? "");
   const [choice, setChoice] = useState<{ type: string; forward: boolean } | null>(
     initialView ? { type: initialView.link.type, forward: initialView.forward } : null,
@@ -336,7 +290,7 @@ function WorldLinkDialog({
           />
         );
       default: {
-        const entries = (otherKind === "item" ? directory.items : directory.species).entries.filter(
+        const entries = sliceOf(directory, otherKind).entries.filter(
           (entry) => entry.id !== self.id,
         );
         return (
@@ -401,31 +355,25 @@ function WorldLinkDialog({
 
             <Field label={t("links.dialog.element")}>{renderOtherSelect}</Field>
 
-            <div className="space-y-2">
-              <p className="text-sm font-medium">{t("links.dialog.type")}</p>
-              <div className="flex flex-wrap gap-1.5" role="radiogroup" aria-label={t("links.dialog.type")}>
-                {choices.map((item) => {
-                  const checked = choice?.type === item.type && choice.forward === item.forward;
-                  return (
-                    <button
-                      key={`${item.type}-${item.forward}`}
-                      type="button"
-                      role="radio"
-                      aria-checked={checked}
-                      disabled={busy}
-                      onClick={() => setChoice(item)}
-                      className={cn(
-                        "rounded-md border px-2.5 py-1 text-xs font-medium transition-colors",
-                        "hover:border-primary/60 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-                        checked && "border-primary bg-primary text-primary-foreground",
-                      )}
-                    >
+            <Field label={t("links.dialog.type")}>
+              {(id) => (
+                // Une option par nature et par sens (« dirige » / « est dirigée par »).
+                <select
+                  id={id}
+                  value={choice ? choiceValue(choice) : ""}
+                  disabled={busy}
+                  onChange={(e) => setChoice(choices.find((item) => choiceValue(item) === e.target.value) ?? null)}
+                  // Même hauteur que la liste « Élément » (`WorldEntrySelect`).
+                  className={cn(fieldClass, "h-9")}
+                >
+                  {choices.map((item) => (
+                    <option key={choiceValue(item)} value={choiceValue(item)}>
                       {labels.type(item.type, item.forward)}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+                    </option>
+                  ))}
+                </select>
+              )}
+            </Field>
 
             <Field label={t("links.dialog.label")}>
               {(id) => (

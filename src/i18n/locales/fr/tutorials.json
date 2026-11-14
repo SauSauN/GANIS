@@ -143,7 +143,18 @@
         "points": [
           "Droite à gauche pour un manga, gauche à droite pour une BD.",
           "Le numéro de la première page décide des pages en vis-à-vis.",
-          "Une révélation mal placée par rapport au tourné de page est signalée."
+          "Une révélation mal placée par rapport au tourné de page est signalée.",
+          "Les pages hors récit (couverture, page de titre, bonus…) s'ajoutent sous les planches.",
+          "« Exporter le scénario » prépare le script du tome pour le dessinateur."
+        ]
+      },
+      "production": {
+        "title": "Suivez la fabrication",
+        "text": "L'étape de chaque page : storyboard, crayonné, encrage, trames, lettrage, puis validation.",
+        "points": [
+          "L'étape choisie est la dernière terminée.",
+          "Cochez plusieurs pages pour les faire avancer d'un coup.",
+          "Le chemin de fer peut montrer les étapes en couleur."
         ]
       },
       "progress": {
@@ -331,6 +342,126 @@
       }
     }
   },
+  "factions": {
+    "title": "Tutoriel : Factions",
+    "name": "Factions",
+    "intro": "Les groupes qui font bouger votre histoire : guildes, ordres, clans, armées, cultes, sociétés secrètes…",
+    "steps": {
+      "enable": {
+        "title": "Activez le module",
+        "text": "Le module Factions est facultatif : il n'apparaît dans la barre de gauche qu'une fois activé dans les paramètres du projet.",
+        "points": [
+          "Choisissez ensuite les catégories utiles : politique, armée, religion, crime…",
+          "Le désactiver plus tard ne supprime rien."
+        ]
+      },
+      "create": {
+        "title": "Créez une faction",
+        "text": "Choisissez son type : la fiche s'adapte. Une armée a ses forces et son équipement, une religion ses dogmes et ses rites.",
+        "points": [
+          "Devise, emblème, objectifs et influence, du local au mondial.",
+          "Ctrl+N dans le module crée une faction."
+        ]
+      },
+      "branches": {
+        "title": "Organisez ses branches",
+        "text": "Une faction peut dépendre d'une autre : la section d'un ordre, la cellule d'un réseau, la famille d'un clan. Le panneau les montre en arbre.",
+        "points": []
+      },
+      "members": {
+        "title": "Donnez-lui des membres",
+        "text": "Sur la fiche, liez des personnages à la faction : « dirige », « fait partie de », « a fondé ».",
+        "points": [
+          "Les liens apparaissent aussi sur la fiche de chaque personnage."
+        ]
+      },
+      "relations": {
+        "title": "Placez-la dans le monde",
+        "text": "Alliés et ennemis, siège, territoires et objets qu'elle contrôle : tout se relie depuis la carte des liens.",
+        "points": [
+          "Précisez une période du récit quand une alliance se noue ou se brise."
+        ]
+      }
+    }
+  },
+  "peoples": {
+    "title": "Tutoriel : Peuples, cultures et religions",
+    "name": "Peuples, cultures et religions",
+    "intro": "L'âme de votre univers : ses peuples, leurs cultures, leurs langues et leurs croyances.",
+    "steps": {
+      "enable": {
+        "title": "Activez le module",
+        "text": "Le module est facultatif : il n'apparaît dans la barre de gauche qu'une fois activé dans les paramètres du projet.",
+        "points": [
+          "Choisissez les catégories utiles : peuples, cultures, religions.",
+          "Le désactiver plus tard ne supprime rien."
+        ]
+      },
+      "create": {
+        "title": "Créez une fiche",
+        "text": "Choisissez son type : la fiche s'adapte. Un peuple a son apparence et ses coutumes, une langue son écriture, une divinité ses domaines.",
+        "points": [
+          "Ctrl+N dans le module crée une fiche."
+        ]
+      },
+      "branches": {
+        "title": "Rangez-les",
+        "text": "Une fiche peut dépendre d'une autre : les elfes des bois dans les elfes, une hérésie dans sa religion, une déesse dans son panthéon.",
+        "points": []
+      },
+      "links": {
+        "title": "Reliez-les au monde",
+        "text": "Sur la fiche, liez des personnages : « appartient à », « pratique », « parle », « vénère ». Notez aussi où vit un peuple.",
+        "points": [
+          "La carte « Qui en fait partie » les regroupe par rôle."
+        ]
+      },
+      "existing": {
+        "title": "Avec les factions",
+        "text": "L'église, le culte ou le clan qui organise un peuple ou une religion reste une faction : reliez-la par « pratique » ou « appartient à », sans rien recopier.",
+        "points": []
+      }
+    }
+  },
+  "magic": {
+    "title": "Tutoriel : Magie et pouvoirs",
+    "name": "Magie et pouvoirs",
+    "intro": "Posez les règles du pouvoir de votre univers : sa source, son coût, ses limites, ses écoles et ses techniques.",
+    "steps": {
+      "enable": {
+        "title": "Activez le module",
+        "text": "Le module est facultatif : il n'apparaît dans la barre de gauche qu'une fois activé dans les paramètres du projet.",
+        "points": [
+          "Choisissez les catégories utiles : systèmes, écoles, techniques.",
+          "Le désactiver plus tard ne supprime rien."
+        ]
+      },
+      "create": {
+        "title": "Créez un système",
+        "text": "Magie, énergie intérieure, super-pouvoirs… Notez sa source, ses règles, son coût et ses limites : c'est ce qui rend un pouvoir crédible.",
+        "points": [
+          "Ctrl+N dans le module crée une fiche."
+        ]
+      },
+      "branches": {
+        "title": "Ajoutez écoles et techniques",
+        "text": "Rangez les écoles et les éléments dans leur système, puis les sorts et techniques dans leur école. Le panneau les montre en arbre.",
+        "points": []
+      },
+      "links": {
+        "title": "Reliez-le au monde",
+        "text": "Liez qui le maîtrise ou l'enseigne, ce qui en est la source (un lieu, un objet, une divinité) et qui l'interdit.",
+        "points": [
+          "La carte « Qui la maîtrise » les regroupe par rôle."
+        ]
+      },
+      "existing": {
+        "title": "Avec les personnages",
+        "text": "Les pouvoirs propres d'un personnage restent sur sa carte « Pouvoirs » : reliez-le simplement au système par « maîtrise ».",
+        "points": []
+      }
+    }
+  },
   "structure": {
     "title": "Tutoriel : Découpage",
     "name": "Découpage",
@@ -376,7 +507,7 @@
       "connect": {
         "title": "Rattachez-les au projet",
         "text": "Point de vue, personnages présents, lieu, chapitre du découpage et notes : tout se relie depuis l'événement.",
-        "points": ["Les fiches liées montrent ces événements dans « Dans la trame »."]
+        "points": ["Les fiches liées montrent ces événements dans leur section « Trame »."]
       },
       "reading": {
         "title": "Lisez dans l'ordre du lecteur",

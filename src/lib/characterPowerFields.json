@@ -1,0 +1,4 @@
+[
+  {"key": "powers", "kind": "longText", "maxLength": 20000},
+  {"key": "powerLimits", "kind": "longText", "maxLength": 20000}
+]

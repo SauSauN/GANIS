@@ -1,4 +1,5 @@
 import catalog from "@/lib/characterFields.json";
+import powerCatalog from "@/lib/characterPowerFields.json";
 import type {
   Character,
   CharacterDetailLevel,
@@ -98,7 +99,20 @@ export const CHARACTER_FIELDS: CharacterField[] = catalog.map((field) => ({
   list: "list" in field ? (field.list as CharacterListKey) : undefined,
 }));
 
-const FIELD_KEYS = new Set(CHARACTER_FIELDS.map((field) => field.key));
+/**
+ * Carte « Pouvoirs » : deux champs hors des trois niveaux, affichés quand
+ * l'auteur l'active pour le projet. Rust a la même liste
+ * (`character_service::POWER_FIELDS`).
+ */
+export const POWER_FIELDS: CharacterField[] = powerCatalog.map((field) => ({
+  key: field.key,
+  // Hors des niveaux : jamais compté dans leur progression.
+  level: "advanced",
+  kind: field.kind as FieldKind,
+  maxLength: field.maxLength,
+}));
+
+const FIELD_KEYS = new Set([...CHARACTER_FIELDS, ...POWER_FIELDS].map((field) => field.key));
 
 /** Champs (de `fields`) propres à un niveau. */
 export function fieldsOfLevel(level: CharacterDetailLevel): CharacterField[] {
@@ -308,6 +322,3 @@ export function characterTabId(characterId: string): string {
 export function characterIdOfTab(tabId: string): string | null {
   return tabId.startsWith(CHARACTER_TAB_PREFIX) ? tabId.slice(CHARACTER_TAB_PREFIX.length) : null;
 }
-
-/** Onglet des paramètres du projet consacré aux personnages. */
-export const CHARACTER_SETTINGS_TAB = "settings:characters";

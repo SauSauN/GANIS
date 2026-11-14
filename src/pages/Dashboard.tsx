@@ -509,8 +509,14 @@ export default function Dashboard() {
         défilement se place ainsi tout à droite de la fenêtre. Le contenu,
         lui, reste centré dans une colonne de largeur limitée.
       */}
-      <main className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-6xl px-6 py-8">
+      {/*
+        Dès qu'un projet existe (actif, archivé ou à la corbeille), la place
+        de la barre de défilement est toujours réservée : passer d'une liste
+        pleine (Projets actifs) à une liste vide (Archivés) ne décale plus
+        rien.
+      */}
+      <main className={cn("min-h-0 flex-1", scoped.length > 0 || scopedTrash.length > 0 ? "overflow-y-scroll" : "overflow-y-auto")}>
+        <div className="mx-auto w-full max-w-6xl 2xl:max-w-[96rem] min-[137.5rem]:max-w-[120rem] px-6 py-8">
           {/* En-tête */}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
@@ -569,7 +575,7 @@ export default function Dashboard() {
               )}
 
               <Button onClick={openCreateDialog}>
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus />
                 {t("newProject")}
               </Button>
             </div>
@@ -639,7 +645,7 @@ export default function Dashboard() {
                 <Clock className="h-4 w-4 text-muted-foreground" />
                 {t("recent")}
               </h2>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 min-[137.5rem]:grid-cols-5">
                 {recent.map(renderCard)}
               </div>
             </section>
@@ -706,7 +712,7 @@ export default function Dashboard() {
                         <CardContent>
                           <div className="flex flex-wrap gap-2">
                             <Button onClick={openCreateDialog}>
-                              <Plus className="mr-2 h-4 w-4" />
+                              <Plus />
                               {t("empty.createFirst")}
                             </Button>
                             {signedIn && (
@@ -724,7 +730,7 @@ export default function Dashboard() {
                       )}
                   </Card>
                 ) : (
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 min-[137.5rem]:grid-cols-5">
                     {visible.map(renderCard)}
                   </div>
                 )}

@@ -92,5 +92,30 @@
     "documentName": "E.g. Chapter 3 - draft",
     "documentText": "Write here…",
     "typedConfirmation": "Retype the name here"
+  },
+  "panelActions": {
+    "open": "Open",
+    "rename": "Rename…",
+    "duplicate": "Duplicate",
+    "delete": "Delete…",
+    "menu": "Actions for “{{name}}”",
+    "deleteTitle": "Delete “{{name}}”?",
+    "deleteConfirm": "Delete",
+    "renameTitle": "Rename “{{name}}”",
+    "renameDescription": "The new name is shown everywhere in the project.",
+    "renameEmpty": "The name cannot be empty.",
+    "copyName": "{{name}} (copy)",
+    "duplicated": "“{{name}}” duplicated.",
+    "addInside": "Add inside…",
+    "nameLabel": "Name",
+    "titleLabel": "Title",
+    "firstNameLabel": "First name",
+    "lastNameLabel": "Last name",
+    "titlePlaceholder": "E.g. The crossing",
+    "deleteTrash": "“{{name}}” will go to the trash: you can restore it from there.",
+    "deleteTrashChildren": "“{{name}}” will go to the trash; what it contains moves up one level. You can restore it from the trash.",
+    "deleteStructure": "“{{name}}” and everything it contains (text included) will go to the trash. You can restore them from there.",
+    "deleteLane": "The “{{name}}” plotline and all its events will be deleted. You can undo right after.",
+    "customize": "Customise"
   }
 }

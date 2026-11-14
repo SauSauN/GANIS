@@ -44,6 +44,8 @@ interface CharacterState {
   detailLevel: CharacterDetailLevel | null;
   /** Listes personnalisées du projet (absente : valeurs par défaut). */
   lists: CharacterSettings["lists"];
+  /** Carte « Pouvoirs » des fiches activée pour le projet. */
+  powersEnabled: boolean;
   /** Vrai une fois la liste et les réglages chargés pour `projectId`. */
   loaded: boolean;
   loading: boolean;
@@ -53,6 +55,8 @@ interface CharacterState {
   fetchCharacters: (projectId: string) => Promise<void>;
   /** Choisit le niveau de détail de toutes les fiches du projet. */
   setDetailLevel: (projectId: string, level: CharacterDetailLevel) => Promise<void>;
+  /** Affiche ou masque la carte « Pouvoirs » des fiches du projet. */
+  setPowersEnabled: (projectId: string, enabled: boolean) => Promise<void>;
   /** Met à jour le nombre d'images de la galerie (après ajout ou retrait). */
   adjustGalleryCount: (projectId: string, id: string, delta: number) => void;
   /** Remplace une liste personnalisable (`null` : valeurs par défaut). */
@@ -102,6 +106,7 @@ export const useCharacterStore = create<CharacterState>((set, get) => {
     characters: [],
     detailLevel: null,
     lists: {},
+    powersEnabled: false,
     loaded: false,
     loading: false,
     error: null,
@@ -134,6 +139,7 @@ export const useCharacterStore = create<CharacterState>((set, get) => {
           characters,
           detailLevel: settings.detailLevel,
           lists: settings.lists,
+          powersEnabled: settings.powersEnabled,
           loaded: true,
           loading: false,
         });
@@ -152,6 +158,14 @@ export const useCharacterStore = create<CharacterState>((set, get) => {
 
       if (get().projectId === projectId) {
         set({ detailLevel: settings.detailLevel });
+      }
+    },
+
+    setPowersEnabled: async (projectId, enabled) => {
+      const settings = await api.setCharacterPowersEnabled(projectId, enabled);
+
+      if (get().projectId === projectId) {
+        set({ powersEnabled: settings.powersEnabled });
       }
     },
 
@@ -273,6 +287,7 @@ export const useCharacterStore = create<CharacterState>((set, get) => {
         characters: [],
         detailLevel: null,
         lists: {},
+        powersEnabled: false,
         loaded: false,
         loading: false,
         error: null,
@@ -291,6 +306,7 @@ export function useProjectCharacters(projectId: string) {
   const characters = useCharacterStore((state) => (mine ? state.characters : EMPTY));
   const detailLevel = useCharacterStore((state) => (mine ? state.detailLevel : null));
   const lists = useCharacterStore((state) => (mine ? state.lists : EMPTY_LISTS));
+  const powersEnabled = useCharacterStore((state) => mine && state.powersEnabled);
   const loaded = useCharacterStore((state) => mine && state.loaded);
   const loading = useCharacterStore((state) => mine && state.loading);
   const error = useCharacterStore((state) => (mine ? state.error : null));
@@ -308,6 +324,7 @@ export function useProjectCharacters(projectId: string) {
     characters,
     detailLevel,
     lists,
+    powersEnabled,
     loaded,
     loading,
     error,

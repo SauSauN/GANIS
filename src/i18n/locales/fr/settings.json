@@ -143,6 +143,44 @@
         "location": "Lieu",
         "item": "Objet"
       }
+    },
+    "panelMenu": {
+      "title": "Menu clic droit du panneau du milieu",
+      "description": "Un clic droit sur un personnage, un lieu, un objet, une note… propose Ouvrir, Renommer, Ajouter dedans, Dupliquer et Supprimer.",
+      "toggle": "Menu au clic droit",
+      "on": "Activé : le clic droit ouvre le menu de l'élément.",
+      "off": "Désactivé : le clic droit ne fait rien ; le clic gauche ouvre toujours la fiche."
+    },
+    "previewTabs": {
+      "title": "Onglets d'aperçu",
+      "description": "Comme dans VS Code : un simple clic sur un élément du panneau du milieu l'ouvre dans un onglet provisoire (titre en italique), remplacé par le prochain élément ouvert de la même façon. Un double-clic sur l'élément ou sur l'onglet, une modification ou l'épinglage le gardent ouvert.",
+      "toggle": "Ouvrir d'un simple clic en aperçu",
+      "on": "Activé : un clic ouvre un aperçu, un double-clic garde l'onglet.",
+      "off": "Désactivé : chaque clic ouvre un nouvel onglet."
+    },
+    "profileFrame": {
+      "title": "Cadre des photos de profil",
+      "description": "Un cadre entoure la photo des personnages, des lieux, des objets et des autres fiches, sur la fiche comme dans les listes. Blanc par défaut, comme un tirage photo.",
+      "toggle": "Cadre autour des photos",
+      "on": "Activé : chaque photo de profil a un cadre.",
+      "off": "Désactivé : les photos s'affichent sans cadre.",
+      "color": "Couleur",
+      "customColor": "Autre couleur…",
+      "width": "Épaisseur",
+      "widths": {
+        "thin": "Fin",
+        "medium": "Moyen",
+        "thick": "Épais"
+      },
+      "colors": {
+        "white": "Blanc",
+        "cream": "Crème",
+        "lightGrey": "Gris clair",
+        "grey": "Gris",
+        "black": "Noir",
+        "gold": "Or"
+      },
+      "reset": "Revenir au cadre blanc par défaut"
     }
   },
   "developer": {

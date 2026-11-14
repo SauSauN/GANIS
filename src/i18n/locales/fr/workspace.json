@@ -3,6 +3,6 @@
   "loading": "Chargement du projet…",
   "empty": {
     "title": "Aucun onglet ouvert",
-    "description": "Choisissez une fonctionnalité dans la barre de gauche pour l'ouvrir."
+    "description": "Choisissez un élément à gauche pour commencer."
   }
 }

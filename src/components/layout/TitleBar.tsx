@@ -2,7 +2,7 @@ import { useEffect, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useMatch } from "react-router-dom";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Activity, Blocks, LogIn, Moon, Play, Settings, Square, Sun, Undo2 } from "lucide-react";
+import { Activity, Blocks, LogIn, Moon, Play, Search, Settings, Square, Sun, Undo2 } from "lucide-react";
 import ganisLogo from "@/assets/ganis-logo.png";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { MenuBar } from "@/components/layout/MenuBar";
@@ -81,6 +81,13 @@ export function TitleBar() {
   const readLabel = reading ? t("reading.stop") : t("reading.play");
   const readTitle = readCombo ? `${readLabel} (${formatCombo(readCombo, keyLabels)})` : readLabel;
 
+  // Loupe : recherche dans le projet ouvert, dans le panneau du milieu
+  // (commande de l'espace de travail, voir `search` dans `Workspace.tsx`).
+  const search = useCommand("search");
+  const searchCombo = shortcutOf("search");
+  const searchLabel = t("search");
+  const searchTitle = searchCombo ? `${searchLabel} (${formatCombo(searchCombo, keyLabels)})` : searchLabel;
+
   /**
    * Change le thème clair/sombre.
    */
@@ -156,6 +163,21 @@ export function TitleBar() {
             inscription, configuration). Une fois connecté, elle se change
             dans le menu du compte. */}
         {!user && <LanguageSwitcher className="mr-1" />}
+
+        {/* Recherche dans le projet ouvert (loupe), enfoncée quand le
+            panneau de recherche est ouvert. */}
+        {projectId && search && (
+          <button
+            type="button"
+            onClick={() => runCommand("search")}
+            aria-label={searchLabel}
+            aria-pressed={Boolean(search.active)}
+            title={searchTitle}
+            className={cn(iconButton, search.active && "bg-secondary text-foreground")}
+          >
+            <Search className="h-4 w-4" />
+          </button>
+        )}
 
         {/* Lecture complète du projet ouvert (▶), même forme que les
             autres icônes ; enfoncé pendant la lecture. */}

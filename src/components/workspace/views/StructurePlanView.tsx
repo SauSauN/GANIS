@@ -816,8 +816,8 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
 /** Cadre de la vue : titre, description, contenu (plus large que `ViewShell`). */
 function Shell({ feature, children }: { feature: WorkspaceFeature; children: ReactNode }) {
   return (
-    <div className="flex-1 overflow-y-auto p-8">
-      <div className="mx-auto max-w-4xl space-y-5">
+    <div className="flex-1 overflow-y-auto p-8 [scrollbar-gutter:stable]">
+      <div className="mx-auto max-w-4xl 2xl:max-w-6xl space-y-5">
         <div>
           <h2 className="sr-only">{feature.label}</h2>
           <p className="text-sm text-muted-foreground">{feature.description}</p>

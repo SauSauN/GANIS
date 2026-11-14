@@ -33,7 +33,6 @@
   "picker": {
     "search": "Search for a type…",
     "noResult": "No type matches.",
-    "manage": "Categories and custom types",
     "change": "Change",
     "changeTitle": "Change the type of “{{name}}”",
     "changeDescription": "Information already entered is kept, even what no longer applies to the new type.",
@@ -58,6 +57,24 @@
       "none": "At the top",
       "empty": "Nothing (at the top)",
       "hint": "A wider group, if you have one: grey wolves within canines."
+    },
+    "faction": {
+      "label": "Branch of",
+      "none": "Independent faction",
+      "empty": "None (independent faction)",
+      "hint": "The faction this one depends on: a section of an order, a cell of a network, a family of a clan."
+    },
+    "people": {
+      "label": "Attached to",
+      "none": "Independent sheet",
+      "empty": "None (independent sheet)",
+      "hint": "A broader sheet: a sub-people in its people, a branch in its religion, a deity in its pantheon."
+    },
+    "magic": {
+      "label": "Attached to",
+      "none": "Independent sheet",
+      "empty": "None (independent sheet)",
+      "hint": "A broader sheet: a school in its system, a technique in its school."
     }
   },
   "sections": {
@@ -95,7 +112,11 @@
     "retry": "Retry",
     "noResult": "No entry matches your search.",
     "expand": "Expand",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "layout": "Display",
+    "tree": "Tree",
+    "grid": "Cards",
+    "inside": "in {{name}}"
   },
   "sidebar": {
     "loading": "Loading…",
@@ -164,9 +185,7 @@
   },
   "animalCharacter": {
     "title": "Character",
-    "description": "Is this animal also a character in the story?",
     "linked": "This animal is also a character: relationships, scenes and psychology live on its character sheet.",
-    "open": "Character sheet",
     "unlink": "Remove the link",
     "unlinkHint": "Becomes just an animal again; the character sheet is kept.",
     "notLinked": "For now, it's just an animal. If it acts in the story (it has relationships, it appears in scenes), make it a character too.",
@@ -178,22 +197,21 @@
   },
   "characterAnimal": {
     "title": "Animal",
-    "description": "Is this character an animal (or a plant) from the fauna and flora?",
     "none": "If this character is an animal, link it to its entry (a specific animal from the fauna and flora).",
     "pickLabel": "Specific animal or plant",
     "noFree": "No specific animal available"
   },
   "links": {
-    "title": "Links with objects and species",
     "description": {
       "character": "What they own, use, made or seek; their companions and mounts.",
       "location": "The objects found there, the animals and plants that live there.",
       "item": "Who owns it, where it is, what it's made of, what it's tied to.",
-      "species": "Where it lives, what it eats, who owns it, what it's used for."
+      "species": "Where it lives, what it eats, who owns it, what it's used for.",
+      "faction": "Who leads it, who belongs to it, its allies and enemies, its seat, what it controls.",
+      "people": "Who belongs to it, who practises or speaks it, where they live, the powers they master.",
+      "magic": "Who masters or teaches it, what its source is, who forbids it."
     },
-    "add": "Link an element",
     "edit": "Edit the link",
-    "empty": "No link yet.",
     "periodBoth": "from {{since}} to {{until}}",
     "periodFrom": "from {{since}}",
     "periodUntil": "until {{until}}",
@@ -201,7 +219,10 @@
       "character": "Character",
       "location": "Location",
       "item": "Object",
-      "species": "Fauna and flora"
+      "species": "Fauna and flora",
+      "faction": "Faction",
+      "people": "People, culture or religion",
+      "magic": "Magic or power"
     },
     "types": {
       "owns": {
@@ -255,6 +276,78 @@
       "other": {
         "forward": "other link with",
         "backward": "other link with"
+      },
+      "leads": {
+        "forward": "leads",
+        "backward": "is led by"
+      },
+      "memberOf": {
+        "forward": "is a member of",
+        "backward": "has as a member"
+      },
+      "founded": {
+        "forward": "founded",
+        "backward": "was founded by"
+      },
+      "supports": {
+        "forward": "supports",
+        "backward": "is supported by"
+      },
+      "allyOf": {
+        "forward": "is allied with",
+        "backward": "is allied with"
+      },
+      "enemyOf": {
+        "forward": "is an enemy of",
+        "backward": "is the enemy of"
+      },
+      "basedIn": {
+        "forward": "is based in",
+        "backward": "is the seat of"
+      },
+      "presentIn": {
+        "forward": "is present in",
+        "backward": "hosts"
+      },
+      "controls": {
+        "forward": "controls",
+        "backward": "is controlled by"
+      },
+      "belongsTo": {
+        "forward": "belongs to",
+        "backward": "counts among its own"
+      },
+      "practices": {
+        "forward": "practises / believes in",
+        "backward": "is practised by"
+      },
+      "speaks": {
+        "forward": "speaks",
+        "backward": "is spoken by"
+      },
+      "worships": {
+        "forward": "worships",
+        "backward": "is worshipped by"
+      },
+      "masters": {
+        "forward": "masters",
+        "backward": "is mastered by"
+      },
+      "teaches": {
+        "forward": "teaches",
+        "backward": "is taught by"
+      },
+      "sourceOf": {
+        "forward": "is a source of",
+        "backward": "draws its strength from"
+      },
+      "grants": {
+        "forward": "grants",
+        "backward": "is granted by"
+      },
+      "forbids": {
+        "forward": "forbids",
+        "backward": "is forbidden by"
       }
     },
     "dialog": {
@@ -265,7 +358,7 @@
       "element": "Element",
       "choose": "Choose…",
       "noneOfKind": "No element of this kind",
-      "noKinds": "Turn on objects or fauna and flora in the project settings to create links.",
+      "noKinds": "Turn on a world module (objects, fauna and flora, factions, peoples, magic) in the project settings to create links.",
       "type": "Kind of link",
       "label": "Detail (optional)",
       "labelPlaceholder": "E.g. Inherited from his father",
@@ -279,11 +372,35 @@
       "create": "Create the link"
     }
   },
+  "universe": {
+    "title": "Links with the world",
+    "description": {
+      "character": "Everything that ties this character to the world: relationships, places, items, fauna and flora, factions, peoples and magic.",
+      "location": "Who lives, rules or comes from here; the items found here, the fauna and flora living here, the factions and peoples present."
+    },
+    "add": "Add a link",
+    "empty": "No links yet.",
+    "animalLabel": "is the animal",
+    "animalAdd": "This character is an animal…",
+    "animalEdit": "Edit the fauna and flora link",
+    "groups": {
+      "character": "Characters",
+      "location": "Places",
+      "species": "Fauna and flora",
+      "item": "Items",
+      "faction": "Factions",
+      "people": "Peoples, cultures and religions",
+      "magic": "Magic and powers"
+    },
+    "characterLabel": "is the character",
+    "characterEdit": "Edit the link with the character",
+    "characterAdd": "This animal is a character…"
+  },
   "item": {
     "categories": {
       "weapon": {
         "label": "Weapons",
-        "description": "Swords, bows, firearms, explosives…"
+        "description": "Swords, axes, bows, firearms, explosives, ammunition…"
       },
       "armor": {
         "label": "Armor and protection",
@@ -805,6 +922,641 @@
         "theme": "The depth",
         "goal": "Type-specific details, habitat and legends",
         "count": "+ 2 to 5 fields"
+      }
+    }
+  },
+  "faction": {
+    "categories": {
+      "political": {
+        "label": "Political power",
+        "description": "Governments, councils, parties, alliances, rebellions…"
+      },
+      "military": {
+        "label": "Armed forces",
+        "description": "Armies, fleets, knightly orders, mercenaries, guards…"
+      },
+      "religious": {
+        "label": "Religion",
+        "description": "Churches, cults, sects, monastic orders…"
+      },
+      "economic": {
+        "label": "Economy",
+        "description": "Guilds, companies, trade leagues, banks…"
+      },
+      "criminal": {
+        "label": "Crime",
+        "description": "Gangs, mafias, thieves' guilds, pirates, smugglers…"
+      },
+      "secret": {
+        "label": "Secret societies",
+        "description": "Secret societies, conspiracies, spy networks, resistances…"
+      },
+      "family": {
+        "label": "Families and clans",
+        "description": "Noble houses, clans, dynasties, tribes…"
+      },
+      "social": {
+        "label": "Groups and movements",
+        "description": "Schools, academies, clubs, brotherhoods, movements…"
+      }
+    },
+    "types": {
+      "government": "Government",
+      "council": "Council",
+      "party": "Party",
+      "alliance": "Alliance",
+      "rebellion": "Rebellion",
+      "army": "Army",
+      "navy": "Navy",
+      "knightOrder": "Knightly order",
+      "mercenaries": "Mercenary company",
+      "militia": "Militia",
+      "guard": "Guard",
+      "church": "Church",
+      "cult": "Cult",
+      "sect": "Sect",
+      "monasticOrder": "Monastic order",
+      "guild": "Guild",
+      "company": "Company",
+      "tradeLeague": "Trade league",
+      "bank": "Bank",
+      "gang": "Gang",
+      "mafia": "Mafia",
+      "thievesGuild": "Thieves' guild",
+      "pirates": "Pirates",
+      "smugglers": "Smugglers",
+      "secretSociety": "Secret society",
+      "conspiracy": "Conspiracy",
+      "spyNetwork": "Spy network",
+      "resistance": "Resistance",
+      "nobleHouse": "Noble house",
+      "clan": "Clan",
+      "dynasty": "Dynasty",
+      "tribe": "Tribe",
+      "school": "School",
+      "academy": "Academy",
+      "club": "Club",
+      "brotherhood": "Brotherhood",
+      "movement": "Movement"
+    },
+    "statuses": {
+      "active": "Active",
+      "rising": "Rising",
+      "declining": "Declining",
+      "underground": "Underground",
+      "banned": "Banned",
+      "dissolved": "Dissolved",
+      "destroyed": "Destroyed",
+      "unknown": "Unknown"
+    },
+    "fields": {
+      "colorPalette": "Color palette",
+      "aliases": "Other names",
+      "description": "Description",
+      "firstAppearance": "First appearance",
+      "motto": "Motto",
+      "emblem": "Emblem",
+      "size": "Size",
+      "influence": "Influence",
+      "goals": "Goals",
+      "ideology": "Ideology",
+      "founded": "Founding",
+      "history": "History",
+      "notes": "Author's notes",
+      "powers": "Powers",
+      "territory": "Territory",
+      "strength": "Strength",
+      "equipment": "Equipment",
+      "ranks": "Ranks",
+      "deity": "Deity",
+      "dogmas": "Dogmas",
+      "rites": "Rites",
+      "wealth": "Wealth",
+      "trade": "Trade",
+      "activities": "Activities",
+      "recognition": "Recognition signs",
+      "membership": "Membership",
+      "secrets": "Secrets",
+      "lineage": "Lineage",
+      "succession": "Succession",
+      "oath": "Oath",
+      "subjects": "Subjects taught",
+      "fleet": "Fleet"
+    },
+    "placeholders": {
+      "aliases": "E.g. The Grey Cloaks",
+      "description": "What it is, what people see of it, what they say about it…",
+      "motto": "E.g. None shall pass",
+      "emblem": "E.g. A silver tower on a black field",
+      "size": "E.g. 300 members, a handful of initiates",
+      "goals": "What it wants to achieve, in the short and long run…",
+      "ideology": "What it believes in, what it stands for…",
+      "founded": "E.g. Two centuries ago, after the Great War",
+      "history": "Its founding, victories, defeats, splits…",
+      "notes": "Ideas, open questions…",
+      "powers": "What it decides, who obeys it…",
+      "territory": "E.g. The harbour districts and the south coast",
+      "strength": "E.g. 3,000 soldiers, 12 ships",
+      "equipment": "Weapons, mounts, war machines…",
+      "ranks": "Add a rank…",
+      "deity": "E.g. The Two-Faced Goddess",
+      "dogmas": "What its faithful must believe and respect…",
+      "rites": "Ceremonies, initiations, sacrifices…",
+      "wealth": "E.g. Immense, declining, hidden",
+      "trade": "Add a good…",
+      "activities": "Add an activity…",
+      "recognition": "E.g. An iron ring on the little finger",
+      "membership": "E.g. Sponsored by two members",
+      "secrets": "What it hides, and from whom…",
+      "lineage": "Founders, heirs, branches of the family…",
+      "succession": "E.g. The eldest son, or the strongest fighter",
+      "oath": "E.g. Serve the queen until death",
+      "subjects": "Add a subject…",
+      "fleet": "Ships, crews, home ports…"
+    },
+    "options": {
+      "influence": {
+        "local": "Local",
+        "regional": "Regional",
+        "national": "National",
+        "continental": "Continental",
+        "worldwide": "Worldwide"
+      }
+    },
+    "profile": {
+      "new": "New faction",
+      "contains_one": "{{count}} branch",
+      "contains_other": "{{count}} branches"
+    },
+    "sections": {
+      "identity": "What makes the faction recognisable, and what it wants.",
+      "story": "Its beliefs, founding, past, and your author's notes.",
+      "gallery": "Up to 30 images: emblems, banners, uniforms, references."
+    },
+    "form": {
+      "namePlaceholder": "E.g. The Order of Aval, the Shadow Guild, House Venn"
+    },
+    "picker": {
+      "title": "What kind of faction?",
+      "description": "Choose a type: the sheet adapts (an army doesn't have the same information as a sect)."
+    },
+    "create": {
+      "save": "Create the faction",
+      "inside": "Will be a branch of “{{name}}”."
+    },
+    "list": {
+      "create": "Create a faction",
+      "emptyTitle": "No factions yet",
+      "emptyDescription": "Guilds, orders, clans, armies, cults, secret societies… Create the groups that drive your story.",
+      "count_one": "{{count}} faction",
+      "count_other": "{{count}} factions",
+      "addInside": "Create a branch of “{{name}}”"
+    },
+    "children": {
+      "title": "Branches",
+      "description": "The sections, cells or families that depend on “{{name}}”.",
+      "add": "Add a branch",
+      "empty": "No branches."
+    },
+    "sidebar": {
+      "title": "Factions",
+      "empty": "No factions."
+    },
+    "disabled": {
+      "title": "The Factions module is turned off",
+      "description": "Your factions are kept. Turn the module back on in the project settings to find them again."
+    },
+    "settings": {
+      "title": "Factions and organisations",
+      "description": "The groups in your story: guilds, orders, clans, armies, cults, secret societies…",
+      "enable": "Turn on factions",
+      "enabledHint": "The “Factions” module is in the left bar.",
+      "disabledHint": "Turn it on to add it to the left bar.",
+      "kept_one": "{{count}} faction is kept and will come back if you turn the module on again.",
+      "kept_other": "{{count}} factions are kept and will come back if you turn the module on again.",
+      "categories": "Keep only what your story needs: the other categories won't be offered.",
+      "types": "Add your own types (Conclave, Syndicate…). Each belongs to a category and gets its fields.",
+      "typePlaceholder": "E.g. Conclave"
+    },
+    "levels": {
+      "title": "Level of detail of faction sheets",
+      "firstTime": "Choose the level of detail of this project's faction sheets. It applies to all factions and can be changed in the project settings.",
+      "basic": {
+        "label": "Basic",
+        "theme": "The essentials",
+        "goal": "Name and describe the faction",
+        "count": "7 fields"
+      },
+      "intermediate": {
+        "label": "Medium",
+        "theme": "What it wants",
+        "goal": "Goals, motto, emblem, influence and category fields (strength, dogmas, wealth…)",
+        "count": "+ 8 to 13 fields"
+      },
+      "advanced": {
+        "label": "Advanced",
+        "theme": "Depth",
+        "goal": "Ideology, founding, history and type-specific details",
+        "count": "+ 3 to 4 fields"
+      }
+    }
+  },
+  "people": {
+    "categories": {
+      "people": {
+        "label": "Peoples and races",
+        "description": "Ethnic groups, fantasy races, aliens…"
+      },
+      "culture": {
+        "label": "Cultures and traditions",
+        "description": "Customs, festivals, languages, social classes…"
+      },
+      "religion": {
+        "label": "Religions and beliefs",
+        "description": "Religions, pantheons, deities, mythologies…"
+      }
+    },
+    "types": {
+      "ethnicGroup": "People or ethnic group",
+      "fantasyRace": "Fantasy race",
+      "alienCivilization": "Alien civilisation",
+      "artificialBeings": "Artificial beings",
+      "spiritBeings": "Spirit beings",
+      "nomadicPeople": "Nomadic people",
+      "culture": "Culture",
+      "tradition": "Tradition or festival",
+      "language": "Language",
+      "socialClass": "Social class or caste",
+      "religion": "Religion",
+      "pantheon": "Pantheon",
+      "deity": "Deity",
+      "mythology": "Mythology",
+      "philosophy": "Philosophy or school of thought",
+      "prophecy": "Prophecy"
+    },
+    "statuses": {
+      "living": "Living",
+      "growing": "Growing",
+      "declining": "Declining",
+      "endangered": "Endangered",
+      "persecuted": "Persecuted",
+      "extinct": "Extinct",
+      "legendary": "Legendary",
+      "unknown": "Unknown"
+    },
+    "fields": {
+      "colorPalette": "Colour palette",
+      "aliases": "Other names",
+      "description": "Description",
+      "firstAppearance": "First appearance",
+      "symbol": "Symbol",
+      "spread": "Reach",
+      "origins": "Origins",
+      "history": "History",
+      "notes": "Author's notes",
+      "population": "Population",
+      "appearance": "Appearance",
+      "lifespan": "Lifespan",
+      "temperament": "Character and temperament",
+      "society": "How society is organised",
+      "customs": "Customs and way of life",
+      "values": "Values",
+      "arts": "Arts, music and crafts",
+      "cuisine": "Cuisine",
+      "clothing": "Clothing and adornments",
+      "beliefs": "Beliefs",
+      "followers": "Followers",
+      "sacredTexts": "Sacred texts",
+      "rituals": "Rites and rituals",
+      "afterlife": "Death and the afterlife",
+      "taboos": "Taboos",
+      "celebrations": "Festivals and celebrations",
+      "writingSystem": "Writing system",
+      "vocabulary": "Words and phrases",
+      "pronunciation": "Pronunciation",
+      "occasion": "When and where",
+      "privileges": "Privileges and duties",
+      "domains": "Domains",
+      "myths": "Great myths",
+      "principles": "Principles",
+      "prophecyText": "Text of the prophecy",
+      "fulfilment": "Fulfilment"
+    },
+    "placeholders": {
+      "aliases": "E.g. The Leaf Folk, the Elders",
+      "description": "Who they are, what they look like, what people say about them…",
+      "symbol": "E.g. A silver leaf on a moon",
+      "origins": "Where they come from, how it all began…",
+      "history": "The great stages: migrations, wars, schisms, golden age…",
+      "notes": "Ideas, open questions, leads for later…",
+      "population": "E.g. A few thousand, scattered across three kingdoms",
+      "appearance": "E.g. Tall and slender, pointed ears, amber eyes",
+      "lifespan": "E.g. About a thousand years",
+      "temperament": "E.g. Patient, proud, wary of strangers",
+      "society": "Who rules, how decisions are made, everyone's place…",
+      "customs": "Everyday life: homes, work, family, manners…",
+      "values": "E.g. Honour before life; a given word is sacred",
+      "arts": "E.g. Many-voiced songs, carving living wood",
+      "cuisine": "E.g. Moss bread, sap wine, no meat",
+      "clothing": "E.g. Capes woven from spider silk, clan tattoos",
+      "beliefs": "What the faithful believe: creation, good, evil…",
+      "followers": "E.g. Half the kingdom, mostly in the countryside",
+      "sacredTexts": "E.g. The Book of Tides, in twelve songs",
+      "rituals": "E.g. Prayer at dawn, an offering of salt every new moon",
+      "afterlife": "E.g. Souls join the sea; oath-breakers wander forever",
+      "taboos": "E.g. Never speak the names of the dead",
+      "celebrations": "E.g. The Night of Lanterns, at the winter solstice",
+      "writingSystem": "E.g. Carved runes, read right to left",
+      "vocabulary": "E.g. “Ilyan”: friend; “Vaer na tol”: may the forest keep you",
+      "pronunciation": "E.g. The “r” is rolled, “ae” sounds like “eh”",
+      "occasion": "E.g. Every spring, at the foot of the mother tree",
+      "privileges": "E.g. Only nobles carry swords; serfs never leave their land",
+      "domains": "E.g. Sea, storms, travellers",
+      "myths": "E.g. The fall of the seven stars, the war of the giants",
+      "principles": "E.g. Detachment leads to peace; nothing is permanent",
+      "prophecyText": "E.g. “When the moon bleeds, the child of both shores will rise.”",
+      "fulfilment": "Who fulfils it, when, and whether it was true…"
+    },
+    "options": {
+      "spread": {
+        "local": "Local",
+        "regional": "Regional",
+        "national": "National",
+        "continental": "Continental",
+        "worldwide": "Worldwide"
+      }
+    },
+    "profile": {
+      "new": "New sheet",
+      "contains_one": "{{count}} linked sheet",
+      "contains_other": "{{count}} linked sheets"
+    },
+    "sections": {
+      "identity": "What makes them recognisable, and who they are.",
+      "story": "Their origins, their past, and your author's notes.",
+      "gallery": "Up to 30 images: costumes, symbols, places of worship, references."
+    },
+    "form": {
+      "namePlaceholder": "E.g. The Sylvan Elves, the Cult of the Moon, Sylvan"
+    },
+    "picker": {
+      "title": "People, culture or religion?",
+      "description": "Choose a type: the sheet adapts (a language doesn't have the same information as a deity)."
+    },
+    "create": {
+      "save": "Create the sheet",
+      "inside": "Will be attached to “{{name}}”."
+    },
+    "list": {
+      "create": "Create a sheet",
+      "emptyTitle": "No peoples, cultures or religions yet",
+      "emptyDescription": "Peoples and races, cultures, languages, religions and deities… Create the soul of your world.",
+      "count_one": "{{count}} sheet",
+      "count_other": "{{count}} sheets",
+      "addInside": "Attach a sheet to “{{name}}”"
+    },
+    "children": {
+      "title": "Attached sheets",
+      "description": "The sub-peoples, branches, deities or variants that depend on “{{name}}”.",
+      "add": "Attach a sheet",
+      "empty": "No attached sheets."
+    },
+    "sidebar": {
+      "title": "Peoples, cultures and religions",
+      "empty": "No sheets."
+    },
+    "disabled": {
+      "title": "The Peoples module is turned off",
+      "description": "Your sheets are kept. Turn the module back on in the project settings to find them again."
+    },
+    "settings": {
+      "title": "Peoples, cultures and religions",
+      "description": "The peoples and races of your world, their cultures, languages and beliefs. Organisations (tribes, clans, churches, cults) stay in Factions.",
+      "enable": "Turn on peoples, cultures and religions",
+      "enabledHint": "The “Peoples” module is in the left bar.",
+      "disabledHint": "Turn it on to add it to the left bar.",
+      "kept_one": "{{count}} sheet is kept and will come back if you turn the module on again.",
+      "kept_other": "{{count}} sheets are kept and will come back if you turn the module on again.",
+      "categories": "Keep only what your story needs: the other categories won't be offered.",
+      "types": "Add your own types (Dialect, School of thought…). Each belongs to a category and gets its fields.",
+      "typePlaceholder": "E.g. Dialect"
+    },
+    "levels": {
+      "title": "Level of detail of people, culture and religion sheets",
+      "firstTime": "Choose the level of detail of these sheets for this project. It applies to all of them and can be changed in the project settings.",
+      "basic": {
+        "label": "Basic",
+        "theme": "The essentials",
+        "goal": "Name and describe",
+        "count": "7 fields"
+      },
+      "intermediate": {
+        "label": "Medium",
+        "theme": "What sets them apart",
+        "goal": "Symbol, reach and category fields (appearance, customs, beliefs, rites…)",
+        "count": "+ 11 to 12 fields"
+      },
+      "advanced": {
+        "label": "Advanced",
+        "theme": "Depth",
+        "goal": "Origins, history and type-specific details (a language's writing, a deity's domains…)",
+        "count": "+ 2 to 5 fields"
+      }
+    }
+  },
+  "magic": {
+    "categories": {
+      "system": {
+        "label": "Systems",
+        "description": "Magic, ki, superpowers, psionics, alchemy…"
+      },
+      "branch": {
+        "label": "Schools and branches",
+        "description": "Schools, elements, bloodlines and inherited gifts…"
+      },
+      "technique": {
+        "label": "Spells and techniques",
+        "description": "Spells, rituals, transformations, summonings…"
+      }
+    },
+    "types": {
+      "magicSystem": "Magic system",
+      "energySystem": "Inner energy",
+      "superpowers": "Superpowers",
+      "divinePower": "Divine power",
+      "psionics": "Psychic powers",
+      "alchemy": "Alchemy",
+      "school": "School",
+      "element": "Element",
+      "bloodline": "Bloodline or inherited gift",
+      "spell": "Spell",
+      "technique": "Technique",
+      "ritual": "Ritual",
+      "transformation": "Transformation",
+      "summoning": "Summoning",
+      "forbiddenArt": "Forbidden art"
+    },
+    "statuses": {
+      "active": "In use",
+      "rare": "Rare",
+      "secret": "Secret",
+      "forbidden": "Forbidden",
+      "forgotten": "Forgotten",
+      "lost": "Lost",
+      "legendary": "Legendary",
+      "unknown": "Unknown"
+    },
+    "fields": {
+      "colorPalette": "Colour palette",
+      "aliases": "Other names",
+      "description": "Description",
+      "firstAppearance": "First appearance",
+      "manifestation": "What you see and feel",
+      "rarity": "Rarity",
+      "origins": "Origins",
+      "history": "History",
+      "notes": "Author's notes",
+      "source": "Source of power",
+      "rules": "Rules",
+      "cost": "Cost and price to pay",
+      "limits": "Limits and weaknesses",
+      "ranks": "Ranks and levels",
+      "learning": "Learning",
+      "whoCanUse": "Who can use it",
+      "taboos": "Taboos",
+      "principles": "Principles",
+      "affinities": "Affinities and oppositions",
+      "power": "Power",
+      "effects": "Effects",
+      "requirements": "Conditions and requirements",
+      "activation": "Activation",
+      "duration": "Duration",
+      "range": "Range",
+      "risks": "Risks",
+      "materials": "Materials and ingredients",
+      "inheritance": "Inheritance",
+      "summoned": "What is summoned",
+      "forms": "Forms"
+    },
+    "placeholders": {
+      "aliases": "E.g. The Art, the Breath, the Gift",
+      "description": "What it is, how people talk about it, what it allows…",
+      "manifestation": "E.g. A blue glow under the skin, a smell of thunder",
+      "origins": "Where this power comes from, who discovered or received it…",
+      "history": "The great stages: discovery, golden age, ban, oblivion…",
+      "notes": "Ideas, open questions, rules to check…",
+      "source": "E.g. Life energy, the stars, a pact with a god",
+      "rules": "What is possible and what isn't, with no exceptions…",
+      "cost": "E.g. Every spell steals a memory; drains the body for days",
+      "limits": "E.g. Useless in the rain; cannot heal the dead",
+      "ranks": "E.g. Apprentice, Adept, Master, Archmage",
+      "learning": "E.g. Ten years at the monastery, or a sudden revelation",
+      "whoCanUse": "E.g. Only those born under an eclipse",
+      "taboos": "E.g. Never bring back the dead; never read a child's mind",
+      "principles": "E.g. Every fire is born of anger and dies with it",
+      "affinities": "E.g. Strong against water, weak against earth",
+      "effects": "What happens when it is used…",
+      "requirements": "E.g. Master rank, a free hand, line of sight",
+      "activation": "E.g. A three-word incantation, a gesture of the hand",
+      "duration": "E.g. One minute, until sunrise",
+      "range": "E.g. Ten paces, anything in sight",
+      "risks": "E.g. If it fails, the fire turns on the caster",
+      "materials": "E.g. Salt, moon blood, a raven feather",
+      "inheritance": "E.g. Mother to daughter, every other generation",
+      "summoned": "E.g. A wind spirit, bound for one night",
+      "forms": "E.g. A wolf, then a giant beast at the full moon"
+    },
+    "options": {
+      "rarity": {
+        "common": "Common",
+        "uncommon": "Uncommon",
+        "rare": "Rare",
+        "veryRare": "Very rare",
+        "unique": "Unique"
+      },
+      "power": {
+        "minor": "Minor",
+        "moderate": "Moderate",
+        "major": "Major",
+        "devastating": "Devastating",
+        "cataclysmic": "Cataclysmic"
+      }
+    },
+    "profile": {
+      "new": "New magic sheet",
+      "contains_one": "{{count}} attached sheet",
+      "contains_other": "{{count}} attached sheets"
+    },
+    "sections": {
+      "identity": "What makes this power recognisable, and what it does.",
+      "story": "Its origins, its past, and your author's notes.",
+      "gallery": "Up to 30 images: seals, circles, effects, references."
+    },
+    "form": {
+      "namePlaceholder": "E.g. Nen, the School of Fire, Iron Fist"
+    },
+    "picker": {
+      "title": "System, school or technique?",
+      "description": "Choose a type: the sheet adapts (a system has its rules, a spell its effects and range)."
+    },
+    "create": {
+      "save": "Create the sheet",
+      "inside": "Will be attached to “{{name}}”."
+    },
+    "list": {
+      "create": "Create a sheet",
+      "emptyTitle": "No magic or powers yet",
+      "emptyDescription": "Magic systems, energies, superpowers, schools, spells and techniques… Set the rules of your world.",
+      "count_one": "{{count}} sheet",
+      "count_other": "{{count}} sheets",
+      "addInside": "Attach a sheet to “{{name}}”"
+    },
+    "children": {
+      "title": "Attached sheets",
+      "description": "The schools, elements or techniques that depend on “{{name}}”.",
+      "add": "Attach a sheet",
+      "empty": "No attached sheets."
+    },
+    "sidebar": {
+      "title": "Magic and powers",
+      "empty": "No sheets."
+    },
+    "disabled": {
+      "title": "The Magic module is turned off",
+      "description": "Your sheets are kept. Turn the module back on in the project settings to find them again."
+    },
+    "settings": {
+      "title": "Magic and power systems",
+      "description": "The shared rules of power in your world: sources, costs, limits, schools, spells and techniques. A character's own powers stay on their “Powers” card.",
+      "enable": "Turn on magic and powers",
+      "enabledHint": "The “Magic” module is in the left bar.",
+      "disabledHint": "Turn it on to add it to the left bar.",
+      "kept_one": "{{count}} sheet is kept and will come back if you turn the module on again.",
+      "kept_other": "{{count}} sheets are kept and will come back if you turn the module on again.",
+      "categories": "Keep only what your story needs: the other categories won't be offered.",
+      "types": "Add your own types (Seal, Contract…). Each belongs to a category and gets its fields.",
+      "typePlaceholder": "E.g. Seal"
+    },
+    "levels": {
+      "title": "Level of detail of magic sheets",
+      "firstTime": "Choose the level of detail of this project's magic sheets. It applies to all of them and can be changed in the project settings.",
+      "basic": {
+        "label": "Basic",
+        "theme": "The essentials",
+        "goal": "Name and describe the power",
+        "count": "7 fields"
+      },
+      "intermediate": {
+        "label": "Medium",
+        "theme": "The rules",
+        "goal": "Rarity, what you see, and category fields (source, cost, limits, effects, range…)",
+        "count": "+ 10 to 13 fields"
+      },
+      "advanced": {
+        "label": "Advanced",
+        "theme": "Depth",
+        "goal": "Origins, history and type-specific details (ingredients, inheritance…)",
+        "count": "+ 2 to 3 fields"
       }
     }
   }

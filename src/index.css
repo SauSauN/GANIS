@@ -196,7 +196,11 @@
    défilement. L'attribut `data-scrolling` est posé et retiré
    par `src/lib/scrollbars.ts` sur l'élément qui défile.
    L'espace de la barre reste réservé : le contenu ne bouge pas
-   quand elle apparaît.
+   quand elle apparaît. Chaque zone qui défile dans un onglet
+   (PageShell, accueil, plan, lecture, tableaux…) porte
+   `[scrollbar-gutter:stable]` : la place de la barre est gardée
+   même quand la page est vide ou courte, l'interface ne bouge
+   pas d'un onglet à l'autre.
    ============================================================ */
 
 /* Moteurs récents (WebView2 sous Windows, Firefox) */
@@ -233,6 +237,39 @@
   [data-scrolling]::-webkit-scrollbar-thumb {
     background-color: var(--scrollbar-thumb);
   }
+}
+
+/* Cadre des photos de profil (personnages, lieux, fiches du monde) :
+   couleur et épaisseur réglées dans Paramètres › Apparence (variables
+   posées par `src/lib/preferences.ts`). Blanc par défaut, comme un tirage
+   photo. `profile-frame-card` : vignette des cartes de liste ; sans cadre,
+   elle garde un liseré de la couleur de la carte pour se détacher du
+   bandeau. Hors couche : passe devant les utilitaires de bordure. */
+.profile-frame {
+  border: var(--profile-frame-width, 5px) solid var(--profile-frame-color, #ffffff);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
+}
+
+[data-profile-frame="off"] .profile-frame {
+  border-width: 0;
+  box-shadow: none;
+}
+
+[data-profile-frame="off"] .profile-frame-card {
+  border: 4px solid var(--card);
+}
+
+/* Zones qui défilent sans barre du tout (barre d'onglets, comme VS Code) :
+   hors couche, comme les règles ci-dessus, pour passer devant elles. */
+.no-scrollbar,
+.no-scrollbar[data-scrolling] {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 /* ============================================================

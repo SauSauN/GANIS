@@ -1,0 +1,47 @@
+{
+  "description": "The words of your story, in alphabetical order: invented terms, places, concepts, titles… Each one can link to the sheets it relates to.",
+  "add": "New term",
+  "loading": "Loading the glossary…",
+  "retry": "Retry",
+  "search": "Search a term or a definition",
+  "categoryFilter": "Filter by category",
+  "allCategories": "All categories",
+  "noCategory": "No category",
+  "count_one": "{{count}} term",
+  "count_other": "{{count}} terms",
+  "letters": "Jump to letter",
+  "noMatch": "No term matches the search.",
+  "noDefinition": "No definition yet.",
+  "openSheet": "Open the sheet ({{kind}}): {{name}}",
+  "edit": "Edit “{{name}}”",
+  "delete": "Delete “{{name}}”",
+  "empty": {
+    "title": "The glossary is empty",
+    "text": "Write down the words of your world here: a place with an invented name, a title, a festival, a saying… You and your readers will find your way around."
+  },
+  "kinds": {
+    "character": "Character",
+    "location": "Place",
+    "item": "Item",
+    "species": "Fauna and flora",
+    "faction": "Faction",
+    "people": "People, culture or religion",
+    "magic": "Magic or power"
+  },
+  "form": {
+    "addTitle": "New term",
+    "editTitle": "Edit the term",
+    "description": "Only the term is required.",
+    "term": "Term",
+    "termPlaceholder": "E.g. Lunéa",
+    "termRequired": "Enter the term.",
+    "category": "Category",
+    "categoryPlaceholder": "E.g. Magic",
+    "definition": "Definition",
+    "definitionPlaceholder": "What this word means in your story…",
+    "links": "Linked sheets",
+    "addLink": "Link a sheet…",
+    "removeLink": "Remove “{{name}}”",
+    "noSheets": "No sheet to link yet."
+  }
+}

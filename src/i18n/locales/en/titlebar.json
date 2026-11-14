@@ -17,5 +17,6 @@
   "reading": {
     "play": "Read the story",
     "stop": "Exit reading"
-  }
+  },
+  "search": "Search the project"
 }

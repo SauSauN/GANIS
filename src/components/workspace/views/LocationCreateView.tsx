@@ -7,7 +7,7 @@ import { LocationSheet } from "@/components/locations/LocationSheet";
 import { LocationTypePicker } from "@/components/locations/LocationTypePicker";
 import { useLocationLabels } from "@/components/locations/useLocationLabels";
 import { LevelPicker } from "@/components/characters/LevelPicker";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { cardClass, cardContentClass, cardFooterClass, cardHeaderClass, PageShell } from "@/components/workspace/views/PageShell";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { api } from "@/lib/api";
@@ -27,6 +27,7 @@ import { useLocationStore, useProjectLocations } from "@/stores/locationStore";
 import type { CharacterDetailLevel } from "@/types";
 import { errorText } from "@/lib/errors";
 import { notifyError } from "@/lib/notify";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 interface LocationCreateViewProps {
   projectId: string;
@@ -218,8 +219,7 @@ export function LocationCreateView({ projectId, feature, onOpenFeature }: Locati
       <PageShell title={feature.label}>
         <Card className={cardClass}>
           <CardHeader className={cardHeaderClass}>
-            <CardTitle>{t("levels.title")}</CardTitle>
-            <CardDescription>{t("levels.firstTime")}</CardDescription>
+            <TitleWithInfo info={t("levels.firstTime")}>{t("levels.title")}</TitleWithInfo>
           </CardHeader>
           <CardContent className={cardContentClass}>
             <LevelPicker namespace="locations" value={pickedLevel} onChange={setPickedLevel} disabled={levelSaving} />

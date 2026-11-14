@@ -14,6 +14,11 @@
       "locations.create": "New location",
       "structure.plan": "New structure item",
       "notes.create": "New note",
+      "items.create": "New object",
+      "species.create": "New fauna and flora sheet",
+      "factions.create": "New faction",
+      "peoples.create": "New people, culture or religion sheet",
+      "magic.create": "New magic sheet",
       "newProject": "New project"
     },
     "save": "Save",
@@ -36,6 +41,7 @@
     "trash": "Trash…",
     "nothing": "Nothing to undo here: place the cursor in a field first.",
     "pasteEmpty": "Nothing to paste: the clipboard contains no text.",
+    "searchProject": "Search the project",
     "search": "Search…",
     "history": "History…"
   },
@@ -81,6 +87,9 @@
     "note": "A note",
     "sticky": "A sticky note",
     "item": "An object",
-    "species": "An animal or a plant"
+    "species": "An animal or a plant",
+    "faction": "A faction",
+    "people": "A people, culture or religion",
+    "magic": "A magic or power"
   }
 }

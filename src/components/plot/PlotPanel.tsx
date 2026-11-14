@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { ArrowLeft, ArrowLeftRight, ArrowRight, BookOpen, Copy, ExternalLink, ListTree, MapPin, NotebookPen, Palette, Plus, Trash2, X } from "lucide-react";
 import { addEvent, createLink, deleteEvent, deleteLane, deleteLink, duplicateEvent, duplicateLane, moveEvent } from "@/components/plot/actions";
+import { EventEntries } from "@/components/plot/EventEntries";
 import { KindIcon } from "@/components/plot/KindIcon";
 import { area, Field, Fold, Head, input, useMutate, type PlotPanelProps } from "@/components/plot/panelParts";
 import { Button } from "@/components/ui/button";
@@ -156,7 +157,7 @@ function EventLinks({ projectId, data, event }: Pick<PlotPanelProps, "projectId"
 // Événement
 // ----------------------------------------------------------------------------
 
-function EventPanel({ projectId, data, links, onOpenFeature, event }: PlotPanelProps & { event: PlotEvent }) {
+function EventPanel({ projectId, data, links, onOpenFeature, event, placementOpen }: PlotPanelProps & { event: PlotEvent }) {
   const { t } = useTranslation(["plot", "common"]);
   const mutate = useMutate(projectId);
   const requestFocus = usePlotStore((s) => s.requestFocus);
@@ -319,6 +320,8 @@ function EventPanel({ projectId, data, links, onOpenFeature, event }: PlotPanelP
           </div>
         </Field>
 
+        <EventEntries projectId={projectId} event={event} onChange={(entries) => set("entries", entries)} onOpenFeature={onOpenFeature} />
+
         <Field label={t("event.node")}>
           <div className="flex gap-1.5">
             <select
@@ -435,7 +438,7 @@ function EventPanel({ projectId, data, links, onOpenFeature, event }: PlotPanelP
         </div>
       </Fold>
 
-      <Fold title={t("event.details")} summary={detailsSummary}>
+      <Fold title={t("event.details")} summary={detailsSummary} defaultOpen={placementOpen}>
         <div className="grid grid-cols-[1fr_5rem] gap-2">
           <Field label={t("event.lane")}>
             <select value={event.laneId} onChange={(e) => moveEvent(projectId, event.id, e.target.value, event.row)} className={input}>

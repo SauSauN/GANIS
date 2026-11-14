@@ -32,7 +32,9 @@ const MAX_NAME_CHARS: usize = 100;
 
 /// Colonnes jamais remplacées par une restauration. `character_id` (faune
 /// et flore) : le lien avec une fiche de personnage se gère à part.
-const KEPT_COLUMNS: [&str; 3] = ["id", "created_at", "character_id"];
+/// `production_stage` (page de manga) : l'avancement de la fabrication
+/// n'est pas du contenu, une ancienne version ne le fait pas reculer.
+const KEPT_COLUMNS: [&str; 4] = ["id", "created_at", "character_id", "production_stage"];
 
 /// Entrée d'une version d'un élément du découpage : ses cases de manga (JSON).
 /// Ce n'est pas une colonne : elle est restaurée à part.
@@ -46,6 +48,8 @@ fn table_of(kind: &str) -> AppResult<&'static str> {
         "item" => Ok("items"),
         "species" => Ok("species"),
         "faction" => Ok("factions"),
+        "people" => Ok("peoples"),
+        "magic" => Ok("magic_systems"),
         "structureNode" => Ok("structure_nodes"),
         "note" => Ok("notes"),
         "synopsis" => Ok("synopsis"),

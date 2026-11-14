@@ -13,7 +13,12 @@
     "mangaPanel": "Case de manga",
     "item": "Objet",
     "species": "Faune et flore",
-    "worldLink": "Lien entre éléments"
+    "faction": "Faction",
+    "people": "Peuple, culture ou religion",
+    "magic": "Magie ou pouvoir",
+    "worldLink": "Lien entre éléments",
+    "glossaryTerm": "Terme du glossaire",
+    "mangaExtraPage": "Page hors récit"
   },
   "deleted": {
     "character": "Personnage « {{name}} » supprimé.",
@@ -28,7 +33,12 @@
     "mangaPanel": "Case « {{name}} » supprimée.",
     "item": "Objet « {{name}} » supprimé.",
     "species": "« {{name}} » supprimé de la faune et flore.",
-    "worldLink": "Lien « {{name}} » supprimé."
+    "faction": "« {{name}} » supprimée des factions.",
+    "people": "« {{name}} » supprimée des peuples, cultures et religions.",
+    "magic": "« {{name}} » supprimée de la magie et des pouvoirs.",
+    "worldLink": "Lien « {{name}} » supprimé.",
+    "glossaryTerm": "Terme « {{name}} » supprimé du glossaire.",
+    "mangaExtraPage": "Page « {{name}} » supprimée."
   },
   "restored": {
     "character": "Personnage « {{name}} » restauré.",
@@ -43,7 +53,12 @@
     "mangaPanel": "Case « {{name}} » restaurée.",
     "item": "Objet « {{name}} » restauré.",
     "species": "« {{name}} » restauré dans la faune et flore.",
-    "worldLink": "Lien « {{name}} » restauré."
+    "faction": "« {{name}} » restaurée dans les factions.",
+    "people": "« {{name}} » restaurée dans les peuples, cultures et religions.",
+    "magic": "« {{name}} » restaurée dans la magie et les pouvoirs.",
+    "worldLink": "Lien « {{name}} » restauré.",
+    "glossaryTerm": "Terme « {{name}} » restauré dans le glossaire.",
+    "mangaExtraPage": "Page « {{name}} » restaurée."
   },
   "untitled": {
     "character": "Personnage sans nom",
@@ -58,7 +73,12 @@
     "mangaPanel": "Case sans action",
     "item": "Objet sans nom",
     "species": "Fiche sans nom",
-    "worldLink": "Lien"
+    "faction": "Faction sans nom",
+    "people": "Fiche sans nom",
+    "magic": "Fiche sans nom",
+    "worldLink": "Lien",
+    "glossaryTerm": "Terme sans nom",
+    "mangaExtraPage": "Page hors récit"
   },
   "view": {
     "description": "Les éléments supprimés restent ici 30 jours. En les restaurant, tout ce qui avait disparu avec eux revient aussi (images, relations, sous-éléments…).",

@@ -78,11 +78,6 @@ export const useUnsavedStore = create<UnsavedState>((set, get) => ({
   clearPending: () => set({ pending: null }),
 }));
 
-/** Vrai si l'élément `id` a des modifications non enregistrées. */
-export function useIsUnsaved(id: string): boolean {
-  return useUnsavedStore((s) => id in s.entries);
-}
-
 /**
  * Enregistre les éléments demandés, l'un après l'autre.
  * Renvoie ceux dont l'enregistrement a échoué (liste vide : tout est bon).

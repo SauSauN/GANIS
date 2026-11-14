@@ -2,32 +2,37 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { doubleClickHint, onRowDoubleClick } from "@/lib/doubleClick";
 import { useTranslation } from "react-i18next";
 import {
+  BookA,
+  BookImage,
+  Drama,
   FileText,
+  Flag,
   Folder,
+  LayoutPanelTop,
+  Link2,
   ListTree,
   MapPin,
   MapPinned,
   Megaphone,
   Network,
   NotebookText,
+  Package,
   Paperclip,
+  PawPrint,
   RefreshCw,
   RotateCcw,
   StickyNote,
   UserRound,
   Waypoints,
+  Zap,
   type LucideIcon,
-  LayoutPanelTop,
-  Package,
-  PawPrint,
-  Link2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { fieldClass, PageShell } from "@/components/workspace/views/PageShell";
 import { api } from "@/lib/api";
 import { itemTabId } from "@/lib/search";
-import { restoreFromTrash } from "@/lib/trash";
+import { restoreFromTrash, trashLabel } from "@/lib/trash";
 import { cn } from "@/lib/utils";
 import { useTrashStore } from "@/stores/trashStore";
 import type { Activity, HistoryKind } from "@/types";
@@ -45,11 +50,16 @@ const ICONS: Record<HistoryKind, LucideIcon> = {
   placeLink: MapPin,
   item: Package,
   species: PawPrint,
+  faction: Flag,
+  people: Drama,
+  magic: Zap,
   worldLink: Link2,
   mangaPanel: LayoutPanelTop,
   synopsis: FileText,
   plot: Waypoints,
   editorial: Megaphone,
+  glossaryTerm: BookA,
+  mangaExtraPage: BookImage,
 };
 
 const KINDS = Object.keys(ICONS) as HistoryKind[];
@@ -122,12 +132,16 @@ export function HistoryView({ projectId, feature, onOpenFeature }: HistoryViewPr
   }
 
   const name = (item: Activity) =>
-    item.kind === "synopsis" || item.kind === "editorial" ? tt(`kinds.${item.kind}`) : item.label.trim() || tt(`trash:untitled.${item.kind}`);
+    item.kind === "synopsis" || item.kind === "editorial"
+      ? tt(`kinds.${item.kind}`)
+      : item.kind === "mangaExtraPage"
+        ? trashLabel(item.kind, item.label)
+        : item.label.trim() || tt(`trash:untitled.${item.kind}`);
 
   return (
     <PageShell
       title={feature.label}
-      description={t("description")}
+      info={t("description")}
       actions={
         <div className="flex items-center gap-2">
           <select

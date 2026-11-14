@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { FolderTree, Loader2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { LevelPicker } from "@/components/characters/LevelPicker";
 import { PendingGallery, type PendingImage } from "@/components/characters/fields/GalleryField";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
@@ -28,6 +28,7 @@ import {
 } from "@/lib/world";
 import { useWorldEntries, useWorldStore } from "@/stores/worldStore";
 import type { CharacterDetailLevel, WorldModule } from "@/types";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 interface PendingBanner {
   data: string;
@@ -199,8 +200,7 @@ export function WorldCreateView({
       <PageShell title={feature.label}>
         <Card className={cardClass}>
           <CardHeader className={cardHeaderClass}>
-            <CardTitle>{labels.text("levels.title")}</CardTitle>
-            <CardDescription>{labels.text("levels.firstTime")}</CardDescription>
+            <TitleWithInfo info={labels.text("levels.firstTime")}>{labels.text("levels.title")}</TitleWithInfo>
           </CardHeader>
           <CardContent className={cardContentClass}>
             <LevelPicker namespace="world" prefix={`${module}.`} value={pickedLevel} onChange={setPickedLevel} disabled={levelSaving} />

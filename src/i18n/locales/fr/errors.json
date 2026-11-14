@@ -90,7 +90,10 @@
     "descriptionTooLong": "La description du projet ne peut pas dépasser 5000 caractères.",
     "dataMissing": "Les données de ce projet sont introuvables.",
     "purgePublicConfirm": "Ce projet public est partagé avec les autres personnes qui utilisent cet ordinateur : confirmez sa suppression définitive.",
-    "makePrivateConfirm": "Pour rendre ce projet privé, retapez son nom : il ne sera plus accessible aux autres personnes qui utilisent cet ordinateur."
+    "makePrivateConfirm": "Pour rendre ce projet privé, retapez son nom : il ne sera plus accessible aux autres personnes qui utilisent cet ordinateur.",
+    "imageNotFound": "Image introuvable.",
+    "galleryFull": "La galerie est pleine ({{max}} images au maximum).",
+    "captionTooLong": "La légende ne peut pas dépasser {{max}} caractères."
   },
   "synopsis": {
     "tooManyTags": "{{field}} : {{max}} éléments au maximum.",
@@ -221,6 +224,16 @@
     "invalidGeometry": "Position ou taille du post-it invalide.",
     "folderCycle": "Un dossier ne peut pas être déplacé dans l'un de ses sous-dossiers."
   },
+  "glossary": {
+    "notFound": "Ce terme n'existe plus.",
+    "termEmpty": "Le terme ne peut pas être vide.",
+    "termTooLong": "Le terme ne doit pas dépasser {{max}} caractères.",
+    "categoryTooLong": "La catégorie ne doit pas dépasser {{max}} caractères.",
+    "definitionTooLong": "La définition ne doit pas dépasser {{max}} caractères.",
+    "tooManyLinks": "Un terme peut citer {{max}} fiches au plus.",
+    "invalidLink": "Sorte de fiche inconnue.",
+    "linkNotFound": "Une des fiches liées n'existe plus."
+  },
   "trash": {
     "notFound": "Cet élément n'est plus dans la corbeille.",
     "unreadable": "Cet élément de la corbeille est illisible.",
@@ -337,7 +350,8 @@
     "search": "La recherche a échoué.",
     "manuscript": "Impossible d'assembler le manuscrit.",
     "world": "Impossible de charger les objets ou la faune et flore.",
-    "worldLinks": "Impossible de charger les liens entre éléments."
+    "worldLinks": "Impossible de charger les liens entre éléments.",
+    "glossary": "Impossible de charger le glossaire."
   },
   "novel": {
     "contentTooLong": "Ce texte est trop long ({{max}} caractères au maximum).",
@@ -366,7 +380,20 @@
     "invalidThreshold": "Seuil invalide.",
     "unknownCharacter": "Un personnage de cette page n'existe plus.",
     "unknownLocation": "Le lieu choisi n'existe plus.",
-    "panelNotFound": "Cette case n'existe plus."
+    "panelNotFound": "Cette case n'existe plus.",
+    "invalidStage": "Étape de fabrication inconnue.",
+    "invalidExtraKind": "Sorte de page inconnue.",
+    "invalidPlacement": "Place invalide : avant ou après le récit.",
+    "coverPlacement": "La couverture va avant le récit, la 4e de couverture après.",
+    "coverExists": "Ce tome a déjà cette couverture.",
+    "extraNotFound": "Cette page n'existe plus.",
+    "extraTitleTooLong": "Le titre ne doit pas dépasser {{max}} caractères.",
+    "tooManyExtras": "Un tome peut avoir {{max}} pages hors récit au plus.",
+    "extraOtherVolume": "Cette page appartient à un autre tome.",
+    "tooManyPages": "Trop de pages à la fois ({{max}} au plus).",
+    "artTooLarge": "L'image est trop lourde ({{max}} Mo au plus).",
+    "artNotImage": "Ce fichier n'est pas une image (PNG, JPEG, GIF ou WebP).",
+    "noArt": "Cette page n'a pas de dessin."
   },
   "world": {
     "notFound": "Fiche introuvable.",
@@ -411,5 +438,8 @@
   },
   "demo": {
     "unknown": "Ce projet d'exemple n'existe pas."
+  },
+  "sheets": {
+    "invalidModule": "Module inconnu."
   }
 }

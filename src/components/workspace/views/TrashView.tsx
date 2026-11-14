@@ -1,23 +1,28 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
+  BookA,
+  BookImage,
+  Drama,
+  Flag,
   Folder,
+  LayoutPanelTop,
+  Link2,
   ListTree,
-  Paperclip,
   MapPin,
   MapPinned,
   Network,
   NotebookText,
+  Package,
+  Paperclip,
+  PawPrint,
   RefreshCw,
   RotateCcw,
   StickyNote,
   Trash2,
   UserRound,
+  Zap,
   type LucideIcon,
-  LayoutPanelTop,
-  Package,
-  PawPrint,
-  Link2,
 } from "lucide-react";
 import { SelectionBar, SelectionCheckbox } from "@/components/common/SelectionBar";
 import { ConfirmDialog } from "@/components/notes/ConfirmDialog";
@@ -45,8 +50,13 @@ const KIND_ICONS: Record<TrashKind, LucideIcon> = {
   placeLink: MapPin,
   item: Package,
   species: PawPrint,
+  faction: Flag,
+  people: Drama,
+  magic: Zap,
   worldLink: Link2,
   mangaPanel: LayoutPanelTop,
+  glossaryTerm: BookA,
+  mangaExtraPage: BookImage,
 };
 
 interface TrashViewProps {
@@ -102,7 +112,7 @@ export function TrashView({ projectId, feature }: TrashViewProps) {
   return (
     <PageShell
       title={feature.label}
-      description={t("view.description")}
+      info={t("view.description")}
       actions={
         items.length > 0 ? (
           <Button variant="destructive" onClick={() => setConfirmEmpty(true)}>

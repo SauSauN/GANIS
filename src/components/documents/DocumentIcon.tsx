@@ -44,7 +44,7 @@ export function DocumentIcon({ document, className }: { document: Pick<Structure
     >
       <Icon className="size-4.5" />
       {ext && ext.length <= 4 && (
-        <span className="absolute -bottom-1 rounded bg-card px-0.5 font-mono text-[0.55rem] leading-3 font-semibold shadow-sm ring-1 ring-border">
+        <span className="absolute -bottom-1 rounded bg-card px-0.5 text-[0.55rem] leading-3 font-semibold shadow-sm ring-1 ring-border">
           {ext}
         </span>
       )}

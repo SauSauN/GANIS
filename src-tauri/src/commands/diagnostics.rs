@@ -1,5 +1,8 @@
 //! Commandes Tauri liées au diagnostic technique.
 
+// Diagnostic : désactivé (voir `lib.rs`), gardé pour être rétabli.
+#![allow(dead_code)]
+
 use crate::error::AppResult;
 use crate::services::diagnostics_service::{self, Diagnostics};
 use crate::state::AppState;

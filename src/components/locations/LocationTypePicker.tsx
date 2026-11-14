@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Plus, Search } from "lucide-react";
+import { Search, Settings2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
   CATEGORY_ICONS,
@@ -43,6 +44,7 @@ export function LocationTypePicker({
   disabled,
 }: LocationTypePickerProps) {
   const { t } = useTranslation("locations");
+  const { t: tc } = useTranslation("common");
   const [query, setQuery] = useState("");
   const needle = normalize(query.trim());
 
@@ -74,14 +76,10 @@ export function LocationTypePicker({
         </div>
 
         {onManageTypes && (
-          <button
-            type="button"
-            onClick={onManageTypes}
-            className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
-          >
-            <Plus className="size-3.5" aria-hidden="true" />
-            {t("picker.manage")}
-          </button>
+          <Button type="button" variant="outline" size="lg" onClick={onManageTypes}>
+            <Settings2 aria-hidden="true" />
+            {tc("panelActions.customize")}
+          </Button>
         )}
       </div>
 

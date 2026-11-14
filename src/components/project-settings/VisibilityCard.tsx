@@ -220,7 +220,7 @@ export function VisibilityCard({
               {t("common:actions.cancel")}
             </Button>
             <Button type="submit" disabled={busy || !nameConfirmed}>
-              <Lock className="mr-2 h-4 w-4" />
+              <Lock />
               {t("visibility.makePrivate")}
             </Button>
           </DialogFooter>
@@ -389,7 +389,7 @@ function SignInToMakePrivate({
             )}
 
             <Button type="submit" className="w-full" disabled={busy}>
-              <LogIn className="mr-2 h-4 w-4" />
+              <LogIn />
               {busy
                 ? t("visibility.signIn.submitting")
                 : t("visibility.signIn.submit")}

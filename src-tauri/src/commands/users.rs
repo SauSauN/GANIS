@@ -9,6 +9,8 @@ use tauri::State;
 
 /// Données de création d'un compte par un administrateur.
 #[derive(Debug, Deserialize)]
+// Gestion des comptes par l'administrateur : désactivée (voir `lib.rs`), gardée pour être rétablie.
+#[allow(dead_code)]
 pub struct CreateUserInput {
     pub username: String,
     pub password: String,
@@ -34,6 +36,8 @@ pub struct ChangePasswordInput {
 ///
 /// Cette commande est strictement réservée aux administrateurs.
 #[tauri::command(rename_all = "camelCase")]
+// Gestion des comptes par l'administrateur : désactivée (voir `lib.rs`), gardée pour être rétablie.
+#[allow(dead_code)]
 pub async fn list_users(
     state: State<'_, AppState>,
 ) -> AppResult<Vec<UserPublic>> {
@@ -48,6 +52,8 @@ pub async fn list_users(
 ///
 /// Réservé aux administrateurs.
 #[tauri::command(rename_all = "camelCase")]
+// Gestion des comptes par l'administrateur : désactivée (voir `lib.rs`), gardée pour être rétablie.
+#[allow(dead_code)]
 pub async fn create_user(
     state: State<'_, AppState>,
     input: CreateUserInput,
@@ -70,6 +76,8 @@ pub async fn create_user(
 /// Un administrateur ne peut pas modifier son propre rôle depuis cette commande,
 /// afin d'éviter de perdre immédiatement ses privilèges pendant l'opération.
 #[tauri::command(rename_all = "camelCase")]
+// Gestion des comptes par l'administrateur : désactivée (voir `lib.rs`), gardée pour être rétablie.
+#[allow(dead_code)]
 pub async fn update_user_role(
     state: State<'_, AppState>,
     user_id: String,
@@ -108,6 +116,8 @@ pub async fn update_user_role(
 /// Réservé aux administrateurs. Un administrateur ne peut pas supprimer
 /// son propre compte, ni le dernier compte administrateur.
 #[tauri::command(rename_all = "camelCase")]
+// Gestion des comptes par l'administrateur : désactivée (voir `lib.rs`), gardée pour être rétablie.
+#[allow(dead_code)]
 pub async fn delete_user(
     state: State<'_, AppState>,
     user_id: String,

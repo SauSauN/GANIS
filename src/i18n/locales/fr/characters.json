@@ -7,17 +7,17 @@
     "countMore": "+ 15 champs",
     "basic": {
       "label": "Basique",
-      "theme": "L'identité",
+      "theme": "Identité",
       "goal": "Identifier le personnage"
     },
     "intermediate": {
       "label": "Moyen",
-      "theme": "L'apparence",
+      "theme": "Apparence",
       "goal": "Visualiser et reconnaître le personnage"
     },
     "advanced": {
       "label": "Avancé",
-      "theme": "La personnalité",
+      "theme": "Personnalité",
       "goal": "Construire un personnage crédible et évolutif"
     },
     "collapse": "Replier",
@@ -108,7 +108,9 @@
     "secret": "Secret",
     "innerConflict": "Conflit intérieur",
     "adversityResponse": "Réaction face aux difficultés",
-    "plannedArc": "Évolution prévue"
+    "plannedArc": "Évolution prévue",
+    "powers": "Pouvoirs et capacités",
+    "powerLimits": "Limites et faiblesses de ces pouvoirs"
   },
   "placeholders": {
     "firstName": "Ex. Aldric",
@@ -149,7 +151,9 @@
     "tags": "Ex. Têtu, généreux… (Entrée pour ajouter)",
     "traits": "Ex. Loyal, impulsif… (Entrée pour ajouter)",
     "strengths": "Ex. Courageux, bon stratège…",
-    "flaws": "Ex. Orgueilleux, rancunier…"
+    "flaws": "Ex. Orgueilleux, rancunier…",
+    "powers": "Ex. Lit les pensées de ceux qu'il touche, voit dans le noir…",
+    "powerLimits": "Ex. Une minute au plus, et il perd la vue pendant une heure"
   },
   "choice": {
     "none": "Non précisé",
@@ -172,8 +176,12 @@
   "gallery": {
     "add": "Ajouter",
     "remove": "Retirer l'image",
-    "open": "Agrandir l'image",
-    "hint": "{{count}} / {{max}} images · vous pouvez aussi les glisser ici."
+    "open": "Voir l'image en grand",
+    "hint": "{{count}} / {{max}} images · vous pouvez aussi les glisser ici.",
+    "close": "Fermer",
+    "previous": "Image précédente",
+    "next": "Image suivante",
+    "position": "{{current}} / {{total}}"
   },
   "portrait": {
     "add": "Ajouter une image",
@@ -260,5 +268,9 @@
   },
   "tab": {
     "fallback": "Personnage"
+  },
+  "powers": {
+    "title": "Pouvoirs",
+    "description": "Ses pouvoirs, ses dons ou sa magie, et ce qu'il lui en coûte."
   }
 }

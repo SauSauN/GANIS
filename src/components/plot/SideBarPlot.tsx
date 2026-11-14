@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { LaneItemMenu } from "@/components/common/PanelItemMenus";
 import { useProjectPlot, usePlotStore } from "@/stores/plotStore";
 import { cn } from "@/lib/utils";
 
@@ -32,23 +33,28 @@ export function SideBarPlot({ projectId, activeTab, onOpenFeature }: SideBarPlot
           {data.lanes.map((lane) => {
             const count = data.events.filter((e) => e.laneId === lane.id).length;
             const current = activeTab === "plot.board" && selection?.type === "lane" && selection.id === lane.id;
+            const open = () => {
+              select({ type: "lane", id: lane.id });
+              onOpenFeature("plot.board");
+            };
             return (
-              <li key={lane.id}>
-                <button
-                  type="button"
-                  aria-current={current ? "true" : undefined}
-                  onClick={() => {
-                    select({ type: "lane", id: lane.id });
-                    onOpenFeature("plot.board");
-                  }}
-                  className={cn("flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent", current && "bg-sidebar-accent font-medium", lane.hidden && "opacity-60")}
-                  title={lane.hidden ? t("sidebar.hidden") : undefined}
-                >
-                  <span className={cn("size-2.5 shrink-0 rounded-full", lane.main && "ring-2 ring-offset-1 ring-offset-sidebar")} style={{ backgroundColor: lane.color, ["--tw-ring-color" as string]: lane.color }} />
-                  <span className="min-w-0 flex-1 truncate text-left">{lane.name}</span>
-                  <span className="text-xs text-muted-foreground tabular-nums">{count}</span>
-                </button>
-              </li>
+              <LaneItemMenu key={lane.id} projectId={projectId} lane={lane} onOpen={open}>
+                {(onContextMenu) => (
+                  <li onContextMenu={onContextMenu}>
+                    <button
+                      type="button"
+                      aria-current={current ? "true" : undefined}
+                      onClick={open}
+                      className={cn("flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent", current && "bg-sidebar-accent font-medium", lane.hidden && "opacity-60")}
+                      title={lane.hidden ? t("sidebar.hidden") : undefined}
+                    >
+                      <span className={cn("size-2.5 shrink-0 rounded-full", lane.main && "ring-2 ring-offset-1 ring-offset-sidebar")} style={{ backgroundColor: lane.color, ["--tw-ring-color" as string]: lane.color }} />
+                      <span className="min-w-0 flex-1 truncate text-left">{lane.name}</span>
+                      <span className="text-xs text-muted-foreground tabular-nums">{count}</span>
+                    </button>
+                  </li>
+                )}
+              </LaneItemMenu>
             );
           })}
           <li className="px-2 pt-2 text-xs text-muted-foreground">{t("sidebar.summary", {

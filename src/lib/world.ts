@@ -1,3 +1,6 @@
+import factionCatalog from "@/lib/factionCatalog.json";
+import magicCatalog from "@/lib/magicCatalog.json";
+import peopleCatalog from "@/lib/peopleCatalog.json";
 import itemCatalog from "@/lib/itemCatalog.json";
 import speciesCatalog from "@/lib/speciesCatalog.json";
 import linkCatalog from "@/lib/worldLinkCatalog.json";
@@ -14,18 +17,18 @@ import type {
 } from "@/types";
 
 /*
- * Objets, faune et flore : deux modules facultatifs construits sur le même
- * modèle que les lieux (voir `lib/locations.ts`).
+ * Objets, faune et flore, factions : trois modules facultatifs construits
+ * sur le même modèle que les lieux (voir `lib/locations.ts`).
  *
  *   champs communs  →  champs de la catégorie  →  champs du type
  *
- * Les catalogues (`itemCatalog.json`, `speciesCatalog.json`) sont lus tels
- * quels par Rust (`world_service::Module::catalog`) : les deux ne peuvent
- * pas diverger. La faune et la flore ont en plus une **nature** : une
+ * Les catalogues (`itemCatalog.json`, `speciesCatalog.json`,
+ * `factionCatalog.json`) sont lus tels quels par Rust
+ * (`world_service::Module::catalog`) : les deux côtés ne peuvent pas diverger. La faune et la flore ont en plus une **nature** : une
  * espèce entière, ou un animal / une plante précis (qui peut aussi être un
  * personnage).
  *
- * Les deux modules sont désactivés par défaut : l'auteur les active dans
+ * Les trois modules sont désactivés par défaut : l'auteur les active dans
  * Paramètres du projet et choisit ses catégories.
  */
 
@@ -99,11 +102,14 @@ function readCatalog(raw: RawCatalog): WorldCatalog {
   };
 }
 
-export const WORLD_MODULES: WorldModule[] = ["item", "species"];
+export const WORLD_MODULES: WorldModule[] = ["item", "species", "faction", "people", "magic"];
 
 export const CATALOGS: Record<WorldModule, WorldCatalog> = {
   item: readCatalog(itemCatalog as RawCatalog),
   species: readCatalog(speciesCatalog as RawCatalog),
+  faction: readCatalog(factionCatalog as RawCatalog),
+  people: readCatalog(peopleCatalog as RawCatalog),
+  magic: readCatalog(magicCatalog as RawCatalog),
 };
 
 export function catalogOf(module: WorldModule): WorldCatalog {
@@ -187,6 +193,18 @@ const COMMON_GROUPS: Record<WorldModule, { identity: string[]; story: string[] }
   species: {
     identity: ["colorPalette", "aliases", "scientificName", "age", "markings", "firstAppearance", "description"],
     story: ["habitat", "legends", "notes"],
+  },
+  faction: {
+    identity: ["colorPalette", "aliases", "firstAppearance", "description", "goals", "motto", "emblem", "size", "influence"],
+    story: ["ideology", "founded", "history", "notes"],
+  },
+  people: {
+    identity: ["colorPalette", "aliases", "firstAppearance", "description", "symbol", "spread"],
+    story: ["origins", "history", "notes"],
+  },
+  magic: {
+    identity: ["colorPalette", "aliases", "firstAppearance", "description", "manifestation", "rarity"],
+    story: ["origins", "history", "notes"],
   },
 };
 
@@ -532,9 +550,15 @@ export function toWorldInput(module: WorldModule, draft: WorldDraft): WorldEntry
 // Onglets, modules de l'espace de travail, paramètres
 // ----------------------------------------------------------------------------
 
-const TAB_PREFIX: Record<WorldModule, string> = { item: "item:", species: "species:" };
+const TAB_PREFIX: Record<WorldModule, string> = {
+  item: "item:",
+  species: "species:",
+  faction: "faction:",
+  people: "people:",
+  magic: "magic:",
+};
 
-/** Onglet d'une fiche : `item:<id>` ou `species:<id>`. */
+/** Onglet d'une fiche : `item:<id>`, `species:<id>` ou `faction:<id>`. */
 export function worldTabId(module: WorldModule, id: string): string {
   return `${TAB_PREFIX[module]}${id}`;
 }
@@ -551,7 +575,20 @@ export function worldEntryOfTab(tabId: string): { module: WorldModule; id: strin
 }
 
 /** Module de la barre de gauche (et section des paramètres) d'un module. */
-export const WORKSPACE_MODULE: Record<WorldModule, "items" | "species"> = { item: "items", species: "species" };
+export type WorldWorkspaceModuleId = "items" | "species" | "factions" | "peoples" | "magic";
+
+export const WORKSPACE_MODULE: Record<WorldModule, WorldWorkspaceModuleId> = {
+  item: "items",
+  species: "species",
+  faction: "factions",
+  people: "peoples",
+  magic: "magic",
+};
+
+/** Module du monde d'un module de la barre de gauche (`null` : ce n'en est pas un). */
+export function worldModuleOfWorkspace(moduleId: string): WorldModule | null {
+  return (Object.keys(WORKSPACE_MODULE) as WorldModule[]).find((module) => WORKSPACE_MODULE[module] === moduleId) ?? null;
+}
 
 export function createFeatureOf(module: WorldModule): string {
   return `${WORKSPACE_MODULE[module]}.create`;
@@ -586,7 +623,7 @@ export const WORLD_LINK_KINDS = linkCatalog.kinds as WorldLinkKind[];
 
 /** Sortes qui ont des liens du monde (les autres paires ont déjà les leurs). */
 export function isWorldKind(kind: WorldLinkKind): boolean {
-  return kind === "item" || kind === "species";
+  return kind === "item" || kind === "species" || kind === "faction" || kind === "people" || kind === "magic";
 }
 
 /** Une paire `a`/`b` peut-elle avoir un lien du monde ? */
@@ -642,6 +679,49 @@ export function linksOfEntry(links: WorldLink[], id: string): LinkView[] {
         ? { link, otherKind: link.targetKind, otherId: link.targetId, forward: true }
         : { link, otherKind: link.sourceKind, otherId: link.sourceId, forward: false },
     );
+}
+
+/**
+ * Rôles de la carte « Membres » de chaque module qui en a une, dans
+ * l'ordre de la carte : les liens dont la fiche est la cible.
+ * - faction : chefs, fondateurs, membres, soutiens ;
+ * - peuple, culture ou religion : membres, pratiquants, locuteurs, fidèles ;
+ * - magie : ceux qui la maîtrisent, ceux qui l'enseignent.
+ */
+export const MEMBER_ROLES_OF = {
+  faction: ["leads", "founded", "memberOf", "supports"],
+  people: ["belongsTo", "practices", "speaks", "worships"],
+  magic: ["masters", "teaches"],
+} as const satisfies Partial<Record<WorldModule, readonly string[]>>;
+
+export type MembersModule = keyof typeof MEMBER_ROLES_OF;
+export const MEMBER_ROLES = MEMBER_ROLES_OF.faction;
+export type MemberRole = (typeof MEMBER_ROLES_OF)[MembersModule][number];
+
+export function hasMembers(module: WorldModule): module is MembersModule {
+  return module in MEMBER_ROLES_OF;
+}
+
+export interface MemberGroup {
+  role: MemberRole;
+  members: LinkView[];
+}
+
+/**
+ * Membres d'une fiche, regroupés par rôle : les liens dont elle est la
+ * cible. Les groupes vides ne sont pas renvoyés.
+ */
+export function membersOf(links: WorldLink[], module: MembersModule, entryId: string): MemberGroup[] {
+  const mine = linksOfEntry(links, entryId).filter((view) => !view.forward);
+  const roles: readonly MemberRole[] = MEMBER_ROLES_OF[module];
+  return roles
+    .map((role) => ({ role, members: mine.filter((view) => view.link.type === role) }))
+    .filter((group) => group.members.length > 0);
+}
+
+/** Membres d'une faction (chefs, fondateurs, membres, soutiens). */
+export function factionMembers(links: WorldLink[], factionId: string): MemberGroup[] {
+  return membersOf(links, "faction", factionId);
 }
 
 /** Lien à créer depuis une fiche, orienté selon le choix. */

@@ -1,5 +1,8 @@
 import { useTranslation } from "react-i18next";
 import {
+  BookA,
+  Drama,
+  Flag,
   Folder,
   ListTree,
   MapPinned,
@@ -10,6 +13,7 @@ import {
   StickyNote,
   UserRound,
   Waypoints,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 import { findFeature } from "@/components/workspace/modules";
@@ -23,12 +27,16 @@ export const SEARCH_ICONS: Record<SearchHit["kind"], LucideIcon> = {
   location: MapPinned,
   item: Package,
   species: PawPrint,
+  faction: Flag,
+  people: Drama,
+  magic: Zap,
   structureNode: ListTree,
   document: Paperclip,
   plotEvent: Waypoints,
   note: NotebookText,
   noteFolder: Folder,
   sticky: StickyNote,
+  glossaryTerm: BookA,
 };
 
 /** Met en évidence les mots cherchés (sans tenir compte des accents). */

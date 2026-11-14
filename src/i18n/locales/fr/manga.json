@@ -138,20 +138,9 @@
     "saved": "Enregistré"
   },
   "read": {
-    "all": "Tout le scénario",
-    "includeCast": "Personnages et lieux en tête",
-    "export": "Exporter",
-    "dialogTitle": "Exporter le scénario",
     "empty": "Aucune page pour l'instant.",
     "emptyHint": "Créez des chapitres et des pages dans le découpage.",
-    "openPlan": "Ouvrir le découpage",
-    "editPage": "Modifier la page",
-    "fileSuffix": "scénario",
-    "toc": "Sommaire",
-    "details": "Indications de dessin",
-    "detailsHint": "Afficher le cadrage, le décor, les indications au dessinateur et la continuité de chaque case",
-    "legend": "Types de texte",
-    "turnPage": "Tourné de page"
+    "openPlan": "Ouvrir le découpage"
   },
   "flatplan": {
     "volume": "Tome",
@@ -179,7 +168,94 @@
       "volume": "Page {{folio}} : page chargée, {{words}} mots (seuil : {{max}})."
     },
     "unplaced_one": "{{count}} dessin rangé sur un chapitre n'a pas de page correspondante.",
-    "unplaced_other": "{{count}} dessins rangés sur un chapitre n'ont pas de page correspondante."
+    "unplaced_other": "{{count}} dessins rangés sur un chapitre n'ont pas de page correspondante.",
+    "mode": "Afficher",
+    "modeScript": "Scénario et dessin",
+    "modeProduction": "Fabrication",
+    "cover": "Couverture",
+    "backCover": "4e de couverture",
+    "covers": "Couvertures",
+    "noCover": "Pas de couverture",
+    "extras": "Pages hors récit",
+    "extrasHint": "Couverture, page de titre, sommaire, bonus, postface… Elles comptent dans les folios du tome, sauf les couvertures.",
+    "stats": {
+      "scripted_one": "{{count}} page avec scénario",
+      "scripted_other": "{{count}} pages avec scénario",
+      "drawn_one": "{{count}} page avec dessin",
+      "drawn_other": "{{count}} pages avec dessin",
+      "alerts_one": "{{count}} alerte",
+      "alerts_other": "{{count}} alertes"
+    },
+    "more": "Plus d'options",
+    "firstFolioMenu": "Première page : n° {{folio}}…"
+  },
+  "production": {
+    "stages": {
+      "none": "Pas commencée",
+      "storyboard": "Storyboard",
+      "pencils": "Crayonné",
+      "inks": "Encrage",
+      "tones": "Trames",
+      "lettering": "Lettrage",
+      "done": "Validée"
+    },
+    "stageHint": "Dernière étape terminée de la page.",
+    "stageOf": "Étape de fabrication : {{name}}",
+    "info": "Où en est le dessin de chaque page : storyboard (le « name »), crayonné, encrage, trames, lettrage, puis validation. L'étape choisie est la dernière terminée. Les pages hors récit (couverture, bonus…) se suivent ici aussi.",
+    "percent": "{{percent}} % fabriqué",
+    "summary": "{{done}} validées sur {{total}}",
+    "front": "Avant le récit",
+    "back": "Après le récit",
+    "covers": "Couvertures",
+    "noChapter": "Sans chapitre",
+    "folio": "p. {{folio}}",
+    "noFolio": "—",
+    "setSelected": "Passer à…",
+    "selectAll": "Tout sélectionner",
+    "select": "Sélectionner {{name}}",
+    "saving": "Enregistrement…"
+  },
+  "extras": {
+    "kinds": {
+      "cover": "Couverture",
+      "title": "Page de titre",
+      "toc": "Sommaire",
+      "credits": "Mentions et crédits",
+      "cast": "Présentation des personnages",
+      "foreword": "Préface",
+      "bonus": "Bonus",
+      "afterword": "Postface",
+      "preview": "Annonce du tome suivant",
+      "blank": "Page blanche",
+      "backCover": "4e de couverture",
+      "other": "Autre page"
+    },
+    "placement": {
+      "front": "Avant le récit",
+      "back": "Après le récit"
+    },
+    "title": "Pages hors récit",
+    "addTitle": "Nouvelle page hors récit",
+    "editTitle": "Modifier la page hors récit",
+    "formDescription": "Elle prend place dans le tome et dans ses folios (sauf une couverture).",
+    "add": "Ajouter une page",
+    "kind": "Sorte de page",
+    "where": "Place",
+    "pageTitle": "Titre",
+    "pageTitlePlaceholder": "Ex. Bonus : croquis de Sora",
+    "notes": "Indications",
+    "notesPlaceholder": "Ce que la page doit montrer, le texte prévu…",
+    "moveUp": "Monter « {{name}} »",
+    "moveDown": "Descendre « {{name}} »",
+    "edit": "Modifier « {{name}} »",
+    "delete": "Supprimer « {{name}} »",
+    "none": "Aucune page hors récit dans ce tome.",
+    "coverTaken": "Ce tome a déjà cette couverture.",
+    "art": "Dessin",
+    "artAdd": "Ajouter une image",
+    "artReplace": "Remplacer l'image",
+    "artRemove": "Retirer",
+    "artHint": "Une image (PNG, JPEG, GIF ou WebP), affichée dans le chemin de fer. Elle est rangée avec la page, chiffrée si le projet est privé."
   },
   "export": {
     "subtitle": "Scénario pour le dessinateur",
@@ -197,6 +273,11 @@
     "notes": "Pour le dessinateur :",
     "continuity": "Continuité :",
     "noPanels": "(aucune case)",
+    "folio": "p. {{folio}} — {{label}}",
+    "extra": "{{kind}}",
+    "extraFolio": "p. {{folio}} — {{kind}}",
+    "frontMatter": "Avant le récit",
+    "backMatter": "Après le récit",
     "text": {
       "dialogue": "{{speaker}} :",
       "dialogueAnon": "DIALOGUE :",
@@ -205,7 +286,12 @@
       "narration": "NARRATION :",
       "sfx": "ONOMATOPÉE :",
       "sign": "TEXTE DU DÉCOR :"
-    }
+    },
+    "button": "Exporter le scénario",
+    "dialogTitle": "Exporter le scénario du tome",
+    "fileSuffix": "scénario",
+    "includeCast": "Personnages et lieux en tête",
+    "short": "Exporter"
   },
   "progress": {
     "pages": "Pages",

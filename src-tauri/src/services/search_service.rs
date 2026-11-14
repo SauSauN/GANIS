@@ -1,5 +1,6 @@
 //! Recherche globale dans un projet : personnages, lieux, objets, faune et
-//! flore (modules activés), éléments du découpage, notes (titre et contenu), dossiers de notes et post-it.
+//! flore (modules activés), éléments du découpage, notes (titre et contenu), dossiers de notes, post-it
+//! et termes du glossaire.
 //!
 //! La recherche ne tient compte ni de la casse ni des accents (« chateau »
 //! trouve « Château »). Tous les mots tapés doivent apparaître (dans
@@ -20,7 +21,7 @@ const SNIPPET_CHARS: usize = 140;
 #[serde(rename_all = "camelCase")]
 pub struct SearchHit {
     /// character, location, item, species, structureNode, document (id : celui de
-    /// l'élément du découpage), note, noteFolder, sticky.
+    /// l'élément du découpage), note, noteFolder, sticky, glossaryTerm.
     pub kind: String,
     pub id: String,
     pub title: String,
@@ -175,11 +176,13 @@ pub async fn search(pool: &SqlitePool, query: &str) -> AppResult<Vec<SearchHit>>
         body: fields_text(&fields),
     }));
 
-    // Objets, faune et flore, factions : seulement si le module est activé.
+    // Objets, faune et flore, factions, peuples, magie : seulement si le module est activé.
     for (kind, sql) in [
         ("item", "SELECT id, name, fields FROM items WHERE (SELECT enabled FROM item_settings WHERE id = 'default') = 1"),
         ("species", "SELECT id, name, fields FROM species WHERE (SELECT enabled FROM species_settings WHERE id = 'default') = 1"),
         ("faction", "SELECT id, name, fields FROM factions WHERE (SELECT enabled FROM faction_settings WHERE id = 'default') = 1"),
+        ("people", "SELECT id, name, fields FROM peoples WHERE (SELECT enabled FROM people_settings WHERE id = 'default') = 1"),
+        ("magic", "SELECT id, name, fields FROM magic_systems WHERE (SELECT enabled FROM magic_settings WHERE id = 'default') = 1"),
     ] {
         let rows: Vec<(String, String, String)> = sqlx::query_as(sql).fetch_all(pool).await?;
         candidates.extend(rows.into_iter().map(|(id, name, fields)| Candidate {
@@ -238,6 +241,16 @@ pub async fn search(pool: &SqlitePool, query: &str) -> AppResult<Vec<SearchHit>>
     // Événements de la trame (document JSON).
     let rows = crate::services::plot_service::search_rows(pool).await?;
     candidates.extend(rows.into_iter().map(|(id, title, body)| Candidate { kind: "plotEvent", id, title, body }));
+
+    // Glossaire : le terme, sa définition et sa catégorie.
+    let rows: Vec<(String, String, String, String)> =
+        sqlx::query_as("SELECT id, term, definition, category FROM glossary_terms").fetch_all(pool).await?;
+    candidates.extend(rows.into_iter().map(|(id, term, definition, category)| Candidate {
+        kind: "glossaryTerm",
+        id,
+        title: term,
+        body: format!("{definition} {category}"),
+    }));
 
     let rows: Vec<(String, String)> = sqlx::query_as("SELECT id, text FROM sticky_notes").fetch_all(pool).await?;
     candidates.extend(rows.into_iter().map(|(id, text)| Candidate {
@@ -326,5 +339,16 @@ mod tests {
         assert_eq!(search(&pool, "trone vide").await.unwrap().len(), 1);
         assert!(search(&pool, "   ").await.unwrap().is_empty());
         assert!(search(&pool, "licorne").await.unwrap().is_empty());
+
+        // Glossaire : le terme et sa définition.
+        crate::services::glossary_service::create(
+            &pool,
+            &crate::services::glossary_service::GlossaryInput { term: "Lunéa".into(), definition: "La force des marées".into(), ..Default::default() },
+        )
+        .await
+        .unwrap();
+        let hits = search(&pool, "lunea").await.unwrap();
+        assert_eq!((hits[0].kind.as_str(), hits[0].in_title), ("glossaryTerm", true));
+        assert_eq!(search(&pool, "marees").await.unwrap()[0].kind, "glossaryTerm");
     }
 }

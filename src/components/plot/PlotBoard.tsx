@@ -721,14 +721,14 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
           <span className="h-5 w-px bg-border" aria-hidden="true" />
           <Button
             variant="ghost"
-            size="sm"
+            size="icon-sm"
             aria-pressed={view.tension}
             onClick={() => setView({ ...view, tension: !view.tension })}
+            aria-label={t("board.tension")}
             title={view.tension ? t("toolbar.tensionHide") : t("toolbar.tensionShow")}
             className={cn(view.tension && "bg-primary/10 text-primary hover:bg-primary/15 hover:text-primary")}
           >
             <Activity />
-            {t("board.tension")}
           </Button>
 
           <div className="ml-auto flex items-center gap-1.5">
@@ -739,10 +739,6 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
             <Button size="sm" onClick={() => void addLane(projectId)} title={t("toolbar.newLaneHint")}>
               <Plus />
               {t("toolbar.newLaneShort")}
-            </Button>
-            <Button variant="outline" size="sm" onClick={() => onOpenFeature("plot.reading")} title={t("toolbar.readingHint")}>
-              <BookOpen />
-              {t("toolbar.reading")}
             </Button>
             <Button
               ref={viewButtonRef}
@@ -761,6 +757,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
               label={t("toolbar.more")}
               trigger={<MoreHorizontal className="size-4" />}
               items={[
+                { id: "reading", label: t("toolbar.reading"), icon: BookOpen, run: () => onOpenFeature("plot.reading") },
                 { id: "tour", label: t("toolbar.tour"), icon: Footprints, disabled: !data.events.length, run: () => startTour() },
                 { id: "import", label: t("project.fromStructure"), icon: ListTree, separated: true, run: () => setDialog("import") },
                 { id: "templates", label: t("project.templates"), icon: LayoutTemplate, run: () => setDialog("templates") },
@@ -792,7 +789,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
             </div>
           </div>
         )}
-        <div ref={scrollerRef} className="absolute inset-0 overflow-auto overscroll-contain bg-muted/30">
+        <div ref={scrollerRef} className="absolute inset-0 overflow-auto overscroll-contain bg-muted/30 [scrollbar-gutter:stable]">
           {/* En-têtes des trames */}
           <div className="sticky top-0 z-20 flex w-max min-w-full border-b bg-background" style={{ height: HEAD }}>
             <div className="sticky left-0 z-30 flex shrink-0 items-end justify-center border-r bg-background pb-2 text-xs text-muted-foreground italic" style={{ width: GUTTER }}>
@@ -1038,7 +1035,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                     )}
                     {m.zoom >= 0.75 && (
                       <p className="mt-0.5 flex min-w-0 items-center gap-1.5 text-muted-foreground" style={{ fontSize: Math.max(8, 10.5 * m.zoom) }}>
-                        <span className="size-[7px] shrink-0 rounded-full" style={{ backgroundColor: STATUS_COLORS[event.status] }} title={t(`status.${event.status}`)} />
+                        <span className="size-[0.4375rem] shrink-0 rounded-full" style={{ backgroundColor: STATUS_COLORS[event.status] }} title={t(`status.${event.status}`)} />
                         <span className="min-w-0 truncate">
                           {pov && <b className="font-semibold text-foreground">{pov}</b>}
                           {people.filter((p) => p.id !== event.povId).map((p, i) => (
@@ -1067,7 +1064,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                       onPointerDown={(e) => startLink(e, event)}
                       title={t("board.handle")}
                       className={cn(
-                        "absolute top-1/2 -right-2.5 size-[18px] -translate-y-1/2 cursor-crosshair touch-none rounded-full border-[2.5px] border-card opacity-0 transition-opacity group-hover/card:opacity-100 after:absolute after:-inset-2",
+                        "absolute top-1/2 -right-2.5 size-[1.125rem] -translate-y-1/2 cursor-crosshair touch-none rounded-full border-[2.5px] border-card opacity-0 transition-opacity group-hover/card:opacity-100 after:absolute after:-inset-2",
                         (selected || (drag?.type === "link" && drag.from === event.id)) && "opacity-100",
                       )}
                       style={{ backgroundColor: lane.color }}

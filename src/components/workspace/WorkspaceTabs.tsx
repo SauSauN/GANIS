@@ -5,7 +5,6 @@ import {
   useState,
   type KeyboardEvent,
   type MouseEvent as ReactMouseEvent,
-  type RefObject,
 } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
@@ -43,6 +42,8 @@ export interface TabInfo {
   label: string;
   icon: LucideIcon;
   pinned: boolean;
+  /** Aperçu (simple clic, comme VS Code) : titre en italique, remplacé par le prochain. */
+  preview?: boolean;
   /** Modifications non enregistrées : un point ● remplace la croix. */
   dirty: boolean;
 }
@@ -78,96 +79,46 @@ interface WorkspaceTabsProps {
 // Nombre d'onglets affichés
 // ----------------------------------------------------------------------------
 
-/** Capacité de base lorsque la barre est large. */
-export const MAX_TABS_LARGE = 5;
-
-/** Capacité de base lorsque la barre est étroite. */
-export const MAX_TABS_SMALL = 4;
-
-/** Largeur (px) à partir de laquelle la zone des onglets est considérée large. */
-export const LARGE_MIN_WIDTH = 1000;
+/** Marge (px) laissée autour d'un onglet ramené dans la partie visible. */
+const REVEAL_MARGIN = 24;
 
 /**
- * Calcule le nombre maximal d'onglets affichables.
- *
- * La capacité de base est de 5 ou 4 onglets non épinglés selon la largeur.
- * Les onglets épinglés s'ajoutent à cette capacité.
- *
- * Exemple :
- * - Barre large, aucun onglet épinglé : 5 onglets.
- * - Barre large, 2 onglets épinglés : 7 onglets.
- * - Barre étroite, 2 onglets épinglés : 6 onglets.
- *
- * Les flèches de navigation restent nécessaires si le nombre total
- * d'onglets dépasse cette capacité.
+ * Ramène l'élément `item` dans la partie visible de la barre `scroller`
+ * (sans toucher au défilement vertical de la page).
  */
-function useMaxVisibleTabs(
-  ref: RefObject<HTMLElement | null>,
-  pinnedCount: number,
-): number {
-  const [large, setLarge] = useState(true);
+function revealInBar(scroller: HTMLElement, item: HTMLElement, smooth: boolean) {
+  const left = item.offsetLeft - scroller.offsetLeft;
+  const right = left + item.offsetWidth;
+  const view = scroller.scrollLeft;
+  let target: number | null = null;
 
-  useLayoutEffect(() => {
-    const element = ref.current;
+  if (left < view) target = left - REVEAL_MARGIN;
+  else if (right > view + scroller.clientWidth) target = right - scroller.clientWidth + REVEAL_MARGIN;
 
-    if (!element) {
-      return;
-    }
-
-    const update = () => {
-      setLarge(element.clientWidth >= LARGE_MIN_WIDTH);
-    };
-
-    update();
-
-    if (typeof ResizeObserver === "undefined") {
-      return;
-    }
-
-    const observer = new ResizeObserver(update);
-    observer.observe(element);
-
-    return () => observer.disconnect();
-  }, [ref]);
-
-  const baseCapacity = large ? MAX_TABS_LARGE : MAX_TABS_SMALL;
-
-  return baseCapacity + pinnedCount;
-}
-
-/** Ramène le premier onglet affiché dans les bornes possibles. */
-function clampStart(start: number, count: number, max: number): number {
-  return Math.min(Math.max(start, 0), Math.max(0, count - max));
-}
-
-/** Premier onglet à afficher pour que l'onglet `index` soit visible. */
-function revealIndex(
-  start: number,
-  index: number,
-  count: number,
-  max: number,
-): number {
-  const from = clampStart(start, count, max);
-
-  if (index < from) {
-    return index;
+  if (target !== null) {
+    scroller.scrollTo({ left: Math.max(0, target), behavior: smooth ? "smooth" : "auto" });
   }
-
-  if (index >= from + max) {
-    return index - max + 1;
-  }
-
-  return from;
 }
 
-// ----------------------------------------------------------------------------
-// Un onglet
-// ----------------------------------------------------------------------------
+/** Onglets entièrement ou en partie cachés de chaque côté de la barre. */
+function hiddenSides(scroller: HTMLElement): { left: number; right: number } {
+  const view = scroller.getBoundingClientRect();
+  let left = 0;
+  let right = 0;
+
+  scroller.querySelectorAll<HTMLElement>("[data-tab-item]").forEach((item) => {
+    const rect = item.getBoundingClientRect();
+    if (rect.left < view.left - 1) left += 1;
+    else if (rect.right > view.right + 1) right += 1;
+  });
+
+  return { left, right };
+}
 
 const tabClass = (active: boolean, pinned: boolean) =>
   cn(
     "group relative flex items-center gap-1 border-t-2 py-1.5 text-sm",
-    pinned ? "shrink-0 pl-2.5 pr-1.5" : "min-w-0 max-w-56 pl-4 pr-2",
+    pinned ? "shrink-0 pl-2.5 pr-1.5" : "max-w-56 shrink-0 pl-4 pr-2",
     active
       ? "border-primary bg-background"
       : "border-transparent text-muted-foreground hover:text-foreground",
@@ -283,6 +234,7 @@ function SortableTab({
       style={style}
       onContextMenu={onContextMenu}
       data-pinned={tab.pinned ? "true" : undefined}
+      data-tab-item=""
       role="presentation"
       className={cn(
         tabClass(active, tab.pinned),
@@ -314,7 +266,7 @@ function SortableTab({
       >
         <Icon className="h-3.5 w-3.5 shrink-0 text-primary" />
 
-        {!tab.pinned && <span className="truncate">{tab.label}</span>}
+        {!tab.pinned && <span className={cn("truncate", tab.preview && "italic")}>{tab.label}</span>}
 
         {/* Onglet agrandi : petit repère discret */}
         {maximized && (
@@ -684,12 +636,13 @@ function TabContextMenu({
 /**
  * Barre d'onglets de l'espace de travail.
  *
- * - La capacité de base est de 5 onglets quand la barre est large et de 4
- *   quand elle est étroite. Les onglets épinglés s'ajoutent à cette capacité.
- * - Si tous les onglets ne tiennent pas, les flèches permettent de naviguer
- *   sans fermer les onglets masqués.
+ * - Comme VS Code : tous les onglets sont sur une ligne qui défile. Le
+ *   pavé tactile (glisser à deux doigts vers la gauche ou la droite) et la
+ *   molette la font défiler en continu.
+ * - Les flèches, affichées quand des onglets sont cachés d'un côté, ramènent
+ *   le prochain onglet caché de ce côté.
  * - L'onglet actif reste toujours ramené dans la partie visible.
- * - Glisser-déposer : déplace un onglet parmi ceux affichés.
+ * - Glisser-déposer : déplace un onglet dans la barre.
  * - Les onglets épinglés restent au début et s'affichent sous forme d'icônes.
  * - Clavier : Alt + flèche gauche ou droite déplace l'onglet sélectionné.
  * - Clic droit : menu pour épingler ou fermer les onglets.
@@ -716,36 +669,74 @@ export function WorkspaceTabs({
   );
 
   const barRef = useRef<HTMLDivElement>(null);
-
-  // Nombre d'onglets épinglés : ils augmentent la capacité de la barre.
-  const pinnedCount = tabs.filter((tab) => tab.pinned).length;
-
-  // Capacité totale = capacité de base + nombre d'onglets épinglés.
-  const maxVisible = useMaxVisibleTabs(barRef, pinnedCount);
-
-  /** Position du premier onglet affiché. */
-  const [start, setStart] = useState(0);
+  const scrollerRef = useRef<HTMLDivElement>(null);
 
   const count = tabs.length;
-  const first = clampStart(start, count, maxVisible);
-  const visible = tabs.slice(first, first + maxVisible);
-  const hiddenLeft = first;
-  const hiddenRight = Math.max(0, count - first - visible.length);
 
-  const activeIndex = activeTab
-    ? tabs.findIndex((tab) => tab.id === activeTab)
-    : -1;
+  /** Onglets cachés de chaque côté : décident des flèches. */
+  const [hidden, setHidden] = useState({ left: 0, right: 0 });
 
-  // L'onglet actif reste visible quand il change ou quand la capacité évolue.
+  const measure = () => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const next = hiddenSides(scroller);
+    setHidden((current) => (current.left === next.left && current.right === next.right ? current : next));
+  };
+
+  // Mesure après chaque rendu (onglets ajoutés, fermés, renommés) et quand
+  // la barre change de largeur.
   useLayoutEffect(() => {
-    if (activeIndex >= 0) {
-      setStart((current) =>
-        revealIndex(current, activeIndex, count, maxVisible),
-      );
-    } else {
-      setStart((current) => clampStart(current, count, maxVisible));
-    }
-  }, [activeIndex, count, maxVisible]);
+    measure();
+  });
+
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => measure());
+    observer.observe(scroller);
+    return () => observer.disconnect();
+  }, []);
+
+  // Molette d'une souris (défilement vertical) : la barre défile de côté.
+  // Le pavé tactile envoie déjà un défilement horizontal, géré nativement.
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    const onWheel = (event: WheelEvent) => {
+      if (Math.abs(event.deltaY) <= Math.abs(event.deltaX)) return;
+      if (scroller.scrollWidth <= scroller.clientWidth) return;
+      event.preventDefault();
+      scroller.scrollLeft += event.deltaY;
+    };
+
+    scroller.addEventListener("wheel", onWheel, { passive: false });
+    return () => scroller.removeEventListener("wheel", onWheel);
+  }, []);
+
+  // L'onglet actif reste visible quand il change ou que la barre change.
+  const firstReveal = useRef(true);
+  useLayoutEffect(() => {
+    const scroller = scrollerRef.current;
+    const item = activeTab
+      ? document.getElementById(`tab-${activeTab}`)?.closest<HTMLElement>("[data-tab-item]")
+      : null;
+    if (scroller && item) revealInBar(scroller, item, !firstReveal.current);
+    firstReveal.current = false;
+  }, [activeTab, count]);
+
+  /** Flèche : ramène le prochain onglet caché de ce côté. */
+  function step(direction: -1 | 1) {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+    const view = scroller.getBoundingClientRect();
+    const items = Array.from(scroller.querySelectorAll<HTMLElement>("[data-tab-item]"));
+    const target =
+      direction < 0
+        ? items.filter((item) => item.getBoundingClientRect().left < view.left - 1).pop()
+        : items.find((item) => item.getBoundingClientRect().right > view.right + 1);
+    if (target) revealInBar(scroller, target, true);
+  }
 
   // Après un déplacement, on rend le focus à l'élément qui l'avait.
   const pendingFocus = useRef<string | null>(null);
@@ -759,16 +750,8 @@ export function WorkspaceTabs({
     }
   });
 
-  /** Alt + flèches : l'onglet déplacé reste visible même s'il n'est pas actif. */
+  /** Alt + flèches : l'onglet déplacé garde le focus, qui le garde visible. */
   function handleShift(id: string, delta: -1 | 1) {
-    const index = tabs.findIndex((tab) => tab.id === id);
-
-    if (index >= 0) {
-      const target = Math.min(Math.max(index + delta, 0), count - 1);
-
-      setStart((current) => revealIndex(current, target, count, maxVisible));
-    }
-
     onShift(id, delta);
   }
 
@@ -806,6 +789,7 @@ export function WorkspaceTabs({
     const layout = {
       tabs: tabs.map((tab) => tab.id),
       pinned: tabs.filter((tab) => tab.pinned).map((tab) => tab.id),
+      preview: null,
     };
 
     const getCount = (scope: CloseScope) =>
@@ -830,12 +814,8 @@ export function WorkspaceTabs({
       ref={barRef}
       className="flex h-9 shrink-0 border-b border-border bg-card"
     >
-      {hiddenLeft > 0 && (
-        <NavButton
-          direction="left"
-          hidden={hiddenLeft}
-          onClick={() => setStart(first - 1)}
-        />
+      {hidden.left > 0 && (
+        <NavButton direction="left" hidden={hidden.left} onClick={() => step(-1)} />
       )}
 
       <DndContext
@@ -845,17 +825,18 @@ export function WorkspaceTabs({
         onDragEnd={handleDragEnd}
       >
         <SortableContext
-          items={visible.map((tab) => tab.id)}
+          items={tabs.map((tab) => tab.id)}
           strategy={horizontalListSortingStrategy}
         >
+          {/* Défile de côté (pavé tactile, molette), barre de défilement cachée. */}
           <div
+            ref={scrollerRef}
             role="tablist"
             aria-label={t("listLabel")}
-            className="flex min-w-0 flex-1 items-end overflow-hidden"
+            onScroll={measure}
+            className="flex min-w-0 flex-1 items-end overflow-x-auto overflow-y-hidden overscroll-x-contain no-scrollbar"
           >
-            {visible.map((tab, offset) => {
-              const index = first + offset;
-
+            {tabs.map((tab, index) => {
               return (
                 <SortableTab
                   key={tab.id}
@@ -878,7 +859,7 @@ export function WorkspaceTabs({
                   onToggleMaximize={onToggleMaximize}
                   focusable={
                     activeTab === tab.id ||
-                    (offset === 0 && !visible.some((item) => item.id === activeTab))
+                    (index === 0 && !tabs.some((item) => item.id === activeTab))
                   }
                 />
               );
@@ -887,12 +868,8 @@ export function WorkspaceTabs({
         </SortableContext>
       </DndContext>
 
-      {hiddenRight > 0 && (
-        <NavButton
-          direction="right"
-          hidden={hiddenRight}
-          onClick={() => setStart(first + 1)}
-        />
+      {hidden.right > 0 && (
+        <NavButton direction="right" hidden={hidden.right} onClick={() => step(1)} />
       )}
 
       {/* Agrandi : rétablir la disposition (même effet qu'un double-clic) */}

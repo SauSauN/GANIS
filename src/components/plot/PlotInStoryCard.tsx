@@ -1,9 +1,11 @@
 import { useTranslation } from "react-i18next";
 import { Waypoints } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { LinkList, LinkMark, LinkRow } from "@/components/links/LinkRow";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import {
   eventsOfCharacter,
+  eventsOfEntry,
   eventsOfLocation,
   eventsOfNode,
   laneOf,
@@ -12,11 +14,12 @@ import {
   type PlotEvent,
 } from "@/lib/plot";
 import { usePlotStore, useProjectPlot } from "@/stores/plotStore";
+import type { WorldModule } from "@/types";
 
 interface PlotInStoryCardProps {
   projectId: string;
-  /** Ce que montre la fiche. */
-  target: { type: "character" | "location" | "node"; id: string };
+  /** Ce que montre la fiche (personnage, lieu, élément du découpage ou fiche du monde). */
+  target: { type: "character" | "location" | "node" | WorldModule; id: string };
   /** Nom de l'élément (description de la carte). */
   name: string;
   onOpenFeature: (featureId: string) => void;
@@ -35,7 +38,13 @@ export function PlotInStoryCard({ projectId, target, name, onOpenFeature }: Plot
 
   if (!data) return null;
   const events: PlotEvent[] =
-    target.type === "character" ? eventsOfCharacter(data, target.id) : target.type === "location" ? eventsOfLocation(data, target.id) : eventsOfNode(data, target.id);
+    target.type === "character"
+      ? eventsOfCharacter(data, target.id)
+      : target.type === "location"
+        ? eventsOfLocation(data, target.id)
+        : target.type === "node"
+          ? eventsOfNode(data, target.id)
+          : eventsOfEntry(data, target.type, target.id);
 
   const show = (id: string, feature: "plot.board" | "plot.reading") => {
     requestFocus(id);
@@ -66,35 +75,25 @@ export function PlotInStoryCard({ projectId, target, name, onOpenFeature }: Plot
           </button>
         </div>
       ) : (
-        <ol className="space-y-1.5">
+        <LinkList ordered>
           {events.map((event) => {
             const lane = laneOf(data, event.laneId);
             const pov = target.type === "character" && event.povId === target.id;
             return (
-              <li key={event.id}>
-                <button
-                  type="button"
-                  onClick={() => show(event.id, "plot.board")}
-                  className="flex w-full items-start gap-3 rounded-lg border border-l-4 bg-card px-3 py-2 text-left transition-colors hover:bg-muted/50"
-                  style={{ borderLeftColor: lane?.color }}
-                >
-                  <span className="w-8 shrink-0 pt-0.5 text-xs font-semibold text-muted-foreground tabular-nums">{momentNumber(event.row)}</span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium">
-                      {event.title || t("untitled")}
-                      {pov && <span className="ml-2 rounded-full bg-foreground px-1.5 py-px text-[0.65rem] font-semibold text-background">{t("inStory.pov")}</span>}
-                    </span>
-                    <span className="block truncate text-xs text-muted-foreground">
-                      {lane?.name}
-                      {event.note ? ` · ${event.note}` : ""}
-                    </span>
-                  </span>
-                  <span className="mt-1.5 size-2 shrink-0 rounded-full" style={{ backgroundColor: STATUS_COLORS[event.status] }} title={t(`status.${event.status}`)} />
-                </button>
-              </li>
+              <LinkRow
+                key={event.id}
+                thumb={<LinkMark color={lane?.color}>{momentNumber(event.row)}</LinkMark>}
+                label={lane?.name}
+                labelColor={lane?.color}
+                name={event.title || t("untitled")}
+                onOpen={() => show(event.id, "plot.board")}
+                detail={pov ? t("inStory.povLong") : undefined}
+                hint={event.note || undefined}
+                status={{ color: STATUS_COLORS[event.status], label: t(`status.${event.status}`) }}
+              />
             );
           })}
-        </ol>
+        </LinkList>
       )}
     </CollapsibleCard>
   );

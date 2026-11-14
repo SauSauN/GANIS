@@ -82,10 +82,10 @@ export function NotesListView({ projectId, feature, onOpenFeature }: NotesListVi
   return (
     <PageShell
       title={feature.label}
-      description={feature.description}
+      description={loaded ? t("list.count", { count: notes.length }) : undefined}
       actions={
         <Button onClick={newNote}>
-          <Plus className="mr-1.5 size-4" />
+          <Plus className="size-4" />
           {t("list.newNote")}
         </Button>
       }
@@ -117,9 +117,6 @@ export function NotesListView({ projectId, feature, onOpenFeature }: NotesListVi
           ))}
         </select>
 
-        {loaded && (
-          <span className="text-sm text-muted-foreground">{t("list.count", { count: visible.length })}</span>
-        )}
       </div>
 
       {error && (
@@ -161,7 +158,7 @@ export function NotesListView({ projectId, feature, onOpenFeature }: NotesListVi
           {notes.length === 0 ? t("list.empty") : t("list.noMatch")}
         </div>
       ) : (
-        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 min-[112.5rem]:grid-cols-4">
           {visible.map((note) => {
             const path = folderPath(folders, note.folderId);
             return (

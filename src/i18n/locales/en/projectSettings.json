@@ -39,6 +39,18 @@
     "species": {
       "label": "Fauna and flora",
       "description": "Optional module: turn it on and choose fauna, flora or both."
+    },
+    "factions": {
+      "label": "Factions",
+      "description": "Optional module: turn it on and choose your categories (politics, army, religion…)."
+    },
+    "peoples": {
+      "label": "Peoples, cultures and religions",
+      "description": "Optional module: turn it on and choose your categories (peoples, cultures, religions)."
+    },
+    "magic": {
+      "label": "Magic and powers",
+      "description": "Optional module: turn it on and choose your categories (systems, schools, techniques)."
     }
   },
   "info": {
@@ -86,6 +98,13 @@
       "add": "Add",
       "remove": "Remove “{{value}}”",
       "reset": "Default values"
+    },
+    "powers": {
+      "title": "Powers",
+      "description": "For stories where characters have powers, gifts or magic.",
+      "enable": "Add a “Powers” card to the sheets",
+      "enabledHint": "Each sheet has a “Powers” card: powers and abilities, limits and weaknesses.",
+      "disabledHint": "Off: sheets have no “Powers” card. Turning it off later deletes nothing."
     }
   },
   "notes": {
@@ -119,5 +138,24 @@
       "createAccount": "Create an account",
       "setupFirst": "Create the first account"
     }
+  },
+  "sheetDisplay": {
+    "title": "Sheet sections",
+    "description": {
+      "character": "Show the “Plot” and “Story” sections on character sheets (hidden by default).",
+      "location": "Show the “Story” and “Plot” sections on location sheets (hidden by default).",
+      "item": "Show the “Plot” and “Story” sections on item sheets (hidden by default).",
+      "species": "Show the “Plot” and “Story” sections on fauna and flora sheets (hidden by default).",
+      "faction": "Show the “Plot” and “Story” sections on faction sheets (hidden by default).",
+      "people": "Show the “Plot” and “Story” sections on people, culture and religion sheets (hidden by default).",
+      "magic": "Show the “Plot” and “Story” sections on magic and power sheets (hidden by default)."
+    },
+    "plot": "Plot",
+    "story": "Story",
+    "shown": "Shown on sheets.",
+    "hidden": "Hidden on sheets.",
+    "note": "Only the display changes: links with the structure and plot events are kept and still used everywhere else (structure, board, reading, search).",
+    "saved": "Sheet display saved.",
+    "failed": "Couldn’t save the sheet display."
   }
 }

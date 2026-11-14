@@ -148,7 +148,6 @@ export function RelationTypeSelect({ id, value, onChange, disabled = false }: Re
           "disabled:cursor-not-allowed disabled:opacity-50",
           open && "ring-2 ring-ring",
         )}
-        style={{ borderLeftColor: color, borderLeftWidth: 3 }}
       >
         <span className="size-3 shrink-0 rounded-full" style={{ backgroundColor: color }} aria-hidden="true" />
         <span className="min-w-0 flex-1 truncate font-medium">{t(`types.${value}`)}</span>

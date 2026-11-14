@@ -224,7 +224,7 @@ export function StructureLevelsEditor({
                 </span>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1.4fr_auto_auto]">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_1.4fr]">
                 <div className="space-y-1.5">
                   <Label htmlFor={`${prefix}-one`}>{t("levels.one")}</Label>
                   <Input
@@ -270,7 +270,10 @@ export function StructureLevelsEditor({
                     ))}
                   </select>
                 </div>
+              </div>
 
+              {/* En bas : « Commencer à », format et couleur, sur une ligne. */}
+              <div className="mt-3 flex flex-wrap items-end gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor={`${prefix}-start`}>{t("levels.start")}</Label>
                   <Input
@@ -306,21 +309,21 @@ export function StructureLevelsEditor({
                     ))}
                   </select>
                 </div>
-              </div>
 
-              {showColors && (
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <span className="text-sm font-medium">{t("colors.level")}</span>
-                <ColorSwatches
-                  label={`${t("colors.level")} : ${level.one || t("levels.position", { number: index + 1 })}`}
-                  value={level.color}
-                  fallback={defaultLevelColor(index)}
-                  resetLabel={t("colors.useDefault")}
-                  disabled={saving}
-                  onChange={(color) => update(level.key, { color })}
-                />
+                {showColors && (
+                  <div className="space-y-1.5">
+                    <p className="text-sm leading-none font-medium">{t("colors.level")}</p>
+                    <ColorSwatches
+                      label={`${t("colors.level")} : ${level.one || t("levels.position", { number: index + 1 })}`}
+                      value={level.color}
+                      fallback={defaultLevelColor(index)}
+                      resetLabel={t("colors.useDefault")}
+                      disabled={saving}
+                      onChange={(color) => update(level.key, { color })}
+                    />
+                  </div>
+                )}
               </div>
-              )}
             </li>
           );
         })}

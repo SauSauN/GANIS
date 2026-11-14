@@ -1,8 +1,11 @@
 import {
   BookOpenText,
+  Brush,
   Clapperboard,
+  Drama,
   FileUp,
   Filter,
+  Flag,
   FolderTree,
   GalleryThumbnails,
   Image,
@@ -27,6 +30,7 @@ import {
   UserRound,
   Users,
   Waypoints,
+  Zap,
   type LucideIcon,
 } from "lucide-react";
 import { create } from "zustand";
@@ -58,6 +62,9 @@ export type TutorialId =
   | "locations"
   | "items"
   | "species"
+  | "factions"
+  | "peoples"
+  | "magic"
   | "structure"
   | "plot"
   | "notes";
@@ -98,6 +105,7 @@ export const TUTORIALS: Record<TutorialId, Tutorial> = {
       { id: "art", icon: Image },
       { id: "read", icon: BookOpenText, open: "script.read" },
       { id: "flatplan", icon: GalleryThumbnails, open: "script.flatplan" },
+      { id: "production", icon: Brush, open: "script.production" },
       { id: "progress", icon: Target, open: "script.progress" },
       { id: "continuity", icon: Route, open: "script.continuity" },
     ],
@@ -151,6 +159,36 @@ export const TUTORIALS: Record<TutorialId, Tutorial> = {
       { id: "links", icon: Link2 },
     ],
   },
+  factions: {
+    icon: Flag,
+    steps: [
+      { id: "enable", icon: Power, open: "settings:factions" },
+      { id: "create", icon: Flag, open: "factions.create" },
+      { id: "branches", icon: FolderTree, open: "factions.list" },
+      { id: "members", icon: Users },
+      { id: "relations", icon: Link2 },
+    ],
+  },
+  peoples: {
+    icon: Drama,
+    steps: [
+      { id: "enable", icon: Power, open: "settings:peoples" },
+      { id: "create", icon: Drama, open: "peoples.create" },
+      { id: "branches", icon: FolderTree, open: "peoples.list" },
+      { id: "links", icon: Link2 },
+      { id: "existing", icon: Flag },
+    ],
+  },
+  magic: {
+    icon: Zap,
+    steps: [
+      { id: "enable", icon: Power, open: "settings:magic" },
+      { id: "create", icon: Zap, open: "magic.create" },
+      { id: "branches", icon: FolderTree, open: "magic.list" },
+      { id: "links", icon: Link2 },
+      { id: "existing", icon: UserRound },
+    ],
+  },
   structure: {
     icon: ListTree,
     steps: [
@@ -198,6 +236,9 @@ export function tutorialForModule(moduleId: string): TutorialId | null {
     case "locations":
     case "items":
     case "species":
+    case "factions":
+    case "peoples":
+    case "magic":
     case "structure":
     case "plot":
     case "notes":

@@ -12,6 +12,8 @@ import { useWorldLinkStore } from "@/stores/worldLinkStore";
 import { useWorldStore } from "@/stores/worldStore";
 import { fullName } from "@/lib/characters";
 import { useDocumentStore } from "@/lib/documents";
+import { useGlossaryStore } from "@/stores/glossaryStore";
+import { useMangaStore } from "@/stores/mangaStore";
 import { notifyMangaScriptChanged } from "@/lib/mangaEvents";
 import type { CharacterLocation, Relation, TrashKind, WorldLink, WorldLinkKind } from "@/types";
 import { errorText } from "@/lib/errors";
@@ -31,6 +33,8 @@ const t = i18n.t.bind(i18n) as unknown as (key: string, options?: Record<string,
 
 /** Nom à afficher pour un élément (« Sans titre » si vide). */
 export function trashLabel(kind: TrashKind, label: string): string {
+  // Page hors récit sans titre : Rust envoie sa sorte (« @cover »).
+  if (kind === "mangaExtraPage" && label.startsWith("@")) return t(`manga:extras.kinds.${label.slice(1)}`);
   return label.trim() || t(`trash:untitled.${kind}`);
 }
 
@@ -156,7 +160,7 @@ async function refreshAfterRestore(projectId: string, kind: TrashKind) {
     tasks.push(structure.fetchStructure(projectId), structure.fetchLinks(projectId));
   }
 
-  // Objets, faune et flore, et leurs liens. Un personnage restauré peut
+  // Objets, faune et flore, factions, et leurs liens. Un personnage restauré peut
   // redevenir un animal (faune) ; un personnage ou un lieu restauré
   // ramène ses liens avec des objets et des espèces.
   const world = useWorldStore.getState();
@@ -166,11 +170,16 @@ async function refreshAfterRestore(projectId: string, kind: TrashKind) {
   if (world.species.projectId === projectId && ["species", "character", "structureNode"].includes(kind)) {
     tasks.push(world.fetchEntries(projectId, "species"));
   }
+  for (const module of ["faction", "people", "magic"] as const) {
+    if (world[module].projectId === projectId && [module, "structureNode"].includes(kind)) {
+      tasks.push(world.fetchEntries(projectId, module));
+    }
+  }
 
   const worldLinks = useWorldLinkStore.getState();
   if (
     worldLinks.projectId === projectId &&
-    ["character", "location", "item", "species", "worldLink", "structureNode"].includes(kind)
+    ["character", "location", "item", "species", "faction", "people", "magic", "worldLink", "structureNode"].includes(kind)
   ) {
     tasks.push(worldLinks.fetchLinks(projectId));
   }
@@ -183,6 +192,13 @@ async function refreshAfterRestore(projectId: string, kind: TrashKind) {
     if (kind === "note" || kind === "noteFolder") tasks.push(notes.fetchNotes(projectId));
     if (kind === "sticky") tasks.push(notes.fetchStickies(projectId));
   }
+
+  // Pages hors récit (et celles d'un tome restauré).
+  const manga = useMangaStore.getState();
+  if (manga.projectId === projectId && manga.extras && (kind === "mangaExtraPage" || kind === "structureNode")) tasks.push(manga.fetchExtras(projectId));
+
+  const glossary = useGlossaryStore.getState();
+  if (glossary.projectId === projectId && kind === "glossaryTerm") tasks.push(glossary.fetchTerms(projectId));
 
   // Scénario de manga : les pages ouvertes et les vues du scénario se relisent.
   if (kind === "mangaPanel" || kind === "structureNode" || kind === "character" || kind === "location") notifyMangaScriptChanged(projectId);

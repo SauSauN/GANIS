@@ -126,6 +126,17 @@ pub async fn set_character_detail_level(
     character_service::set_detail_level(&pool, &level).await
 }
 
+/// Affiche ou masque la carte « Pouvoirs » des fiches du projet.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn set_character_powers_enabled(
+    state: State<'_, AppState>,
+    project_id: String,
+    enabled: bool,
+) -> AppResult<CharacterSettings> {
+    let pool = project_pool(&state, &project_id).await?;
+    character_service::set_powers_enabled(&pool, enabled).await
+}
+
 /// Remplace une liste personnalisable (`null` : valeurs par défaut).
 #[tauri::command(rename_all = "camelCase")]
 pub async fn set_character_list(

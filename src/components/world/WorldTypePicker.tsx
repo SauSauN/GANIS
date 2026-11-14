@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Search, Settings2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { categoryIcon, categoryTint } from "@/components/world/worldStyle";
 import type { WorldLabels } from "@/components/world/useWorldLabels";
@@ -37,6 +38,7 @@ export function WorldTypePicker({
   disabled?: boolean;
 }) {
   const { t } = useTranslation("world");
+  const { t: tc } = useTranslation("common");
   const [query, setQuery] = useState("");
   const needle = normalize(query.trim());
 
@@ -69,14 +71,10 @@ export function WorldTypePicker({
         </div>
 
         {onManage && (
-          <button
-            type="button"
-            onClick={onManage}
-            className="inline-flex items-center gap-1 text-sm text-primary underline-offset-4 hover:underline"
-          >
-            <Settings2 className="size-3.5" aria-hidden="true" />
-            {t("picker.manage")}
-          </button>
+          <Button type="button" variant="outline" size="lg" onClick={onManage}>
+            <Settings2 aria-hidden="true" />
+            {tc("panelActions.customize")}
+          </Button>
         )}
       </div>
 
@@ -89,7 +87,7 @@ export function WorldTypePicker({
             const selected = types.some((item) => item.id === value);
 
             return (
-              <section key={category} className="rounded-lg border bg-card p-4" aria-label={labels.category(category)}>
+              <section key={category} className="flex flex-col rounded-lg border bg-card p-4" aria-label={labels.category(category)}>
                 <div className="mb-3 flex items-start gap-3">
                   <span
                     className="flex size-9 shrink-0 items-center justify-center rounded-md"
@@ -109,7 +107,8 @@ export function WorldTypePicker({
                   value={selected ? value : ""}
                   onChange={(e) => e.target.value && onSelect(e.target.value)}
                   className={cn(
-                    "h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none",
+                    // En bas de la carte : les listes restent alignées, même sous une description courte.
+                    "mt-auto h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none",
                     "focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
                     selected && "border-primary",
                   )}

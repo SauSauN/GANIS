@@ -95,6 +95,8 @@ pub async fn find_by_username(
 ///
 /// Cette fonction est appelée uniquement par une commande qui vérifie
 /// auparavant les droits administrateur.
+// Gestion des comptes par l'administrateur : désactivée (voir `lib.rs`), gardée pour être rétablie.
+#[allow(dead_code)]
 pub async fn list_all(pool: &SqlitePool) -> AppResult<Vec<User>> {
     let users = sqlx::query_as::<_, User>(
         r#"

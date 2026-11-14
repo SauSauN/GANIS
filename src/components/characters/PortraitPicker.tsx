@@ -104,15 +104,18 @@ export function PortraitPicker({
         )}
         style={ring ? { background: ring } : undefined}
       >
-        {/* Fin liseré de la couleur de la carte entre l'anneau et la photo. */}
-        <span className={cn("relative block", round, frame && "size-full", ring && "bg-card p-1")}>
+        {/* Avec une palette, son anneau sert de cadre : la photo vient
+            directement dedans (sans liseré ni cadre blanc). */}
+        <span className={cn("relative block", round, frame && "size-full")}>
           <AvatarFace
             colorKey={colorKey}
             name={name}
             url={url}
             size={frame ? "fill" : size}
             square={frame}
-            className={ring ? "ring-0" : undefined}
+            // Photo de la fiche : cadre réglable (Paramètres › Apparence),
+            // sauf si la fiche a sa propre palette.
+            className={cn(ring && "ring-0", frame && !ring && "profile-frame ring-0")}
           />
 
           {/* Action au survol (ou au focus clavier), sur la photo elle-même. */}

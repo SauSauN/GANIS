@@ -10,7 +10,7 @@ const THUMBNAIL_WORKERS = 2;
 export type ThumbnailLoader = (document: StructureDocument) => Promise<string | null>;
 
 /** Réduit une planche en vignette ; à défaut, l'image telle quelle (SVG…). */
-async function thumbnailUrl(blob: Blob): Promise<string> {
+export async function thumbnailUrl(blob: Blob): Promise<string> {
   try {
     const bitmap = await createImageBitmap(blob, { resizeWidth: THUMBNAIL_WIDTH, resizeQuality: "high" });
     const canvas = document.createElement("canvas");

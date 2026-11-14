@@ -1,10 +1,11 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronDown, Eye, Fingerprint, Sparkles, type LucideIcon } from "lucide-react";
+import { Brain, ChevronDown, Eye, Fingerprint, WandSparkles, type LucideIcon } from "lucide-react";
+import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
+import { useProjectCharacters } from "@/stores/characterStore";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,11 +21,14 @@ import {
   useListLabel,
 } from "@/components/characters/fields/SpecialFields";
 import {
+  profileCardClass,
+  profileImageClass,
   cardClass,
   cardContentClass,
   cardHeaderClass,
   fieldClass,
 } from "@/components/workspace/views/PageShell";
+import { SheetProgress } from "@/components/common/SheetProgress";
 import {
   MAX_NAME_LENGTH,
   fieldsOfLevel,
@@ -32,11 +36,13 @@ import {
   levelProgress,
   levelsUpTo,
   parseList,
+  POWER_FIELDS,
   type CharacterDraft,
   type CharacterField,
 } from "@/lib/characters";
 import { cn } from "@/lib/utils";
 import type { CharacterDetailLevel } from "@/types";
+import { InfoTip } from "@/components/common/InfoTip";
 
 export interface PortraitControls {
   /** Clé de couleur des initiales (identifiant du personnage, ou provisoire). */
@@ -69,7 +75,7 @@ interface CharacterSheetProps {
 const LEVEL_ICONS: Record<CharacterDetailLevel, LucideIcon> = {
   basic: Fingerprint,
   intermediate: Eye,
-  advanced: Sparkles,
+  advanced: Brain,
 };
 
 /** Niveaux repliés, mémorisés sur l'appareil (pour toutes les fiches). */
@@ -116,22 +122,10 @@ function Field({
   const id = useId();
 
   return (
-    <div className={cn("space-y-2", wide && "sm:col-span-2")}>
+    <div className={cn("space-y-2", wide && "@md:col-span-2")}>
       <Label htmlFor={id}>{label}</Label>
       {children(id)}
     </div>
-  );
-}
-
-/** Barre de progression d'un niveau. */
-function ProgressBar({ filled, total }: { filled: number; total: number }) {
-  return (
-    <span className="block h-1.5 overflow-hidden rounded-full bg-muted">
-      <span
-        className="block h-full rounded-full bg-primary transition-[width]"
-        style={{ width: `${Math.round((filled / total) * 100)}%` }}
-      />
-    </span>
   );
 }
 
@@ -157,6 +151,8 @@ export function CharacterSheet({
   const listLabel = useListLabel();
   const sectionId = useId();
   const [collapsed, setCollapsed] = useState<Set<CharacterDetailLevel>>(loadCollapsed);
+  const { powersEnabled } = useProjectCharacters(projectId);
+  const [powersOpen, setPowersOpen] = useCollapsible("ganis.characterPowers.collapsed");
 
   function setOpen(level: CharacterDetailLevel, open: boolean) {
     setCollapsed((current) => {
@@ -305,9 +301,9 @@ export function CharacterSheet({
 
     return (
       <>
-        <div className="space-y-2 sm:col-span-2">
+        <div className="space-y-2 @md:col-span-2">
           <p className="text-sm font-medium">{label("fullName")}</p>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 @md:grid-cols-2">
             <Input
               aria-label={label("firstName")}
               placeholder={example("firstName")}
@@ -376,12 +372,13 @@ export function CharacterSheet({
   }
 
   return (
-    <div className="grid items-start gap-8 lg:grid-cols-[17rem_minmax(0,1fr)]">
+    <div className="grid items-start gap-8 @xl:grid-cols-[17rem_minmax(0,1fr)]">
       {/* ================================================================
           CARTE DE PROFIL
           ================================================================ */}
-      <Card className={cn(cardClass, "lg:sticky lg:top-0")}>
+      <Card className={cn(cardClass, profileCardClass)}>
         <CardContent className="flex flex-col items-center gap-4 px-5 py-5 text-center">
+          <div className={profileImageClass}>
           <PortraitPicker
             colorKey={portrait.colorKey}
             name={name}
@@ -394,6 +391,7 @@ export function CharacterSheet({
             onPick={portrait.onPick}
             onRemove={portrait.onRemove}
           />
+          </div>
 
           <div className="w-full min-w-0 space-y-1">
             <p className={cn("break-words text-lg font-semibold", !name && "text-muted-foreground")}>
@@ -411,39 +409,22 @@ export function CharacterSheet({
             </span>
           </div>
 
-          <div className="w-full space-y-3 border-t pt-4 text-left">
-            <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">
-              {t("profile.progress")}
-            </p>
-
-            {levels.map((item) => {
-              const progress = levelProgress(draft, item, images);
-
-              return (
-                <button
-                  key={item}
-                  type="button"
-                  onClick={() => goTo(item)}
-                  className="block w-full space-y-1.5 rounded-md text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                >
-                  <span className="flex items-baseline justify-between gap-2 text-sm">
-                    <span>{t(`levels.${item}.theme`)}</span>
-                    <span className="text-xs text-muted-foreground tabular-nums">
-                      {progress.filled} / {progress.total}
-                    </span>
-                  </span>
-                  <ProgressBar {...progress} />
-                </button>
-              );
-            })}
-          </div>
+          <SheetProgress
+            title={t("profile.progress")}
+            rows={levels.map((item) => ({
+              key: item,
+              label: t(`levels.${item}.theme`),
+              ...levelProgress(draft, item, images),
+              onClick: () => goTo(item),
+            }))}
+          />
         </CardContent>
       </Card>
 
       {/* ================================================================
           SECTIONS PAR NIVEAU
           ================================================================ */}
-      <div className="min-w-0 space-y-8">
+      <div className="@container min-w-0 space-y-8">
         {levels.map((item) => {
           const Icon = LEVEL_ICONS[item];
           const progress = levelProgress(draft, item, images);
@@ -452,36 +433,48 @@ export function CharacterSheet({
           return (
             <Card key={item} id={`${sectionId}-${item}`} className={cn(cardClass, "scroll-mt-4")}>
               {/* En-tête cliquable : replie ou déplie le niveau. */}
-              <CardHeader className={cn(cardHeaderClass, "p-0", !open && "border-b-0")}>
+              {/* En-tête : le titre replie ou déplie le niveau ; son objectif est
+                  derrière le « i » (hors du bouton) ; le reste de l'en-tête
+                  replie aussi. */}
+              <CardHeader
+                className={cn(
+                  cardHeaderClass,
+                  "flex flex-row items-center gap-2 rounded-t-xl p-0 transition-colors hover:bg-muted/40",
+                  !open && "border-b-0",
+                )}
+              >
                 <button
                   type="button"
                   aria-expanded={open}
                   aria-controls={`${sectionId}-${item}-content`}
                   title={open ? t("levels.collapse") : t("levels.expand")}
                   onClick={() => setOpen(item, !open)}
-                  className="flex w-full items-center gap-4 rounded-t-xl px-6 py-5 text-left transition-colors hover:bg-muted/40 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                  className="flex min-w-0 items-center gap-4 rounded-tl-xl py-5 pl-6 text-left focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
                 >
                   <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
                     <Icon className="size-5" aria-hidden="true" />
                   </span>
+                  <CardTitle className="min-w-0 truncate">{t(`levels.${item}.theme`)}</CardTitle>
+                </button>
 
-                  <span className="min-w-0 flex-1">
-                    <CardTitle>
-                      {t(`levels.${item}.theme`)}
-                    </CardTitle>
-                    <CardDescription>{t(`levels.${item}.goal`)}</CardDescription>
-                  </span>
+                <InfoTip>{t(`levels.${item}.goal`)}</InfoTip>
 
+                <button
+                  type="button"
+                  tabIndex={-1}
+                  aria-hidden="true"
+                  title={open ? t("levels.collapse") : t("levels.expand")}
+                  onClick={() => setOpen(item, !open)}
+                  className="flex min-w-4 flex-1 items-center justify-end gap-4 self-stretch rounded-tr-xl py-5 pr-6 pl-2"
+                >
                   <span className="shrink-0 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground tabular-nums">
                     {progress.filled} / {progress.total}
                   </span>
-
                   <ChevronDown
                     className={cn(
                       "size-5 shrink-0 text-muted-foreground transition-transform duration-300",
                       !open && "-rotate-90",
                     )}
-                    aria-hidden="true"
                   />
                 </button>
               </CardHeader>
@@ -496,7 +489,7 @@ export function CharacterSheet({
                 )}
               >
                 <div className="min-h-0 overflow-hidden">
-                  <CardContent className={cn(cardContentClass, "grid gap-x-4 gap-y-5 sm:grid-cols-2")}>
+                  <CardContent className={cn(cardContentClass, "grid gap-x-4 gap-y-5 @md:grid-cols-2")}>
                     {item === "basic" && renderIdentity()}
                     {item === "intermediate" && (
                       <>
@@ -511,6 +504,20 @@ export function CharacterSheet({
             </Card>
           );
         })}
+
+        {/* Pouvoirs : hors des niveaux, si l'auteur les a activés pour le projet. */}
+        {powersEnabled && (
+          <CollapsibleCard
+            open={powersOpen}
+            onOpenChange={setPowersOpen}
+            icon={WandSparkles}
+            title={t("powers.title")}
+            description={t("powers.description")}
+            contentClassName={cn(cardContentClass, "grid gap-x-4 gap-y-5 @md:grid-cols-2")}
+          >
+            {POWER_FIELDS.map(renderField)}
+          </CollapsibleCard>
+        )}
 
         {footer}
       </div>

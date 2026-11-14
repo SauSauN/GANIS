@@ -187,11 +187,39 @@ async fn the_manga_is_complete_with_its_script() {
     assert_eq!(world::list_entries(&pool, Module::Item).await.unwrap().len(), parsed.data.items.len());
     assert_eq!(world::list_entries(&pool, Module::Species).await.unwrap().len(), parsed.data.species.len());
 
+    // Factions, peuples et magie : créés, activés, rangés en branches.
+    for (module, list) in [(Module::Faction, &parsed.data.factions), (Module::People, &parsed.data.peoples), (Module::Magic, &parsed.data.magic)] {
+        let entries = world::list_entries(&pool, module).await.unwrap();
+        assert_eq!(entries.len(), list.len(), "{}", module.kind());
+        assert!(!list.is_empty(), "{} vide", module.kind());
+        assert!(entries.iter().any(|e| e.parent_id.is_some()), "{} : aucune branche", module.kind());
+        assert!(world::get_settings(&pool, module).await.unwrap().enabled, "{} désactivé", module.kind());
+    }
+    let world_links = crate::services::world_link_service::list_links(&pool).await.unwrap();
+    for kind in ["faction", "people", "magic"] {
+        assert!(world_links.iter().any(|l| l.target_kind == kind), "aucun lien vers {kind}");
+    }
+    assert!(characters::get_settings(&pool).await.unwrap().powers_enabled, "carte « Pouvoirs » activée");
+
+    // Fabrication : pages hors récit des deux tomes, pages à toutes les étapes.
+    let extras = crate::services::manga_production_service::list_extra_pages(&pool).await.unwrap();
+    assert_eq!(extras.len(), parsed.data.extra_pages.len());
+    assert!(extras.iter().all(|e| e.volume_id.is_some()));
+    let nodes = structure::get_structure(&pool, ProjectType::Manga).await.unwrap().nodes;
+    for stage in crate::services::manga_production_service::PRODUCTION_STAGES {
+        assert!(nodes.iter().any(|n| n.production_stage.as_deref() == Some(stage)), "étape {stage} inutilisée");
+    }
+
+    // Glossaire : tous les termes créés, liés à des fiches.
+    let terms = crate::services::glossary_service::list(&pool).await.unwrap();
+    assert_eq!(terms.len(), parsed.data.glossary.len());
+    assert!(!terms.is_empty() && terms.iter().all(|t| !t.links.is_empty() && !t.links[0].id.starts_with('@')));
+
     // Le synopsis garde la version envoyée à l'éditrice, plus courte que l'actuelle.
     let synopsis = synopsis_service::get_synopsis(&pool).await.unwrap();
     let versions = history::list_versions(&pool, "synopsis", &synopsis.id).await.unwrap();
     assert!(versions.versions.iter().any(|v| v.name.starts_with("Synopsis envoyé")));
-    assert!(synopsis.content.contains("cote 412"));
+    assert!(synopsis.content.contains("quarante-neuf jours"));
 
     // Trame : chaque événement placé sur une page ou un chapitre existe.
     let plot = plot_service::get(&pool).await.unwrap();
@@ -216,14 +244,19 @@ async fn the_manga_is_complete_with_its_script() {
         assert!(chapters.iter().any(|c| c.script_status.as_deref() == Some(*status)), "statut {status} inutilisé");
     }
 
-    // Hina n'a qu'une réplique, sa version de page garde le premier jet, l'état actuel le texte final.
-    let hina: &str = &cast.iter().find(|c| c.first_name == "Hina").unwrap().id;
-    let lines = panels.iter().flat_map(|p| &p.texts).filter(|t| t.kind == "dialogue" && t.character_id.as_deref() == Some(hina)).count();
-    assert_eq!(lines, 2, "le cri du prologue et « REN. »");
+    // Au moins vingt personnages. Kagami ne parle qu'une fois, Kiyoshi jamais ;
+    // la version de page garde le premier jet, l'état actuel le texte final.
+    assert!(cast.len() >= 20, "{} personnages", cast.len());
+    let lines_of = |name: &str| {
+        let id = &cast.iter().find(|c| c.first_name == name).unwrap().id;
+        panels.iter().flat_map(|p| &p.texts).filter(|t| t.kind == "dialogue" && t.character_id.as_deref() == Some(id.as_str())).count()
+    };
+    assert_eq!(lines_of("Kagami"), 1, "« J'AI FAIM. »");
+    assert_eq!(lines_of("Kiyoshi"), 0, "Kiyoshi ne parle jamais");
     let versioned: String = sqlx::query_scalar("SELECT item_id FROM versions WHERE name = 'Premier jet de la page'").fetch_one(&pool).await.unwrap();
     let list = history::list_versions(&pool, "structureNode", &versioned).await.unwrap();
-    assert!(list.versions[0].data["manga_panels"].as_str().unwrap().contains("en marchant dans le village"));
-    assert!(!list.current["manga_panels"].as_str().unwrap().contains("en marchant dans le village"));
+    assert!(list.versions[0].data["manga_panels"].as_str().unwrap().contains("en courant vers le phare"));
+    assert!(!list.current["manga_panels"].as_str().unwrap().contains("en courant vers le phare"));
 
     // Corbeille, journal et calendrier sont peuplés.
     assert_eq!(count(&pool, "SELECT COUNT(*) FROM trash").await, parsed.data.trash.len() as i64);

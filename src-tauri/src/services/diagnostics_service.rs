@@ -4,6 +4,9 @@
 //! base de données locale : aucun chemin de fichier, aucun contenu de
 //! compte ni de projet n'est exposé.
 
+// Diagnostic : désactivé (voir `lib.rs`), gardé pour être rétabli.
+#![allow(dead_code)]
+
 use crate::error::{AppError, AppResult};
 use serde::Serialize;
 use sqlx::SqlitePool;

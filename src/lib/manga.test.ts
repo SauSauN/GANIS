@@ -5,6 +5,8 @@ import {
   draftFromScript,
   draftSignature,
   duplicatePanel,
+  extrasOfVolume,
+  isExtraItem,
   inputFromDraft,
   isTurnMisplaced,
   moveItem,
@@ -13,18 +15,21 @@ import {
   panelsByPage,
   panelVolume,
   pageVolume,
+  productionPercent,
   readingOrder,
   spreadsOf,
+  stageCounts,
   textStats,
+  volumeSequence,
   type ScriptExportLabels,
 } from "@/lib/manga";
 import { documentToText } from "@/lib/novelExport";
-import type { Character, Location, Panel, StructureDocument, StructureNode } from "@/types";
+import type { Character, ExtraPageKind, Location, MangaExtraPage, Panel, StructureDocument, StructureNode } from "@/types";
 
 const date = "2026-10-19T00:00:00Z";
 const node = (id: string, parentId: string | null, level: number, position: number, extra: Partial<StructureNode> = {}): StructureNode => ({
   id, parentId, level, title: "", summary: "", position, numbered: true, number: null, contentWords: 0, wordGoal: null, writingStatus: null,
-  narrativePerson: null, narrativeTense: null, narrativeGoal: "", pageGoal: null, scriptStatus: null, rhythm: null, pageTurn: false,
+  narrativePerson: null, narrativeTense: null, narrativeGoal: "", pageGoal: null, scriptStatus: null, rhythm: null, pageTurn: false, productionStage: null,
   createdAt: date, updatedAt: date, ...extra,
 });
 const panel = (id: string, pageId: string, position: number, extra: Partial<Panel> = {}): Panel => ({
@@ -171,5 +176,71 @@ describe("export pour le dessinateur", () => {
     expect(text).toContain("    Personnages : Léa (bras bandé)");
     expect(text).toContain("        LÉA : Il y a quelqu'un ?");
     expect(text).toContain("        ONOMATOPÉE : GRIIIN");
+  });
+});
+
+const extra = (id: string, kind: ExtraPageKind, placement: "front" | "back", position: number, volumeId: string | null = "t1"): MangaExtraPage => ({
+  id, volumeId, placement, position, kind, title: "", notes: "", productionStage: null, hasArt: false, artUpdatedAt: null, createdAt: date, updatedAt: date,
+});
+
+describe("fabrication et pages hors récit", () => {
+  const extras = [
+    extra("bonus", "bonus", "back", 0),
+    extra("titre", "title", "front", 0),
+    extra("couv", "cover", "front", 1),
+    extra("credits", "credits", "front", 2),
+    extra("4e", "backCover", "back", 1),
+    extra("autre-tome", "title", "front", 0, "t2"),
+  ];
+
+  it("range les pages hors récit d'un tome et met les couvertures à part", () => {
+    const volume = extrasOfVolume(extras, "t1");
+    expect(volume.cover?.id).toBe("couv");
+    expect(volume.backCover?.id).toBe("4e");
+    expect(volume.front.map((e) => e.id)).toEqual(["titre", "credits"]);
+    expect(volume.back.map((e) => e.id)).toEqual(["bonus"]);
+    expect(extrasOfVolume(extras, null).front).toEqual([]);
+  });
+
+  it("numérote les pages intérieures dans l'ordre d'impression, couvertures exclues", () => {
+    const nodes = [node("c1", null, 1, 0), node("p1", "c1", 2, 0), node("p2", "c1", 2, 1)];
+    const items = volumeSequence(pagesInOrder(nodes, 3), extrasOfVolume(extras, "t1"), 3);
+    expect(items.map((item) => (isExtraItem(item) ? item.extra.id : item.page.id))).toEqual(["titre", "credits", "p1", "p2", "bonus"]);
+    expect(items.map((item) => item.folio)).toEqual([3, 4, 5, 6, 7]);
+    // Les planches tiennent compte des pages hors récit.
+    expect(spreadsOf(items)[0].first).toBeNull();
+  });
+
+  it("compte les étapes et l'avancement", () => {
+    const counts = stageCounts([null, "done", "inks", "done"]);
+    expect(counts).toMatchObject({ none: 1, done: 2, inks: 1, pencils: 0 });
+    expect(productionPercent([])).toBe(0);
+    expect(productionPercent(["done", "done"])).toBe(100);
+    expect(productionPercent([null, "inks"])).toBe(25);
+  });
+
+  it("exporte un tome avec ses folios et ses pages hors récit", () => {
+    const nodes = [node("c1", null, 1, 0), node("p1", "c1", 2, 0)];
+    const entries = pagesInOrder(nodes, 3);
+    const volumeExtras = extrasOfVolume([{ ...extra("titre", "title", "front", 0), notes: "Logo centré." }, extra("couv", "cover", "front", 1), extra("bonus", "bonus", "back", 0)], "t1");
+    const items = volumeSequence(entries, volumeExtras, 1);
+    const labels: ScriptExportLabels = {
+      subtitle: "Scénario", cast: "", places: "", pageHeading: (label) => label, panelHeading: (n) => `Case ${n}`,
+      goal: "", rhythm: (v) => v, pageTurn: "", setting: "", place: "", characters: "", notes: "", continuity: "",
+      textLabel: () => "", framing: () => "", rhythmName: (v) => v, noPanels: "(aucune case)",
+      folio: (folio, label) => `p. ${folio} — ${label}`,
+      extraHeading: (e, folio) => (folio === null ? e.kind : `p. ${folio} — ${e.kind}`),
+      frontMatter: "Avant le récit", backMatter: "Après le récit",
+    };
+    const text = documentToText(
+      buildScriptExport({
+        project: { name: "Valombre" }, entries, panels: new Map(), labelOf: (n) => (n.id === "c1" ? "Chapitre 1" : "Page 1"),
+        characters: [], locations: [], nameOf: () => "", includeCast: false, labels, volume: { items, extras: volumeExtras },
+      }),
+    );
+    const order = ["AVANT LE RÉCIT", "cover", "p. 1 — title", "Logo centré.", "CHAPITRE 1", "p. 2 — Page 1", "APRÈS LE RÉCIT", "p. 3 — bonus"];
+    const positions = order.map((part) => text.indexOf(part));
+    expect(positions.every((position) => position >= 0)).toBe(true);
+    expect([...positions].sort((a, b) => a - b)).toEqual(positions);
   });
 });

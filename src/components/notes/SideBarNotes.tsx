@@ -14,6 +14,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { TreeGuides } from "@/components/common/TreeGuides";
+import { NoteItemMenu } from "@/components/common/PanelItemMenus";
 import { ConfirmDialog } from "@/components/notes/ConfirmDialog";
 import { activeGuide } from "@/lib/treeGuides";
 import {
@@ -429,35 +430,39 @@ export function SideBarNotes({ projectId, activeTab, onOpenFeature }: SideBarNot
             const active = activeTab === tabId;
 
             return (
-              <li
-                key={row.note.id}
-                role="treeitem"
-                aria-level={row.depth + 1}
-                draggable={!row.note.system}
-                onDragStart={(event) => onDragStart(event, "note", row.note.id)}
-                className="relative flex items-center"
-                style={indent(row.depth)}
-              >
-                {guides}
-                <span className="size-6 shrink-0" />
-                <button
-                  type="button"
-                  aria-current={active ? "page" : undefined}
-                  onClick={() => onOpenFeature(tabId)}
-                  className={cn(
-                    "flex min-w-0 flex-1 items-center gap-2 rounded-md px-1.5 py-1 text-sm hover:bg-sidebar-accent",
-                    active && "bg-sidebar-accent font-medium",
-                  )}
-                >
-                  <NotebookText className="size-4 shrink-0 text-muted-foreground" />
-                  <span className={cn("flex-1 truncate text-left", !row.note.title && "text-muted-foreground italic")}>
-                    {row.note.title || untitled}
-                  </span>
-                  {row.note.pinned && (
-                    <Pin aria-label={t("sidebar.pinned")} className="size-3 shrink-0 text-primary" />
-                  )}
-                </button>
-              </li>
+              <NoteItemMenu key={row.note.id} projectId={projectId} note={row.note} name={row.note.title || untitled} onOpen={() => onOpenFeature(tabId)}>
+                {(onContextMenu) => (
+                  <li
+                    onContextMenu={onContextMenu}
+                    role="treeitem"
+                    aria-level={row.depth + 1}
+                    draggable={!row.note.system}
+                    onDragStart={(event) => onDragStart(event, "note", row.note.id)}
+                    className="relative flex items-center"
+                    style={indent(row.depth)}
+                  >
+                    {guides}
+                    <span className="size-6 shrink-0" />
+                    <button
+                      type="button"
+                      aria-current={active ? "page" : undefined}
+                      onClick={() => onOpenFeature(tabId)}
+                      className={cn(
+                        "flex min-w-0 flex-1 items-center gap-2 rounded-md px-1.5 py-1 text-sm hover:bg-sidebar-accent",
+                        active && "bg-sidebar-accent font-medium",
+                      )}
+                    >
+                      <NotebookText className="size-4 shrink-0 text-muted-foreground" />
+                      <span className={cn("flex-1 truncate text-left", !row.note.title && "text-muted-foreground italic")}>
+                        {row.note.title || untitled}
+                      </span>
+                      {row.note.pinned && (
+                        <Pin aria-label={t("sidebar.pinned")} className="size-3 shrink-0 text-primary" />
+                      )}
+                    </button>
+                  </li>
+                )}
+              </NoteItemMenu>
             );
           })}
         </ul>

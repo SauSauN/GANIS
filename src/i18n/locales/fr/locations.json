@@ -368,7 +368,6 @@
     "description": "Choisissez un type : la fiche s'adapte (une capitale n'a pas les mêmes informations qu'une forêt).",
     "search": "Chercher un type…",
     "noResult": "Aucun type ne correspond.",
-    "manage": "Ajouter vos propres types",
     "changeTitle": "Changer le type de « {{name}} »",
     "changeDescription": "Les informations déjà saisies sont gardées, même celles qui ne s'appliquent plus au nouveau type.",
     "change": "Changer",
@@ -468,12 +467,6 @@
     }
   },
   "links": {
-    "characterTitle": "Lieux liés",
-    "characterDescription": "Où vit, est né, règne… ce personnage.",
-    "locationTitle": "Personnages liés",
-    "locationDescription": "Qui vit, est né, règne… ici.",
-    "add": "Ajouter un lien",
-    "empty": "Aucun lien pour l'instant.",
     "edit": "Modifier le lien",
     "mentions": "Cité dans les fiches",
     "mentionsHint": "Ces liens viennent des champs des fiches (Origine, Dirigeant…) : modifiez-les depuis la fiche concernée.",

@@ -5,10 +5,17 @@ import type {
   StructureLinks,
   NodeCharacterRole,
   NodeLocationRole,
+  NodeEntryRole,
+  WorldModule,
   StructureNode,
   Editorial,
   MangaChapterFields,
   MangaSettings,
+  MangaExtraPage,
+  ExtraPageInput,
+  ExtraPageUpdate,
+  ExtraPagePlacement,
+  ProductionStage,
   PageScript,
   PageScriptInput,
   Panel,
@@ -97,6 +104,40 @@ export const structureApi = {
   getMangaSettings: (projectId: string) => call<MangaSettings>("get_manga_settings", { projectId }),
 
   setMangaSettings: (projectId: string, settings: MangaSettings) => call<MangaSettings>("set_manga_settings", { projectId, settings }),
+
+  /** Pages hors récit de tous les tomes. */
+  listMangaExtraPages: (projectId: string) => call<MangaExtraPage[]>("list_manga_extra_pages", { projectId }),
+
+  createMangaExtraPage: (projectId: string, input: ExtraPageInput) => call<MangaExtraPage>("create_manga_extra_page", { projectId, input }),
+
+  updateMangaExtraPage: (projectId: string, pageId: string, update: ExtraPageUpdate) =>
+    call<MangaExtraPage>("update_manga_extra_page", { projectId, pageId, update }),
+
+  /** Nouvel ordre d'un groupe (tome + placement) ; renvoie toutes les pages hors récit. */
+  reorderMangaExtraPages: (projectId: string, volumeId: string | null, placement: ExtraPagePlacement, ids: string[]) =>
+    call<MangaExtraPage[]>("reorder_manga_extra_pages", { projectId, volumeId, placement, ids }),
+
+  /** Met la page à la corbeille ; renvoie l'identifiant de l'entrée. */
+  deleteMangaExtraPage: (projectId: string, pageId: string) => call<string>("delete_manga_extra_page", { projectId, pageId }),
+
+  /** Range le dessin d'une page hors récit (image envoyée telle quelle). */
+  setMangaExtraArt: (projectId: string, pageId: string, name: string, data: ArrayBuffer | Uint8Array) =>
+    call<MangaExtraPage>("set_manga_extra_art", toBytes(data), {
+      headers: {
+        "x-project-id": encodeURIComponent(projectId),
+        "x-page-id": encodeURIComponent(pageId),
+        "x-name": encodeURIComponent(name),
+      },
+    }),
+
+  removeMangaExtraArt: (projectId: string, pageId: string) => call<MangaExtraPage>("remove_manga_extra_art", { projectId, pageId }),
+
+  /** Contenu du dessin d'une page hors récit, en binaire. */
+  getMangaExtraArt: (projectId: string, pageId: string) => call<ArrayBuffer>("get_manga_extra_art", { projectId, pageId }),
+
+  /** Étape de fabrication de pages du récit et de pages hors récit (`null` : rien de commencé). */
+  setMangaProductionStage: (projectId: string, pageIds: string[], extraIds: string[], stage: ProductionStage | null) =>
+    call<void>("set_manga_production_stage", { projectId, pageIds, extraIds, stage }),
 
   getEditorial: (projectId: string) => call<Editorial>("get_editorial", { projectId }),
 
@@ -193,4 +234,11 @@ export const structureApi = {
   /** Retire un lieu d'un élément. */
   unlinkStructureLocation: (projectId: string, nodeId: string, locationId: string) =>
     call<void>("unlink_structure_location", { projectId, nodeId, locationId }),
+
+  /** Lie une fiche du monde (objet, faune et flore, faction, peuple, magie) à un élément. */
+  linkStructureEntry: (projectId: string, nodeId: string, kind: WorldModule, entryId: string, role: NodeEntryRole) =>
+    call<void>("link_structure_entry", { projectId, nodeId, kind, entryId, role }),
+
+  unlinkStructureEntry: (projectId: string, nodeId: string, kind: WorldModule, entryId: string) =>
+    call<void>("unlink_structure_entry", { projectId, nodeId, kind, entryId }),
 };

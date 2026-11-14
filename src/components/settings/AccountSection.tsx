@@ -30,6 +30,7 @@ import {
 import { IDLE_LOCK_DELAYS, setIdleLock, useIdleLock, type IdleLockDelay } from "@/lib/preferences";
 import { RECOVERY_KEY_ENABLED } from "@/lib/recoveryKey";
 import { useAuthStore } from "@/stores/authStore";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 /** Messages propres à cette section (clés de `settings.json`). */
 type AccountMessage =
@@ -177,9 +178,7 @@ function RecoveryKeyCard({ username }: { username: string }) {
     <Card className={cardClass}>
       <form onSubmit={handleSubmit}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("account.recovery.title")}</CardTitle>
-
-          <CardDescription>{t("account.recovery.description")}</CardDescription>
+          <TitleWithInfo info={t("account.recovery.description")}>{t("account.recovery.title")}</TitleWithInfo>
         </CardHeader>
 
         <CardContent className="space-y-6 px-6 py-6">
@@ -225,9 +224,7 @@ function IdleLockCard() {
   return (
     <Card className={cardClass}>
       <CardHeader className={cardHeaderClass}>
-        <CardTitle>{t("lock.settingTitle")}</CardTitle>
-
-        <CardDescription>{t("lock.settingDescription")}</CardDescription>
+        <TitleWithInfo info={t("lock.settingDescription")}>{t("lock.settingTitle")}</TitleWithInfo>
       </CardHeader>
 
       <CardContent className="px-6 py-6">
@@ -334,7 +331,7 @@ function DeleteAccountCard() {
 
         <CardFooter className={cardFooterClass}>
           <Button type="submit" variant="destructive" disabled={busy}>
-            <Trash2 className="mr-2 h-4 w-4" />
+            <Trash2 />
             {busy ? t("account.delete.submitting") : t("account.delete.submit")}
           </Button>
         </CardFooter>
@@ -486,9 +483,7 @@ export function AccountSection() {
       <Card className={cardClass}>
         <form onSubmit={handleEmailSubmit} noValidate>
           <CardHeader className={cardHeaderClass}>
-            <CardTitle>{t("account.email.title")}</CardTitle>
-
-            <CardDescription>{t("account.email.description")}</CardDescription>
+            <TitleWithInfo info={t("account.email.description")}>{t("account.email.title")}</TitleWithInfo>
           </CardHeader>
 
           <CardContent className="space-y-6 px-6 py-6">
@@ -523,9 +518,7 @@ export function AccountSection() {
       <Card className={cardClass}>
         <form onSubmit={handlePasswordSubmit}>
           <CardHeader className={cardHeaderClass}>
-            <CardTitle>{t("account.password.title")}</CardTitle>
-
-            <CardDescription>{t("account.password.description")}</CardDescription>
+            <TitleWithInfo info={t("account.password.description")}>{t("account.password.title")}</TitleWithInfo>
           </CardHeader>
 
           <CardContent className="space-y-6 px-6 py-6">

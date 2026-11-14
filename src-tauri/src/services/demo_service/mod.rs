@@ -44,6 +44,8 @@ use crate::models::project::{Project, ProjectStatus, ProjectType};
 use crate::services::character_location_service::{self as character_places, CharacterLocationInput};
 use crate::services::character_service::{self as characters, CharacterInput};
 use crate::services::document_service as documents;
+use crate::services::glossary_service::{self as glossary, GlossaryInput};
+use crate::services::manga_production_service::{self as production, ExtraPageInput};
 use crate::services::history_service as history;
 use crate::services::location_service::{self as locations, CustomTypeInput, LocationInput};
 use crate::services::manga_service::{self as manga, ChapterFields, MangaSettings, PageScriptInput, PanelCharacter, PanelInput, TextInput};
@@ -91,7 +93,8 @@ const SOURCES: [Source; 2] = [
     },
 ];
 
-/// Identifiants des exemples, dans l'ordre d'affichage.
+/// Identifiants des exemples, dans l'ordre d'affichage (pour les tests).
+#[cfg(test)]
 pub fn ids() -> Vec<&'static str> {
     SOURCES.iter().map(|s| s.id).collect()
 }
@@ -136,6 +139,14 @@ struct Data {
     #[serde(default)]
     species: Vec<Value>,
     #[serde(default)]
+    factions: Vec<Value>,
+    /// Peuples, cultures et religions.
+    #[serde(default)]
+    peoples: Vec<Value>,
+    /// Systèmes de magie et de pouvoirs.
+    #[serde(default)]
+    magic: Vec<Value>,
+    #[serde(default)]
     relations: Vec<Value>,
     #[serde(default)]
     graph: Vec<Value>,
@@ -145,6 +156,15 @@ struct Data {
     world_links: Vec<Value>,
     #[serde(default)]
     node_links: Vec<NodeLinksDef>,
+    /// Termes du glossaire (`term`, `definition`, `category`, `links`).
+    #[serde(default)]
+    glossary: Vec<Value>,
+    /// Manga : pages hors récit des tomes (couverture, page de titre…).
+    #[serde(default)]
+    extra_pages: Vec<ExtraPageDef>,
+    /// Manga : étape de fabrication des pages (`stage` → clés de pages).
+    #[serde(default)]
+    production: Vec<ProductionDef>,
     #[serde(default)]
     manuscript: Option<ManuscriptDef>,
     #[serde(default)]
@@ -169,6 +189,30 @@ struct Data {
     /// Jours du calendrier de travail.
     #[serde(default)]
     work_days: Vec<WorkDayDef>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct ExtraPageDef {
+    /// Tome (`@node:clé`) ; absent si le projet n'a pas de tomes.
+    #[serde(default)]
+    volume: Option<String>,
+    placement: String,
+    kind: String,
+    #[serde(default)]
+    title: String,
+    #[serde(default)]
+    notes: String,
+    #[serde(default)]
+    stage: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct ProductionDef {
+    stage: String,
+    /// Clés des pages (sans `@`).
+    pages: Vec<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -227,6 +271,9 @@ struct SynopsisDef {
 struct ListSettingsDef {
     #[serde(default)]
     enabled: Option<bool>,
+    /// Personnages : carte « Pouvoirs » affichée sur les fiches.
+    #[serde(default)]
+    powers_enabled: Option<bool>,
     #[serde(default)]
     categories: Option<Vec<String>>,
     #[serde(default)]
@@ -546,10 +593,6 @@ impl Registry {
         self.ids.get(&format!("{kind}:{key}")).cloned().ok_or_else(|| invalid(format!("référence inconnue : @{kind}:{key}")))
     }
 
-    fn has(&self, kind: &str, key: &str) -> bool {
-        self.ids.contains_key(&format!("{kind}:{key}"))
-    }
-
     /// Remplace, dans une valeur JSON, chaque chaîne `@sorte:clé` par
     /// l'identifiant correspondant.
     fn resolve(&self, value: &Value) -> AppResult<Value> {
@@ -686,6 +729,8 @@ impl<'a> Builder<'a> {
         self.places_and_people().await?;
         self.world_entries().await?;
         self.links().await?;
+        self.glossary().await?;
+        self.production().await?;
         self.texts().await?;
         self.manuscript().await?;
         self.documents().await?;
@@ -735,7 +780,7 @@ impl<'a> Builder<'a> {
                 "char" => drop(characters::delete_character(pool, &id).await?),
                 "loc" => drop(locations::delete_location(pool, &id).await?),
                 "item" => drop(world::delete_entry(pool, Module::Item, &id).await?),
-                "species" => drop(world::delete_entry(pool, Module::Species, &id).await?),
+                "species" | "faction" | "people" | "magic" => drop(world::delete_entry(pool, world_module(kind)?, &id).await?),
                 "note" => drop(notes::delete_note(pool, &id).await?),
                 other => return Err(invalid(format!("corbeille : sorte inconnue « {other} »"))),
             }
@@ -756,12 +801,18 @@ impl<'a> Builder<'a> {
             for (list, values) in &s.lists {
                 characters::set_list(pool, list, Some(values)).await?;
             }
+            if let Some(enabled) = s.powers_enabled {
+                characters::set_powers_enabled(pool, enabled).await?;
+            }
             if !s.custom_types.is_empty() || s.enabled.is_some() || s.categories.is_some() {
                 return Err(invalid("personnages : types, activation et catégories ne s'appliquent pas"));
             }
         }
 
         if let Some(s) = &data.location_settings {
+            if s.powers_enabled.is_some() {
+                return Err(invalid("la carte « Pouvoirs » ne concerne que les personnages"));
+            }
             if let Some(level) = &s.detail_level {
                 locations::set_detail_level(pool, level).await?;
             }
@@ -781,7 +832,10 @@ impl<'a> Builder<'a> {
 
         for (name, s) in &data.world {
             let module = world_module(name)?;
-            let kind = if module == Module::Item { "itype" } else { "stype" };
+            if s.powers_enabled.is_some() {
+                return Err(invalid("la carte « Pouvoirs » ne concerne que les personnages"));
+            }
+            let kind = custom_type_kind(module);
             if let Some(enabled) = s.enabled {
                 world::set_enabled(pool, module, enabled).await?;
             }
@@ -869,14 +923,19 @@ impl<'a> Builder<'a> {
         let pool = self.pool;
 
         // Les lieux d'abord ; un champ qui désigne un personnage (souverain…)
-        // est complété une fois les personnages créés.
+        // ou un autre lieu (capitale d'un royaume, créée après lui) est
+        // complété une fois les personnages et tous les lieux créés.
         let mut deferred: Vec<(String, LocationInput, BTreeMap<String, String>)> = Vec::new();
         for value in &data.locations {
             let mut e = entry(value, "lieu")?;
             let mut later = BTreeMap::new();
             if let Some(fields) = e.body.get_mut("fields").and_then(Value::as_object_mut) {
                 let keys: Vec<String> =
-                    fields.iter().filter(|(_, v)| v.as_str().is_some_and(|s| s.starts_with("@char:"))).map(|(k, _)| k.clone()).collect();
+                    fields
+                        .iter()
+                        .filter(|(_, v)| v.as_str().is_some_and(|s| s.starts_with("@char:") || s.starts_with("@loc:")))
+                        .map(|(k, _)| k.clone())
+                        .collect();
                 for k in keys {
                     if let Some(Value::String(v)) = fields.remove(&k) {
                         later.insert(k, v);
@@ -926,7 +985,13 @@ impl<'a> Builder<'a> {
 
     async fn world_entries(&mut self) -> AppResult<()> {
         let data = &self.parsed.data;
-        for (module, list, kind) in [(Module::Item, &data.items, "item"), (Module::Species, &data.species, "species")] {
+        for (module, list, kind) in [
+            (Module::Item, &data.items, "item"),
+            (Module::Species, &data.species, "species"),
+            (Module::Faction, &data.factions, "faction"),
+            (Module::People, &data.peoples, "people"),
+            (Module::Magic, &data.magic, "magic"),
+        ] {
             for value in list {
                 let e = entry(value, kind)?;
                 let input: WorldEntryInput = self.refs.resolve_as(&e.body, &format!("{kind} {}", e.key))?;
@@ -979,6 +1044,41 @@ impl<'a> Builder<'a> {
             for (location, role) in &def.locations {
                 node_links::link_location(pool, &node, &self.refs.id("loc", location)?, role).await?;
             }
+        }
+        Ok(())
+    }
+
+    // ------------------------------------------------------------ Fabrication
+
+    async fn production(&mut self) -> AppResult<()> {
+        let data = &self.parsed.data;
+        for def in &data.extra_pages {
+            let volume_id = def.volume.as_deref().map(|v| self.refs.id("node", v)).transpose()?;
+            let input = ExtraPageInput {
+                volume_id,
+                placement: def.placement.clone(),
+                kind: def.kind.clone(),
+                title: def.title.clone(),
+                notes: def.notes.clone(),
+            };
+            let created = production::create_extra_page(self.pool, &input).await?;
+            if def.stage.is_some() {
+                production::set_production_stage(self.pool, &[], &[created.id], def.stage.as_deref()).await?;
+            }
+        }
+        for def in &data.production {
+            let pages = def.pages.iter().map(|key| self.refs.id("node", key)).collect::<AppResult<Vec<_>>>()?;
+            production::set_production_stage(self.pool, &pages, &[], Some(&def.stage)).await?;
+        }
+        Ok(())
+    }
+
+    // -------------------------------------------------------------- Glossaire
+
+    async fn glossary(&mut self) -> AppResult<()> {
+        for value in &self.parsed.data.glossary {
+            let input: GlossaryInput = self.refs.resolve_as(value, "terme du glossaire")?;
+            glossary::create(self.pool, &input).await?;
         }
         Ok(())
     }
@@ -1216,10 +1316,25 @@ impl Builder<'_> {
     }
 }
 
+/// Sorte des références vers les types ajoutés par l'auteur d'un module
+/// (`@itype:…`, `@stype:…`, `@ftype:…`, `@ptype:…`, `@mtype:…`).
+fn custom_type_kind(module: Module) -> &'static str {
+    match module {
+        Module::Item => "itype",
+        Module::Species => "stype",
+        Module::Faction => "ftype",
+        Module::People => "ptype",
+        Module::Magic => "mtype",
+    }
+}
+
 fn world_module(name: &str) -> AppResult<Module> {
     match name {
         "item" => Ok(Module::Item),
         "species" => Ok(Module::Species),
+        "faction" => Ok(Module::Faction),
+        "people" => Ok(Module::People),
+        "magic" => Ok(Module::Magic),
         other => Err(invalid(format!("module inconnu : {other}"))),
     }
 }

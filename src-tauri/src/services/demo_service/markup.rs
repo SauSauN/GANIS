@@ -17,7 +17,6 @@
 //! (JSON Tiptap). Les mentions désignent une fiche par sa clé :
 //! `char:` personnage, `loc:` lieu, `node:` élément du découpage.
 
-use std::collections::BTreeMap;
 
 use serde_json::{json, Value};
 
@@ -58,11 +57,6 @@ pub fn sections(text: &str) -> AppResult<Vec<(String, String)>> {
         out.push((key, lines.join("\n").trim().to_owned()));
     }
     Ok(out)
-}
-
-/// Sections sous forme de dictionnaire.
-pub fn section_map(text: &str) -> AppResult<BTreeMap<String, String>> {
-    Ok(sections(text)?.into_iter().collect())
 }
 
 /// Blocs de texte séparés par des lignes vides ; les lignes d'un même bloc

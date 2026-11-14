@@ -17,8 +17,8 @@ import type {
 } from "@/types";
 
 /*
- * Objets, faune et flore du projet ouvert : une « tranche » par module
- * (`item`, `species`), chacune avec ses fiches et ses réglages (activé,
+ * Objets, faune et flore, factions du projet ouvert : une « tranche » par
+ * module (`item`, `species`, `faction`), chacune avec ses fiches et ses réglages (activé,
  * catégories choisies, types ajoutés, statuts, niveau de détail).
  *
  * Comme les autres stores du projet, chaque tranche sait à quel projet
@@ -55,6 +55,9 @@ type CustomTypeInput = Omit<CustomLocationType, "id"> & { id?: string };
 interface WorldState {
   item: Slice;
   species: Slice;
+  faction: Slice;
+  people: Slice;
+  magic: Slice;
 
   fetchEntries: (projectId: string, module: WorldModule) => Promise<void>;
   createEntry: (projectId: string, module: WorldModule, input: WorldEntryInput) => Promise<WorldEntry>;
@@ -102,7 +105,7 @@ const emptySlice = (): Slice => ({
   createPreset: null,
 });
 
-const latestFetch: Record<WorldModule, number> = { item: 0, species: 0 };
+const latestFetch: Record<WorldModule, number> = { item: 0, species: 0, faction: 0, people: 0, magic: 0 };
 const loadingPortraits = new Set<string>();
 
 const messageOf = (error: unknown, fallback: string): string =>
@@ -135,6 +138,9 @@ export const useWorldStore = create<WorldState>((set, get) => {
   return {
     item: emptySlice(),
     species: emptySlice(),
+    faction: emptySlice(),
+    people: emptySlice(),
+    magic: emptySlice(),
 
     fetchEntries: async (projectId, module) => {
       const request = ++latestFetch[module];
@@ -287,8 +293,11 @@ export const useWorldStore = create<WorldState>((set, get) => {
     reset: () => {
       latestFetch.item++;
       latestFetch.species++;
+      latestFetch.faction++;
+      latestFetch.people++;
+      latestFetch.magic++;
       loadingPortraits.clear();
-      set({ item: emptySlice(), species: emptySlice() });
+      set({ item: emptySlice(), species: emptySlice(), faction: emptySlice(), people: emptySlice(), magic: emptySlice() });
     },
   };
 });
@@ -319,15 +328,21 @@ export function useWorldEntries(projectId: string, module: WorldModule) {
 
 /**
  * Modules activés pour ce projet (barre de gauche) ; faux tant qu'ils ne
- * sont pas lus (`loaded` dit quand les deux réglages le sont).
+ * sont pas lus (`loaded` dit quand tous les réglages le sont).
  */
 export function useEnabledWorldModules(projectId: string): Record<WorldModule, boolean> & { loaded: boolean } {
   const item = useWorldEntries(projectId, "item");
   const species = useWorldEntries(projectId, "species");
+  const faction = useWorldEntries(projectId, "faction");
+  const people = useWorldEntries(projectId, "people");
+  const magic = useWorldEntries(projectId, "magic");
   return {
     item: item.loaded && item.settings.enabled,
     species: species.loaded && species.settings.enabled,
-    loaded: item.loaded && species.loaded,
+    faction: faction.loaded && faction.settings.enabled,
+    people: people.loaded && people.settings.enabled,
+    magic: magic.loaded && magic.settings.enabled,
+    loaded: item.loaded && species.loaded && faction.loaded && people.loaded && magic.loaded,
   };
 }
 

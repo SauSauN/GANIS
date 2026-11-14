@@ -13,6 +13,9 @@ interface SideBarSearchProps {
  * Module « Recherche » : cherche dans tout le projet (personnages, lieux,
  * découpage, notes, post-it), sans tenir compte des accents ni de la casse.
  */
+/** Champ de recherche du panneau (Ctrl+F y remet le curseur). */
+export const SEARCH_INPUT_ID = "project-search-input";
+
 export function SideBarSearch({ projectId, onOpenFeature }: SideBarSearchProps) {
   const { t } = useTranslation("search");
   const [query, setQuery] = useState("");
@@ -24,6 +27,7 @@ export function SideBarSearch({ projectId, onOpenFeature }: SideBarSearchProps) 
       <div className="relative px-3">
         <Search className="pointer-events-none absolute top-1/2 left-5.5 size-4 -translate-y-1/2 text-muted-foreground" />
         <input
+          id={SEARCH_INPUT_ID}
           autoFocus
           type="search"
           value={query}

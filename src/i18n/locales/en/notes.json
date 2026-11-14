@@ -205,5 +205,6 @@
   "system": {
     "banner": "System note: it mirrors the sheet. Headings are fixed; text written under a heading is saved to the sheet, as plain text. Formatting (font, size, lists) stays in the note, and is lost for a section whose text is changed from the sheet.",
     "folder": "System folder"
-  }
+  },
+  "colorLabel": "Color"
 }
