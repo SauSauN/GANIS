@@ -11,7 +11,6 @@ use crate::services::login_throttle::LoginThrottle;
 use sqlx::SqlitePool;
 use std::collections::HashMap;
 use std::path::PathBuf;
-use std::sync::Arc;
 use tokio::sync::Mutex;
 
 /// Personne qui utilise l'application à cet instant.
@@ -201,6 +200,8 @@ impl AppState {
     }
 
     /// Vérifie que l'utilisateur connecté est administrateur.
+    // Gestion des comptes par l'administrateur : désactivée (voir `lib.rs`), gardée pour être rétablie.
+    #[allow(dead_code)]
     pub async fn require_admin(&self) -> AppResult<User> {
         let user = self.require_user().await?;
 
@@ -226,6 +227,3 @@ impl AppState {
         Ok(user)
     }
 }
-
-/// Type alias pratique pour l'état géré par Tauri.
-pub type ManagedState = Arc<AppState>;

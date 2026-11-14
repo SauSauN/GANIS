@@ -39,7 +39,7 @@ export default function Activity() {
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-background">
       <main className="min-h-0 flex-1 overflow-y-auto">
-        <div className="mx-auto w-full max-w-6xl px-6 py-8">
+        <div className="mx-auto w-full max-w-6xl 2xl:max-w-[96rem] min-[137.5rem]:max-w-[120rem] px-6 py-8">
           <header className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight">{t("pageTitle")}</h1>

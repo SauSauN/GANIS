@@ -32,7 +32,7 @@
       },
       "layout": {
         "title": "L'espace de travail",
-        "text": "À gauche, la barre des modules : Détails, Personnages, Lieux, Découpage, Trame, Notes et Recherche. Le panneau du milieu liste les fonctions et les éléments du module ; chacun s'ouvre dans un onglet. Objets et Faune et flore s'ajoutent quand vous les activez dans les paramètres du projet.",
+        "text": "À gauche, la barre des modules : Détails, Personnages, Lieux, Découpage, Trame, Notes et Recherche. Le panneau du milieu liste les fonctions et les éléments du module ; chacun s'ouvre dans un onglet. Objets, Faune et flore et Factions s'ajoutent quand vous les activez dans les paramètres du projet.",
         "points": [
           "Cliquez à nouveau sur un module pour replier son panneau.",
           "Clic droit sur un onglet : l'épingler, fermer les autres, ceux de gauche ou de droite.",
@@ -46,6 +46,7 @@
         "text": "Chaque projet commence par sa fiche : synopsis, genres, ton et informations générales de l'histoire.",
         "points": [
           "Détails › Synopsis du projet pour écrire le résumé.",
+          "Détails › Glossaire pour définir les mots de votre univers et les relier aux fiches.",
           "Le nom, la description et le type se modifient dans les paramètres du projet.",
           "Le statut (en préparation, en cours, en pause, terminé) aide à suivre l'avancement."
         ]
@@ -58,7 +59,9 @@
           "Le niveau de détail des fiches se règle dans les paramètres du projet.",
           "Ajoutez un portrait et une galerie d'images à chaque fiche.",
           "Chaque fiche s'ouvre dans son propre onglet, au nom du personnage.",
-          "Palette de couleurs : ses couleurs encadrent le portrait du personnage."
+          "Palette de couleurs : ses couleurs encadrent le portrait du personnage.",
+          "Sous la fiche, trois sections de liens : « Liens avec l'univers » (relations, lieux, faune et flore, objets, factions, peuples, magie, rangés par sorte, avec un seul bouton « Ajouter un lien »), « Trame » et « Récit ».",
+          "« Trame » et « Récit » sont masquées par défaut sur les fiches ; affichez-les dans Paramètres du projet › Personnages (ou › Lieux, › Objets…). Seul l'affichage change : les liens restent utilisés partout ailleurs."
         ]
       },
       "locations": {
@@ -72,13 +75,14 @@
         ]
       },
       "world": {
-        "title": "Objets, faune et flore",
-        "text": "Deux modules facultatifs pour les objets de votre histoire (armes, véhicules, téléphones, objets magiques…) et les animaux et plantes de votre univers. Ils sont masqués tant que vous ne les activez pas.",
+        "title": "Objets, faune et flore, factions",
+        "text": "Trois modules facultatifs : les objets de votre histoire (armes, véhicules, téléphones, objets magiques…), les animaux et plantes de votre univers, et les factions (guildes, ordres, clans, armées, cultes…). Ils sont masqués tant que vous ne les activez pas.",
         "points": [
-          "Paramètres du projet › Objets (ou Faune et flore) : activez le module, puis gardez seulement les catégories utiles.",
+          "Paramètres du projet › Objets (ou Faune et flore, ou Factions) : activez le module, puis gardez seulement les catégories utiles.",
           "Un objet peut être rangé dans un autre (une clé dans un coffre) ; un animal précis se range sous son espèce.",
           "Un animal précis peut aussi devenir un personnage : sa fiche de personnage lui est reliée.",
-          "« Lier un élément » relie objets, espèces, personnages et lieux : « possède », « vit à », « fait partie de »…"
+          "Une faction peut avoir des branches (la section d'un ordre, la famille d'un clan).",
+          "« Lier un élément » relie objets, espèces, factions, personnages et lieux : « possède », « vit à », « dirige », « fait partie de »…"
         ]
       },
       "relations": {
@@ -123,7 +127,7 @@
         "title": "Rechercher",
         "text": "Retrouvez n'importe quoi dans le projet : personnages, lieux, découpage, documents, trame, notes et post-it.",
         "points": [
-          "Le module Recherche fouille tout le projet, sans tenir compte des accents ni des majuscules.",
+          "La loupe en haut à droite (ou Ctrl+F) ouvre la recherche dans le panneau du milieu : elle fouille tout le projet, sans tenir compte des accents ni des majuscules.",
           "Ctrl+K ouvre la palette : tapez pour aller à un élément ou lancer une commande.",
           "Un clic sur un résultat l'ouvre dans un onglet."
         ]
@@ -197,6 +201,8 @@
       "guide": "Guide de démarrage",
       "shortcuts": "Raccourcis clavier",
       "palette": "Palette : pages, actions, recherche",
+      "togglePanel": "Replier ou déplier le panneau du milieu (hors de l'éditeur)",
+      "search": "Rechercher dans le projet (loupe)",
       "center": "Aide de GANIS",
       "readStory": "Lire toute l'histoire / quitter la lecture"
     },
@@ -240,7 +246,7 @@
     "description": "Ce qui a changé dans GANIS, version par version.",
     "version": "Version {{version}}",
     "releases": {
-      "v0_1_0": {
+      "v1_0_0": {
         "title": "Clarté et sécurité",
         "items": [
           "Une petite fenêtre explique l'espace public (partagé sur cet ordinateur, non chiffré) au clic sur « Commencer » ; le badge « Espace public » la rouvre.",
@@ -250,8 +256,8 @@
           "Les messages distinguent vraiment le singulier et le pluriel.",
           "Édition › Coller fonctionne depuis le menu.",
           "Nouveau : Aide › Signaler un problème, pour copier les informations techniques utiles.",
-        "Les messages d'enregistrement (réussite ou échec) s'affichent en notification en bas de l'écran : la page ne bouge plus.",
-        "Double-clic : sur une ligne du plan, de l'avancement ou de l'historique, et dans le sommaire de lecture, il ouvre la fiche ; sur l'en-tête d'une piste de la trame, il la renomme."
+          "Les messages d'enregistrement (réussite ou échec) s'affichent en notification en bas de l'écran : la page ne bouge plus.",
+          "Double-clic : sur une ligne du plan, de l'avancement ou de l'historique, et dans le sommaire de lecture, il ouvre la fiche ; sur l'en-tête d'une piste de la trame, il la renomme."
         ]
       }
     }
@@ -297,8 +303,9 @@
         "title": "L'espace de travail",
         "intro": "Un projet s'ouvre dans l'espace de travail : modules à gauche, panneau au milieu, onglets au centre.",
         "items": [
-          "La barre de gauche donne accès aux modules : Détails, Personnages, Lieux, Découpage, Notes, Recherche, et les paramètres du projet en bas.",
+          "La barre de gauche donne accès aux modules : Détails, Personnages, Lieux, Découpage, Notes, et les paramètres du projet en bas. La loupe, en haut à droite (Ctrl+F), ouvre la recherche.",
           "Le panneau du milieu liste les fonctions du module et ses éléments ; un clic ouvre un onglet. Glissez son bord droit pour l'élargir, ou vers la gauche pour le fermer.",
+          "Un simple clic dans le panneau du milieu ouvre un onglet d'aperçu (titre en italique), remplacé par le prochain ; un double-clic, une modification ou l'épinglage le gardent. Réglable dans Paramètres › Apparence.",
           "Les onglets se déplacent par glisser-déposer. Clic droit sur un onglet : l'épingler, fermer les autres, ceux à droite…",
           "Un point ● sur un onglet signale des modifications non enregistrées. La barre d'état, en bas, indique toujours si tout est enregistré.",
           "Ctrl+K ouvre la palette : tapez le nom d'une page, d'une action ou d'un élément pour y aller directement."
@@ -308,8 +315,10 @@
         "title": "Détails du projet",
         "intro": "L'accueil du projet résume votre histoire ; le synopsis la raconte.",
         "items": [
-          "Accueil du projet : description, type, statut et aperçu du synopsis.",
+          "Accueil du projet : logo, description, type, statut et aperçu du synopsis.",
+          "Galerie : le logo du projet (affiché sur l'accueil, à côté du nom ; il garde sa forme, même s'il est long) et les images de l'univers et de l'histoire (affiches, cartes du monde, ambiances, croquis…), 30 au maximum, glisser-déposer accepté.",
           "Synopsis : le résumé de l'histoire, avec ses genres, sous-genres et son ton.",
+          "Glossaire : les termes propres à l'histoire (mots inventés, lieux, concepts, titres…), par ordre alphabétique, avec leur définition, une catégorie et des liens vers les fiches.",
           "Historique : tout ce qui a été créé, modifié, supprimé ou restauré dans le projet, jour par jour.",
           "Corbeille : les éléments supprimés depuis moins de 30 jours, à restaurer."
         ]
@@ -322,7 +331,9 @@
           "Image principale et galerie de références : glissez des images directement sur la fiche.",
           "Relations : liens familiaux, amicaux, rivalités… Le graphe des relations montre tout le monde d'un coup d'œil ; les personnages s'y déplacent librement.",
           "Lieux : où le personnage vit, travaille, a grandi — avec, si vous le souhaitez, la période du récit concernée.",
-          "Palette de couleurs : ses couleurs encadrent le portrait du personnage."
+          "Palette de couleurs : ses couleurs encadrent le portrait du personnage.",
+          "Pouvoirs : pour les histoires où les personnages ont des pouvoirs, des dons ou de la magie, activez la carte « Pouvoirs » dans Paramètres du projet › Personnages. Elle s'ajoute à toutes les fiches, quel que soit le niveau de détail.",
+          "Arbre généalogique : dans Relations, disposition « Arbre », choisissez un personnage pour voir sa famille seulement, génération par génération, d'après les relations « Famille » dont le lien est précisé. Un grand-parent, un oncle ou un cousin relié sans les personnes d'entre eux fait apparaître ces membres en fantômes « Non mentionné ». Un double clic sur une personne ouvre sa fiche."
         ]
       },
       "locations": {
@@ -335,15 +346,59 @@
           "Palette de couleurs : comme pour les personnages, ses couleurs encadrent l'image du lieu."
         ]
       },
-      "world": {
-        "title": "Objets, faune et flore",
-        "intro": "Des modules facultatifs, activés dans les paramètres du projet, construits comme les lieux.",
+      "items": {
+        "title": "Objets",
+        "intro": "Les objets de votre histoire : armes, véhicules, vêtements, téléphones, objets magiques…",
         "items": [
-          "Activez Objets ou Faune et flore dans Paramètres du projet : le module apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
-          "Choisissez les catégories utiles (armes, véhicules, magie… ; faune, flore) : seules celles-ci sont proposées à la création. Vous pouvez aussi ajouter vos propres types.",
-          "Faune et flore : une fiche est soit une espèce entière, soit un animal ou une plante précis, rangé sous son espèce.",
+          "Module facultatif : activez-le dans Paramètres du projet › Objets, il apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
+          "Choisissez les catégories utiles (armes, véhicules, magie…) : seules celles-ci sont proposées à la création. Vous pouvez aussi ajouter vos propres types.",
+          "Le type choisit les champs de la fiche : une arme n'a pas les mêmes informations qu'un véhicule.",
+          "Un objet peut être rangé dans un autre (une clé dans un coffre, un moteur dans un vaisseau) : le panneau les montre en arbre.",
+          "« Liens avec l'univers » relie l'objet à qui le possède, l'utilise ou le recherche, et au lieu où il se trouve, avec une période du récit si besoin (un objet qui change de main)."
+        ]
+      },
+      "species": {
+        "title": "Faune et flore",
+        "intro": "Les animaux et les plantes de votre univers, de l'espèce entière à l'individu qui a son nom.",
+        "items": [
+          "Module facultatif : activez-le dans Paramètres du projet › Faune et flore, il apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
+          "Choisissez la faune, la flore ou les deux. Vous pouvez aussi ajouter vos propres types.",
+          "Une fiche est soit une espèce entière (les loups gris), soit un animal ou une plante précis (Éclair, le cheval du héros), rangé sous son espèce.",
           "Un animal précis peut aussi être un personnage : « Créer sa fiche de personnage » ou l'associer à un personnage existant. La fiche du personnage le montre en retour.",
-          "La carte « Liens avec des objets et des espèces » relie ces fiches aux personnages, aux lieux et entre elles, avec une période du récit si besoin (un objet qui change de main)."
+          "« Liens avec l'univers » indique où il vit, de quoi il se nourrit, à qui il appartient et ce qu'on en fait."
+        ]
+      },
+      "factions": {
+        "title": "Factions",
+        "intro": "Les groupes qui font bouger votre histoire : guildes, ordres, clans, armées, cultes, sociétés secrètes…",
+        "items": [
+          "Module facultatif : activez-le dans Paramètres du projet › Factions, il apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
+          "Choisissez les catégories utiles (pouvoir politique, armée, religion, crime…). Le type choisit les champs : une armée a ses forces, une religion ses dogmes et ses rites.",
+          "Une faction peut avoir des branches : la section d'un ordre, la cellule d'un réseau, la famille d'un clan.",
+          "Ses chefs, ses fondateurs, ses membres et ses soutiens sont dans « Liens avec l'univers », avec les personnages. Le rôle précis (capitaine, espion…) se note dans la précision du lien.",
+          "« Liens avec l'univers » note aussi ses alliés, ses ennemis, son siège, les lieux où elle est implantée et ce qu'elle contrôle, avec une période du récit si besoin."
+        ]
+      },
+      "peoples": {
+        "title": "Peuples, cultures et religions",
+        "intro": "L'âme de votre univers : ses peuples et ses races, leurs cultures, leurs langues et leurs croyances.",
+        "items": [
+          "Module facultatif : activez-le dans Paramètres du projet › Peuples, cultures et religions, il apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
+          "Trois catégories : peuples et races, cultures et traditions (dont les langues), religions et croyances (panthéons, divinités, mythologies, prophéties). Le type choisit les champs.",
+          "Une fiche peut en contenir d'autres : un sous-peuple dans son peuple, une branche dans sa religion, une divinité dans son panthéon.",
+          "« Liens avec l'univers » regroupe les membres, les pratiquants, les locuteurs et les fidèles, où vit un peuple et les pouvoirs qu'il maîtrise.",
+          "Pas de doublon avec les Factions : une religion (ses croyances, ses rites) est ici, l'église ou le culte qui l'organise reste une faction, reliée par « pratique »."
+        ]
+      },
+      "magic": {
+        "title": "Magie et pouvoirs",
+        "intro": "Les règles communes du pouvoir dans votre univers : d'où il vient, ce qu'il coûte, ses limites, ses écoles et ses techniques.",
+        "items": [
+          "Module facultatif : activez-le dans Paramètres du projet › Magie et pouvoirs, il apparaît dans la barre de gauche. Le désactiver ne supprime rien.",
+          "Trois niveaux : le système (magie, énergie intérieure, super-pouvoirs, pouvoir divin, psychisme, alchimie), ses écoles et branches (éléments, lignées), puis ses sorts et techniques.",
+          "Le type choisit les champs : un système a sa source, ses règles, son coût et ses limites ; une technique ses effets, sa puissance, sa portée et ses risques.",
+          "« Liens avec l'univers » regroupe ceux qui la maîtrisent et ceux qui l'enseignent, ce qui en est la source et qui l'interdit.",
+          "Pas de doublon : les pouvoirs propres d'un personnage restent sur sa carte « Pouvoirs » ; reliez-le au système par « maîtrise »."
         ]
       },
       "structure": {
@@ -352,11 +407,15 @@
         "items": [
           "Roman : parties, chapitres, scènes. Film : actes, séquences, scènes. Manga : tomes, chapitres, pages… Les noms se changent dans les paramètres du projet.",
           "Les numéros se calculent seuls ; vous pouvez sortir un élément de la numérotation (prologue, interlude).",
+          "La fiche d'un élément réunit tous ses liens dans « Liens avec l'univers », rangés par sorte : personnages (point de vue, présents…), lieux, et fiches du monde (un objet au cœur de la scène, une faction présente, une magie citée). « Ajouter un lien », dans le titre de la carte, propose la sorte puis l'élément et son rôle ; le crayon d'une ligne change le rôle ou retire le lien. Une fiche du monde peut aussi se lier à un élément depuis sa section « Récit ».",
           "La numérotation automatique (renumérotation à chaque déplacement) s'active dans les paramètres du projet, tout comme la couleur de chaque niveau.",
-          "La fiche d'un élément montre son résumé, ses personnages (point de vue, présents…) et ses lieux.",
+          "La fiche d'un élément montre son résumé et ses liens avec l'univers.",
           "Documents : dans la fiche d'un élément, rangez ses fichiers (pages de manga, PDF, Word, images, sons…) avec « Ajouter des fichiers » ou par glisser-déposer. Ils sont rangés dans le projet (chiffrés si le projet est privé) et exportés dans le .ganix.",
           "Cliquez sur un document pour le lire dans GANIS ; « Lire les pages » enchaîne les images d'un chapitre. « Modifier dans l'application » l'ouvre dans Word, Acrobat, Clip Studio… : chaque enregistrement est repris, l'ancien contenu reste dans les versions.",
           "Manga / BD : Scénario › Chemin de fer montre les pages d'un tome en planches, dans le sens de lecture choisi. Une page affiche le dessin rangé sur sa fiche ; à défaut, les dessins rangés sur le chapitre sont répartis dans l'ordre. La première page imprimée décide des vis-à-vis : une révélation prévue au tourné sur une page paire est signalée.",
+          "Manga / BD : les pages hors récit (couverture, page de titre, sommaire, crédits, bonus, postface…) s'ajoutent sous le chemin de fer. Elles prennent leur place dans les planches et dans les folios ; les couvertures sont à part, sans folio.",
+          "Manga / BD : Scénario › Suivi de fabrication donne l'étape de chaque page (storyboard, crayonné, encrage, trames, lettrage, validée), une page ou toute une sélection à la fois. Le chemin de fer peut afficher ces étapes en couleur (« Afficher : Fabrication »).",
+          "Manga / BD : « Exporter le scénario », dans le chemin de fer, enregistre le scénario du tome pour le dessinateur (Word, PDF ou texte) : personnages et lieux en tête, pages hors récit, folio de chaque page, cases et textes.",
           "Manga / BD : la fiche d'un chapitre crée ses pages en une fois (« Ajouter des pages »). Rangez chaque dessin sur la fiche de sa page : il s'affiche à côté des cases, et « Lire les pages » du chapitre les enchaîne. Les cases sont trouvées par la recherche et gardées dans les versions de la page."
         ]
       },
@@ -379,7 +438,7 @@
           "Tirez la poignée ronde d'une carte vers une autre pour créer un lien : impact, influence ou croisement.",
           "Reliez chaque événement au projet : point de vue, personnages présents, lieu, chapitre du découpage et notes.",
           "« Lecture de l'histoire » affiche les événements dans l'ordre du lecteur (par défaut celui du découpage) avec tout ce qui s'y rattache, documents du chapitre compris.",
-          "Les fiches des personnages, des lieux et des éléments du découpage montrent leurs événements dans « Dans la trame ».",
+          "Les fiches des personnages, des lieux, des éléments du découpage et du monde (objets, factions…) montrent leurs événements dans leur section « Trame ». Dans le panneau d'un événement, « Objets, faune et flore, factions… » y ajoute des fiches du monde.",
           "Ctrl+Z annule chaque geste sur le plateau. Le bouton « Tension » affiche la courbe de tension ; les couleurs des trames se règlent dans Paramètres du projet › Trame."
         ]
       },
@@ -397,9 +456,9 @@
         "title": "Recherche",
         "intro": "Retrouvez n'importe quoi dans le projet.",
         "items": [
-          "Le module Recherche cherche dans les personnages, les lieux, le découpage, les notes (contenu compris) et les post-it.",
+          "La loupe en haut à droite, ou Ctrl+F, ouvre la recherche dans le panneau du milieu. Elle cherche dans les personnages, les lieux, le découpage, les notes (contenu compris) et les post-it.",
           "Les accents et les majuscules ne comptent pas : « chateau » trouve « Château ». Plusieurs mots : tous doivent apparaître.",
-          "Ctrl+K fait la même chose depuis n'importe où, et propose aussi les pages et les actions."
+          "Ctrl+K ouvre la palette, qui propose aussi les pages et les actions."
         ]
       },
       "history": {
@@ -428,7 +487,7 @@
         "intro": "Deux niveaux de réglages.",
         "items": [
           "Paramètres du projet (en bas de la barre de gauche) : informations, statuts, niveau de détail des personnages, types de lieux, découpage et couleurs.",
-          "Objets, Faune et flore : activer ces modules facultatifs et choisir leurs catégories.",
+          "Objets, Faune et flore, Factions : activer ces modules facultatifs et choisir leurs catégories.",
           "Paramètres généraux (roue dentée en haut) : compte, mot de passe, clé de récupération, langue, thème, enregistrement automatique.",
           "Packages : des thèmes de couleurs pour toute l'application."
         ]
@@ -501,8 +560,8 @@
           "a": "Paramètres › Compte › Verrouillage automatique : choisissez un délai. Passé ce délai sans activité, votre mot de passe est demandé pour reprendre ; vos onglets restent ouverts."
         },
         {
-          "q": "Je ne trouve pas les objets ni la faune et flore.",
-          "a": "Ces modules sont masqués par défaut. Ouvrez Paramètres du projet › Objets (ou Faune et flore) et activez-les : ils apparaissent dans la barre de gauche, sous Lieux."
+          "q": "Je ne trouve pas les objets, la faune et flore ni les factions.",
+          "a": "Ces modules sont masqués par défaut. Ouvrez Paramètres du projet › Objets (ou Faune et flore, ou Factions) et activez-les : ils apparaissent dans la barre de gauche, sous Lieux."
         },
         {
           "q": "Mon animal parle et a des relations : personnage ou animal ?",

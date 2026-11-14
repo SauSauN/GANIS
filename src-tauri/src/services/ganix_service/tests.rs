@@ -164,7 +164,7 @@
     async fn stage(path: &Path) -> AppResult<(Manifest, Counts)> {
         let dir = temp_dir("stage");
         let result = stage_files(&dir, path).await;
-        std::fs::remove_dir_all(dir).unwrap();
+        crate::utils::remove_dir_eventually(dir).await;
         result
     }
 
@@ -257,7 +257,7 @@
         assert!(!staging.join(STAGED_ASSETS).exists());
 
         source.close().await;
-        std::fs::remove_dir_all(dir).unwrap();
+        crate::utils::remove_dir_eventually(dir).await;
     }
 
     #[tokio::test]
@@ -291,7 +291,7 @@
         rebuilt.close().await;
 
         source.close().await;
-        std::fs::remove_dir_all(dir).unwrap();
+        crate::utils::remove_dir_eventually(dir).await;
     }
 
     #[tokio::test]
@@ -355,7 +355,7 @@
         let result = key(stage(&path).await);
         assert!(result.contains("ganix.unsafe"), "{result}");
 
-        std::fs::remove_dir_all(dir).unwrap();
+        crate::utils::remove_dir_eventually(dir).await;
     }
 
     #[tokio::test]
@@ -392,7 +392,7 @@
         drop(conn);
         pool.close().await;
 
-        std::fs::remove_dir_all(dir).unwrap();
+        crate::utils::remove_dir_eventually(dir).await;
     }
 
     #[tokio::test]
@@ -430,7 +430,7 @@
             assert!(result.contains(expected), "cas {i} : {result}");
         }
 
-        std::fs::remove_dir_all(dir).unwrap();
+        crate::utils::remove_dir_eventually(dir).await;
     }
 
     #[tokio::test]
@@ -462,7 +462,11 @@
         let build: Vec<_> = seen.iter().filter(|p| p.stage == Stage::Build).collect();
         let last = build.last().unwrap();
         assert!(last.total > 0 && last.done == last.total);
+        drop(seen);
 
-        std::fs::remove_dir_all(staging).unwrap();
-        std::fs::remove_dir_all(dir).unwrap();
+        // La base source reste ouverte jusqu'ici : la fermer avant d'effacer
+        // son dossier (sinon Windows refuse la suppression).
+        source.close().await;
+        crate::utils::remove_dir_eventually(staging).await;
+        crate::utils::remove_dir_eventually(dir).await;
     }

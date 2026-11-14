@@ -90,7 +90,10 @@
     "descriptionTooLong": "Project description cannot exceed 5000 characters.",
     "dataMissing": "This project's data cannot be found.",
     "purgePublicConfirm": "This public project is shared with the other people who use this computer: confirm its permanent deletion.",
-    "makePrivateConfirm": "To make this project private, type its name again: other people who use this computer will no longer have access to it."
+    "makePrivateConfirm": "To make this project private, type its name again: other people who use this computer will no longer have access to it.",
+    "imageNotFound": "Image not found.",
+    "galleryFull": "The gallery is full ({{max}} images at most).",
+    "captionTooLong": "The caption cannot exceed {{max}} characters."
   },
   "synopsis": {
     "tooManyTags": "{{field}}: {{max}} items maximum.",
@@ -221,6 +224,16 @@
     "invalidGeometry": "Invalid sticky note position or size.",
     "folderCycle": "A folder cannot be moved into one of its own subfolders."
   },
+  "glossary": {
+    "notFound": "This term no longer exists.",
+    "termEmpty": "The term cannot be empty.",
+    "termTooLong": "The term must not exceed {{max}} characters.",
+    "categoryTooLong": "The category must not exceed {{max}} characters.",
+    "definitionTooLong": "The definition must not exceed {{max}} characters.",
+    "tooManyLinks": "A term can link to {{max}} sheets at most.",
+    "invalidLink": "Unknown sheet type.",
+    "linkNotFound": "One of the linked sheets no longer exists."
+  },
   "trash": {
     "notFound": "This item is no longer in the trash.",
     "unreadable": "This trash item cannot be read.",
@@ -337,7 +350,8 @@
     "search": "Search failed.",
     "manuscript": "Unable to assemble the manuscript.",
     "world": "Couldn’t load objects or fauna and flora.",
-    "worldLinks": "Couldn’t load links between elements."
+    "worldLinks": "Couldn’t load links between elements.",
+    "glossary": "Couldn’t load the glossary."
   },
   "novel": {
     "contentTooLong": "This text is too long (at most {{max}} characters).",
@@ -366,7 +380,20 @@
     "invalidThreshold": "Invalid threshold.",
     "unknownCharacter": "A character on this page no longer exists.",
     "unknownLocation": "The chosen location no longer exists.",
-    "panelNotFound": "This panel no longer exists."
+    "panelNotFound": "This panel no longer exists.",
+    "invalidStage": "Unknown production step.",
+    "invalidExtraKind": "Unknown page type.",
+    "invalidPlacement": "Invalid position: before or after the story.",
+    "coverPlacement": "The cover goes before the story, the back cover after it.",
+    "coverExists": "This volume already has this cover.",
+    "extraNotFound": "This page no longer exists.",
+    "extraTitleTooLong": "The title must not exceed {{max}} characters.",
+    "tooManyExtras": "A volume can have at most {{max}} non-story pages.",
+    "extraOtherVolume": "This page belongs to another volume.",
+    "tooManyPages": "Too many pages at once (at most {{max}}).",
+    "artTooLarge": "The image is too large (at most {{max}} MB).",
+    "artNotImage": "This file is not an image (PNG, JPEG, GIF or WebP).",
+    "noArt": "This page has no art."
   },
   "world": {
     "notFound": "Entry not found.",
@@ -411,5 +438,8 @@
   },
   "demo": {
     "unknown": "This example project does not exist."
+  },
+  "sheets": {
+    "invalidModule": "Unknown module."
   }
 }

@@ -1,23 +1,26 @@
-//! Objets, faune et flore, et factions d'un projet (base du projet).
+//! Objets, faune et flore, factions, peuples et magie d'un projet (base du projet).
 //!
-//! # Trois modules, un seul moteur
+//! # Cinq modules, un seul moteur
 //!
 //! Les **objets** (`items` : armes, véhicules, vêtements, téléphones…), la
-//! **faune et flore** (`species` : animaux, plantes) et les **factions**
-//! (`factions` : guildes, ordres, clans, cultes…) fonctionnent comme les
+//! **faune et flore** (`species` : animaux, plantes), les **factions**
+//! (`factions` : guildes, ordres, clans, cultes…), les **peuples, cultures et
+//! religions** (`peoples`) et les **systèmes de magie ou de pouvoirs**
+//! (`magic_systems` : systèmes, écoles, techniques) fonctionnent comme les
 //! lieux (`location_service`) : un type rangé dans une catégorie, une fiche
 //! en trois couches de champs (communs, de la catégorie, du type) gardée en
 //! JSON, une image principale, une galerie, des types ajoutés par l'auteur,
 //! une liste de statuts personnalisable et un niveau de détail.
 //!
-//! Ce fichier les gère tous les trois ; seuls les noms de tables et le
+//! Ce fichier les gère tous les cinq ; seuls les noms de tables et le
 //! catalogue changent (voir [`Module`]). Les catalogues sont lus à la fois
 //! par l'interface et par Rust : `src/lib/itemCatalog.json`,
-//! `src/lib/speciesCatalog.json` et `src/lib/factionCatalog.json`.
+//! `src/lib/speciesCatalog.json`, `src/lib/factionCatalog.json`,
+//! `src/lib/peopleCatalog.json` et `src/lib/magicCatalog.json`.
 //!
 //! # Activation
 //!
-//! Les trois modules sont **désactivés par défaut**. L'auteur les active dans
+//! Les cinq modules sont **désactivés par défaut**. L'auteur les active dans
 //! Paramètres du projet et choisit les catégories qu'il veut utiliser
 //! (`*_settings.enabled`, `*_settings.categories`). Désactiver un module ne
 //! supprime rien : il est seulement masqué.
@@ -74,6 +77,10 @@ pub enum Module {
     Item,
     Species,
     Faction,
+    /// Peuples, cultures et religions.
+    People,
+    /// Systèmes de magie ou de pouvoirs.
+    Magic,
 }
 
 /// Noms des tables et colonnes d'un module (constantes : jamais saisies).
@@ -110,12 +117,30 @@ const FACTION_SPEC: Spec = Spec {
     fk: "faction_id",
 };
 
+const PEOPLE_SPEC: Spec = Spec {
+    table: "peoples",
+    settings: "people_settings",
+    portraits: "people_portraits",
+    images: "people_images",
+    fk: "people_id",
+};
+
+const MAGIC_SPEC: Spec = Spec {
+    table: "magic_systems",
+    settings: "magic_settings",
+    portraits: "magic_portraits",
+    images: "magic_images",
+    fk: "magic_id",
+};
+
 impl Module {
     fn spec(self) -> &'static Spec {
         match self {
             Module::Item => &ITEM_SPEC,
             Module::Species => &SPECIES_SPEC,
             Module::Faction => &FACTION_SPEC,
+            Module::People => &PEOPLE_SPEC,
+            Module::Magic => &MAGIC_SPEC,
         }
     }
 
@@ -125,6 +150,8 @@ impl Module {
             Module::Item => "item",
             Module::Species => "species",
             Module::Faction => "faction",
+            Module::People => "people",
+            Module::Magic => "magic",
         }
     }
 
@@ -156,6 +183,20 @@ impl Module {
                         .expect("src/lib/factionCatalog.json invalide (voir le test catalogs_are_consistent)")
                 })
             }
+            Module::People => {
+                static CATALOG: OnceLock<Catalog> = OnceLock::new();
+                CATALOG.get_or_init(|| {
+                    serde_json::from_str(include_str!("../../../src/lib/peopleCatalog.json"))
+                        .expect("src/lib/peopleCatalog.json invalide (voir le test catalogs_are_consistent)")
+                })
+            }
+            Module::Magic => {
+                static CATALOG: OnceLock<Catalog> = OnceLock::new();
+                CATALOG.get_or_init(|| {
+                    serde_json::from_str(include_str!("../../../src/lib/magicCatalog.json"))
+                        .expect("src/lib/magicCatalog.json invalide (voir le test catalogs_are_consistent)")
+                })
+            }
         }
     }
 
@@ -164,7 +205,8 @@ impl Module {
         !self.catalog().natures.is_empty()
     }
 
-    pub const ALL: [Module; 3] = [Module::Item, Module::Species, Module::Faction];
+    #[cfg(test)]
+    pub const ALL: [Module; 5] = [Module::Item, Module::Species, Module::Faction, Module::People, Module::Magic];
 }
 
 // ----------------------------------------------------------------------------
@@ -1475,6 +1517,49 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn peoples_and_magic_have_their_own_fields_and_branches() {
+        let pool = pool().await;
+
+        // Peuple : champs de la catégorie, choix contrôlé, sous-peuple.
+        let elves = create_entry(&pool, Module::People, &input("Elfes", "fantasyRace")).await.unwrap();
+        assert_eq!(elves.status, "living");
+        let mut changed = input("Elfes", "fantasyRace");
+        changed.fields.insert("lifespan".to_owned(), "Mille ans".to_owned());
+        changed.fields.insert("spread".to_owned(), "continental".to_owned());
+        let saved = update_entry(&pool, Module::People, &elves.id, &changed).await.unwrap();
+        assert_eq!(saved.fields["lifespan"], "Mille ans");
+        let mut bad = input("X", "religion");
+        bad.fields.insert("spread".to_owned(), "galactique".to_owned());
+        assert!(create_entry(&pool, Module::People, &bad).await.is_err());
+        // Un type d'un autre module (tribu : faction) est refusé.
+        assert!(create_entry(&pool, Module::People, &input("X", "tribe")).await.is_err());
+        let wood = create_entry(&pool, Module::People, &WorldEntryInput { parent_id: Some(elves.id.clone()), ..input("Elfes des bois", "fantasyRace") })
+            .await
+            .unwrap();
+        assert_eq!(wood.parent_id.as_deref(), Some(elves.id.as_str()));
+
+        // Magie : un système, une école dedans, une technique dans l'école.
+        let nen = create_entry(&pool, Module::Magic, &input("Nen", "energySystem")).await.unwrap();
+        assert_eq!(nen.status, "active");
+        let school = create_entry(&pool, Module::Magic, &WorldEntryInput { parent_id: Some(nen.id.clone()), ..input("Renforcement", "school") })
+            .await
+            .unwrap();
+        let mut spell = WorldEntryInput { parent_id: Some(school.id.clone()), ..input("Poing de fer", "technique") };
+        spell.fields.insert("power".to_owned(), "major".to_owned());
+        spell.fields.insert("cost".to_owned(), "Épuise l'aura".to_owned());
+        let spell = create_entry(&pool, Module::Magic, &spell).await.unwrap();
+        assert_eq!(spell.fields["power"], "major");
+        assert!(create_entry(&pool, Module::Magic, &input("X", "sword")).await.is_err());
+
+        // Le système supprimé : l'école remonte, puis revient avec la corbeille.
+        let trash = delete_entry(&pool, Module::Magic, &nen.id).await.unwrap();
+        assert_eq!(get_entry(&pool, Module::Magic, &school.id).await.unwrap().parent_id, None);
+        trash_service::restore(&pool, &trash).await.unwrap();
+        assert_eq!(get_entry(&pool, Module::Magic, &school.id).await.unwrap().parent_id, Some(nen.id.clone()));
+        assert_eq!(list_entries(&pool, Module::Magic).await.unwrap().len(), 3);
+    }
+
+    #[tokio::test]
     async fn items_are_created_updated_and_deleted() {
         let pool = pool().await;
         let m = Module::Item;
@@ -1642,7 +1727,13 @@ mod tests {
         let pool = pool().await;
 
         for module in Module::ALL {
-            let kind = if module == Module::Item { "phone" } else { "tree" };
+            let kind = match module {
+                Module::Item => "phone",
+                Module::Species => "tree",
+                Module::Faction => "guild",
+                Module::People => "fantasyRace",
+                Module::Magic => "spell",
+            };
             let entry = create_entry(&pool, module, &input("Élément", kind)).await.unwrap();
             let png = BASE64.encode(PNG);
 
@@ -1681,7 +1772,13 @@ mod tests {
         let pool = pool().await;
 
         for module in Module::ALL {
-            let kind = if module == Module::Item { "hat" } else { "flower" };
+            let kind = match module {
+                Module::Item => "hat",
+                Module::Species => "flower",
+                Module::Faction => "nobleHouse",
+                Module::People => "religion",
+                Module::Magic => "school",
+            };
             let mut entry = input("Avec palette", kind);
             entry.fields.insert("colorPalette".to_owned(), r##"[" #AA3366 ","#00ff00"]"##.to_owned());
             let saved = create_entry(&pool, module, &entry).await.unwrap();

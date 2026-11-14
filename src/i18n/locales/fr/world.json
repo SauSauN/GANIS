@@ -33,7 +33,6 @@
   "picker": {
     "search": "Chercher un type…",
     "noResult": "Aucun type ne correspond.",
-    "manage": "Catégories et types personnalisés",
     "change": "Changer",
     "changeTitle": "Changer le type de « {{name}} »",
     "changeDescription": "Les informations déjà saisies sont gardées, même celles qui ne s'appliquent plus au nouveau type.",
@@ -58,6 +57,24 @@
       "none": "Tout en haut",
       "empty": "Rien (tout en haut)",
       "hint": "Un groupe plus large, si vous en avez un : les loups gris dans les canidés."
+    },
+    "faction": {
+      "label": "Branche de",
+      "none": "Faction indépendante",
+      "empty": "Aucune (faction indépendante)",
+      "hint": "La faction dont celle-ci dépend : une section d'un ordre, une cellule d'un réseau, une famille d'un clan."
+    },
+    "people": {
+      "label": "Rattachée à",
+      "none": "Fiche indépendante",
+      "empty": "Aucune (fiche indépendante)",
+      "hint": "Une fiche plus large : un sous-peuple dans son peuple, une branche dans sa religion, une divinité dans son panthéon."
+    },
+    "magic": {
+      "label": "Rattachée à",
+      "none": "Fiche indépendante",
+      "empty": "Aucune (fiche indépendante)",
+      "hint": "Une fiche plus large : une école dans son système, une technique dans son école."
     }
   },
   "sections": {
@@ -95,7 +112,11 @@
     "retry": "Réessayer",
     "noResult": "Aucune fiche ne correspond à votre recherche.",
     "expand": "Déplier",
-    "collapse": "Replier"
+    "collapse": "Replier",
+    "layout": "Affichage",
+    "tree": "Arborescence",
+    "grid": "Cartes",
+    "inside": "dans {{name}}"
   },
   "sidebar": {
     "loading": "Chargement…",
@@ -164,9 +185,7 @@
   },
   "animalCharacter": {
     "title": "Personnage",
-    "description": "Cet animal est-il aussi un personnage de l'histoire ?",
     "linked": "Cet animal est aussi un personnage : relations, scènes et psychologie sont sur sa fiche de personnage.",
-    "open": "Fiche personnage",
     "unlink": "Retirer le lien",
     "unlinkHint": "Redevient un animal tout court ; la fiche de personnage est gardée.",
     "notLinked": "Pour l'instant, c'est un animal tout court. S'il agit dans l'histoire (il a des relations, il apparaît dans des scènes), faites-en aussi un personnage.",
@@ -178,22 +197,21 @@
   },
   "characterAnimal": {
     "title": "Animal",
-    "description": "Ce personnage est-il un animal (ou une plante) de la faune et flore ?",
     "none": "Si ce personnage est un animal, associez-le à sa fiche (un animal précis de la faune et flore).",
     "pickLabel": "Animal ou plante précis",
     "noFree": "Aucun animal précis disponible"
   },
   "links": {
-    "title": "Liens avec des objets et des espèces",
     "description": {
       "character": "Ce qu'il possède, utilise, a fabriqué ou recherche ; ses compagnons et montures.",
       "location": "Les objets qui s'y trouvent, les animaux et les plantes qui y vivent.",
       "item": "À qui il appartient, où il se trouve, de quoi il est fait, à quoi il est lié.",
-      "species": "Où il vit, de quoi il se nourrit, à qui il appartient, ce qu'on en fait."
+      "species": "Où il vit, de quoi il se nourrit, à qui il appartient, ce qu'on en fait.",
+      "faction": "Qui la dirige, qui en fait partie, ses alliés et ses ennemis, son siège, ce qu'elle contrôle.",
+      "people": "Qui en fait partie, qui la pratique ou la parle, où ils vivent, les pouvoirs qu'ils maîtrisent.",
+      "magic": "Qui la maîtrise ou l'enseigne, ce qui en est la source, qui l'interdit."
     },
-    "add": "Lier un élément",
     "edit": "Modifier le lien",
-    "empty": "Aucun lien pour l'instant.",
     "periodBoth": "de {{since}} à {{until}}",
     "periodFrom": "à partir de {{since}}",
     "periodUntil": "jusqu'à {{until}}",
@@ -201,7 +219,10 @@
       "character": "Personnage",
       "location": "Lieu",
       "item": "Objet",
-      "species": "Faune et flore"
+      "species": "Faune et flore",
+      "faction": "Faction",
+      "people": "Peuple, culture ou religion",
+      "magic": "Magie ou pouvoir"
     },
     "types": {
       "owns": {
@@ -255,6 +276,78 @@
       "other": {
         "forward": "autre lien avec",
         "backward": "autre lien avec"
+      },
+      "leads": {
+        "forward": "dirige",
+        "backward": "est dirigée par"
+      },
+      "memberOf": {
+        "forward": "fait partie de",
+        "backward": "compte parmi ses membres"
+      },
+      "founded": {
+        "forward": "a fondé",
+        "backward": "a été fondée par"
+      },
+      "supports": {
+        "forward": "soutient",
+        "backward": "est soutenue par"
+      },
+      "allyOf": {
+        "forward": "est alliée de",
+        "backward": "est alliée de"
+      },
+      "enemyOf": {
+        "forward": "est ennemi de",
+        "backward": "est l'ennemie de"
+      },
+      "basedIn": {
+        "forward": "a son siège à",
+        "backward": "abrite le siège de"
+      },
+      "presentIn": {
+        "forward": "est implantée à",
+        "backward": "accueille"
+      },
+      "controls": {
+        "forward": "contrôle",
+        "backward": "est contrôlé par"
+      },
+      "belongsTo": {
+        "forward": "appartient à",
+        "backward": "compte parmi les siens"
+      },
+      "practices": {
+        "forward": "pratique / croit en",
+        "backward": "est pratiquée par"
+      },
+      "speaks": {
+        "forward": "parle",
+        "backward": "est parlée par"
+      },
+      "worships": {
+        "forward": "vénère",
+        "backward": "est vénérée par"
+      },
+      "masters": {
+        "forward": "maîtrise",
+        "backward": "est maîtrisée par"
+      },
+      "teaches": {
+        "forward": "enseigne",
+        "backward": "est enseignée par"
+      },
+      "sourceOf": {
+        "forward": "est une source de",
+        "backward": "puise sa force dans"
+      },
+      "grants": {
+        "forward": "accorde",
+        "backward": "est accordée par"
+      },
+      "forbids": {
+        "forward": "interdit",
+        "backward": "est interdite par"
       }
     },
     "dialog": {
@@ -265,7 +358,7 @@
       "element": "Élément",
       "choose": "Choisir…",
       "noneOfKind": "Aucun élément de cette sorte",
-      "noKinds": "Activez les objets ou la faune et la flore dans les paramètres du projet pour créer des liens.",
+      "noKinds": "Activez un module du monde (objets, faune et flore, factions, peuples, magie) dans les paramètres du projet pour créer des liens.",
       "type": "Nature du lien",
       "label": "Précision (facultatif)",
       "labelPlaceholder": "Ex. Héritée de son père",
@@ -279,11 +372,35 @@
       "create": "Créer le lien"
     }
   },
+  "universe": {
+    "title": "Liens avec l'univers",
+    "description": {
+      "character": "Tout ce qui relie ce personnage au monde : ses relations, ses lieux, les objets, la faune et la flore, les factions, les peuples et la magie.",
+      "location": "Qui y vit, y règne ou en est originaire ; les objets qui s'y trouvent, la faune et la flore qui y vivent, les factions et les peuples qui y sont."
+    },
+    "add": "Ajouter un lien",
+    "empty": "Aucun lien pour l'instant.",
+    "animalLabel": "est l'animal",
+    "animalAdd": "Ce personnage est un animal…",
+    "animalEdit": "Modifier le lien avec la faune et flore",
+    "groups": {
+      "character": "Personnages",
+      "location": "Lieux",
+      "species": "Faune et flore",
+      "item": "Objets",
+      "faction": "Factions",
+      "people": "Peuples, cultures et religions",
+      "magic": "Magie et pouvoirs"
+    },
+    "characterLabel": "est le personnage",
+    "characterEdit": "Modifier le lien avec le personnage",
+    "characterAdd": "Cet animal est un personnage…"
+  },
   "item": {
     "categories": {
       "weapon": {
         "label": "Armes",
-        "description": "Épées, arcs, armes à feu, explosifs…"
+        "description": "Épées, haches, arcs, armes à feu, explosifs, munitions…"
       },
       "armor": {
         "label": "Armures et protections",
@@ -805,6 +922,641 @@
         "theme": "La profondeur",
         "goal": "Détails propres au type, habitat et légendes",
         "count": "+ 2 à 5 champs"
+      }
+    }
+  },
+  "faction": {
+    "categories": {
+      "political": {
+        "label": "Pouvoir politique",
+        "description": "Gouvernements, conseils, partis, alliances, rébellions…"
+      },
+      "military": {
+        "label": "Forces armées",
+        "description": "Armées, flottes, ordres de chevaliers, mercenaires, gardes…"
+      },
+      "religious": {
+        "label": "Religion",
+        "description": "Églises, cultes, sectes, ordres monastiques…"
+      },
+      "economic": {
+        "label": "Économie",
+        "description": "Guildes, compagnies, ligues marchandes, banques…"
+      },
+      "criminal": {
+        "label": "Crime",
+        "description": "Gangs, mafias, guildes des voleurs, pirates, contrebandiers…"
+      },
+      "secret": {
+        "label": "Sociétés secrètes",
+        "description": "Sociétés secrètes, complots, réseaux d'espions, résistances…"
+      },
+      "family": {
+        "label": "Familles et clans",
+        "description": "Maisons nobles, clans, dynasties, tribus…"
+      },
+      "social": {
+        "label": "Groupes et mouvements",
+        "description": "Écoles, académies, clubs, confréries, mouvements…"
+      }
+    },
+    "types": {
+      "government": "Gouvernement",
+      "council": "Conseil",
+      "party": "Parti",
+      "alliance": "Alliance",
+      "rebellion": "Rébellion",
+      "army": "Armée",
+      "navy": "Flotte",
+      "knightOrder": "Ordre de chevaliers",
+      "mercenaries": "Compagnie de mercenaires",
+      "militia": "Milice",
+      "guard": "Garde",
+      "church": "Église",
+      "cult": "Culte",
+      "sect": "Secte",
+      "monasticOrder": "Ordre monastique",
+      "guild": "Guilde",
+      "company": "Compagnie",
+      "tradeLeague": "Ligue marchande",
+      "bank": "Banque",
+      "gang": "Gang",
+      "mafia": "Mafia",
+      "thievesGuild": "Guilde des voleurs",
+      "pirates": "Pirates",
+      "smugglers": "Contrebandiers",
+      "secretSociety": "Société secrète",
+      "conspiracy": "Complot",
+      "spyNetwork": "Réseau d'espions",
+      "resistance": "Résistance",
+      "nobleHouse": "Maison noble",
+      "clan": "Clan",
+      "dynasty": "Dynastie",
+      "tribe": "Tribu",
+      "school": "École",
+      "academy": "Académie",
+      "club": "Club",
+      "brotherhood": "Confrérie",
+      "movement": "Mouvement"
+    },
+    "statuses": {
+      "active": "Active",
+      "rising": "En pleine ascension",
+      "declining": "En déclin",
+      "underground": "Clandestine",
+      "banned": "Interdite",
+      "dissolved": "Dissoute",
+      "destroyed": "Anéantie",
+      "unknown": "Inconnu"
+    },
+    "fields": {
+      "colorPalette": "Palette de couleurs",
+      "aliases": "Autres noms",
+      "description": "Description",
+      "firstAppearance": "Première apparition",
+      "motto": "Devise",
+      "emblem": "Emblème",
+      "size": "Taille",
+      "influence": "Influence",
+      "goals": "Objectifs",
+      "ideology": "Idéologie",
+      "founded": "Fondation",
+      "history": "Histoire",
+      "notes": "Notes de l'auteur",
+      "powers": "Pouvoirs",
+      "territory": "Territoire",
+      "strength": "Forces",
+      "equipment": "Équipement",
+      "ranks": "Rangs",
+      "deity": "Divinité",
+      "dogmas": "Dogmes",
+      "rites": "Rites",
+      "wealth": "Richesse",
+      "trade": "Commerce",
+      "activities": "Activités",
+      "recognition": "Signes de reconnaissance",
+      "membership": "Conditions d'entrée",
+      "secrets": "Secrets",
+      "lineage": "Lignée",
+      "succession": "Succession",
+      "oath": "Serment",
+      "subjects": "Enseignements",
+      "fleet": "Flotte"
+    },
+    "placeholders": {
+      "aliases": "Ex. Les Manteaux gris",
+      "description": "Ce qu'elle est, ce qu'on en voit, ce qu'on en dit…",
+      "motto": "Ex. Rien ne passe",
+      "emblem": "Ex. Une tour d'argent sur fond noir",
+      "size": "Ex. 300 membres, une poignée d'initiés",
+      "goals": "Ce qu'elle veut obtenir, à court et à long terme…",
+      "ideology": "Ce en quoi elle croit, ce qu'elle défend…",
+      "founded": "Ex. Il y a deux siècles, après la Grande Guerre",
+      "history": "Sa fondation, ses victoires, ses défaites, ses scissions…",
+      "notes": "Idées, questions en suspens…",
+      "powers": "Ce qu'elle décide, qui lui obéit…",
+      "territory": "Ex. Les quartiers du port et la côte sud",
+      "strength": "Ex. 3 000 soldats, 12 navires",
+      "equipment": "Armes, montures, machines de guerre…",
+      "ranks": "Ajouter un rang…",
+      "deity": "Ex. La Déesse aux deux visages",
+      "dogmas": "Ce que ses fidèles doivent croire et respecter…",
+      "rites": "Cérémonies, initiations, sacrifices…",
+      "wealth": "Ex. Immense, en déclin, dissimulée",
+      "trade": "Ajouter une marchandise…",
+      "activities": "Ajouter une activité…",
+      "recognition": "Ex. Un anneau de fer au petit doigt",
+      "membership": "Ex. Être parrainé par deux membres",
+      "secrets": "Ce qu'elle cache, et à qui…",
+      "lineage": "Fondateurs, héritiers, branches de la famille…",
+      "succession": "Ex. Le fils aîné, ou le plus fort au combat",
+      "oath": "Ex. Servir la reine jusqu'à la mort",
+      "subjects": "Ajouter une matière…",
+      "fleet": "Navires, équipages, ports d'attache…"
+    },
+    "options": {
+      "influence": {
+        "local": "Locale",
+        "regional": "Régionale",
+        "national": "Nationale",
+        "continental": "Continentale",
+        "worldwide": "Mondiale"
+      }
+    },
+    "profile": {
+      "new": "Nouvelle faction",
+      "contains_one": "{{count}} branche",
+      "contains_other": "{{count}} branches"
+    },
+    "sections": {
+      "identity": "Ce qui permet de reconnaître la faction et de comprendre ce qu'elle veut.",
+      "story": "Ses convictions, sa fondation, son passé, et vos notes d'auteur.",
+      "gallery": "Jusqu'à 30 images : emblèmes, bannières, uniformes, références."
+    },
+    "form": {
+      "namePlaceholder": "Ex. L'Ordre d'Aval, la Guilde des Ombres, la Maison Venn"
+    },
+    "picker": {
+      "title": "Quel genre de faction ?",
+      "description": "Choisissez un type : la fiche s'adapte (une armée n'a pas les mêmes informations qu'une secte)."
+    },
+    "create": {
+      "save": "Créer la faction",
+      "inside": "Sera une branche de « {{name}} »."
+    },
+    "list": {
+      "create": "Créer une faction",
+      "emptyTitle": "Aucune faction pour l'instant",
+      "emptyDescription": "Guildes, ordres, clans, armées, cultes, sociétés secrètes… Créez les groupes qui font bouger votre histoire.",
+      "count_one": "{{count}} faction",
+      "count_other": "{{count}} factions",
+      "addInside": "Créer une branche de « {{name}} »"
+    },
+    "children": {
+      "title": "Branches",
+      "description": "Les sections, cellules ou familles qui dépendent de « {{name}} ».",
+      "add": "Ajouter une branche",
+      "empty": "Aucune branche."
+    },
+    "sidebar": {
+      "title": "Factions",
+      "empty": "Aucune faction."
+    },
+    "disabled": {
+      "title": "Le module Factions est désactivé",
+      "description": "Vos factions sont gardées. Réactivez le module dans les paramètres du projet pour les retrouver."
+    },
+    "settings": {
+      "title": "Factions et organisations",
+      "description": "Les groupes de votre histoire : guildes, ordres, clans, armées, cultes, sociétés secrètes…",
+      "enable": "Activer les factions",
+      "enabledHint": "Le module « Factions » est dans la barre de gauche.",
+      "disabledHint": "Activez-le pour l'ajouter à la barre de gauche.",
+      "kept_one": "{{count}} faction est gardée et réapparaîtra si vous réactivez le module.",
+      "kept_other": "{{count}} factions sont gardées et réapparaîtront si vous réactivez le module.",
+      "categories": "Ne gardez que ce dont votre histoire a besoin : les autres catégories ne seront pas proposées.",
+      "types": "Ajoutez vos propres types (Conclave, Syndicat…). Chacun est rangé dans une catégorie et en reçoit les champs.",
+      "typePlaceholder": "Ex. Conclave"
+    },
+    "levels": {
+      "title": "Niveau de détail des fiches de factions",
+      "firstTime": "Choisissez le niveau de détail des fiches de factions de ce projet. Il s'applique à toutes les factions et se change dans les paramètres du projet.",
+      "basic": {
+        "label": "Basique",
+        "theme": "L'essentiel",
+        "goal": "Nommer et décrire la faction",
+        "count": "7 champs"
+      },
+      "intermediate": {
+        "label": "Moyen",
+        "theme": "Ce qu'elle veut",
+        "goal": "Objectifs, devise, emblème, influence et champs de la catégorie (forces, dogmes, richesse…)",
+        "count": "+ 8 à 13 champs"
+      },
+      "advanced": {
+        "label": "Avancé",
+        "theme": "La profondeur",
+        "goal": "Idéologie, fondation, histoire et détails propres au type",
+        "count": "+ 3 à 4 champs"
+      }
+    }
+  },
+  "people": {
+    "categories": {
+      "people": {
+        "label": "Peuples et races",
+        "description": "Ethnies, races fantastiques, extraterrestres…"
+      },
+      "culture": {
+        "label": "Cultures et traditions",
+        "description": "Coutumes, fêtes, langues, classes sociales…"
+      },
+      "religion": {
+        "label": "Religions et croyances",
+        "description": "Religions, panthéons, divinités, mythologies…"
+      }
+    },
+    "types": {
+      "ethnicGroup": "Peuple ou ethnie",
+      "fantasyRace": "Race fantastique",
+      "alienCivilization": "Civilisation extraterrestre",
+      "artificialBeings": "Êtres artificiels",
+      "spiritBeings": "Êtres spirituels",
+      "nomadicPeople": "Peuple nomade",
+      "culture": "Culture",
+      "tradition": "Tradition ou fête",
+      "language": "Langue",
+      "socialClass": "Classe sociale ou caste",
+      "religion": "Religion",
+      "pantheon": "Panthéon",
+      "deity": "Divinité",
+      "mythology": "Mythologie",
+      "philosophy": "Philosophie ou courant de pensée",
+      "prophecy": "Prophétie"
+    },
+    "statuses": {
+      "living": "Vivant",
+      "growing": "En expansion",
+      "declining": "En déclin",
+      "endangered": "Menacé",
+      "persecuted": "Persécuté",
+      "extinct": "Disparu",
+      "legendary": "Légendaire",
+      "unknown": "Inconnu"
+    },
+    "fields": {
+      "colorPalette": "Palette de couleurs",
+      "aliases": "Autres noms",
+      "description": "Description",
+      "firstAppearance": "Première apparition",
+      "symbol": "Symbole",
+      "spread": "Étendue",
+      "origins": "Origines",
+      "history": "Histoire",
+      "notes": "Notes de l'auteur",
+      "population": "Population",
+      "appearance": "Apparence",
+      "lifespan": "Espérance de vie",
+      "temperament": "Caractère et tempérament",
+      "society": "Organisation de la société",
+      "customs": "Coutumes et mode de vie",
+      "values": "Valeurs",
+      "arts": "Arts, musique et artisanat",
+      "cuisine": "Cuisine",
+      "clothing": "Vêtements et parures",
+      "beliefs": "Croyances",
+      "followers": "Fidèles",
+      "sacredTexts": "Textes sacrés",
+      "rituals": "Rites et rituels",
+      "afterlife": "Mort et au-delà",
+      "taboos": "Tabous et interdits",
+      "celebrations": "Fêtes et célébrations",
+      "writingSystem": "Écriture",
+      "vocabulary": "Mots et expressions",
+      "pronunciation": "Prononciation",
+      "occasion": "Quand et où",
+      "privileges": "Privilèges et devoirs",
+      "domains": "Domaines",
+      "myths": "Grands mythes",
+      "principles": "Principes",
+      "prophecyText": "Texte de la prophétie",
+      "fulfilment": "Accomplissement"
+    },
+    "placeholders": {
+      "aliases": "Ex. Le Peuple des feuilles, les Aînés",
+      "description": "Qui ils sont, ce qu'on en voit, ce qu'on en dit…",
+      "symbol": "Ex. Une feuille d'argent sur une lune",
+      "origins": "D'où ils viennent, comment tout a commencé…",
+      "history": "Les grandes étapes : migrations, guerres, schismes, âge d'or…",
+      "notes": "Idées, questions en suspens, pistes pour la suite…",
+      "population": "Ex. Quelques milliers, dispersés dans trois royaumes",
+      "appearance": "Ex. Grands et minces, oreilles pointues, yeux couleur d'ambre",
+      "lifespan": "Ex. Environ mille ans",
+      "temperament": "Ex. Patients, fiers, méfiants envers les étrangers",
+      "society": "Qui dirige, comment on prend les décisions, la place de chacun…",
+      "customs": "La vie de tous les jours : habitat, travail, famille, politesse…",
+      "values": "Ex. L'honneur avant la vie, la parole donnée est sacrée",
+      "arts": "Ex. Chants à plusieurs voix, sculpture sur bois vivant",
+      "cuisine": "Ex. Pain de mousse, vin de sève, aucune viande",
+      "clothing": "Ex. Capes tissées de fils d'araignée, tatouages de clan",
+      "beliefs": "Ce que croient les fidèles : la création, le bien, le mal…",
+      "followers": "Ex. La moitié du royaume, surtout dans les campagnes",
+      "sacredTexts": "Ex. Le Livre des Marées, en douze chants",
+      "rituals": "Ex. Prière à l'aube, offrande de sel à chaque nouvelle lune",
+      "afterlife": "Ex. Les âmes rejoignent la mer ; les parjures errent à jamais",
+      "taboos": "Ex. Ne jamais prononcer le nom des morts",
+      "celebrations": "Ex. La Nuit des lanternes, au solstice d'hiver",
+      "writingSystem": "Ex. Runes gravées, lues de droite à gauche",
+      "vocabulary": "Ex. « Ilyan » : ami ; « Vaer na tol » : que la forêt te garde",
+      "pronunciation": "Ex. Le « r » est roulé, « ae » se dit « è »",
+      "occasion": "Ex. Chaque printemps, au pied de l'arbre-mère",
+      "privileges": "Ex. Seuls les nobles portent l'épée ; les serfs ne quittent pas leur terre",
+      "domains": "Ex. Mer, tempêtes, voyageurs",
+      "myths": "Ex. La chute des sept étoiles, la guerre des géants",
+      "principles": "Ex. Le détachement mène à la paix ; rien n'est permanent",
+      "prophecyText": "Ex. « Quand la lune saignera, l'enfant des deux rives se lèvera. »",
+      "fulfilment": "Qui l'accomplit, quand, et si elle était vraie…"
+    },
+    "options": {
+      "spread": {
+        "local": "Locale",
+        "regional": "Régionale",
+        "national": "Nationale",
+        "continental": "Continentale",
+        "worldwide": "Mondiale"
+      }
+    },
+    "profile": {
+      "new": "Nouvelle fiche",
+      "contains_one": "{{count}} fiche rattachée",
+      "contains_other": "{{count}} fiches rattachées"
+    },
+    "sections": {
+      "identity": "Ce qui permet de les reconnaître et de comprendre qui ils sont.",
+      "story": "Leurs origines, leur passé, et vos notes d'auteur.",
+      "gallery": "Jusqu'à 30 images : costumes, symboles, lieux de culte, références."
+    },
+    "form": {
+      "namePlaceholder": "Ex. Les Elfes sylvains, le Culte de la Lune, le Sylvain"
+    },
+    "picker": {
+      "title": "Peuple, culture ou religion ?",
+      "description": "Choisissez un type : la fiche s'adapte (une langue n'a pas les mêmes informations qu'une divinité)."
+    },
+    "create": {
+      "save": "Créer la fiche",
+      "inside": "Sera rattachée à « {{name}} »."
+    },
+    "list": {
+      "create": "Créer une fiche",
+      "emptyTitle": "Aucun peuple, aucune culture ni religion pour l'instant",
+      "emptyDescription": "Peuples et races, cultures, langues, religions et divinités… Créez ce qui fait l'âme de votre univers.",
+      "count_one": "{{count}} fiche",
+      "count_other": "{{count}} fiches",
+      "addInside": "Rattacher une fiche à « {{name}} »"
+    },
+    "children": {
+      "title": "Fiches rattachées",
+      "description": "Les sous-peuples, branches, divinités ou variantes qui dépendent de « {{name}} ».",
+      "add": "Rattacher une fiche",
+      "empty": "Aucune fiche rattachée."
+    },
+    "sidebar": {
+      "title": "Peuples, cultures et religions",
+      "empty": "Aucune fiche."
+    },
+    "disabled": {
+      "title": "Le module Peuples est désactivé",
+      "description": "Vos fiches sont gardées. Réactivez le module dans les paramètres du projet pour les retrouver."
+    },
+    "settings": {
+      "title": "Peuples, cultures et religions",
+      "description": "Les peuples et races de votre univers, leurs cultures, leurs langues et leurs croyances. Les organisations (tribus, clans, églises, cultes) restent dans les Factions.",
+      "enable": "Activer les peuples, cultures et religions",
+      "enabledHint": "Le module « Peuples » est dans la barre de gauche.",
+      "disabledHint": "Activez-le pour l'ajouter à la barre de gauche.",
+      "kept_one": "{{count}} fiche est gardée et réapparaîtra si vous réactivez le module.",
+      "kept_other": "{{count}} fiches sont gardées et réapparaîtront si vous réactivez le module.",
+      "categories": "Ne gardez que ce dont votre histoire a besoin : les autres catégories ne seront pas proposées.",
+      "types": "Ajoutez vos propres types (Dialecte, Ordre de pensée…). Chacun est rangé dans une catégorie et en reçoit les champs.",
+      "typePlaceholder": "Ex. Dialecte"
+    },
+    "levels": {
+      "title": "Niveau de détail des fiches de peuples, cultures et religions",
+      "firstTime": "Choisissez le niveau de détail de ces fiches pour ce projet. Il s'applique à toutes et se change dans les paramètres du projet.",
+      "basic": {
+        "label": "Basique",
+        "theme": "L'essentiel",
+        "goal": "Nommer et décrire",
+        "count": "7 champs"
+      },
+      "intermediate": {
+        "label": "Moyen",
+        "theme": "Ce qui les distingue",
+        "goal": "Symbole, étendue et champs de la catégorie (apparence, coutumes, croyances, rites…)",
+        "count": "+ 11 à 12 champs"
+      },
+      "advanced": {
+        "label": "Avancé",
+        "theme": "La profondeur",
+        "goal": "Origines, histoire et détails propres au type (écriture d'une langue, domaines d'une divinité…)",
+        "count": "+ 2 à 5 champs"
+      }
+    }
+  },
+  "magic": {
+    "categories": {
+      "system": {
+        "label": "Systèmes",
+        "description": "Magie, ki, super-pouvoirs, psychisme, alchimie…"
+      },
+      "branch": {
+        "label": "Écoles et branches",
+        "description": "Écoles, éléments, lignées et dons héréditaires…"
+      },
+      "technique": {
+        "label": "Sorts et techniques",
+        "description": "Sorts, rituels, transformations, invocations…"
+      }
+    },
+    "types": {
+      "magicSystem": "Système de magie",
+      "energySystem": "Énergie intérieure",
+      "superpowers": "Super-pouvoirs",
+      "divinePower": "Pouvoir divin",
+      "psionics": "Pouvoirs psychiques",
+      "alchemy": "Alchimie",
+      "school": "École",
+      "element": "Élément",
+      "bloodline": "Lignée ou don héréditaire",
+      "spell": "Sort",
+      "technique": "Technique",
+      "ritual": "Rituel",
+      "transformation": "Transformation",
+      "summoning": "Invocation",
+      "forbiddenArt": "Art interdit"
+    },
+    "statuses": {
+      "active": "En usage",
+      "rare": "Rare",
+      "secret": "Secret",
+      "forbidden": "Interdit",
+      "forgotten": "Oublié",
+      "lost": "Perdu",
+      "legendary": "Légendaire",
+      "unknown": "Inconnu"
+    },
+    "fields": {
+      "colorPalette": "Palette de couleurs",
+      "aliases": "Autres noms",
+      "description": "Description",
+      "firstAppearance": "Première apparition",
+      "manifestation": "Ce qu'on voit et ressent",
+      "rarity": "Rareté",
+      "origins": "Origines",
+      "history": "Histoire",
+      "notes": "Notes de l'auteur",
+      "source": "Source du pouvoir",
+      "rules": "Règles",
+      "cost": "Coût et prix à payer",
+      "limits": "Limites et faiblesses",
+      "ranks": "Rangs et niveaux",
+      "learning": "Apprentissage",
+      "whoCanUse": "Qui peut l'utiliser",
+      "taboos": "Interdits",
+      "principles": "Principes",
+      "affinities": "Affinités et oppositions",
+      "power": "Puissance",
+      "effects": "Effets",
+      "requirements": "Conditions et prérequis",
+      "activation": "Déclenchement",
+      "duration": "Durée",
+      "range": "Portée",
+      "risks": "Risques",
+      "materials": "Matériaux et ingrédients",
+      "inheritance": "Transmission",
+      "summoned": "Ce qui est invoqué",
+      "forms": "Formes"
+    },
+    "placeholders": {
+      "aliases": "Ex. L'Art, le Souffle, le Don",
+      "description": "Ce que c'est, comment on en parle, ce qu'il permet…",
+      "manifestation": "Ex. Une lueur bleue sous la peau, une odeur d'orage",
+      "origins": "D'où vient ce pouvoir, qui l'a découvert ou reçu…",
+      "history": "Les grandes étapes : découverte, âge d'or, interdiction, oubli…",
+      "notes": "Idées, questions en suspens, règles à vérifier…",
+      "source": "Ex. L'énergie vitale, les étoiles, un pacte avec un dieu",
+      "rules": "Ce qui est possible et ce qui ne l'est pas, sans exception…",
+      "cost": "Ex. Chaque sort vole un souvenir ; épuise le corps pour des jours",
+      "limits": "Ex. Inutile sous la pluie ; ne guérit pas les morts",
+      "ranks": "Ex. Apprenti, Adepte, Maître, Archimage",
+      "learning": "Ex. Dix ans d'étude au monastère, ou une révélation brutale",
+      "whoCanUse": "Ex. Seuls ceux nés sous une éclipse",
+      "taboos": "Ex. Ne jamais ramener un mort ; ne jamais lire dans l'esprit d'un enfant",
+      "principles": "Ex. Tout feu naît d'une colère et s'éteint avec elle",
+      "affinities": "Ex. Fort contre l'eau, faible contre la terre",
+      "effects": "Ce qui se passe quand on l'utilise…",
+      "requirements": "Ex. Rang de Maître, une main libre, voir sa cible",
+      "activation": "Ex. Une incantation de trois mots, un geste de la main",
+      "duration": "Ex. Une minute, jusqu'au lever du soleil",
+      "range": "Ex. Dix pas, tout ce que l'on voit",
+      "risks": "Ex. Raté, il retourne le feu contre le lanceur",
+      "materials": "Ex. Sel, sang de lune, une plume de corbeau",
+      "inheritance": "Ex. De mère en fille, une génération sur deux",
+      "summoned": "Ex. Un esprit du vent, lié pour une nuit",
+      "forms": "Ex. Loup, puis bête géante à la pleine lune"
+    },
+    "options": {
+      "rarity": {
+        "common": "Courant",
+        "uncommon": "Peu courant",
+        "rare": "Rare",
+        "veryRare": "Très rare",
+        "unique": "Unique"
+      },
+      "power": {
+        "minor": "Mineure",
+        "moderate": "Modérée",
+        "major": "Majeure",
+        "devastating": "Dévastatrice",
+        "cataclysmic": "Cataclysmique"
+      }
+    },
+    "profile": {
+      "new": "Nouvelle fiche de magie",
+      "contains_one": "{{count}} fiche rattachée",
+      "contains_other": "{{count}} fiches rattachées"
+    },
+    "sections": {
+      "identity": "Ce qui permet de reconnaître ce pouvoir et de comprendre ce qu'il fait.",
+      "story": "Ses origines, son passé, et vos notes d'auteur.",
+      "gallery": "Jusqu'à 30 images : sceaux, cercles, effets, références."
+    },
+    "form": {
+      "namePlaceholder": "Ex. Le Nen, l'École du feu, Poing de fer"
+    },
+    "picker": {
+      "title": "Système, école ou technique ?",
+      "description": "Choisissez un type : la fiche s'adapte (un système a ses règles, un sort ses effets et sa portée)."
+    },
+    "create": {
+      "save": "Créer la fiche",
+      "inside": "Sera rattachée à « {{name}} »."
+    },
+    "list": {
+      "create": "Créer une fiche",
+      "emptyTitle": "Aucune magie ni aucun pouvoir pour l'instant",
+      "emptyDescription": "Systèmes de magie, énergies, super-pouvoirs, écoles, sorts et techniques… Posez les règles de votre univers.",
+      "count_one": "{{count}} fiche",
+      "count_other": "{{count}} fiches",
+      "addInside": "Rattacher une fiche à « {{name}} »"
+    },
+    "children": {
+      "title": "Fiches rattachées",
+      "description": "Les écoles, éléments ou techniques qui dépendent de « {{name}} ».",
+      "add": "Rattacher une fiche",
+      "empty": "Aucune fiche rattachée."
+    },
+    "sidebar": {
+      "title": "Magie et pouvoirs",
+      "empty": "Aucune fiche."
+    },
+    "disabled": {
+      "title": "Le module Magie est désactivé",
+      "description": "Vos fiches sont gardées. Réactivez le module dans les paramètres du projet pour les retrouver."
+    },
+    "settings": {
+      "title": "Systèmes de magie et de pouvoirs",
+      "description": "Les règles communes du pouvoir dans votre univers : sources, coûts, limites, écoles, sorts et techniques. Les pouvoirs propres à un personnage restent sur sa carte « Pouvoirs ».",
+      "enable": "Activer la magie et les pouvoirs",
+      "enabledHint": "Le module « Magie » est dans la barre de gauche.",
+      "disabledHint": "Activez-le pour l'ajouter à la barre de gauche.",
+      "kept_one": "{{count}} fiche est gardée et réapparaîtra si vous réactivez le module.",
+      "kept_other": "{{count}} fiches sont gardées et réapparaîtront si vous réactivez le module.",
+      "categories": "Ne gardez que ce dont votre histoire a besoin : les autres catégories ne seront pas proposées.",
+      "types": "Ajoutez vos propres types (Sceau, Contrat…). Chacun est rangé dans une catégorie et en reçoit les champs.",
+      "typePlaceholder": "Ex. Sceau"
+    },
+    "levels": {
+      "title": "Niveau de détail des fiches de magie",
+      "firstTime": "Choisissez le niveau de détail des fiches de magie de ce projet. Il s'applique à toutes et se change dans les paramètres du projet.",
+      "basic": {
+        "label": "Basique",
+        "theme": "L'essentiel",
+        "goal": "Nommer et décrire le pouvoir",
+        "count": "7 champs"
+      },
+      "intermediate": {
+        "label": "Moyen",
+        "theme": "Les règles",
+        "goal": "Rareté, ce qu'on voit, et champs de la catégorie (source, coût, limites, effets, portée…)",
+        "count": "+ 10 à 13 champs"
+      },
+      "advanced": {
+        "label": "Avancé",
+        "theme": "La profondeur",
+        "goal": "Origines, histoire et détails propres au type (ingrédients, transmission…)",
+        "count": "+ 2 à 3 champs"
       }
     }
   }

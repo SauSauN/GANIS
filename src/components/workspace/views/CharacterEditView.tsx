@@ -19,11 +19,10 @@ import {
 } from "@/components/ui/dialog";
 import { CharacterSheet } from "@/components/characters/CharacterForm";
 import { CharacterGallery } from "@/components/characters/fields/GalleryField";
-import { CharacterRelationsCard } from "@/components/relations/CharacterRelationsCard";
-import { PlaceLinksCard } from "@/components/locations/PlaceLinksCard";
-import { WorldExtras } from "@/components/world/WorldExtras";
+import { UniverseLinksCard } from "@/components/links/UniverseLinksCard";
 import { StoryLinksCard } from "@/components/structure/StoryLinksCard";
 import { PlotInStoryCard } from "@/components/plot/PlotInStoryCard";
+import { useSheetDisplay } from "@/stores/sheetDisplayStore";
 import {
   PageShell,
   cardClass,
@@ -74,6 +73,7 @@ export function CharacterEditView({
   onOpenFeature,
 }: CharacterEditViewProps) {
   const { t } = useTranslation(["characters", "common"]);
+  const sheetDisplay = useSheetDisplay(projectId, "character");
 
   const { detailLevel, loaded, error: loadError, reload } = useProjectCharacters(projectId);
   const character = useProjectCharacter(projectId, characterId);
@@ -272,26 +272,22 @@ export function CharacterEditView({
           galleryCount={character.galleryCount}
           footer={
             <>
-            <CharacterRelationsCard
-              projectId={projectId}
-              characterId={character.id}
-              onOpenGraph={() => onOpenFeature("characters.relations")}
-            />
-            <PlaceLinksCard
-              projectId={projectId}
-              side="character"
-              id={character.id}
-              onOpenFeature={onOpenFeature}
-            />
-            <WorldExtras projectId={projectId} kind="character" id={character.id} onOpenFeature={onOpenFeature} />
-            <StoryLinksCard
-              projectId={projectId}
-              side="character"
-              id={character.id}
-              firstAppearance={character.fields.firstAppearance}
-              onOpenFeature={onOpenFeature}
-            />
-            <PlotInStoryCard projectId={projectId} target={{ type: "character", id: character.id }} name={fullName(character)} onOpenFeature={onOpenFeature} />
+            {/* Trois sections de liens : l'univers (personnages, lieux, faune et
+                flore, objets, factions, peuples, magie), la trame, le récit. */}
+            <UniverseLinksCard projectId={projectId} self={{ kind: "character", id: character.id }} onOpenFeature={onOpenFeature} />
+            {/* « Trame » et « Récit » : masquables dans Paramètres du projet › Personnages. */}
+            {sheetDisplay.showPlot && (
+              <PlotInStoryCard projectId={projectId} target={{ type: "character", id: character.id }} name={fullName(character)} onOpenFeature={onOpenFeature} />
+            )}
+            {sheetDisplay.showStory && (
+              <StoryLinksCard
+                projectId={projectId}
+                side="character"
+                id={character.id}
+                firstAppearance={character.fields.firstAppearance}
+                onOpenFeature={onOpenFeature}
+              />
+            )}
             <div className="flex min-h-10 flex-wrap items-center gap-4">
               <Button type="submit" disabled={!dirty || saving}>
                 {saving ? <Loader2 className="animate-spin" /> : <Save />}

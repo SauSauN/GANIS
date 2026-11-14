@@ -21,6 +21,8 @@ export interface PlotPanelProps {
   onStartTour: (mode?: TourState["mode"], laneId?: string | null) => void;
   filter: PlotFilter;
   onFilter: (filter: PlotFilter) => void;
+  /** Ouvrir d’emblée « Placement et détails » (trame, moment, date). */
+  placementOpen?: boolean;
 }
 
 /** Section repliable : le titre montre un résumé quand elle est fermée. */

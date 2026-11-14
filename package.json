@@ -1,7 +1,7 @@
 {
   "name": "ganis",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "test": "vitest run src",
+    "test:e2e": "playwright test",
     "seed:roman": "cd src-tauri && cargo test --lib seed_demo_roman -- --ignored --nocapture",
     "seed:manga": "cd src-tauri && cargo test --lib seed_demo_manga -- --ignored --nocapture"
   },

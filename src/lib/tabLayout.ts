@@ -1,6 +1,7 @@
 /**
- * Disposition des onglets de l'espace de travail : leur ordre et ceux
- * qui sont épinglés.
+ * Disposition des onglets de l'espace de travail : leur ordre, ceux qui
+ * sont épinglés et l'onglet « aperçu » (comme VS Code : ouvert d'un simple
+ * clic, provisoire, remplacé par le prochain aperçu).
  *
  * Toutes les fonctions sont pures (elles renvoient une nouvelle
  * disposition sans modifier l'ancienne), ce qui les rend faciles à tester.
@@ -15,6 +16,14 @@ export interface TabLayout {
 
   /** Onglets épinglés (toujours un sous-ensemble de `tabs`). */
   pinned: string[];
+
+  /**
+   * Onglet « aperçu » : ouvert d'un simple clic dans le panneau du milieu,
+   * titre en italique. Le prochain aperçu le remplace au lieu d'ouvrir un
+   * nouvel onglet. Il devient définitif au double-clic, quand on le
+   * modifie ou qu'on l'épingle. `null` : aucun. Jamais épinglé.
+   */
+  preview: string | null;
 }
 
 /** Nombre maximal d'onglets épinglés mémorisés par projet. */
@@ -29,14 +38,20 @@ function unique(ids: string[]): string[] {
  * d'abord (l'ordre relatif de chaque groupe est conservé), et aucun
  * épinglé absent de la liste des onglets.
  */
-export function normalize(layout: TabLayout): TabLayout {
+export function normalize(layout: Omit<TabLayout, "preview"> & { preview?: string | null }): TabLayout {
   const tabs = unique(layout.tabs);
   const pinnedSet = new Set(layout.pinned);
 
   const pinned = tabs.filter((id) => pinnedSet.has(id));
   const others = tabs.filter((id) => !pinnedSet.has(id));
 
-  return { tabs: [...pinned, ...others], pinned };
+  // L'aperçu doit être ouvert et ne jamais être épinglé.
+  const preview =
+    layout.preview && tabs.includes(layout.preview) && !pinnedSet.has(layout.preview)
+      ? layout.preview
+      : null;
+
+  return { tabs: [...pinned, ...others], pinned, preview };
 }
 
 /** Déplace un élément d'un tableau vers une autre position. */
@@ -74,13 +89,57 @@ export function initialLayout(
   });
 }
 
-/** Ouvre un onglet : il se place à la fin, après les autres onglets libres. */
+/**
+ * Ouvre un onglet définitif : il se place à la fin, après les autres
+ * onglets libres. Déjà ouvert en aperçu, il devient définitif.
+ */
 export function addTab(layout: TabLayout, id: string): TabLayout {
+  if (layout.tabs.includes(id)) {
+    return keepTab(layout, id);
+  }
+
+  return normalize({ ...layout, tabs: [...layout.tabs, id] });
+}
+
+/**
+ * Ouvre un onglet en aperçu (simple clic, comme VS Code) :
+ * - déjà ouvert : rien ne change (un onglet définitif le reste) ;
+ * - un aperçu existe et peut être remplacé : le nouvel onglet prend sa
+ *   place, à la même position ;
+ * - sinon : nouvel onglet en aperçu, à la fin.
+ *
+ * `canReplace` dit si l'aperçu actuel peut disparaître (pas de
+ * modification en attente, par exemple).
+ */
+export function previewTab(
+  layout: TabLayout,
+  id: string,
+  canReplace: (previewId: string) => boolean = () => true,
+): TabLayout {
   if (layout.tabs.includes(id)) {
     return layout;
   }
 
-  return normalize({ ...layout, tabs: [...layout.tabs, id] });
+  const current = layout.preview;
+
+  if (current && canReplace(current)) {
+    return normalize({
+      ...layout,
+      tabs: layout.tabs.map((tab) => (tab === current ? id : tab)),
+      preview: id,
+    });
+  }
+
+  return normalize({ ...layout, tabs: [...layout.tabs, id], preview: id });
+}
+
+/** Rend un onglet définitif (il n'est plus l'aperçu). */
+export function keepTab(layout: TabLayout, id: string | null): TabLayout {
+  if (!id || layout.preview !== id) {
+    return layout;
+  }
+
+  return { ...layout, preview: null };
 }
 
 /**
@@ -181,15 +240,18 @@ export function togglePin(layout: TabLayout, id: string): TabLayout {
     return normalize({
       tabs: [...rest.slice(0, pinned.length), id, ...rest.slice(pinned.length)],
       pinned,
+      preview: layout.preview,
     });
   }
 
   const rest = layout.tabs.filter((tab) => tab !== id);
   const at = layout.pinned.length;
 
+  // Épinglé : il devient définitif (`normalize` retire l'aperçu épinglé).
   return normalize({
     tabs: [...rest.slice(0, at), id, ...rest.slice(at)],
     pinned: [...layout.pinned, id],
+    preview: layout.preview,
   });
 }
 
@@ -223,6 +285,7 @@ export function moveTab(
   return normalize({
     tabs: arrayMove(layout.tabs, from, to),
     pinned: [...pinned],
+    preview: layout.preview,
   });
 }
 

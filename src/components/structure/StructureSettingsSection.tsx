@@ -5,9 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { StructureLevelsEditor } from "@/components/structure/StructureLevelsEditor";
 import { StructureTemplatePicker } from "@/components/structure/StructureTemplatePicker";
@@ -19,6 +17,7 @@ import { useProjectStructureData } from "@/stores/structureStore";
 import type { Project, StructureTemplateId } from "@/types";
 import { errorText } from "@/lib/errors";
 import { notifyError, notifySaved } from "@/lib/notify";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 /**
  * Paramètres du projet › Découpage : modèle de départ, puis noms et
@@ -88,8 +87,7 @@ export function StructureSettingsSection({ project }: { project: Project }) {
     <div className="space-y-8">
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("template.label")}</CardTitle>
-          <CardDescription>{t("template.hint")}</CardDescription>
+          <TitleWithInfo info={t("template.hint")}>{t("template.label")}</TitleWithInfo>
         </CardHeader>
         <CardContent className={cardContentClass}>
           <StructureTemplatePicker
@@ -104,8 +102,7 @@ export function StructureSettingsSection({ project }: { project: Project }) {
 
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("numbering.title")}</CardTitle>
-          <CardDescription>{t("numbering.description")}</CardDescription>
+          <TitleWithInfo info={t("numbering.description")}>{t("numbering.title")}</TitleWithInfo>
         </CardHeader>
         <CardContent className={cardContentClass}>
           <div className="flex items-center justify-between gap-4">
@@ -129,8 +126,7 @@ export function StructureSettingsSection({ project }: { project: Project }) {
 
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("levels.title")}</CardTitle>
-          <CardDescription>{t("levels.description")}</CardDescription>
+          <TitleWithInfo info={t("levels.description")}>{t("levels.title")}</TitleWithInfo>
         </CardHeader>
         <CardContent className={cardContentClass}>
           <StructureLevelsEditor

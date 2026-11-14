@@ -2,8 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useParams } from "react-router-dom";
 import { FileText, type LucideIcon } from "lucide-react";
+import { GanisMark } from "@/components/common/GanisMark";
 
 import { ActivityBar } from "@/components/layout/ActivityBar";
+import { SEARCH_INPUT_ID } from "@/components/search/SideBarSearch";
 import { ExternalDocumentsWatcher } from "@/components/documents/ExternalDocumentsWatcher";
 import { UnsavedChangesDialog } from "@/components/layout/UnsavedChangesDialog";
 import { useUnsavedQueue } from "@/components/layout/useUnsavedQueue";
@@ -31,14 +33,18 @@ import { cn } from "@/lib/utils";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 import {
   setRailExpanded,
+  getPreviewTabsEnabled,
+  usePreviewTabsEnabled,
   useRailExpanded,
 } from "@/lib/preferences";
 import {
   addTab,
   closeTabs as closeTabsInLayout,
   initialLayout,
+  keepTab,
   loadOpenTabs,
   moveTab as moveTabInLayout,
+  previewTab,
   saveOpenTabs,
   savePinnedTabs,
   shiftTab as shiftTabInLayout,
@@ -101,10 +107,16 @@ const NEW_TARGETS: Partial<Record<ModuleId, string>> = {
   notes: "notes.create",
   items: "items.create",
   species: "species.create",
+  factions: "factions.create",
+  peoples: "peoples.create",
+  magic: "magic.create",
 };
 
 /** En dessous : barre de gauche en icônes, panneau du milieu par-dessus. */
 const NARROW_QUERY = "(max-width: 899px)";
+
+/** En dessous (demi-écran…) : barre de gauche en icônes, pour laisser la place à la page. */
+const COMPACT_QUERY = "(max-width: 1279px)";
 
 export default function Workspace() {
   const { t } = useTranslation(["workspace", "unsaved", "menus", "projects", "titlebar"]);
@@ -178,6 +190,7 @@ export default function Workspace() {
    * Revenue à une largeur normale, la disposition habituelle revient.
    */
   const narrow = useMediaQuery(NARROW_QUERY);
+  const compact = useMediaQuery(COMPACT_QUERY);
   useEffect(() => {
     setPanelOpen(!narrow);
   }, [narrow]);
@@ -248,6 +261,9 @@ export default function Workspace() {
   /** Et des objets, de la faune et de la flore (nom de la fiche). */
   useWorldStore((state) => state.item.entries);
   useWorldStore((state) => state.species.entries);
+  useWorldStore((state) => state.faction.entries);
+  useWorldStore((state) => state.people.entries);
+  useWorldStore((state) => state.magic.entries);
 
   /**
    * Objets, faune et flore : modules facultatifs, dans la barre de gauche
@@ -258,12 +274,28 @@ export default function Workspace() {
   useEffect(() => {
     if (!worldModules.loaded) return;
     setActiveModule((current) =>
-      (current === "items" && !worldModules.item) || (current === "species" && !worldModules.species) ? "details" : current,
+      (current === "items" && !worldModules.item) ||
+      (current === "species" && !worldModules.species) ||
+      (current === "factions" && !worldModules.faction) ||
+      (current === "peoples" && !worldModules.people) ||
+      (current === "magic" && !worldModules.magic)
+        ? "details"
+        : current,
     );
-  }, [worldModules.loaded, worldModules.item, worldModules.species]);
+  }, [worldModules.loaded, worldModules.item, worldModules.species, worldModules.faction, worldModules.people, worldModules.magic]);
 
   /** Onglets avec des modifications non enregistrées (point ● sur l'onglet). */
   const unsavedEntries = useUnsavedStore((state) => state.entries);
+
+  // Un aperçu modifié devient définitif : il ne sera pas remplacé. De même
+  // si les aperçus sont désactivés dans les paramètres.
+  const previewTabsEnabled = usePreviewTabsEnabled();
+  useEffect(() => {
+    const preview = layout.preview;
+    if (preview && (!previewTabsEnabled || preview in unsavedEntries)) {
+      setLayout((current) => keepTab(current, preview));
+    }
+  }, [layout.preview, unsavedEntries, previewTabsEnabled]);
 
   /** Palette de commandes (Ctrl+K) et « Que voulez-vous créer ? ». */
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -368,6 +400,23 @@ export default function Workspace() {
       run: () => (createTarget ? openFeature(createTarget) : setChooserOpen(true)),
     },
     palette: { run: () => setPaletteOpen(true) },
+    // Loupe de la barre de titre et Ctrl+F : la recherche s'ouvre dans le
+    // panneau du milieu (elle n'est plus dans la barre de gauche). Déjà
+    // ouverte : le curseur revient dans le champ, texte sélectionné.
+    search: {
+      active: panelOpen && !(maximized && activeTab !== null) && activeModule === "search",
+      label: t("titlebar:search"),
+      run: () => {
+        setMaximized(false);
+        setActiveModule("search");
+        setPanelOpen(true);
+        requestAnimationFrame(() => {
+          const input = document.getElementById(SEARCH_INPUT_ID) as HTMLInputElement | null;
+          input?.focus();
+          input?.select();
+        });
+      },
+    },
     openHistory: { run: () => openFeature("history") },
     save: {
       disabled: !activeDirty,
@@ -458,7 +507,10 @@ export default function Workspace() {
     if (!projectType) return;
     if (activeModule === "items" && worldModules.item) showTutorialOnce("items");
     if (activeModule === "species" && worldModules.species) showTutorialOnce("species");
-  }, [projectType, activeModule, worldModules.item, worldModules.species]);
+    if (activeModule === "factions" && worldModules.faction) showTutorialOnce("factions");
+    if (activeModule === "peoples" && worldModules.people) showTutorialOnce("peoples");
+    if (activeModule === "magic" && worldModules.magic) showTutorialOnce("magic");
+  }, [projectType, activeModule, worldModules.item, worldModules.species, worldModules.faction, worldModules.people, worldModules.magic]);
 
   /**
    * Si le projet est inexistant ou a été supprimé,
@@ -537,6 +589,30 @@ export default function Workspace() {
     setLayout((current) => addTab(current, featureId));
 
     activate(featureId);
+  }
+
+  /**
+   * Simple clic dans le panneau du milieu (comme VS Code) : ouvre l'élément
+   * en aperçu. L'aperçu précédent est remplacé, sauf s'il a des
+   * modifications non enregistrées ; un onglet déjà ouvert est simplement
+   * affiché. Le double-clic (`openFeature`) le rend définitif.
+   */
+  function previewFeature(featureId: string) {
+    // Aperçus désactivés (Paramètres › Apparence) : onglet définitif.
+    if (!getPreviewTabsEnabled()) {
+      openFeature(featureId);
+      return;
+    }
+
+    const isUnsaved = (id: string) => id in useUnsavedStore.getState().entries;
+    setLayout((current) => previewTab(current, featureId, (id) => !isUnsaved(id)));
+
+    activate(featureId);
+  }
+
+  /** Rend l'aperçu définitif (double-clic sur l'onglet, modification…). */
+  function keepPreview(tabId: string) {
+    setLayout((current) => keepTab(current, tabId));
   }
 
   /**
@@ -691,6 +767,7 @@ export default function Workspace() {
             label: meta.label,
             icon: meta.icon,
             pinned: layout.pinned.includes(id),
+            preview: layout.preview === id,
             dirty: id in unsavedEntries,
           },
         ]
@@ -719,6 +796,12 @@ export default function Workspace() {
    * recréé : il garde son état (saisie, défilement…).
    */
   function toggleMaximize(tabId: string) {
+    // Double-clic sur un aperçu : il devient définitif (comme VS Code).
+    if (layout.preview === tabId) {
+      keepPreview(tabId);
+      activate(tabId);
+      return;
+    }
     if (isMaximized && activeTab === tabId) {
       setMaximized(false);
       return;
@@ -735,12 +818,12 @@ export default function Workspace() {
             ========================================================= */}
         {!isMaximized && (
         <ActivityBar
-          modules={modulesFor(project.type, worldModules)}
+          modules={modulesFor(project.type, worldModules).filter((module) => module.id !== "search")}
           active={activeModule}
           linked={linkedModule}
           panelOpen={panelOpen}
-          expanded={railExpanded && !narrow}
-          onToggleExpanded={narrow ? undefined : () =>
+          expanded={railExpanded && !compact}
+          onToggleExpanded={compact ? undefined : () =>
             setRailExpanded(!railExpanded)
           }
           onSelect={selectModule}
@@ -767,6 +850,10 @@ export default function Workspace() {
               activeTab={activeTab}
               onOpenFeature={(id) => {
                 openFeature(id);
+                if (narrow) setPanelOpen(false);
+              }}
+              onPreviewFeature={(id) => {
+                previewFeature(id);
                 if (narrow) setPanelOpen(false);
               }}
               onClose={() => setPanelOpen(false)}
@@ -813,6 +900,8 @@ export default function Workspace() {
             contentIds.map((tabId) => (
               <div
                 key={tabId}
+                role="tabpanel"
+                aria-label={tabMeta(tabId)?.label ?? tabId}
                 className={cn(
                   "flex min-h-0 flex-1 flex-col",
                   activeTab !== tabId && "hidden",
@@ -838,17 +927,15 @@ export default function Workspace() {
             /* -----------------------------------------------------
                AUCUN ONGLET OUVERT
                ----------------------------------------------------- */
-            <div className="flex flex-1 items-center justify-center">
-              <div className="flex flex-col items-center gap-2 text-center">
-                <FileText className="h-8 w-8 text-muted-foreground/50" />
-
-                <p className="text-sm text-muted-foreground">
-                  {t("empty.title")}
-                </p>
-
-                <p className="text-xs text-muted-foreground">
-                  {t("empty.description")}
-                </p>
+            <div className="flex flex-1 items-center justify-center p-6">
+              {/* Le logo de GANIS au trait (sans le « G »), et dessous la
+                  consigne pour commencer. */}
+              <div className="flex select-none flex-col items-center gap-4 text-center">
+                {/* Couleur des icônes de la barre de gauche, un tout petit peu plus
+                    foncée ; elle suit le thème. */}
+                <GanisMark letter={false} className="size-32 text-[color-mix(in_oklab,var(--muted-foreground)_88%,black)] sm:size-40" />
+                <p className="sr-only">{t("empty.title")}</p>
+                <p className="max-w-xs text-sm text-muted-foreground">{t("empty.description")}</p>
               </div>
             </div>
           )}

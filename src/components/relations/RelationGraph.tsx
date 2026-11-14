@@ -263,8 +263,8 @@ interface RelationGraphProps {
   onOpenCharacter: (characterId: string) => void;
   onEditRelation: (relationId: string) => void;
   onConnect: (sourceId: string, targetId: string) => void;
-  /** Fin d'un déplacement à la main (centre de l'avatar). */
-  onMoved: (characterId: string, center: Point) => void;
+  /** Fin d'un déplacement à la main (centre de l'avatar), si besoin. */
+  onMoved?: (characterId: string, center: Point) => void;
 }
 
 function toNodePosition(center: Point): Point {
@@ -372,7 +372,7 @@ function GraphCanvas(props: RelationGraphProps) {
       onNodeDoubleClick={(_, node) => node.type === "character" && onOpenCharacter(node.id)}
       onNodeDragStop={(_, node) =>
         node.type === "character" &&
-        onMoved(node.id, {
+        onMoved?.(node.id, {
           x: node.position.x + NODE_WIDTH / 2,
           y: node.position.y + AVATAR_RADIUS + 4,
         })

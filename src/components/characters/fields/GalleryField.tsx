@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type DragEvent } from "react";
 import { useConfirmImageRemoval } from "@/components/common/useConfirmImageRemoval";
 import { useTranslation } from "react-i18next";
-import { ImagePlus, Loader2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, ImagePlus, Loader2, X } from "lucide-react";
 import {
   Dialog,
   DialogHeader,
@@ -46,7 +46,8 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
   const { t } = useTranslation("characters");
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
-  const [zoomed, setZoomed] = useState<GalleryItem | null>(null);
+  /** Image affichée en grand (position dans `items`), ou `null`. */
+  const [zoomed, setZoomed] = useState<number | null>(null);
 
   const full = items.length >= MAX_GALLERY_IMAGES;
   const locked = disabled || busy || full;
@@ -61,7 +62,7 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
   }
 
   return (
-    <div className="space-y-2 sm:col-span-2">
+    <div className="space-y-2 @md:col-span-2">
       <p className="text-sm font-medium">{label}</p>
 
       <div
@@ -82,7 +83,7 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
             {item.url ? (
               <button
                 type="button"
-                onClick={() => setZoomed(item)}
+                onClick={() => setZoomed(items.indexOf(item))}
                 className="block size-full rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
                 aria-label={t("gallery.open")}
               >
@@ -146,16 +147,116 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
         </p>
       )}
 
-      <Dialog open={zoomed !== null} onOpenChange={(open) => !open && setZoomed(null)}>
-        <DialogHeader>
-          <DialogTitle className="sr-only">{label}</DialogTitle>
-        </DialogHeader>
-        {zoomed?.url && (
-          <img src={zoomed.url} alt="" className="max-h-[70vh] w-full rounded-md object-contain" />
-        )}
-      </Dialog>
+      <ImageViewer
+        label={label}
+        items={items}
+        index={zoomed}
+        onIndexChange={setZoomed}
+      />
       {removal.dialog}
     </div>
+  );
+}
+
+/**
+ * Image en grand, sur presque tout l'écran : flèches (boutons ou ← →) pour
+ * passer d'une image à l'autre, Échap ou un clic à côté pour fermer.
+ */
+function ImageViewer({
+  label,
+  items,
+  index,
+  onIndexChange,
+}: {
+  label: string;
+  items: GalleryItem[];
+  index: number | null;
+  onIndexChange: (index: number | null) => void;
+}) {
+  const { t } = useTranslation("characters");
+  const open = index !== null && index >= 0 && index < items.length;
+  const count = items.length;
+
+  useEffect(() => {
+    if (!open || count < 2) return;
+
+    function onKey(event: KeyboardEvent) {
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        onIndexChange(((index ?? 0) - 1 + count) % count);
+      } else if (event.key === "ArrowRight") {
+        event.preventDefault();
+        onIndexChange(((index ?? 0) + 1) % count);
+      }
+    }
+
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [open, index, count, onIndexChange]);
+
+  const item = open ? items[index] : null;
+  const navClass =
+    "absolute top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/85 shadow-md transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(next) => !next && onIndexChange(null)}
+      className="relative w-auto max-w-[96vw] overflow-hidden p-2"
+    >
+      <DialogHeader>
+        <DialogTitle className="sr-only">{label}</DialogTitle>
+      </DialogHeader>
+
+      {item?.url ? (
+        <img
+          src={item.url}
+          alt=""
+          className="mx-auto block max-h-[calc(100vh-4rem)] max-w-full rounded-md object-contain"
+          data-testid="gallery-viewer-image"
+        />
+      ) : (
+        <span className="flex size-40 items-center justify-center">
+          <Loader2 className="size-6 animate-spin text-muted-foreground" />
+        </span>
+      )}
+
+      <button
+        type="button"
+        onClick={() => onIndexChange(null)}
+        aria-label={t("gallery.close")}
+        title={t("gallery.close")}
+        className="absolute top-3 right-3 flex size-8 items-center justify-center rounded-full bg-background/85 shadow-md hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        <X className="size-4" />
+      </button>
+
+      {count > 1 && open && (
+        <>
+          <button
+            type="button"
+            onClick={() => onIndexChange((index - 1 + count) % count)}
+            aria-label={t("gallery.previous")}
+            title={t("gallery.previous")}
+            className={cn(navClass, "left-3")}
+          >
+            <ChevronLeft className="size-5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onIndexChange((index + 1) % count)}
+            aria-label={t("gallery.next")}
+            title={t("gallery.next")}
+            className={cn(navClass, "right-3")}
+          >
+            <ChevronRight className="size-5" />
+          </button>
+          <span className="absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-background/85 px-2.5 py-0.5 text-xs font-medium tabular-nums shadow-md">
+            {t("gallery.position", { current: index + 1, total: count })}
+          </span>
+        </>
+      )}
+    </Dialog>
   );
 }
 

@@ -7,7 +7,7 @@ import { Dialog, DialogDescription, DialogHeader, DialogTitle } from "@/componen
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
-import { cardClass, cardContentClass } from "@/components/workspace/views/PageShell";
+import { cardClass, cardContentClass, profileCardClass } from "@/components/workspace/views/PageShell";
 import { WorldFieldInput, WorldParentSelect, WorldStatusSelect } from "@/components/world/WorldFields";
 import { WorldTypePicker } from "@/components/world/WorldTypePicker";
 import { WorldBanner, WorldTypeBadge } from "@/components/world/WorldVisuals";
@@ -33,6 +33,7 @@ import {
 import { parseList } from "@/lib/characters";
 import { cn } from "@/lib/utils";
 import type { SpeciesNature, WorldEntry, WorldModule, WorldSettings } from "@/types";
+import { InfoTip } from "@/components/common/InfoTip";
 
 export interface WorldBannerControls {
   url: string | null;
@@ -76,10 +77,13 @@ function Field({
 }) {
   const id = useId();
   return (
-    <div className={cn("space-y-2", wide && "sm:col-span-2")}>
-      <Label htmlFor={id}>{label}</Label>
+    <div className={cn("space-y-2", wide && "@md:col-span-2")}>
+      {/* L'aide du champ est derrière un « i », à côté du libellé. */}
+      <div className="flex items-center gap-1.5">
+        <Label htmlFor={id}>{label}</Label>
+        {hint && <InfoTip>{hint}</InfoTip>}
+      </div>
       {children(id)}
-      {hint && <p className="text-xs leading-5 text-muted-foreground">{hint}</p>}
     </div>
   );
 }
@@ -115,7 +119,7 @@ function Section({
       title={title}
       description={description}
       tint={tint}
-      contentClassName={cn(cardContentClass, "grid gap-x-4 gap-y-5 sm:grid-cols-2")}
+      contentClassName={cn(cardContentClass, "grid gap-x-4 gap-y-5 @md:grid-cols-2")}
     >
       {children}
     </CollapsibleCard>
@@ -198,16 +202,19 @@ export function WorldSheet({
     );
   }
 
-  // « Rangé dans » (objet), « Espèce » (animal précis), « Fait partie de » (espèce).
-  const parentKey = module === "item" ? "item" : nature === "individual" ? "individual" : "species";
+  // « Rangé dans » (objet), « Espèce » (animal précis), « Fait partie de »
+  // (espèce), « Branche de » (faction).
+  const parentKey = module === "species" ? (nature === "individual" ? "individual" : "species") : module;
   const displayName = draft.name.trim() || labels.text("profile.new");
 
   return (
-    <div className="grid items-start gap-8 lg:grid-cols-[17rem_minmax(0,1fr)]">
+    <div className="grid items-start gap-8 @xl:grid-cols-[17rem_minmax(0,1fr)]">
       {/* Carte de présentation */}
-      <Card className={cn(cardClass, "lg:sticky lg:top-0")}>
+      <Card className={cn(cardClass, profileCardClass)}>
         <CardContent className="flex flex-col items-center gap-4 px-5 py-5 text-center">
+          <div className="w-full">
           <WorldBanner
+            tall
             module={module}
             url={banner.url}
             type={draft.type}
@@ -219,6 +226,7 @@ export function WorldSheet({
             onPick={banner.onPick}
             onRemove={banner.onRemove}
           />
+          </div>
 
           <div className="w-full min-w-0 space-y-2">
             <p className={cn("break-words text-lg font-semibold", !draft.name.trim() && "text-muted-foreground")}>
@@ -233,11 +241,11 @@ export function WorldSheet({
             </div>
           </div>
 
-          <div className="w-full space-y-2 border-t pt-4 text-left text-sm">
+          <div className="w-full space-y-1 text-sm">
             {path.length === 0 ? (
               <p className="text-xs text-muted-foreground">{t(`parent.${parentKey}.none`)}</p>
             ) : (
-              <nav aria-label={t(`parent.${parentKey}.label`)} className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-xs">
+              <nav aria-label={t(`parent.${parentKey}.label`)} className="flex flex-wrap items-center justify-center gap-x-1 gap-y-0.5 text-xs">
                 {path.map((item, index) => (
                   <span key={item.id} className="inline-flex items-center gap-1">
                     {index > 0 && <ChevronRight className="size-3 text-muted-foreground" aria-hidden="true" />}
@@ -262,7 +270,7 @@ export function WorldSheet({
       </Card>
 
       {/* Sections */}
-      <div className="min-w-0 space-y-8">
+      <div className="@container min-w-0 space-y-8">
         <Section
           storageKey={`ganis.worldSheet.${module}.identity.collapsed`}
           forceOpen={Boolean(nameError)}
@@ -292,9 +300,9 @@ export function WorldSheet({
           </Field>
 
           {nature && (
-            <div className="space-y-2 sm:col-span-2">
+            <div className="space-y-2 @md:col-span-2">
               <p className="text-sm font-medium">{t("natures.title")}</p>
-              <div role="radiogroup" aria-label={t("natures.title")} className="grid gap-2 sm:grid-cols-2">
+              <div role="radiogroup" aria-label={t("natures.title")} className="grid gap-2 @md:grid-cols-2">
                 {NATURES.map((item) => (
                   <button
                     key={item}

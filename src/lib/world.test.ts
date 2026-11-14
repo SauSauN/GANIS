@@ -10,6 +10,7 @@ import {
   categoryFields,
   emptyWorldDraft,
   enabledCategories,
+  factionMembers,
   flattenWorldTree,
   groupWorldTreeByCategory,
   hiddenFilledKeys,
@@ -184,6 +185,46 @@ describe("liens", () => {
     expect(link).toMatchObject({ sourceKind: "character", sourceId: "aldric", targetId: "sword" });
     expect(linksOfEntry([link], "sword")[0]).toMatchObject({ otherId: "aldric", forward: false });
     expect(linksOfEntry([link], "aldric")[0]).toMatchObject({ otherId: "sword", forward: true });
+  });
+
+  it("un personnage soutient une faction, une faction est implantée dans un lieu", () => {
+    expect(linkChoices("character", "faction")).toContainEqual({ type: "supports", forward: true });
+    expect(linkChoices("faction", "character")).toContainEqual({ type: "supports", forward: false });
+    expect(linkChoices("faction", "location")).toContainEqual({ type: "presentIn", forward: true });
+    expect(linkChoices("location", "faction")).toContainEqual({ type: "presentIn", forward: false });
+  });
+
+  it("les membres d'une faction sont regroupés par rôle, dans l'ordre de la carte", () => {
+    const link = (id: string, type: string, sourceKind: WorldLink["sourceKind"], sourceId: string, targetId: string): WorldLink => ({
+      id,
+      sourceKind,
+      sourceId,
+      targetKind: "faction",
+      targetId,
+      type,
+      label: "",
+      description: "",
+      sinceNode: null,
+      untilNode: null,
+      createdAt: id,
+      updatedAt: id,
+    });
+    const links = [
+      link("1", "memberOf", "character", "mira", "order"),
+      link("2", "supports", "character", "venn", "order"),
+      link("3", "leads", "character", "aldric", "order"),
+      link("4", "memberOf", "species", "eclair", "order"),
+      link("5", "enemyOf", "character", "kael", "order"),
+      link("6", "memberOf", "character", "nox", "guild"),
+    ];
+
+    const groups = factionMembers(links, "order");
+    expect(groups.map((group) => group.role)).toEqual(["leads", "memberOf", "supports"]);
+    expect(groups[1].members.map((view) => view.otherId)).toEqual(["mira", "eclair"]);
+    // Un ennemi n'est pas un membre, ni un membre d'une autre faction.
+    expect(groups.flatMap((group) => group.members).map((view) => view.otherId)).not.toContain("kael");
+    expect(groups.flatMap((group) => group.members).map((view) => view.otherId)).not.toContain("nox");
+    expect(factionMembers(links, "nobody")).toEqual([]);
   });
 });
 

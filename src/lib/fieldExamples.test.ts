@@ -2,8 +2,12 @@ import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join, relative, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import characterFields from "@/lib/characterFields.json";
+import characterPowerFields from "@/lib/characterPowerFields.json";
+import factionCatalog from "@/lib/factionCatalog.json";
 import itemCatalog from "@/lib/itemCatalog.json";
 import locationCatalog from "@/lib/locationCatalog.json";
+import magicCatalog from "@/lib/magicCatalog.json";
+import peopleCatalog from "@/lib/peopleCatalog.json";
 import speciesCatalog from "@/lib/speciesCatalog.json";
 import enCharacters from "@/i18n/locales/en/characters.json";
 import frCharacters from "@/i18n/locales/fr/characters.json";
@@ -65,9 +69,13 @@ describe("exemples dans les champs de texte", () => {
 
   it.each([
     ["personnages", textKeys(characterFields), frCharacters.placeholders, enCharacters.placeholders],
+    ["pouvoirs des personnages", textKeys(characterPowerFields), frCharacters.placeholders, enCharacters.placeholders],
     ["lieux", textKeys(locationCatalog.fields), frLocations.placeholders, enLocations.placeholders],
     ["objets", textKeys(itemCatalog.fields), frWorld.item.placeholders, enWorld.item.placeholders],
     ["faune et flore", textKeys(speciesCatalog.fields), frWorld.species.placeholders, enWorld.species.placeholders],
+    ["factions", textKeys(factionCatalog.fields), frWorld.faction.placeholders, enWorld.faction.placeholders],
+    ["peuples, cultures et religions", textKeys(peopleCatalog.fields), frWorld.people.placeholders, enWorld.people.placeholders],
+    ["magie et pouvoirs", textKeys(magicCatalog.fields), frWorld.magic.placeholders, enWorld.magic.placeholders],
   ])("%s : chaque champ du catalogue a son exemple, dans les deux langues", (_name, keys, fr, en) => {
     expect(keys.length).toBeGreaterThan(0);
     expect(keys.filter((key) => !(fr as Record<string, string>)[key])).toEqual([]);

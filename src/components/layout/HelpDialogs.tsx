@@ -14,13 +14,13 @@ import {
   LayoutPanelLeft,
   ListTree,
   MapPin,
-  Package,
+  Megaphone,
   Network,
+  Package,
   Palette,
   PenLine,
   Save,
   Search,
-  Sparkles,
   StickyNote,
   Trash2,
   Users,
@@ -34,6 +34,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { writeText as writeNativeClipboard } from "@tauri-apps/plugin-clipboard-manager";
 import { api, isTauri } from "@/lib/api";
+import { notifyError, notifySaved } from "@/lib/notify";
 import { buildReport } from "@/lib/problemReport";
 import { RELEASES, releaseId, shouldShowWhatsNew } from "@/lib/releaseNotes";
 import { useSaveStatusStore } from "@/lib/saveStatus";
@@ -86,7 +87,9 @@ function GuideDialog({ open, onClose }: { open: boolean; onClose: () => void }) 
   };
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-3xl" guardInput={false}>
+    // Assez large pour que l'étape la plus longue tienne sans barre de
+    // défilement sur un écran d'ordinateur portable.
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-5xl" guardInput={false}>
       <DialogHeader>
         <p className="text-xs font-medium text-primary">
           {t("guide.progress", { current: step + 1, total: STEPS.length })}
@@ -184,7 +187,7 @@ function Keys({ keys }: { keys: string[] }) {
       {keys.map((key) => (
         <kbd
           key={key}
-          className="rounded border border-b-2 bg-muted px-1.5 py-0.5 font-mono text-[0.7rem] font-medium text-foreground"
+          className="rounded border border-b-2 bg-muted px-1.5 py-0.5 text-[0.7rem] font-medium text-foreground"
         >
           {key}
         </kbd>
@@ -339,7 +342,7 @@ const ABOUT_TYPES = ["novel", "manga", "film", "series", "game", "rpg", "custom"
 // Aide intégrée (une rubrique par module + questions fréquentes)
 // ----------------------------------------------------------------------------
 
-const CENTER_SECTIONS = ["workspace", "details", "characters", "locations", "world", "structure", "reading", "plot", "notes", "search", "history", "files", "settings", "about", "faq"] as const;
+const CENTER_SECTIONS = ["workspace", "details", "characters", "locations", "items", "species", "factions", "peoples", "magic", "structure", "reading", "plot", "notes", "search", "history", "files", "settings", "about", "faq"] as const;
 type CenterSection = (typeof CENTER_SECTIONS)[number];
 
 interface SectionContent {
@@ -496,7 +499,7 @@ function WhatsNewDialog({ open, onClose }: { open: boolean; onClose: () => void 
     <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-xl" guardInput={false}>
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2">
-          <Sparkles className="size-5 text-primary" aria-hidden="true" />
+          <Megaphone className="size-5 text-primary" aria-hidden="true" />
           {t("whatsNew.title")}
         </DialogTitle>
         <DialogDescription>{t("whatsNew.description")}</DialogDescription>
@@ -564,11 +567,9 @@ function ReportDialog({ open, onClose }: { open: boolean; onClose: () => void })
   const lastSaveError = useSaveStatusStore((state) => state.lastError);
   const [version, setVersion] = useState<string | null>(null);
   const [description, setDescription] = useState("");
-  const [copied, setCopied] = useState<"done" | "failed" | null>(null);
 
   useEffect(() => {
     if (!open) return;
-    setCopied(null);
     api
       .appInfo()
       .then((info) => setVersion(info.version))
@@ -600,8 +601,10 @@ function ReportDialog({ open, onClose }: { open: boolean; onClose: () => void })
     },
   });
 
+  // Résultat en notification, comme pour les autres actions.
   async function copy() {
-    setCopied((await copyText(report)) ? "done" : "failed");
+    if (await copyText(report)) notifySaved(t("report.copied"), "report-copy");
+    else notifyError(t("report.copyFailed"), "report-copy");
   }
 
   return (
@@ -622,10 +625,7 @@ function ReportDialog({ open, onClose }: { open: boolean; onClose: () => void })
           <textarea
             id="report-description"
             value={description}
-            onChange={(event) => {
-              setDescription(event.target.value);
-              setCopied(null);
-            }}
+            onChange={(event) => setDescription(event.target.value)}
             placeholder={t("report.whatPlaceholder")}
             rows={3}
             className="w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm leading-6 outline-none focus:ring-2 focus:ring-ring"
@@ -642,7 +642,7 @@ function ReportDialog({ open, onClose }: { open: boolean; onClose: () => void })
             value={report}
             rows={10}
             aria-describedby="report-privacy"
-            className="w-full resize-y rounded-md border border-input bg-muted/40 px-3 py-2 font-mono text-xs leading-5 outline-none focus:ring-2 focus:ring-ring"
+            className="w-full resize-y rounded-md border border-input bg-muted/40 px-3 py-2 text-xs leading-5 outline-none focus:ring-2 focus:ring-ring"
           />
           <p id="report-privacy" className="text-xs text-muted-foreground">
             {t("report.privacy")}
@@ -650,12 +650,6 @@ function ReportDialog({ open, onClose }: { open: boolean; onClose: () => void })
         </div>
 
         <p className="text-sm text-muted-foreground">{t("report.howToSend")}</p>
-
-        {copied && (
-          <p role="status" className={cn("text-sm", copied === "done" ? "text-success" : "text-destructive")}>
-            {copied === "done" ? t("report.copied") : t("report.copyFailed")}
-          </p>
-        )}
       </div>
 
       <DialogFooter className="mt-6 gap-2">

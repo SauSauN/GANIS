@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { FolderLock, Loader2 } from "lucide-react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cardClass, cardContentClass, cardHeaderClass } from "@/components/workspace/views/PageShell";
 import { api } from "@/lib/api";
 import { useNoteStore } from "@/stores/noteStore";
 import { errorText } from "@/lib/errors";
 import { notifyError, notifyInfo } from "@/lib/notify";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 /**
  * Paramètres du projet › Notes : l'option « notes système » (désactivée par
@@ -49,8 +50,7 @@ export function NoteSettingsSection({ projectId }: { projectId: string }) {
     <div className="space-y-8">
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("notes.title")}</CardTitle>
-          <CardDescription>{t("notes.description")}</CardDescription>
+          <TitleWithInfo info={t("notes.description")}>{t("notes.title")}</TitleWithInfo>
         </CardHeader>
         <CardContent className={`${cardContentClass} space-y-4`}>
           <label className="flex cursor-pointer items-start gap-3 rounded-lg border p-4 has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring">

@@ -30,6 +30,11 @@
     "mangaPanel": "Case de manga",
     "item": "Objet",
     "species": "Faune et flore",
-    "worldLink": "Lien entre éléments"
+    "faction": "Faction",
+    "people": "Peuple, culture ou religion",
+    "magic": "Magie ou pouvoir",
+    "worldLink": "Lien entre éléments",
+    "glossaryTerm": "Terme du glossaire",
+    "mangaExtraPage": "Page hors récit"
   }
 }

@@ -217,7 +217,7 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
   }
 
   return (
-    <main className="relative flex min-h-0 flex-1 overflow-y-auto overscroll-contain">
+    <main className="relative flex min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]">
       <div className="mx-auto w-full max-w-5xl px-6 py-6 pb-24 lg:px-10">
         <header className="mb-4 space-y-3">
           {note.system && (

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { SheetDisplayCard } from "@/components/project-settings/SheetDisplayCard";
 import { Plus, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,6 +26,7 @@ import { useLocationStore, useProjectLocations } from "@/stores/locationStore";
 import type { CharacterDetailLevel } from "@/types";
 import { errorText } from "@/lib/errors";
 import { notifyError, notifySaved } from "@/lib/notify";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 /**
  * Paramètres du projet › Lieux : types ajoutés par l'auteur (chacun dans
@@ -89,8 +91,7 @@ export function LocationSettingsSection({ projectId }: { projectId: string }) {
     <div className="space-y-8">
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("settings.level.title")}</CardTitle>
-          <CardDescription>{t("settings.level.description")}</CardDescription>
+          <TitleWithInfo info={t("settings.level.description")}>{t("settings.level.title")}</TitleWithInfo>
         </CardHeader>
 
         <CardContent className={`${cardContentClass} space-y-4`}>
@@ -103,10 +104,11 @@ export function LocationSettingsSection({ projectId }: { projectId: string }) {
         </CardContent>
       </Card>
 
+      <SheetDisplayCard projectId={projectId} module="location" />
+
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("settings.types.title")}</CardTitle>
-          <CardDescription>{t("settings.types.description")}</CardDescription>
+          <TitleWithInfo info={t("settings.types.description")}>{t("settings.types.title")}</TitleWithInfo>
         </CardHeader>
 
         <CardContent className={`${cardContentClass} space-y-5`}>

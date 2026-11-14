@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Blocks,
+  Check,
+  ChevronRight,
   Languages,
   LogOut,
   Settings,
@@ -24,54 +26,71 @@ const itemClass =
   "flex h-8 w-full items-center gap-2 rounded-sm px-2 text-left text-sm hover:bg-accent";
 
 /**
- * Langue de l'interface, sous forme de ligne du menu.
- *
- * Des boutons plutôt qu'une liste déroulante native : la liste native
- * s'ouvre hors du menu, qui se refermerait au survol de ses options.
+ * Langue de l'interface, sous forme de ligne du menu : « Langue · Français ».
+ * Un clic déplie la liste des langues dans le menu même (une liste native
+ * s'ouvrirait hors du menu, qui se refermerait au survol de ses options).
+ * Elle tient autant de langues qu'il en faut : au-delà, elle défile.
  */
 function LanguageItem() {
   const { t, i18n } = useTranslation(["usermenu", "common"]);
+  const [open, setOpen] = useState(false);
 
   const current = isLanguage(i18n.resolvedLanguage)
     ? i18n.resolvedLanguage
     : DEFAULT_LANGUAGE;
 
   return (
-    <div className="flex items-center gap-2 px-2 py-1.5 text-sm">
-      <Languages className="h-4 w-4 shrink-0" />
-      <span className="flex-1">{t("language")}</span>
-
-      <div
-        role="radiogroup"
-        aria-label={t("common:language.label")}
-        className="flex rounded-md border bg-muted/40 p-0.5"
+    <div>
+      <button
+        type="button"
+        aria-expanded={open}
+        aria-controls="user-menu-languages"
+        onClick={() => setOpen((value) => !value)}
+        className={itemClass}
       >
-        {LANGUAGES.map((language) => {
-          const selected = language === current;
+        <Languages className="h-4 w-4 shrink-0" />
+        <span className="flex-1">{t("language")}</span>
+        <span className="truncate text-xs text-muted-foreground" lang={current}>
+          {LANGUAGE_NAMES[current]}
+        </span>
+        <ChevronRight className={cn("h-3.5 w-3.5 shrink-0 text-muted-foreground transition-transform", open && "rotate-90")} />
+      </button>
 
-          return (
-            <button
-              key={language}
-              type="button"
-              role="radio"
-              aria-checked={selected}
-              lang={language}
-              title={LANGUAGE_NAMES[language]}
-              aria-label={LANGUAGE_NAMES[language]}
-              onClick={() => !selected && void setLanguage(language)}
-              className={cn(
-                "rounded px-1.5 py-0.5 text-xs font-medium transition-colors",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
-                selected
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground",
-              )}
-            >
-              {language.toUpperCase()}
-            </button>
-          );
-        })}
-      </div>
+      {open && (
+        <div
+          id="user-menu-languages"
+          role="radiogroup"
+          aria-label={t("common:language.label")}
+          className="mx-1 mb-1 max-h-48 overflow-y-auto rounded-md border bg-muted/30 p-1"
+        >
+          {LANGUAGES.map((language) => {
+            const selected = language === current;
+
+            return (
+              <button
+                key={language}
+                type="button"
+                role="radio"
+                aria-checked={selected}
+                lang={language}
+                onClick={() => {
+                  if (!selected) void setLanguage(language);
+                  setOpen(false);
+                }}
+                className={cn(
+                  "flex h-7 w-full items-center gap-2 rounded-sm px-2 text-left text-sm hover:bg-accent",
+                  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50",
+                  selected && "font-medium",
+                )}
+              >
+                <span className="w-6 shrink-0 text-xs text-muted-foreground uppercase">{language}</span>
+                <span className="flex-1 truncate">{LANGUAGE_NAMES[language]}</span>
+                {selected && <Check className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden="true" />}
+              </button>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

@@ -180,7 +180,7 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
   const open = (id: string) => onOpenFeature(characterTabId(id));
 
   const createButton = (
-    <Button size="lg" onClick={() => onOpenFeature("characters.create")}>
+    <Button onClick={() => onOpenFeature("characters.create")}>
       <Plus />
       {t("list.create")}
     </Button>
@@ -208,21 +208,6 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
     );
   }
 
-  if (characters.length === 0) {
-    return (
-      <PageShell title={feature.label}>
-        <div className="flex flex-col items-center rounded-2xl border border-dashed bg-card px-8 py-16 text-center">
-          <span className="flex size-16 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <Users className="size-8" aria-hidden="true" />
-          </span>
-          <h2 className="mt-5 text-xl font-semibold">{t("list.emptyTitle")}</h2>
-          <p className="mt-2 max-w-sm text-sm text-muted-foreground">{t("list.emptyDescription")}</p>
-          <div className="mt-6">{createButton}</div>
-        </div>
-      </PageShell>
-    );
-  }
-
   // ---------------------------------------------------------------------------
   // Liste
   // ---------------------------------------------------------------------------
@@ -231,16 +216,16 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
     <PageShell title={feature.label} description={t("list.count", { count: characters.length })} actions={createButton}>
       {/* Recherche, rôle, statut, tri, affichage. Rôles et statuts en menus
           déroulants : leur nombre peut grandir sans encombrer la barre. */}
-      <div className="mb-6 flex flex-wrap items-center gap-3">
-        <div className="relative min-w-60 flex-1">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+      <div className="mb-4 flex flex-wrap items-center gap-3">
+        <div className="relative min-w-56 flex-1">
+          <Search className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={t("list.searchPlaceholder")}
             aria-label={t("list.search")}
-            className="h-10 pl-9"
+            className="pl-8"
           />
         </div>
 
@@ -248,7 +233,7 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
           aria-label={t("fields.role")}
           value={role ?? ""}
           onChange={(e) => setRole(e.target.value || null)}
-          className={cn(fieldClass, "h-10 w-52")}
+          className={cn(fieldClass, "h-9 w-52")}
         >
           <option value="">
             {t("list.allRolesOption")} ({characters.length})
@@ -263,11 +248,11 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
 
         <label className="relative">
           <span className="sr-only">{t("list.sortLabel")}</span>
-          <ArrowDownAZ className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <ArrowDownAZ className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <select
             value={prefs.sort}
             onChange={(e) => updatePrefs({ sort: e.target.value as Sort })}
-            className={cn(fieldClass, "h-10 w-52 pl-9")}
+            className={cn(fieldClass, "h-9 w-52 pl-8")}
           >
             {(["name", "recent", "completion", "role"] as const).map((value) => (
               <option key={value} value={value}>{t(`list.sort.${value}`)}</option>
@@ -275,7 +260,7 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
           </select>
         </label>
 
-        <div role="radiogroup" aria-label={t("list.layoutLabel")} className="flex rounded-lg border bg-card p-1">
+        <div role="radiogroup" aria-label={t("list.layoutLabel")} className="inline-flex rounded-md border p-0.5">
           {([
             ["grid", LayoutGrid],
             ["table", Rows3],
@@ -289,11 +274,11 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
               aria-label={t(`list.layout.${value}`)}
               onClick={() => updatePrefs({ layout: value })}
               className={cn(
-                "flex size-8 items-center justify-center rounded-md transition-colors",
-                prefs.layout === value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted",
+                "flex size-7 items-center justify-center rounded transition-colors",
+                prefs.layout === value ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground",
               )}
             >
-              <Icon className="size-4" />
+              <Icon className="size-3.5" />
             </button>
           ))}
         </div>
@@ -318,11 +303,12 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
       )}
 
       {visible.length === 0 ? (
-        <div className="rounded-2xl border border-dashed px-6 py-12 text-center text-sm text-muted-foreground">
-          {t("list.noMatch")}
+<div className="rounded-xl border border-dashed px-6 py-14 text-center text-sm text-muted-foreground">
+          <Users className="mx-auto mb-3 size-8 opacity-40" aria-hidden="true" />
+          {characters.length === 0 ? t("list.emptyTitle") : t("list.noMatch")}
         </div>
       ) : prefs.layout === "grid" ? (
-        <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3 min-[112.5rem]:grid-cols-4">
           {visible.map((character) => (
             <li key={character.id}>
               <CharacterCard
@@ -427,7 +413,11 @@ function CharacterCard({
           name={name}
           url={url}
           size="lg"
-          className="relative z-10 size-20 border-4 border-card text-2xl ring-0 shadow-sm"
+          className={cn(
+            "relative z-10 size-20 text-2xl ring-0",
+            palette.length > 0 ? "border-4 shadow-sm" : "profile-frame profile-frame-card",
+          )}
+          style={palette.length > 0 ? { borderColor: palette[0] } : undefined}
         />
 
         <span className="min-w-0">

@@ -30,6 +30,11 @@
     "mangaPanel": "Manga panel",
     "item": "Object",
     "species": "Fauna and flora",
-    "worldLink": "Link between elements"
+    "faction": "Faction",
+    "people": "People, culture or religion",
+    "magic": "Magic or power",
+    "worldLink": "Link between elements",
+    "glossaryTerm": "Glossary term",
+    "mangaExtraPage": "Non-story page"
   }
 }

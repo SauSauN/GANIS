@@ -1,0 +1,47 @@
+{
+  "description": "Les termes propres à votre histoire, par ordre alphabétique : mots inventés, lieux, concepts, titres… Chacun peut citer les fiches qui s'y rapportent.",
+  "add": "Nouveau terme",
+  "loading": "Chargement du glossaire…",
+  "retry": "Réessayer",
+  "search": "Rechercher un terme ou une définition",
+  "categoryFilter": "Filtrer par catégorie",
+  "allCategories": "Toutes les catégories",
+  "noCategory": "Sans catégorie",
+  "count_one": "{{count}} terme",
+  "count_other": "{{count}} termes",
+  "letters": "Aller à la lettre",
+  "noMatch": "Aucun terme ne correspond à la recherche.",
+  "noDefinition": "Pas encore de définition.",
+  "openSheet": "Ouvrir la fiche ({{kind}}) : {{name}}",
+  "edit": "Modifier « {{name}} »",
+  "delete": "Supprimer « {{name}} »",
+  "empty": {
+    "title": "Le glossaire est vide",
+    "text": "Notez ici les mots de votre univers : un lieu au nom inventé, un titre, une fête, une expression… Le lecteur comme vous s'y retrouveront."
+  },
+  "kinds": {
+    "character": "Personnage",
+    "location": "Lieu",
+    "item": "Objet",
+    "species": "Faune et flore",
+    "faction": "Faction",
+    "people": "Peuple, culture ou religion",
+    "magic": "Magie ou pouvoir"
+  },
+  "form": {
+    "addTitle": "Nouveau terme",
+    "editTitle": "Modifier le terme",
+    "description": "Seul le terme est obligatoire.",
+    "term": "Terme",
+    "termPlaceholder": "Ex. Lunéa",
+    "termRequired": "Indiquez le terme.",
+    "category": "Catégorie",
+    "categoryPlaceholder": "Ex. Magie",
+    "definition": "Définition",
+    "definitionPlaceholder": "Ce que ce mot désigne dans votre histoire…",
+    "links": "Fiches liées",
+    "addLink": "Lier une fiche…",
+    "removeLink": "Retirer « {{name}} »",
+    "noSheets": "Aucune fiche à lier pour l'instant."
+  }
+}

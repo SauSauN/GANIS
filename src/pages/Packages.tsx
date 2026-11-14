@@ -5,9 +5,9 @@ import {
   ArrowLeft,
   FileUp,
   Library,
+  PackagePlus,
   Plus,
   Search,
-  Sparkles,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
@@ -151,7 +151,7 @@ export default function Packages() {
             ZONE CENTRALE
             ========================================================= */}
         <main className="flex min-h-0 min-w-0 flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-5xl px-6 py-8 pb-24 lg:px-10">
+          <div className="mx-auto w-full max-w-5xl 2xl:max-w-7xl min-[137.5rem]:max-w-[100rem] px-6 py-8 pb-24 lg:px-10">
             <header className="mb-8 flex flex-wrap items-start justify-between gap-4">
               <div className="min-w-0">
                 <h1 className="text-3xl font-semibold tracking-tight">
@@ -311,7 +311,7 @@ function InstalledView() {
             title={t("groups.system.title")}
             description={t("groups.system.description")}
           />
-          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 min-[112.5rem]:grid-cols-4">
             {systemShown.map(card)}
           </div>
         </section>
@@ -336,14 +336,14 @@ function InstalledView() {
               </Button>
             </div>
           ) : mineShown.length > 0 ? (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 min-[112.5rem]:grid-cols-4">
               {mineShown.map(card)}
             </div>
           ) : (
             (loaded || !loading) && (
               <div className="flex flex-col items-center rounded-xl border border-dashed p-8 text-center">
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                  <Sparkles className="h-5 w-5 text-primary" />
+                  <PackagePlus className="h-5 w-5 text-primary" />
                 </span>
                 <p className="mt-3 text-sm font-medium">{t("mine.emptyTitle")}</p>
                 <p className="mt-1 max-w-sm text-sm text-muted-foreground">

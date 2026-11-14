@@ -12,6 +12,7 @@ import {
   Plus,
   Search,
 } from "lucide-react";
+import { ProfileCard } from "@/components/common/ProfileCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -32,6 +33,7 @@ import {
   type LocationCategory,
   type LocationNode,
 } from "@/lib/locations";
+import { parseList } from "@/lib/characters";
 import { cn } from "@/lib/utils";
 import { useLocationImageUrl, useLocationStore, useProjectLocations } from "@/stores/locationStore";
 import type { CustomLocationType, Location } from "@/types";
@@ -188,21 +190,6 @@ export function LocationListView({ projectId, feature, onOpenFeature }: Location
   // Aucun lieu
   // ---------------------------------------------------------------------------
 
-  if (locations.length === 0) {
-    return (
-      <PageShell title={feature.label} description={feature.description}>
-        <div className="flex flex-col items-center rounded-xl border border-dashed px-6 py-16 text-center">
-          <span className="mb-4 flex size-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-            <MapPinned className="size-7" aria-hidden="true" />
-          </span>
-          <h2 className="text-lg font-semibold">{t("list.empty.title")}</h2>
-          <p className="mt-2 mb-6 max-w-md text-sm text-muted-foreground">{t("list.empty.description")}</p>
-          {createButton}
-        </div>
-      </PageShell>
-    );
-  }
-
   // ---------------------------------------------------------------------------
   // Liste
   // ---------------------------------------------------------------------------
@@ -272,20 +259,24 @@ export function LocationListView({ projectId, feature, onOpenFeature }: Location
               type="button"
               aria-pressed={layout === item}
               onClick={() => chooseLayout(item)}
+              title={t(`list.${item}`)}
+              aria-label={t(`list.${item}`)}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors",
-                layout === item ? "bg-secondary text-foreground" : "hover:text-foreground",
+                "flex size-7 items-center justify-center rounded transition-colors",
+                layout === item ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground",
               )}
             >
               <Icon className="size-3.5" aria-hidden="true" />
-              {t(`list.${item}`)}
             </button>
           ))}
         </div>
       </div>
 
       {matching.length === 0 ? (
-        <p className="py-10 text-center text-sm text-muted-foreground">{t("list.noResult")}</p>
+<div className="rounded-xl border border-dashed px-6 py-14 text-center text-sm text-muted-foreground">
+          <MapPinned className="mx-auto mb-3 size-8 opacity-40" aria-hidden="true" />
+          {locations.length === 0 ? t("list.empty.title") : t("list.noResult")}
+        </div>
       ) : layout === "tree" ? (
         <ul className="overflow-hidden rounded-xl border bg-card" role="tree" aria-label={feature.label}>
           {rows.map((node) => (
@@ -304,7 +295,7 @@ export function LocationListView({ projectId, feature, onOpenFeature }: Location
           ))}
         </ul>
       ) : (
-        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 min-[112.5rem]:grid-cols-4">
           {matching.map((location) => (
             <GridCard
               key={location.id}
@@ -426,34 +417,21 @@ function GridCard({
   const summary = location.fields.description?.trim();
 
   return (
-    <li>
-      <button
-        type="button"
-        onClick={onOpen}
-        className="group flex h-full w-full flex-col overflow-hidden rounded-xl border bg-card text-left shadow-sm transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-      >
-        <span
-          className="flex aspect-[16/7] w-full items-center justify-center overflow-hidden text-white"
-          style={url ? undefined : categoryBackdrop(category)}
-        >
-          {url ? (
-            <img src={url} alt="" className="size-full object-cover transition-transform group-hover:scale-[1.02]" />
-          ) : (
-            <Icon className="size-9 opacity-90" aria-hidden="true" />
-          )}
-        </span>
-
-        <span className="flex flex-1 flex-col gap-2 p-4">
-          <span className="truncate font-semibold">{location.name}</span>
-          <span className="flex flex-wrap items-center gap-1.5">
-            <TypeBadge type={location.type} customTypes={customTypes} labels={labels} />
-            {parent && (
-              <span className="truncate text-xs text-muted-foreground">{t("list.inside", { name: parent.name })}</span>
-            )}
-          </span>
-          {summary && <span className="line-clamp-2 text-sm text-muted-foreground">{summary}</span>}
-        </span>
-      </button>
-    </li>
+    <ProfileCard
+      url={url}
+      palette={parseList(location.fields.colorPalette)}
+      backdrop={categoryBackdrop(category)}
+      icon={Icon}
+      onOpen={onOpen}
+    >
+      <span className="truncate text-lg font-semibold group-hover:text-primary">{location.name}</span>
+      <span className="flex flex-wrap items-center gap-1.5">
+        <TypeBadge type={location.type} customTypes={customTypes} labels={labels} />
+        {parent && (
+          <span className="truncate text-xs text-muted-foreground">{t("list.inside", { name: parent.name })}</span>
+        )}
+      </span>
+      {summary && <span className="line-clamp-3 text-sm leading-6 text-muted-foreground">{summary}</span>}
+    </ProfileCard>
   );
 }

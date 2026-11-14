@@ -242,6 +242,8 @@ export interface StructureNode {
   rhythm: Rhythm | null;
   /** Vrai : révélation après le tourné de page (manga). */
   pageTurn: boolean;
+  /** Dernière étape de fabrication terminée d'une page (manga) ; `null` : rien de commencé. */
+  productionStage: ProductionStage | null;
   createdAt: string; // RFC 3339, UTC
   updatedAt: string; // RFC 3339, UTC
 }
@@ -328,6 +330,63 @@ export interface PageScriptInput {
 export interface MangaSettings {
   panelWordsMax: number | null;
   pageWordsMax: number | null;
+}
+
+/**
+ * Étapes de fabrication d'une page, dans l'ordre (voir
+ * `manga_production_service.rs`). La valeur est la dernière étape terminée.
+ */
+export type ProductionStage = "storyboard" | "pencils" | "inks" | "tones" | "lettering" | "done";
+
+/** Sorte de page hors récit d'un tome. */
+export type ExtraPageKind =
+  | "cover"
+  | "title"
+  | "toc"
+  | "credits"
+  | "cast"
+  | "foreword"
+  | "bonus"
+  | "afterword"
+  | "preview"
+  | "blank"
+  | "backCover"
+  | "other";
+
+/** Avant (`front`) ou après (`back`) le récit. */
+export type ExtraPagePlacement = "front" | "back";
+
+/** Page d'un tome qui n'est pas l'histoire (couverture, page de titre, bonus…). */
+export interface MangaExtraPage {
+  id: string;
+  /** Tome ; `null` si le projet n'a pas de tomes. */
+  volumeId: string | null;
+  placement: ExtraPagePlacement;
+  position: number;
+  kind: ExtraPageKind;
+  title: string;
+  notes: string;
+  productionStage: ProductionStage | null;
+  /** Vrai : la page a un dessin (lu à part, voir `getMangaExtraArt`). */
+  hasArt: boolean;
+  /** Date du dernier changement du dessin (rafraîchit la vignette). */
+  artUpdatedAt: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ExtraPageInput {
+  volumeId: string | null;
+  placement: ExtraPagePlacement;
+  kind: ExtraPageKind;
+  title: string;
+  notes: string;
+}
+
+export interface ExtraPageUpdate {
+  kind: ExtraPageKind;
+  title: string;
+  notes: string;
 }
 
 export interface MangaChapterFields {
@@ -460,9 +519,23 @@ export interface NodeLocationLink {
 }
 
 /** Personnages et lieux liés aux éléments du découpage. */
+/** Rôle d'une fiche du monde (objet, faune et flore…) dans un élément du découpage. */
+export type NodeEntryRole = "central" | "present" | "mentioned";
+
+/** Fiche du monde liée à un élément du découpage. */
+export interface NodeEntryLink {
+  nodeId: string;
+  kind: WorldModule;
+  entryId: string;
+  role: NodeEntryRole;
+  createdAt: string; // RFC 3339, UTC
+}
+
 export interface StructureLinks {
   characters: NodeCharacterLink[];
   locations: NodeLocationLink[];
+  /** Fiches du monde ; un lien vers une fiche supprimée peut y rester (à ignorer). */
+  entries: NodeEntryLink[];
 }
 
 /** Découpage complet d'un projet. */
@@ -534,6 +607,8 @@ export interface CharacterSettings {
   detailLevel: CharacterDetailLevel | null;
   /** Listes personnalisées ; une liste absente : valeurs par défaut. */
   lists: Partial<Record<CharacterListKey, string[]>>;
+  /** Carte « Pouvoirs » affichée sur les fiches (désactivée par défaut). */
+  powersEnabled: boolean;
 }
 
 /** Image de la galerie, sans son contenu. */
@@ -623,6 +698,13 @@ export interface CharacterLocationInput {
   untilNode: string | null;
 }
 
+/** Image de la galerie de l'univers d'un projet, sans son contenu. */
+export interface ProjectImage {
+  id: string;
+  caption: string | null;
+  createdAt: string;
+}
+
 /** Image de la galerie d'un lieu, sans son contenu. */
 export interface LocationImage {
   id: string;
@@ -631,11 +713,15 @@ export interface LocationImage {
 }
 
 // ----------------------------------------------------------------------------
-// Objets, faune et flore (voir `world_service.rs`, `lib/world.ts`)
+// Objets, faune et flore, factions (voir `world_service.rs`, `lib/world.ts`)
 // ----------------------------------------------------------------------------
 
-/** Module : objets (`item`) ou faune et flore (`species`). */
-export type WorldModule = "item" | "species";
+/**
+ * Module : objets (`item`), faune et flore (`species`), factions
+ * (`faction`), peuples, cultures et religions (`people`) ou systèmes de
+ * magie et de pouvoirs (`magic`).
+ */
+export type WorldModule = "item" | "species" | "faction" | "people" | "magic";
 
 /** Faune et flore : une espèce entière, ou un animal / une plante précis. */
 export type SpeciesNature = "species" | "individual";
@@ -648,7 +734,7 @@ export interface WorldEntry {
   type: string;
   /** Faune et flore seulement ; `null` pour un objet. */
   nature: SpeciesNature | null;
-  /** Objet qui le contient ; espèce d'un animal précis. `null` : tout en haut. */
+  /** Objet qui le contient ; espèce d'un animal précis ; faction dont elle est une branche. `null` : tout en haut. */
   parentId: string | null;
   /** Faune et flore : fiche de personnage de cet animal (`null` : aucune). */
   characterId: string | null;
@@ -688,7 +774,7 @@ export interface WorldImage {
 }
 
 /** Sorte d'élément reliée par un lien du monde. */
-export type WorldLinkKind = "character" | "location" | "item" | "species";
+export type WorldLinkKind = "character" | "location" | "item" | "species" | "faction" | "people" | "magic";
 
 /** Lien entre deux éléments, dont au moins un objet ou une espèce. */
 export interface WorldLink {
@@ -748,9 +834,17 @@ export interface Relation {
   sinceNode: string | null;
   /** Élément du découpage où elle finit (`null` : jusqu'à la fin). */
   untilNode: string | null;
+  /**
+   * Relation « family » : lien précis pour l'arbre généalogique
+   * (`parent` : la source est le parent de la cible). `null` : non précisé.
+   */
+  familyLink: FamilyLink | null;
   createdAt: string;
   updatedAt: string;
 }
+
+/** Lien familial précis (voir `relation_service::FAMILY_LINKS`). */
+export type FamilyLink = "parent" | "partner" | "sibling" | "grandparent" | "auntUncle" | "cousin";
 
 export type RelationInput = Omit<Relation, "id" | "createdAt" | "updatedAt">;
 
@@ -966,7 +1060,12 @@ export type TrashKind =
   | "mangaPanel"
   | "item"
   | "species"
-  | "worldLink";
+  | "faction"
+  | "people"
+  | "magic"
+  | "worldLink"
+  | "glossaryTerm"
+  | "mangaExtraPage";
 
 export interface TrashItem {
   id: string;
@@ -998,7 +1097,7 @@ export interface Activity {
 }
 
 /** Éléments qui ont des versions. */
-export type VersionKind = "character" | "location" | "item" | "species" | "structureNode" | "note" | "synopsis" | "plot" | "editorial";
+export type VersionKind = "character" | "location" | "item" | "species" | "faction" | "people" | "magic" | "structureNode" | "note" | "synopsis" | "plot" | "editorial";
 
 export interface Version {
   id: string;
@@ -1027,7 +1126,7 @@ export interface WorkCalendar {
 }
 
 /** `document` : l'identifiant est celui de l'élément du découpage qui le contient. */
-export type SearchKind = "character" | "location" | "item" | "species" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky";
+export type SearchKind = "character" | "location" | "item" | "species" | "faction" | "people" | "magic" | "structureNode" | "document" | "plotEvent" | "note" | "noteFolder" | "sticky" | "glossaryTerm";
 
 export interface SearchHit {
   kind: SearchKind;
@@ -1058,11 +1157,6 @@ export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
   done: "Terminé",
 };
 
-export const ROLE_LABELS: Record<Role, string> = {
-  admin: "Administrateur",
-  developer: "Développeur",
-  user: "Utilisateur",
-};
 // ----------------------------------------------------------------------------
 // Documents rangés dans le découpage (voir `document_service.rs`)
 // ----------------------------------------------------------------------------
@@ -1102,4 +1196,44 @@ export interface ExternalSync {
   status: ExternalStatus;
   /** Document mis à jour : ses modifications viennent d'être reprises. */
   document: StructureDocument | null;
+}
+
+// ----------------------------------------------------------------------------
+// Glossaire (voir `glossary_service.rs`)
+// ----------------------------------------------------------------------------
+
+/** Modules dont les fiches ont les sections « Récit » et « Trame ». */
+export type SheetModule = "character" | "location" | WorldModule;
+
+/** Sections « Récit » et « Trame » visibles sur les fiches d'un module (réglage du projet). */
+export interface SheetDisplay {
+  module: SheetModule;
+  showStory: boolean;
+  showPlot: boolean;
+}
+
+/** Sortes de fiches qu'un terme du glossaire peut citer. */
+export type GlossaryLinkKind = "character" | "location" | WorldModule;
+
+export interface GlossaryLink {
+  kind: GlossaryLinkKind;
+  id: string;
+}
+
+export interface GlossaryTerm {
+  id: string;
+  term: string;
+  definition: string;
+  /** Catégorie libre ; vide si aucune. */
+  category: string;
+  links: GlossaryLink[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface GlossaryInput {
+  term: string;
+  definition: string;
+  category: string;
+  links: GlossaryLink[];
 }

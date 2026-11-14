@@ -138,20 +138,9 @@
     "saved": "Saved"
   },
   "read": {
-    "all": "Whole script",
-    "includeCast": "Characters and locations first",
-    "export": "Export",
-    "dialogTitle": "Export the script",
     "empty": "No pages yet.",
     "emptyHint": "Create chapters and pages in the structure.",
-    "openPlan": "Open the structure",
-    "editPage": "Edit page",
-    "fileSuffix": "script",
-    "toc": "Contents",
-    "details": "Art directions",
-    "detailsHint": "Show framing, setting, notes to the artist and continuity for each panel",
-    "legend": "Text types",
-    "turnPage": "Page turn"
+    "openPlan": "Open the structure"
   },
   "flatplan": {
     "volume": "Volume",
@@ -179,7 +168,94 @@
       "volume": "Page {{folio}}: heavy page, {{words}} words (threshold: {{max}})."
     },
     "unplaced_one": "{{count}} piece of art filed on a chapter has no matching page.",
-    "unplaced_other": "{{count}} pieces of art filed on a chapter have no matching page."
+    "unplaced_other": "{{count}} pieces of art filed on a chapter have no matching page.",
+    "mode": "Show",
+    "modeScript": "Script and art",
+    "modeProduction": "Production",
+    "cover": "Cover",
+    "backCover": "Back cover",
+    "covers": "Covers",
+    "noCover": "No cover",
+    "extras": "Non-story pages",
+    "extrasHint": "Cover, title page, contents, bonus, afterword… They count in the volume's page numbers, except the covers.",
+    "stats": {
+      "scripted_one": "{{count}} page with script",
+      "scripted_other": "{{count}} pages with script",
+      "drawn_one": "{{count}} page with art",
+      "drawn_other": "{{count}} pages with art",
+      "alerts_one": "{{count}} alert",
+      "alerts_other": "{{count}} alerts"
+    },
+    "more": "More options",
+    "firstFolioMenu": "First page: no. {{folio}}…"
+  },
+  "production": {
+    "stages": {
+      "none": "Not started",
+      "storyboard": "Storyboard",
+      "pencils": "Pencils",
+      "inks": "Inks",
+      "tones": "Screentones",
+      "lettering": "Lettering",
+      "done": "Approved"
+    },
+    "stageHint": "Last finished step of the page.",
+    "stageOf": "Production step: {{name}}",
+    "info": "How far the art of each page has come: storyboard (the “name”), pencils, inks, screentones, lettering, then approval. The chosen step is the last one finished. Non-story pages (cover, bonus…) are tracked here too.",
+    "percent": "{{percent}}% produced",
+    "summary": "{{done}} approved out of {{total}}",
+    "front": "Before the story",
+    "back": "After the story",
+    "covers": "Covers",
+    "noChapter": "No chapter",
+    "folio": "p. {{folio}}",
+    "noFolio": "—",
+    "setSelected": "Move to…",
+    "selectAll": "Select all",
+    "select": "Select {{name}}",
+    "saving": "Saving…"
+  },
+  "extras": {
+    "kinds": {
+      "cover": "Cover",
+      "title": "Title page",
+      "toc": "Contents",
+      "credits": "Copyright and credits",
+      "cast": "Character introductions",
+      "foreword": "Foreword",
+      "bonus": "Bonus",
+      "afterword": "Afterword",
+      "preview": "Next volume preview",
+      "blank": "Blank page",
+      "backCover": "Back cover",
+      "other": "Other page"
+    },
+    "placement": {
+      "front": "Before the story",
+      "back": "After the story"
+    },
+    "title": "Non-story pages",
+    "addTitle": "New non-story page",
+    "editTitle": "Edit the non-story page",
+    "formDescription": "It takes its place in the volume and its page numbers (except a cover).",
+    "add": "Add a page",
+    "kind": "Page type",
+    "where": "Position",
+    "pageTitle": "Title",
+    "pageTitlePlaceholder": "E.g. Bonus: Sora sketches",
+    "notes": "Notes",
+    "notesPlaceholder": "What the page should show, the planned text…",
+    "moveUp": "Move “{{name}}” up",
+    "moveDown": "Move “{{name}}” down",
+    "edit": "Edit “{{name}}”",
+    "delete": "Delete “{{name}}”",
+    "none": "No non-story pages in this volume.",
+    "coverTaken": "This volume already has this cover.",
+    "art": "Art",
+    "artAdd": "Add an image",
+    "artReplace": "Replace the image",
+    "artRemove": "Remove",
+    "artHint": "An image (PNG, JPEG, GIF or WebP), shown in the flatplan. It is stored with the page, encrypted if the project is private."
   },
   "export": {
     "subtitle": "Script for the artist",
@@ -197,6 +273,11 @@
     "notes": "For the artist:",
     "continuity": "Continuity:",
     "noPanels": "(no panels)",
+    "folio": "p. {{folio}} — {{label}}",
+    "extra": "{{kind}}",
+    "extraFolio": "p. {{folio}} — {{kind}}",
+    "frontMatter": "Before the story",
+    "backMatter": "After the story",
     "text": {
       "dialogue": "{{speaker}}:",
       "dialogueAnon": "DIALOGUE:",
@@ -205,7 +286,12 @@
       "narration": "CAPTION:",
       "sfx": "SFX:",
       "sign": "BACKGROUND TEXT:"
-    }
+    },
+    "button": "Export the script",
+    "dialogTitle": "Export the volume script",
+    "fileSuffix": "script",
+    "includeCast": "Characters and locations first",
+    "short": "Export"
   },
   "progress": {
     "pages": "Pages",

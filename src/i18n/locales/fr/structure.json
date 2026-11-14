@@ -238,18 +238,22 @@
       "close": "Fermer l'onglet"
     },
     "profile": {
-      "topLevel": "À la racine du plan",
-      "contains_one": "Contient {{count}} élément",
-      "contains_other": "Contient {{count}} éléments",
       "unnumbered": "Hors numérotation",
       "openPlan": "Voir dans le plan",
-      "path": "Emplacement dans le plan",
       "noSummary": "Pas encore de résumé."
     },
     "sections": {
       "info": {
         "title": "Informations",
         "description": "Titre, numéro et résumé."
+      },
+      "universe": {
+        "title": "Liens avec l'univers",
+        "description": "Les personnages, les lieux et les fiches du monde de « {{name}} », rangés par sorte.",
+        "add": "Ajouter un lien",
+        "choose": "Choisir…",
+        "empty": "Aucun lien pour l'instant.",
+        "noItems": "Le projet n'a encore ni personnage, ni lieu, ni fiche du monde."
       },
       "characters": {
         "title": "Personnages",
@@ -269,6 +273,16 @@
         "empty": "Aucun lieu lié pour l'instant.",
         "noneLeft": "Tous les lieux du projet sont déjà liés.",
         "noItems": "Le projet n'a pas encore de lieu.",
+        "firstAppearance": "Première apparition ici"
+      },
+      "entries": {
+        "title": "Univers",
+        "description": "Les objets, la faune et la flore, les factions, les peuples et la magie de « {{name}} ».",
+        "add": "Lier une fiche",
+        "choose": "Choisir un objet, une faction…",
+        "empty": "Aucune fiche de l'univers liée.",
+        "noneLeft": "Toutes les fiches sont déjà liées.",
+        "noItems": "Aucune fiche dans les modules activés.",
         "firstAppearance": "Première apparition ici"
       },
       "children": {
@@ -291,17 +305,34 @@
       "location": {
         "setting": "Lieu de l'action",
         "mentioned": "Cité"
+      },
+      "entry": {
+        "central": "Au cœur de l'action",
+        "present": "Présent",
+        "mentioned": "Cité"
       }
     },
     "saved": "Enregistré.",
     "delete": "Supprimer"
   },
   "story": {
-    "title": "Dans le récit",
+    "title": "Récit",
     "characterDescription": "Les éléments du plan où apparaît ce personnage.",
     "locationDescription": "Les éléments du plan qui se déroulent dans ce lieu ou le citent.",
     "empty": "Pas encore lié au plan : liez-le depuis la fiche d'un chapitre, d'une scène…",
-    "firstAppearance": "Première apparition"
+    "firstAppearance": "Première apparition",
+    "link": "Lier à un élément du plan",
+    "editLink": "Modifier le lien",
+    "entryDescription": "Les éléments du plan (chapitres, scènes…) où cette fiche est au cœur de l'action, présente ou citée.",
+    "entryEmpty": "Pas encore liée au plan : liez-la d'ici ou depuis la fiche d'un chapitre, d'une scène…",
+    "dialog": {
+      "newTitle": "Lier à un élément du plan",
+      "editTitle": "Modifier le lien avec le plan",
+      "description": "Le lien apparaît dans le Récit de cette fiche et sur la fiche de l'élément.",
+      "node": "Élément du plan",
+      "role": "Rôle",
+      "remove": "Retirer le lien"
+    }
   },
   "colors": {
     "custom": "Autre couleur…",

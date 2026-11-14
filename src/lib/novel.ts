@@ -194,11 +194,6 @@ export function wordTotals(nodes: StructureNode[], ownWords: (node: StructureNod
   return totals;
 }
 
-/** Total du manuscrit. */
-export function manuscriptWords(nodes: StructureNode[], ownWords: (node: StructureNode) => number): number {
-  return nodes.reduce((sum, node) => sum + ownWords(node), 0);
-}
-
 /** Avancement vers un objectif, en pour cent (arrondi, peut dépasser 100). */
 export function goalPercent(words: number, goal: number | null | undefined): number | null {
   if (!goal || goal <= 0) return null;

@@ -14,5 +14,17 @@
     "title": "Informations du projet",
     "createdAt": "Créé le",
     "updatedAt": "Dernière modification"
+  },
+  "gallery": {
+    "label": "Images de l'univers"
+  },
+  "logo": {
+    "add": "Ajouter un logo",
+    "change": "Changer le logo",
+    "remove": "Retirer le logo",
+    "drop": "Déposer l'image",
+    "alt": "Logo de {{name}}",
+    "title": "Logo",
+    "hint": "Affiché sur l'accueil du projet, à côté de son nom. Il garde sa forme, même s'il est long."
   }
 }

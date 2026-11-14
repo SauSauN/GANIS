@@ -2,7 +2,7 @@
  * « Aide › Nouveautés » : ce qui a changé, version par version.
  *
  * Textes : `help.json` › `whatsNew.releases.<id>` (`title` et `items`).
- * L'identifiant est la version sans points (« 0.1.0 » → « v0_1_0 ») :
+ * L'identifiant est la version sans points (« 1.0.0 » → « v1_0_0 ») :
  * i18next lit les points comme des niveaux de clés.
  *
  * Après une mise à jour, la fenêtre s'ouvre seule une fois (version vue
@@ -11,7 +11,7 @@
  */
 
 /** Versions décrites, de la plus récente à la plus ancienne. */
-export const RELEASES = ["0.1.0"] as const;
+export const RELEASES = ["1.0.0"] as const;
 
 const SEEN_KEY = "ganis-whats-new-seen";
 

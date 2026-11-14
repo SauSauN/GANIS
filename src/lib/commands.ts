@@ -35,7 +35,9 @@ export type CommandId =
   | "readStory"
   /** Tutoriel du module affiché (sinon du type de projet). */
   | "openTutorial"
-  | "palette";
+  | "palette"
+  // Recherche dans le projet (loupe de la barre de titre, Ctrl+F)
+  | "search";
 
 export interface CommandHandler {
   run: () => void;

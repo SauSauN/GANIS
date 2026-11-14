@@ -20,6 +20,10 @@ export function itemTabId(kind: HistoryKind | SearchHit["kind"], id: string): st
       return worldTabId("item", id);
     case "species":
       return worldTabId("species", id);
+    case "faction":
+    case "people":
+    case "magic":
+      return worldTabId(kind, id);
     case "structureNode":
     // Document : `id` est celui de l'élément du découpage qui le contient.
     case "document":
@@ -37,6 +41,10 @@ export function itemTabId(kind: HistoryKind | SearchHit["kind"], id: string): st
       return "plot.board";
     case "editorial":
       return "manuscript.editorial";
+    case "glossaryTerm":
+      return "glossary.list";
+    case "mangaExtraPage":
+      return "script.flatplan";
     default:
       return null;
   }
@@ -53,7 +61,7 @@ export function openSearchHit(hit: SearchHit, onOpenFeature: (featureId: string)
 }
 
 /** Ordre des groupes de résultats. */
-export const SEARCH_ORDER: SearchHit["kind"][] = ["character", "location", "item", "species", "structureNode", "document", "plotEvent", "note", "noteFolder", "sticky"];
+export const SEARCH_ORDER: SearchHit["kind"][] = ["character", "location", "item", "species", "faction", "people", "magic", "structureNode", "document", "plotEvent", "glossaryTerm", "note", "noteFolder", "sticky"];
 
 /**
  * Résultats de recherche dans le projet, relus 200 ms après la dernière

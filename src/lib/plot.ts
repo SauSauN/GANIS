@@ -60,6 +60,11 @@ export interface PlotEvent {
   /** Point de vue (personnage du projet). */
   povId: string | null;
   locationId: string | null;
+  /**
+   * Fiches du monde présentes dans l'événement (objets, faune et flore,
+   * factions, peuples, magie). Une fiche supprimée depuis est ignorée.
+   */
+  entries: PlotEntryRef[];
   /** Élément du découpage où l'événement est raconté (chapitre, scène…) : il fixe sa place dans la lecture. */
   nodeId: string | null;
   /** Autres scènes où l'événement est raconté à nouveau (souvenir, autre point de vue…). */
@@ -68,6 +73,31 @@ export interface PlotEvent {
   /** Date dans l'histoire (libre), pour la chronologie. */
   date: string;
   words: number;
+}
+
+/** Fiche du monde citée par un événement. */
+export interface PlotEntryRef {
+  kind: "item" | "species" | "faction" | "people" | "magic";
+  id: string;
+}
+
+const ENTRY_KINDS: ReadonlySet<string> = new Set(["item", "species", "faction", "people", "magic"]);
+
+/** Fiches du monde d'un événement enregistré : sortes connues, sans doublon, 50 au plus. */
+function cleanEntries(value: unknown): PlotEntryRef[] {
+  if (!Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  const out: PlotEntryRef[] = [];
+  for (const item of value) {
+    const ref = (item ?? {}) as Record<string, unknown>;
+    if (typeof ref.kind !== "string" || !ENTRY_KINDS.has(ref.kind) || typeof ref.id !== "string" || !ref.id) continue;
+    const key = `${ref.kind}:${ref.id}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ kind: ref.kind as PlotEntryRef["kind"], id: ref.id });
+    if (out.length >= 50) break;
+  }
+  return out;
 }
 
 export interface PlotLink {
@@ -312,6 +342,7 @@ export function normalizePlot(raw: unknown, mainName: string): PlotData {
       characterIds: ids(e.characterIds),
       povId: idOrNull(e.povId),
       locationId: idOrNull(e.locationId),
+      entries: cleanEntries(e.entries),
       nodeId: idOrNull(e.nodeId),
       alsoNodeIds: ids(e.alsoNodeIds)
         .filter((x) => x !== idOrNull(e.nodeId))
@@ -495,9 +526,6 @@ export function pastRowsCount(data: PlotData): number {
   }
   return Math.max(PAST_MIN_ROWS, -min + 2);
 }
-
-/** Vrai pour un moment du passé narratif (avant le début de l'histoire). */
-export const isPast = (row: number) => row < 0;
 
 /**
  * Numéro affiché d'un moment : 1, 2, 3… pour l'histoire principale,
@@ -915,6 +943,11 @@ export function eventsOfLocation(data: PlotData, locationId: string): PlotEvent[
   return planOrder(data).filter((e) => e.locationId === locationId);
 }
 
+/** Événements où apparaît une fiche du monde (objet, faction…), dans l'ordre du plan. */
+export function eventsOfEntry(data: PlotData, kind: PlotEntryRef["kind"], id: string): PlotEvent[] {
+  return planOrder(data).filter((e) => e.entries.some((ref) => ref.kind === kind && ref.id === id));
+}
+
 /** Événements racontés dans un élément (scène principale), dans l'ordre de la scène. */
 export function eventsOfNode(data: PlotData, nodeId: string): PlotEvent[] {
   const plan = planOrder(data).filter((e) => e.nodeId === nodeId);
@@ -951,10 +984,6 @@ export function attachToNode(data: PlotData, eventId: string, nodeId: string | n
 export function moveInScene(data: PlotData, nodeId: string, eventId: string, delta: number) {
   const order = eventsOfNode(data, nodeId).map((e) => e.id);
   data.sceneOrder[nodeId] = moveInReadingOrder(order, eventId, delta);
-}
-
-export function eventsOfNote(data: PlotData, noteId: string): PlotEvent[] {
-  return planOrder(data).filter((e) => e.noteIds.includes(noteId));
 }
 
 /** Retire les liens vers des éléments qui n'existent plus (nettoyage volontaire). Modifie `data`. */
@@ -1031,6 +1060,3 @@ export function nextColor(data: PlotData): string {
   const used = new Set(data.lanes.map((lane) => lane.color.toLowerCase()));
   return PLOT_PALETTE.find((color) => !used.has(color)) ?? PLOT_PALETTE[data.lanes.length % PLOT_PALETTE.length];
 }
-
-/** Total des mots renseignés sur les événements. */
-export const sumWords = (data: PlotData) => data.events.reduce((sum, event) => sum + event.words, 0);

@@ -1,4 +1,3 @@
-import { errorText } from "@/lib/errors";
 import { toast } from "@/stores/toastStore";
 
 /*
@@ -16,11 +15,6 @@ export const SAVED_DURATION = 2500;
 /** « … enregistré » : confirmation discrète. */
 export function notifySaved(message: string, key?: string) {
   toast({ tone: "success", message, key: key && `saved:${key}`, duration: SAVED_DURATION });
-}
-
-/** Échec d'un enregistrement : message clair (et piste de solution). */
-export function notifySaveFailed(error: unknown, key?: string, fallbackKey?: string) {
-  toast({ tone: "error", message: errorText(error, fallbackKey), key: key && `saved:${key}` });
 }
 
 /** Échec avec un message déjà rédigé. */

@@ -584,6 +584,10 @@ pub async fn close_pool(state: &AppState, project_id: &str) {
     }
 }
 
+/// Nouveaux essais de suppression d'un dossier verrouillé, et leur écart.
+const REMOVE_ATTEMPTS: u32 = 20;
+const REMOVE_RETRY_DELAY: std::time::Duration = std::time::Duration::from_millis(50);
+
 /// Supprime le stockage d'un projet : ferme sa connexion puis efface
 /// son dossier (et un éventuel reste de l'ancien dossier temporaire).
 ///
@@ -600,15 +604,21 @@ pub async fn delete_storage(state: &AppState, project_id: &str) {
         return;
     };
 
+    // Sous Windows, un fichier de la base peut rester verrouillé un court
+    // instant après la fermeture des connexions (fin de leurs fils,
+    // antivirus) : on réessaie pendant une seconde au plus.
     for path in [dir, legacy_dir(project_id)] {
-        match std::fs::remove_dir_all(&path) {
-            Ok(()) => {}
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => {}
-            Err(e) => {
-                tracing::warn!(
-                    error = %e,
-                    "Dossier de projet impossible à supprimer"
-                );
+        for attempt in 1..=REMOVE_ATTEMPTS {
+            match std::fs::remove_dir_all(&path) {
+                Ok(()) => break,
+                Err(e) if e.kind() == std::io::ErrorKind::NotFound => break,
+                Err(_) if attempt < REMOVE_ATTEMPTS => tokio::time::sleep(REMOVE_RETRY_DELAY).await,
+                Err(e) => {
+                    tracing::warn!(
+                        error = %e,
+                        "Dossier de projet impossible à supprimer"
+                    );
+                }
             }
         }
     }

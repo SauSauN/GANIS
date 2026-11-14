@@ -24,6 +24,7 @@ import { WorldEditView } from "@/components/workspace/views/WorldEditView";
 import { WorldListView } from "@/components/workspace/views/WorldListView";
 import { NotesListView } from "@/components/workspace/views/NotesListView";
 import { TrashView } from "@/components/workspace/views/TrashView";
+import { GalleryView } from "@/components/workspace/views/GalleryView";
 import {
   ComingSoonView,
   EmptyListView,
@@ -34,7 +35,7 @@ import { WorkspaceHome } from "@/components/workspace/WorkspaceHome";
 import { characterIdOfTab } from "@/lib/characters";
 import { locationIdOfTab } from "@/lib/locations";
 import { noteIdOfTab } from "@/lib/notes";
-import { worldEntryOfTab } from "@/lib/world";
+import { createFeatureOf, listFeatureOf, WORLD_MODULES, worldEntryOfTab } from "@/lib/world";
 import { structureNodeIdOfTab } from "@/lib/structure";
 import type { Project } from "@/types";
 
@@ -46,6 +47,7 @@ import type { Project } from "@/types";
 const NoteEditView = lazy(() => import("@/components/workspace/views/NoteEditView").then((module) => ({ default: module.NoteEditView })));
 const RelationsView = lazy(() => import("@/components/workspace/views/RelationsView").then((module) => ({ default: module.RelationsView })));
 const StickyWallView = lazy(() => import("@/components/workspace/views/StickyWallView").then((module) => ({ default: module.StickyWallView })));
+const GlossaryView = lazy(() => import("@/components/workspace/views/GlossaryView").then((module) => ({ default: module.GlossaryView })));
 const HistoryView = lazy(() => import("@/components/workspace/views/HistoryView").then((module) => ({ default: module.HistoryView })));
 const StructureNodeView = lazy(() => import("@/components/workspace/views/StructureNodeView").then((module) => ({ default: module.StructureNodeView })));
 const PlotBoard = lazy(() => import("@/components/plot/PlotBoard").then((module) => ({ default: module.PlotBoard })));
@@ -57,6 +59,7 @@ const ReplaceView = lazy(() => import("@/components/novel/ReplaceView").then((mo
 const ImportView = lazy(() => import("@/components/novel/ImportView").then((module) => ({ default: module.ImportView })));
 const FlatplanView = lazy(() => import("@/components/manga/FlatplanView").then((module) => ({ default: module.FlatplanView })));
 const ScriptProgressView = lazy(() => import("@/components/manga/ScriptProgressView").then((module) => ({ default: module.ScriptProgressView })));
+const ProductionView = lazy(() => import("@/components/manga/ProductionView").then((module) => ({ default: module.ProductionView })));
 const ContinuityView = lazy(() => import("@/components/manga/ContinuityView").then((module) => ({ default: module.ContinuityView })));
 // Lecture complète (film, série, jeu vidéo, JDR, projet libre).
 const StoryReadView = lazy(() => import("@/components/structure/StoryReadView").then((module) => ({ default: module.StoryReadView })));
@@ -138,6 +141,14 @@ function WorkspaceContent({
     return <SynopsisEditView projectId={project.id} feature={feature} />;
   }
 
+  if (tabId === "gallery") {
+    return <GalleryView project={project} feature={feature} />;
+  }
+
+  if (tabId === "glossary.list") {
+    return <GlossaryView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
   // ---------------------------------------------------------------------------
   // Découpage du récit
   // ---------------------------------------------------------------------------
@@ -202,6 +213,10 @@ function WorkspaceContent({
 
   if (tabId === "script.progress") {
     return <ScriptProgressView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "script.production") {
+    return <ProductionView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
   if (tabId === "script.continuity") {
@@ -309,8 +324,9 @@ function WorkspaceContent({
     );
   }
 
-  if (tabId === "items.create" || tabId === "species.create") {
-    const worldModule = tabId === "items.create" ? "item" : "species";
+  const worldCreate = WORLD_MODULES.find((module) => createFeatureOf(module) === tabId);
+  if (worldCreate) {
+    const worldModule = worldCreate;
     return (
       <WorldCreateView
         key={worldModule}
@@ -322,8 +338,9 @@ function WorkspaceContent({
     );
   }
 
-  if (tabId === "items.list" || tabId === "species.list") {
-    const worldModule = tabId === "items.list" ? "item" : "species";
+  const worldList = WORLD_MODULES.find((module) => listFeatureOf(module) === tabId);
+  if (worldList) {
+    const worldModule = worldList;
     return (
       <WorldListView
         key={worldModule}

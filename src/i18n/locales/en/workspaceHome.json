@@ -14,5 +14,17 @@
     "title": "Project information",
     "createdAt": "Created on",
     "updatedAt": "Last modified"
+  },
+  "gallery": {
+    "label": "World images"
+  },
+  "logo": {
+    "add": "Add a logo",
+    "change": "Change logo",
+    "remove": "Remove logo",
+    "drop": "Drop the image",
+    "alt": "{{name}} logo",
+    "title": "Logo",
+    "hint": "Shown on the project home, next to its name. It keeps its shape, even a wide one."
   }
 }

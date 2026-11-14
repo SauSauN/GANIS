@@ -129,7 +129,12 @@
     "modes": {
       "structure": "By outline",
       "lane": "By storyline"
-    }
+    },
+    "edit": "Edit",
+    "editHint": "Edit the event you are reading: plotline, moment, date, status, characters…",
+    "editPanel": "Edit the event",
+    "newEvent": "Event",
+    "newEventHint": "New event right after this one, in the same plotline"
   },
   "issues": {
     "title": "Automatic checks",
@@ -217,7 +222,10 @@
       "open": "Show this link",
       "toAria": "to",
       "fromAria": "from"
-    }
+    },
+    "entries": "Items, fauna and flora, factions…",
+    "addEntry": "Add an item, a faction…",
+    "removeEntry": "Remove {{name}}"
   },
   "link": {
     "from": "From",
@@ -508,20 +516,30 @@
     "summaryLinks_other": "{{count}} links"
   },
   "inStory": {
-    "title": "In the plot",
+    "title": "Plot",
     "description": {
       "character": "Events where {{name}} appears or carries the point of view.",
       "location": "Events that take place at {{name}}.",
-      "node": "Events told in “{{name}}”."
+      "node": "Events told in “{{name}}”.",
+      "item": "Events where “{{name}}” appears.",
+      "species": "Events where “{{name}}” appears.",
+      "faction": "Events where “{{name}}” is involved.",
+      "people": "Events where “{{name}}” is involved.",
+      "magic": "Events where “{{name}}” is at play."
     },
     "empty": {
       "character": "This character does not appear in any plot event yet.",
       "location": "No plot event takes place here yet.",
-      "node": "No plot event is told here yet."
+      "node": "No plot event is told here yet.",
+      "item": "This item doesn't appear in any plot event yet.",
+      "species": "This entry doesn't appear in any plot event yet.",
+      "faction": "This faction isn't involved in any plot event yet.",
+      "people": "This entry doesn't appear in any plot event yet.",
+      "magic": "This magic isn't at play in any plot event yet."
     },
     "openBoard": "Open the plot board",
     "read": "Read",
-    "pov": "POV"
+    "povLong": "point of view"
   },
   "settings": {
     "colors": "Plot colours",
@@ -556,6 +574,6 @@
     "events_one": "{{count}} plot event told here",
     "events_other": "{{count}} plot events told here",
     "noEvents": "no event",
-    "noEventsHint": "No plot event is told in this scene (scene sheet › In the plot)."
+    "noEventsHint": "No plot event is told in this scene (scene sheet › Plot)."
   }
 }

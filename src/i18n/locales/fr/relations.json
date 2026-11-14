@@ -26,6 +26,82 @@
     "4": "Forte",
     "5": "Très forte"
   },
+  "family": {
+    "label": "Lien dans la famille",
+    "none": "Non précisé (cousin, oncle…)",
+    "parent": "{{source}} est le parent de {{target}}",
+    "child": "{{source}} est l'enfant de {{target}}",
+    "partner": "En couple (époux, compagnons)",
+    "sibling": "Frères et sœurs",
+    "direct": "Sans créer les personnes d'entre eux",
+    "grandparent": "{{source}} est le grand-parent de {{target}}",
+    "grandchild": "{{source}} est le petit-enfant de {{target}}",
+    "auntUncle": "{{source}} est l'oncle ou la tante de {{target}}",
+    "nephew": "{{source}} est le neveu ou la nièce de {{target}}",
+    "cousin": "Cousins, cousines",
+    "someone": "…",
+    "hint": "Sert à dessiner l'arbre généalogique (Relations › Graphe › Arbre)."
+  },
+  "tree": {
+    "description": "Les relations « Famille » dont le lien est précisé : parent, couple, frères et sœurs, grand-parent, oncle ou tante, cousins.",
+    "add": "Ajouter un lien familial",
+    "loading": "Chargement…",
+    "empty": "Aucun lien familial pour l'instant.",
+    "emptyHint": "Créez une relation de type « Famille » et choisissez son lien : parent, couple ou frères et sœurs.",
+    "emptyFor": "Aucun lien familial pour {{name}}.",
+    "showTree": "Afficher son arbre",
+    "ghost": {
+      "title": "Non mentionné",
+      "of1": "Parent de {{name}}",
+      "of2": "Grand-parent de {{name}}",
+      "of3": "Ancêtre de {{name}}",
+      "hint": "membre de la famille jamais mentionné dans l'histoire"
+    },
+    "open": "Ouvrir la fiche de {{name}}",
+    "others": "Autres liens familiaux",
+    "othersHint": "Lien non précisé : cliquez pour le préciser et le placer dans l'arbre.",
+    "legend": {
+      "parent": "Parent → enfant",
+      "partner": "Couple",
+      "sibling": "Frères et sœurs",
+      "direct": "Grand-parent, oncle ou tante (sans intermédiaire)",
+      "cousin": "Cousins",
+      "ghost": "Membre non mentionné dans l'histoire"
+    },
+    "people_one": "{{count}} personne",
+    "people_other": "{{count}} personnes",
+    "links_one": "{{count}} lien",
+    "links_other": "{{count}} liens",
+    "find": "Trouver une personne…",
+    "toSpecify_one": "{{count}} lien à préciser",
+    "toSpecify_other": "{{count}} liens à préciser",
+    "generation": "Génération {{n}}",
+    "legendTitle": "Légende",
+    "hint": "Molette ou pincement pour zoomer, glisser pour se déplacer. Clic sur une personne : sa famille ; double clic : sa fiche ; clic sur un trait : modifier le lien.",
+    "editLink": "cliquer pour modifier",
+    "kinOf": "Famille de",
+    "kinTitle": "Famille de {{name}}",
+    "close": "Fermer",
+    "noKin": "Aucun proche placé dans l’arbre.",
+    "openSheet": "Ouvrir la fiche",
+    "kin": {
+      "parents": "Parents",
+      "partners": "Couple",
+      "children": "Enfants",
+      "siblings": "Frères et sœurs",
+      "grandparents": "Grands-parents",
+      "grandchildren": "Petits-enfants",
+      "auntsUncles": "Oncles et tantes",
+      "nephews": "Neveux et nièces",
+      "cousins": "Cousins"
+    },
+    "addKin": {
+      "parent": "Parent",
+      "child": "Enfant",
+      "partner": "Conjoint",
+      "sibling": "Frère ou sœur"
+    }
+  },
   "form": {
     "createTitle": "Nouvelle relation",
     "editTitle": "Modifier la relation",
@@ -55,7 +131,7 @@
     "deleteConfirm": "Supprimer définitivement cette relation ?",
     "missingCharacters": "Choisissez les deux personnages.",
     "sameCharacter": "Choisissez deux personnages différents.",
-    "moreDetails": "Plus de détails : intensité, tonalité, période, description"
+    "moreDetails": "Plus de détails"
   },
   "view": {
     "newRelation": "Nouvelle relation",
@@ -69,16 +145,17 @@
       "circle": "Cercle",
       "groups": "Par rôle",
       "ego": "Centré",
-      "free": "Libre"
+      "tree": "Arbre"
     },
     "layoutHints": {
       "force": "Les personnages liés se rapprochent.",
       "circle": "Tous les personnages en cercle.",
       "groups": "Regroupés par rôle dans l'histoire.",
       "ego": "Un personnage au centre, ses proches autour.",
-      "free": "Déplacez les personnages : leur place est enregistrée."
+      "tree": "L'arbre généalogique d'un personnage : sa famille seulement."
     },
     "center": "Au centre",
+    "treeOf": "Arbre de",
     "types": "Types",
     "allTypes": "Tous les types",
     "search": "Rechercher un personnage",

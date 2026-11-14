@@ -9,7 +9,7 @@ interface ViewShellProps {
 /** Cadre commun des vues de la zone centrale : titre, description, contenu. */
 export function ViewShell({ title, description, children }: ViewShellProps) {
   return (
-    <div className="flex-1 overflow-y-auto p-8">
+    <div className="flex-1 overflow-y-auto p-8 [scrollbar-gutter:stable]">
       <div className="mx-auto max-w-2xl space-y-6">
         <div>
           <h2 className="sr-only">{title}</h2>

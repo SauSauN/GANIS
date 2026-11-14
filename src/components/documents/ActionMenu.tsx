@@ -1,6 +1,6 @@
 import { useEffect, useLayoutEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
-import { MoreHorizontal, type LucideIcon } from "lucide-react";
+import { Check, MoreHorizontal, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export interface MenuItem {
@@ -13,6 +13,8 @@ export interface MenuItem {
   danger?: boolean;
   /** Trait de séparation avant l'élément. */
   separated?: boolean;
+  /** Option à cocher (choix parmi plusieurs) : cochée ou non ; absent : simple action. */
+  checked?: boolean;
   run: () => void;
 }
 
@@ -126,7 +128,8 @@ export function ActionMenu({ label, items, trigger, className }: ActionMenuProps
                   {item.separated && <div role="separator" className="my-1 h-px bg-border" />}
                   <button
                     type="button"
-                    role="menuitem"
+                    role={item.checked === undefined ? "menuitem" : "menuitemradio"}
+                    aria-checked={item.checked}
                     disabled={item.disabled}
                     onClick={() => {
                       dismiss(false);
@@ -139,7 +142,8 @@ export function ActionMenu({ label, items, trigger, className }: ActionMenuProps
                   >
                     {Icon ? <Icon className="size-4 shrink-0" /> : <span className="size-4" />}
                     <span className="flex-1">{item.label}</span>
-                    {item.hint && <kbd className="font-mono text-[0.7rem] text-muted-foreground">{item.hint}</kbd>}
+                    {item.hint && <kbd className="text-[0.7rem] text-muted-foreground">{item.hint}</kbd>}
+                    {item.checked && <Check className="size-4 shrink-0 text-primary" aria-hidden="true" />}
                   </button>
                 </div>
               );

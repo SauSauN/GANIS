@@ -55,7 +55,9 @@ export function MenuBar() {
   // paramètres généraux.
   const signedIn = useAuthStore((state) => state.user !== null);
 
-  const wide = useMediaQuery("(min-width: 768px)");
+  // En dessous (demi-écran, Windows à 125 %…) : un seul menu ☰, pour que la
+  // barre de titre garde toujours ses boutons de fenêtre visibles.
+  const wide = useMediaQuery("(min-width: 1024px)");
   const [open, setOpen] = useState<MenuId | null>(null);
   const [active, setActive] = useState(-1);
   const barRef = useRef<HTMLDivElement>(null);
@@ -90,6 +92,7 @@ export function MenuBar() {
     readStory: useCommand("readStory"),
     openTutorial: useCommand("openTutorial"),
     palette: useCommand("palette"),
+    search: useCommand("search"),
   };
 
   const command = (id: CommandId, fallbackLabel: string, shortcut?: AppAction): Entry => ({
@@ -168,13 +171,14 @@ export function MenuBar() {
       SEPARATOR,
       edit("selectAll", t("edit.selectAll"), "Ctrl+A"),
       SEPARATOR,
+      command("search", t("edit.searchProject"), "search"),
       command("palette", t("edit.search"), "palette"),
       SEPARATOR,
       command("openHistory", t("edit.history")),
       command("openTrash", t("edit.trash")),
     ],
     view: [
-      command("togglePanel", t("view.togglePanel")),
+      command("togglePanel", t("view.togglePanel"), "togglePanel"),
       command("toggleRail", t("view.toggleRail")),
       SEPARATOR,
       command("nextTab", t("view.nextTab"), "nextTab"),

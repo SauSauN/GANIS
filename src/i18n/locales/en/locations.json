@@ -368,7 +368,6 @@
     "description": "Pick a type: the sheet adapts (a capital doesn't need the same information as a forest).",
     "search": "Search a type…",
     "noResult": "No matching type.",
-    "manage": "Add your own types",
     "changeTitle": "Change the type of “{{name}}”",
     "changeDescription": "Information already entered is kept, even what no longer applies to the new type.",
     "change": "Change",
@@ -468,12 +467,6 @@
     }
   },
   "links": {
-    "characterTitle": "Linked places",
-    "characterDescription": "Where this character lives, was born, rules…",
-    "locationTitle": "Linked characters",
-    "locationDescription": "Who lives, was born, rules… here.",
-    "add": "Add a link",
-    "empty": "No link yet.",
     "edit": "Edit link",
     "mentions": "Mentioned in sheets",
     "mentionsHint": "These links come from sheet fields (Origin, Ruler…): edit them from the sheet concerned.",

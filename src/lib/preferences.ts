@@ -23,12 +23,6 @@ export type TextSize = "small" | "normal" | "large";
 
 export const TEXT_SIZES: TextSize[] = ["small", "normal", "large"];
 
-export const TEXT_SIZE_LABELS: Record<TextSize, string> = {
-  small: "Petite",
-  normal: "Normale",
-  large: "Grande",
-};
-
 /** Taille de base de l'interface, en pixels (toute l'interface est en rem). */
 const TEXT_SIZE_PX: Record<TextSize, number> = {
   small: 14,
@@ -367,4 +361,161 @@ export function setPanelImageSize(size: number) {
 /** Taille courante des images du panneau, mise à jour dès qu'elle change. */
 export function usePanelImageSize(): number {
   return useSyncExternalStore(subscribeTo(PANEL_IMAGE_EVENT), getPanelImageSize);
+}
+
+// ----------------------------------------------------------------------------
+// Menu clic droit des éléments du panneau du milieu
+// ----------------------------------------------------------------------------
+
+const PANEL_MENU_KEY = "ganis-panel-menu";
+const PANEL_MENU_EVENT = "ganis:panel-menu-change";
+
+/** Vrai si le clic droit ouvre le menu d'un élément (valeur par défaut). */
+export function getPanelMenuEnabled(): boolean {
+  try {
+    return localStorage.getItem(PANEL_MENU_KEY) !== "false";
+  } catch {
+    return true;
+  }
+}
+
+/** Active ou désactive le menu clic droit du panneau du milieu. */
+export function setPanelMenuEnabled(enabled: boolean) {
+  try {
+    localStorage.setItem(PANEL_MENU_KEY, String(enabled));
+  } catch {
+    /* ignoré */
+  }
+
+  window.dispatchEvent(new Event(PANEL_MENU_EVENT));
+}
+
+/** Réglage du menu clic droit, mis à jour dès qu'il change. */
+export function usePanelMenuEnabled(): boolean {
+  return useSyncExternalStore(subscribeTo(PANEL_MENU_EVENT), getPanelMenuEnabled);
+}
+
+// ----------------------------------------------------------------------------
+// Onglets d'aperçu (comme VS Code)
+// ----------------------------------------------------------------------------
+
+const PREVIEW_TABS_KEY = "ganis-preview-tabs";
+const PREVIEW_TABS_EVENT = "ganis:preview-tabs-change";
+
+/**
+ * Vrai (par défaut) : un simple clic dans le panneau du milieu ouvre un
+ * onglet d'aperçu, remplacé par le suivant ; le double-clic le garde.
+ * Faux : chaque clic ouvre un onglet définitif.
+ */
+export function getPreviewTabsEnabled(): boolean {
+  try {
+    return localStorage.getItem(PREVIEW_TABS_KEY) !== "false";
+  } catch {
+    return true;
+  }
+}
+
+/** Active ou désactive les onglets d'aperçu. */
+export function setPreviewTabsEnabled(enabled: boolean) {
+  try {
+    localStorage.setItem(PREVIEW_TABS_KEY, String(enabled));
+  } catch {
+    /* ignoré */
+  }
+
+  window.dispatchEvent(new Event(PREVIEW_TABS_EVENT));
+}
+
+/** Réglage des onglets d'aperçu, mis à jour dès qu'il change. */
+export function usePreviewTabsEnabled(): boolean {
+  return useSyncExternalStore(subscribeTo(PREVIEW_TABS_EVENT), getPreviewTabsEnabled);
+}
+
+// ----------------------------------------------------------------------------
+// Cadre des photos de profil (personnages, lieux, fiches du monde)
+// ----------------------------------------------------------------------------
+
+export type ProfileFrameWidth = "thin" | "medium" | "thick";
+
+export const PROFILE_FRAME_WIDTHS: ProfileFrameWidth[] = ["thin", "medium", "thick"];
+
+/** Épaisseur du cadre, en pixels. */
+const PROFILE_FRAME_PX: Record<ProfileFrameWidth, number> = { thin: 3, medium: 5, thick: 8 };
+
+export interface ProfileFrame {
+  /** Vrai (par défaut) : un cadre entoure chaque photo de profil. */
+  enabled: boolean;
+  /** Couleur « #rrggbb » (blanc par défaut). */
+  color: string;
+  width: ProfileFrameWidth;
+}
+
+export const DEFAULT_PROFILE_FRAME: ProfileFrame = { enabled: true, color: "#ffffff", width: "medium" };
+
+const PROFILE_FRAME_KEY = "ganis-profile-frame";
+const PROFILE_FRAME_EVENT = "ganis:profile-frame-change";
+
+let profileFrameRaw: string | null | undefined;
+let profileFrameCache: ProfileFrame = DEFAULT_PROFILE_FRAME;
+
+export function getProfileFrame(): ProfileFrame {
+  let raw: string | null = null;
+  try {
+    raw = localStorage.getItem(PROFILE_FRAME_KEY);
+  } catch {
+    /* stockage indisponible : réglage par défaut */
+  }
+
+  // Même objet tant que rien n'a changé (exigé par useSyncExternalStore).
+  if (raw === profileFrameRaw) return profileFrameCache;
+  profileFrameRaw = raw;
+
+  try {
+    const parsed = raw ? (JSON.parse(raw) as Partial<ProfileFrame>) : {};
+    profileFrameCache = {
+      enabled: typeof parsed.enabled === "boolean" ? parsed.enabled : DEFAULT_PROFILE_FRAME.enabled,
+      color:
+        typeof parsed.color === "string" && /^#[0-9a-f]{6}$/i.test(parsed.color)
+          ? parsed.color.toLowerCase()
+          : DEFAULT_PROFILE_FRAME.color,
+      width: PROFILE_FRAME_WIDTHS.includes(parsed.width as ProfileFrameWidth)
+        ? (parsed.width as ProfileFrameWidth)
+        : DEFAULT_PROFILE_FRAME.width,
+    };
+  } catch {
+    profileFrameCache = DEFAULT_PROFILE_FRAME;
+  }
+
+  return profileFrameCache;
+}
+
+/** Variables CSS lues par la classe `profile-frame` (voir `index.css`). */
+function paintProfileFrame(frame: ProfileFrame) {
+  const root = document.documentElement;
+  root.style.setProperty("--profile-frame-color", frame.color);
+  root.style.setProperty("--profile-frame-width", `${PROFILE_FRAME_PX[frame.width]}px`);
+  root.dataset.profileFrame = frame.enabled ? "on" : "off";
+}
+
+/** Applique le cadre enregistré au démarrage, avant le premier rendu. */
+export function initProfileFrame() {
+  paintProfileFrame(getProfileFrame());
+}
+
+/** Change le cadre (une partie seulement suffit) et l'applique aussitôt. */
+export function setProfileFrame(change: Partial<ProfileFrame>) {
+  const next = { ...getProfileFrame(), ...change };
+  try {
+    localStorage.setItem(PROFILE_FRAME_KEY, JSON.stringify(next));
+  } catch {
+    /* ignoré */
+  }
+
+  paintProfileFrame(next);
+  window.dispatchEvent(new Event(PROFILE_FRAME_EVENT));
+}
+
+/** Cadre des photos de profil, mis à jour dès qu'il change. */
+export function useProfileFrame(): ProfileFrame {
+  return useSyncExternalStore(subscribeTo(PROFILE_FRAME_EVENT), getProfileFrame);
 }

@@ -7,6 +7,7 @@ import { categoryBackdrop, categoryTint, typeIcon } from "@/components/world/wor
 import type { WorldLabels } from "@/components/world/useWorldLabels";
 import { findType } from "@/lib/world";
 import { PORTRAIT_ACCEPT } from "@/lib/portraitImage";
+import { profileTallImageClass } from "@/components/workspace/views/PageShell";
 import { cn } from "@/lib/utils";
 import { useWorldImageUrl } from "@/stores/worldStore";
 import type { CustomLocationType, WorldEntry, WorldModule } from "@/types";
@@ -108,6 +109,8 @@ interface WorldBannerProps {
   ringColors?: string[];
   onPick: (file: File) => void;
   onRemove: () => void;
+  /** Grande image de la fiche : remplit la hauteur de la carte (écran large). */
+  tall?: boolean;
 }
 
 /**
@@ -124,6 +127,7 @@ export function WorldBanner({
   error,
   disabled = false,
   ringColors = [],
+  tall = false,
   onPick,
   onRemove,
 }: WorldBannerProps) {
@@ -170,7 +174,8 @@ export function WorldBanner({
         title={dragOver ? t("image.drop") : actionLabel}
         aria-label={actionLabel}
         className={cn(
-          "group relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg text-white transition-shadow",
+          "group relative flex w-full items-center justify-center overflow-hidden rounded-lg text-white transition-shadow",
+          tall ? profileTallImageClass : "aspect-square",
           "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
           dragOver && "ring-4 ring-primary ring-offset-2 ring-offset-background",
         )}

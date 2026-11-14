@@ -12,6 +12,11 @@ export default defineConfig({
       "@": path.resolve(import.meta.dirname, "./src"),
     },
   },
+  // Correcteur orthographique (chargé à la demande) : préparé dès le
+  // démarrage, sinon Vite recharge la fenêtre à sa première utilisation.
+  optimizeDeps: {
+    include: ["hunspell-asm/dist/esm/lib/browser/hunspell.js"],
+  },
   // Ne masque pas les erreurs Rust affichées par la CLI Tauri
   clearScreen: false,
   server: {

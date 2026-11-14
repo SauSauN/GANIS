@@ -5,7 +5,9 @@ import { buildStructureTree, flattenVisible } from "@/lib/structure";
 import {
   PANEL_TEXT_KINDS,
   type Character,
+  type ExtraPageKind,
   type Location,
+  type MangaExtraPage,
   type MangaSettings,
   type PageScript,
   type PageScriptInput,
@@ -13,6 +15,7 @@ import {
   type PanelCharacter,
   type PanelText,
   type PanelTextKind,
+  type ProductionStage,
   type Project,
   type Rhythm,
   type StructureDocument,
@@ -228,6 +231,121 @@ export function readingOrder(entries: PageEntry[], { art, unplaced }: FlatplanAr
 }
 
 // ----------------------------------------------------------------------------
+// Fabrication et pages hors récit
+// ----------------------------------------------------------------------------
+
+/** Étapes de fabrication d'une page, dans l'ordre (la valeur est la dernière terminée). */
+export const PRODUCTION_STAGES: readonly ProductionStage[] = ["storyboard", "pencils", "inks", "tones", "lettering", "done"];
+
+/** Couleur de chaque étape ; `none` : rien de commencé. */
+export const PRODUCTION_STAGE_COLORS: Record<ProductionStage | "none", string> = {
+  none: "#94a3b8",
+  storyboard: "#a855f7",
+  pencils: "#3b82f6",
+  inks: "#0d9488",
+  tones: "#d97706",
+  lettering: "#ea580c",
+  done: "#16a34a",
+};
+
+/** Sortes de pages hors récit, dans l'ordre où on les propose. */
+export const EXTRA_PAGE_KINDS: readonly ExtraPageKind[] = [
+  "cover", "title", "toc", "credits", "cast", "foreword", "bonus", "afterword", "preview", "blank", "backCover", "other",
+];
+
+/** Couvertures : hors des pages intérieures, sans folio. */
+export const isCoverKind = (kind: ExtraPageKind) => kind === "cover" || kind === "backCover";
+
+/** Avancement d'une étape (0 : rien, 6 : validée) ; sert aux pourcentages. */
+export function stageRank(stage: ProductionStage | null): number {
+  return stage ? PRODUCTION_STAGES.indexOf(stage) + 1 : 0;
+}
+
+/** Nombre de pages à chaque étape. */
+export function stageCounts(stages: Array<ProductionStage | null>): Record<ProductionStage | "none", number> {
+  const counts = { none: 0, storyboard: 0, pencils: 0, inks: 0, tones: 0, lettering: 0, done: 0 };
+  for (const stage of stages) counts[stage ?? "none"]++;
+  return counts;
+}
+
+/** Avancement moyen de pages, de 0 à 100 (chaque étape compte pour un sixième). */
+export function productionPercent(stages: Array<ProductionStage | null>): number {
+  if (!stages.length) return 0;
+  const total = stages.reduce((sum, stage) => sum + stageRank(stage), 0);
+  return Math.round((total / (stages.length * PRODUCTION_STAGES.length)) * 100);
+}
+
+/** Pages hors récit d'un tome, triées : couvertures à part, puis avant et après le récit. */
+export interface VolumeExtras {
+  cover: MangaExtraPage | null;
+  backCover: MangaExtraPage | null;
+  front: MangaExtraPage[];
+  back: MangaExtraPage[];
+}
+
+export function extrasOfVolume(extras: readonly MangaExtraPage[], volumeId: string | null): VolumeExtras {
+  const mine = extras
+    .filter((extra) => extra.volumeId === volumeId)
+    .sort((a, b) => a.position - b.position || a.createdAt.localeCompare(b.createdAt));
+  return {
+    cover: mine.find((extra) => extra.kind === "cover") ?? null,
+    backCover: mine.find((extra) => extra.kind === "backCover") ?? null,
+    front: mine.filter((extra) => extra.placement === "front" && !isCoverKind(extra.kind)),
+    back: mine.filter((extra) => extra.placement === "back" && !isCoverKind(extra.kind)),
+  };
+}
+
+/** Page hors récit placée dans le tome, avec son folio. */
+export interface FolioExtra {
+  extra: MangaExtraPage;
+  folio: number;
+}
+
+/** Une page intérieure du tome : du récit ou hors récit. */
+export type FlatplanItem = FolioPage | FolioExtra;
+
+export const isExtraItem = (item: FlatplanItem): item is FolioExtra => "extra" in item;
+
+/** Identifiant d'une page intérieure (page du récit ou page hors récit). */
+export const itemId = (item: FlatplanItem) => (isExtraItem(item) ? item.extra.id : item.page.id);
+
+/**
+ * Pages intérieures d'un tome dans l'ordre d'impression : pages hors récit
+ * d'ouverture, récit, pages hors récit de fin. Les folios se suivent à
+ * partir de `firstFolio` ; les couvertures n'en ont pas.
+ */
+export function volumeSequence(entries: PageEntry[], extras: VolumeExtras, firstFolio: number): FlatplanItem[] {
+  let folio = firstFolio;
+  const items: FlatplanItem[] = [];
+  for (const extra of extras.front) items.push({ extra, folio: folio++ });
+  for (const entry of entries) items.push({ ...entry, folio: folio++ });
+  for (const extra of extras.back) items.push({ extra, folio: folio++ });
+  return items;
+}
+
+/** Folio de la première page d'un tome (réglage du chemin de fer, gardé sur cet ordinateur). */
+const firstFolioKey = (groupId: string) => `ganis.flatplan.firstFolio.${groupId}`;
+export const MAX_FIRST_FOLIO = 99;
+
+export function storedFirstFolio(groupId: string): number {
+  let value = Number.NaN;
+  try {
+    value = Number.parseInt(localStorage.getItem(firstFolioKey(groupId)) ?? "", 10);
+  } catch {
+    // Stockage indisponible : la première page porte le numéro 1.
+  }
+  return value >= 1 && value <= MAX_FIRST_FOLIO ? value : 1;
+}
+
+export function rememberFirstFolio(groupId: string, value: number) {
+  try {
+    localStorage.setItem(firstFolioKey(groupId), String(value));
+  } catch {
+    // Préférence gardée pour cette séance seulement.
+  }
+}
+
+// ----------------------------------------------------------------------------
 // Brouillon d'une page
 // ----------------------------------------------------------------------------
 
@@ -357,6 +475,13 @@ export function moveItem<T>(list: T[], from: number, to: number): T[] {
 
 export interface ScriptExportLabels {
   subtitle: string;
+  /** Titre d'une page avec son folio : « p. 12 — Page 3 ». Absent : titre seul. */
+  folio?: (folio: number, label: string) => string;
+  /** Titre d'une page hors récit (`folio` : `null` pour une couverture). */
+  extraHeading?: (extra: MangaExtraPage, folio: number | null) => string;
+  /** Titres des parties « avant le récit » et « après le récit ». */
+  frontMatter?: string;
+  backMatter?: string;
   cast: string;
   places: string;
   pageHeading: (label: string, panels: number) => string;
@@ -385,6 +510,11 @@ export interface ScriptExportInput {
   nameOf: (character: Character) => string;
   includeCast: boolean;
   labels: ScriptExportLabels;
+  /**
+   * Tome exporté avec ses folios et ses pages hors récit (voir
+   * `volumeSequence`). Absent : les pages de `entries`, sans folio.
+   */
+  volume?: { items: FlatplanItem[]; extras: VolumeExtras };
 }
 
 const plain = (text: string) => ({ type: "paragraph" as const, runs: [{ text }] });
@@ -399,12 +529,27 @@ export function buildScriptExport(input: ScriptExportInput): ExportDocument {
     return c ? input.nameOf(c) : "";
   };
   const blocks: ExportBlock[] = [];
+  const items: FlatplanItem[] = input.volume?.items ?? input.entries.map((entry) => ({ ...entry, folio: 0 }));
+  const storyPages = items.filter((item): item is FolioPage => !isExtraItem(item));
+  const withFolio = Boolean(input.volume);
+
+  // Pages hors récit : titre, puis indications.
+  const matter = (title: string | undefined, list: Array<{ extra: MangaExtraPage; folio: number | null }>) => {
+    if (!list.length) return;
+    blocks.push({ type: "heading", level: 1, text: title ?? "", pageBreakBefore: blocks.length > 0 });
+    for (const { extra, folio } of list) {
+      blocks.push({ type: "heading", level: 2, text: labels.extraHeading?.(extra, folio) ?? extra.title });
+      if (extra.notes.trim()) blocks.push(plain(extra.notes.trim()));
+    }
+  };
+  const extras = input.volume?.extras;
+  const folioOfExtra = new Map(items.filter(isExtraItem).map((item) => [item.extra.id, item.folio]));
 
   // Personnages et lieux présents dans les pages exportées.
   if (input.includeCast) {
     const castIds = new Set<string>();
     const placeIds = new Set<string>();
-    for (const entry of input.entries) {
+    for (const entry of storyPages) {
       for (const panel of input.panels.get(entry.page.id) ?? []) {
         panel.characters.forEach((c) => castIds.add(c.characterId));
         panel.texts.forEach((t) => t.characterId && castIds.add(t.characterId));
@@ -430,8 +575,15 @@ export function buildScriptExport(input: ScriptExportInput): ExportDocument {
     }
   }
 
+  if (extras) {
+    matter(labels.frontMatter, [
+      ...(extras.cover ? [{ extra: extras.cover, folio: null }] : []),
+      ...extras.front.map((extra) => ({ extra, folio: folioOfExtra.get(extra.id) ?? null })),
+    ]);
+  }
+
   let currentChapter: string | null | undefined;
-  for (const entry of input.entries) {
+  for (const entry of storyPages) {
     const chapterId = entry.chapter?.id ?? null;
     if (chapterId !== currentChapter) {
       currentChapter = chapterId;
@@ -443,7 +595,8 @@ export function buildScriptExport(input: ScriptExportInput): ExportDocument {
     }
 
     const panels = input.panels.get(entry.page.id) ?? [];
-    blocks.push({ type: "heading", level: 2, text: labels.pageHeading(input.labelOf(entry.page), panels.length) });
+    const pageLabel = withFolio && labels.folio ? labels.folio(entry.folio, input.labelOf(entry.page)) : input.labelOf(entry.page);
+    blocks.push({ type: "heading", level: 2, text: labels.pageHeading(pageLabel, panels.length) });
     const pageNotes = [entry.page.rhythm ? labels.rhythm(labels.rhythmName(entry.page.rhythm)) : "", entry.page.pageTurn ? labels.pageTurn : ""].filter(Boolean);
     if (pageNotes.length) blocks.push({ type: "paragraph", runs: [{ text: pageNotes.join(" · "), italics: true }] });
     if (entry.page.summary.trim()) blocks.push(plain(entry.page.summary.trim()));
@@ -478,6 +631,13 @@ export function buildScriptExport(input: ScriptExportInput): ExportDocument {
         });
       }
     });
+  }
+
+  if (extras) {
+    matter(labels.backMatter, [
+      ...extras.back.map((extra) => ({ extra, folio: folioOfExtra.get(extra.id) ?? null })),
+      ...(extras.backCover ? [{ extra: extras.backCover, folio: null }] : []),
+    ]);
   }
 
   return { title: input.project.name, subtitle: [labels.subtitle], titlePage: false, layout: "script", blocks };

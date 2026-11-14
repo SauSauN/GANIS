@@ -5,10 +5,8 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import { CharacterSheet } from "@/components/characters/CharacterForm";
 import { PendingGallery, type PendingImage } from "@/components/characters/fields/GalleryField";
@@ -37,6 +35,7 @@ import { useCharacterStore, useProjectCharacters } from "@/stores/characterStore
 import type { CharacterDetailLevel } from "@/types";
 import { errorText } from "@/lib/errors";
 import { notifyError } from "@/lib/notify";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 interface CharacterCreateViewProps {
   projectId: string;
@@ -214,8 +213,7 @@ export function CharacterCreateView({ projectId, feature, onOpenFeature }: Chara
       <PageShell title={feature.label}>
         <Card className={cardClass}>
           <CardHeader className={cardHeaderClass}>
-            <CardTitle>{t("levels.title")}</CardTitle>
-            <CardDescription>{t("levels.firstTime")}</CardDescription>
+            <TitleWithInfo info={t("levels.firstTime")}>{t("levels.title")}</TitleWithInfo>
           </CardHeader>
 
           <CardContent className={cardContentClass}>

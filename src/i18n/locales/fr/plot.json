@@ -129,7 +129,12 @@
     "modes": {
       "structure": "Par plan",
       "lane": "Par trame"
-    }
+    },
+    "edit": "Modifier",
+    "editHint": "Modifier l'événement lu : trame, moment, date, statut, personnages…",
+    "editPanel": "Modifier l'événement",
+    "newEvent": "Événement",
+    "newEventHint": "Nouvel événement juste après celui-ci, dans la même trame"
   },
   "issues": {
     "title": "Repères automatiques",
@@ -217,7 +222,10 @@
       "open": "Afficher ce lien",
       "toAria": "vers",
       "fromAria": "depuis"
-    }
+    },
+    "entries": "Objets, faune et flore, factions…",
+    "addEntry": "Ajouter un objet, une faction…",
+    "removeEntry": "Retirer {{name}}"
   },
   "link": {
     "from": "Part de",
@@ -508,20 +516,30 @@
     "summaryLinks_other": "{{count}} liens"
   },
   "inStory": {
-    "title": "Dans la trame",
+    "title": "Trame",
     "description": {
       "character": "Les événements où {{name}} apparaît ou porte le point de vue.",
       "location": "Les événements qui se passent à {{name}}.",
-      "node": "Les événements racontés dans « {{name}} »."
+      "node": "Les événements racontés dans « {{name}} ».",
+      "item": "Les événements où apparaît « {{name}} ».",
+      "species": "Les événements où apparaît « {{name}} ».",
+      "faction": "Les événements où intervient « {{name}} ».",
+      "people": "Les événements où intervient « {{name}} ».",
+      "magic": "Les événements où « {{name}} » est en jeu."
     },
     "empty": {
       "character": "Ce personnage n'apparaît encore dans aucun événement de la trame.",
       "location": "Aucun événement de la trame ne se passe encore ici.",
-      "node": "Aucun événement de la trame n'est encore raconté ici."
+      "node": "Aucun événement de la trame n'est encore raconté ici.",
+      "item": "Cet objet n'apparaît encore dans aucun événement de la trame.",
+      "species": "Cette fiche n'apparaît encore dans aucun événement de la trame.",
+      "faction": "Cette faction n'intervient encore dans aucun événement de la trame.",
+      "people": "Cette fiche n'apparaît encore dans aucun événement de la trame.",
+      "magic": "Cette magie n'est encore en jeu dans aucun événement de la trame."
     },
     "openBoard": "Ouvrir le plateau de la trame",
     "read": "Lire",
-    "pov": "PDV"
+    "povLong": "point de vue"
   },
   "settings": {
     "colors": "Couleurs des trames",
@@ -556,6 +574,6 @@
     "events_one": "{{count}} événement de la trame raconté ici",
     "events_other": "{{count}} événements de la trame racontés ici",
     "noEvents": "sans événement",
-    "noEventsHint": "Aucun événement de la trame n'est raconté dans cette scène (fiche de la scène › Dans la trame)."
+    "noEventsHint": "Aucun événement de la trame n'est raconté dans cette scène (fiche de la scène › Trame)."
   }
 }

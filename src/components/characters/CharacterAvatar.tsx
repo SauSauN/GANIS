@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { avatarColor, fullName, initials } from "@/lib/characters";
 import { cn } from "@/lib/utils";
@@ -29,13 +30,15 @@ interface AvatarFaceProps {
   /** Coins arrondis au lieu d'un cercle (cadre de la carte de profil). */
   square?: boolean;
   className?: string;
+  /** Style ajouté (couleur du cadre…). */
+  style?: CSSProperties;
 }
 
 /**
  * Avatar d'un personnage : sa photo, ou à défaut ses initiales sur une
  * couleur propre au personnage.
  */
-export function AvatarFace({ colorKey, name, url, size = "md", square = false, className }: AvatarFaceProps) {
+export function AvatarFace({ colorKey, name, url, size = "md", square = false, className, style }: AvatarFaceProps) {
   const { t } = useTranslation("characters");
 
   const shape = cn(
@@ -52,6 +55,7 @@ export function AvatarFace({ colorKey, name, url, size = "md", square = false, c
         alt={t("portrait.alt", { name })}
         draggable={false}
         className={cn(shape, "bg-muted object-cover")}
+        style={style}
       />
     );
   }
@@ -60,7 +64,7 @@ export function AvatarFace({ colorKey, name, url, size = "md", square = false, c
     <span
       aria-hidden="true"
       className={cn(shape, "inline-flex items-center justify-center font-semibold text-white select-none")}
-      style={{ backgroundColor: avatarColor(colorKey) }}
+      style={{ backgroundColor: avatarColor(colorKey), ...style }}
     >
       {initials(name)}
     </span>

@@ -6,6 +6,7 @@ import {
   computeIssues,
   dropMissing,
   eventsOfCharacter,
+  eventsOfEntry,
   matchesFilter,
   EMPTY_FILTER,
   moveInReadingOrder,
@@ -45,6 +46,7 @@ function ev(id: string, laneId: string, row: number, extra: Partial<PlotEvent> =
     characterIds: [],
     povId: null,
     locationId: null,
+    entries: [],
     nodeId: null,
     alsoNodeIds: [],
     noteIds: [],
@@ -329,5 +331,24 @@ describe("passé narratif (moments négatifs)", () => {
     data.links.push({ id: "k3", from: "f1", to: "e1", kind: "impact", label: "", note: "" });
     const again = normalizePlot(JSON.parse(JSON.stringify(data)), "Principale");
     expect(again.links.map((l) => l.id)).toContain("k3");
+  });
+});
+
+describe("fiches du monde dans la trame", () => {
+  it("garde les sortes connues, sans doublon, et retrouve les événements d'une fiche", () => {
+    const data = normalizePlot(
+      {
+        lanes: [{ id: "a", name: "A" }],
+        events: [
+          { id: "e1", laneId: "a", row: 0, entries: [{ kind: "item", id: "i1" }, { kind: "item", id: "i1" }, { kind: "plot", id: "x" }, { kind: "faction", id: "f1" }] },
+          { id: "e2", laneId: "a", row: 1 },
+        ],
+      },
+      "A",
+    );
+    expect(data.events[0].entries).toEqual([{ kind: "item", id: "i1" }, { kind: "faction", id: "f1" }]);
+    expect(data.events[1].entries).toEqual([]);
+    expect(eventsOfEntry(data, "item", "i1").map((e) => e.id)).toEqual(["e1"]);
+    expect(eventsOfEntry(data, "magic", "i1")).toEqual([]);
   });
 });

@@ -1,65 +1,65 @@
-Documents rangés dans le découpage de « Kodama-sen » (retours de l'éditrice,
-planning, dossier éditeur, feuille de lettrage). Une section par document :
-« === doc:<clé> === » ; le fichier, son format et sa place sont dans
-projet.json. Voir ../README.md.
+Documents rangés dans le découpage de « Hanaori » (retours de l'éditrice,
+planning, dossier éditeur, feuille de lettrage, lettre d'Haruo). Une section
+par document : « === doc:<clé> === » ; le fichier, son format et sa place sont
+dans projet.json. Voir ../README.md.
 
 === doc:retours-ch3-v1 ===
-Retours sur le storyboard du chapitre 3 — « Le tunnel n° 7 »
+Retours sur le storyboard du chapitre 3 — « Les Archives englouties »
 
-Page 1 : superbe idée, mais on ne comprend pas que Sōta ne voit rien. À travailler.
+Page 3 : la prophétie arrive trop vite. La faire lire par Nanami, pas en récitatif.
 
-Page 3 : la révélation arrive trop vite. Faire languir une case de plus.
+Page 5 : on ne comprend pas que l'ombre ignore Sora.
 
 === doc:retours-ch3 ===
-Retours sur le storyboard du chapitre 3 — « Le tunnel n° 7 »
+Retours sur le storyboard du chapitre 3 — « Les Archives englouties »
 
-Dans l'ensemble : le meilleur chapitre du tome. La voûte de phalènes est l'image de couverture.
+Dans l'ensemble : le chapitre qui donne les règles du monde, et il les donne bien.
 
-Page 1 : on comprend désormais que Sōta ne voit rien grâce au contrechamp de la case 3. Garder.
+Page 3 : la prophétie lue par Nanami, en insert : parfait.
 
-Page 3 : la phrase de Ren est parfaite. Surtout, ne pas ajouter de pensée de Hina après.
+Page 5 : la vue plongeante rend lisible le fait que l'ombre passe sur Sora sans s'arrêter. Garder.
 
-Page 4 : attention, le tourné de page tombe mal. La case « TOKUBEI » est sur une page de gauche, le lecteur voit la page suivante en même temps. Soit décaler d'une page, soit retirer l'effet. (Voir le chemin de fer : l'alerte est signalée.)
-
-Page 9 : ne pas rajouter de texte sur la dernière case.
+Page 6 : la dernière pensée de Sora est la meilleure réplique du tome. Ne rien ajouter après.
 
 === doc:planning-v1 ===
-# Planning de la série
-| Tome | Scénario | Storyboard | Encrage |
-|---|---|---|---|
-| 1 | Septembre | Octobre | Novembre |
-| 2 | Octobre | Novembre | Décembre |
+Planning de la série
 
-Remise à l'éditrice : 15 décembre.
+Tome 1 : prologue et chapitres 1 à 3, remise en décembre.
+
+Tome 2 : à définir.
 
 === doc:planning ===
-# Planning de la série
-Mis à jour après les retours : le chapitre 3 repart en storyboard, le chapitre 6 prend deux pages de plus.
+Planning de la série
 
-| Tome | Scénario | Storyboard | Encrage | Lettrage |
-|---|---|---|---|---|
-| 1 | Fait | Fait (ch. 3 en reprise) | Décembre | Janvier |
-| 2 | Chapitres 5 et 6 en cours | Janvier | Février | Mars |
+Tome 1 : prologue et chapitres 1 à 3. Storyboard terminé, encrage en cours, remise en décembre.
 
-Remise à l'éditrice : 31 mars.
+Tome 2 : chapitres 4 à 6 et épilogue. Chapitre 6 incomplet (7 pages sur 9), épilogue scénarisé en premier jet.
+
+Couverture du tome 2 : les sept lunes alignées au-dessus de l'Île blanche.
 
 === doc:dossier ===
-Kodama-sen — La ligne des échos : dossier de présentation
+Dossier de présentation — Hanaori
 
-Pitch. Dans une vallée condamnée par un barrage, une apprentie contrôleuse muette entend les dernières paroles des morts. Elle a trente jours pour les recueillir dans des lanternes, avant que l'eau ne les efface toutes, et pour écouter enfin celle de son frère.
+**Pitch** : dans un archipel aux sept lunes, une cartographe née sans magie part sauver sa sœur avant que les lunes ne s'alignent.
 
-Public et format. Seinen doux, à partir de 13 ans. Récit complet en deux tomes (environ 60 pages de scénario détaillé, 180 pages dessinées), noir et blanc, sens de lecture japonais.
+**Pourquoi maintenant** : une héroïne qui gagne par ce qui lui manque, dans une grande aventure maritime à équipage.
 
-Pourquoi maintenant. Une histoire sur ce qu'on sacrifie au nom du progrès, sans méchant simple : la directrice construit ce lac par deuil, le mécanicien coupable est celui qui a élevé l'héroïne.
-
-Particularité. Après le prologue, l'héroïne n'a qu'une seule réplique, vers la fin du second tome.
+**Format** : deux tomes, six chapitres et un épilogue, environ 45 pages scénarisées.
 
 === doc:lettrage ===
-Page	Case	Type	Texte
-c3p03	3	Dialogue (écho, bord pointillé)	Ils ont tiré deux fois. Tokubei tenait le détonateur. Hina, compte jusqu'à cent.
-c6p08	2	Dialogue (seule réplique de Hina)	REN.
+Feuille de lettrage — chapitre 5
 
-=== doc:lettre-haruki ===
-Mot retrouvé dans le cartable d'Haruki Ishigami :
+Page 4, case 4 : onomatopée « tok » en petit, dans le sel, sans contour.
 
-Maman, je reviens pour le goûter.
+Page 5, case 2 : « TILIIIING » le long de la clochette, en courbe.
+
+Page 5, case 3 : « WHOOOOOOOM » sur toute la largeur, derrière la baleine.
+
+=== doc:lettre-haruo ===
+Ma petite Sora,
+
+Si tu lis ceci, la carte est à toi. Tu crois qu'elle est vide le jour ; elle ne l'est pas. Elle attend seulement quelqu'un qui sache regarder.
+
+Les autres plient les marées. Toi, tu les vois. C'est plus rare, et ça vaut davantage.
+
+Ton grand-père, Haruo.

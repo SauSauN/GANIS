@@ -71,7 +71,12 @@ pub fn run() {
             // -----------------------------------------------------------------
             // 2. Base de données de l'application
             // -----------------------------------------------------------------
-            let data_dir = app.path().app_data_dir()?;
+            // `GANIS_DATA_DIR` : autre dossier de données (tests de bout en
+            // bout, démonstration), comme pour `seed_demo`.
+            let data_dir = match std::env::var_os("GANIS_DATA_DIR") {
+                Some(dir) if !dir.is_empty() => std::path::PathBuf::from(dir),
+                _ => app.path().app_data_dir()?,
+            };
 
             let app_db = tauri::async_runtime::block_on(async {
                 db::init_app_db(&data_dir).await
@@ -100,6 +105,7 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             app_info,
+            commands::window::show_snap_layouts,
             commands::auth::setup_admin,
             commands::auth::has_any_user,
             commands::auth::register,
@@ -134,6 +140,14 @@ pub fn run() {
             commands::ganix::cancel_ganix_import,
             commands::synopsis::get_synopsis,
             commands::synopsis::update_synopsis,
+            commands::project_images::get_project_logo,
+            commands::project_images::set_project_logo,
+            commands::project_images::remove_project_logo,
+            commands::project_images::list_project_gallery,
+            commands::project_images::get_project_gallery_image,
+            commands::project_images::add_project_gallery_image,
+            commands::project_images::set_project_gallery_caption,
+            commands::project_images::delete_project_gallery_image,
             commands::novel::get_structure_node_content,
             commands::novel::set_structure_node_content,
             commands::novel::get_manuscript_contents,
@@ -153,11 +167,21 @@ pub fn run() {
             commands::manga::set_manga_chapter,
             commands::manga::get_manga_settings,
             commands::manga::set_manga_settings,
+            commands::manga::list_manga_extra_pages,
+            commands::manga::create_manga_extra_page,
+            commands::manga::update_manga_extra_page,
+            commands::manga::reorder_manga_extra_pages,
+            commands::manga::delete_manga_extra_page,
+            commands::manga::set_manga_production_stage,
+            commands::manga::set_manga_extra_art,
+            commands::manga::remove_manga_extra_art,
+            commands::manga::get_manga_extra_art,
             commands::novel::update_editorial,
             commands::novel::save_export_file,
             commands::characters::get_character_settings,
             commands::characters::set_character_detail_level,
             commands::characters::set_character_list,
+            commands::characters::set_character_powers_enabled,
             commands::characters::list_character_gallery,
             commands::characters::get_character_gallery_image,
             commands::characters::add_character_gallery_image,
@@ -260,12 +284,20 @@ pub fn run() {
             commands::structure_links::unlink_structure_character,
             commands::structure_links::link_structure_location,
             commands::structure_links::unlink_structure_location,
+            commands::structure_links::link_structure_entry,
+            commands::structure_links::unlink_structure_entry,
             commands::structure::create_structure_node,
             commands::structure::update_structure_node,
             commands::structure::move_structure_node,
             commands::structure::delete_structure_node,
             commands::plot::get_plot,
             commands::plot::update_plot,
+            commands::sheets::get_sheet_display,
+            commands::sheets::set_sheet_display,
+            commands::glossary::list_glossary_terms,
+            commands::glossary::create_glossary_term,
+            commands::glossary::update_glossary_term,
+            commands::glossary::delete_glossary_term,
             commands::documents::list_structure_documents,
             commands::documents::count_structure_documents,
             commands::documents::get_structure_document_content,

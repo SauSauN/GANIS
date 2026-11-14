@@ -53,6 +53,7 @@ import {
   type ProjectType,
 } from "@/types";
 import { errorText } from "@/lib/errors";
+import { TitleWithInfo } from "@/components/common/TitleWithInfo";
 
 // Les libellés français de `@/types` ne servent plus qu'à lister les valeurs ;
 // le texte affiché vient de `projects.json` (types.* et statuses.*).
@@ -179,8 +180,8 @@ export function ProjectSettingsPanel({
     ) ?? PROJECT_SETTINGS_SECTIONS[0];
 
   return (
-    <main className="flex min-h-0 flex-1 overflow-y-auto">
-      <div className="mx-auto w-full max-w-5xl px-6 py-8 pb-24 lg:px-10">
+    <main className="flex min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]">
+      <div className="mx-auto w-full max-w-5xl 2xl:max-w-7xl min-[137.5rem]:max-w-[100rem] px-6 py-8 pb-24 lg:px-10">
         {/* ================================================================
             EN-TÊTE
             ================================================================ */}
@@ -220,6 +221,12 @@ export function ProjectSettingsPanel({
         {section === "items" && <WorldSettingsSection projectId={project.id} module="item" />}
 
         {section === "species" && <WorldSettingsSection projectId={project.id} module="species" />}
+
+        {section === "factions" && <WorldSettingsSection projectId={project.id} module="faction" />}
+
+        {section === "peoples" && <WorldSettingsSection projectId={project.id} module="people" />}
+
+        {section === "magic" && <WorldSettingsSection projectId={project.id} module="magic" />}
 
         {section === "structure" && (
           <StructureSettingsSection project={project} />
@@ -481,9 +488,7 @@ function StatusSection({ project }: { project: Project }) {
       {/* Organisation */}
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("organization.title")}</CardTitle>
-
-          <CardDescription>{t("organization.description")}</CardDescription>
+          <TitleWithInfo info={t("organization.description")}>{t("organization.title")}</TitleWithInfo>
         </CardHeader>
 
         <CardContent className="flex flex-wrap gap-3 px-6 py-6">
@@ -638,9 +643,7 @@ function DangerSection({ project }: { project: Project }) {
       {/* Export .ganix */}
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("danger.exportTitle")}</CardTitle>
-
-          <CardDescription>{t("danger.exportDescription")}</CardDescription>
+          <TitleWithInfo info={t("danger.exportDescription")}>{t("danger.exportTitle")}</TitleWithInfo>
         </CardHeader>
 
         <CardContent className="space-y-3 px-6 py-6">
@@ -666,9 +669,7 @@ function DangerSection({ project }: { project: Project }) {
       {/* Duplication */}
       <Card className={cardClass}>
         <CardHeader className={cardHeaderClass}>
-          <CardTitle>{t("danger.duplicateTitle")}</CardTitle>
-
-          <CardDescription>{t("danger.duplicateDescription")}</CardDescription>
+          <TitleWithInfo info={t("danger.duplicateDescription")}>{t("danger.duplicateTitle")}</TitleWithInfo>
         </CardHeader>
 
         <CardContent className="space-y-3 px-6 py-6">

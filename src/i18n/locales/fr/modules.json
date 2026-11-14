@@ -40,6 +40,18 @@
     "species": {
       "label": "Faune et flore",
       "empty": "Aucun animal ni aucune plante pour l'instant."
+    },
+    "factions": {
+      "label": "Factions",
+      "empty": "Aucune faction pour l'instant."
+    },
+    "peoples": {
+      "label": "Peuples",
+      "empty": "Aucun peuple, aucune culture ni religion pour l'instant."
+    },
+    "magic": {
+      "label": "Magie",
+      "empty": "Aucune magie ni aucun pouvoir pour l'instant."
     }
   },
   "features": {
@@ -52,6 +64,16 @@
         "label": "Synopsis du projet",
         "description": "Résumé, genres, ton et informations générales de votre histoire."
       }
+    },
+    "glossary": {
+      "list": {
+        "label": "Glossaire",
+        "description": "Les termes propres à votre histoire : mots inventés, lieux, concepts, titres…"
+      }
+    },
+    "gallery": {
+      "label": "Galerie",
+      "description": "Le logo du projet et les images de l'univers et de l'histoire : affiches, cartes du monde, ambiances, croquis… (30 au maximum, glisser-déposer accepté)."
     },
     "characters": {
       "create": {
@@ -150,6 +172,10 @@
         "label": "Chemin de fer",
         "description": "Toutes les pages d'un tome en planches : ce qui est écrit, dessiné, et les tournés de page."
       },
+      "production": {
+        "label": "Suivi de fabrication",
+        "description": "Storyboard, crayonné, encrage, trames, lettrage : où en est chaque page."
+      },
       "progress": {
         "label": "Suivi du scénario",
         "description": "Pages prévues et écrites, statuts, volume de texte."
@@ -177,6 +203,36 @@
       "list": {
         "label": "Liste de la faune et flore",
         "description": "Les espèces de votre univers et leurs individus."
+      }
+    },
+    "factions": {
+      "create": {
+        "label": "Créer une faction",
+        "description": "Guilde, ordre, clan, armée, culte… une fiche adaptée à chaque type."
+      },
+      "list": {
+        "label": "Liste des factions",
+        "description": "Toutes les factions de votre histoire, avec leurs branches."
+      }
+    },
+    "peoples": {
+      "create": {
+        "label": "Créer une fiche",
+        "description": "Peuple, culture, langue, religion, divinité… une fiche adaptée à chaque type."
+      },
+      "list": {
+        "label": "Liste des peuples, cultures et religions",
+        "description": "Tous les peuples, cultures et croyances de votre univers, avec ce qui en dépend."
+      }
+    },
+    "magic": {
+      "create": {
+        "label": "Créer une fiche",
+        "description": "Système, école, sort, technique… une fiche adaptée à chaque type."
+      },
+      "list": {
+        "label": "Liste de la magie et des pouvoirs",
+        "description": "Toutes les règles du pouvoir de votre univers, avec leurs écoles et techniques."
       }
     }
   }

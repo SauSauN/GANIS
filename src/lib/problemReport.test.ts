@@ -62,8 +62,8 @@ describe("nouveautés", () => {
   it("pas à la première installation, une fois après une mise à jour", () => {
     const storage = memory();
     expect(shouldShowWhatsNew("0.0.9", storage)).toBe(false); // première installation
-    expect(shouldShowWhatsNew("0.1.0", storage)).toBe(true); // mise à jour
-    expect(shouldShowWhatsNew("0.1.0", storage)).toBe(false); // déjà vue
+    expect(shouldShowWhatsNew("1.0.0", storage)).toBe(true); // mise à jour
+    expect(shouldShowWhatsNew("1.0.0", storage)).toBe(false); // déjà vue
   });
 
   it("identifiant de traduction sans points", () => {
