@@ -255,7 +255,7 @@ export function RelationDialog({
       >
         <form onSubmit={submit} noValidate className="flex min-h-0 flex-1 flex-col">
           {/* En-tête */}
-          <div className="flex items-center gap-2 border-b px-4 py-2.5" style={{ borderTop: `3px solid ${color}` }}>
+          <div className="flex items-center gap-2 border-b px-4 py-2.5">
             <h2 id="relation-panel-title" className="flex-1 text-base font-semibold">
               {relationId ? t("form.editTitle") : t("form.createTitle")}
             </h2>
@@ -421,8 +421,7 @@ export function RelationDialog({
                       value={draft.intensity}
                       disabled={busy}
                       onChange={(e) => set("intensity", Number(e.target.value))}
-                      className="h-8 w-full"
-                      style={{ accentColor: color }}
+                      className="h-8 w-full accent-primary"
                     />
                   </div>
 

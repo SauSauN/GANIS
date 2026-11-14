@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from "react";
 import { Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 /*
  * Présentation commune des liens d'une fiche (« Liens avec l'univers »,
@@ -11,7 +12,8 @@ import { Button } from "@/components/ui/button";
  */
 
 export function LinkList({ children, ordered }: { children: ReactNode; ordered?: boolean }) {
-  const className = "divide-y rounded-lg border";
+  // `overflow-hidden` : le survol d'une ligne suit les coins arrondis.
+  const className = "divide-y overflow-hidden rounded-lg border";
   return ordered ? <ol className={className}>{children}</ol> : <ul className={className}>{children}</ul>;
 }
 
@@ -65,11 +67,24 @@ interface LinkRowProps {
   /** Bouton crayon : modifier le lien. */
   onEdit?: () => void;
   editLabel?: string;
+  /** Icône du bouton d'action, à la place du crayon (« + » : lier). */
+  editIcon?: ReactNode;
 }
 
-export function LinkRow({ thumb, label, labelColor, name, onOpen, detail, secondary, badge, hint, status, onEdit, editLabel }: LinkRowProps) {
+/**
+ * Ligne d'un lien. Avec `onOpen`, toute la ligne est cliquable : le bouton
+ * du nom s'étend sur la ligne entière (un seul arrêt au clavier) ; le crayon
+ * reste au-dessus et garde son propre clic.
+ */
+export function LinkRow({ thumb, label, labelColor, name, onOpen, detail, secondary, badge, hint, status, onEdit, editLabel, editIcon }: LinkRowProps) {
   return (
-    <li className="flex items-center gap-3 px-3 py-2.5" title={hint}>
+    <li
+      className={cn(
+        "flex items-center gap-3 px-3 py-2.5",
+        onOpen && "relative transition-colors hover:bg-muted/50 focus-within:bg-muted/50",
+      )}
+      title={hint}
+    >
       {thumb}
       <div className="min-w-0 flex-1">
         <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
@@ -79,7 +94,12 @@ export function LinkRow({ thumb, label, labelColor, name, onOpen, detail, second
             </span>
           )}
           {onOpen ? (
-            <button type="button" onClick={onOpen} className="max-w-full truncate text-left font-medium underline-offset-4 hover:underline">
+            <button
+              type="button"
+              data-open=""
+              onClick={onOpen}
+              className="max-w-full truncate text-left font-medium underline-offset-4 outline-none after:absolute after:inset-0 after:content-[''] hover:underline focus-visible:underline"
+            >
               {name}
             </button>
           ) : (
@@ -94,8 +114,8 @@ export function LinkRow({ thumb, label, labelColor, name, onOpen, detail, second
         <span className="size-2.5 shrink-0 rounded-full" style={{ backgroundColor: status.color }} title={status.label} role="img" aria-label={status.label} />
       )}
       {onEdit && (
-        <Button type="button" size="icon-sm" variant="ghost" onClick={onEdit} aria-label={editLabel} title={editLabel}>
-          <Pencil />
+        <Button type="button" size="icon-sm" variant="ghost" onClick={onEdit} aria-label={editLabel} title={editLabel} className="relative z-10">
+          {editIcon ?? <Pencil />}
         </Button>
       )}
     </li>

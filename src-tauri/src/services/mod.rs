@@ -23,6 +23,7 @@ pub mod novel_replace_service;
 pub mod novel_service;
 pub mod plot_service;
 pub mod package_service;
+pub mod project_image_service;
 pub mod project_service;
 pub mod project_storage;
 pub mod relation_service;

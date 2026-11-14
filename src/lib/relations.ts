@@ -116,9 +116,10 @@ export function isActiveAt(
 // Dispositions du graphe
 // ----------------------------------------------------------------------------
 
-export type GraphLayout = "force" | "circle" | "groups" | "ego" | "free";
+/** « tree » : l'arbre généalogique d'un personnage, dessiné à part (`FamilyTree`). */
+export type GraphLayout = "force" | "circle" | "groups" | "ego" | "tree";
 
-export const GRAPH_LAYOUTS: GraphLayout[] = ["force", "circle", "groups", "ego", "free"];
+export const GRAPH_LAYOUTS: GraphLayout[] = ["force", "circle", "groups", "ego", "tree"];
 
 export interface Point {
   x: number;

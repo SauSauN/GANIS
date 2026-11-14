@@ -789,7 +789,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
             </div>
           </div>
         )}
-        <div ref={scrollerRef} className="absolute inset-0 overflow-auto overscroll-contain bg-muted/30">
+        <div ref={scrollerRef} className="absolute inset-0 overflow-auto overscroll-contain bg-muted/30 [scrollbar-gutter:stable]">
           {/* En-têtes des trames */}
           <div className="sticky top-0 z-20 flex w-max min-w-full border-b bg-background" style={{ height: HEAD }}>
             <div className="sticky left-0 z-30 flex shrink-0 items-end justify-center border-r bg-background pb-2 text-xs text-muted-foreground italic" style={{ width: GUTTER }}>

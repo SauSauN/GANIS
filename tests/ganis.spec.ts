@@ -414,10 +414,13 @@ test.describe("Personnages", () => {
     await expect(view()).toContainText("Mirabelle");
   });
 
-  test("arbre généalogique", async () => {
-    await openFeature("Personnages", "Arbre généalogique");
-    await expect(tabs().getByRole("tab", { name: /Arbre généalogique/ })).toBeVisible();
-    await expect(view()).toBeVisible();
+  test("arbre généalogique d'un personnage", async () => {
+    await openFeature("Personnages", "Relations entre personnages");
+    await view().getByRole("radio", { name: "Arbre" }).click();
+    const root = view().getByRole("combobox", { name: "Arbre de" });
+    await root.selectOption({ label: "Aldric VENN" });
+    await expect(root).toHaveValue(/.+/);
+    await view().getByRole("radio", { name: "Réseau" }).click();
   });
 });
 

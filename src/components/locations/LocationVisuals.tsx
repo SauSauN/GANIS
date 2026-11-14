@@ -186,6 +186,8 @@ export function BannerPicker({
         title={dragOver ? t("image.drop") : actionLabel}
         aria-label={actionLabel}
         className={cn(
+          // Cadre réglable, sauf si la fiche a sa propre palette (son liseré le remplace).
+          ringColors.length === 0 && "profile-frame",
           "group relative flex w-full items-center justify-center overflow-hidden rounded-lg text-white transition-shadow",
           tall ? profileTallImageClass : "aspect-square",
           "focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",

@@ -9,6 +9,7 @@ import { packagesApi } from "./packages";
 import { worldApi } from "./world";
 import { glossaryApi } from "./glossary";
 import { sheetsApi } from "./sheets";
+import { projectImagesApi } from "./projectImages";
 
 export { ApiError, isTauri, translateApiError } from "./client";
 
@@ -27,4 +28,5 @@ export const api = {
   ...worldApi,
   ...glossaryApi,
   ...sheetsApi,
+  ...projectImagesApi,
 };

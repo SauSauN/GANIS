@@ -10,9 +10,9 @@ import {
   FileText,
   FileUp,
   Flag,
-  GitFork,
   GalleryThumbnails,
   History,
+  Images,
   Info,
   LayoutGrid,
   List,
@@ -119,12 +119,12 @@ type FeatureId =
   | typeof HOME_TAB
   | "synopsis.edit"
   | "glossary.list"
+  | "gallery"
   | "trash"
   | "history"
   | "characters.create"
   | "characters.list"
   | "characters.relations"
-  | "characters.family"
   | "locations.create"
   | "locations.list"
   | "items.create"
@@ -210,6 +210,7 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
     defineFeature(HOME_TAB, Info),
     defineFeature("synopsis.edit", PenLine),
     defineFeature("glossary.list", BookA),
+    defineFeature("gallery", Images),
     defineFeature("history", History),
     defineFeature("trash", Trash2),
   ]),
@@ -217,7 +218,6 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
     defineFeature("characters.create", UserPlus),
     defineFeature("characters.list", List),
     defineFeature("characters.relations", Network),
-    defineFeature("characters.family", GitFork),
   ]),
   defineListModule("locations", MapPin, [
     defineFeature("locations.create", Plus),

@@ -698,6 +698,13 @@ export interface CharacterLocationInput {
   untilNode: string | null;
 }
 
+/** Image de la galerie de l'univers d'un projet, sans son contenu. */
+export interface ProjectImage {
+  id: string;
+  caption: string | null;
+  createdAt: string;
+}
+
 /** Image de la galerie d'un lieu, sans son contenu. */
 export interface LocationImage {
   id: string;

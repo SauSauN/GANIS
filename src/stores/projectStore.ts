@@ -15,6 +15,7 @@ import { useToastStore } from "@/stores/toastStore";
 import { useTrashStore } from "@/stores/trashStore";
 import { useStructureStore } from "@/stores/structureStore";
 import { useSynopsisStore } from "@/stores/synopsisStore";
+import { useProjectLogoStore } from "@/stores/projectLogoStore";
 import type {
   GanixImportMode,
   GanixImportOutcome,
@@ -318,6 +319,7 @@ export const useProjectStore =
         // périmées et seront relues à la prochaine ouverture.
         if (outcome.backupFile) {
           useSynopsisStore.getState().reset();
+          useProjectLogoStore.getState().reset();
           useCharacterStore.getState().reset();
           useRelationStore.getState().reset();
           useLocationStore.getState().reset();
@@ -442,6 +444,7 @@ export const useProjectStore =
       closeProject: () => {
         // Le synopsis, les personnages et les lieux appartiennent au projet qu'on quitte.
         useSynopsisStore.getState().reset();
+        useProjectLogoStore.getState().reset();
         useCharacterStore.getState().reset();
         useRelationStore.getState().reset();
         useLocationStore.getState().reset();
@@ -466,6 +469,7 @@ export const useProjectStore =
         // invité : aucune donnée de la session précédente ne doit rester
         // en mémoire.
         useSynopsisStore.getState().reset();
+        useProjectLogoStore.getState().reset();
         useCharacterStore.getState().reset();
         useRelationStore.getState().reset();
         useLocationStore.getState().reset();

@@ -18,6 +18,7 @@ pub mod manga;
 pub mod novel;
 pub mod packages;
 pub mod plot;
+pub mod project_images;
 pub mod projects;
 pub mod relations;
 pub mod sheets;

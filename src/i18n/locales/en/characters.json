@@ -176,8 +176,12 @@
   "gallery": {
     "add": "Add",
     "remove": "Remove image",
-    "open": "Enlarge image",
-    "hint": "{{count}} / {{max}} images · you can also drop them here."
+    "open": "View image full size",
+    "hint": "{{count}} / {{max}} images · you can also drop them here.",
+    "close": "Close",
+    "previous": "Previous image",
+    "next": "Next image",
+    "position": "{{current}} / {{total}}"
   },
   "portrait": {
     "add": "Add an image",

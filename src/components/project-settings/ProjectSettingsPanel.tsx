@@ -180,7 +180,7 @@ export function ProjectSettingsPanel({
     ) ?? PROJECT_SETTINGS_SECTIONS[0];
 
   return (
-    <main className="flex min-h-0 flex-1 overflow-y-auto">
+    <main className="flex min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]">
       <div className="mx-auto w-full max-w-5xl 2xl:max-w-7xl min-[137.5rem]:max-w-[100rem] px-6 py-8 pb-24 lg:px-10">
         {/* ================================================================
             EN-TÊTE

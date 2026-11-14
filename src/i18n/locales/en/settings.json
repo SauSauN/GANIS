@@ -150,6 +150,37 @@
       "toggle": "Right-click menu",
       "on": "On: right-clicking opens the element's menu.",
       "off": "Off: right-clicking does nothing; left-clicking still opens the sheet."
+    },
+    "previewTabs": {
+      "title": "Preview tabs",
+      "description": "Like VS Code: a single click on an item in the middle panel opens it in a temporary tab (italic title), replaced by the next item opened the same way. Double-clicking the item or the tab, editing it or pinning it keeps it open.",
+      "toggle": "Open as a preview on single click",
+      "on": "On: a click opens a preview, a double-click keeps the tab.",
+      "off": "Off: every click opens a new tab."
+    },
+    "profileFrame": {
+      "title": "Profile photo frame",
+      "description": "A frame surrounds the photo of characters, places, items and other sheets, on the sheet and in lists. White by default, like a photo print.",
+      "toggle": "Frame around photos",
+      "on": "On: every profile photo has a frame.",
+      "off": "Off: photos are shown without a frame.",
+      "color": "Colour",
+      "customColor": "Other colour…",
+      "width": "Thickness",
+      "widths": {
+        "thin": "Thin",
+        "medium": "Medium",
+        "thick": "Thick"
+      },
+      "colors": {
+        "white": "White",
+        "cream": "Cream",
+        "lightGrey": "Light grey",
+        "grey": "Grey",
+        "black": "Black",
+        "gold": "Gold"
+      },
+      "reset": "Back to the default white frame"
     }
   },
   "developer": {

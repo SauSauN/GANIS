@@ -238,18 +238,22 @@
       "close": "Close tab"
     },
     "profile": {
-      "topLevel": "At the top of the plan",
-      "contains_one": "Contains {{count}} element",
-      "contains_other": "Contains {{count}} elements",
       "unnumbered": "Not numbered",
       "openPlan": "Show in the plan",
-      "path": "Location in the plan",
       "noSummary": "No summary yet."
     },
     "sections": {
       "info": {
         "title": "Information",
         "description": "Title, number and summary."
+      },
+      "universe": {
+        "title": "Links with the world",
+        "description": "The characters, places and world sheets of “{{name}}”, sorted by kind.",
+        "add": "Add a link",
+        "choose": "Choose…",
+        "empty": "No links yet.",
+        "noItems": "The project has no characters, places or world sheets yet."
       },
       "characters": {
         "title": "Characters",

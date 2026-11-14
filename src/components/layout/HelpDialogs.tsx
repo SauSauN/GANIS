@@ -87,7 +87,9 @@ function GuideDialog({ open, onClose }: { open: boolean; onClose: () => void }) 
   };
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-3xl" guardInput={false}>
+    // Assez large pour que l'étape la plus longue tienne sans barre de
+    // défilement sur un écran d'ordinateur portable.
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-5xl" guardInput={false}>
       <DialogHeader>
         <p className="text-xs font-medium text-primary">
           {t("guide.progress", { current: step + 1, total: STEPS.length })}

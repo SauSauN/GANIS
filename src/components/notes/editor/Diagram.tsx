@@ -24,6 +24,7 @@ import "@xyflow/react/dist/style.css";
 import { useTranslation } from "react-i18next";
 import { ArrowRight, Maximize2, Minimize2, Plus, Trash2 } from "lucide-react";
 import { isStickyColor, STICKY_COLORS, STICKY_STYLES } from "@/lib/notes";
+import { ColorMenu } from "@/components/common/ColorMenu";
 import { cn } from "@/lib/utils";
 import type { StickyColor } from "@/types";
 
@@ -386,42 +387,17 @@ function DiagramCanvas({ node, updateAttributes, deleteNode, editor }: ReactNode
                 onChange={(event) => setNodeData(selectedNode.id, { label: event.target.value })}
                 className="h-7 min-w-40 flex-1 resize-none rounded border border-input bg-background px-2 py-1 text-xs outline-none focus:ring-2 focus:ring-ring"
               />
-              <div className="flex items-center">
-                <button
-                  type="button"
-                  title={t("editor.diagram.noColor")}
-                  aria-label={t("editor.diagram.noColor")}
-                  aria-pressed={!selectedNode.data.color}
-                  onClick={() => setNodeData(selectedNode.id, { color: null })}
-                  className="flex size-6 items-center justify-center rounded-full hover:bg-muted"
-                >
-                  <span
-                    className={cn(
-                      "size-4 rounded-full border bg-card",
-                      !selectedNode.data.color && "ring-2 ring-ring ring-offset-1",
-                    )}
-                  />
-                </button>
-                {STICKY_COLORS.map((color) => (
-                  <button
-                    key={color}
-                    type="button"
-                    title={t(`colors.${color}`)}
-                    aria-label={t(`colors.${color}`)}
-                    aria-pressed={selectedNode.data.color === color}
-                    onClick={() => setNodeData(selectedNode.id, { color })}
-                    className="flex size-6 items-center justify-center rounded-full hover:bg-muted"
-                  >
-                    <span
-                      className={cn(
-                        "size-4 rounded-full border border-black/10",
-                        selectedNode.data.color === color && "ring-2 ring-ring ring-offset-1",
-                      )}
-                      style={{ background: STICKY_STYLES[color].swatch }}
-                    />
-                  </button>
-                ))}
-              </div>
+              <ColorMenu
+                label={t("colorLabel")}
+                size="sm"
+                options={STICKY_COLORS.map((color) => ({ value: color, swatch: STICKY_STYLES[color].swatch, label: t(`colors.${color}`) }))}
+                value={selectedNode.data.color ?? null}
+                current={selectedNode.data.color ? STICKY_STYLES[selectedNode.data.color].swatch : null}
+                none={{ label: t("editor.diagram.noColor") }}
+                onSelect={(color) =>
+                  setNodeData(selectedNode.id, { color: color && isStickyColor(color) ? color : null })
+                }
+              />
             </>
           )}
 

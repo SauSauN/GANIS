@@ -305,6 +305,7 @@
         "items": [
           "La barre de gauche donne accès aux modules : Détails, Personnages, Lieux, Découpage, Notes, et les paramètres du projet en bas. La loupe, en haut à droite (Ctrl+F), ouvre la recherche.",
           "Le panneau du milieu liste les fonctions du module et ses éléments ; un clic ouvre un onglet. Glissez son bord droit pour l'élargir, ou vers la gauche pour le fermer.",
+          "Un simple clic dans le panneau du milieu ouvre un onglet d'aperçu (titre en italique), remplacé par le prochain ; un double-clic, une modification ou l'épinglage le gardent. Réglable dans Paramètres › Apparence.",
           "Les onglets se déplacent par glisser-déposer. Clic droit sur un onglet : l'épingler, fermer les autres, ceux à droite…",
           "Un point ● sur un onglet signale des modifications non enregistrées. La barre d'état, en bas, indique toujours si tout est enregistré.",
           "Ctrl+K ouvre la palette : tapez le nom d'une page, d'une action ou d'un élément pour y aller directement."
@@ -314,7 +315,8 @@
         "title": "Détails du projet",
         "intro": "L'accueil du projet résume votre histoire ; le synopsis la raconte.",
         "items": [
-          "Accueil du projet : description, type, statut et aperçu du synopsis.",
+          "Accueil du projet : logo, description, type, statut et aperçu du synopsis.",
+          "Galerie : le logo du projet (affiché sur l'accueil, à côté du nom ; il garde sa forme, même s'il est long) et les images de l'univers et de l'histoire (affiches, cartes du monde, ambiances, croquis…), 30 au maximum, glisser-déposer accepté.",
           "Synopsis : le résumé de l'histoire, avec ses genres, sous-genres et son ton.",
           "Glossaire : les termes propres à l'histoire (mots inventés, lieux, concepts, titres…), par ordre alphabétique, avec leur définition, une catégorie et des liens vers les fiches.",
           "Historique : tout ce qui a été créé, modifié, supprimé ou restauré dans le projet, jour par jour.",
@@ -331,7 +333,7 @@
           "Lieux : où le personnage vit, travaille, a grandi — avec, si vous le souhaitez, la période du récit concernée.",
           "Palette de couleurs : ses couleurs encadrent le portrait du personnage.",
           "Pouvoirs : pour les histoires où les personnages ont des pouvoirs, des dons ou de la magie, activez la carte « Pouvoirs » dans Paramètres du projet › Personnages. Elle s'ajoute à toutes les fiches, quel que soit le niveau de détail.",
-          "Arbre généalogique : dans Personnages › Arbre généalogique, les relations « Famille » dont le lien est précisé (parent, couple, frères et sœurs) se rangent génération par génération, y compris un grand-parent, un oncle, une tante ou des cousins reliés directement, sans créer les personnes d'entre eux. Un clic sur une personne ouvre sa fiche."
+          "Arbre généalogique : dans Relations, disposition « Arbre », choisissez un personnage pour voir sa famille seulement, génération par génération, d'après les relations « Famille » dont le lien est précisé. Un grand-parent, un oncle ou un cousin relié sans les personnes d'entre eux fait apparaître ces membres en fantômes « Non mentionné ». Un double clic sur une personne ouvre sa fiche."
         ]
       },
       "locations": {
@@ -405,9 +407,9 @@
         "items": [
           "Roman : parties, chapitres, scènes. Film : actes, séquences, scènes. Manga : tomes, chapitres, pages… Les noms se changent dans les paramètres du projet.",
           "Les numéros se calculent seuls ; vous pouvez sortir un élément de la numérotation (prologue, interlude).",
-          "La fiche d'un élément lie aussi les fiches du monde (section « Univers ») : un objet au cœur de la scène, une faction présente, une magie citée. Une fiche du monde peut aussi se lier à un élément depuis sa section « Récit ».",
+          "La fiche d'un élément réunit tous ses liens dans « Liens avec l'univers », rangés par sorte : personnages (point de vue, présents…), lieux, et fiches du monde (un objet au cœur de la scène, une faction présente, une magie citée). « Ajouter un lien », dans le titre de la carte, propose la sorte puis l'élément et son rôle ; le crayon d'une ligne change le rôle ou retire le lien. Une fiche du monde peut aussi se lier à un élément depuis sa section « Récit ».",
           "La numérotation automatique (renumérotation à chaque déplacement) s'active dans les paramètres du projet, tout comme la couleur de chaque niveau.",
-          "La fiche d'un élément montre son résumé, ses personnages (point de vue, présents…) et ses lieux.",
+          "La fiche d'un élément montre son résumé et ses liens avec l'univers.",
           "Documents : dans la fiche d'un élément, rangez ses fichiers (pages de manga, PDF, Word, images, sons…) avec « Ajouter des fichiers » ou par glisser-déposer. Ils sont rangés dans le projet (chiffrés si le projet est privé) et exportés dans le .ganix.",
           "Cliquez sur un document pour le lire dans GANIS ; « Lire les pages » enchaîne les images d'un chapitre. « Modifier dans l'application » l'ouvre dans Word, Acrobat, Clip Studio… : chaque enregistrement est repris, l'ancien contenu reste dans les versions.",
           "Manga / BD : Scénario › Chemin de fer montre les pages d'un tome en planches, dans le sens de lecture choisi. Une page affiche le dessin rangé sur sa fiche ; à défaut, les dessins rangés sur le chapitre sont répartis dans l'ordre. La première page imprimée décide des vis-à-vis : une révélation prévue au tourné sur une page paire est signalée.",

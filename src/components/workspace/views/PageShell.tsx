@@ -63,7 +63,7 @@ interface PageShellProps {
 
 export function PageShell({ title, description, info, actions, children }: PageShellProps) {
   return (
-    <main className="relative flex min-h-0 flex-1 overflow-y-auto overscroll-contain">
+    <main className="relative flex min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]">
       {/* `@container` : les fiches s'organisent selon la place de la page
           (panneau du milieu ouvert ou non, demi-écran…), pas selon la fenêtre. */}
       <div className="@container mx-auto w-full max-w-5xl 2xl:max-w-7xl min-[137.5rem]:max-w-[100rem] px-6 py-8 pb-24 lg:px-10">

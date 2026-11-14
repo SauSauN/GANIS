@@ -112,7 +112,11 @@
     "retry": "Retry",
     "noResult": "No entry matches your search.",
     "expand": "Expand",
-    "collapse": "Collapse"
+    "collapse": "Collapse",
+    "layout": "Display",
+    "tree": "Tree",
+    "grid": "Cards",
+    "inside": "in {{name}}"
   },
   "sidebar": {
     "loading": "Loading…",
@@ -396,7 +400,7 @@
     "categories": {
       "weapon": {
         "label": "Weapons",
-        "description": "Swords, bows, firearms, explosives…"
+        "description": "Swords, axes, bows, firearms, explosives, ammunition…"
       },
       "armor": {
         "label": "Armor and protection",
@@ -1161,15 +1165,15 @@
     "categories": {
       "people": {
         "label": "Peoples and races",
-        "description": "Ethnic groups, fantasy races, alien civilisations, artificial or spirit beings, nomads…"
+        "description": "Ethnic groups, fantasy races, aliens…"
       },
       "culture": {
         "label": "Cultures and traditions",
-        "description": "Cultures, customs and festivals, languages, social classes…"
+        "description": "Customs, festivals, languages, social classes…"
       },
       "religion": {
         "label": "Religions and beliefs",
-        "description": "Religions, pantheons, deities, mythologies, philosophies, prophecies…"
+        "description": "Religions, pantheons, deities, mythologies…"
       }
     },
     "types": {
@@ -1364,7 +1368,7 @@
     "categories": {
       "system": {
         "label": "Systems",
-        "description": "The great rules of power: magic, inner energy (ki, chakra…), superpowers, divine power, psionics, alchemy…"
+        "description": "Magic, ki, superpowers, psionics, alchemy…"
       },
       "branch": {
         "label": "Schools and branches",
@@ -1372,7 +1376,7 @@
       },
       "technique": {
         "label": "Spells and techniques",
-        "description": "Spells, techniques, rituals, transformations, summonings, forbidden arts…"
+        "description": "Spells, rituals, transformations, summonings…"
       }
     },
     "types": {

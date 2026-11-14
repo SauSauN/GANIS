@@ -238,18 +238,22 @@
       "close": "Fermer l'onglet"
     },
     "profile": {
-      "topLevel": "À la racine du plan",
-      "contains_one": "Contient {{count}} élément",
-      "contains_other": "Contient {{count}} éléments",
       "unnumbered": "Hors numérotation",
       "openPlan": "Voir dans le plan",
-      "path": "Emplacement dans le plan",
       "noSummary": "Pas encore de résumé."
     },
     "sections": {
       "info": {
         "title": "Informations",
         "description": "Titre, numéro et résumé."
+      },
+      "universe": {
+        "title": "Liens avec l'univers",
+        "description": "Les personnages, les lieux et les fiches du monde de « {{name}} », rangés par sorte.",
+        "add": "Ajouter un lien",
+        "choose": "Choisir…",
+        "empty": "Aucun lien pour l'instant.",
+        "noItems": "Le projet n'a encore ni personnage, ni lieu, ni fiche du monde."
       },
       "characters": {
         "title": "Personnages",

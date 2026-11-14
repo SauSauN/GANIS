@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CharacterAvatar } from "@/components/characters/CharacterAvatar";
 import { useListLabel } from "@/components/characters/fields/SpecialFields";
+import { FamilyTree } from "@/components/relations/FamilyTree";
 import { RelationDialog } from "@/components/relations/RelationDialog";
 import { useRelationColors } from "@/components/relations/useRelationColors";
 import { RelationGraph, type GraphGroup } from "@/components/relations/RelationGraph";
@@ -42,12 +43,11 @@ import {
   otherEnd,
   relationsOf,
   type GraphLayout,
-  type Point,
   type Positions,
 } from "@/lib/relations";
 import { cn } from "@/lib/utils";
 import { useProjectCharacters } from "@/stores/characterStore";
-import { useProjectRelations, useRelationStore } from "@/stores/relationStore";
+import { useProjectRelations } from "@/stores/relationStore";
 import type { Character, Relation, RelationInput, RelationType } from "@/types";
 
 type ViewMode = "graph" | "matrix" | "list";
@@ -77,7 +77,9 @@ const DEFAULT_PREFS: ViewPrefs = { mode: "graph", layout: "force", showLabels: t
 
 function loadPrefs(): ViewPrefs {
   try {
-    return { ...DEFAULT_PREFS, ...JSON.parse(localStorage.getItem(PREFS_KEY) ?? "{}") };
+    const prefs: ViewPrefs = { ...DEFAULT_PREFS, ...JSON.parse(localStorage.getItem(PREFS_KEY) ?? "{}") };
+    // Disposition disparue (l'ancienne « libre ») : retour au réseau.
+    return GRAPH_LAYOUTS.includes(prefs.layout) ? prefs : { ...prefs, layout: DEFAULT_PREFS.layout };
   } catch {
     return DEFAULT_PREFS;
   }
@@ -108,9 +110,7 @@ export function RelationsView({ projectId, feature, onOpenFeature }: RelationsVi
   const { t } = useTranslation(["relations", "characters"]);
   const listLabel = useListLabel();
   const { characters, lists, loaded: charactersLoaded } = useProjectCharacters(projectId);
-  const { relations, positions: savedPositions, loaded, error, reload } = useProjectRelations(projectId);
-  const savePositions = useRelationStore((state) => state.savePositions);
-  const clearPositions = useRelationStore((state) => state.clearPositions);
+  const { relations, loaded, error, reload } = useProjectRelations(projectId);
   const story = useStory(projectId);
 
   const [prefs, setPrefs] = useState<ViewPrefs>(loadPrefs);
@@ -240,31 +240,27 @@ export function RelationsView({ projectId, feature, onOpenFeature }: RelationsVi
       case "ego":
         return { positions: effectiveCenter ? egoLayout(effectiveCenter, ids, links).positions : circleLayout(ids) };
 
-      case "free": {
-        // Positions enregistrées ; les nouveaux venus sont placés par la
-        // disposition « réseau ».
-        const auto = forceLayout(ids, links);
-        return {
-          positions: Object.fromEntries(ids.map((id) => [id, savedPositions[id] ?? auto[id]])),
-        };
-      }
+      case "tree":
+        // Dessiné à part (FamilyTree) : rien à placer ici.
+        return { positions: {} };
 
       default:
         return { positions: forceLayout(ids, links) };
     }
-  }, [prefs.layout, visibleCharacters, visibleRelations, lists, listLabel, effectiveCenter, savedPositions]);
+  }, [prefs.layout, visibleCharacters, visibleRelations, lists, listLabel, effectiveCenter]);
 
-  /** Fin d'un déplacement : enregistré en disposition libre. */
-  function onMoved(characterId: string, center: Point) {
-    if (prefs.layout !== "free") return;
-
-    // Premier déplacement : toutes les positions actuelles sont figées.
-    const missing = visibleCharacters
-      .filter((c) => !savedPositions[c.id] && c.id !== characterId)
-      .map((c) => ({ characterId: c.id, ...positions[c.id] }));
-
-    void savePositions(projectId, [...missing, { characterId, ...center }]);
-  }
+  /**
+   * Arbre : le personnage choisi, sinon le premier qui a un lien familial
+   * précis (pour ne pas ouvrir sur un arbre vide).
+   */
+  const treeRoot = useMemo(() => {
+    const chosen = centerId ?? selectedId;
+    if (chosen && characters.some((c) => c.id === chosen)) return chosen;
+    const withFamily = new Set(
+      relations.filter((r) => r.type === "family" && r.familyLink).flatMap((r) => [r.sourceId, r.targetId]),
+    );
+    return characters.find((c) => withFamily.has(c.id))?.id ?? characters[0]?.id ?? null;
+  }, [centerId, selectedId, characters, relations]);
 
   // ---------------------------------------------------------------------------
   // Dialogue
@@ -402,28 +398,43 @@ export function RelationsView({ projectId, feature, onOpenFeature }: RelationsVi
         </div>
       ) : (
         <div className="relative min-h-0 flex-1">
+          {prefs.mode === "graph" && prefs.layout === "tree" && treeRoot && (
+            <FamilyTree
+              projectId={projectId}
+              characters={characters}
+              relations={visibleRelations}
+              rootId={treeRoot}
+              fitKey={`${fullscreen}`}
+              onRoot={setCenterId}
+              onOpenCharacter={(id) => onOpenFeature(characterTabId(id))}
+              onEditRelation={openEdit}
+              onCreate={(initial) => setDialog({ relationId: null, initial })}
+            />
+          )}
+
+          {prefs.mode === "graph" && prefs.layout !== "tree" && (
+            <RelationGraph
+              projectId={projectId}
+              characters={visibleCharacters}
+              relations={visibleRelations}
+              positions={positions}
+              groups={groups}
+              layoutKey={`${prefs.layout}|${effectiveCenter}|${moment}|${prefs.showIsolated}|${[...hiddenTypes].join()}|${fullscreen}`}
+              selectedId={selectedId}
+              highlightIds={highlightIds}
+              dimmedIds={dimmedIds}
+              showLabels={prefs.showLabels}
+              labelOf={labelOf}
+              onSelect={setSelectedId}
+              onOpenCharacter={(id) => onOpenFeature(characterTabId(id))}
+              onEditRelation={openEdit}
+              onConnect={(source, target) => openCreate(source, target)}
+            />
+          )}
+
           {prefs.mode === "graph" && (
             <>
-              <RelationGraph
-                projectId={projectId}
-                characters={visibleCharacters}
-                relations={visibleRelations}
-                positions={positions}
-                groups={groups}
-                layoutKey={`${prefs.layout}|${effectiveCenter}|${moment}|${prefs.showIsolated}|${[...hiddenTypes].join()}|${fullscreen}`}
-                selectedId={selectedId}
-                highlightIds={highlightIds}
-                dimmedIds={dimmedIds}
-                showLabels={prefs.showLabels}
-                labelOf={labelOf}
-                onSelect={setSelectedId}
-                onOpenCharacter={(id) => onOpenFeature(characterTabId(id))}
-                onEditRelation={openEdit}
-                onConnect={(source, target) => openCreate(source, target)}
-                onMoved={onMoved}
-              />
-
-              {/* Disposition : posée sur le graphe */}
+              {/* Disposition : posée sur le graphe (ou l'arbre) */}
               <div className="absolute top-4 left-4 z-10 flex flex-wrap items-center gap-2">
                 <Segmented
                   value={prefs.layout}
@@ -435,10 +446,10 @@ export function RelationsView({ projectId, feature, onOpenFeature }: RelationsVi
                   onChange={(layout) => updatePrefs({ layout })}
                 />
 
-                {prefs.layout === "ego" && (
+                {(prefs.layout === "ego" || prefs.layout === "tree") && (
                   <select
-                    aria-label={t("view.center")}
-                    value={effectiveCenter ?? ""}
+                    aria-label={prefs.layout === "tree" ? t("view.treeOf") : t("view.center")}
+                    value={(prefs.layout === "tree" ? treeRoot : effectiveCenter) ?? ""}
                     onChange={(e) => setCenterId(e.target.value || null)}
                     className={cn(fieldClass, "h-10 w-52 bg-card shadow-sm")}
                   >
@@ -447,16 +458,9 @@ export function RelationsView({ projectId, feature, onOpenFeature }: RelationsVi
                     ))}
                   </select>
                 )}
-
-                {prefs.layout === "free" && Object.keys(savedPositions).length > 0 && (
-                  <Button variant="outline" size="lg" className="bg-card shadow-sm" onClick={() => void clearPositions(projectId)}>
-                    <RotateCcw />
-                    {t("view.resetLayout")}
-                  </Button>
-                )}
               </div>
 
-              {relations.length === 0 && (
+              {prefs.layout !== "tree" && relations.length === 0 && (
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                   <div className="pointer-events-auto max-w-sm rounded-2xl border bg-card/95 px-8 py-7 text-center shadow-lg">
                     <p className="text-lg font-semibold">{t("view.noRelations")}</p>
@@ -469,7 +473,7 @@ export function RelationsView({ projectId, feature, onOpenFeature }: RelationsVi
                 </div>
               )}
 
-              {relations.length > 0 && !selected && !hintDismissed && (
+              {prefs.layout !== "tree" && relations.length > 0 && !selected && !hintDismissed && (
                 <div className="absolute bottom-4 left-1/2 z-10 flex max-w-lg -translate-x-1/2 items-center gap-2 rounded-full border bg-card/95 py-1.5 pr-1.5 pl-4 text-sm text-muted-foreground shadow-sm">
                   <span>{t("view.dragHint")}</span>
                   <Button
@@ -490,7 +494,7 @@ export function RelationsView({ projectId, feature, onOpenFeature }: RelationsVi
                 </div>
               )}
 
-              {selected && (
+              {prefs.layout !== "tree" && selected && (
                 <DetailsPanel
                   projectId={projectId}
                   character={selected}
@@ -885,7 +889,7 @@ function RelationMatrix({
     relations.filter((r) => (r.sourceId === a && r.targetId === b) || (r.sourceId === b && r.targetId === a));
 
   return (
-    <div className="absolute inset-0 overflow-auto px-6 pt-2 pb-8 lg:px-10">
+    <div className="absolute inset-0 overflow-auto px-6 pt-2 pb-8 lg:px-10 [scrollbar-gutter:stable]">
       <p className="mb-3 text-xs text-muted-foreground">{t("matrix.hint")}</p>
 
       <table className="border-separate border-spacing-0 text-sm">
@@ -998,7 +1002,7 @@ function RelationList({
   };
 
   return (
-    <div className="absolute inset-0 overflow-auto px-6 pt-2 pb-8 lg:px-10">
+    <div className="absolute inset-0 overflow-auto px-6 pt-2 pb-8 lg:px-10 [scrollbar-gutter:stable]">
       <div className="overflow-hidden rounded-xl border bg-card shadow-sm">
         <table className="w-full text-sm">
           <thead className="border-b bg-muted/40 text-left text-xs text-muted-foreground">

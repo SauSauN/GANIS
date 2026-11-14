@@ -352,7 +352,7 @@ export function SynopsisEditView({
   const loadFailed = !synopsis && !loading && error !== null;
 
   return (
-    <main className="flex min-h-0 flex-1 overflow-y-auto">
+    <main className="flex min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]">
       <div className="mx-auto w-full max-w-5xl px-6 py-8 pb-24 lg:px-10">
         {/* ================================================================
             EN-TÊTE

@@ -10,11 +10,12 @@ import { PageShell, cardClass, cardContentClass, cardHeaderClass } from "@/compo
 import { WorldDisabledNotice } from "@/components/workspace/views/WorldListView";
 import { WorldGallery } from "@/components/world/WorldGallery";
 import { UniverseLinksCard } from "@/components/links/UniverseLinksCard";
+import { LinkList, LinkRow } from "@/components/links/LinkRow";
 import { PlotInStoryCard } from "@/components/plot/PlotInStoryCard";
 import { StoryLinksCard } from "@/components/structure/StoryLinksCard";
 import { useSheetDisplay } from "@/stores/sheetDisplayStore";
 import { WorldSheet } from "@/components/world/WorldSheet";
-import { WorldThumb, WorldTypeBadge } from "@/components/world/WorldVisuals";
+import { WorldThumb } from "@/components/world/WorldVisuals";
 import { useWorldLabels } from "@/components/world/useWorldLabels";
 import { errorText } from "@/lib/errors";
 import { notifyError, notifySaved } from "@/lib/notify";
@@ -229,23 +230,18 @@ export function WorldEditView({
       {children.length === 0 ? (
         <p className="text-sm text-muted-foreground">{labels.text("children.empty")}</p>
       ) : (
-        <ul className="grid gap-2 sm:grid-cols-2">
+        // Même présentation que « Liens avec l'univers ».
+        <LinkList>
           {children.map((child) => (
-            <li key={child.id}>
-              <button
-                type="button"
-                onClick={() => onOpenFeature(worldTabId(module, child.id))}
-                className="flex w-full items-center gap-3 rounded-lg border p-2 text-left transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-              >
-                <WorldThumb projectId={projectId} module={module} entry={child} customTypes={settings.customTypes} size="md" />
-                <span className="min-w-0 flex-1 space-y-1">
-                  <span className="block truncate text-sm font-medium">{child.name}</span>
-                  <WorldTypeBadge module={module} type={child.type} customTypes={settings.customTypes} labels={labels} />
-                </span>
-              </button>
-            </li>
+            <LinkRow
+              key={child.id}
+              thumb={<WorldThumb projectId={projectId} module={module} entry={child} customTypes={settings.customTypes} size="sm" />}
+              name={child.name}
+              onOpen={() => onOpenFeature(worldTabId(module, child.id))}
+              badge={labels.type(child.type)}
+            />
           ))}
-        </ul>
+        </LinkList>
       )}
     </CollapsibleCard>
   );

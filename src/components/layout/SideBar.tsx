@@ -42,6 +42,11 @@ interface SideBarProps {
   activeTab: string | null;
   /** Ouvre une fonctionnalité dans un onglet de la zone centrale. */
   onOpenFeature: (featureId: string) => void;
+  /**
+   * Simple clic sur un élément : ouverture en aperçu (comme VS Code). Le
+   * double-clic appelle ensuite `onOpenFeature`, qui le rend définitif.
+   */
+  onPreviewFeature: (featureId: string) => void;
   /** Ferme le panneau (tiré vers la gauche au-delà de sa largeur minimale). */
   onClose: () => void;
 }
@@ -71,12 +76,16 @@ function resetBodyStyle() {
  * La largeur est mémorisée sur l'appareil ; le panneau rouvert retrouve
  * sa largeur précédente.
  */
+/** Délai (ms) dans lequel un second clic rend l'aperçu définitif. */
+const DOUBLE_CLICK_MS = 600;
+
 export function SideBar({
   module: moduleId,
   projectId,
   projectName,
   activeTab,
   onOpenFeature,
+  onPreviewFeature,
   onClose,
 }: SideBarProps) {
   const { t } = useTranslation("sidebar");
@@ -182,10 +191,28 @@ export function SideBar({
     }
   }
 
+  /**
+   * Aperçu (simple clic) : on retient le dernier élément ouvert ainsi. Un
+   * double-clic juste après, sur cet élément, le rend définitif.
+   */
+  const lastPreview = useRef<{ id: string; at: number } | null>(null);
+  const preview = (featureId: string) => {
+    lastPreview.current = { id: featureId, at: Date.now() };
+    onPreviewFeature(featureId);
+  };
+  const keepOnDoubleClick = () => {
+    const last = lastPreview.current;
+    if (last && Date.now() - last.at < DOUBLE_CLICK_MS) {
+      lastPreview.current = null;
+      onOpenFeature(last.id);
+    }
+  };
+
   return (
     <div className="relative flex shrink-0" style={{ width }}>
       <aside
         aria-label={t("label")}
+        onDoubleClick={keepOnDoubleClick}
         aria-hidden={collapsing || undefined}
         className={cn(
           "flex min-w-0 flex-1 flex-col overflow-hidden bg-sidebar text-sidebar-foreground",
@@ -211,7 +238,7 @@ export function SideBar({
         </div>
 
         {module.id === "search" ? (
-          <SideBarSearch projectId={projectId} onOpenFeature={onOpenFeature} />
+          <SideBarSearch projectId={projectId} onOpenFeature={preview} />
         ) : (
           <ul className="px-2">
             {module.features.filter((feature) => featureAvailable(feature.id, projectType)).map(({ id, label, icon: Icon }) => (
@@ -219,7 +246,7 @@ export function SideBar({
                 <button
                   type="button"
                   aria-current={activeTab === id ? "page" : undefined}
-                  onClick={() => onOpenFeature(id)}
+                  onClick={() => preview(id)}
                   className={cn(
                     "flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-sidebar-accent",
                     activeTab === id && "bg-sidebar-accent font-medium",
@@ -238,7 +265,7 @@ export function SideBar({
           <SideBarCharacters
             projectId={projectId}
             activeTab={activeTab}
-            onOpenFeature={onOpenFeature}
+            onOpenFeature={preview}
           />
         )}
 
@@ -247,7 +274,7 @@ export function SideBar({
           <SideBarLocations
             projectId={projectId}
             activeTab={activeTab}
-            onOpenFeature={onOpenFeature}
+            onOpenFeature={preview}
           />
         )}
 
@@ -257,23 +284,23 @@ export function SideBar({
             projectId={projectId}
             module={worldModuleOfWorkspace(module.id)!}
             activeTab={activeTab}
-            onOpenFeature={onOpenFeature}
+            onOpenFeature={preview}
           />
         )}
 
         {/* Découpage du récit, en arborescence, sous « Plan du récit ». */}
         {module.id === "structure" && (
-          <SideBarStructure projectId={projectId} activeTab={activeTab} onOpenFeature={onOpenFeature} />
+          <SideBarStructure projectId={projectId} activeTab={activeTab} onOpenFeature={preview} />
         )}
 
         {/* Trames du projet. */}
         {module.id === "plot" && (
-          <SideBarPlot projectId={projectId} activeTab={activeTab} onOpenFeature={onOpenFeature} />
+          <SideBarPlot projectId={projectId} activeTab={activeTab} onOpenFeature={preview} />
         )}
 
         {/* Dossiers et notes, en arborescence. */}
         {module.id === "notes" && (
-          <SideBarNotes projectId={projectId} activeTab={activeTab} onOpenFeature={onOpenFeature} />
+          <SideBarNotes projectId={projectId} activeTab={activeTab} onOpenFeature={preview} />
         )}
       </aside>
 

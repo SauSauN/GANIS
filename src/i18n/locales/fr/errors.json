@@ -90,7 +90,10 @@
     "descriptionTooLong": "La description du projet ne peut pas dépasser 5000 caractères.",
     "dataMissing": "Les données de ce projet sont introuvables.",
     "purgePublicConfirm": "Ce projet public est partagé avec les autres personnes qui utilisent cet ordinateur : confirmez sa suppression définitive.",
-    "makePrivateConfirm": "Pour rendre ce projet privé, retapez son nom : il ne sera plus accessible aux autres personnes qui utilisent cet ordinateur."
+    "makePrivateConfirm": "Pour rendre ce projet privé, retapez son nom : il ne sera plus accessible aux autres personnes qui utilisent cet ordinateur.",
+    "imageNotFound": "Image introuvable.",
+    "galleryFull": "La galerie est pleine ({{max}} images au maximum).",
+    "captionTooLong": "La légende ne peut pas dépasser {{max}} caractères."
   },
   "synopsis": {
     "tooManyTags": "{{field}} : {{max}} éléments au maximum.",

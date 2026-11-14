@@ -20,11 +20,12 @@ import {
 import { LocationGallery } from "@/components/locations/LocationGallery";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
 import { UniverseLinksCard } from "@/components/links/UniverseLinksCard";
+import { LinkList, LinkRow } from "@/components/links/LinkRow";
 import { StoryLinksCard } from "@/components/structure/StoryLinksCard";
 import { PlotInStoryCard } from "@/components/plot/PlotInStoryCard";
 import { useSheetDisplay } from "@/stores/sheetDisplayStore";
 import { LocationSheet } from "@/components/locations/LocationSheet";
-import { LocationThumb, TypeBadge } from "@/components/locations/LocationVisuals";
+import { LocationThumb } from "@/components/locations/LocationVisuals";
 import { useLocationLabels } from "@/components/locations/useLocationLabels";
 import {
   PageShell,
@@ -262,28 +263,19 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
         {children.length === 0 ? (
           <p className="text-sm text-muted-foreground">{t("sections.children.empty")}</p>
         ) : (
-          <ul className="grid gap-2 sm:grid-cols-2">
+          // Même présentation que « Liens avec l'univers » : une ligne par
+          // lieu contenu, cliquable sur toute sa largeur.
+          <LinkList>
             {children.map((child) => (
-              <li key={child.id}>
-                <button
-                  type="button"
-                  onClick={() => onOpenFeature(locationTabId(child.id))}
-                  className="flex w-full items-center gap-3 rounded-lg border p-2 text-left transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-                >
-                  <LocationThumb
-                    projectId={projectId}
-                    location={child}
-                    customTypes={settings.customTypes}
-                    size="md"
-                  />
-                  <span className="min-w-0 flex-1 space-y-1">
-                    <span className="block truncate text-sm font-medium">{child.name}</span>
-                    <TypeBadge type={child.type} customTypes={settings.customTypes} labels={labels} />
-                  </span>
-                </button>
-              </li>
+              <LinkRow
+                key={child.id}
+                thumb={<LocationThumb projectId={projectId} location={child} customTypes={settings.customTypes} size="sm" />}
+                name={child.name}
+                onOpen={() => onOpenFeature(locationTabId(child.id))}
+                badge={labels.type(child.type)}
+              />
             ))}
-          </ul>
+          </LinkList>
         )}
     </CollapsibleCard>
   );

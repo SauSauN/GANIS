@@ -90,7 +90,10 @@
     "descriptionTooLong": "Project description cannot exceed 5000 characters.",
     "dataMissing": "This project's data cannot be found.",
     "purgePublicConfirm": "This public project is shared with the other people who use this computer: confirm its permanent deletion.",
-    "makePrivateConfirm": "To make this project private, type its name again: other people who use this computer will no longer have access to it."
+    "makePrivateConfirm": "To make this project private, type its name again: other people who use this computer will no longer have access to it.",
+    "imageNotFound": "Image not found.",
+    "galleryFull": "The gallery is full ({{max}} images at most).",
+    "captionTooLong": "The caption cannot exceed {{max}} characters."
   },
   "synopsis": {
     "tooManyTags": "{{field}}: {{max}} items maximum.",

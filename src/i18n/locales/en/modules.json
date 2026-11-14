@@ -71,6 +71,10 @@
         "description": "The words of your story: invented terms, places, concepts, titles…"
       }
     },
+    "gallery": {
+      "label": "Gallery",
+      "description": "The project logo and images of your world and story: posters, world maps, mood boards, sketches… (up to 30, drag and drop works)."
+    },
     "characters": {
       "create": {
         "label": "Create a character",
@@ -83,10 +87,6 @@
       "relations": {
         "label": "Character relationships",
         "description": "Family ties, friendships, rivalries and alliances."
-      },
-      "family": {
-        "label": "Family tree",
-        "description": "Your characters' families, generation by generation."
       }
     },
     "locations": {

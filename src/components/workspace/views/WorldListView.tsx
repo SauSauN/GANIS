@@ -1,26 +1,51 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ChevronDown, ChevronRight, Loader2, Plus, Search, Settings2, UserRound } from "lucide-react";
+import { ChevronDown, ChevronRight, LayoutGrid, ListTree, Loader2, Plus, Search, Settings2, UserRound } from "lucide-react";
+import { ProfileCard } from "@/components/common/ProfileCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { PageShell, fieldClass } from "@/components/workspace/views/PageShell";
 import { WorldThumb, WorldTypeBadge } from "@/components/world/WorldVisuals";
 import { useWorldLabels } from "@/components/world/useWorldLabels";
-import { MODULE_ICONS } from "@/components/world/worldStyle";
+import { MODULE_ICONS, categoryBackdrop, typeIcon } from "@/components/world/worldStyle";
+import type { WorldLabels } from "@/components/world/useWorldLabels";
+import { parseList } from "@/lib/characters";
 import { cn } from "@/lib/utils";
 import {
   buildWorldTree,
   catalogOf,
   createFeatureOf,
+  defaultStatus,
   findType,
   flattenWorldTree,
   hasNature,
   worldSettingsTab,
   worldTabId,
 } from "@/lib/world";
-import { useWorldEntries, useWorldStore } from "@/stores/worldStore";
-import type { SpeciesNature, WorldEntry, WorldModule } from "@/types";
+import { useWorldEntries, useWorldImageUrl, useWorldStore } from "@/stores/worldStore";
+import type { CustomLocationType, SpeciesNature, WorldEntry, WorldModule } from "@/types";
+
+type Layout = "tree" | "grid";
+
+/** Affichage choisi pour chaque module, mémorisé sur l'appareil. */
+const layoutKey = (module: WorldModule) => `ganis.world.${module}.layout`;
+
+function loadLayout(module: WorldModule): Layout {
+  try {
+    return localStorage.getItem(layoutKey(module)) === "grid" ? "grid" : "tree";
+  } catch {
+    return "tree";
+  }
+}
+
+function saveLayout(module: WorldModule, layout: Layout) {
+  try {
+    localStorage.setItem(layoutKey(module), layout);
+  } catch {
+    // Stockage indisponible : choix gardé pour cette session seulement.
+  }
+}
 
 function normalize(text: string): string {
   return text.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
@@ -57,9 +82,10 @@ export function WorldDisabledNotice({
 }
 
 /**
- * Tous les objets (ou toute la faune et la flore) du projet, en
- * arborescence. Recherche par nom ou autre nom, filtre par catégorie et,
- * pour la faune et la flore, par nature (espèces / individus).
+ * Toutes les fiches d'un module du monde (objets, faune et flore,
+ * factions, peuples, magie), en arborescence ou en cartes. Recherche par
+ * nom ou autre nom, filtre par catégorie et, pour la faune et la flore,
+ * par nature (espèces / individus).
  */
 export function WorldListView({
   projectId,
@@ -81,6 +107,12 @@ export function WorldListView({
   const [category, setCategory] = useState<string | null>(null);
   const [nature, setNature] = useState<SpeciesNature | null>(null);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [layout, setLayout] = useState<Layout>(() => loadLayout(module));
+
+  function chooseLayout(next: Layout) {
+    setLayout(next);
+    saveLayout(module, next);
+  }
 
   const customTypes = settings.customTypes;
   const categoryOf = (entry: WorldEntry) => findType(module, entry.type, customTypes)?.category;
@@ -122,6 +154,12 @@ export function WorldListView({
   const rows = flattenWorldTree(buildWorldTree(entries), filtering ? new Set() : collapsed).filter(
     (node) => !visible || visible.has(node.entry.id),
   );
+
+  /** Cartes : les fiches trouvées seulement, par nom. */
+  const cards = entries
+    .filter(matches)
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }));
+  const byId = new Map(entries.map((entry) => [entry.id, entry]));
 
   function toggle(id: string) {
     setCollapsed((current) => {
@@ -216,13 +254,52 @@ export function WorldListView({
             <option value="individual">{labels.nature("individual")}</option>
           </select>
         )}
+
+        <div className="inline-flex rounded-md border p-0.5" role="group" aria-label={t("list.layout")}>
+          {(
+            [
+              ["tree", ListTree],
+              ["grid", LayoutGrid],
+            ] as const
+          ).map(([item, Icon]) => (
+            <button
+              key={item}
+              type="button"
+              aria-pressed={layout === item}
+              onClick={() => chooseLayout(item)}
+              title={t(`list.${item}`)}
+              aria-label={t(`list.${item}`)}
+              className={cn(
+                "flex size-7 items-center justify-center rounded transition-colors",
+                layout === item ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              <Icon className="size-3.5" aria-hidden="true" />
+            </button>
+          ))}
+        </div>
       </div>
 
-      {rows.length === 0 ? (
+      {(layout === "tree" ? rows.length : cards.length) === 0 ? (
 <div className="rounded-xl border border-dashed px-6 py-14 text-center text-sm text-muted-foreground">
           <ModuleIcon className="mx-auto mb-3 size-8 opacity-40" aria-hidden="true" />
           {entries.length === 0 ? labels.text("list.emptyTitle") : t("list.noResult")}
         </div>
+      ) : layout === "grid" ? (
+        <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3 min-[112.5rem]:grid-cols-4">
+          {cards.map((entry) => (
+            <WorldCard
+              key={entry.id}
+              projectId={projectId}
+              module={module}
+              entry={entry}
+              parent={entry.parentId ? byId.get(entry.parentId) : undefined}
+              customTypes={customTypes}
+              labels={labels}
+              onOpen={() => onOpenFeature(worldTabId(module, entry.id))}
+            />
+          ))}
+        </ul>
       ) : (
         <ul className="divide-y rounded-xl border bg-card" role="tree">
           {rows.map(({ entry, depth, children }) => {
@@ -298,5 +375,66 @@ export function WorldListView({
         </ul>
       )}
     </PageShell>
+  );
+}
+
+// ----------------------------------------------------------------------------
+// Carte
+// ----------------------------------------------------------------------------
+
+function WorldCard({
+  projectId,
+  module,
+  entry,
+  parent,
+  customTypes,
+  labels,
+  onOpen,
+}: {
+  projectId: string;
+  module: WorldModule;
+  entry: WorldEntry;
+  parent: WorldEntry | undefined;
+  customTypes: CustomLocationType[];
+  labels: WorldLabels;
+  onOpen: () => void;
+}) {
+  const { t } = useTranslation("world");
+  const url = useWorldImageUrl(projectId, module, entry);
+  const category = findType(module, entry.type, customTypes)?.category;
+  const summary = entry.fields.description?.trim();
+  const unusualStatus = entry.status && entry.status !== defaultStatus(module, entry.nature);
+
+  return (
+    <ProfileCard
+      url={url}
+      palette={parseList(entry.fields.colorPalette)}
+      backdrop={categoryBackdrop(module, category)}
+      icon={typeIcon(module, entry.type, category)}
+      onOpen={onOpen}
+    >
+      <span className="min-w-0">
+        <span className="flex items-center gap-1.5 text-lg font-semibold group-hover:text-primary">
+          <span className="truncate">{entry.name}</span>
+          {entry.characterId && (
+            <UserRound className="size-4 shrink-0 text-primary" aria-label={t("animalCharacter.badge")} />
+          )}
+        </span>
+        {entry.fields.aliases && (
+          <span className="block truncate text-sm text-muted-foreground">{entry.fields.aliases}</span>
+        )}
+      </span>
+      <span className="flex flex-wrap items-center gap-1.5">
+        <WorldTypeBadge module={module} type={entry.type} customTypes={customTypes} labels={labels} />
+        {entry.nature && (
+          <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">{labels.nature(entry.nature)}</span>
+        )}
+        {unusualStatus && (
+          <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">{labels.status(entry.status)}</span>
+        )}
+      </span>
+      {parent && <span className="truncate text-xs text-muted-foreground">{t("list.inside", { name: parent.name })}</span>}
+      {summary && <span className="line-clamp-3 text-sm leading-6 text-muted-foreground">{summary}</span>}
+    </ProfileCard>
   );
 }

@@ -425,7 +425,7 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
           </nav>
         )}
 
-        <div ref={scrollRef} className="min-w-0 flex-1 overflow-y-auto">
+        <div ref={scrollRef} className="min-w-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]">
           {!list.length ? (
             <div className="mx-auto max-w-md px-6 py-16 text-center text-sm text-muted-foreground">
               <BookOpen className="mx-auto mb-3 size-8" />

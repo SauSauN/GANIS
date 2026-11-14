@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Check, Plus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,8 @@ import {
   serializeList,
 } from "@/lib/characters";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
-import { buildStructureTree, flattenVisible } from "@/lib/structure";
+import { buildStructureTree, COLOR_CHOICES, flattenVisible } from "@/lib/structure";
+import { ColorMenu } from "@/components/common/ColorMenu";
 import { cn } from "@/lib/utils";
 import { useCharacterStore } from "@/stores/characterStore";
 import type { CharacterListKey } from "@/types";
@@ -278,28 +279,18 @@ interface ColorsFieldProps {
   disabled?: boolean;
 }
 
-/** Palette : pastilles de couleur, « + » ouvre le sélecteur de couleur du système. */
+/**
+ * Palette : pastilles de couleur. « + » propose d'abord des couleurs
+ * (comme partout dans GANIS), puis « Autre couleur… » ouvre le sélecteur du
+ * système.
+ */
 export function ColorsField({ id, value, onChange, disabled }: ColorsFieldProps) {
-  const { t } = useTranslation("characters");
+  const { t } = useTranslation(["characters", "structure"]);
   const colors = parseList(value);
-  const [picking, setPicking] = useState("#8b5cf6");
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  // L'évènement natif « change » part quand le sélecteur se ferme (React
-  // `onChange` suit chaque mouvement) : la couleur est ajoutée à ce moment.
-  const addRef = useRef<(color: string) => void>(() => {});
-  addRef.current = (color: string) => {
+  function add(color: string) {
     if (!colors.includes(color)) onChange(serializeList([...colors, color]));
-  };
-
-  useEffect(() => {
-    const input = inputRef.current;
-    if (!input) return;
-
-    const onNativeChange = () => addRef.current(input.value.toLowerCase());
-    input.addEventListener("change", onNativeChange);
-    return () => input.removeEventListener("change", onNativeChange);
-  }, [colors.length >= MAX_COLORS]);
+  }
 
   return (
     <div className="flex flex-wrap items-center gap-2">
@@ -323,26 +314,21 @@ export function ColorsField({ id, value, onChange, disabled }: ColorsFieldProps)
       ))}
 
       {colors.length < MAX_COLORS && (
-        <label
-          className={cn(
-            "relative flex size-9 cursor-pointer items-center justify-center rounded-full border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary",
-            "has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-ring",
-            disabled && "pointer-events-none opacity-50",
-          )}
-          title={t("colors.add")}
-        >
-          <Plus className="size-4" />
-          <input
-            ref={inputRef}
-            id={id}
-            type="color"
-            value={picking}
-            disabled={disabled}
-            aria-label={t("colors.add")}
-            onChange={(e) => setPicking(e.target.value)}
-            className="absolute inset-0 cursor-pointer opacity-0"
-          />
-        </label>
+        <ColorMenu
+          id={id}
+          label={t("colors.add")}
+          options={COLOR_CHOICES.filter((color) => !colors.includes(color)).map((color) => ({ value: color, swatch: color, label: color }))}
+          value={null}
+          onSelect={(color) => color && add(color)}
+          custom={{ label: t("structure:colors.custom") }}
+          disabled={disabled}
+          trigger={
+            <span className="flex size-9 items-center justify-center rounded-full border border-dashed text-muted-foreground transition-colors hover:border-primary hover:text-primary">
+              <Plus className="size-4" />
+            </span>
+          }
+          triggerClassName="rounded-full focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+        />
       )}
     </div>
   );

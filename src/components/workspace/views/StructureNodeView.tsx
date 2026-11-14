@@ -1,6 +1,9 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { VersionsButton } from "@/components/history/VersionsDialog";
 import { InfoTip } from "@/components/common/InfoTip";
+import { ActionMenu, type MenuItem } from "@/components/documents/ActionMenu";
+import { LinkGroup, LinkList, LinkMark, LinkRow } from "@/components/links/LinkRow";
 import { DocumentsCard } from "@/components/documents/DocumentsCard";
 import { SceneEventsCard } from "@/components/plot/SceneEventsCard";
 import { NovelTextCard, NovelWritingCard } from "@/components/novel/NovelSheetCards";
@@ -17,7 +20,6 @@ import { refreshWriting } from "@/stores/writingStore";
 import type { Editor } from "@tiptap/react";
 import { useTranslation } from "react-i18next";
 import {
-  ChevronRight,
   FileQuestion,
   Flag,
   Globe,
@@ -30,7 +32,6 @@ import {
   Save,
   Trash2,
   Users,
-  X,
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -55,13 +56,13 @@ import {
   cardContentClass,
   cardHeaderClass,
   fieldClass,
+  profileCardClass,
 } from "@/components/workspace/views/PageShell";
 import { api } from "@/lib/api";
 import { announceDeletion } from "@/lib/trash";
 import { characterTabId, fullName } from "@/lib/characters";
 import { locationTabId } from "@/lib/locations";
 import {
-  ancestorsOf,
   buildStructureTree,
   descendantIdsOf,
   flattenVisible,
@@ -81,6 +82,8 @@ import { useProjectLocations } from "@/stores/locationStore";
 import { useProjectStructureLinks, useStructureStore } from "@/stores/structureStore";
 import type { NodeCharacterRole, NodeEntryRole, NodeLocationRole, StructureNode } from "@/types";
 import { ENTRY_ROLES, splitEntryKey, useNodeEntryItems } from "@/components/structure/nodeEntries";
+import { MODULE_ICONS } from "@/components/world/worldStyle";
+import { WORKSPACE_MODULE, WORLD_MODULES } from "@/lib/world";
 import { errorText } from "@/lib/errors";
 
 const CHARACTER_ROLES: NodeCharacterRole[] = ["present", "pov", "mentioned"];
@@ -117,7 +120,7 @@ interface StructureNodeViewProps {
  *   ce que l'élément contient.
  */
 export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }: StructureNodeViewProps) {
-  const { t } = useTranslation(["structure", "common", "locations"]);
+  const { t } = useTranslation(["structure", "common", "locations", "modules"]);
 
   const { structure, failed, reload, levels, numbers, headingOf, colorOf } = useProjectStructure(projectId);
   const links = useProjectStructureLinks(projectId);
@@ -449,7 +452,6 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   const heading = headingOf(node);
   const level = levelOf(levels, node.level);
   const color = colorOf(node);
-  const path = ancestorsOf(structure.nodes, node.id);
   const contained = descendantIdsOf(structure.nodes, node.id).size;
   const children =
     buildStructureTree(structure.nodes)
@@ -487,82 +489,61 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
 
   return (
     <PageShell>
-      <div className="grid items-start gap-8 lg:grid-cols-[17rem_minmax(0,1fr)]">
+      <div className="grid items-start gap-8 @xl:grid-cols-[17rem_minmax(0,1fr)]">
         {/* ================================================================
             CARTE DE PRÉSENTATION
-            ================================================================ */}
-        <Card className={cn(cardClass, "lg:sticky lg:top-0")}>
-          <CardContent className="flex flex-col items-center gap-4 px-5 py-6 text-center">
-            {/* Page de manga dessinée : le dessin reste visible à côté des cases */}
-            {pageArt ? (
-              <PageArtPreview projectId={projectId} document={pageArt} title={heading.label} />
-            ) : isMangaPage && script.draft && script.draft.panels.length > 0 ? (
-              // Pas encore de dessin : le modèle de page selon le nombre de cases.
-              <PageLayoutPreview projectId={projectId} pageId={nodeId} framings={script.draft.panels.map((panel) => panel.framing)} />
-            ) : (
-              <span
-                className="flex size-24 items-center justify-center rounded-2xl"
-                style={{ backgroundColor: `${color}1f`, color }}
-                aria-hidden="true"
-              >
-                {heading.number !== null ? (
-                  <span className="text-3xl font-semibold tabular-nums">{heading.number}</span>
-                ) : (
-                  <ListTree className="size-10" />
-                )}
-              </span>
-            )}
-
-            <div className="w-full min-w-0 space-y-2">
-              <p className="break-words text-lg font-semibold">{heading.prefix}</p>
-              {heading.number !== null && heading.title && (
-                <p className="break-words text-base">{heading.title}</p>
-              )}
-
-              <div className="flex flex-wrap justify-center gap-1.5">
-                <span className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs">
-                  <span className="size-2 rounded-full" style={{ backgroundColor: level?.color }} />
-                  {level?.one}
-                </span>
-                {heading.number === null && (
-                  <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">
-                    {t("node.profile.unnumbered")}
-                  </span>
-                )}
-              </div>
-            </div>
-
-            {node.summary && !isMangaPage && (
-              <p className="w-full border-t pt-4 text-left text-sm leading-6 whitespace-pre-line text-muted-foreground">
-                {node.summary}
-              </p>
-            )}
-
-            <div className="w-full space-y-2 border-t pt-4 text-left text-sm">
-              {path.length === 0 ? (
-                <p className="text-xs text-muted-foreground">{t("node.profile.topLevel")}</p>
+            ================================================================
+            Figée à gauche comme sur les autres fiches (même hauteur) : seule
+            la colonne de droite défile. Un long résumé défile dans la carte. */}
+        <Card className={cn(cardClass, profileCardClass, "flex flex-col")}>
+          {/* « Voir dans le plan » reste toujours en bas de la carte, à la
+              même place pour tous les éléments (page, chapitre, épilogue…) ;
+              le reste défile au-dessus si besoin. */}
+          <CardContent className="flex min-h-0 flex-1 flex-col px-5 py-6 text-center">
+            <div className="-mx-1 flex min-h-0 flex-1 flex-col items-center gap-4 overflow-y-auto px-1">
+              {/* Page de manga dessinée : le dessin reste visible à côté des cases */}
+              {pageArt ? (
+                <PageArtPreview projectId={projectId} document={pageArt} title={heading.label} />
+              ) : isMangaPage && script.draft && script.draft.panels.length > 0 ? (
+                // Pas encore de dessin : le modèle de page selon le nombre de cases.
+                <PageLayoutPreview projectId={projectId} pageId={nodeId} framings={script.draft.panels.map((panel) => panel.framing)} />
               ) : (
-                <nav
-                  aria-label={t("node.profile.path")}
-                  className="flex flex-wrap items-center gap-x-1 gap-y-0.5 text-xs"
+                <span
+                  className="flex size-24 items-center justify-center rounded-2xl"
+                  style={{ backgroundColor: `${color}1f`, color }}
+                  aria-hidden="true"
                 >
-                  {path.map((item, index) => (
-                    <span key={item.id} className="inline-flex items-center gap-1">
-                      {index > 0 && <ChevronRight className="size-3 text-muted-foreground" aria-hidden="true" />}
-                      <button
-                        type="button"
-                        onClick={() => openNode(item.id)}
-                        className="rounded text-primary underline-offset-4 hover:underline"
-                      >
-                        {headingOf(item).label}
-                      </button>
-                    </span>
-                  ))}
-                </nav>
+                  {heading.number !== null ? (
+                    <span className="text-3xl font-semibold tabular-nums">{heading.number}</span>
+                  ) : (
+                    <ListTree className="size-10" />
+                  )}
+                </span>
               )}
 
-              {contained > 0 && (
-                <p className="text-xs text-muted-foreground">{t("node.profile.contains", { count: contained })}</p>
+              <div className="w-full min-w-0 space-y-2">
+                <p className="break-words text-lg font-semibold">{heading.prefix}</p>
+                {heading.number !== null && heading.title && (
+                  <p className="break-words text-base">{heading.title}</p>
+                )}
+
+                <div className="flex flex-wrap justify-center gap-1.5">
+                  <span className="inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs">
+                    <span className="size-2 rounded-full" style={{ backgroundColor: level?.color }} />
+                    {level?.one}
+                  </span>
+                  {heading.number === null && (
+                    <span className="rounded-full border px-2 py-0.5 text-xs text-muted-foreground">
+                      {t("node.profile.unnumbered")}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {node.summary && !isMangaPage && (
+                <p className="w-full border-t pt-4 text-left text-sm leading-6 whitespace-pre-line text-muted-foreground">
+                  {node.summary}
+                </p>
               )}
             </div>
 
@@ -570,7 +551,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
               type="button"
               variant="outline"
               size="sm"
-              className="w-full"
+              className="mt-4 w-full shrink-0"
               onClick={() => {
                 focusNode(node.id);
                 onOpenFeature(PLAN_FEATURE);
@@ -738,120 +719,98 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
 
           <SceneEventsCard projectId={projectId} nodeId={nodeId} name={name} onOpenFeature={onOpenFeature} />
 
-          <LinkSection
-            storageKey="ganis.nodeSheet.characters.collapsed"
-            icon={Users}
-            title={t("node.sections.characters.title")}
-            description={t("node.sections.characters.description", { name })}
+          {/* Liens avec l'univers : personnages, lieux et fiches du monde
+              (objets, faune et flore, factions, peuples, magie des modules
+              activés), réunis dans une seule carte, rangés par sorte. */}
+          <UniverseLinksSection
+            name={name}
             loading={!related}
-            items={characters.map((c) => ({
-              id: c.id,
-              name: fullName(c),
-              visual: <CharacterAvatar projectId={projectId} character={c} size="sm" />,
-              chip: <CharacterAvatar projectId={projectId} character={c} size="xs" />,
-              tab: characterTabId(c.id),
-            }))}
-            direct={(related?.characters.direct ?? []).map((l) => ({ id: l.characterId, role: l.role }))}
-            indirect={related?.characters.indirect ?? []}
-            firstHere={firstCharacters.map((c) => c.id)}
-            roles={CHARACTER_ROLES}
-            roleLabel={(role) => t(`node.roles.character.${role as NodeCharacterRole}`)}
-            texts={{
-              add: t("node.sections.characters.add"),
-              choose: t("node.sections.characters.choose"),
-              empty: t("node.sections.characters.empty"),
-              noneLeft: t("node.sections.characters.noneLeft"),
-              noItems: t("node.sections.characters.noItems"),
-              firstHere: t("node.sections.characters.firstAppearance"),
-            }}
             labelOfNode={labelOfNode}
             onOpenFeature={onOpenFeature}
-            onLink={(id, role) => runLink(() => linkCharacter(projectId, nodeId, id, role as NodeCharacterRole))}
-            onUnlink={(id) => runLink(() => unlinkCharacter(projectId, nodeId, id))}
+            groups={[
+              {
+                key: "character",
+                icon: Users,
+                title: t("node.sections.characters.title"),
+                items: characters.map((c) => ({
+                  id: c.id,
+                  name: fullName(c),
+                  visual: <CharacterAvatar projectId={projectId} character={c} size="sm" />,
+                  chip: <CharacterAvatar projectId={projectId} character={c} size="xs" />,
+                  tab: characterTabId(c.id),
+                })),
+                direct: (related?.characters.direct ?? []).map((l) => ({ id: l.characterId, role: l.role })),
+                indirect: related?.characters.indirect ?? [],
+                firstHere: firstCharacters.map((c) => c.id),
+                roles: CHARACTER_ROLES,
+                roleLabel: (role) => t(`node.roles.character.${role as NodeCharacterRole}`),
+                onLink: (id, role) => runLink(() => linkCharacter(projectId, nodeId, id, role as NodeCharacterRole)),
+                onUnlink: (id) => runLink(() => unlinkCharacter(projectId, nodeId, id)),
+              },
+              {
+                key: "location",
+                icon: MapPinned,
+                title: t("node.sections.locations.title"),
+                items: locations.map((l) => ({
+                  id: l.id,
+                  name: l.name,
+                  visual: <LocationThumb projectId={projectId} location={l} customTypes={settings.customTypes} size="sm" />,
+                  chip: (
+                    <LocationThumb
+                      projectId={projectId}
+                      location={l}
+                      customTypes={settings.customTypes}
+                      size="xs"
+                      className="rounded-full"
+                    />
+                  ),
+                  badge: (
+                    <TypeBadge
+                      type={l.type}
+                      customTypes={settings.customTypes}
+                      labels={locationLabels}
+                      className="hidden sm:inline-flex"
+                    />
+                  ),
+                  tab: locationTabId(l.id),
+                })),
+                direct: (related?.locations.direct ?? []).map((l) => ({ id: l.locationId, role: l.role })),
+                indirect: related?.locations.indirect ?? [],
+                firstHere: firstLocations.map((l) => l.id),
+                roles: LOCATION_ROLES,
+                roleLabel: (role) => t(`node.roles.location.${role as NodeLocationRole}`),
+                onLink: (id, role) => runLink(() => linkLocation(projectId, nodeId, id, role as NodeLocationRole)),
+                onUnlink: (id) => runLink(() => unlinkLocation(projectId, nodeId, id)),
+              },
+              ...WORLD_MODULES.flatMap((module): LinkGroupSpec[] => {
+                const mine = (key: string) => splitEntryKey(key).kind === module;
+                const items = worldEntries.items.filter((item) => mine(item.id));
+                const direct = worldEntries.direct.filter((link) => mine(link.id));
+                if (items.length === 0 && direct.length === 0) return [];
+                return [
+                  {
+                    key: module,
+                    icon: MODULE_ICONS[module],
+                    title: t(`modules:modules.${WORKSPACE_MODULE[module]}.label`),
+                    items,
+                    direct,
+                    indirect: [],
+                    firstHere: worldEntries.firstHere.filter(mine),
+                    roles: ENTRY_ROLES,
+                    roleLabel: (role) => t(`node.roles.entry.${role as NodeEntryRole}`),
+                    onLink: (key, role) => {
+                      const { kind, id } = splitEntryKey(key);
+                      return runLink(() => linkEntry(projectId, nodeId, kind, id, role as NodeEntryRole));
+                    },
+                    onUnlink: (key) => {
+                      const { kind, id } = splitEntryKey(key);
+                      return runLink(() => unlinkEntry(projectId, nodeId, kind, id));
+                    },
+                  },
+                ];
+              }),
+            ]}
           />
-
-          <LinkSection
-            storageKey="ganis.nodeSheet.locations.collapsed"
-            icon={MapPinned}
-            title={t("node.sections.locations.title")}
-            description={t("node.sections.locations.description", { name })}
-            loading={!related}
-            items={locations.map((l) => ({
-              id: l.id,
-              name: l.name,
-              visual: <LocationThumb projectId={projectId} location={l} customTypes={settings.customTypes} size="sm" />,
-              chip: (
-                <LocationThumb
-                  projectId={projectId}
-                  location={l}
-                  customTypes={settings.customTypes}
-                  size="xs"
-                  className="rounded-full"
-                />
-              ),
-              badge: (
-                <TypeBadge
-                  type={l.type}
-                  customTypes={settings.customTypes}
-                  labels={locationLabels}
-                  className="hidden sm:inline-flex"
-                />
-              ),
-              tab: locationTabId(l.id),
-            }))}
-            direct={(related?.locations.direct ?? []).map((l) => ({ id: l.locationId, role: l.role }))}
-            indirect={related?.locations.indirect ?? []}
-            firstHere={firstLocations.map((l) => l.id)}
-            roles={LOCATION_ROLES}
-            roleLabel={(role) => t(`node.roles.location.${role as NodeLocationRole}`)}
-            texts={{
-              add: t("node.sections.locations.add"),
-              choose: t("node.sections.locations.choose"),
-              empty: t("node.sections.locations.empty"),
-              noneLeft: t("node.sections.locations.noneLeft"),
-              noItems: t("node.sections.locations.noItems"),
-              firstHere: t("node.sections.locations.firstAppearance"),
-            }}
-            labelOfNode={labelOfNode}
-            onOpenFeature={onOpenFeature}
-            onLink={(id, role) => runLink(() => linkLocation(projectId, nodeId, id, role as NodeLocationRole))}
-            onUnlink={(id) => runLink(() => unlinkLocation(projectId, nodeId, id))}
-          />
-
-          {/* Univers : objets, faune et flore, factions, peuples, magie (modules activés). */}
-          {worldEntries.anyModule && (
-            <LinkSection
-              storageKey="ganis.nodeSheet.entries.collapsed"
-              icon={Globe}
-              title={t("node.sections.entries.title")}
-              description={t("node.sections.entries.description", { name })}
-              loading={!related}
-              items={worldEntries.items}
-              direct={worldEntries.direct}
-              indirect={[]}
-              firstHere={worldEntries.firstHere}
-              roles={ENTRY_ROLES}
-              roleLabel={(role) => t(`node.roles.entry.${role as NodeEntryRole}`)}
-              texts={{
-                add: t("node.sections.entries.add"),
-                choose: t("node.sections.entries.choose"),
-                empty: t("node.sections.entries.empty"),
-                noneLeft: t("node.sections.entries.noneLeft"),
-                noItems: t("node.sections.entries.noItems"),
-                firstHere: t("node.sections.entries.firstAppearance"),
-              }}
-              labelOfNode={labelOfNode}
-              onOpenFeature={onOpenFeature}
-              onLink={(key, role) => {
-                const { kind, id } = splitEntryKey(key);
-                return runLink(() => linkEntry(projectId, nodeId, kind, id, role as NodeEntryRole));
-              }}
-              onUnlink={(key) => {
-                const { kind, id } = splitEntryKey(key);
-                return runLink(() => unlinkEntry(projectId, nodeId, kind, id));
-              }}
-            />
-          )}
 
           <ChildrenCard
             name={name}
@@ -919,12 +878,11 @@ interface LinkItem {
   tab: string;
 }
 
-interface LinkSectionProps {
-  storageKey: string;
+/** Une sorte d'élément de la carte (personnages, lieux, objets…). */
+interface LinkGroupSpec {
+  key: string;
   icon: LucideIcon;
   title: string;
-  description: string;
-  loading: boolean;
   items: LinkItem[];
   direct: { id: string; role: string }[];
   indirect: { id: string; nodeIds: string[] }[];
@@ -932,46 +890,63 @@ interface LinkSectionProps {
   firstHere: string[];
   roles: string[];
   roleLabel: (role: string) => string;
-  texts: { add: string; choose: string; empty: string; noneLeft: string; noItems: string; firstHere: string };
-  labelOfNode: (id: string) => string;
-  onOpenFeature: (featureId: string) => void;
   onLink: (id: string, role: string) => Promise<void>;
   onUnlink: (id: string) => Promise<void>;
 }
 
+interface UniverseLinksSectionProps {
+  name: string;
+  loading: boolean;
+  groups: LinkGroupSpec[];
+  labelOfNode: (id: string) => string;
+  onOpenFeature: (featureId: string) => void;
+}
+
+/** Lien ouvert dans la fenêtre (`id` vide : nouveau lien). */
+interface EditingLink {
+  group: string;
+  id: string;
+  role: string;
+}
+
 /**
- * Personnages ou lieux liés à l'élément : liés directement (avec leur rôle),
- * puis ceux des éléments contenus, et ceux dont c'est la première
- * apparition.
+ * « Liens avec l'univers » : personnages, lieux et fiches du monde liés à
+ * l'élément, dans une seule carte rangée par sorte, présentée comme sur les
+ * fiches : « Ajouter un lien » dans le titre (une sorte, puis une fenêtre),
+ * une ligne par lien avec son rôle, un crayon pour le modifier ou le
+ * retirer. Les fiches dont c'est la première apparition ont leur ligne ;
+ * celles des éléments contenus suivent en pastilles.
  */
-function LinkSection({
-  storageKey,
-  icon,
-  title,
-  description,
-  loading,
-  items,
-  direct,
-  indirect,
-  firstHere,
-  roles,
-  roleLabel,
-  texts,
-  labelOfNode,
-  onOpenFeature,
-  onLink,
-  onUnlink,
-}: LinkSectionProps) {
+function UniverseLinksSection({ name, loading, groups, labelOfNode, onOpenFeature }: UniverseLinksSectionProps) {
   const { t } = useTranslation("structure");
-  const [open, setOpen] = useCollapsible(storageKey);
-  const [choice, setChoice] = useState("");
-  const [role, setRole] = useState(roles[0]);
+  const [open, setOpen] = useCollapsible("ganis.nodeSheet.universe.collapsed");
+  const [editing, setEditing] = useState<EditingLink | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const byId = new Map(items.map((item) => [item.id, item]));
-  const linked = new Set(direct.map((link) => link.id));
-  const available = items.filter((item) => !linked.has(item.id)).sort((a, b) => a.name.localeCompare(b.name));
-  const firstOthers = firstHere.filter((id) => !linked.has(id));
+  const itemsOf = new Map(groups.map((group) => [group.key, new Map(group.items.map((item) => [item.id, item]))]));
+  const total = groups.reduce((sum, group) => sum + group.direct.length, 0);
+
+  /** Éléments des éléments contenus, toutes sortes confondues. */
+  const indirect = groups.flatMap((group) =>
+    group.indirect.flatMap((mention) => {
+      const item = itemsOf.get(group.key)?.get(mention.id);
+      return item ? [{ group, item, nodeIds: mention.nodeIds }] : [];
+    }),
+  );
+
+  const addItems: MenuItem[] = groups.map((group) => {
+    const linked = new Set(group.direct.map((link) => link.id));
+    return {
+      id: group.key,
+      label: group.title,
+      icon: group.icon,
+      disabled: !group.items.some((item) => !linked.has(item.id)),
+      run: () => {
+        setOpen(true);
+        setEditing({ group: group.key, id: "", role: group.roles[0] });
+      },
+    };
+  });
 
   async function act(action: () => Promise<void>) {
     setBusy(true);
@@ -982,15 +957,37 @@ function LinkSection({
     }
   }
 
+  const visible = groups.filter((group) => {
+    const linked = new Set(group.direct.map((link) => link.id));
+    return group.direct.length > 0 || group.firstHere.some((id) => !linked.has(id));
+  });
+
+  const editingGroup = editing ? groups.find((group) => group.key === editing.group) : undefined;
+
   return (
     <CollapsibleCard
       open={open}
       onOpenChange={setOpen}
-      icon={icon}
-      title={title}
-      description={description}
-      count={direct.length}
+      icon={Globe}
+      title={t("node.sections.universe.title")}
+      description={t("node.sections.universe.description", { name })}
+      count={total}
       contentClassName={`${cardContentClass} space-y-5`}
+      actions={
+        !loading && addItems.some((item) => !item.disabled) ? (
+          <ActionMenu
+            label={t("node.sections.universe.add")}
+            className="h-8 w-auto gap-1.5 border px-2.5 text-sm text-foreground"
+            trigger={
+              <>
+                <Plus className="size-4" />
+                <span className="hidden sm:inline">{t("node.sections.universe.add")}</span>
+              </>
+            }
+            items={addItems}
+          />
+        ) : undefined
+      }
     >
       {loading ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -999,183 +996,193 @@ function LinkSection({
         </p>
       ) : (
         <>
-          {direct.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{texts.empty}</p>
-          ) : (
-            <ul className="divide-y rounded-lg border">
-              {direct.map((link) => {
-                const item = byId.get(link.id);
-                if (!item) return null;
-
-                return (
-                  <li key={link.id} className="flex items-center gap-3 px-3 py-2">
-                    {item.visual}
-                    <button
-                      type="button"
-                      onClick={() => onOpenFeature(item.tab)}
-                      className="min-w-0 flex-1 truncate text-left text-sm font-medium underline-offset-4 hover:underline"
-                    >
-                      {item.name}
-                    </button>
-                    {item.badge}
-                    <select
-                      aria-label={t("node.role")}
-                      value={link.role}
-                      disabled={busy}
-                      onChange={(e) => void act(() => onLink(link.id, e.target.value))}
-                      className={cn(fieldClass, "h-8 w-auto")}
-                    >
-                      {roles.map((value) => (
-                        <option key={value} value={value}>
-                          {roleLabel(value)}
-                        </option>
-                      ))}
-                    </select>
-                    <Button
-                      type="button"
-                      size="icon-sm"
-                      variant="ghost"
-                      disabled={busy}
-                      title={t("node.remove")}
-                      aria-label={`${t("node.remove")} : ${item.name}`}
-                      onClick={() => void act(() => onUnlink(link.id))}
-                    >
-                      <X />
-                    </Button>
-                  </li>
-                );
-              })}
-            </ul>
+          {visible.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              {groups.some((group) => group.items.length > 0) ? t("node.sections.universe.empty") : t("node.sections.universe.noItems")}
+            </p>
           )}
 
-          {/* Ajout */}
-          {items.length === 0 ? (
-            <p className="text-xs text-muted-foreground">{texts.noItems}</p>
-          ) : available.length === 0 ? (
-            <p className="text-xs text-muted-foreground">{texts.noneLeft}</p>
-          ) : (
-            <div className="flex flex-wrap items-center gap-2">
-              <select
-                aria-label={texts.choose}
-                value={choice}
-                disabled={busy}
-                onChange={(e) => setChoice(e.target.value)}
-                className={cn(fieldClass, "h-9 min-w-48 flex-1")}
-              >
-                <option value="">{texts.choose}</option>
-                {available.map((item) => (
-                  <option key={item.id} value={item.id}>
-                    {item.name}
-                  </option>
-                ))}
-              </select>
-              <select
-                aria-label={t("node.role")}
-                value={role}
-                disabled={busy}
-                onChange={(e) => setRole(e.target.value)}
-                className={cn(fieldClass, "h-9 w-auto")}
-              >
-                {roles.map((value) => (
-                  <option key={value} value={value}>
-                    {roleLabel(value)}
-                  </option>
-                ))}
-              </select>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={busy || !choice}
-                onClick={() =>
-                  void act(async () => {
-                    await onLink(choice, role);
-                    setChoice("");
-                  })
-                }
-              >
-                <Plus />
-                {texts.add}
-              </Button>
-            </div>
-          )}
+          {visible.map((group) => {
+            const byId = itemsOf.get(group.key)!;
+            const linked = new Set(group.direct.map((link) => link.id));
+            const first = new Set(group.firstHere);
+
+            return (
+              <LinkGroup key={group.key} title={group.title} count={group.direct.length}>
+                <LinkList>
+                  {/* Première apparition (sans lien) : en tête, comme sur les fiches. */}
+                  {group.firstHere
+                    .filter((id) => !linked.has(id))
+                    .map((id) => {
+                      const item = byId.get(id);
+                      if (!item) return null;
+                      return (
+                        <LinkRow
+                          key={`first-${id}`}
+                          thumb={item.visual}
+                          label={
+                            <span className="inline-flex items-center gap-1">
+                              <Flag className="size-3.5" aria-hidden="true" />
+                              {t("story.firstAppearance")}
+                            </span>
+                          }
+                          name={item.name}
+                          onOpen={() => onOpenFeature(item.tab)}
+                        />
+                      );
+                    })}
+
+                  {group.direct.map((link) => {
+                    const item = byId.get(link.id);
+                    if (!item) return null;
+                    return (
+                      <LinkRow
+                        key={link.id}
+                        thumb={item.visual}
+                        label={group.roleLabel(link.role)}
+                        name={item.name}
+                        onOpen={() => onOpenFeature(item.tab)}
+                        detail={first.has(link.id) ? t("story.firstAppearance") : undefined}
+                        onEdit={() => setEditing({ group: group.key, id: link.id, role: link.role })}
+                        editLabel={t("story.editLink")}
+                      />
+                    );
+                  })}
+                </LinkList>
+              </LinkGroup>
+            );
+          })}
 
           {/* Dans les éléments contenus */}
           {indirect.length > 0 && (
             <div className="space-y-2">
-              <p className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
+              <p className="flex items-center gap-1.5 text-xs font-semibold tracking-wide text-muted-foreground uppercase">
                 <Network className="size-3.5" aria-hidden="true" />
                 {t("node.inside")}
               </p>
-              <ul className="flex flex-wrap gap-2">
-                {indirect.map((mention) => {
-                  const item = byId.get(mention.id);
-                  if (!item) return null;
-
-                  return (
-                    <li key={mention.id} className="inline-flex items-center rounded-full border text-sm">
-                      <button
-                        type="button"
-                        title={mention.nodeIds.map(labelOfNode).join(", ")}
-                        onClick={() => onOpenFeature(item.tab)}
-                        className="inline-flex items-center gap-2 rounded-l-full py-1 pr-2 pl-1 transition-colors hover:bg-muted/50"
-                      >
-                        {item.chip}
-                        <span className="font-medium">{item.name}</span>
-                        <span className="text-xs text-muted-foreground">
-                          · {mention.nodeIds.map(labelOfNode).slice(0, 2).join(", ")}
-                          {mention.nodeIds.length > 2 && ` +${mention.nodeIds.length - 2}`}
-                        </span>
-                      </button>
-                      <button
-                        type="button"
-                        disabled={busy}
-                        title={texts.add}
-                        aria-label={`${texts.add} : ${item.name}`}
-                        onClick={() => void act(() => onLink(mention.id, roles[0]))}
-                        className="flex h-full items-center rounded-r-full border-l px-2 py-1.5 text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
-                      >
-                        <Plus className="size-3.5" />
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
+              <LinkList>
+                {indirect.map(({ group, item, nodeIds }) => (
+                  <LinkRow
+                    key={`${group.key}|${item.id}`}
+                    thumb={item.visual}
+                    label={group.title}
+                    name={item.name}
+                    onOpen={() => onOpenFeature(item.tab)}
+                    detail={
+                      nodeIds.map(labelOfNode).slice(0, 2).join(", ") +
+                      (nodeIds.length > 2 ? ` +${nodeIds.length - 2}` : "")
+                    }
+                    hint={nodeIds.map(labelOfNode).join(", ")}
+                    onEdit={busy ? undefined : () => void act(() => group.onLink(item.id, group.roles[0]))}
+                    editLabel={`${t("node.sections.universe.add")} : ${item.name}`}
+                    editIcon={<Plus />}
+                  />
+                ))}
+              </LinkList>
               <InfoTip>{t("node.insideHint")}</InfoTip>
             </div>
           )}
-
-          {/* Première apparition */}
-          {firstOthers.length > 0 && (
-            <div className="space-y-2">
-              <p className="flex items-center gap-1.5 text-xs font-medium tracking-wide text-muted-foreground uppercase">
-                <Flag className="size-3.5" aria-hidden="true" />
-                {texts.firstHere}
-              </p>
-              <ul className="flex flex-wrap gap-2">
-                {firstOthers.map((id) => {
-                  const item = byId.get(id);
-                  if (!item) return null;
-
-                  return (
-                    <li key={id}>
-                      <button
-                        type="button"
-                        onClick={() => onOpenFeature(item.tab)}
-                        className="inline-flex items-center gap-2 rounded-full border py-1 pr-3 pl-1 text-sm transition-colors hover:bg-muted/50"
-                      >
-                        {item.chip}
-                        <span className="font-medium">{item.name}</span>
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          )}
-
         </>
       )}
+
+      {editing && editingGroup && (
+        <NodeLinkDialog group={editingGroup} initial={editing} onClose={() => setEditing(null)} />
+      )}
     </CollapsibleCard>
+  );
+}
+
+/**
+ * Lien de l'élément avec un personnage, un lieu ou une fiche du monde :
+ * l'élément lié et son rôle. Un lien existant peut changer de rôle ou être
+ * retiré.
+ */
+function NodeLinkDialog({ group, initial, onClose }: { group: LinkGroupSpec; initial: EditingLink; onClose: () => void }) {
+  const { t } = useTranslation(["structure", "common"]);
+  const itemFieldId = useId();
+  const roleFieldId = useId();
+  const [itemId, setItemId] = useState(initial.id);
+  const [role, setRole] = useState(initial.role);
+  const [busy, setBusy] = useState(false);
+  const editingExisting = initial.id !== "";
+
+  const linked = new Set(group.direct.map((link) => link.id));
+  const choices = group.items
+    .filter((item) => item.id === initial.id || !linked.has(item.id))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  async function run(action: () => Promise<void>) {
+    setBusy(true);
+    try {
+      await action();
+      onClose();
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  // Rendue hors de la fiche (portail) : la fiche contient un formulaire.
+  return createPortal(
+    <Dialog open onOpenChange={(value) => !value && !busy && onClose()} className="max-w-lg">
+      <DialogHeader>
+        <DialogTitle>
+          {editingExisting ? t("story.editLink") : `${t("node.sections.universe.add")} · ${group.title}`}
+        </DialogTitle>
+      </DialogHeader>
+
+      <div className="mt-5 space-y-4">
+        <div className="space-y-1.5">
+          <Label htmlFor={itemFieldId}>{group.title}</Label>
+          <select
+            id={itemFieldId}
+            value={itemId}
+            disabled={busy || editingExisting}
+            onChange={(e) => setItemId(e.target.value)}
+            className={cn(fieldClass, "h-9")}
+          >
+            <option value="">{t("node.sections.universe.choose")}</option>
+            {choices.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor={roleFieldId}>{t("node.role")}</Label>
+          <select id={roleFieldId} value={role} disabled={busy} onChange={(e) => setRole(e.target.value)} className={cn(fieldClass, "h-9")}>
+            {group.roles.map((value) => (
+              <option key={value} value={value}>
+                {group.roleLabel(value)}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      <DialogFooter className="mt-6 gap-2">
+        {editingExisting && (
+          <Button
+            type="button"
+            variant="ghost"
+            className="mr-auto text-destructive hover:text-destructive"
+            disabled={busy}
+            onClick={() => void run(() => group.onUnlink(initial.id))}
+          >
+            <Trash2 />
+            {t("node.remove")}
+          </Button>
+        )}
+        <Button type="button" variant="ghost" disabled={busy} onClick={onClose}>
+          {t("common:actions.cancel")}
+        </Button>
+        <Button type="button" disabled={busy || !itemId} onClick={() => void run(() => group.onLink(itemId, role))}>
+          {busy && <Loader2 className="animate-spin" />}
+          {t("common:actions.save")}
+        </Button>
+      </DialogFooter>
+    </Dialog>,
+    document.body,
   );
 }
 
@@ -1215,25 +1222,23 @@ function ChildrenCard({ name, items, headingLabel, colorOf, canAdd, addLabel, on
       {items.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t("node.sections.children.empty")}</p>
       ) : (
-        <ul className="grid gap-2 sm:grid-cols-2">
+        // Même présentation que « Liens avec l'univers » : la couleur du
+        // niveau en vignette, le titre, le début du résumé dessous.
+        <LinkList>
           {items.map((child) => (
-            <li key={child.id}>
-              <button
-                type="button"
-                onClick={() => onOpen(child.id)}
-                className="flex w-full items-start gap-3 rounded-lg border p-3 text-left transition-colors hover:bg-muted/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-              >
-                <span className="mt-1.5 size-2 shrink-0 rounded-full" style={{ backgroundColor: colorOf(child) }} />
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-medium">{headingLabel(child)}</span>
-                  {child.summary && (
-                    <span className="mt-0.5 line-clamp-2 block text-xs text-muted-foreground">{child.summary}</span>
-                  )}
-                </span>
-              </button>
-            </li>
+            <LinkRow
+              key={child.id}
+              thumb={
+                <LinkMark color={colorOf(child)}>
+                  <ListTree />
+                </LinkMark>
+              }
+              name={headingLabel(child)}
+              onOpen={() => onOpen(child.id)}
+              secondary={child.summary.trim() || undefined}
+            />
           ))}
-        </ul>
+        </LinkList>
       )}
     </CollapsibleCard>
   );

@@ -25,6 +25,12 @@ import {
   setTextSize,
   usePanelImageSize,
   usePanelMenuEnabled,
+  usePreviewTabsEnabled,
+  setPreviewTabsEnabled,
+  DEFAULT_PROFILE_FRAME,
+  PROFILE_FRAME_WIDTHS,
+  setProfileFrame,
+  useProfileFrame,
   useTextSize,
   type TextSize,
 } from "@/lib/preferences";
@@ -35,6 +41,7 @@ import {
   type ThemeMode,
 } from "@/lib/theme";
 import { TitleWithInfo } from "@/components/common/TitleWithInfo";
+import { ColorMenu } from "@/components/common/ColorMenu";
 
 /** Thèmes proposés (libellés dans `settings.json`). */
 const THEME_OPTIONS: { id: ThemeMode; icon: LucideIcon }[] = [
@@ -220,6 +227,10 @@ export function AppearanceSection() {
 
       <PanelMenuCard />
 
+      <ProfileFrameCard />
+
+      <PreviewTabsCard />
+
       {/* ==================================================================
           NOTE
           ================================================================== */}
@@ -333,6 +344,181 @@ function PanelMenuCard() {
             aria-checked={enabled}
             aria-labelledby="panel-menu-label"
             onClick={() => setPanelMenuEnabled(!enabled)}
+            className={cn(
+              "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              enabled ? "bg-primary" : "bg-input",
+            )}
+          >
+            <span
+              className={cn(
+                "inline-block h-5 w-5 rounded-full bg-background shadow transition-transform",
+                enabled ? "translate-x-5" : "translate-x-0",
+              )}
+            />
+          </button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+/** Couleurs proposées pour le cadre des photos (blanc par défaut). */
+const FRAME_COLORS = ["#ffffff", "#f5ecd7", "#e4e4e7", "#a1a1aa", "#27272a", "#c9a227"] as const;
+const FRAME_COLOR_KEYS: Record<(typeof FRAME_COLORS)[number], "white" | "cream" | "lightGrey" | "grey" | "black" | "gold"> = {
+  "#ffffff": "white",
+  "#f5ecd7": "cream",
+  "#e4e4e7": "lightGrey",
+  "#a1a1aa": "grey",
+  "#27272a": "black",
+  "#c9a227": "gold",
+};
+
+/**
+ * Cadre des photos de profil (personnages, lieux, objets…) : blanc par
+ * défaut, comme un tirage photo. On peut le retirer, changer sa couleur
+ * et son épaisseur. Un aperçu montre le résultat.
+ */
+function ProfileFrameCard() {
+  const { t } = useTranslation("settings");
+  const frame = useProfileFrame();
+  const changed =
+    frame.enabled !== DEFAULT_PROFILE_FRAME.enabled ||
+    frame.color !== DEFAULT_PROFILE_FRAME.color ||
+    frame.width !== DEFAULT_PROFILE_FRAME.width;
+
+  return (
+    <Card className={cardClass}>
+      <CardHeader className={cardHeaderClass}>
+        <TitleWithInfo info={t("appearance.profileFrame.description")}>{t("appearance.profileFrame.title")}</TitleWithInfo>
+      </CardHeader>
+
+      <CardContent className="space-y-6 px-6 py-6">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p id="profile-frame-label" className="text-sm font-medium">
+              {t("appearance.profileFrame.toggle")}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {frame.enabled ? t("appearance.profileFrame.on") : t("appearance.profileFrame.off")}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            role="switch"
+            aria-checked={frame.enabled}
+            aria-labelledby="profile-frame-label"
+            onClick={() => setProfileFrame({ enabled: !frame.enabled })}
+            className={cn(
+              "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              frame.enabled ? "bg-primary" : "bg-input",
+            )}
+          >
+            <span
+              className={cn(
+                "inline-block h-5 w-5 rounded-full bg-background shadow transition-transform",
+                frame.enabled ? "translate-x-5" : "translate-x-0",
+              )}
+            />
+          </button>
+        </div>
+
+        <div className={cn("flex flex-wrap items-end gap-6 border-t pt-6", !frame.enabled && "opacity-50")}>
+          <div className="space-y-1.5">
+            <p className="text-sm font-medium">{t("appearance.profileFrame.color")}</p>
+            <ColorMenu
+              label={t("appearance.profileFrame.color")}
+              options={FRAME_COLORS.map((color) => ({
+                value: color,
+                swatch: color,
+                label: t(`appearance.profileFrame.colors.${FRAME_COLOR_KEYS[color]}`),
+              }))}
+              value={frame.color}
+              current={frame.color}
+              onSelect={(color) => color && setProfileFrame({ color })}
+              custom={{ label: t("appearance.profileFrame.customColor") }}
+              disabled={!frame.enabled}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <p id="profile-frame-width" className="text-sm font-medium">{t("appearance.profileFrame.width")}</p>
+            <div role="radiogroup" aria-labelledby="profile-frame-width" className="inline-flex rounded-md border p-0.5">
+              {PROFILE_FRAME_WIDTHS.map((width) => (
+                <button
+                  key={width}
+                  type="button"
+                  role="radio"
+                  aria-checked={frame.width === width}
+                  disabled={!frame.enabled}
+                  onClick={() => setProfileFrame({ width })}
+                  className={cn(
+                    "h-8 rounded px-3 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                    frame.width === width ? "bg-primary text-primary-foreground" : "hover:bg-muted",
+                  )}
+                >
+                  {t(`appearance.profileFrame.widths.${width}`)}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Aperçu : une photo fictive dans le cadre choisi. */}
+          <div className="ml-auto flex items-end gap-3" aria-hidden="true">
+            <span
+              className="profile-frame block size-16 rounded-lg"
+              style={{ background: "linear-gradient(135deg, #6366f1, #0891b2 55%, #f59e0b)" }}
+            />
+            <span
+              className="profile-frame block size-16 rounded-full"
+              style={{ background: "linear-gradient(135deg, #db2777, #7c3aed)" }}
+            />
+          </div>
+        </div>
+
+        {changed && (
+          <Button type="button" variant="ghost" size="sm" onClick={() => setProfileFrame(DEFAULT_PROFILE_FRAME)}>
+            <RotateCcw />
+            {t("appearance.profileFrame.reset")}
+          </Button>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+/**
+ * Onglets d'aperçu (comme VS Code) : un simple clic dans le panneau du
+ * milieu ouvre un onglet provisoire, remplacé par le suivant ; le
+ * double-clic le garde. Activé par défaut.
+ */
+function PreviewTabsCard() {
+  const { t } = useTranslation("settings");
+  const enabled = usePreviewTabsEnabled();
+
+  return (
+    <Card className={cardClass}>
+      <CardHeader className={cardHeaderClass}>
+        <TitleWithInfo info={t("appearance.previewTabs.description")}>{t("appearance.previewTabs.title")}</TitleWithInfo>
+      </CardHeader>
+
+      <CardContent className="px-6 py-6">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p id="preview-tabs-label" className="text-sm font-medium">
+              {t("appearance.previewTabs.toggle")}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {enabled ? t("appearance.previewTabs.on") : t("appearance.previewTabs.off")}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            role="switch"
+            aria-checked={enabled}
+            aria-labelledby="preview-tabs-label"
+            onClick={() => setPreviewTabsEnabled(!enabled)}
             className={cn(
               "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
               enabled ? "bg-primary" : "bg-input",

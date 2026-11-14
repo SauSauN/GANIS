@@ -305,6 +305,7 @@
         "items": [
           "The left bar gives access to the modules: Details, Characters, Locations, Structure, Notes, and the project settings at the bottom. The magnifier at the top right (Ctrl+F) opens search.",
           "The middle panel lists the module's features and items; a click opens a tab. Drag its right edge to widen it, or to the left to close it.",
+          "A single click in the middle panel opens a preview tab (italic title), replaced by the next one; a double-click, an edit or pinning keeps it. Can be changed in Settings › Appearance.",
           "Tabs can be dragged. Right-click a tab to pin it, close the others, those to the right…",
           "A ● dot on a tab means unsaved changes. The status bar at the bottom always shows whether everything is saved.",
           "Ctrl+K opens the palette: type the name of a page, an action or an item to jump to it."
@@ -314,7 +315,8 @@
         "title": "Project details",
         "intro": "The project home sums up your story; the synopsis tells it.",
         "items": [
-          "Project home: description, type, status and synopsis preview.",
+          "Project home: logo, description, type, status and synopsis preview.",
+          "Gallery: the project logo (shown on the project home next to the name; it keeps its shape, even a wide one) and images of your world and story (posters, world maps, mood boards, sketches…), up to 30, drag and drop works.",
           "Synopsis: the story summary, with its genres, subgenres and tone.",
           "Glossary: the words of your story (invented terms, places, concepts, titles…), in alphabetical order, with their definition, a category and links to sheets.",
           "History: everything created, edited, deleted or restored in the project, day by day.",
@@ -331,7 +333,7 @@
           "Locations: where the character lives, works, grew up — optionally with the part of the story concerned.",
           "Colour palette: its colours frame the character's portrait.",
           "Powers: for stories where characters have powers, gifts or magic, turn on the “Powers” card in Project settings › Characters. It is added to every sheet, whatever the level of detail.",
-          "Family tree: in Characters › Family tree, “Family” relations whose link is specified (parent, partners, siblings) are arranged generation by generation, including a grandparent, uncle, aunt or cousins linked directly, without creating the people in between. Click a person to open their sheet."
+          "Family tree: in Relationships, “Tree” layout, choose a character to see their family only, generation by generation, from “Family” relations whose link is specified. A grandparent, uncle or cousin linked without the people in between makes those members appear as “Not mentioned” ghosts. Double-click a person to open their sheet."
         ]
       },
       "locations": {
@@ -405,9 +407,9 @@
         "items": [
           "Novel: parts, chapters, scenes. Film: acts, sequences, scenes. Manga: volumes, chapters, pages… Names can be changed in the project settings.",
           "Numbers are computed for you; an item can be left out of the numbering (prologue, interlude).",
-          "A structure item sheet also links world entries (“World” section): an item at the heart of the scene, a faction present, a magic mentioned. A world entry can also be linked to an item from its “Story” section.",
+          "A structure item sheet gathers all its links in “Links with the world”, sorted by kind: characters (point of view, present…), places, and world entries (an item at the heart of the scene, a faction present, a magic mentioned). “Add a link”, in the card title, asks for the kind, then the item and its role; the pencil on a row changes the role or removes the link. A world entry can also be linked to an item from its “Story” section.",
           "Automatic numbering (renumbering on every move) is turned on in the project settings, as is each level's colour.",
-          "An item's sheet shows its summary, its characters (point of view, present…) and its locations.",
+          "An item's sheet shows its summary and its links with the world.",
           "Documents: in an item's sheet, keep its files (manga pages, PDFs, Word files, images, sounds…) with “Add files” or by drag and drop. They are stored in the project (encrypted if the project is private) and exported in the .ganix.",
           "Click a document to read it in GANIS; “Read the pages” chains a chapter's images. “Edit in its application” opens it in Word, Acrobat, Clip Studio…: every save comes back, the previous content stays in the versions.",
           "Manga / comic: Script › Flatplan shows a volume's pages as spreads, in the chosen reading direction. A page shows the art filed on its sheet; otherwise, art filed on the chapter is shared out in order. The first printed page decides which pages face each other: a reveal planned at the page turn on an even page is flagged.",

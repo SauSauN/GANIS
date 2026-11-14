@@ -8,7 +8,7 @@ import {
 import { useTranslation } from "react-i18next";
 import { StickyNote, Trash2 } from "lucide-react";
 import { isStickyColor, STICKY_COLORS, STICKY_STYLES } from "@/lib/notes";
-import { cn } from "@/lib/utils";
+import { ColorMenu } from "@/components/common/ColorMenu";
 import type { StickyColor } from "@/types";
 
 declare module "@tiptap/core" {
@@ -47,25 +47,15 @@ function CalloutView({ node, updateAttributes, deleteNode, editor }: ReactNodeVi
           contentEditable={false}
           className="absolute -top-4 right-2 flex items-center gap-0.5 rounded-full border bg-background px-1 py-0.5 opacity-0 shadow-sm transition-opacity group-hover/callout:opacity-100 focus-within:opacity-100"
         >
-          {STICKY_COLORS.map((item) => (
-            <button
-              key={item}
-              type="button"
-              title={t(`colors.${item}`)}
-              aria-label={t(`colors.${item}`)}
-              aria-pressed={item === color}
-              onClick={() => updateAttributes({ color: item })}
-              className="flex size-6 items-center justify-center rounded-full hover:bg-muted"
-            >
-              <span
-                className={cn(
-                  "size-3.5 rounded-full border border-black/10",
-                  item === color && "ring-2 ring-ring ring-offset-1",
-                )}
-                style={{ background: STICKY_STYLES[item].swatch }}
-              />
-            </button>
-          ))}
+          <ColorMenu
+            label={t("colorLabel")}
+            size="xs"
+            options={STICKY_COLORS.map((item) => ({ value: item, swatch: STICKY_STYLES[item].swatch, label: t(`colors.${item}`) }))}
+            value={color}
+            onSelect={(item) => {
+              if (item && isStickyColor(item)) updateAttributes({ color: item });
+            }}
+          />
           <button
             type="button"
             title={t("editor.callout.remove")}

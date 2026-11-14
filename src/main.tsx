@@ -6,7 +6,7 @@ import "@/i18n";
 import App from "./App";
 import { initColorTheme } from "@/lib/colorTheme";
 import { initNativeGuards } from "@/lib/nativeGuards";
-import { initPanelImageSize, initTextSize } from "@/lib/preferences";
+import { initPanelImageSize, initProfileFrame, initTextSize } from "@/lib/preferences";
 import { initAutoHideScrollbars } from "@/lib/scrollbars";
 import { initErrorLog } from "@/lib/problemReport";
 import { initTheme } from "@/lib/theme";
@@ -18,6 +18,7 @@ initTheme();
 initColorTheme();
 initTextSize();
 initPanelImageSize();
+initProfileFrame();
 
 // Derniers messages d'erreur, pour « Aide › Signaler un problème ».
 initErrorLog();

@@ -40,7 +40,7 @@
     "nephew": "{{source}} is the nephew or niece of {{target}}",
     "cousin": "Cousins",
     "someone": "…",
-    "hint": "Used to draw the family tree (Characters › Family tree)."
+    "hint": "Used to draw the family tree (Relationships › Graph › Tree)."
   },
   "tree": {
     "description": "“Family” relations whose link is specified: parent, partners, siblings, grandparent, uncle or aunt, cousins.",
@@ -48,6 +48,15 @@
     "loading": "Loading…",
     "empty": "No family links yet.",
     "emptyHint": "Create a “Family” relation and choose its link: parent, partners or siblings.",
+    "emptyFor": "No family links for {{name}}.",
+    "showTree": "Show their tree",
+    "ghost": {
+      "title": "Not mentioned",
+      "of1": "Parent of {{name}}",
+      "of2": "Grandparent of {{name}}",
+      "of3": "Ancestor of {{name}}",
+      "hint": "family member never mentioned in the story"
+    },
     "open": "Open {{name}}'s sheet",
     "others": "Other family links",
     "othersHint": "Link not specified: click to specify it and place it in the tree.",
@@ -56,7 +65,8 @@
       "partner": "Partners",
       "sibling": "Siblings",
       "direct": "Grandparent, uncle or aunt (no one in between)",
-      "cousin": "Cousins"
+      "cousin": "Cousins",
+      "ghost": "Member never mentioned in the story"
     },
     "people_one": "{{count}} person",
     "people_other": "{{count}} people",
@@ -121,7 +131,7 @@
     "deleteConfirm": "Permanently delete this relationship?",
     "missingCharacters": "Choose both characters.",
     "sameCharacter": "Choose two different characters.",
-    "moreDetails": "More details: intensity, tone, period, description"
+    "moreDetails": "More details"
   },
   "view": {
     "newRelation": "New relationship",
@@ -135,16 +145,17 @@
       "circle": "Circle",
       "groups": "By role",
       "ego": "Centred",
-      "free": "Free"
+      "tree": "Tree"
     },
     "layoutHints": {
       "force": "Related characters move closer together.",
       "circle": "All characters in a circle.",
       "groups": "Grouped by role in the story.",
       "ego": "One character in the middle, their circle around them.",
-      "free": "Move characters around: their place is saved."
+      "tree": "A character's family tree: their family only."
     },
     "center": "Centre",
+    "treeOf": "Tree of",
     "types": "Types",
     "allTypes": "All types",
     "search": "Search a character",

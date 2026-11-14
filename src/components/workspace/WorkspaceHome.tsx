@@ -11,6 +11,7 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SynopsisContent } from "@/components/workspace/SynopsisContent";
+import { ProjectLogo } from "@/components/workspace/ProjectVisuals";
 import {
   useProjectSynopsis,
   useSynopsisStore,
@@ -191,7 +192,7 @@ function SynopsisReadonly({ projectId }: { projectId: string }) {
  *
  * Hiérarchie d'affichage :
  *
- * 1. Identité du projet
+ * 1. Identité du projet (logo, nom, type, statut)
  * 2. Description
  * 3. Synopsis et informations narratives
  * 4. Informations techniques du projet
@@ -206,7 +207,7 @@ export function WorkspaceHome({ project }: { project: Project }) {
     format(new Date(iso), "d MMMM yyyy", { locale: dateLocale });
 
   return (
-    <main className="flex min-h-0 flex-1 overflow-y-auto">
+    <main className="flex min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]">
       <div className="mx-auto w-full max-w-5xl 2xl:max-w-7xl min-[137.5rem]:max-w-[100rem] px-6 py-8 pb-24 lg:px-10">
         {/* ================================================================
             1. IDENTITÉ DU PROJET
@@ -214,8 +215,10 @@ export function WorkspaceHome({ project }: { project: Project }) {
 
         <header className="mb-8">
 
-          <div className="flex flex-col gap-4">
-            <div>
+          {/* Nom à gauche, logo à droite, centrés l'un par rapport à l'autre ;
+              le bord droit du logo s'aligne sur celui des cartes en dessous. */}
+          <div className="flex flex-wrap items-center justify-between gap-x-8 gap-y-4">
+            <div className="min-w-0 flex-1">
               <h1 className="break-words text-3xl font-semibold tracking-tight">
                 {project.name}
               </h1>
@@ -238,6 +241,8 @@ export function WorkspaceHome({ project }: { project: Project }) {
                 )}
               </div>
             </div>
+
+            <ProjectLogo project={project} />
           </div>
         </header>
 

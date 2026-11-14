@@ -176,8 +176,12 @@
   "gallery": {
     "add": "Ajouter",
     "remove": "Retirer l'image",
-    "open": "Agrandir l'image",
-    "hint": "{{count}} / {{max}} images · vous pouvez aussi les glisser ici."
+    "open": "Voir l'image en grand",
+    "hint": "{{count}} / {{max}} images · vous pouvez aussi les glisser ici.",
+    "close": "Fermer",
+    "previous": "Image précédente",
+    "next": "Image suivante",
+    "position": "{{current}} / {{total}}"
   },
   "portrait": {
     "add": "Ajouter une image",

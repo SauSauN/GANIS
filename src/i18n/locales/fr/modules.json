@@ -71,6 +71,10 @@
         "description": "Les termes propres à votre histoire : mots inventés, lieux, concepts, titres…"
       }
     },
+    "gallery": {
+      "label": "Galerie",
+      "description": "Le logo du projet et les images de l'univers et de l'histoire : affiches, cartes du monde, ambiances, croquis… (30 au maximum, glisser-déposer accepté)."
+    },
     "characters": {
       "create": {
         "label": "Créer un personnage",
@@ -83,10 +87,6 @@
       "relations": {
         "label": "Relations entre personnages",
         "description": "Liens familiaux, amicaux, rivalités et alliances."
-      },
-      "family": {
-        "label": "Arbre généalogique",
-        "description": "Les familles de vos personnages, génération par génération."
       }
     },
     "locations": {

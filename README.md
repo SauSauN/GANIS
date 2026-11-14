@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="ganis-icon.png" alt="Logo GANIS" width="96" />
+  <img src="ganis-icon.png" alt="GANIS logo" width="96" />
 </p>
 
 <h1 align="center">GANIS</h1>
 
-<p align="center"><strong>Studio de conception narrative — local, hors ligne, chiffré.</strong></p>
+<p align="center"><strong>A narrative design studio — local, offline, encrypted.</strong></p>
 
 <p align="center">
   Tauri 2 · Rust · React 19 · TypeScript · SQLite / SQLCipher
@@ -12,314 +12,359 @@
 
 ---
 
-GANIS est une application de bureau pour concevoir des récits : romans, mangas, films, séries, jeux vidéo, jeux de rôle… Elle réunit en un seul espace de travail les personnages, les lieux, les relations, le découpage du récit, la trame des intrigues, les notes et les documents de travail.
+GANIS is a desktop application for designing stories: novels, manga, films, TV series, video games, tabletop role-playing games and more. It brings everything a writer needs into a single workspace: characters, places, relationships, the story outline, parallel plotlines, notes and working documents.
 
-Tout reste sur l'ordinateur de l'utilisateur. GANIS fonctionne **sans connexion internet** et **chiffre** chaque projet avec une clé qui lui est propre.
+Everything stays on the user's computer. GANIS works **without an internet connection** and **encrypts** every project with a key of its own.
 
-## Sommaire
+The interface is available in **French and English**.
 
-- [Fonctionnalités](#fonctionnalités)
-- [Sécurité et confidentialité](#sécurité-et-confidentialité)
-- [Démarrage rapide](#démarrage-rapide)
-- [Scripts disponibles](#scripts-disponibles)
+## Table of contents
+
+- [Features](#features)
+  - [Accounts and projects](#accounts-and-projects)
+  - [The project workspace](#the-project-workspace)
+  - [Tabs](#tabs)
+  - [Novel tools](#novel-tools)
+  - [Manga tools](#manga-tools)
+  - [History and data safety](#history-and-data-safety)
+  - [Customisation](#customisation)
+- [Security and privacy](#security-and-privacy)
+- [Quick start](#quick-start)
+- [Available scripts](#available-scripts)
 - [Architecture](#architecture)
-- [Arborescence du dépôt](#arborescence-du-dépôt)
-- [Données et fichiers](#données-et-fichiers)
-- [Format `.ganix`](#format-ganix)
+- [Repository layout](#repository-layout)
+- [Data and files](#data-and-files)
+- [The `.ganix` format](#the-ganix-format)
 - [Tests](#tests)
 - [Internationalisation](#internationalisation)
-- [Contribuer](#contribuer)
-- [Dépannage](#dépannage)
-- [Licences tierces](#licences-tierces)
+- [Contributing](#contributing)
+- [Troubleshooting](#troubleshooting)
+- [Third-party licences](#third-party-licences)
 
 ---
 
-## Fonctionnalités
+## Features
 
-### Comptes et projets
+### Accounts and projects
 
-- **Accueil** : un message court, un plateau de trame en miniature (intrigues, scènes, personnages, lieu) dessiné aux couleurs du thème, et deux boutons : « Commencer » et « Se connecter ».
-- **Deux espaces, jamais mélangés** : sans connexion (« Commencer »), le tableau de bord montre l'**espace public** (projets publics uniquement) ; connecté, l'**espace privé** (projets privés du compte uniquement). Il n'y a pas de filtre : le mode décide. Les projets créés prennent automatiquement la visibilité de l'espace.
-- **Guide de démarrage** : il s'ouvre une seule fois, à la première arrivée sur le tableau de bord (avec ou sans compte), puis reste disponible dans Aide › Guide de démarrage. 16 étapes, chacune avec un court texte et ses points clés : projets, espaces public et privé, espace de travail, accueil du projet, personnages, lieux, relations, découpage, trame, notes, recherche, enregistrement et versions, historique et corbeille, export .ganix, personnalisation, raccourcis.
-- **Tutoriels** : à la première ouverture d'un projet de chaque sorte (roman, manga, ou autre type), un mode de démarrage explique par où commencer ; Objets, Faune et flore et Factions ont le leur à leur première ouverture. Chaque module a aussi son tutoriel, à la demande : bouton `?` du panneau, Aide › Tutoriel, ou palette. Les étapes peuvent ouvrir la fonctionnalité dont elles parlent, puis le tutoriel reprend au même endroit.
-- **Changer la visibilité** : paramètres du projet → « Statut et organisation » → « Visibilité ».
-  - Public → privé : immédiat si on est connecté ; sinon une connexion est demandée sur place, puis le projet devient privé. Si la connexion passe par la création d'un compte ou l'assistant, le changement est appliqué à l'arrivée sur le tableau de bord.
-  - Privé → public : confirmation explicite (« Annuler » / « Rendre public »).
-- **Comptes locaux** : un administrateur est créé au premier compte (assistant de configuration), puis d'autres comptes peuvent s'inscrire. Il existe trois rôles : `admin`, `developer` et `user`. Chacun peut supprimer son compte (Paramètres › Compte, mot de passe demandé) : le compte et ses projets privés sont effacés ; le dernier administrateur ne peut pas partir tant que d'autres comptes existent.
-- **Verrouillage automatique** (facultatif, Paramètres › Compte) : après 5 à 60 minutes sans activité, la clé du compte est effacée de la mémoire et le mot de passe est demandé pour reprendre, onglets et saisies conservés.
-- **Clé de récupération** : elle est remise à la création du compte et permet de retrouver l'accès en cas de mot de passe oublié. Elle peut être régénérée depuis les paramètres.
-- **Tableau de bord** : création, duplication, suppression et favoris de projets.
-  - **Corbeille des projets** : un projet supprimé y reste 30 jours (restauration, ou suppression définitive) ; passé ce délai, il est effacé au démarrage. Sélection multiple pour restaurer ou supprimer plusieurs projets.
-  - Types de projet : manga, roman, film, série, jeu, JDR, personnalisé.
-  - Statuts : en préparation, en cours, en pause, terminé.
-- **Calendrier de travail** : il retrace le rythme d'écriture à partir de l'activité réelle sur les projets.
+- **Welcome screen**: a short message, a miniature plot board (plotlines, scenes, characters, a place) drawn in the colours of the current theme, and two buttons: **Start** and **Sign in**.
+- **Two spaces, never mixed**:
+  - without signing in (**Start**), the dashboard shows the **public space** (public projects only);
+  - once signed in, it shows the **private space** (that account's private projects only).
 
-### Espace de travail d'un projet
+  There is no filter: the mode decides. New projects automatically take the visibility of the space they are created in.
+- **Getting-started guide**: opens once, the first time the dashboard is reached (with or without an account), then stays available under *Help › Getting-started guide*. It has 16 steps, each with a short text and its key points: projects, public and private spaces, the workspace, the project home, characters, places, relationships, the outline, plotlines, notes, search, saving and versions, history and trash, `.ganix` export, customisation and keyboard shortcuts.
+- **Tutorials**: the first time a project of each kind is opened (novel, manga or another type), a start-up mode explains where to begin. The Items, Flora and fauna and Factions modules have their own on first use. Every module also has an on-demand tutorial: the `?` button of the panel, *Help › Tutorial*, or the command palette. A step can open the feature it talks about, and the tutorial then resumes where it left off.
+- **Changing visibility**: *Project settings › Status and organisation › Visibility*.
+  - Public → private: immediate when signed in; otherwise GANIS asks you to sign in on the spot, then makes the project private. If signing in goes through account creation or the setup wizard, the change is applied on arrival at the dashboard.
+  - Private → public: requires explicit confirmation (*Cancel* / *Make public*).
+- **Local accounts**: the first account is an administrator, created by the setup wizard; other accounts can then register. There are three roles: `admin`, `developer` and `user`. Anyone can delete their own account (*Settings › Account*, password required): the account and its private projects are erased. The last administrator cannot leave while other accounts exist.
+- **Automatic lock** (optional, *Settings › Account*): after 5 to 60 minutes of inactivity, the account key is wiped from memory and the password is required to continue. Open tabs and unsaved input are kept.
+- **Recovery key**: handed over when the account is created; it restores access if the password is forgotten. It can be regenerated from the settings.
+- **Dashboard**: create, duplicate, delete and favourite projects.
+  - **Project trash**: a deleted project stays there for 30 days (restore it or delete it for good); after that it is erased at start-up. Several projects can be selected to restore or delete them together.
+  - Project types: manga, novel, film, series, game, tabletop RPG, custom.
+  - Statuses: in preparation, in progress, on hold, finished.
+- **Work calendar**: shows your writing rhythm, based on actual activity in your projects.
 
-L'espace de travail reprend le modèle d'un éditeur de code : une barre d'activité à gauche, un panneau latéral et une zone centrale à onglets.
+### The project workspace
 
-| Module | Contenu |
+The workspace follows the layout of a code editor: an activity bar on the left, a side panel (the *middle panel*) and a tabbed central area.
+
+| Module | What it contains |
 |---|---|
-| **Détails** | Accueil du projet, synopsis, historique, corbeille |
-| **Personnages** | Fiches à niveau de détail réglable, portrait, galerie, champs personnalisés, lieux associés, carte « Pouvoirs » à activer (pouvoirs et capacités, limites et faiblesses) |
-| **Relations** | Liens entre personnages (types et couleurs), graphe interactif aux positions mémorisées |
-| **Lieux** | Fiches hiérarchiques (un lieu peut en contenir d'autres), types personnalisés, portrait, galerie légendée |
-| **Objets, Faune et flore, Factions** | Modules facultatifs, activés dans les paramètres du projet. Factions : guildes, ordres, clans, armées, cultes, sociétés secrètes… en 8 catégories et 37 types, avec des branches et des liens (« dirige », « fait partie de », « est alliée de », « a son siège à »…) |
-| **Peuples, cultures et religions ; Magie et pouvoirs** | Deux modules facultatifs de plus, activés dans les paramètres du projet. Peuples : peuples et races, cultures, traditions, langues, classes sociales, religions, panthéons, divinités, mythologies, prophéties. Magie : systèmes (magie, énergie intérieure, super-pouvoirs, pouvoir divin, psychisme, alchimie), écoles, éléments, lignées, sorts et techniques (source, coût, limites, puissance, portée…). Cartes « Qui en fait partie » et « Qui la maîtrise », liens « appartient à », « pratique », « parle », « vénère », « maîtrise », « enseigne », « est une source de », « interdit ». Sans doublon : les organisations restent des factions, les pouvoirs d'un personnage sa carte « Pouvoirs » |
-| **Découpage** | Plan du récit en 1 à 5 niveaux (parties, chapitres, scènes…), numérotation automatique ou manuelle, couleurs par niveau, liens vers les personnages et les lieux |
-| **Trame** | Plateau des intrigues parallèles avec vue de lecture (par plan ou par trame) et visite guidée ; passé narratif au-dessus du début de l'histoire (flash-back, souvenirs, événements antérieurs) |
-| **Notes** | Éditeur riche (Tiptap) : tableaux, encadrés, diagrammes, chaînes, mentions de personnages et de lieux, correcteur orthographique ; dossiers, mur de post-it, notes système synchronisées avec les fiches (police, taille et listes, gardées dans la note ; la fiche reste en texte simple) |
-| **Documents** | Fichiers rangés dans le découpage (PDF, Word, images, textes, sons, vidéos, pages de manga…), lecture intégrée, modification dans l'application associée avec reprise automatique, 20 versions par document |
-| **Recherche** | Recherche globale insensible à la casse et aux accents, palette de commandes (`Ctrl+K`) |
-| **Paramètres** | Réglages propres au projet (personnages, lieux, découpage, trame, notes) |
+| **Details** | Project home (logo, description, type, status, synopsis preview), synopsis, glossary, **gallery**, history, trash |
+| **Characters** | Sheets with an adjustable level of detail, portrait, image gallery, custom fields, colour palette, linked places, an optional *Powers* card (powers and abilities, limits and weaknesses) |
+| **Relationships** | Links between characters (typed and colour-coded), an interactive graph with remembered positions, and a **family tree** layout |
+| **Places** | Nested sheets (a place can contain others), custom types, portrait, captioned gallery |
+| **Items, Flora and fauna, Factions** | Optional modules, enabled in the project settings. Factions: guilds, orders, clans, armies, cults, secret societies… in 8 categories and 37 types, with branches and links (*leads*, *is part of*, *is allied with*, *is headquartered in*…) |
+| **Peoples, cultures and religions; Magic and powers** | Two more optional modules. Peoples: peoples and races, cultures, traditions, languages, social classes, religions, pantheons, deities, mythologies, prophecies. Magic: systems (magic, inner energy, superpowers, divine power, psychic powers, alchemy), schools, elements, bloodlines, spells and techniques (source, cost, limits, power, range…). *Who belongs to it* and *Who masters it* cards; links such as *belongs to*, *practises*, *speaks*, *worships*, *masters*, *teaches*, *is a source of*, *forbids*. No duplication: organisations remain factions, and a character's own powers stay on their *Powers* card |
+| **Outline** | The story plan in 1 to 5 levels (parts, chapters, scenes…), automatic or manual numbering, a colour per level. Each item's sheet gathers all its **links with the world** (characters, places, world entries) in a single card, sorted by kind |
+| **Plot** | A board of parallel plotlines, with a reading view (by outline or by plotline) and a guided tour; a *narrative past* above the start of the story (flashbacks, memories, earlier events) |
+| **Notes** | A rich editor (Tiptap): tables, callouts, diagrams, chains, mentions of characters and places, spell checking; folders, a sticky-note wall, and system notes kept in sync with the sheets (font, size and lists are kept in the note; the sheet stays plain text) |
+| **Documents** | Files filed in the outline (PDF, Word, images, text, audio, video, manga pages…), built-in viewer, editing in the associated application with automatic pick-up of changes, 20 versions per document |
+| **Search** | Global search that ignores case and accents, plus a command palette (`Ctrl+K`) |
+| **Settings** | Project-specific settings (characters, places, outline, plot, notes) |
 
-**Outils du romancier (projets de type Roman uniquement)** : un module **Manuscrit** apparaît dans la barre de gauche, et les fiches du découpage gagnent deux cartes.
-- **Texte** (fiche d'une scène, ou d'un chapitre sans scène) : le texte s'écrit dans l'éditeur de GANIS, s'enregistre avec la fiche (Ctrl+S, enregistrement automatique, versions) et son nombre de mots est recalculé par Rust.
-- **Écriture** : objectif de mots (scène, chapitre, partie), état de rédaction des chapitres (À écrire, Premier jet, En révision, Relu, Corrigé — distinct du statut du projet), point de vue (personnage lié avec le rôle « Point de vue »), personne et temps de la narration. Ces réglages ne modifient jamais le texte.
-- **Manuscrit** : le roman d'un seul tenant, assemblé à la demande dans l'ordre du plan (aucune copie : déplacer une scène la déplace ici). Le texte d'une scène est celui de sa fiche ; à défaut, celui de ses documents texte (Word, Markdown, texte). Export Word, PDF ou texte (page de titre, chapitres sur une nouvelle page, numéros de page).
-- **Suivi de rédaction** : mots et objectifs du manuscrit, des parties, chapitres et scènes ; filtre par état de rédaction ; scènes dont la personne ou le temps diffère du reste du roman signalées.
-- **Dossier éditorial** : pitch en une phrase, résumé court, résumé long, indépendants du synopsis (qui peut servir de point de départ), versionnés et exportables séparément (Word, PDF, texte).
-Données : migration `023_novel.sql` (colonnes de `structure_nodes`, objectif dans `structure_settings`, table `editorial`), `services/novel_service.rs`, `commands/novel.rs`, `src/lib/novel.ts`, `src/lib/novelExport.ts`, `src/components/novel/*`.
+**Project logo and gallery.** *Details › Gallery* holds the project **logo**, shown on the project home next to its name, and up to 30 **world images** (posters, world maps, mood boards, sketches…). The logo keeps its shape, even a wide one. Images can be added by drag and drop, and clicking one opens it full screen, with ← → to browse. Images are stored, encrypted, in the project and are included in the `.ganix` export.
 
-**Chemin de fer (projets de type Manga uniquement)** : Scénario › Chemin de fer affiche les pages d'un tome en planches, de droite à gauche ou de gauche à droite, avec leur vignette, l'état de chaque page (vide, scénario écrit, dessin rangé) et le début des chapitres. Le numéro de la première page décide des vis-à-vis ; une révélation prévue au tourné sur une page paire et une page trop chargée en texte sont signalées. Le sens de lecture et ce numéro sont des préférences locales : ils ne suivent pas le `.ganix`.
+**Colour choice.** Wherever a colour is picked (outline levels, plotlines, sticky notes, callouts, diagram boxes, a character's palette), GANIS shows a single swatch with the current colour. Clicking it opens a small menu of suggested colours, *Other colour…* (the system colour picker) and, where it makes sense, *Default colour*.
 
-**Pages de manga** : la fiche d'un chapitre crée plusieurs pages d'un coup. Le dessin rangé sur la fiche d'une page s'affiche à côté de ses cases, et la lecture du chapitre enchaîne les dessins de ses pages. Les cases sont trouvées par la recherche, et les versions d'une page les gardent.
+**Maximising a tab.** Double-clicking a tab shows its content across the whole workspace (the activity bar and the middle panel are hidden). Another double-click, or the button at the right end of the tab bar, restores the layout. The tab keeps its state.
 
-**Modèles de page (manga)** : tant qu'une page n'a pas de dessin, sa fiche et le chemin de fer montrent une planche type selon son nombre de cases : diagonales, colonnes, fonds perdus, cases incrustées. Trois modèles au plus par nombre, de 1 à 10 cases ; au-delà, des rangées de cases en biais. Ils sont intégrés à l'application (hors ligne, sans IA) ; le modèle choisi est une préférence locale qui ne suit pas le `.ganix`.
+**Narrative past (Plot).** Moment 1 is the start of the main story. Above it, moments −1, −2… form the narrative past: scroll up to reach it, and create, move and link events there as anywhere else. The board always opens at the start of the story. In the data, these events simply have a negative moment (`row`), so existing projects are unaffected.
 
-**Agrandir un onglet** : un double-clic sur un onglet affiche son contenu sur toute la surface de l'espace de travail (la barre des modules et le panneau du milieu sont masqués) ; un nouveau double-clic, ou le bouton à droite de la barre d'onglets, rétablit la disposition. Le contenu de l'onglet garde son état.
+The suggested outline templates are:
 
-**Passé narratif (Trame)** : le moment 1 est le début de l'histoire principale. Au-dessus, les moments −1, −2… forment le passé narratif : on y remonte en faisant défiler vers le haut, on y crée, déplace et relie des événements comme ailleurs. Le plateau s'ouvre toujours au début de l'histoire. Dans les données, ces événements ont simplement un moment (`row`) négatif ; les projets existants ne changent pas.
-
-Les modèles de découpage proposés sont les suivants :
-
-| Modèle | Niveau 0 | Niveau 1 | Niveau 2 |
+| Template | Level 0 | Level 1 | Level 2 |
 |---|---|---|---|
-| Roman | Partie | Chapitre | Scène |
-| Manga | Tome | Chapitre | Page |
-| Film | Acte | Séquence | Scène |
-| Série | Saison | Épisode | Scène |
-| Jeu | Acte | Quête | Mission |
-| JDR | Scénario | Session | Rencontre |
-| Générique | Partie | Section | Élément |
+| Novel | Part | Chapter | Scene |
+| Manga | Volume | Chapter | Page |
+| Film | Act | Sequence | Scene |
+| Series | Season | Episode | Scene |
+| Game | Act | Quest | Mission |
+| Tabletop RPG | Scenario | Session | Encounter |
+| Generic | Part | Section | Item |
 
-### Historique et sécurité des données
+### Tabs
 
-- **Journal d'activité** : il est conservé 90 jours.
-- **Versions automatiques** : une version est prise au début de chaque séance de modification, au plus une toutes les 10 minutes et 50 par élément. Les versions manuelles sont aussi possibles. Restaurer une version garde d'abord l'état actuel.
-- **Corbeille** : les éléments supprimés sont restaurés avec tout ce qui en dépendait (images, relations, liens).
-- **Garde des modifications non enregistrées** : l'application pose la question avant de quitter ou de fermer un onglet modifié. Une fenêtre où l'on a saisi du texte ne se ferme plus d'un clic à côté : « Abandonner ce que vous avez saisi ? » est demandé d'abord.
-- **Écran de secours** : une erreur d'affichage remplace l'onglet (ou l'application) par un message clair, avec « Réessayer » et « Enregistrer et recharger GANIS ».
+- **Scrolling tab bar**: all open tabs sit on a single line that scrolls like VS Code's: swipe left or right with two fingers on a touchpad, or use the mouse wheel. The ‹ › arrows appear only when tabs are hidden on that side and bring the next hidden tab into view. The active tab is always scrolled into view.
+- **Preview tabs** (like VS Code): a single click on an item in the middle panel opens it in a temporary tab with an *italic* title. Opening another item the same way replaces that tab instead of adding a new one. The tab becomes permanent when you double-click the item or the tab, edit its content or pin it. This can be turned off in *Settings › Appearance › Preview tabs*.
+- **Pinning, reordering, closing**: drag and drop to reorder; right-click a tab to pin it or to close it, the others, those to its left or right, or all of them. Pinned tabs stay at the start of the bar and are remembered per project.
+- **Unsaved changes**: a dot ● replaces the close button; GANIS asks before closing a modified tab.
 
-### Personnalisation
+### Novel tools
 
-- **Thèmes** : clair, sombre et thèmes système.
-- **Packages** : en mode développeur, un éditeur de thème permet de créer ses propres thèmes. Ils sont déclaratifs (couleurs hexadécimales et arrondi uniquement) et validés côté Rust.
-- **Langue** : français et anglais.
-- **Raccourcis clavier** :
+Available for **Novel** projects only. A **Manuscript** module appears in the activity bar, and outline sheets gain two cards.
 
-  | Action | Raccourci |
+- **Text** (on a scene's sheet, or a chapter without scenes): the text is written in GANIS's editor and saved with the sheet (`Ctrl+S`, auto-save, versions). Its word count is computed by Rust.
+- **Writing**: word goals (scene, chapter, part), the chapter's writing state (*To write*, *First draft*, *In revision*, *Proofread*, *Corrected*, separate from the project status), point of view (a linked character with the *Point of view* role), grammatical person and tense of the narration. These settings never change the text.
+- **Manuscript**: the whole novel in one piece, assembled on demand in outline order. Nothing is copied: moving a scene moves it here too. A scene's text is the one on its sheet, or, failing that, the text of its documents (Word, Markdown, plain text). Exports to Word, PDF or plain text (title page, each chapter on a new page, page numbers).
+- **Writing progress**: words and goals for the manuscript, parts, chapters and scenes; filter by writing state; scenes whose person or tense differs from the rest of the novel are flagged.
+- **Editorial file**: a one-sentence pitch, a short summary and a long summary, independent of the synopsis (which can serve as a starting point), versioned and exportable separately (Word, PDF, plain text).
+
+Data: migration `023_novel.sql` (columns of `structure_nodes`, the goal in `structure_settings`, the `editorial` table), `services/novel_service.rs`, `commands/novel.rs`, `src/lib/novel.ts`, `src/lib/novelExport.ts`, `src/components/novel/*`.
+
+### Manga tools
+
+Available for **Manga** projects only.
+
+- **Flatplan** (*Script › Flatplan*): shows a volume's pages as spreads, right-to-left or left-to-right, with their thumbnail, the state of each page (empty, script written, artwork filed) and where chapters begin. The number of the first page decides which pages face each other. A reveal planned on a page turn that lands on an even page, and a page with too much text, are flagged. The reading direction and that first number are local preferences: they do not travel with the `.ganix` file.
+- **Manga pages**: a chapter's sheet can create several pages at once. The artwork filed on a page's sheet is shown next to its panels, and reading a chapter chains its pages' artwork. Panels are found by search, and page versions keep them.
+- **Page templates**: until a page has artwork, its sheet and the flatplan show a template layout based on its number of panels: diagonals, columns, bleeds, inset panels. Up to three templates per panel count, from 1 to 10 panels; beyond that, rows of slanted panels. They are built into the application (offline, no AI). The chosen template is a local preference and does not travel with the `.ganix` file.
+
+### History and data safety
+
+- **Activity log**: kept for 90 days.
+- **Automatic versions**: a version is taken at the start of each editing session, at most one every 10 minutes and 50 per item. Manual versions are also possible. Restoring a version first saves the current state.
+- **Trash**: deleted items are restored together with everything that depended on them (images, relationships, links).
+- **Auto-save**: screens save themselves a few seconds after the last change (1, 3, 10 or 30 seconds, configurable in *Settings › Saving*, and can be turned off).
+- **Unsaved-changes guard**: GANIS asks before quitting or closing a modified tab. A dialog in which text has been typed no longer closes on a click outside it: *Discard what you typed?* is asked first.
+- **Recovery screen**: a rendering error replaces the tab (or the whole application) with a clear message, with *Try again* and *Save and reload GANIS*.
+
+### Customisation
+
+- **Themes**: light, dark and system themes.
+- **Packages**: in developer mode, a theme editor lets you create your own themes. They are declarative (hexadecimal colours and corner radius only) and validated in Rust.
+- **Language**: French and English.
+- **Appearance options**: text size, middle-panel image size, right-click menu in the middle panel, preview tabs.
+- **Keyboard shortcuts**:
+
+  | Action | Shortcut |
   |---|---|
-  | Nouveau | `Ctrl+N` |
-  | Enregistrer | `Ctrl+S` |
-  | Tout enregistrer | `Ctrl+Alt+S` |
-  | Fermer l'onglet | `Ctrl+W` / `Ctrl+F4` |
-  | Onglet suivant / précédent | `Ctrl+Tab` / `Ctrl+Maj+Tab` |
-  | Palette de commandes | `Ctrl+K` |
-  | Centre d'aide | `F1` |
-  | Liste des raccourcis | `Ctrl+/` |
+  | New | `Ctrl+N` |
+  | Save | `Ctrl+S` |
+  | Save all | `Ctrl+Alt+S` |
+  | Close tab | `Ctrl+W` / `Ctrl+F4` |
+  | Next / previous tab | `Ctrl+Tab` / `Ctrl+Shift+Tab` (also `Ctrl+PgDn` / `Ctrl+PgUp`) |
+  | Move the selected tab | `Alt+←` / `Alt+→` |
+  | Command palette | `Ctrl+K` |
+  | Help centre | `F1` |
+  | List of shortcuts | `Ctrl+/` |
 
 ---
 
-## Sécurité et confidentialité
+## Security and privacy
 
-GANIS a été pensé pour qu'une copie du dossier de données ne révèle rien du contenu des projets.
+GANIS is designed so that a copy of its data folder reveals nothing about the content of private projects.
 
-### Organisation des clés
+### Key hierarchy
 
 ```text
-mot de passe ──(Argon2id)──┐
-                           ├─► verrous ─► clé du compte ─┬─► clé du projet A ─► project.db (SQLCipher)
-clé de récupération ───────┘                             ├─► clé du projet B ─► project.db (SQLCipher)
-                                                         └─► e-mail, nom et description des projets
+password ──(Argon2id)──┐
+                       ├─► key slots ─► account key ─┬─► project A key ─► project.db (SQLCipher)
+recovery key ──────────┘                             ├─► project B key ─► project.db (SQLCipher)
+                                                     └─► e-mail, project names and descriptions
 ```
 
-- **Clé du compte** : 256 bits aléatoires, jamais écrite en clair. Elle est enfermée dans des *verrous* (`user_key_slots`) : un pour le mot de passe, un pour la clé de récupération. Changer l'un des deux ne remplace qu'un verrou, sans rechiffrer les données.
-- **Clé de projet** : une clé distincte par projet, enfermée par la clé du compte. Elle chiffre toute la base du projet avec **SQLCipher**.
-- **Champs sensibles de `app.db`** : l'e-mail, ainsi que le nom et la description des projets, sont chiffrés champ par champ avec **XChaCha20-Poly1305**. Un contexte (AAD) lie chaque valeur à sa table, sa colonne et sa ligne.
-- **En mémoire** : la clé du compte n'existe que pendant la session et est effacée à la déconnexion (`zeroize`).
-- **Projets publics** : ils n'appartiennent à aucun compte (`owner_id` vide, `visibility = 'public'`). Leur base reste au format SQLCipher, mais sa clé est conservée en clair dans `app.db` (`public_key`), et leur nom et leur description ne sont pas chiffrés : c'est ce qui permet de les ouvrir sans connexion. Rendre un projet privé enferme cette même clé avec la clé du compte (la base n'est pas réécrite) ; le rendre public fait l'inverse, après confirmation.
+- **Account key**: 256 random bits, never written in clear. It is sealed in *key slots* (`user_key_slots`): one for the password, one for the recovery key. Changing either one only replaces its slot; no data is re-encrypted.
+- **Project key**: one separate key per project, sealed with the account key. It encrypts the whole project database with **SQLCipher**.
+- **Sensitive fields of `app.db`**: the e-mail address and the names and descriptions of projects are encrypted field by field with **XChaCha20-Poly1305**. Associated data (AAD) binds each value to its table, column and row.
+- **In memory**: the account key only exists during the session and is wiped on sign-out (`zeroize`).
+- **Public projects**: they belong to no account (`owner_id` empty, `visibility = 'public'`). Their database is still in SQLCipher format, but its key is stored in clear in `app.db` (`public_key`), and their name and description are not encrypted: that is what allows them to be opened without signing in. Making a project private seals that same key with the account key (the database is not rewritten); making it public does the opposite, after confirmation.
 
-### Ce qui reste lisible
+### What remains readable
 
-Le nom d'utilisateur, l'empreinte du mot de passe (Argon2id, irréversible), le rôle, les dates, le type, le statut et le favori des projets, et les thèmes créés restent lisibles. Le contenu des **projets publics** est lisible par quiconque a accès au dossier de données, par conception. Ces informations sont nécessaires à la connexion ou sans valeur pour un tiers.
+The user name, the password hash (Argon2id, irreversible), the role, dates, the project type, status and favourite flag, and user-created themes remain readable. The content of **public projects** is readable by anyone with access to the data folder, by design. This information is either needed to sign in or of no value to a third party.
 
-### Autres protections
+### Other protections
 
-| Mesure | Détail |
+| Measure | Details |
 |---|---|
-| Mots de passe | Argon2id ; paramètres enregistrés avec chaque verrou pour pouvoir les renforcer plus tard |
-| Clé de récupération | 6 groupes de 6 caractères (Crockford base 32, 180 bits), saisie tolérante, vérification d'un groupe tiré au hasard à l'affichage |
-| Tentatives de connexion | 5 échecs tolérés, puis blocage de 30 s doublé à chaque échec, jusqu'à 15 min maximum ; compteur séparé pour la récupération ; noms inconnus traités comme les autres |
-| Interface | CSP stricte (`default-src 'self'`), aucun accès réseau, HTML des notes nettoyé |
-| Droits | Le rôle est vérifié par Rust à chaque commande ; l'interface ne fait que le refléter |
-| Fichiers temporaires | Copies de documents ouvertes à l'extérieur supprimées en fin d'usage et au démarrage ; fichiers effacés par écrasement avant suppression |
-| Journaux | Rotation quotidienne, 14 jours conservés ; jamais de mot de passe, de jeton ni de contenu narratif |
+| Passwords | Argon2id; parameters are stored with each key slot so they can be strengthened later |
+| Recovery key | 6 groups of 6 characters (Crockford base 32, 180 bits), tolerant input, one randomly chosen group checked when it is displayed |
+| Sign-in attempts | 5 failures tolerated, then a 30 s lock-out that doubles with each failure, up to 15 min; a separate counter for recovery; unknown user names are treated like the others |
+| Interface | Strict CSP (`default-src 'self'`), no network access, note HTML sanitised |
+| Permissions | The role is checked in Rust on every command; the interface only reflects it |
+| Temporary files | Copies of documents opened externally are removed after use and at start-up; files are overwritten before deletion |
+| Logs | Daily rotation, 14 days kept; never any password, token or story content |
 
-Pour le détail, voir [`src-tauri/src/security/mod.rs`](src-tauri/src/security/mod.rs) et [`LISEZ-MOI-chiffrement.md`](LISEZ-MOI-chiffrement.md).
+For the details, see [`src-tauri/src/security/mod.rs`](src-tauri/src/security/mod.rs).
 
-> ⚠️ **Sans mot de passe ni clé de récupération, les données sont irrécupérables.** C'est voulu : il n'existe aucune porte dérobée.
+> ⚠️ **Without the password or the recovery key, the data cannot be recovered.** This is intentional: there is no back door.
 
 ---
 
-## Démarrage rapide
+## Quick start
 
-### Prérequis
+### Prerequisites
 
-| Outil | Version |
+| Tool | Version |
 |---|---|
-| [Node.js](https://nodejs.org) | 20 LTS ou plus récent |
-| [Rust](https://rustup.rs) | stable (édition 2021) |
-| Dépendances système Tauri 2 | voir [tauri.app/start/prerequisites](https://tauri.app/start/prerequisites/) |
-| **Windows uniquement** : [Strawberry Perl](https://strawberryperl.com) | nécessaire pour compiler OpenSSL (SQLCipher) |
+| [Node.js](https://nodejs.org) | 20 LTS or later |
+| [Rust](https://rustup.rs) | stable (2021 edition) |
+| Tauri 2 system dependencies | see [tauri.app/start/prerequisites](https://tauri.app/start/prerequisites/) |
+| **Windows only**: [Strawberry Perl](https://strawberryperl.com) | needed to build OpenSSL (for SQLCipher) |
 
-Sous Linux, il faut notamment `libwebkit2gtk-4.1-dev`, `build-essential`, `libssl-dev`, `librsvg2-dev` et `libayatana-appindicator3-dev`. Sous macOS, les outils en ligne de commande Xcode suffisent.
+On Linux you need, among others, `libwebkit2gtk-4.1-dev`, `build-essential`, `libssl-dev`, `librsvg2-dev` and `libayatana-appindicator3-dev`. On macOS, the Xcode command-line tools are enough.
 
 ### Installation
 
 ```bash
-git clone <url-du-dépôt> ganis
+git clone <repository-url> ganis
 cd ganis
 npm install
 ```
 
-### Lancer en développement
+### Running in development
 
 ```bash
 npm run tauri dev
 ```
 
-Le premier lancement est long (plusieurs minutes), car SQLCipher et OpenSSL sont compilés avec l'application. Les suivants sont incrémentaux.
+This starts Vite (through `beforeDevCommand` in `src-tauri/tauri.conf.json`), compiles the Rust side and opens the GANIS window. The first run takes several minutes, because SQLCipher and OpenSSL are compiled with the application; later runs are incremental.
 
-Au premier démarrage, GANIS ouvre l'écran **Configuration** pour créer le compte administrateur.
+On first launch, GANIS opens the **Setup** screen to create the administrator account.
 
-### Construire l'application
+> `npm run dev` alone only serves the interface on `http://localhost:1420`, without the Rust commands: accounts, projects and the database do not work there. Use `npm run tauri dev` to run the real application.
+
+### Building the application
 
 ```bash
 npm run tauri build
 ```
 
-Les installateurs sont produits dans `src-tauri/target/release/bundle/` : `.msi` et `.exe` sous Windows, `.dmg` et `.app` sous macOS, `.deb`, `.rpm` et `.AppImage` sous Linux. Le profil `release` active LTO, `strip` et `panic = "abort"` pour un binaire léger.
+Installers are written to `src-tauri/target/release/bundle/`: `.msi` and `.exe` on Windows, `.dmg` and `.app` on macOS, `.deb`, `.rpm` and `.AppImage` on Linux. The `release` profile enables LTO, `strip` and `panic = "abort"` for a small binary.
 
 ---
 
-## Scripts disponibles
+## Available scripts
 
-| Commande | Rôle |
+| Command | Purpose |
 |---|---|
-| `npm run tauri dev` | Application complète en développement (Vite + Rust, rechargement à chaud) |
-| `npm run tauri build` | Build de production et installateurs |
-| `npm run dev` | Front-end seul sur `http://localhost:1420` (sans les commandes Rust) |
-| `npm run build` | Vérification TypeScript (`tsc`) puis build Vite dans `dist/` |
-| `npm run preview` | Prévisualisation du build front-end |
-| `npm test` | Tests unitaires front-end (Vitest, dossier `src/`) |
-| `cd src-tauri && cargo test --lib` | Tests Rust (services, chiffrement, migrations) |
-| `npx playwright test` | Tests de bout en bout (voir [Tests](#tests)) |
+| `npm run tauri dev` | Full application in development (Vite + Rust, hot reload) |
+| `npm run tauri build` | Production build and installers |
+| `npm run dev` | Interface only, on `http://localhost:1420` (no Rust commands) |
+| `npm run build` | TypeScript check (`tsc`), then a Vite build into `dist/` |
+| `npm run preview` | Preview of the interface build |
+| `npm test` | Interface unit tests (Vitest, `src/` folder) |
+| `npm run test:e2e` | End-to-end tests (see [Tests](#tests)) |
+| `npm run seed:roman` / `npm run seed:manga` | Create a demo novel or manga project (Rust test marked `ignored`) |
+| `cd src-tauri && cargo test --lib` | Rust tests (services, encryption, migrations) |
 
 ---
 
 ## Architecture
 
 ```text
-┌──────────────────────────────── Fenêtre Tauri (WebView) ────────────────────────────────┐
+┌──────────────────────────────── Tauri window (WebView) ─────────────────────────────────┐
 │  React 19 + React Router                                                                 │
-│  ├── pages/        écrans (Welcome, Login, Dashboard, Workspace, Settings…)              │
-│  ├── components/   modules de l'espace de travail, UI (shadcn / Base UI, Tailwind 4)     │
-│  ├── stores/       état par domaine (Zustand)                                            │
-│  └── lib/api.ts    unique point d'appel des commandes Rust (invoke)                      │
+│  ├── pages/        screens (Welcome, Login, Dashboard, Workspace, Settings…)             │
+│  ├── components/   workspace modules, UI (shadcn / Base UI, Tailwind 4)                  │
+│  ├── stores/       state per domain (Zustand)                                            │
+│  └── lib/api/      the single entry point to Rust commands (invoke)                      │
 └───────────────────────────────────────────┬──────────────────────────────────────────────┘
-                                            │ IPC Tauri (commandes typées)
+                                            │ Tauri IPC (typed commands)
 ┌───────────────────────────────────────────▼──────────────────────────────────────────────┐
 │  Rust (src-tauri/src)                                                                    │
-│  ├── commands/     fines couches d'entrée : session, droits, puis appel du service       │
-│  ├── services/     logique métier (un service par domaine)                               │
-│  ├── security/     primitives crypto, clé de récupération, contextes AAD                 │
-│  ├── db/           app.db, bases de projet, migrations embarquées (sqlx::migrate!)       │
-│  ├── models/       types partagés (User, Project, Package…)                              │
-│  └── state.rs      AppState : pool app.db, pools des projets, session, clé du compte     │
+│  ├── commands/     thin entry layer: session, permissions, then the service call         │
+│  ├── services/     business logic (one service per domain)                               │
+│  ├── security/     crypto primitives, recovery key, AAD contexts                         │
+│  ├── db/           app.db, project databases, embedded migrations (sqlx::migrate!)       │
+│  ├── models/       shared types (User, Project, Package…)                                │
+│  └── state.rs      AppState: app.db pool, project pools, session, account key            │
 └───────────────────────────────────────────┬──────────────────────────────────────────────┘
                                             │
                      app.db (SQLite)  +  projets/<uuid>/project.db (SQLCipher)
 ```
 
-### Principes
+### Principles
 
-- **Rust fait autorité** : toute validation (droits, tailles, formats, couleurs de thème…) est faite côté Rust. Les vérifications de l'interface ne servent qu'au confort.
-- **Une base par projet** : chaque projet est isolé dans son propre fichier chiffré. Seul `services::project_storage` ouvre ces bases, avec un pool unique par projet.
-- **Migrations embarquées** : les fichiers SQL de `src-tauri/migrations/` sont compilés dans le binaire. `build.rs` force la recompilation quand un fichier est ajouté.
-- **Registre de modules** : `src/components/workspace/modules.ts` décrit les modules et fonctionnalités de l'espace de travail. La barre d'activité, le panneau latéral et les onglets le lisent tous ; ajouter une fonctionnalité se fait à cet endroit.
-- **Erreurs traduisibles** : `AppError` porte une clé i18n (`with_key`) que l'interface affiche dans la langue choisie.
+- **Rust is the authority**: every validation (permissions, sizes, formats, theme colours…) happens in Rust. Checks in the interface are only for convenience.
+- **One database per project**: each project is isolated in its own encrypted file. Only `services::project_storage` opens these databases, with a single pool per project.
+- **Embedded migrations**: the SQL files in `src-tauri/migrations/` are compiled into the binary. `build.rs` forces a rebuild when a file is added.
+- **Module registry**: `src/components/workspace/modules.ts` describes the workspace modules and features. The activity bar, the middle panel and the tabs all read it; adding a feature happens there.
+- **Translatable errors**: `AppError` carries an i18n key (`with_key`) that the interface displays in the chosen language.
+- **Pure tab model**: tab order, pinned tabs and the preview tab live in `src/lib/tabLayout.ts`, as pure functions covered by unit tests.
 
-### Principales dépendances
+### Main dependencies
 
-| Côté | Bibliothèques |
+| Side | Libraries |
 |---|---|
-| Front-end | React 19, React Router 7, Zustand, TanStack Query/Table, Tiptap 3, React Flow (`@xyflow/react`), dnd-kit, i18next, Zod, Tailwind CSS 4, shadcn, Lucide, mammoth (aperçu Word), hunspell-asm (orthographe) |
-| Rust | Tauri 2 (+ plugins `opener`, `dialog`), sqlx 0.8 (SQLite), libsqlite3-sys (SQLCipher + OpenSSL embarqués), tokio, argon2, chacha20poly1305, zeroize, sha2, zip, quick-xml, tracing |
+| Interface | React 19, React Router 7, Zustand, TanStack Query/Table, Tiptap 3, React Flow (`@xyflow/react`), dnd-kit, i18next, Zod, Tailwind CSS 4, shadcn, Lucide, mammoth (Word preview), hunspell-asm (spell checking) |
+| Rust | Tauri 2 (+ `opener`, `dialog` and `clipboard-manager` plugins), sqlx 0.8 (SQLite), libsqlite3-sys (bundled SQLCipher + OpenSSL), tokio, argon2, chacha20poly1305, zeroize, sha2, zip, quick-xml, tracing |
 
 ---
 
-## Arborescence du dépôt
+## Repository layout
 
 ```text
 GANIS/
-├── src/                          Front-end React
-│   ├── assets/                   Logo, dictionnaires Hunspell fr/en
+├── src/                          React interface
+│   ├── assets/                   Logo, Hunspell dictionaries (fr/en)
 │   ├── components/
-│   │   ├── auth/                 Clé de récupération
-│   │   ├── characters/           Fiches personnages
-│   │   ├── documents/            Documents du découpage, lecture, versions
-│   │   ├── layout/               Barre de titre, barre d'activité, menus, garde des modifications
-│   │   ├── locations/            Fiches lieux
-│   │   ├── notes/                Notes, éditeur Tiptap et extensions
-│   │   ├── packages/             Thèmes
-│   │   ├── plot/                 Trame
-│   │   ├── relations/            Relations et graphe
-│   │   ├── search/               Recherche, palette de commandes
-│   │   ├── settings/             Paramètres du compte et de l'application
-│   │   ├── structure/            Découpage
-│   │   ├── ui/                   Composants de base (shadcn)
-│   │   └── workspace/            Espace de travail, onglets, vues
-│   ├── i18n/locales/{fr,en}/     Traductions par domaine
-│   ├── lib/                      Logique pure, API, tests unitaires
-│   ├── pages/                    Écrans routés
-│   ├── stores/                   Stores Zustand
-│   └── types/                    Types partagés
-├── src-tauri/                    Back-end Rust
-│   ├── capabilities/             Permissions Tauri
+│   │   ├── auth/                 Recovery key
+│   │   ├── characters/           Character sheets
+│   │   ├── common/               Shared pieces (colour menu, info tips…)
+│   │   ├── documents/            Outline documents, viewer, versions
+│   │   ├── history/              Activity history, versions
+│   │   ├── layout/               Title bar, activity bar, menus, help, unsaved-changes guard
+│   │   ├── links/                "Links with the world" cards
+│   │   ├── locations/            Place sheets
+│   │   ├── manga/                Flatplan, pages, production
+│   │   ├── notes/                Notes, Tiptap editor and extensions
+│   │   ├── novel/                Manuscript, writing progress, editorial file
+│   │   ├── packages/             Themes and theme editor
+│   │   ├── plot/                 Plot board and reading view
+│   │   ├── project-settings/     Project settings
+│   │   ├── projects/             Dashboard, project cards, .ganix import
+│   │   ├── relations/            Relationships, graph, family tree
+│   │   ├── search/               Search, command palette
+│   │   ├── settings/             Account and application settings
+│   │   ├── structure/            Outline
+│   │   ├── ui/                   Base components (shadcn)
+│   │   ├── welcome/              Welcome screen
+│   │   ├── workspace/            Workspace, tabs, views
+│   │   └── world/                Items, flora and fauna, factions, peoples, magic
+│   ├── i18n/locales/{fr,en}/     Translations, one file per domain
+│   ├── lib/                      Pure logic, API, unit tests
+│   ├── pages/                    Routed screens
+│   ├── stores/                   Zustand stores
+│   └── types/                    Shared types
+├── src-tauri/                    Rust back end
+│   ├── capabilities/             Tauri permissions
 │   ├── migrations/
-│   │   ├── app/                  Schéma de app.db
-│   │   └── project/              Schéma de chaque project.db
+│   │   ├── app/                  Schema of app.db
+│   │   └── project/              Schema of each project.db
 │   ├── src/
-│   │   ├── commands/             Commandes exposées à l'interface
-│   │   ├── db/                   Connexions et migrations
-│   │   ├── models/               Modèles
-│   │   ├── security/             Chiffrement
-│   │   └── services/             Logique métier
+│   │   ├── commands/             Commands exposed to the interface
+│   │   ├── db/                   Connections and migrations
+│   │   ├── models/               Models
+│   │   ├── security/             Encryption
+│   │   └── services/             Business logic
 │   ├── Cargo.toml
 │   └── tauri.conf.json
-├── tests/                        Tests de bout en bout (Playwright sur l'application Tauri)
-├── LISEZ-MOI-chiffrement.md      Notes sur le chiffrement
+├── tests/                        End-to-end tests (Playwright on the Tauri application)
 └── package.json
 ```
 
 ---
 
-## Données et fichiers
+## Data and files
 
-GANIS range ses données dans le dossier de données standard du système, avec l'identifiant `app.ganis.studio` :
+GANIS stores its data in the system's standard application-data folder, under the identifier `app.ganis.studio`:
 
-| Système | Dossier de données |
+| System | Data folder |
 |---|---|
 | Windows | `%APPDATA%\app.ganis.studio\` |
 | macOS | `~/Library/Application Support/app.ganis.studio/` |
@@ -327,116 +372,118 @@ GANIS range ses données dans le dossier de données standard du système, avec 
 
 ```text
 app.ganis.studio/
-├── app.db                       comptes, verrous de clés, liste des projets, packages
+├── app.db                       accounts, key slots, project list, packages
 ├── projets/
-│   └── <uuid>/project.db        base chiffrée d'un projet (SQLCipher)
-├── sauvegardes/                 copie de l'ancien projet quand un import .ganix le remplace
-├── open-documents/              copies temporaires des documents ouverts à l'extérieur
-├── staging/                     zone d'attente des imports .ganix
-└── tmp/                         fichiers de travail (exports en cours)
+│   └── <uuid>/project.db        a project's encrypted database (SQLCipher)
+├── sauvegardes/                 copy of the old project when a .ganix import replaces it
+├── open-documents/              temporary copies of documents opened externally
+├── staging/                     waiting area for .ganix imports
+└── tmp/                         working files (exports in progress)
 ```
 
-Les journaux se trouvent dans le dossier de journaux du système (`app_log_dir`).
+Folder names are in French on disk (`projets` = projects, `sauvegardes` = backups). Logs are written to the system's log folder (`app_log_dir`). The `GANIS_DATA_DIR` environment variable points GANIS at another data folder; the end-to-end tests use it.
 
 ### Migrations
 
-- `migrations/app/` : schéma de `app.db` (utilisateurs, projets, packages, chiffrement).
-- `migrations/project/` : schéma des projets (synopsis, découpage, personnages, relations, lieux, notes, corbeille, historique, documents, trame…).
+- `migrations/app/`: schema of `app.db` (users, projects, packages, encryption).
+- `migrations/project/`: schema of projects (synopsis, outline, characters, relationships, places, notes, trash, history, documents, plot, world modules, glossary, project images…).
 
-Une migration déjà publiée ne doit **jamais être modifiée** : il faut ajouter un nouveau fichier numéroté (`023_…sql`). Les projets existants sont mis à jour automatiquement à leur ouverture.
+A migration that has been released must **never be modified**: add a new numbered file instead (for example `038_….sql`). Existing projects are upgraded automatically when they are opened.
 
 ---
 
-## Format `.ganix`
+## The `.ganix` format
 
-Le `.ganix` est le format d'échange des projets. C'est une archive ZIP qui ne contient que du XML et des images, **jamais de base de données** :
+`.ganix` is the project exchange format. It is a ZIP archive that only contains XML and images, **never a database**:
 
 ```text
-mon-projet.ganix
-├── manifest.xml     identité, versions, contenu, compatibilité
-├── checksums.xml    empreintes SHA-256 des autres fichiers
-├── project.xml      données du projet, table par table
-└── assets/          images et gros documents, nommés par leur empreinte
+my-project.ganix
+├── manifest.xml     identity, versions, content, compatibility
+├── checksums.xml    SHA-256 hashes of the other files
+├── project.xml      the project's data, table by table
+└── assets/          images and large documents, named by their hash
 ```
 
-- **Export** : les données sont lues en un instantané cohérent, puis écrites dans un `.ganix.part` qui est relu, vérifié et enfin renommé. Un export interrompu ne laisse jamais de faux fichier.
-- **Import** : la base est reconstruite par les migrations de GANIS dans une zone d'attente, puis les lignes sont insérées colonne par colonne. Le fichier n'apporte que des données (aucun SQL, aucun déclencheur). L'archive est entièrement contrôlée : chemins, liens symboliques, taux de compression, empreintes, type réel des images, XML sans DTD. Un aperçu est présenté avant confirmation.
-- Aucune donnée de compte (mot de passe, clé, identifiant) n'est exportée. Le `.ganix` n'est **pas chiffré** : c'est un fichier de partage.
+- **Export**: the data is read as one consistent snapshot, then written to a `.ganix.part` file that is read back, checked and finally renamed. An interrupted export never leaves a half-written file behind. Every table of the project is exported, so new tables (such as the logo and gallery) are included automatically.
+- **Import**: the database is rebuilt by GANIS's own migrations in a staging area, then rows are inserted column by column. The file only brings data (no SQL, no triggers). The archive is fully checked: paths, symbolic links, compression ratio, hashes, the real type of images, XML without DTD. A preview is shown before confirmation.
+- No account data (password, key, identifier) is ever exported. A `.ganix` file is **not encrypted**: it is meant for sharing.
 
 ---
 
 ## Tests
 
-| Suite | Commande | Contenu |
+| Suite | Command | Coverage |
 |---|---|---|
-| Rust | `cd src-tauri && cargo test --lib` | Services sur base SQLite en mémoire, chiffrement (`encryption_tests.rs`), limitation des connexions, validation des packages |
-| Front-end | `npm test` | Logique de `src/lib/` (structure, notes, relations, trame, raccourcis, nettoyage HTML, clé de récupération…) |
-| Bout en bout | `npm run test:e2e` | La vraie application (Rust + interface) : premier lancement, comptes et espaces, tableau de bord, chaque module, roman, manga, recherche, corbeille, historique, paramètres, persistance après redémarrage |
+| Rust | `cd src-tauri && cargo test --lib` | Services on an in-memory SQLite database, encryption (`encryption_tests.rs`), sign-in throttling, package validation, `.ganix` export and import |
+| Interface | `npm test` | Logic in `src/lib/` (outline, notes, relationships, plot, tab layout, shortcuts, HTML sanitising, recovery key…) and some components |
+| End-to-end | `npm run test:e2e` | The real application (Rust + interface): first launch, accounts and spaces, dashboard, every module, novel, manga, search, trash, history, settings, persistence after restart |
 
-> Les tests de bout en bout (`tests/ganis.spec.ts`, Windows) pilotent l'exécutable de `src-tauri/target/debug` : WebView2 ouvre un port de débogage auquel Playwright se connecte (`tests/ganis-app.ts`). Chaque lancement utilise un dossier de données temporaire (`GANIS_DATA_DIR`) : vos comptes et projets ne sont pas touchés. Compilez d'abord (`cd src-tauri && cargo build`) ; le serveur Vite est lancé, ou réutilisé, par `playwright.config.ts`. En cas d'échec, le rapport (`npx playwright show-report`) contient une capture et l'arbre d'accessibilité de la fenêtre.
+> The end-to-end tests (`tests/ganis.spec.ts`, Windows) drive the executable in `src-tauri/target/debug`: WebView2 opens a debugging port that Playwright connects to (`tests/ganis-app.ts`). Each run uses a temporary data folder (`GANIS_DATA_DIR`), so your own accounts and projects are not touched. Build first (`cd src-tauri && cargo build`); the Vite server is started, or reused, by `playwright.config.ts`. When a test fails, the report (`npx playwright show-report`) contains a screenshot and the window's accessibility tree.
 
 ---
 
 ## Internationalisation
 
-Les textes sont dans `src/i18n/locales/<langue>/<domaine>.json`, avec un fichier par domaine : `characters.json`, `plot.json`, `errors.json`… Le typage des clés est assuré par `src/i18n/i18next.d.ts`.
+Texts live in `src/i18n/locales/<language>/<domain>.json`, one file per domain: `characters.json`, `plot.json`, `errors.json`… Keys are typed through `src/i18n/i18next.d.ts`.
 
-Pour ajouter un texte, il faut ajouter la clé **dans les deux langues** (`fr` et `en`).
+To add a text, add the key **in both languages** (`fr` and `en`).
 
-Pour ajouter une langue :
+To add a language:
 
-1. Copier `locales/fr/` vers `locales/<code>/` et traduire les fichiers.
-2. Importer chacun de ces fichiers dans `src/i18n/index.ts` et les ajouter aux ressources, comme pour `fr` et `en`.
-3. L'ajouter au sélecteur (`components/layout/LanguageSwitcher.tsx`).
+1. Copy `locales/fr/` to `locales/<code>/` and translate the files.
+2. Import each of these files in `src/i18n/index.ts` and add them to the resources, as for `fr` and `en`.
+3. Add the language to the switcher (`components/layout/LanguageSwitcher.tsx`).
 
 ---
 
-## Contribuer
+## Contributing
 
 ### Conventions
 
-- **Langue** : les commentaires, la documentation et les messages sont en français ; les identifiants de code sont en anglais.
-- **TypeScript** : mode `strict`, sans variable ni paramètre inutilisé. Utiliser l'alias `@/` pour importer depuis `src/`.
-- **Rust** : `cargo fmt` et `cargo clippy` avant chaque commit. Les commandes restent fines et la logique va dans `services/`.
-- **Sécurité** : ne jamais journaliser de donnée sensible, toujours valider côté Rust, et ne jamais écrire une clé en clair.
-- **Base de données** : toute évolution du schéma passe par une nouvelle migration.
+- **Language**: code comments and in-app documentation are written in French; code identifiers are in English.
+- **TypeScript**: `strict` mode, no unused variables or parameters. Use the `@/` alias to import from `src/`.
+- **Rust**: run `cargo fmt` and `cargo clippy` before each commit. Commands stay thin; logic goes into `services/`.
+- **Security**: never log sensitive data, always validate in Rust, and never write a key in clear.
+- **Database**: every schema change goes through a new migration.
 
-### Ajouter une commande Rust
+### Adding a Rust command
 
-1. Écrire la logique dans `src-tauri/src/services/<domaine>_service.rs`, avec ses tests.
-2. Exposer la commande dans `src-tauri/src/commands/<domaine>.rs`.
-3. L'enregistrer dans `generate_handler!` (`src-tauri/src/lib.rs`).
-4. Ajouter l'appel typé dans `src/lib/api.ts`.
+1. Write the logic in `src-tauri/src/services/<domain>_service.rs`, with its tests.
+2. Expose the command in `src-tauri/src/commands/<domain>.rs`.
+3. Register it in `generate_handler!` (`src-tauri/src/lib.rs`).
+4. Add the typed call in `src/lib/api/<domain>.ts`, and spread that object into `api` in `src/lib/api/index.ts` if it is a new file.
 
-### Ajouter un module à l'espace de travail
+### Adding a feature to the workspace
 
-1. Ajouter l'identifiant dans `ModuleId` et `FeatureId` (`src/components/workspace/modules.ts`).
-2. Ajouter ses textes dans `modules.json` (fr et en).
-3. Créer la vue dans `components/workspace/views/` et la brancher dans `WorkspaceView.tsx`.
+1. Add its identifier to `ModuleId` / `FeatureId` and register it with `defineFeature` (`src/components/workspace/modules.ts`).
+2. Add its texts to `modules.json` (fr and en).
+3. Create the view in `components/workspace/views/` and wire it in `WorkspaceView.tsx`.
 
 ---
 
-## Dépannage
+## Troubleshooting
 
-| Problème | Solution |
+| Problem | Solution |
 |---|---|
-| Échec de compilation d'OpenSSL sous Windows | Installer Strawberry Perl, rouvrir le terminal, puis relancer |
-| Le port 1420 est déjà utilisé | Fermer l'autre instance de Vite (`strictPort` est activé) |
-| Nouvelle migration non prise en compte | `cd src-tauri && cargo clean -p ganis`, puis relancer |
-| « Projet non trouvé » au démarrage | La base du projet a été déplacée ou supprimée ; GANIS refuse volontairement de la recréer vide |
-| Connexion bloquée temporairement | Trop d'échecs : attendre la fin du délai indiqué (15 min maximum) |
-| Mot de passe oublié | Écran **Mot de passe oublié**, puis saisir la clé de récupération |
+| OpenSSL fails to build on Windows | Install Strawberry Perl, reopen the terminal, then try again |
+| `Port 1420 is already in use` | Another Vite server is running (often from an earlier `npm run tauri dev` or `npm run dev`). Stop it, then start again (`strictPort` is enabled) |
+| `npm run dev` shows the interface but nothing works | That command serves the interface without Rust. Run `npm run tauri dev` instead |
+| A new migration is not picked up | `cd src-tauri && cargo clean -p ganis`, then run again |
+| "Project not found" at start-up | The project database was moved or deleted; GANIS deliberately refuses to recreate it empty |
+| Sign-in temporarily blocked | Too many failures: wait for the indicated delay (15 min at most) |
+| Forgotten password | Use the **Forgotten password** screen, then enter the recovery key |
+| `src-tauri/target` takes a lot of disk space | Rust build caches grow over time. `cd src-tauri && cargo clean` frees them; the next build will take longer |
 
 ---
 
-## Licences tierces
+## Third-party licences
 
-- Dictionnaire français : Grammalecte / Olivier R., [MPL 2.0](src/assets/dictionaries/LICENSE-fr.txt).
-- Dictionnaire anglais : SCOWL / Kevin Atkinson et autres, [licence](src/assets/dictionaries/LICENSE-en.txt).
-- Les autres dépendances sont sous leurs licences respectives (voir `package-lock.json` et `Cargo.lock`).
+- French dictionary: Grammalecte / Olivier R., [MPL 2.0](src/assets/dictionaries/LICENSE-fr.txt).
+- English dictionary: SCOWL / Kevin Atkinson and others, [licence](src/assets/dictionaries/LICENSE-en.txt).
+- Other dependencies are under their respective licences (see `package-lock.json` and `Cargo.lock`).
 
-La licence de GANIS lui-même reste à définir.
+The licence of GANIS itself is still to be decided.
 
 ---
 
-<p align="center"><sub>GANIS 0.1.0</sub></p>
+<p align="center"><sub>GANIS 1.0.0</sub></p>

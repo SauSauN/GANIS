@@ -159,3 +159,158 @@ export function buildFamilyTree(relations: Relation[], nameOf: (id: string) => s
     others,
   };
 }
+
+// ----------------------------------------------------------------------------
+// Arbre d'un personnage
+// ----------------------------------------------------------------------------
+
+/** Préfixe des membres « fantômes » : de la famille, mais jamais mentionnés. */
+export const GHOST_PREFIX = "ghost:";
+
+export const isGhost = (id: string) => id.startsWith(GHOST_PREFIX);
+
+/** Fantôme parent de `childId` (lui-même éventuellement fantôme). */
+const ghostParentId = (childId: string) => `${GHOST_PREFIX}${childId}`;
+
+/** Personne réelle sous un fantôme, et nombre de générations qui les séparent. */
+export function ghostAnchor(id: string): { childId: string; depth: number } {
+  let depth = 0;
+  let current = id;
+  while (isGhost(current)) {
+    current = current.slice(GHOST_PREFIX.length);
+    depth += 1;
+  }
+  return { childId: current, depth };
+}
+
+/** Toute la famille de `rootId` : les personnes reliées par un lien familial précis, de proche en proche. */
+export function familyOf(relations: Relation[], rootId: string): Set<string> {
+  const linked = relations.filter((r) => r.type === "family" && r.familyLink);
+  const family = new Set([rootId]);
+  const queue = [rootId];
+  while (queue.length) {
+    const id = queue.shift()!;
+    for (const r of linked) {
+      const other = r.sourceId === id ? r.targetId : r.targetId === id ? r.sourceId : null;
+      if (other && !family.has(other)) {
+        family.add(other);
+        queue.push(other);
+      }
+    }
+  }
+  return family;
+}
+
+/**
+ * Complète les liens sans intermédiaire par des membres « fantômes » : un
+ * grand-père sans parent connu entre lui et son petit-fils devient le père
+ * d'un parent fantôme ; un oncle, le frère d'un parent fantôme ; deux
+ * cousins, les enfants de deux fantômes frères et sœurs.
+ *
+ * Un fantôme n'est créé que lorsqu'il n'y a pas d'ambiguïté (aucun parent
+ * connu) ; sinon le lien reste dessiné en pointillés. Les relations rendues
+ * sont prêtes pour `buildFamilyTree` : les liens « parent » ajoutés ont un
+ * identifiant qui commence par `ghost:`.
+ */
+export function withGhosts(relations: Relation[]): Relation[] {
+  const family = relations.filter((r) => r.type === "family");
+  const parents = new Map<string, string[]>();
+  const parentsOf = (id: string) => parents.get(id) ?? [];
+  const addParent = (child: string, parent: string) => {
+    const list = parents.get(child) ?? [];
+    if (!list.includes(parent)) list.push(parent);
+    parents.set(child, list);
+  };
+  for (const r of family) if (r.familyLink === "parent") addParent(r.targetId, r.sourceId);
+
+  const siblingKeys = new Set(family.filter((r) => r.familyLink === "sibling").map((r) => pairKey(r.sourceId, r.targetId)));
+  const areSiblings = (a: string, b: string) =>
+    a !== b && (siblingKeys.has(pairKey(a, b)) || parentsOf(a).some((p) => parentsOf(b).includes(p)));
+
+  /** Un parent sans ambiguïté pour y rattacher un ancêtre : un fantôme, existant ou à créer. */
+  const anchor = (id: string): string | null => {
+    const known = parentsOf(id);
+    if (known.length === 0) {
+      const ghost = ghostParentId(id);
+      addParent(id, ghost);
+      return ghost;
+    }
+    return known.find(isGhost) ?? null;
+  };
+
+  /** Rend `a` et `b` frères et sœurs ; seuls les fantômes reçoivent des parents d'office. */
+  const makeSiblings = (a: string, b: string): boolean => {
+    if (areSiblings(a, b)) return true;
+    const pa = parentsOf(a);
+    const pb = parentsOf(b);
+    if (pa.length && !pb.length && isGhost(b)) pa.forEach((p) => addParent(b, p));
+    else if (pb.length && !pa.length && isGhost(a)) pb.forEach((p) => addParent(a, p));
+    else if (!pa.length && !pb.length) {
+      const common = ghostParentId(isGhost(a) ? b : a);
+      addParent(a, common);
+      addParent(b, common);
+    } else return false;
+    return true;
+  };
+
+  const resolved = new Set<string>();
+  const indirect = (link: FamilyLinkName) => family.filter((r) => r.familyLink === link);
+
+  for (const r of indirect("grandparent")) {
+    const [elder, young] = [r.sourceId, r.targetId];
+    if (parentsOf(young).some((p) => parentsOf(p).includes(elder))) {
+      resolved.add(r.id);
+      continue;
+    }
+    const parent = anchor(young);
+    if (parent) {
+      addParent(parent, elder);
+      resolved.add(r.id);
+    }
+  }
+  for (const r of indirect("auntUncle")) {
+    const [elder, young] = [r.sourceId, r.targetId];
+    if (parentsOf(young).some((p) => areSiblings(p, elder))) {
+      resolved.add(r.id);
+      continue;
+    }
+    const parent = anchor(young);
+    if (parent && makeSiblings(parent, elder)) resolved.add(r.id);
+  }
+  for (const r of indirect("cousin")) {
+    const [a, b] = [r.sourceId, r.targetId];
+    if (parentsOf(a).some((p) => parentsOf(b).some((q) => areSiblings(p, q)))) {
+      resolved.add(r.id);
+      continue;
+    }
+    // Pas de fantôme si l'un des deux a déjà des parents connus : on ne sait pas lequel.
+    const free = (id: string) => parentsOf(id).length === 0 || parentsOf(id).some(isGhost);
+    if (!free(a) || !free(b)) continue;
+    const pa = anchor(a);
+    const pb = anchor(b);
+    if (pa && pb && makeSiblings(pa, pb)) resolved.add(r.id);
+  }
+
+  // Liens « parent » ajoutés : ceux qui touchent un fantôme.
+  const template = family[0];
+  const ghostLinks: Relation[] = [];
+  for (const [child, list] of parents) {
+    for (const parent of list) {
+      if (!isGhost(parent) && !isGhost(child)) continue;
+      ghostLinks.push({
+        ...template,
+        id: `${GHOST_PREFIX}${parent}>${child}`,
+        sourceId: parent,
+        targetId: child,
+        type: "family",
+        label: "",
+        description: "",
+        directed: true,
+        familyLink: "parent",
+      });
+    }
+  }
+  return [...relations.filter((r) => !resolved.has(r.id)), ...ghostLinks];
+}
+
+type FamilyLinkName = NonNullable<Relation["familyLink"]>;

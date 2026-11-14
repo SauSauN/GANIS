@@ -413,7 +413,11 @@ function CharacterCard({
           name={name}
           url={url}
           size="lg"
-          className="relative z-10 size-20 border-4 border-card text-2xl ring-0 shadow-sm"
+          className={cn(
+            "relative z-10 size-20 text-2xl ring-0",
+            palette.length > 0 ? "border-4 shadow-sm" : "profile-frame profile-frame-card",
+          )}
+          style={palette.length > 0 ? { borderColor: palette[0] } : undefined}
         />
 
         <span className="min-w-0">

@@ -112,7 +112,11 @@
     "retry": "Réessayer",
     "noResult": "Aucune fiche ne correspond à votre recherche.",
     "expand": "Déplier",
-    "collapse": "Replier"
+    "collapse": "Replier",
+    "layout": "Affichage",
+    "tree": "Arborescence",
+    "grid": "Cartes",
+    "inside": "dans {{name}}"
   },
   "sidebar": {
     "loading": "Chargement…",
@@ -396,7 +400,7 @@
     "categories": {
       "weapon": {
         "label": "Armes",
-        "description": "Épées, arcs, armes à feu, explosifs…"
+        "description": "Épées, haches, arcs, armes à feu, explosifs, munitions…"
       },
       "armor": {
         "label": "Armures et protections",
@@ -1161,15 +1165,15 @@
     "categories": {
       "people": {
         "label": "Peuples et races",
-        "description": "Ethnies, races fantastiques, civilisations extraterrestres, êtres artificiels ou spirituels, nomades…"
+        "description": "Ethnies, races fantastiques, extraterrestres…"
       },
       "culture": {
         "label": "Cultures et traditions",
-        "description": "Cultures, coutumes et fêtes, langues, classes sociales…"
+        "description": "Coutumes, fêtes, langues, classes sociales…"
       },
       "religion": {
         "label": "Religions et croyances",
-        "description": "Religions, panthéons, divinités, mythologies, philosophies, prophéties…"
+        "description": "Religions, panthéons, divinités, mythologies…"
       }
     },
     "types": {
@@ -1364,7 +1368,7 @@
     "categories": {
       "system": {
         "label": "Systèmes",
-        "description": "Les grandes règles du pouvoir : magie, énergie (ki, chakra…), super-pouvoirs, pouvoir divin, psychisme, alchimie…"
+        "description": "Magie, ki, super-pouvoirs, psychisme, alchimie…"
       },
       "branch": {
         "label": "Écoles et branches",
@@ -1372,7 +1376,7 @@
       },
       "technique": {
         "label": "Sorts et techniques",
-        "description": "Sorts, techniques, rituels, transformations, invocations, arts interdits…"
+        "description": "Sorts, rituels, transformations, invocations…"
       }
     },
     "types": {

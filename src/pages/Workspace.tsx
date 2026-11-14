@@ -33,14 +33,18 @@ import { cn } from "@/lib/utils";
 import { useMediaQuery } from "@/lib/useMediaQuery";
 import {
   setRailExpanded,
+  getPreviewTabsEnabled,
+  usePreviewTabsEnabled,
   useRailExpanded,
 } from "@/lib/preferences";
 import {
   addTab,
   closeTabs as closeTabsInLayout,
   initialLayout,
+  keepTab,
   loadOpenTabs,
   moveTab as moveTabInLayout,
+  previewTab,
   saveOpenTabs,
   savePinnedTabs,
   shiftTab as shiftTabInLayout,
@@ -282,6 +286,16 @@ export default function Workspace() {
 
   /** Onglets avec des modifications non enregistrées (point ● sur l'onglet). */
   const unsavedEntries = useUnsavedStore((state) => state.entries);
+
+  // Un aperçu modifié devient définitif : il ne sera pas remplacé. De même
+  // si les aperçus sont désactivés dans les paramètres.
+  const previewTabsEnabled = usePreviewTabsEnabled();
+  useEffect(() => {
+    const preview = layout.preview;
+    if (preview && (!previewTabsEnabled || preview in unsavedEntries)) {
+      setLayout((current) => keepTab(current, preview));
+    }
+  }, [layout.preview, unsavedEntries, previewTabsEnabled]);
 
   /** Palette de commandes (Ctrl+K) et « Que voulez-vous créer ? ». */
   const [paletteOpen, setPaletteOpen] = useState(false);
@@ -578,6 +592,30 @@ export default function Workspace() {
   }
 
   /**
+   * Simple clic dans le panneau du milieu (comme VS Code) : ouvre l'élément
+   * en aperçu. L'aperçu précédent est remplacé, sauf s'il a des
+   * modifications non enregistrées ; un onglet déjà ouvert est simplement
+   * affiché. Le double-clic (`openFeature`) le rend définitif.
+   */
+  function previewFeature(featureId: string) {
+    // Aperçus désactivés (Paramètres › Apparence) : onglet définitif.
+    if (!getPreviewTabsEnabled()) {
+      openFeature(featureId);
+      return;
+    }
+
+    const isUnsaved = (id: string) => id in useUnsavedStore.getState().entries;
+    setLayout((current) => previewTab(current, featureId, (id) => !isUnsaved(id)));
+
+    activate(featureId);
+  }
+
+  /** Rend l'aperçu définitif (double-clic sur l'onglet, modification…). */
+  function keepPreview(tabId: string) {
+    setLayout((current) => keepTab(current, tabId));
+  }
+
+  /**
    * Ferme un ou plusieurs onglets, relativement à l'onglet `tabId`
    * (voir `CloseScope` : cet onglet, les autres, ceux à gauche, à droite,
    * ou tous).
@@ -729,6 +767,7 @@ export default function Workspace() {
             label: meta.label,
             icon: meta.icon,
             pinned: layout.pinned.includes(id),
+            preview: layout.preview === id,
             dirty: id in unsavedEntries,
           },
         ]
@@ -757,6 +796,12 @@ export default function Workspace() {
    * recréé : il garde son état (saisie, défilement…).
    */
   function toggleMaximize(tabId: string) {
+    // Double-clic sur un aperçu : il devient définitif (comme VS Code).
+    if (layout.preview === tabId) {
+      keepPreview(tabId);
+      activate(tabId);
+      return;
+    }
     if (isMaximized && activeTab === tabId) {
       setMaximized(false);
       return;
@@ -805,6 +850,10 @@ export default function Workspace() {
               activeTab={activeTab}
               onOpenFeature={(id) => {
                 openFeature(id);
+                if (narrow) setPanelOpen(false);
+              }}
+              onPreviewFeature={(id) => {
+                previewFeature(id);
                 if (narrow) setPanelOpen(false);
               }}
               onClose={() => setPanelOpen(false)}
