@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo } from "react";
+import { createContext, useContext, useMemo, useRef } from "react";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
 import { characterTabId, fullName } from "@/lib/characters";
 import { locationTabId } from "@/lib/locations";
@@ -45,6 +45,11 @@ export function useNoteLinks(projectId: string, onOpenFeature?: (featureId: stri
   const { characters } = useProjectCharacters(projectId);
   const { locations } = useProjectLocations(projectId);
   const { structure, labelOf } = useProjectStructure(projectId);
+  // Toujours la dernière fonction, sans recalculer les liens : l'espace de
+  // travail la recrée à chaque rendu (ex. note modifiée ↔ enregistrée), ce
+  // qui relançait l'orthographe et redessinait la note, qui sautait.
+  const openRef = useRef(onOpenFeature);
+  openRef.current = onOpenFeature;
 
   return useMemo(() => {
     const items: MentionItem[] = [
@@ -64,12 +69,13 @@ export function useNoteLinks(projectId: string, onOpenFeature?: (featureId: stri
       items,
       resolve: (kind, id) => byKey.get(`${kind}:${id}`) ?? null,
       open: (kind, id) => {
+        const onOpenFeature = openRef.current;
         if (!onOpenFeature) return;
         onOpenFeature(kind === "character" ? characterTabId(id) : kind === "location" ? locationTabId(id) : structureNodeTabId(id));
       },
       names,
     };
-  }, [characters, locations, structure, labelOf, onOpenFeature]);
+  }, [characters, locations, structure, labelOf]);
 }
 
 /** Sans accents ni majuscules, pour comparer. */

@@ -1,7 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { EditorContent, useEditor, type Editor } from "@tiptap/react";
 import { useTranslation } from "react-i18next";
-import { BookPlus, EyeOff } from "lucide-react";
+import { BookPlus, ClipboardPaste, Copy, EyeOff, Scissors, TextSelect } from "lucide-react";
+import { ContextMenu } from "@/components/common/ContextMenu";
+import { runEditAction, type EditAction } from "@/lib/editCommands";
+import { toast } from "@/stores/toastStore";
 import { noteExtensions } from "@/components/notes/editor/extensions";
 import { NoteLinksContext, useNoteLinks } from "@/components/notes/editor/noteLinks";
 import { NoteToolbar } from "@/components/notes/editor/NoteToolbar";
@@ -24,6 +27,8 @@ interface NoteEditorProps {
   onOpenFeature?: (featureId: string) => void;
   /** Note système : titres fixes, mise en forme de l'écriture seulement. */
   system?: boolean;
+  /** Annuler / Rétablir dans la barre d'outils (faux : posés ailleurs, ex. en-tête de la note). */
+  history?: boolean;
 }
 
 /**
@@ -35,7 +40,7 @@ interface NoteEditorProps {
  * L'orthographe est vérifiée dans la langue du logiciel ; « $$ » propose
  * les personnages, lieux et éléments du découpage à citer.
  */
-export function NoteEditor({ projectId, initialContent, onChange, onReady, onOpenFeature, system = false }: NoteEditorProps) {
+export function NoteEditor({ projectId, initialContent, onChange, onReady, onOpenFeature, system = false, history = true }: NoteEditorProps) {
   const { t, i18n } = useTranslation("notes");
   const onChangeRef = useRef(onChange);
   onChangeRef.current = onChange;
@@ -48,6 +53,9 @@ export function NoteEditor({ projectId, initialContent, onChange, onReady, onOpe
   const languageRef = useRef(i18n.language);
   languageRef.current = i18n.language;
   const [menu, setMenu] = useState<SpellMenuRequest | null>(null);
+  /** Menu du clic droit dans le texte (à la place de celui du navigateur). */
+  const [editMenu, setEditMenu] = useState<{ x: number; y: number } | null>(null);
+  const { t: tMenus } = useTranslation("menus");
 
   const editor = useEditor({
     extensions: noteExtensions(system ? "" : t("editor.placeholder"), {
@@ -86,10 +94,30 @@ export function NoteEditor({ projectId, initialContent, onChange, onReady, onOpe
 
   if (!editor) return null;
 
+  /** Action du menu du clic droit, sur la sélection de l'éditeur. */
+  function edit(action: EditAction) {
+    void runEditAction(action).then((done) => {
+      if (!done && action === "paste") toast({ message: tMenus("edit.pasteEmpty") });
+    });
+  }
+
+  const empty = editor.state.selection.empty;
+  const editable = editor.isEditable;
+
   return (
     <NoteLinksContext.Provider value={links}>
-      <div className="note-editor rounded-xl border bg-card shadow-sm">
-        <NoteToolbar editor={editor} system={system} />
+      <div
+        className="note-editor rounded-xl border bg-card shadow-sm"
+        onContextMenu={(event) => {
+          // Mot mal orthographié : son menu est déjà ouvert (SpellCheck).
+          if (event.defaultPrevented) return;
+          // Jamais le menu du navigateur (Inspecter, Emoji…) dans une note.
+          event.preventDefault();
+          // Dans le texte : notre menu Couper / Copier / Coller.
+          if (editor.view.dom.contains(event.target as Node)) setEditMenu({ x: event.clientX, y: event.clientY });
+        }}
+      >
+        <NoteToolbar editor={editor} system={system} history={history} />
         <div
           className="px-6 py-6 sm:px-10"
           onClick={(event) => {
@@ -101,6 +129,20 @@ export function NoteEditor({ projectId, initialContent, onChange, onReady, onOpe
         </div>
       </div>
       {menu && <SpellMenu editor={editor} request={menu} language={spellLanguage(i18n.language)} onClose={() => setMenu(null)} />}
+      {editMenu && (
+        <ContextMenu
+          label={tMenus("menus.edit")}
+          x={editMenu.x}
+          y={editMenu.y}
+          onDismiss={() => setEditMenu(null)}
+          items={[
+            { id: "cut", label: tMenus("edit.cut"), icon: Scissors, hint: "Ctrl+X", disabled: empty || !editable, run: () => edit("cut") },
+            { id: "copy", label: tMenus("edit.copy"), icon: Copy, hint: "Ctrl+C", disabled: empty, run: () => edit("copy") },
+            { id: "paste", label: tMenus("edit.paste"), icon: ClipboardPaste, hint: "Ctrl+V", disabled: !editable, run: () => edit("paste") },
+            { id: "selectAll", label: tMenus("edit.selectAll"), icon: TextSelect, hint: "Ctrl+A", separated: true, run: () => edit("selectAll") },
+          ]}
+        />
+      )}
     </NoteLinksContext.Provider>
   );
 }

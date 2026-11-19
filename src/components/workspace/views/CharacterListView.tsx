@@ -1,5 +1,8 @@
+import { FilterResults } from "@/components/common/FilterResults";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { portraitFrameKey } from "@/lib/imageFrame";
+import { useImageFrame } from "@/stores/imageFrameStore";
 import {
   ArrowDownAZ,
   LayoutGrid,
@@ -9,7 +12,6 @@ import {
   Search,
   Users,
   Waypoints,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -285,21 +287,14 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
       </div>
 
       {filtering && (
-        <div className="mb-4 flex items-center gap-3 text-sm text-muted-foreground">
-          <span aria-live="polite">{t("list.results", { count: visible.length })}</span>
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => {
-              setQuery("");
-              setRole(null);
-              setStatus("");
-            }}
-          >
-            <X />
-            {t("list.clearFilters")}
-          </Button>
-        </div>
+        <FilterResults
+          count={visible.length}
+          onClear={() => {
+            setQuery("");
+            setRole(null);
+            setStatus("");
+          }}
+        />
       )}
 
       {visible.length === 0 ? (
@@ -369,6 +364,7 @@ function CharacterCard({
   const { t } = useTranslation(["characters", "relations"]);
   const listLabel = useListLabel();
   const url = usePortraitUrl(projectId, character);
+  const frame = useImageFrame(projectId, portraitFrameKey("character", character.id));
   const name = fullName(character);
   const { nickname, occupation, description } = character.fields;
   const palette = parseList(character.fields.colorPalette);
@@ -412,6 +408,7 @@ function CharacterCard({
           colorKey={character.id}
           name={name}
           url={url}
+          frame={frame}
           size="lg"
           className={cn(
             "relative z-10 size-20 text-2xl ring-0",

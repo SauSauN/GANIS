@@ -11,6 +11,12 @@ import { MangaChapterCard } from "@/components/manga/MangaChapterCard";
 import { PageArtPreview } from "@/components/manga/PageArtPreview";
 import { PageLayoutPreview } from "@/components/manga/PageLayoutPreview";
 import { PageScriptCard } from "@/components/manga/PageScriptCard";
+import { EpisodeCard } from "@/components/series/EpisodeCard";
+import { CharacterStatesCard } from "@/components/structure/CharacterStatesCard";
+import { SceneScriptCard } from "@/components/series/SceneScriptCard";
+import { useSceneScript } from "@/components/series/useSceneScript";
+import { episodeProgress, isSeriesProject, seriesLevels } from "@/lib/series";
+import { useSeriesBlocks } from "@/stores/seriesStore";
 import { usePageScript } from "@/components/manga/usePageScript";
 import { assignArt, isMangaProject, mangaLevels, pagesInOrder, readingOrder } from "@/lib/manga";
 import { notifyMangaScriptChanged } from "@/lib/mangaEvents";
@@ -157,6 +163,17 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   const script = usePageScript(projectId, nodeId, isMangaPage);
   const mangaSettings = useMangaSettings(projectId, isMangaPage);
   const { panels: allPanels } = useScriptPanelsIf(projectId, isMangaChapter);
+  // Série : une scène a son scénario ; un épisode, sa fiche et sa durée estimée.
+  const series = useProjectStore((state) => isSeriesProject(state.projects.find((p) => p.id === projectId)));
+  const seriesLevel = seriesLevels(levelCount);
+  const isSeriesScene = series && node !== null && structure !== null && node.level >= seriesLevel.scene && seriesLevel.episode < seriesLevel.scene;
+  const isSeriesEpisode = series && node !== null && structure !== null && node.level === seriesLevel.episode && seriesLevel.episode < seriesLevel.scene;
+  const sceneScript = useSceneScript(projectId, nodeId, isSeriesScene);
+  const { blocks: seriesBlocks } = useSeriesBlocks(projectId, isSeriesEpisode);
+  const episodeStats = useMemo(
+    () => (isSeriesEpisode && structure ? episodeProgress(structure.nodes, levelCount, seriesBlocks ?? []).find((p) => p.episode.id === nodeId) : undefined),
+    [isSeriesEpisode, structure, levelCount, seriesBlocks, nodeId],
+  );
   // Dessins : ceux du chapitre entier, car un dessin rangé sur le chapitre va
   // à la page de son rang (voir `assignArt`).
   const artEntries = useMemo(() => {
@@ -296,14 +313,26 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   }, [draft, base]);
 
   const infoDirty = draft !== null && base !== null && !sameDraft(draft, base);
-  const dirty = infoDirty || textDirty || script.dirty;
+  const dirty = infoDirty || textDirty || script.dirty || sceneScript.dirty;
 
   /** Enregistre ce qui a changé : informations, texte (roman), cases (manga). */
   async function save(): Promise<boolean> {
     const infoOk = infoDirty ? await saveInfo() : true;
     const textOk = textDirty ? await saveText() : true;
     const scriptOk = script.dirty ? await saveScript() : true;
-    return infoOk && textOk && scriptOk;
+    const sceneOk = sceneScript.dirty ? await saveSceneScript() : true;
+    return infoOk && textOk && scriptOk && sceneOk;
+  }
+
+  async function saveSceneScript(): Promise<boolean> {
+    try {
+      const result = await sceneScript.save();
+      if (result) applyNode(projectId, result.scene);
+      return result !== null;
+    } catch (e) {
+      setError(errorText(e));
+      return false;
+    }
   }
 
   async function saveScript(): Promise<boolean> {
@@ -366,7 +395,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   useUnsavedChanges({
     dirty,
     save,
-    revision: draft ? `${JSON.stringify(draft)}\u0000${textRevision}\u0000${script.signature ?? ""}` : null,
+    revision: draft ? `${JSON.stringify(draft)}\u0000${textRevision}\u0000${script.signature ?? ""}\u0000${sceneScript.signature ?? ""}` : null,
   });
 
   function onSubmit(event: FormEvent) {
@@ -583,6 +612,17 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             />
           )}
 
+          {/* Série : le scénario de la scène d'abord (c'est là qu'on écrit) */}
+          {isSeriesScene && (
+            <SceneScriptCard
+              draft={sceneScript.draft}
+              failed={sceneScript.failed}
+              onChange={(update) => sceneScript.setDraft((current) => (current ? update(current) : current))}
+              characters={characters}
+              locations={locations}
+            />
+          )}
+
           {/* Roman : le texte de la scène d'abord (c'est là qu'on écrit) */}
           {holdsText && (
             <NovelTextCard
@@ -699,6 +739,16 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             />
           )}
 
+          {isSeriesEpisode && (
+            <EpisodeCard
+              projectId={projectId}
+              node={node}
+              scenes={episodeStats?.scenes ?? 0}
+              writtenScenes={episodeStats?.writtenScenes ?? 0}
+              minutes={episodeStats?.minutes ?? 0}
+            />
+          )}
+
           {novel && (
             <NovelWritingCard
               projectId={projectId}
@@ -811,6 +861,11 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
               }),
             ]}
           />
+
+          {/* Continuité : l'état des personnages liés (le manga note le sien case par case) */}
+          {!manga && structure && (
+            <CharacterStatesCard projectId={projectId} node={node} nodes={structure.nodes} links={links} characters={characters} />
+          )}
 
           <ChildrenCard
             name={name}

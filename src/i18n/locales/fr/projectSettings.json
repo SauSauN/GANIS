@@ -9,7 +9,7 @@
       "description": "Avancement, favori, archivage et visibilité."
     },
     "danger": {
-      "label": "Export, duplication et suppression",
+      "label": "Gestion du projet",
       "description": "Exporter en .ganix, dupliquer ou mettre le projet à la corbeille."
     },
     "characters": {
@@ -156,6 +156,9 @@
     "hidden": "Masquée sur les fiches.",
     "note": "Seul l'affichage change : les liens avec le plan et les événements de la trame sont gardés et restent utilisés partout ailleurs (plan, plateau, lecture, recherche).",
     "saved": "Affichage des fiches enregistré.",
-    "failed": "Impossible d'enregistrer l'affichage des fiches."
+    "failed": "Impossible d'enregistrer l'affichage des fiches.",
+    "panelTree": "Panneau du milieu en arborescence",
+    "panelTreeOn": "Les fiches rangées dans une autre s'affichent dessous, reliées par des lignes. Désactivez pour une simple liste par ordre alphabétique, comme les personnages.",
+    "panelTreeOff": "Simple liste par ordre alphabétique, comme les personnages. La vue « Liste » garde toujours l'arborescence."
   }
 }

@@ -1,0 +1,124 @@
+{
+  "scene": {
+    "title": "Scénario de la scène",
+    "description": "En-tête, actions, répliques et transitions, au format du scénario.",
+    "loading": "Chargement du scénario…",
+    "failed": "Impossible de charger le scénario de cette scène.",
+    "estimate": "≈ {{duration}}",
+    "place": "Int. / Ext.",
+    "location": "Lieu",
+    "noLocations": "Aucun lieu créé",
+    "time": "Moment",
+    "headingPlaceholder": "INT. LIEU — MOMENT",
+    "empty": "Scène vide. Ajoutez une action ou une réplique ci-dessous.",
+    "character": "Personnage",
+    "chooseCharacter": "Personnage…",
+    "parenthetical": "Didascalie",
+    "parentheticalPlaceholder": "(didascalie)",
+    "kind": "Type d'élément",
+    "moveUp": "Monter",
+    "moveDown": "Descendre",
+    "remove": "Retirer",
+    "keyboard": "Ctrl+Entrée : élément suivant (après une réplique, l'autre personnage répond). Tab sur un élément vide : changer son type. Retour arrière sur un élément vide : le retirer. Alt+↑ / Alt+↓ : déplacer. La durée est estimée à une page de scénario par minute."
+  },
+  "kind": {
+    "action": "Action",
+    "dialogue": "Réplique",
+    "transition": "Transition",
+    "shot": "Plan",
+    "note": "Note"
+  },
+  "placeholder": {
+    "action": "Ce que l'on voit et entend à l'écran…",
+    "dialogue": "Ce que dit le personnage…",
+    "transition": "CUT TO:",
+    "shot": "GROS PLAN SUR…",
+    "note": "Note pour vous (n'apparaît pas à l'export)…"
+  },
+  "place": {
+    "int": "Int.",
+    "ext": "Ext.",
+    "intExt": "Int./Ext."
+  },
+  "time": {
+    "day": "Jour",
+    "night": "Nuit",
+    "morning": "Matin",
+    "evening": "Soir",
+    "dawn": "Aube",
+    "dusk": "Crépuscule",
+    "continuous": "Continu",
+    "later": "Plus tard"
+  },
+  "duration": {
+    "lessThanOne": "< 1 min",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "hours": "{{hours}} h {{minutes}}"
+  },
+  "episode": {
+    "title": "Fiche de l'épisode",
+    "description": "Logline, durée visée, statut d'écriture et scénariste.",
+    "logline": "Logline",
+    "loglinePlaceholder": "L'épisode en une phrase : qui veut quoi, et ce qui l'en empêche.",
+    "estimated": "Durée estimée",
+    "ofGoal": "{{duration}} / {{goal}} min",
+    "runtimeGoal": "Durée visée (minutes)",
+    "runtimeGoalPlaceholder": "Ex. 52",
+    "writer": "Scénariste",
+    "writerPlaceholder": "Qui écrit cet épisode ?",
+    "scenes_one": "{{written}} scène écrite sur {{count}}.",
+    "scenes_other": "{{written}} scènes écrites sur {{count}}.",
+    "status": "Statut"
+  },
+  "status": {
+    "idea": "Idée",
+    "outline": "Séquencier",
+    "draft": "1re version",
+    "revision": "Révision",
+    "final": "Validé"
+  },
+  "read": {
+    "title": "Lecture du scénario",
+    "all": "Toute la série",
+    "filter": "Afficher",
+    "loading": "Chargement du scénario…",
+    "failed": "Impossible de charger le scénario.",
+    "empty": "Aucune scène pour l'instant. Créez des épisodes et des scènes dans le plan.",
+    "noScript": "Scène pas encore écrite.",
+    "untitledScene": "{{label}}",
+    "openScene": "Ouvrir la scène",
+    "export": "Exporter",
+    "dialogTitle": "Exporter le scénario",
+    "fountain": "Fountain (logiciels de scénario)",
+    "subtitle": "Scénario",
+    "logline": "Logline :",
+    "writer": "Écrit par :",
+    "estimate": "Durée estimée : {{duration}}"
+  },
+  "progress": {
+    "title": "Suivi des épisodes",
+    "loading": "Chargement…",
+    "failed": "Impossible de charger le suivi.",
+    "empty": "Aucun épisode pour l'instant. Créez des saisons et des épisodes dans le plan.",
+    "episodes_one": "{{count}} épisode",
+    "episodes_other": "{{count}} épisodes",
+    "final": "Validés",
+    "totalDuration": "Durée estimée",
+    "scenesWritten": "Scènes écrites",
+    "columns": {
+      "episode": "Épisode",
+      "status": "Statut",
+      "writer": "Scénariste",
+      "scenes": "Scènes",
+      "duration": "Durée",
+      "goal": "Visée"
+    },
+    "noSeason": "Sans saison",
+    "season": "{{label}} · {{duration}}",
+    "overGoal": "Au-delà de la durée visée",
+    "cast": "Répliques par personnage",
+    "castHint": "Nombre de répliques de chaque personnage sur toute la série.",
+    "noLines": "Aucune réplique attribuée pour l'instant."
+  }
+}

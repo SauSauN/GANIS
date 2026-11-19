@@ -1,4 +1,4 @@
-import { Drama, Flag, Info, ListChecks, ListTree, MapPin, NotebookPen, Package, PawPrint, TriangleAlert, Users, Waypoints, Zap, type LucideIcon } from "lucide-react";
+import { Drama, Flag, Info, ListChecks, ListTree, MapPin, Package, PawPrint, StickyNote, TriangleAlert, Users, Waypoints, Zap, type LucideIcon } from "lucide-react";
 
 import i18n from "@/i18n";
 
@@ -62,6 +62,6 @@ export const PROJECT_SETTINGS_SECTIONS: ProjectSettingsSection[] = [
   section("magic", Zap),
   section("structure", ListTree),
   section("plot", Waypoints),
-  section("notes", NotebookPen),
+  section("notes", StickyNote),
   section("danger", TriangleAlert),
 ];

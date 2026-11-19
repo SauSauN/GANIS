@@ -78,6 +78,20 @@
       "passwordRequired": "Saisissez votre mot de passe pour confirmer.",
       "confirmRequired": "Cochez la case pour confirmer.",
       "failed": "Impossible de supprimer le compte."
+    },
+    "profile": {
+      "title": "Profil d'auteur",
+      "description": "Facultatif. Ces informations vous présentent comme auteur ; elles sont chiffrées et restent sur cet appareil.",
+      "penName": "Nom d'auteur",
+      "penNamePlaceholder": "Ex. le nom qui figure sur vos livres",
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "Prénom et nom",
+      "website": "Site web ou réseau",
+      "websitePlaceholder": "Ex. https://monsite.fr",
+      "bio": "Biographie",
+      "bioPlaceholder": "Quelques lignes pour vous présenter",
+      "updated": "Profil d'auteur enregistré.",
+      "failed": "Impossible d'enregistrer le profil d'auteur."
     }
   },
   "appearance": {
@@ -181,6 +195,16 @@
         "gold": "Or"
       },
       "reset": "Revenir au cadre blanc par défaut"
+    },
+    "moduleOrder": {
+      "title": "Ordre des modules",
+      "description": "L'ordre des modules dans la barre de gauche, sur cet appareil. Un module absent d'un projet (type de projet, module du monde désactivé) garde sa place quand il apparaît. La recherche reste toujours à la fin.",
+      "projectType": "Module du type de projet (Manuscrit, Scénario)",
+      "moveUp": "Monter « {{name}} »",
+      "moveDown": "Descendre « {{name}} »",
+      "reset": "Revenir à l'ordre par défaut",
+      "previous": "Ancien ordre",
+      "previousHint": "Détails, Personnages, Lieux et les modules du monde d'abord, puis Découpage, Trame, le module du type de projet et Notes."
     }
   },
   "developer": {

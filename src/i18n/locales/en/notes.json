@@ -99,7 +99,8 @@
       "hint": "Drag from the edge of a box to draw an arrow. Click a box or an arrow to edit it."
     },
     "more": "More tools",
-    "code": "Inline code"
+    "code": "Inline code",
+    "history": "Edit history"
   },
   "sidebar": {
     "title": "Folders and notes",

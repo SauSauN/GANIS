@@ -21,6 +21,7 @@ import { toast } from "@/stores/toastStore";
 import type { Version, VersionKind, VersionList } from "@/types";
 import { errorText } from "@/lib/errors";
 import { notifyMangaScriptChanged } from "@/lib/mangaEvents";
+import { notifySeriesScriptChanged } from "@/stores/seriesStore";
 
 interface VersionsDialogProps {
   open: boolean;
@@ -77,8 +78,9 @@ async function refresh(projectId: string, kind: VersionKind) {
       break;
     case "structureNode":
       await useStructureStore.getState().fetchStructure(projectId);
-      // Page de manga : ses cases sont revenues avec elle.
+      // Page de manga, scène de série : ses cases ou son scénario sont revenus avec elle.
       notifyMangaScriptChanged(projectId);
+      notifySeriesScriptChanged(projectId);
       break;
     case "note":
       await useNoteStore.getState().fetchNotes(projectId);
@@ -357,17 +359,32 @@ export function VersionsDialog({ open, onClose, projectId, kind, itemId, name }:
 }
 
 /** Bouton « Versions » des écrans (note, synopsis, fiches). */
-export function VersionsButton(props: Omit<VersionsDialogProps, "open" | "onClose"> & { className?: string }) {
+export function VersionsButton(
+  props: Omit<VersionsDialogProps, "open" | "onClose"> & { className?: string; iconOnly?: boolean },
+) {
   const { t } = useTranslation("versions");
   const [open, setOpen] = useState(false);
-  const { className, ...rest } = props;
+  const { className, iconOnly, ...rest } = props;
 
   return (
     <>
-      <Button variant="ghost" size="sm" onClick={() => setOpen(true)} className={className} title={t("buttonHint")}>
-        <History className="mr-1.5 size-4" />
-        {t("button")}
-      </Button>
+      {iconOnly ? (
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          onClick={() => setOpen(true)}
+          className={className}
+          title={`${t("button")} — ${t("buttonHint")}`}
+          aria-label={t("button")}
+        >
+          <History className="size-4" />
+        </Button>
+      ) : (
+        <Button variant="ghost" size="sm" onClick={() => setOpen(true)} className={className} title={t("buttonHint")}>
+          <History className="mr-1.5 size-4" />
+          {t("button")}
+        </Button>
+      )}
       <VersionsDialog {...rest} open={open} onClose={() => setOpen(false)} />
     </>
   );

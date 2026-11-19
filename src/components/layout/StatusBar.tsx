@@ -63,7 +63,7 @@ export function StatusBar() {
   }
 
   return (
-    <footer className="flex h-6 shrink-0 items-center justify-between border-t border-border bg-card px-3 text-xs text-muted-foreground">
+    <footer className="flex h-6 shrink-0 items-center overflow-hidden justify-between border-t border-border bg-card px-3 text-xs text-muted-foreground">
       <div className="flex items-center gap-4">
         <span className="flex items-center gap-1">
           <WifiOff className="h-3 w-3" /> {t("offline")}
@@ -110,7 +110,7 @@ export function StatusBar() {
           <button
             type="button"
             onClick={() => setDetailsOpen(true)}
-            className="-my-1 flex h-6 items-center gap-1 rounded px-2 font-medium text-foreground hover:bg-secondary"
+            className="flex h-5 items-center gap-1 rounded px-2 font-medium text-foreground hover:bg-secondary"
           >
             <Info className="h-3 w-3" />
             {t("save.details")}
@@ -123,7 +123,7 @@ export function StatusBar() {
             onClick={dismissError}
             title={t("save.dismiss")}
             aria-label={t("save.dismiss")}
-            className="-my-1 flex size-6 items-center justify-center rounded hover:bg-secondary hover:text-foreground"
+            className="flex size-5 items-center justify-center rounded hover:bg-secondary hover:text-foreground"
           >
             <X className="h-3 w-3" />
           </button>
@@ -135,7 +135,7 @@ export function StatusBar() {
             disabled={savingAll}
             onClick={() => void saveAll()}
             title={t("save.saveAllHint")}
-            className="-my-1 flex h-6 items-center gap-1 rounded px-2 font-medium text-foreground hover:bg-secondary disabled:opacity-50"
+            className="flex h-5 items-center gap-1 rounded px-2 font-medium text-foreground hover:bg-secondary disabled:opacity-50"
           >
             <Save className="h-3 w-3" />
             {t("save.saveAll")}

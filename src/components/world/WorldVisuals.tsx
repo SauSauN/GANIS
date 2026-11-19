@@ -1,6 +1,9 @@
 import { useRef, useState, type DragEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { ImagePlus, Loader2, Trash2 } from "lucide-react";
+import { ImagePlus, Loader2, Maximize2, Trash2 } from "lucide-react";
+import { ImageDialog } from "@/components/common/ImageDialog";
+import { frameStyle, portraitFrameKey } from "@/lib/imageFrame";
+import { useImageFrame } from "@/stores/imageFrameStore";
 import { useConfirmImageRemoval } from "@/components/common/useConfirmImageRemoval";
 import { PaletteFrame } from "@/components/common/PaletteFrame";
 import { categoryBackdrop, categoryTint, typeIcon } from "@/components/world/worldStyle";
@@ -79,6 +82,7 @@ export function WorldThumb({
   className?: string;
 }) {
   const url = useWorldImageUrl(projectId, module, entry);
+  const frame = useImageFrame(projectId, portraitFrameKey(module, entry.id));
   const category = findType(module, entry.type, customTypes)?.category;
   const Icon = typeIcon(module, entry.type, category);
 
@@ -88,7 +92,7 @@ export function WorldThumb({
       style={url ? undefined : categoryBackdrop(module, category)}
       aria-hidden="true"
     >
-      {url ? <img src={url} alt="" className="size-full object-cover" /> : <Icon className={THUMB_ICONS[size]} />}
+      {url ? <img src={url} alt="" className="size-full object-cover" style={frameStyle(frame)} /> : <Icon className={THUMB_ICONS[size]} />}
     </span>
   );
 }
@@ -111,6 +115,11 @@ interface WorldBannerProps {
   onRemove: () => void;
   /** Grande image de la fiche : remplit la hauteur de la carte (écran large). */
   tall?: boolean;
+  /** Projet et clé du cadrage (fiche enregistrée) : un clic sur l'image l'ouvre en grand. */
+  projectId?: string;
+  frameKey?: string;
+  /** Nom de la fiche (titre de la fenêtre de l'image). */
+  name?: string;
 }
 
 /**
@@ -130,8 +139,11 @@ export function WorldBanner({
   tall = false,
   onPick,
   onRemove,
+  projectId,
+  frameKey,
+  name = "",
 }: WorldBannerProps) {
-  const { t } = useTranslation("world");
+  const { t } = useTranslation(["world", "common"]);
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -158,8 +170,13 @@ export function WorldBanner({
     pickFirst(event.dataTransfer.files);
   }
 
-  const actionLabel = url ? t("image.remove") : t("image.choose");
-  const ActionIcon = url ? Trash2 : ImagePlus;
+  // Fiche enregistrée : un clic ouvre l'image en grand (cadrer, remplacer,
+  // retirer). À la création, un clic la retire.
+  const [viewing, setViewing] = useState(false);
+  const canView = Boolean(url && projectId && frameKey);
+  const frame = useImageFrame(projectId, frameKey);
+  const actionLabel = url ? (canView ? t("common:image.open") : t("image.remove")) : t("image.choose");
+  const ActionIcon = url ? (canView ? Maximize2 : Trash2) : ImagePlus;
 
   return (
     <div className="w-full space-y-2">
@@ -167,7 +184,7 @@ export function WorldBanner({
       <button
         type="button"
         disabled={locked}
-        onClick={() => (url ? removal.ask() : inputRef.current?.click())}
+        onClick={() => (url ? (canView ? setViewing(true) : removal.ask()) : inputRef.current?.click())}
         onDragOver={onDragOver}
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
@@ -182,7 +199,7 @@ export function WorldBanner({
         style={url ? undefined : categoryBackdrop(module, category)}
       >
         {url ? (
-          <img src={url} alt="" className="size-full object-cover" />
+          <img src={url} alt="" className="size-full object-cover" style={frameStyle(frame)} />
         ) : (
           <Icon
             className={cn(
@@ -233,6 +250,18 @@ export function WorldBanner({
         <p role="alert" className="text-center text-xs text-destructive">
           {error}
         </p>
+      )}
+      {viewing && url && projectId && frameKey && (
+        <ImageDialog
+          open
+          onClose={() => setViewing(false)}
+          projectId={projectId}
+          frameKey={frameKey}
+          url={url}
+          name={name}
+          onReplace={onPick}
+          onRemove={onRemove}
+        />
       )}
       {removal.dialog}
     </div>

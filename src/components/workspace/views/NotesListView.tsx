@@ -1,3 +1,4 @@
+import { FilterResults } from "@/components/common/FilterResults";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Folder, NotebookText, Pin, Plus, Search, Trash2 } from "lucide-react";
@@ -118,6 +119,16 @@ export function NotesListView({ projectId, feature, onOpenFeature }: NotesListVi
         </select>
 
       </div>
+
+      {loaded && (query.trim() !== "" || filter !== ALL) && (
+        <FilterResults
+          count={visible.length}
+          onClear={() => {
+            setQuery("");
+            setFilter(ALL);
+          }}
+        />
+      )}
 
       {error && (
         <p role="alert" className="mb-4 text-sm text-destructive">

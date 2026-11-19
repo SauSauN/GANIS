@@ -1,0 +1,124 @@
+{
+  "scene": {
+    "title": "Scene script",
+    "description": "Heading, action, dialogue and transitions, in screenplay format.",
+    "loading": "Loading the script…",
+    "failed": "Could not load the script of this scene.",
+    "estimate": "≈ {{duration}}",
+    "place": "Int. / Ext.",
+    "location": "Location",
+    "noLocations": "No location yet",
+    "time": "Time",
+    "headingPlaceholder": "INT. LOCATION — TIME",
+    "empty": "Empty scene. Add action or dialogue below.",
+    "character": "Character",
+    "chooseCharacter": "Character…",
+    "parenthetical": "Parenthetical",
+    "parentheticalPlaceholder": "(parenthetical)",
+    "kind": "Element type",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "remove": "Remove",
+    "keyboard": "Ctrl+Enter: next element (after a line, the other character answers). Tab on an empty element: change its type. Backspace on an empty element: remove it. Alt+↑ / Alt+↓: move. Duration is estimated at one script page per minute."
+  },
+  "kind": {
+    "action": "Action",
+    "dialogue": "Dialogue",
+    "transition": "Transition",
+    "shot": "Shot",
+    "note": "Note"
+  },
+  "placeholder": {
+    "action": "What we see and hear on screen…",
+    "dialogue": "What the character says…",
+    "transition": "CUT TO:",
+    "shot": "CLOSE ON…",
+    "note": "Note to self (not exported)…"
+  },
+  "place": {
+    "int": "Int.",
+    "ext": "Ext.",
+    "intExt": "Int./Ext."
+  },
+  "time": {
+    "day": "Day",
+    "night": "Night",
+    "morning": "Morning",
+    "evening": "Evening",
+    "dawn": "Dawn",
+    "dusk": "Dusk",
+    "continuous": "Continuous",
+    "later": "Later"
+  },
+  "duration": {
+    "lessThanOne": "< 1 min",
+    "minutes_one": "{{count}} min",
+    "minutes_other": "{{count}} min",
+    "hours": "{{hours}} h {{minutes}}"
+  },
+  "episode": {
+    "title": "Episode sheet",
+    "description": "Logline, target runtime, writing status and writer.",
+    "logline": "Logline",
+    "loglinePlaceholder": "The episode in one sentence: who wants what, and what stands in the way.",
+    "estimated": "Estimated runtime",
+    "ofGoal": "{{duration}} / {{goal}} min",
+    "runtimeGoal": "Target runtime (minutes)",
+    "runtimeGoalPlaceholder": "E.g. 52",
+    "writer": "Writer",
+    "writerPlaceholder": "Who writes this episode?",
+    "scenes_one": "{{written}} of {{count}} scene written.",
+    "scenes_other": "{{written}} of {{count}} scenes written.",
+    "status": "Status"
+  },
+  "status": {
+    "idea": "Idea",
+    "outline": "Outline",
+    "draft": "First draft",
+    "revision": "Revision",
+    "final": "Locked"
+  },
+  "read": {
+    "title": "Script reading",
+    "all": "Whole series",
+    "filter": "Show",
+    "loading": "Loading the script…",
+    "failed": "Could not load the script.",
+    "empty": "No scene yet. Create episodes and scenes in the plan.",
+    "noScript": "Scene not written yet.",
+    "untitledScene": "{{label}}",
+    "openScene": "Open the scene",
+    "export": "Export",
+    "dialogTitle": "Export the script",
+    "fountain": "Fountain (screenwriting apps)",
+    "subtitle": "Screenplay",
+    "logline": "Logline:",
+    "writer": "Written by:",
+    "estimate": "Estimated runtime: {{duration}}"
+  },
+  "progress": {
+    "title": "Episode tracking",
+    "loading": "Loading…",
+    "failed": "Could not load the tracking.",
+    "empty": "No episode yet. Create seasons and episodes in the plan.",
+    "episodes_one": "{{count}} episode",
+    "episodes_other": "{{count}} episodes",
+    "final": "Locked",
+    "totalDuration": "Estimated runtime",
+    "scenesWritten": "Scenes written",
+    "columns": {
+      "episode": "Episode",
+      "status": "Status",
+      "writer": "Writer",
+      "scenes": "Scenes",
+      "duration": "Runtime",
+      "goal": "Target"
+    },
+    "noSeason": "No season",
+    "season": "{{label}} · {{duration}}",
+    "overGoal": "Over the target runtime",
+    "cast": "Lines per character",
+    "castHint": "Number of lines of each character across the whole series.",
+    "noLines": "No line assigned yet."
+  }
+}

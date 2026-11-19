@@ -140,6 +140,7 @@
       "matrix": "Matrix",
       "list": "List"
     },
+    "layoutLabel": "Layout",
     "layouts": {
       "force": "Network",
       "circle": "Circle",

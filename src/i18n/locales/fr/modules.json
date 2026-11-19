@@ -33,6 +33,9 @@
     "script": {
       "label": "Scénario"
     },
+    "screenplay": {
+      "label": "Scénario"
+    },
     "items": {
       "label": "Objets",
       "empty": "Aucun objet pour l'instant."
@@ -107,6 +110,10 @@
       "read": {
         "label": "Lecture complète",
         "description": "Toute l'histoire d'un seul tenant, compilée dans l'ordre du découpage."
+      },
+      "continuity": {
+        "label": "Continuité",
+        "description": "Où apparaît chaque personnage, dans quel rôle et dans quel état, élément par élément ; tableau des présences."
       }
     },
     "notes": {
@@ -161,6 +168,10 @@
       "import": {
         "label": "Importer un manuscrit",
         "description": "Un fichier Word, Markdown ou texte, découpé en parties, chapitres et scènes."
+      },
+      "continuity": {
+        "label": "Continuité",
+        "description": "Où apparaît chaque personnage, dans quel rôle et dans quel état, scène par scène ; tableau des présences par chapitre."
       }
     },
     "script": {
@@ -183,6 +194,20 @@
       "continuity": {
         "label": "Continuité",
         "description": "Où apparaît chaque personnage, et dans quel état, case par case."
+      }
+    },
+    "screenplay": {
+      "read": {
+        "label": "Lecture du scénario",
+        "description": "Tout le scénario au format standard, épisode par épisode ; export Word, PDF, texte et Fountain."
+      },
+      "progress": {
+        "label": "Suivi des épisodes",
+        "description": "Statuts, scènes écrites, durée estimée par rapport à la durée visée, répliques par personnage."
+      },
+      "continuity": {
+        "label": "Continuité",
+        "description": "Où apparaît chaque personnage, dans quel état, avec ses répliques, scène par scène ; tableau des présences par épisode."
       }
     },
     "items": {

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Blocks, Check, Info, MapPin, Minus, Monitor, Moon, Package, Plus, RotateCcw, Sun, type LucideIcon } from "lucide-react";
 import { ThemeSwatch } from "@/components/packages/ThemeSwatch";
 import { useInstalledThemes } from "@/components/packages/useInstalledThemes";
+import { ModuleOrderCard } from "@/components/settings/ModuleOrderCard";
 import { cardClass, cardHeaderClass } from "@/components/settings/styles";
 import {
   Card,
@@ -230,6 +231,8 @@ export function AppearanceSection() {
       <ProfileFrameCard />
 
       <PreviewTabsCard />
+
+      <ModuleOrderCard />
 
       {/* ==================================================================
           NOTE
@@ -463,6 +466,19 @@ function ProfileFrameCard() {
             </div>
           </div>
 
+          {/* Retour au cadre par défaut, juste à droite de l'épaisseur. */}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-9"
+            disabled={!changed}
+            onClick={() => setProfileFrame(DEFAULT_PROFILE_FRAME)}
+          >
+            <RotateCcw />
+            {t("appearance.profileFrame.reset")}
+          </Button>
+
           {/* Aperçu : une photo fictive dans le cadre choisi. */}
           <div className="ml-auto flex items-end gap-3" aria-hidden="true">
             <span
@@ -475,13 +491,6 @@ function ProfileFrameCard() {
             />
           </div>
         </div>
-
-        {changed && (
-          <Button type="button" variant="ghost" size="sm" onClick={() => setProfileFrame(DEFAULT_PROFILE_FRAME)}>
-            <RotateCcw />
-            {t("appearance.profileFrame.reset")}
-          </Button>
-        )}
       </CardContent>
     </Card>
   );

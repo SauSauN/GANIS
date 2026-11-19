@@ -15,6 +15,7 @@ import { useDocumentStore } from "@/lib/documents";
 import { useGlossaryStore } from "@/stores/glossaryStore";
 import { useMangaStore } from "@/stores/mangaStore";
 import { notifyMangaScriptChanged } from "@/lib/mangaEvents";
+import { notifySeriesScriptChanged } from "@/stores/seriesStore";
 import type { CharacterLocation, Relation, TrashKind, WorldLink, WorldLinkKind } from "@/types";
 import { errorText } from "@/lib/errors";
 
@@ -202,6 +203,8 @@ async function refreshAfterRestore(projectId: string, kind: TrashKind) {
 
   // Scénario de manga : les pages ouvertes et les vues du scénario se relisent.
   if (kind === "mangaPanel" || kind === "structureNode" || kind === "character" || kind === "location") notifyMangaScriptChanged(projectId);
+  // Scénario de série : une scène restaurée ramène son scénario, un personnage ses répliques.
+  if (kind === "structureNode" || kind === "character" || kind === "location") notifySeriesScriptChanged(projectId);
 
   await Promise.allSettled(tasks);
 }

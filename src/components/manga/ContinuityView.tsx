@@ -1,11 +1,14 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { History } from "lucide-react";
+import { ContinuityLevelSelect, ContinuityModeSwitch, type ContinuityMode } from "@/components/structure/ContinuityControls";
+import { PresenceTable } from "@/components/structure/PresenceTable";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { PageShell } from "@/components/workspace/views/PageShell";
 import { fullName } from "@/lib/characters";
-import { pagesInOrder, panelsByPage } from "@/lib/manga";
+import { panelPresences, presenceTable } from "@/lib/continuity";
+import { mangaLevels, pagesInOrder, panelsByPage } from "@/lib/manga";
 import { structureNodeTabId } from "@/lib/structure";
 import { cn } from "@/lib/utils";
 import { useProjectCharacters } from "@/stores/characterStore";
@@ -25,8 +28,10 @@ interface ContinuityViewProps {
  * case à l'autre est signalé : c'est là que naissent les incohérences.
  */
 export function ContinuityView({ project, feature, onOpenFeature }: ContinuityViewProps) {
-  const { t } = useTranslation("manga");
-  const { structure, labelOf } = useProjectStructure(project.id);
+  const { t } = useTranslation(["manga", "structure"]);
+  const { structure, labelOf, levels } = useProjectStructure(project.id);
+  const [tab, setTab] = useState<ContinuityMode>("path");
+  const [level, setLevel] = useState<number | null>(null);
   const { panels } = useScriptPanels(project.id);
   const { characters } = useProjectCharacters(project.id);
   const { locations } = useProjectLocations(project.id);
@@ -77,72 +82,116 @@ export function ContinuityView({ project, feature, onOpenFeature }: ContinuityVi
     return out;
   }, [entries, byPage, selected, locationId, labelOf, locations]);
 
+  // Tableau des présences : pages où apparaît chaque personnage, par chapitre (ou niveau choisi).
+  const columnLevel = level ?? mangaLevels(levelCount).chapter;
+  const table = useMemo(
+    () => (structure ? presenceTable(structure.nodes, panelPresences(panels ?? []), columnLevel) : null),
+    [structure, panels, columnLevel],
+  );
+  const characterName = (id: string) => {
+    const c = characters.find((item) => item.id === id);
+    return c ? fullName(c) || "—" : "—";
+  };
+
   const select = "h-9 rounded-md border border-input bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-ring";
 
   return (
     <PageShell title={feature.label}>
       <div className="space-y-5">
         <div className="flex flex-wrap items-end gap-4">
-          <label className="space-y-1.5 text-sm font-medium">
-            <span className="block">{t("continuity.character")}</span>
-            <select value={selected} onChange={(e) => setCharacterId(e.target.value)} className={cn(select, "w-64")}>
-              {appearing.length === 0 && <option value="">—</option>}
-              {appearing.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {fullName(c) || "—"} ({counts.get(c.id)})
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="space-y-1.5 text-sm font-medium">
-            <span className="block">{t("continuity.location")}</span>
-            <select value={locationId} onChange={(e) => setLocationId(e.target.value)} className={cn(select, "w-56")}>
-              <option value="">{t("continuity.allLocations")}</option>
-              {locations.map((l) => (
-                <option key={l.id} value={l.id}>
-                  {l.name}
-                </option>
-              ))}
-            </select>
-          </label>
-          {selected && <p className="pb-2 text-sm text-muted-foreground tabular-nums">{t("continuity.appearances", { count: rows.length })}</p>}
+          <ContinuityModeSwitch
+            mode={tab}
+            onMode={setTab}
+            label={feature.label}
+            labels={{ path: t("continuity.tabPanels"), presence: t("structure:continuity.tabs.presence") }}
+          />
+          {tab === "presence" ? (
+            <ContinuityLevelSelect levels={levels} level={columnLevel} onLevel={setLevel} hint={t("structure:continuity.presenceHintManga")} />
+          ) : (
+            <>
+              <label className="space-y-1.5 text-sm font-medium">
+                <span className="block">{t("continuity.character")}</span>
+                <select value={selected} onChange={(e) => setCharacterId(e.target.value)} className={cn(select, "w-64")}>
+                  {appearing.length === 0 && <option value="">—</option>}
+                  {appearing.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {fullName(c) || "—"} ({counts.get(c.id)})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="space-y-1.5 text-sm font-medium">
+                <span className="block">{t("continuity.location")}</span>
+                <select value={locationId} onChange={(e) => setLocationId(e.target.value)} className={cn(select, "w-56")}>
+                  <option value="">{t("continuity.allLocations")}</option>
+                  {locations.map((l) => (
+                    <option key={l.id} value={l.id}>
+                      {l.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </>
+          )}
+          <p className="ml-auto pb-2 text-sm text-muted-foreground tabular-nums">
+            {tab === "presence"
+              ? table && t("structure:continuity.characters", { count: table.rows.length })
+              : selected && t("continuity.appearances", { count: rows.length })}
+          </p>
         </div>
 
-        {!selected ? (
-          <p className="rounded-xl border border-dashed px-6 py-12 text-center text-sm text-muted-foreground">{t("continuity.choose")}</p>
-        ) : rows.length === 0 ? (
-          <p className="rounded-xl border border-dashed px-6 py-12 text-center text-sm text-muted-foreground">{t("continuity.none")}</p>
+        {tab === "presence" ? (
+          table && (
+            <PresenceTable
+              table={table}
+              labelOf={labelOf}
+              characterName={characterName}
+              onOpenFeature={onOpenFeature}
+              onCharacter={(id) => {
+                setCharacterId(id);
+                setTab("path");
+              }}
+            />
+          )
         ) : (
-          <ol className="relative space-y-2 border-l pl-5">
-            {rows.map((row) => (
-              <li key={row.key} className="relative">
-                <span className={cn("absolute top-3 -left-[25px] size-2.5 rounded-full border-2 border-background", row.changed ? "bg-warning" : "bg-primary/60")} aria-hidden="true" />
-                <button
-                  type="button"
-                  onClick={() => onOpenFeature(structureNodeTabId(row.pageId))}
-                  className="w-full rounded-lg border bg-card px-4 py-2.5 text-left shadow-sm transition-colors hover:bg-muted/40"
-                >
-                  <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
-                    <span className="font-medium">{row.where}</span>
-                    <span className="text-muted-foreground">· {t("panel.title", { number: row.number })}</span>
-                    {row.place && <span className="text-muted-foreground">· {row.place}</span>}
-                    {row.lines > 0 && <span className="ml-auto text-xs text-muted-foreground tabular-nums">{t("continuity.speaks", { count: row.lines })}</span>}
-                  </p>
-                  <p className="mt-1 flex items-center gap-2 text-sm">
-                    <span className="text-xs font-medium text-muted-foreground">{t("continuity.state")}</span>
-                    <span className={cn(!row.state && "text-muted-foreground", row.changed && "font-medium text-warning")}>{row.state || t("continuity.noState")}</span>
-                    {row.changed && (
-                      <span className="flex items-center gap-1 rounded-full bg-warning/15 px-2 py-0.5 text-xs text-warning">
-                        <History className="size-3" aria-hidden="true" />
-                        {t("continuity.changed")}
-                      </span>
-                    )}
-                  </p>
-                  {row.action && <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">{row.action}</p>}
-                </button>
-              </li>
-            ))}
-          </ol>
+          <>
+            {!selected ? (
+              <p className="rounded-xl border border-dashed px-6 py-12 text-center text-sm text-muted-foreground">{t("continuity.choose")}</p>
+            ) : rows.length === 0 ? (
+              <p className="rounded-xl border border-dashed px-6 py-12 text-center text-sm text-muted-foreground">{t("continuity.none")}</p>
+            ) : (
+              <ol className="relative space-y-2 border-l pl-5">
+                {rows.map((row) => (
+                  <li key={row.key} className="relative">
+                    <span className={cn("absolute top-3 -left-[25px] size-2.5 rounded-full border-2 border-background", row.changed ? "bg-warning" : "bg-primary/60")} aria-hidden="true" />
+                    <button
+                      type="button"
+                      onClick={() => onOpenFeature(structureNodeTabId(row.pageId))}
+                      className="w-full rounded-lg border bg-card px-4 py-2.5 text-left shadow-sm transition-colors hover:bg-muted/40"
+                    >
+                      <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
+                        <span className="font-medium">{row.where}</span>
+                        <span className="text-muted-foreground">· {t("panel.title", { number: row.number })}</span>
+                        {row.place && <span className="text-muted-foreground">· {row.place}</span>}
+                        {row.lines > 0 && <span className="ml-auto text-xs text-muted-foreground tabular-nums">{t("continuity.speaks", { count: row.lines })}</span>}
+                      </p>
+                      <p className="mt-1 flex items-center gap-2 text-sm">
+                        <span className="text-xs font-medium text-muted-foreground">{t("continuity.state")}</span>
+                        <span className={cn(!row.state && "text-muted-foreground", row.changed && "font-medium text-warning")}>{row.state || t("continuity.noState")}</span>
+                        {row.changed && (
+                          <span className="flex items-center gap-1 rounded-full bg-warning/15 px-2 py-0.5 text-xs text-warning">
+                            <History className="size-3" aria-hidden="true" />
+                            {t("continuity.changed")}
+                          </span>
+                        )}
+                      </p>
+                      {row.action && <p className="mt-0.5 line-clamp-2 text-sm text-muted-foreground">{row.action}</p>}
+                    </button>
+                  </li>
+                ))}
+              </ol>
+            )}
+          </>
         )}
       </div>
     </PageShell>

@@ -333,6 +333,7 @@
     "speaks_other": "{{count}} lines",
     "noState": "—",
     "state": "State",
-    "where": "Location and time"
+    "where": "Location and time",
+    "tabPanels": "Panel by panel"
   }
 }

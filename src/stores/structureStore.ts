@@ -31,6 +31,8 @@ interface StructureState {
   fetchLinks: (projectId: string) => Promise<StructureLinks | null>;
   linkCharacter: (projectId: string, nodeId: string, characterId: string, role: NodeCharacterRole) => Promise<void>;
   unlinkCharacter: (projectId: string, nodeId: string, characterId: string) => Promise<void>;
+  /** État d'un personnage lié à un élément (continuité), mis à jour sur place. */
+  setCharacterState: (projectId: string, nodeId: string, characterId: string, value: string) => Promise<void>;
   linkLocation: (projectId: string, nodeId: string, locationId: string, role: NodeLocationRole) => Promise<void>;
   unlinkLocation: (projectId: string, nodeId: string, locationId: string) => Promise<void>;
   linkEntry: (projectId: string, nodeId: string, kind: WorldModule, entryId: string, role: NodeEntryRole) => Promise<void>;
@@ -103,6 +105,19 @@ export const useStructureStore = create<StructureState>()((set, get) => ({
   linkCharacter: async (projectId, nodeId, characterId, role) => {
     await api.linkStructureCharacter(projectId, nodeId, characterId, role);
     await get().fetchLinks(projectId);
+  },
+
+  setCharacterState: async (projectId, nodeId, characterId, value) => {
+    await api.setStructureCharacterState(projectId, nodeId, characterId, value);
+    const { links } = get();
+    if (get().projectId !== projectId || !links) return;
+    const state = value.trim();
+    set({
+      links: {
+        ...links,
+        characters: links.characters.map((l) => (l.nodeId === nodeId && l.characterId === characterId ? { ...l, state } : l)),
+      },
+    });
   },
 
   unlinkCharacter: async (projectId, nodeId, characterId) => {

@@ -9,11 +9,11 @@ import { Button } from "@/components/ui/button";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { fullName } from "@/lib/characters";
 import { mangaLevels } from "@/lib/manga";
-import { readingMinutes, textToHtml } from "@/lib/novel";
+import { textToHtml } from "@/lib/novel";
 import { htmlToBlocks, type ExportBlock, type ExportDocument } from "@/lib/novelExport";
 import type { PlotEvent } from "@/lib/plot";
 import { structureNodeTabId } from "@/lib/structure";
-import { assembleStory, eventsByNode, unplacedEvents, type StoryEntry } from "@/lib/storyReading";
+import { assembleStory, eventsByNode, type StoryEntry } from "@/lib/storyReading";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/stores/authStore";
 import { useProjectCharacters } from "@/stores/characterStore";
@@ -68,8 +68,6 @@ export function StoryReadView({ project, feature, onOpenFeature }: StoryReadView
     [structure, manuscript.texts, events, label, sceneLevel],
   );
   const headings = entries.filter((e): e is Heading => e.kind === "heading");
-  const words = entries.reduce((sum, e) => sum + (e.kind === "text" ? e.words : 0), 0);
-  const unplaced = structure && plot ? unplacedEvents(plot.events, structure.nodes) : 0;
 
   const characterName = (id: string) => {
     const c = characters.find((x) => x.id === id);
@@ -140,13 +138,6 @@ export function StoryReadView({ project, feature, onOpenFeature }: StoryReadView
         <Button variant="ghost" size="icon-sm" onClick={toggleToc} aria-label={t("reading.toc")} aria-expanded={toc} title={t("reading.toc")}>
           {toc ? <PanelLeftClose /> : <PanelLeftOpen />}
         </Button>
-        <div className="min-w-0">
-          <p className="text-sm font-medium tabular-nums">
-            {t("reading.summary", { count: headings.length })}
-            {words > 0 && ` · ${t("reading.minutes", { minutes: readingMinutes(words) })}`}
-          </p>
-          {unplaced > 0 && <p className="text-xs text-muted-foreground">{t("reading.unplaced", { count: unplaced })}</p>}
-        </div>
         <div className="ml-auto flex items-center gap-2">
           {manuscript.loading && (
             <span className="flex items-center gap-1.5 text-xs text-muted-foreground" role="status">

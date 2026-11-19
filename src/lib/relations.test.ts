@@ -54,6 +54,13 @@ const node = (id: string, parentId: string | null, level: number, position: numb
   rhythm: null,
   pageTurn: false,
   productionStage: null,
+  logline: "",
+  runtimeGoal: null,
+  episodeStatus: null,
+  writer: "",
+  scenePlace: null,
+  sceneLocationId: null,
+  sceneTime: null,
   createdAt: "2026-10-10T00:00:00Z",
   updatedAt: "2026-10-10T00:00:00Z",
 });

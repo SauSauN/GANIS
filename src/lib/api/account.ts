@@ -1,6 +1,7 @@
 import { call } from "./client";
 import type {
   AccountCreated,
+  AuthorProfile,
   AppInfo,
   LoginResult,
   User,
@@ -138,6 +139,13 @@ export const accountApi = {
    */
   updateProfile: (input: { email?: string }) =>
     call<User>("update_profile", { input }),
+
+  /**
+   * Met à jour le profil d'auteur du compte connecté (nom d'auteur, nom
+   * complet, site web, biographie). Tous les champs vides l'effacent.
+   */
+  updateAuthorProfile: (profile: AuthorProfile) =>
+    call<User>("update_author_profile", { profile }),
 
   /**
    * Change le mot de passe du compte connecté.

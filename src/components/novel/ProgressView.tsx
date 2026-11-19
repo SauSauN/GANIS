@@ -338,7 +338,7 @@ function FilterChip({ active, onClick, label, count, color }: { active: boolean;
       onClick={onClick}
       className={cn(
         "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm transition-colors hover:bg-muted",
-        active && "border-foreground bg-foreground text-background hover:bg-foreground/90",
+        active && "border-primary bg-primary text-primary-foreground hover:bg-primary/90",
       )}
     >
       {color && <span className="size-2 rounded-full" style={{ backgroundColor: color }} aria-hidden="true" />}

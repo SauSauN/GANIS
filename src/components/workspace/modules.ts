@@ -34,6 +34,7 @@ import {
   StickyNote,
   Target,
   Trash2,
+  Tv,
   UserPlus,
   UserRound,
   Users,
@@ -42,6 +43,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/sections";
+import { getModuleOrder } from "@/lib/preferences";
 import i18n from "@/i18n";
 import { characterIdOfTab, fullName } from "@/lib/characters";
 import { locationIdOfTab } from "@/lib/locations";
@@ -84,6 +86,7 @@ export type ModuleId =
   | "notes"
   | "manuscript"
   | "script"
+  | "screenplay"
   | "search"
   | "settings";
 
@@ -139,6 +142,7 @@ type FeatureId =
   | "magic.list"
   | "structure.plan"
   | "structure.read"
+  | "structure.continuity"
   | "plot.board"
   | "plot.reading"
   | "notes.create"
@@ -149,11 +153,15 @@ type FeatureId =
   | "manuscript.replace"
   | "manuscript.import"
   | "manuscript.editorial"
+  | "manuscript.continuity"
   | "script.read"
   | "script.flatplan"
   | "script.production"
   | "script.progress"
-  | "script.continuity";
+  | "script.continuity"
+  | "screenplay.read"
+  | "screenplay.progress"
+  | "screenplay.continuity";
 
 /** Modules qui ont une liste (et donc un message de liste vide). */
 type ListModuleId = "characters" | "locations" | "items" | "species" | "factions" | "peoples" | "magic" | "notes";
@@ -204,7 +212,11 @@ function defineListModule(
 // Registre
 // ----------------------------------------------------------------------------
 
-/** Modules affichés en haut de la barre de gauche. */
+/**
+ * Modules affichés en haut de la barre de gauche : d'abord le projet
+ * (détails, notes, découpage, trame, puis le module du type de projet),
+ * ensuite l'univers (personnages, lieux, modules du monde).
+ */
 export const WORKSPACE_MODULES: WorkspaceModule[] = [
   defineModule("details", FileText, [
     defineFeature(HOME_TAB, Info),
@@ -214,14 +226,10 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
     defineFeature("history", History),
     defineFeature("trash", Trash2),
   ]),
-  defineListModule("characters", Users, [
-    defineFeature("characters.create", UserPlus),
-    defineFeature("characters.list", List),
-    defineFeature("characters.relations", Network),
-  ]),
-  defineListModule("locations", MapPin, [
-    defineFeature("locations.create", Plus),
-    defineFeature("locations.list", List),
+  defineListModule("notes", StickyNote, [
+    defineFeature("notes.create", Plus),
+    defineFeature("notes.list", List),
+    defineFeature("notes.wall", LayoutGrid),
   ]),
   // Découpage du récit : ses niveaux (parties, chapitres, scènes ; actes,
   // séquences… ) dépendent du type de projet. Voir `lib/structure.ts`.
@@ -232,6 +240,7 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
   defineModule("structure", ListTree, [
     defineFeature("structure.plan", ListTree),
     defineFeature("structure.read", Play),
+    defineFeature("structure.continuity", Route),
   ]),
   // Trame : plateau vertical des intrigues parallèles, lecture de
   // l'histoire et analyse. Voir `lib/plot.ts`.
@@ -239,10 +248,14 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
     defineFeature("plot.board", Columns3),
     defineFeature("plot.reading", BookOpen),
   ]),
-  defineListModule("notes", StickyNote, [
-    defineFeature("notes.create", Plus),
-    defineFeature("notes.list", List),
-    defineFeature("notes.wall", LayoutGrid),
+  defineListModule("characters", Users, [
+    defineFeature("characters.create", UserPlus),
+    defineFeature("characters.list", List),
+    defineFeature("characters.relations", Network),
+  ]),
+  defineListModule("locations", MapPin, [
+    defineFeature("locations.create", Plus),
+    defineFeature("locations.list", List),
   ]),
   defineModule("search", Search, []),
 ];
@@ -259,6 +272,7 @@ export const NOVEL_MODULE: WorkspaceModule = defineModule("manuscript", BookText
   defineFeature("manuscript.replace", Replace),
   defineFeature("manuscript.import", FileUp),
   defineFeature("manuscript.editorial", Megaphone),
+  defineFeature("manuscript.continuity", Route),
 ]);
 
 /** Fonctionnalités réservées aux romans. */
@@ -278,6 +292,20 @@ export const MANGA_MODULE: WorkspaceModule = defineModule("script", Clapperboard
 
 /** Fonctionnalités réservées aux mangas / BD. */
 export const MANGA_FEATURES = new Set(MANGA_MODULE.features.map((feature) => feature.id));
+
+/**
+ * Scénario de série : lecture et export du scénario, suivi des épisodes.
+ * Proposé seulement aux projets de série (l'écriture se fait dans la fiche
+ * de chaque scène, la fiche de l'épisode dans celle de l'épisode).
+ */
+export const SERIES_MODULE: WorkspaceModule = defineModule("screenplay", Tv, [
+  defineFeature("screenplay.read", BookOpenText),
+  defineFeature("screenplay.progress", Target),
+  defineFeature("screenplay.continuity", Route),
+]);
+
+/** Fonctionnalités réservées aux séries. */
+export const SERIES_FEATURES = new Set(SERIES_MODULE.features.map((feature) => feature.id));
 
 /**
  * Objets, faune et flore, factions : modules facultatifs, masqués tant que l'auteur ne
@@ -325,11 +353,95 @@ export type EnabledWorldModules = Partial<Record<WorldModule, boolean>>;
 /**
  * Modules de la barre de gauche pour un type de projet : après la Trame,
  * le module Manuscrit s'ajoute pour un roman, le module Scénario pour un
- * manga ou une BD.
+ * manga ou une BD, ou pour une série ; les personnages, les lieux et les
+ * modules du monde viennent ensuite.
  */
 export function modulesFor(
   projectType: string | null | undefined,
   world: EnabledWorldModules = {},
+  order: readonly string[] | null = null,
+): WorkspaceModule[] {
+  return applyModuleOrder(defaultModulesFor(projectType, world), order);
+}
+
+/**
+ * Modules que l'on peut ranger dans les paramètres généraux, dans l'ordre
+ * par défaut. « projectType » : le module du type de projet (Manuscrit,
+ * Scénario), un seul par projet. La Recherche reste toujours à la fin.
+ */
+export const MODULE_ORDER_KEYS = [
+  "details",
+  "notes",
+  "structure",
+  "plot",
+  "projectType",
+  "characters",
+  "locations",
+  "items",
+  "species",
+  "factions",
+  "peoples",
+  "magic",
+] as const;
+
+export type ModuleOrderKey = (typeof MODULE_ORDER_KEYS)[number];
+
+/**
+ * Ancien ordre de la barre de gauche (l'univers d'abord), proposé dans les
+ * paramètres généraux en un clic.
+ */
+export const PREVIOUS_MODULE_ORDER: readonly ModuleOrderKey[] = [
+  "details",
+  "characters",
+  "locations",
+  "items",
+  "species",
+  "factions",
+  "peoples",
+  "magic",
+  "structure",
+  "plot",
+  "projectType",
+  "notes",
+];
+
+const PROJECT_TYPE_MODULES: ReadonlySet<string> = new Set(["manuscript", "script", "screenplay"]);
+
+/** Clé de rangement d'un module (`null` : il ne se range pas). */
+export function moduleOrderKey(id: string): ModuleOrderKey | null {
+  if (PROJECT_TYPE_MODULES.has(id)) return "projectType";
+  return (MODULE_ORDER_KEYS as readonly string[]).includes(id) ? (id as ModuleOrderKey) : null;
+}
+
+/** Ordre complet : celui choisi, complété des clés manquantes à leur place par défaut. */
+export function normalizeModuleOrder(order: readonly string[] | null): ModuleOrderKey[] {
+  const known = (order ?? []).filter((key, index, all): key is ModuleOrderKey =>
+    (MODULE_ORDER_KEYS as readonly string[]).includes(key) && all.indexOf(key) === index,
+  );
+  const result = [...known];
+  // Une clé absente (module ajouté depuis) se place après celle qui la précède par défaut.
+  MODULE_ORDER_KEYS.forEach((key, index) => {
+    if (result.includes(key)) return;
+    const before = MODULE_ORDER_KEYS.slice(0, index).reverse().find((other) => result.includes(other));
+    result.splice(before ? result.indexOf(before) + 1 : 0, 0, key);
+  });
+  return result;
+}
+
+/** Range les modules selon l'ordre choisi ; ceux qui ne se rangent pas gardent leur place. */
+export function applyModuleOrder(modules: WorkspaceModule[], order: readonly string[] | null): WorkspaceModule[] {
+  if (!order) return modules;
+  const rank = new Map(normalizeModuleOrder(order).map((key, index) => [key, index]));
+  const ranked = modules
+    .filter((module) => moduleOrderKey(module.id) !== null)
+    .sort((a, b) => rank.get(moduleOrderKey(a.id)!)! - rank.get(moduleOrderKey(b.id)!)!);
+  let next = 0;
+  return modules.map((module) => (moduleOrderKey(module.id) !== null ? ranked[next++] : module));
+}
+
+function defaultModulesFor(
+  projectType: string | null | undefined,
+  world: EnabledWorldModules,
 ): WorkspaceModule[] {
   // Objets, Faune et flore, Factions, Peuples puis Magie, juste après les
   // Lieux, s'ils sont activés.
@@ -339,7 +451,7 @@ export function modulesFor(
   const after = WORKSPACE_MODULES.findIndex((module) => module.id === "locations");
   const base = [...WORKSPACE_MODULES.slice(0, after + 1), ...worldModules, ...WORKSPACE_MODULES.slice(after + 1)];
 
-  const extra = projectType === "novel" ? NOVEL_MODULE : projectType === "manga" ? MANGA_MODULE : null;
+  const extra = projectType === "novel" ? NOVEL_MODULE : projectType === "manga" ? MANGA_MODULE : projectType === "series" ? SERIES_MODULE : null;
   if (!extra) return base;
   const index = base.findIndex((module) => module.id === "plot");
   return [...base.slice(0, index + 1), extra, ...base.slice(index + 1)];
@@ -349,6 +461,15 @@ export function modulesFor(
 export const STORY_READ_FEATURE = "structure.read";
 
 /**
+ * Continuité des types sans module dédié (film, jeu vidéo, jeu de rôle,
+ * personnalisé), dans le Découpage. Le roman l'a dans son Manuscrit
+ * (`manuscript.continuity`), la série dans son Scénario
+ * (`screenplay.continuity`) ; le manga a la sienne, case par case
+ * (`script.continuity`). Les trois premières ouvrent la même vue.
+ */
+export const STORY_CONTINUITY_FEATURE = "structure.continuity";
+
+/**
  * La fonctionnalité est-elle proposée à ce type de projet ? Les outils du
  * roman et du manga leur sont réservés ; la lecture complète générique ne
  * l'est pas à eux (ils lisent leur histoire dans le Manuscrit / Scénario).
@@ -356,7 +477,9 @@ export const STORY_READ_FEATURE = "structure.read";
 export function featureAvailable(featureId: string, projectType: string | null | undefined): boolean {
   if (NOVEL_FEATURES.has(featureId)) return projectType === "novel";
   if (MANGA_FEATURES.has(featureId)) return projectType === "manga";
+  if (SERIES_FEATURES.has(featureId)) return projectType === "series";
   if (featureId === STORY_READ_FEATURE) return projectType !== "novel" && projectType !== "manga";
+  if (featureId === STORY_CONTINUITY_FEATURE) return projectType !== "manga" && projectType !== "novel" && projectType !== "series";
   return true;
 }
 
@@ -367,18 +490,43 @@ export const SETTINGS_MODULE: WorkspaceModule = {
   get label() {
     return i18n.t("modules:modules.settings.label");
   },
-  // Accesseurs (get) : le libellé est relu à chaque rendu et suit la langue.
-  features: PROJECT_SETTINGS_SECTIONS.map((section) => ({
-    id: `${SETTINGS_PREFIX}${section.id}`,
-    get label() {
-      return section.label;
-    },
-    get description() {
-      return section.description;
-    },
-    icon: section.icon,
-  })),
+  // Sections des modules dans le même ordre que la barre de gauche
+  // (paramètres généraux) ; recalculées seulement quand cet ordre change.
+  get features() {
+    const order = getModuleOrder();
+    if (settingsFeatures === null || order !== settingsOrder) {
+      settingsOrder = order;
+      settingsFeatures = orderSettingsSections(PROJECT_SETTINGS_SECTIONS, order).map((section) => ({
+        id: `${SETTINGS_PREFIX}${section.id}`,
+        // Accesseurs (get) : le libellé est relu à chaque rendu et suit la langue.
+        get label() {
+          return section.label;
+        },
+        get description() {
+          return section.description;
+        },
+        // Même icône que le module dans la barre de gauche.
+        icon: moduleOrderKey(section.id) ? getModule(section.id as ModuleId).icon : section.icon,
+      }));
+    }
+    return settingsFeatures;
+  },
 };
+
+let settingsOrder: string[] | null = null;
+let settingsFeatures: WorkspaceFeature[] | null = null;
+
+/**
+ * Sections des paramètres du projet : celles des modules suivent l'ordre
+ * des modules ; les autres (informations, statuts, zone de danger) gardent
+ * leur place.
+ */
+export function orderSettingsSections<T extends { id: string }>(sections: readonly T[], order: readonly string[] | null): T[] {
+  const rank = new Map(normalizeModuleOrder(order).map((key, index) => [key as string, index]));
+  const ranked = sections.filter((section) => rank.has(section.id)).sort((a, b) => rank.get(a.id)! - rank.get(b.id)!);
+  let next = 0;
+  return sections.map((section) => (rank.has(section.id) ? ranked[next++] : section));
+}
 
 const ALL_MODULES: WorkspaceModule[] = [
   ...WORKSPACE_MODULES,
@@ -389,6 +537,7 @@ const ALL_MODULES: WorkspaceModule[] = [
   MAGIC_MODULE,
   NOVEL_MODULE,
   MANGA_MODULE,
+  SERIES_MODULE,
   SETTINGS_MODULE,
 ];
 

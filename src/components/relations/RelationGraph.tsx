@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState, type CSSProperties } from "react";
 import {
   Background,
   BaseEdge,
@@ -393,6 +393,9 @@ function GraphCanvas(props: RelationGraphProps) {
       fitView
       proOptions={{ hideAttribution: true }}
       deleteKeyCode={null}
+      // Fond de la page (comme « Lecture de l'histoire ») : React Flow impose
+      // sinon son propre noir en thème sombre.
+      style={{ "--xy-background-color": "var(--background)" } as CSSProperties}
       className="bg-background"
     >
       <Background gap={24} size={1.2} />

@@ -2,7 +2,7 @@ import { useEffect, useState, type FormEvent, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { notifyError, notifySaved } from "@/lib/notify";
-import { CalendarDays, Mail, ShieldCheck, Trash2, User as UserIcon } from "lucide-react";
+import { CalendarDays, Feather, Mail, ShieldCheck, Trash2, User as UserIcon } from "lucide-react";
 import { RecoveryKeyPanel } from "@/components/auth/RecoveryKeyPanel";
 import {
   cardClass,
@@ -31,6 +31,7 @@ import { IDLE_LOCK_DELAYS, setIdleLock, useIdleLock, type IdleLockDelay } from "
 import { RECOVERY_KEY_ENABLED } from "@/lib/recoveryKey";
 import { useAuthStore } from "@/stores/authStore";
 import { TitleWithInfo } from "@/components/common/TitleWithInfo";
+import type { AuthorProfile, User } from "@/types";
 
 /** Messages propres à cette section (clés de `settings.json`). */
 type AccountMessage =
@@ -45,7 +46,9 @@ type AccountMessage =
   | "account.recovery.done"
   | "account.delete.passwordRequired"
   | "account.delete.confirmRequired"
-  | "account.delete.failed";
+  | "account.delete.failed"
+  | "account.profile.updated"
+  | "account.profile.failed";
 
 /**
  * Retour affiché sous un formulaire.
@@ -115,6 +118,118 @@ function InfoCell({
         <div className="mt-1 break-words text-sm font-medium">{children}</div>
       </div>
     </div>
+  );
+}
+
+const EMPTY_PROFILE: AuthorProfile = { penName: "", fullName: "", website: "", bio: "" };
+
+/** Longueurs maximales (les mêmes que côté Rust, `AuthorProfile::MAX_*`). */
+const PROFILE_MAX = { penName: 100, fullName: 100, website: 200, bio: 1000 } as const;
+
+/**
+ * Profil d'auteur : informations facultatives ajoutées au compte (nom
+ * d'auteur, nom complet, site web, biographie). Chiffré sur l'appareil,
+ * comme l'adresse e-mail.
+ */
+function AuthorProfileCard({ user, onSaved }: { user: User; onSaved: (user: User) => void }) {
+  const { t } = useTranslation(["settings", "common"]);
+  const saved = { ...EMPTY_PROFILE, ...user.profile };
+  const [profile, setProfile] = useState<AuthorProfile>(saved);
+  const [saving, setSaving] = useState(false);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+
+  const dirty = (Object.keys(EMPTY_PROFILE) as Array<keyof AuthorProfile>).some((key) => profile[key] !== saved[key]);
+  const set = (key: keyof AuthorProfile) => (value: string) => setProfile((current) => ({ ...current, [key]: value }));
+
+  async function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setSaving(true);
+    try {
+      const updated = await api.updateAuthorProfile(profile);
+      onSaved(updated);
+      setProfile({ ...EMPTY_PROFILE, ...updated.profile });
+      setFeedback({ kind: "success", key: "account.profile.updated" });
+    } catch (e) {
+      setFeedback(failure(e, "account.profile.failed"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Card className={cardClass}>
+      <form onSubmit={handleSubmit} noValidate>
+        <CardHeader className={cardHeaderClass}>
+          <TitleWithInfo info={t("account.profile.description")}>{t("account.profile.title")}</TitleWithInfo>
+        </CardHeader>
+
+        <CardContent className="space-y-6 px-6 py-6">
+          <div className="grid max-w-2xl gap-x-6 gap-y-5 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="profile-pen-name">{t("account.profile.penName")}</Label>
+              <Input
+                id="profile-pen-name"
+                maxLength={PROFILE_MAX.penName}
+                placeholder={t("account.profile.penNamePlaceholder")}
+                value={profile.penName}
+                onChange={(e) => set("penName")(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="profile-full-name">{t("account.profile.fullName")}</Label>
+              <Input
+                id="profile-full-name"
+                maxLength={PROFILE_MAX.fullName}
+                autoComplete="name"
+                placeholder={t("account.profile.fullNamePlaceholder")}
+                value={profile.fullName}
+                onChange={(e) => set("fullName")(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2 sm:col-span-2">
+              <Label htmlFor="profile-website">{t("account.profile.website")}</Label>
+              <Input
+                id="profile-website"
+                type="url"
+                maxLength={PROFILE_MAX.website}
+                autoComplete="url"
+                placeholder={t("account.profile.websitePlaceholder")}
+                value={profile.website}
+                onChange={(e) => set("website")(e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2 sm:col-span-2">
+              <div className="flex items-baseline justify-between gap-3">
+                <Label htmlFor="profile-bio">{t("account.profile.bio")}</Label>
+                <span className="text-xs text-muted-foreground tabular-nums">
+                  {profile.bio.length} / {PROFILE_MAX.bio}
+                </span>
+              </div>
+              <textarea
+                id="profile-bio"
+                rows={4}
+                maxLength={PROFILE_MAX.bio}
+                placeholder={t("account.profile.bioPlaceholder")}
+                value={profile.bio}
+                onChange={(e) => set("bio")(e.target.value)}
+                className="w-full resize-y rounded-lg border border-input bg-transparent px-3 py-2 text-sm outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 dark:bg-input/30"
+              />
+            </div>
+          </div>
+
+          <FeedbackMessage feedback={feedback} />
+        </CardContent>
+
+        <CardFooter className={cardFooterClass}>
+          <Button type="submit" disabled={saving || !dirty}>
+            {t("common:actions.save")}
+          </Button>
+        </CardFooter>
+      </form>
+    </Card>
   );
 }
 
@@ -472,9 +587,21 @@ export function AccountSection() {
             <InfoCell icon={CalendarDays} label={t("account.info.createdAt")}>
               {createdAt}
             </InfoCell>
+
+            {user.profile?.penName && (
+              <InfoCell icon={Feather} label={t("account.profile.penName")}>
+                {user.profile.penName}
+              </InfoCell>
+            )}
           </div>
         </CardContent>
       </Card>
+
+      {/* ==================================================================
+          PROFIL D'AUTEUR
+          ================================================================== */}
+
+      <AuthorProfileCard user={user} onSaved={setUser} />
 
       {/* ==================================================================
           ADRESSE E-MAIL

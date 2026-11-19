@@ -78,6 +78,20 @@
       "passwordRequired": "Enter your password to confirm.",
       "confirmRequired": "Tick the box to confirm.",
       "failed": "Unable to delete the account."
+    },
+    "profile": {
+      "title": "Author profile",
+      "description": "Optional. This information introduces you as an author; it is encrypted and stays on this device.",
+      "penName": "Author name",
+      "penNamePlaceholder": "E.g. the name on your books",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "First and last name",
+      "website": "Website or social link",
+      "websitePlaceholder": "E.g. https://mysite.com",
+      "bio": "Biography",
+      "bioPlaceholder": "A few lines about you",
+      "updated": "Author profile saved.",
+      "failed": "Couldn't save the author profile."
     }
   },
   "appearance": {
@@ -181,6 +195,16 @@
         "gold": "Gold"
       },
       "reset": "Back to the default white frame"
+    },
+    "moduleOrder": {
+      "title": "Module order",
+      "description": "The order of the modules in the left bar, on this device. A module a project doesn't have (project type, disabled world module) keeps its place when it shows up. Search always stays last.",
+      "projectType": "Project type module (Manuscript, Script)",
+      "moveUp": "Move “{{name}}” up",
+      "moveDown": "Move “{{name}}” down",
+      "reset": "Back to the default order",
+      "previous": "Previous order",
+      "previousHint": "Details, Characters, Locations and the world modules first, then Structure, Plot, the project type module and Notes."
     }
   },
   "developer": {

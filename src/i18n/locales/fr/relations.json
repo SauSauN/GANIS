@@ -140,6 +140,7 @@
       "matrix": "Matrice",
       "list": "Liste"
     },
+    "layoutLabel": "Disposition",
     "layouts": {
       "force": "Réseau",
       "circle": "Cercle",

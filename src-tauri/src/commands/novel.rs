@@ -143,7 +143,7 @@ pub async fn update_editorial(
 }
 
 /// Extensions acceptées pour un export (manuscrit, pitch, résumés).
-const EXPORT_EXTENSIONS: [&str; 4] = ["docx", "pdf", "txt", "md"];
+const EXPORT_EXTENSIONS: [&str; 5] = ["docx", "pdf", "txt", "md", "fountain"];
 
 /// Enregistre un fichier exporté (Word, PDF, texte) à l'emplacement choisi
 /// dans la fenêtre du système. Corps binaire ; en-têtes : `x-file-name`,

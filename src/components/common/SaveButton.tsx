@@ -11,6 +11,8 @@ interface SaveButtonProps {
   className?: string;
   /** Libellé (par défaut « Enregistrer »). */
   label?: string;
+  /** Apparence (par défaut, bouton principal). */
+  variant?: "default" | "ghost" | "outline";
 }
 
 /**
@@ -18,7 +20,7 @@ interface SaveButtonProps {
  * libellé ne change pas (seule l'icône tourne), pour que rien ne bouge
  * autour. Le résultat est annoncé par une notification (`notify.ts`).
  */
-export function SaveButton({ saving, disabled, onClick, type = "button", size = "sm", className, label }: SaveButtonProps) {
+export function SaveButton({ saving, disabled, onClick, type = "button", size = "sm", className, label, variant }: SaveButtonProps) {
   const { t } = useTranslation("common");
   const Icon = saving ? Loader2 : Save;
 
@@ -26,6 +28,7 @@ export function SaveButton({ saving, disabled, onClick, type = "button", size = 
     <Button
       type={type}
       size={size}
+      variant={variant}
       className={className}
       onClick={onClick}
       disabled={saving || disabled}

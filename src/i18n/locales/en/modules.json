@@ -33,6 +33,9 @@
     "script": {
       "label": "Script"
     },
+    "screenplay": {
+      "label": "Screenplay"
+    },
     "items": {
       "label": "Objects",
       "empty": "No objects yet."
@@ -107,6 +110,10 @@
       "read": {
         "label": "Full reading",
         "description": "The whole story in one piece, compiled in outline order."
+      },
+      "continuity": {
+        "label": "Continuity",
+        "description": "Where each character appears, in which role and state, element by element; presence chart."
       }
     },
     "notes": {
@@ -161,6 +168,10 @@
       "import": {
         "label": "Import a manuscript",
         "description": "A Word, Markdown or text file, split into parts, chapters and scenes."
+      },
+      "continuity": {
+        "label": "Continuity",
+        "description": "Where each character appears, in which role and state, scene by scene; presence chart by chapter."
       }
     },
     "script": {
@@ -183,6 +194,20 @@
       "continuity": {
         "label": "Continuity",
         "description": "Where each character appears, and in what state, panel by panel."
+      }
+    },
+    "screenplay": {
+      "read": {
+        "label": "Script reading",
+        "description": "The whole script in standard format, episode by episode; export to Word, PDF, text and Fountain."
+      },
+      "progress": {
+        "label": "Episode tracking",
+        "description": "Statuses, scenes written, estimated vs target runtime, lines per character."
+      },
+      "continuity": {
+        "label": "Continuity",
+        "description": "Where each character appears, in which state, with their lines, scene by scene; presence chart by episode."
       }
     },
     "items": {

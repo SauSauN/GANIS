@@ -1,3 +1,4 @@
+import { FilterResults } from "@/components/common/FilterResults";
 import { useMemo, useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -206,10 +207,22 @@ export function GlossaryView({ projectId, feature, onOpenFeature }: GlossaryView
               {terms.some((term) => !term.category.trim()) && <option value={NO_CATEGORY}>{t("noCategory")}</option>}
             </select>
 
-            <span className="text-sm text-muted-foreground" aria-live="polite">
-              {t("count", { count: visible.length })}
-            </span>
+            {!(query.trim() || category) && (
+              <span className="text-sm text-muted-foreground" aria-live="polite">
+                {t("count", { count: visible.length })}
+              </span>
+            )}
           </div>
+
+          {(query.trim() !== "" || category !== null) && (
+            <FilterResults
+              count={visible.length}
+              onClear={() => {
+                setQuery("");
+                setCategory(null);
+              }}
+            />
+          )}
 
           {groups.length > 1 && (
             <nav aria-label={t("letters")} className="mb-6 flex flex-wrap gap-1">

@@ -29,7 +29,7 @@ import type { Character, ExtraPageKind, Location, MangaExtraPage, Panel, Structu
 const date = "2026-10-19T00:00:00Z";
 const node = (id: string, parentId: string | null, level: number, position: number, extra: Partial<StructureNode> = {}): StructureNode => ({
   id, parentId, level, title: "", summary: "", position, numbered: true, number: null, contentWords: 0, wordGoal: null, writingStatus: null,
-  narrativePerson: null, narrativeTense: null, narrativeGoal: "", pageGoal: null, scriptStatus: null, rhythm: null, pageTurn: false, productionStage: null,
+  narrativePerson: null, narrativeTense: null, narrativeGoal: "", pageGoal: null, scriptStatus: null, rhythm: null, pageTurn: false, productionStage: null, logline: "", runtimeGoal: null, episodeStatus: null, writer: "", scenePlace: null, sceneLocationId: null, sceneTime: null,
   createdAt: date, updatedAt: date, ...extra,
 });
 const panel = (id: string, pageId: string, position: number, extra: Partial<Panel> = {}): Panel => ({

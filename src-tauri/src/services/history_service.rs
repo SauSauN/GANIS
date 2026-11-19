@@ -18,7 +18,7 @@ use serde_json::{Map, Value};
 use sqlx::SqlitePool;
 
 use crate::error::{AppError, AppResult};
-use crate::services::manga_service;
+use crate::services::{manga_service, series_service};
 use crate::services::trash_service::{bind, quote, select_rows, table_columns, Val};
 use crate::utils::{new_id, now_utc};
 
@@ -39,6 +39,10 @@ const KEPT_COLUMNS: [&str; 4] = ["id", "created_at", "character_id", "production
 /// Entrée d'une version d'un élément du découpage : ses cases de manga (JSON).
 /// Ce n'est pas une colonne : elle est restaurée à part.
 const PANELS_COLUMN: &str = "manga_panels";
+
+/// Entrée d'une version d'un élément du découpage : le scénario d'une scène
+/// de série (JSON). Restaurée à part, comme les cases.
+const SCREENPLAY_COLUMN: &str = "series_scene_blocks";
 
 /// Table d'un type d'élément versionné.
 fn table_of(kind: &str) -> AppResult<&'static str> {
@@ -270,6 +274,7 @@ async fn current_row(pool: &SqlitePool, kind: &str, item_id: &str) -> AppResult<
     let mut row: Row = columns.into_iter().zip(values).collect();
     if kind == "structureNode" {
         row.push((PANELS_COLUMN.to_owned(), Val::text(manga_service::panels_snapshot(pool, item_id).await?)));
+        row.push((SCREENPLAY_COLUMN.to_owned(), Val::text(series_service::blocks_snapshot(pool, item_id).await?)));
     }
     Ok(Some(row))
 }
@@ -389,7 +394,7 @@ pub async fn restore_version(pool: &SqlitePool, version_id: &str) -> AppResult<(
 
     // Colonnes existant encore (le schéma a pu changer depuis la version).
     let table = table_of(&kind)?;
-    let existing: Vec<String> = current.iter().map(|(column, _)| column.clone()).filter(|column| column != PANELS_COLUMN).collect();
+    let existing: Vec<String> = current.iter().map(|(column, _)| column.clone()).filter(|column| column != PANELS_COLUMN && column != SCREENPLAY_COLUMN).collect();
     let mut sets: Vec<(&str, Val)> = saved
         .iter()
         .filter(|(column, _)| existing.contains(column) && !KEPT_COLUMNS.contains(&column.as_str()) && column != "updated_at")
@@ -416,6 +421,10 @@ pub async fn restore_version(pool: &SqlitePool, version_id: &str) -> AppResult<(
     // Les cases de la version (absentes des versions anciennes : inchangées).
     if let Some((_, Val::Text(panels))) = saved.iter().find(|(column, _)| column == PANELS_COLUMN) {
         manga_service::restore_panels(pool, &item_id, panels).await?;
+    }
+    // Le scénario de série de la version (absent des versions anciennes : inchangé).
+    if let Some((_, Val::Text(blocks))) = saved.iter().find(|(column, _)| column == SCREENPLAY_COLUMN) {
+        series_service::restore_blocks(pool, &item_id, blocks).await?;
     }
 
     Ok((kind, item_id))

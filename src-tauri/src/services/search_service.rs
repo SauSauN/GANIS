@@ -194,8 +194,9 @@ pub async fn search(pool: &SqlitePool, query: &str) -> AppResult<Vec<SearchHit>>
     }
 
     // Résumé, puis texte de l'élément (scène d'un roman, cases d'une page de
-    // manga), en texte brut.
+    // manga, scénario d'une scène de série), en texte brut.
     let mut panels = crate::services::manga_service::search_rows(pool).await?;
+    let mut screenplay = crate::services::series_service::search_rows(pool).await?;
     let rows: Vec<(String, String, String, String)> =
         sqlx::query_as("SELECT id, title, summary, content FROM structure_nodes").fetch_all(pool).await?;
     candidates.extend(rows.into_iter().map(|(id, title, summary, content)| {
@@ -205,6 +206,10 @@ pub async fn search(pool: &SqlitePool, query: &str) -> AppResult<Vec<SearchHit>>
             format!("{summary}\n{}", crate::services::novel_service::plain_text(&content))
         };
         if let Some(text) = panels.remove(&id) {
+            body.push('\n');
+            body.push_str(&text);
+        }
+        if let Some(text) = screenplay.remove(&id) {
             body.push('\n');
             body.push_str(&text);
         }

@@ -697,31 +697,31 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
 
       {/* Barre d'outils : l'essentiel visible, le reste dans « Plus » */}
       {!clean && (
-        <div className="flex items-center gap-2 border-b bg-card/60 px-3 py-1.5">
+        <div className="flex items-center gap-2 border-b bg-card/60 px-3 py-2">
           <div className="flex items-center" role="group" aria-label={t("toolbar.zoom")}>
-            <Button variant="ghost" size="icon-sm" onClick={() => setZoom(view.zoom / 1.15)} aria-label={t("toolbar.zoomOut")} title={`${t("toolbar.zoomOut")} (-)`}>
+            <Button variant="ghost" size="icon" onClick={() => setZoom(view.zoom / 1.15)} aria-label={t("toolbar.zoomOut")} title={`${t("toolbar.zoomOut")} (-)`}>
               <Minus />
             </Button>
-            <button type="button" onClick={fitZoom} title={`${t("toolbar.fit")} (0)`} className="h-7 min-w-11 rounded-md px-1 text-xs text-muted-foreground tabular-nums hover:bg-muted hover:text-foreground">
+            <button type="button" onClick={fitZoom} title={`${t("toolbar.fit")} (0)`} className="h-8 min-w-11 rounded-md px-1 text-xs text-muted-foreground tabular-nums hover:bg-muted hover:text-foreground">
               {Math.round(view.zoom * 100)} %
             </button>
-            <Button variant="ghost" size="icon-sm" onClick={() => setZoom(view.zoom * 1.15)} aria-label={t("toolbar.zoomIn")} title={`${t("toolbar.zoomIn")} (+)`}>
+            <Button variant="ghost" size="icon" onClick={() => setZoom(view.zoom * 1.15)} aria-label={t("toolbar.zoomIn")} title={`${t("toolbar.zoomIn")} (+)`}>
               <Plus />
             </Button>
           </div>
 
           <span className="h-5 w-px bg-border" aria-hidden="true" />
-          <Button variant="ghost" size="icon-sm" disabled={!canUndo} onClick={undo} aria-label={t("toolbar.undo")} title={`${t("toolbar.undo")} (Ctrl+Z)`}>
+          <Button variant="ghost" size="icon" disabled={!canUndo} onClick={undo} aria-label={t("toolbar.undo")} title={`${t("toolbar.undo")} (Ctrl+Z)`}>
             <Undo2 />
           </Button>
-          <Button variant="ghost" size="icon-sm" disabled={!canRedo} onClick={redo} aria-label={t("toolbar.redo")} title={`${t("toolbar.redo")} (Ctrl+Y)`}>
+          <Button variant="ghost" size="icon" disabled={!canRedo} onClick={redo} aria-label={t("toolbar.redo")} title={`${t("toolbar.redo")} (Ctrl+Y)`}>
             <Redo2 />
           </Button>
 
           <span className="h-5 w-px bg-border" aria-hidden="true" />
           <Button
             variant="ghost"
-            size="icon-sm"
+            size="icon"
             aria-pressed={view.tension}
             onClick={() => setView({ ...view, tension: !view.tension })}
             aria-label={t("board.tension")}
@@ -732,18 +732,18 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
           </Button>
 
           <div className="ml-auto flex items-center gap-1.5">
-            <Button size="sm" onClick={() => addEventSmart(projectId)} title={`${t("toolbar.newEvent")} (Ctrl+N)`}>
+            <Button onClick={() => addEventSmart(projectId)} title={`${t("toolbar.newEvent")} (Ctrl+N)`}>
               <Plus />
               {t("toolbar.newEvent")}
             </Button>
-            <Button size="sm" onClick={() => void addLane(projectId)} title={t("toolbar.newLaneHint")}>
+            <Button onClick={() => void addLane(projectId)} title={t("toolbar.newLaneHint")}>
               <Plus />
               {t("toolbar.newLaneShort")}
             </Button>
             <Button
               ref={viewButtonRef}
               variant="ghost"
-              size="icon-sm"
+              size="icon"
               aria-expanded={menuOpen}
               aria-haspopup="dialog"
               onClick={() => setMenuOpen((o) => !o)}
@@ -764,7 +764,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
                 { id: "clean", label: t("toolbar.clean"), icon: EyeOff, separated: true, run: () => setClean(true) },
               ]}
             />
-            <Button variant="ghost" size="icon-sm" onClick={togglePanel} aria-label={t("toolbar.panel")} aria-expanded={panelOpen} title={`${t("toolbar.panel")} (Ctrl+B)`}>
+            <Button variant="ghost" size="icon" onClick={togglePanel} aria-label={t("toolbar.panel")} aria-expanded={panelOpen} title={`${t("toolbar.panel")} (Ctrl+B)`}>
               {panelOpen ? <PanelRightClose /> : <PanelRightOpen />}
             </Button>
           </div>

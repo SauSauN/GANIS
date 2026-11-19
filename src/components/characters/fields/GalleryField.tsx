@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState, type DragEvent } from "react";
+import { createPortal } from "react-dom";
 import { useConfirmImageRemoval } from "@/components/common/useConfirmImageRemoval";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, ChevronRight, ImagePlus, Loader2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Crop, ImagePlus, Loader2, Trash2, X } from "lucide-react";
+import { FrameEditor } from "@/components/common/FrameEditor";
+import { InfoTip } from "@/components/common/InfoTip";
+import { Button } from "@/components/ui/button";
+import { frameStyle, imageFrameKey } from "@/lib/imageFrame";
+import { notifyError } from "@/lib/notify";
+import { useImageFrame, useImageFrameStore } from "@/stores/imageFrameStore";
 import {
   Dialog,
   DialogHeader,
@@ -36,13 +43,19 @@ interface GalleryGridProps {
   disabled?: boolean;
   onAdd: (files: File[]) => void;
   onRemove: (id: string) => void;
+  /**
+   * Projet des images enregistrées : chaque vignette peut être cadrée
+   * depuis la vue en grand. Absent (images pas encore enregistrées) : pas de
+   * cadrage.
+   */
+  projectId?: string;
 }
 
 /**
  * Galerie de références visuelles : vignettes, ajout (bouton ou
  * glisser-déposer, plusieurs images à la fois), agrandissement au clic.
  */
-export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemove }: GalleryGridProps) {
+export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemove, projectId }: GalleryGridProps) {
   const { t } = useTranslation("characters");
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -51,7 +64,12 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
 
   const full = items.length >= MAX_GALLERY_IMAGES;
   const locked = disabled || busy || full;
-  const removal = useConfirmImageRemoval<string>((id) => onRemove(id));
+  const removal = useConfirmImageRemoval<string>(async (id) => {
+    await onRemove(id);
+    if (projectId) void useImageFrameStore.getState().setFrame(projectId, imageFrameKey(id), null).catch(() => {});
+    // L'image affichée en grand vient d'être retirée : on referme.
+    setZoomed(null);
+  });
 
   function onDrop(event: DragEvent) {
     setDragOver(false);
@@ -87,7 +105,7 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
                 className="block size-full rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset"
                 aria-label={t("gallery.open")}
               >
-                <img src={item.url} alt="" className="size-full object-cover" draggable={false} />
+                <GalleryThumb projectId={projectId} id={item.id} url={item.url} />
               </button>
             ) : (
               <span className="flex size-full items-center justify-center">
@@ -152,33 +170,54 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
         items={items}
         index={zoomed}
         onIndexChange={setZoomed}
+        projectId={projectId}
+        onRemove={disabled || busy ? undefined : (id) => removal.ask(id)}
       />
       {removal.dialog}
     </div>
   );
 }
 
+/** Vignette d'une image de galerie, avec son cadrage. */
+function GalleryThumb({ projectId, id, url }: { projectId?: string; id: string; url: string }) {
+  const frame = useImageFrame(projectId, projectId ? imageFrameKey(id) : null);
+  return <img src={url} alt="" className="size-full object-cover" style={frameStyle(frame)} draggable={false} />;
+}
+
 /**
  * Image en grand, sur presque tout l'écran : flèches (boutons ou ← →) pour
- * passer d'une image à l'autre, Échap ou un clic à côté pour fermer.
+ * passer d'une image à l'autre, Échap ou un clic à côté pour fermer. Images
+ * enregistrées : cadrage de la vignette et retrait.
  */
 function ImageViewer({
   label,
   items,
   index,
   onIndexChange,
+  projectId,
+  onRemove,
 }: {
   label: string;
   items: GalleryItem[];
   index: number | null;
   onIndexChange: (index: number | null) => void;
+  projectId?: string;
+  onRemove?: (id: string) => void;
 }) {
-  const { t } = useTranslation("characters");
+  const { t } = useTranslation(["characters", "common"]);
   const open = index !== null && index >= 0 && index < items.length;
   const count = items.length;
+  const [framing, setFraming] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const current = open ? items[index] : null;
+  const frame = useImageFrame(projectId, projectId && current ? imageFrameKey(current.id) : null);
+  const setFrame = useImageFrameStore((s) => s.setFrame);
+
+  // Autre image ou fenêtre refermée : on quitte le cadrage.
+  useEffect(() => setFraming(false), [index, open]);
 
   useEffect(() => {
-    if (!open || count < 2) return;
+    if (!open || count < 2 || framing) return;
 
     function onKey(event: KeyboardEvent) {
       if (event.key === "ArrowLeft") {
@@ -192,13 +231,15 @@ function ImageViewer({
 
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open, index, count, onIndexChange]);
+  }, [open, index, count, onIndexChange, framing]);
 
   const item = open ? items[index] : null;
   const navClass =
     "absolute top-1/2 flex size-10 -translate-y-1/2 items-center justify-center rounded-full bg-background/85 shadow-md transition-colors hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring";
 
-  return (
+  // Rendue hors de la fiche (portail) : la carte de la fiche ne doit pas
+  // enfermer la fenêtre (voir `ImageDialog`).
+  return createPortal(
     <Dialog
       open={open}
       onOpenChange={(next) => !next && onIndexChange(null)}
@@ -208,7 +249,32 @@ function ImageViewer({
         <DialogTitle className="sr-only">{label}</DialogTitle>
       </DialogHeader>
 
-      {item?.url ? (
+      {item?.url && framing && projectId ? (
+        <div className="w-[min(92vw,44rem)] space-y-4 p-4">
+          {/* Titre du cadrage, avec son « i » (comme pour l'image d'une fiche). */}
+          <div className="flex items-center gap-1.5 pr-10">
+            <p className="text-lg font-semibold">{t("common:image.frameThumb")}</p>
+            <InfoTip>{t("common:image.frameHint")}</InfoTip>
+          </div>
+          <FrameEditor
+            url={item.url}
+            frame={frame}
+            busy={saving}
+            onCancel={() => setFraming(false)}
+            onSave={async (next) => {
+              setSaving(true);
+              try {
+                await setFrame(projectId, imageFrameKey(item.id), next);
+                setFraming(false);
+              } catch (e) {
+                notifyError(errorText(e), "image:frame");
+              } finally {
+                setSaving(false);
+              }
+            }}
+          />
+        </div>
+      ) : item?.url ? (
         <img
           src={item.url}
           alt=""
@@ -231,7 +297,24 @@ function ImageViewer({
         <X className="size-4" />
       </button>
 
-      {count > 1 && open && (
+      {item?.url && !framing && (projectId || onRemove) && (
+        <div className="absolute right-3 bottom-3 flex gap-2">
+          {onRemove && (
+            <Button type="button" size="sm" variant="outline" className="bg-background/90 text-destructive shadow-md hover:text-destructive" onClick={() => onRemove(item.id)}>
+              <Trash2 />
+              {t("common:image.remove")}
+            </Button>
+          )}
+          {projectId && (
+            <Button type="button" size="sm" className="shadow-md" onClick={() => setFraming(true)}>
+              <Crop />
+              {t("common:image.frameThumb")}
+            </Button>
+          )}
+        </div>
+      )}
+
+      {count > 1 && open && !framing && (
         <>
           <button
             type="button"
@@ -256,7 +339,8 @@ function ImageViewer({
           </span>
         </>
       )}
-    </Dialog>
+    </Dialog>,
+    document.body,
   );
 }
 
@@ -379,6 +463,7 @@ export function CharacterGallery({ label, projectId, characterId, disabled }: Ch
       disabled={disabled}
       onAdd={(files) => void add(files)}
       onRemove={(id) => void remove(id)}
+      projectId={projectId}
     />
   );
 }

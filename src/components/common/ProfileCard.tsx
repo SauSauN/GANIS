@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
+import { frameStyle, type ImageFrame } from "@/lib/imageFrame";
 import { cn } from "@/lib/utils";
 
 /**
@@ -14,6 +15,7 @@ import { cn } from "@/lib/utils";
  */
 export function ProfileCard({
   url,
+  frame,
   palette,
   backdrop,
   icon: Icon,
@@ -21,6 +23,8 @@ export function ProfileCard({
   children,
 }: {
   url: string | null;
+  /** Cadrage de l'image (vignette). */
+  frame?: ImageFrame | null;
   /** Couleurs choisies dans la fiche (vide : pas de palette). */
   palette: string[];
   /** Teinte de la catégorie (fond de la vignette sans image). */
@@ -64,7 +68,13 @@ export function ProfileCard({
             aria-hidden="true"
           >
             {url ? (
-              <img src={url} alt="" className="size-full object-cover transition-transform group-hover:scale-[1.04]" />
+              <img
+                src={url}
+                alt=""
+                // Image cadrée : pas d'agrandissement au survol (il changerait la zone choisie).
+                className={cn("size-full object-cover", !frameStyle(frame) && "transition-transform group-hover:scale-[1.04]")}
+                style={frameStyle(frame)}
+              />
             ) : (
               <Icon className="size-8 opacity-90" />
             )}

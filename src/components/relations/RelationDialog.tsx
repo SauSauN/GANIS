@@ -15,6 +15,8 @@ import { fullName } from "@/lib/characters";
 import { SENTIMENTS, emptyRelation } from "@/lib/relations";
 import { cn } from "@/lib/utils";
 import { usePortraitUrl, useProjectCharacters } from "@/stores/characterStore";
+import { portraitFrameKey } from "@/lib/imageFrame";
+import { useImageFrame } from "@/stores/imageFrameStore";
 import { useRelationStore } from "@/stores/relationStore";
 import type { RelationInput } from "@/types";
 import { errorText } from "@/lib/errors";
@@ -70,6 +72,7 @@ function PersonPicker({
   const { characters } = useProjectCharacters(projectId);
   const character = characters.find((c) => c.id === value);
   const url = usePortraitUrl(projectId, character);
+  const frame = useImageFrame(projectId, character ? portraitFrameKey("character", character.id) : null);
 
   return (
     <div className="flex min-w-0 flex-1 flex-col items-center gap-2">
@@ -77,6 +80,7 @@ function PersonPicker({
         colorKey={character?.id ?? "none"}
         name={character ? fullName(character) : ""}
         url={url}
+        frame={frame}
         size="xl"
         className={cn("size-14 text-lg", !character && "opacity-40")}
       />

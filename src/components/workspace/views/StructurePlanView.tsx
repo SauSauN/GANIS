@@ -536,7 +536,7 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
                 aria-selected={editing}
                 className="relative"
               >
-                <TreeGuides depth={node.depth} step={1.5} offset={1.25} />
+                <TreeGuides depth={node.depth} step={1.5} offset={1.25} subtle />
                 <div
                   // Double-clic sur la ligne : ouvre la fiche de l'élément
                   // (le clic sur le titre, lui, le renomme).

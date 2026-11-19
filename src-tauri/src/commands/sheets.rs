@@ -27,3 +27,12 @@ pub async fn set_sheet_display(
     history::touch_day(&pool).await;
     Ok(saved)
 }
+
+/// Panneau du milieu en arborescence ou en simple liste (lieux, objets…).
+#[tauri::command(rename_all = "camelCase")]
+pub async fn set_panel_tree(state: State<'_, AppState>, project_id: String, module: String, tree: bool) -> AppResult<SheetDisplay> {
+    let pool = project_storage::pool_for_request(&state, &project_id).await?;
+    let saved = sheet_display_service::set_panel_tree(&pool, &module, tree).await?;
+    history::touch_day(&pool).await;
+    Ok(saved)
+}

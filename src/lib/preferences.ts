@@ -519,3 +519,57 @@ export function setProfileFrame(change: Partial<ProfileFrame>) {
 export function useProfileFrame(): ProfileFrame {
   return useSyncExternalStore(subscribeTo(PROFILE_FRAME_EVENT), getProfileFrame);
 }
+
+// ----------------------------------------------------------------------------
+// Ordre des modules de la barre de gauche
+// ----------------------------------------------------------------------------
+
+const MODULE_ORDER_KEY = "ganis-module-order";
+const MODULE_ORDER_EVENT = "ganis:module-order-change";
+
+// Même tableau tant que la valeur enregistrée ne change pas
+// (exigé par `useSyncExternalStore`).
+let moduleOrderRaw: string | null | undefined;
+let moduleOrderCache: string[] | null = null;
+
+/** Ordre choisi (clés de `MODULE_ORDER_KEYS`), ou `null` : ordre par défaut. */
+export function getModuleOrder(): string[] | null {
+  let raw: string | null = null;
+  try {
+    raw = localStorage.getItem(MODULE_ORDER_KEY);
+  } catch {
+    /* stockage indisponible : ordre par défaut */
+  }
+
+  if (raw === moduleOrderRaw) return moduleOrderCache;
+  moduleOrderRaw = raw;
+  moduleOrderCache = null;
+
+  try {
+    const parsed: unknown = raw ? JSON.parse(raw) : null;
+    if (Array.isArray(parsed) && parsed.every((item) => typeof item === "string")) {
+      moduleOrderCache = parsed as string[];
+    }
+  } catch {
+    /* valeur illisible : ordre par défaut */
+  }
+
+  return moduleOrderCache;
+}
+
+/** Enregistre l'ordre des modules ; `null` revient à l'ordre par défaut. */
+export function setModuleOrder(order: string[] | null) {
+  try {
+    if (order) localStorage.setItem(MODULE_ORDER_KEY, JSON.stringify(order));
+    else localStorage.removeItem(MODULE_ORDER_KEY);
+  } catch {
+    /* ignoré */
+  }
+
+  window.dispatchEvent(new Event(MODULE_ORDER_EVENT));
+}
+
+/** Ordre des modules, mis à jour dès qu'il change. */
+export function useModuleOrder(): string[] | null {
+  return useSyncExternalStore(subscribeTo(MODULE_ORDER_EVENT), getModuleOrder);
+}

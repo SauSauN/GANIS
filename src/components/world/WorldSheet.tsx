@@ -41,6 +41,8 @@ export interface WorldBannerControls {
   error?: string | null;
   onPick: (file: File) => void;
   onRemove: () => void;
+  /** Clé du cadrage (fiche enregistrée) : un clic sur l'image l'ouvre en grand pour la cadrer, la remplacer ou la retirer. */
+  frameKey?: string;
 }
 
 interface WorldSheetProps {
@@ -225,6 +227,9 @@ export function WorldSheet({
             ringColors={parseList(draft.fields.colorPalette)}
             onPick={banner.onPick}
             onRemove={banner.onRemove}
+            projectId={projectId}
+            frameKey={banner.frameKey}
+            name={draft.name}
           />
           </div>
 

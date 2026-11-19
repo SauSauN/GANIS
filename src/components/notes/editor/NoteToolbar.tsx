@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { useEditorState, type Editor } from "@tiptap/react";
 import { useTranslation } from "react-i18next";
 import {
@@ -37,6 +37,7 @@ import {
 import { isSafeLink } from "@/components/notes/editor/extensions";
 import { HIGHLIGHT_COLORS, NOTE_FONT_SIZES, NOTE_FONTS, TEXT_COLORS } from "@/lib/notes";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 // ----------------------------------------------------------------------------
 // Éléments de base
@@ -71,7 +72,8 @@ function ToolButton({ icon: Icon, label, active, disabled, onClick }: ToolButton
   );
 }
 
-const Separator = () => <span aria-hidden className="mx-0.5 h-5 w-px shrink-0 bg-border" />;
+/** Trait vertical entre deux groupes de boutons (barre de mise en forme, en-tête d'une note). */
+export const Separator = () => <span aria-hidden className="mx-0.5 h-5 w-px shrink-0 bg-border" />;
 
 /** Menu déroulant léger (se ferme au clic extérieur ou avec Échap). */
 function ToolMenu({
@@ -82,6 +84,7 @@ function ToolMenu({
   children,
   wide,
   alignRight,
+  onToggle,
 }: {
   icon: LucideIcon;
   label: string;
@@ -92,11 +95,55 @@ function ToolMenu({
   wide?: boolean;
   /** Menu ouvert vers la gauche (bouton en fin de barre). */
   alignRight?: boolean;
+  /** Appelé quand le menu s'ouvre ou se ferme. */
+  onToggle?: (open: boolean) => void;
 }) {
   const [open, setOpen] = useState(false);
+  const onToggleRef = useRef(onToggle);
+  onToggleRef.current = onToggle;
+  // Accolades : l'effet ne doit rien renvoyer (React prendrait la valeur pour une fonction de nettoyage).
+  useEffect(() => {
+    onToggleRef.current?.(open);
+  }, [open]);
   const ref = useRef<HTMLDivElement>(null);
   /** Pas assez de place à droite : le menu s'ouvre vers la gauche. */
   const [toLeft, setToLeft] = useState(false);
+
+  // Le menu reste dans la zone de la note (`.note-editor`) : décalé
+  // horizontalement s'il en dépasse, et jamais plus large qu'elle.
+  // Recalculé quand son contenu change (ex. « Lien » affiche un champ).
+  const popupRef = useRef<HTMLDivElement>(null);
+  const [shift, setShift] = useState(0);
+  const shiftRef = useRef(0);
+  shiftRef.current = shift;
+  const [maxWidth, setMaxWidth] = useState<number | null>(null);
+  useLayoutEffect(() => {
+    const popup = popupRef.current;
+    if (!open || !popup) {
+      setShift(0);
+      return;
+    }
+    const MARGIN = 8;
+    const place = () => {
+      const area = (ref.current?.closest(".note-editor") ?? ref.current?.parentElement)?.getBoundingClientRect();
+      if (!area) return;
+      setMaxWidth(Math.max(0, area.width - MARGIN * 2));
+      // Position sans décalage : on retire celui déjà appliqué.
+      const rect = popup.getBoundingClientRect();
+      const current = shiftRef.current;
+      const left = rect.left - current;
+      const right = rect.right - current;
+      let next = 0;
+      if (right > area.right - MARGIN) next = area.right - MARGIN - right;
+      if (left + next < area.left + MARGIN) next = area.left + MARGIN - left;
+      setShift((previous) => (Math.abs(previous - next) < 0.5 ? previous : next));
+    };
+    place();
+    if (typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(place);
+    observer.observe(popup);
+    return () => observer.disconnect();
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -147,11 +194,14 @@ function ToolMenu({
 
       {open && (
         <div
+          ref={popupRef}
           role="menu"
+          style={{ transform: shift ? `translateX(${shift}px)` : undefined, maxWidth: maxWidth ?? undefined }}
           className={cn(
             "absolute top-full z-40 mt-1 rounded-lg border bg-popover p-1.5 text-popover-foreground shadow-lg",
             toLeft ? "right-0" : "left-0",
-            wide ? "w-56" : "w-auto",
+            // S'élargit à son contenu (ex. champ du lien dans « Plus d'outils »).
+            wide ? "w-max min-w-56" : "w-max",
           )}
         >
           {children(() => setOpen(false))}
@@ -230,9 +280,34 @@ const selectClass =
  * encadrés post-it, cases enchaînées et schémas. `system` (note système) :
  * police, taille, gras, italique, souligné, barré et listes seulement.
  */
-export function NoteToolbar({ editor, system = false }: { editor: Editor; system?: boolean }) {
+/**
+ * Annuler / Rétablir d'un éditeur, à poser hors de la barre (ex. en-tête
+ * d'une note). Suit l'état de l'éditeur (grisés quand il n'y a rien à faire).
+ */
+export function NoteHistoryButtons({ editor, className }: { editor: Editor; className?: string }) {
+  const { t } = useTranslation("notes");
+  const state = useEditorState({
+    editor,
+    selector: ({ editor: e }) => ({ canUndo: e.can().undo(), canRedo: e.can().redo() }),
+  });
+
+  return (
+    <div className={cn("flex items-center gap-0.5", className)} role="group" aria-label={t("editor.history")}>
+      <Button variant="ghost" size="icon-sm" disabled={!state.canUndo} onClick={() => editor.chain().focus().undo().run()} title={t("editor.undo")} aria-label={t("editor.undo")} className="text-muted-foreground">
+        <Undo2 className="size-4" />
+      </Button>
+      <Button variant="ghost" size="icon-sm" disabled={!state.canRedo} onClick={() => editor.chain().focus().redo().run()} title={t("editor.redo")} aria-label={t("editor.redo")} className="text-muted-foreground">
+        <Redo2 className="size-4" />
+      </Button>
+    </div>
+  );
+}
+
+export function NoteToolbar({ editor, system = false, history = true }: { editor: Editor; system?: boolean; history?: boolean }) {
   const { t } = useTranslation("notes");
   const [linkDraft, setLinkDraft] = useState("");
+  /** Menu « Plus d'outils » : champ du lien affiché à la place des outils. */
+  const [linkOpen, setLinkOpen] = useState(false);
 
   // Relu à chaque changement de sélection ou de contenu.
   const state = useEditorState({
@@ -294,15 +369,59 @@ export function NoteToolbar({ editor, system = false }: { editor: Editor; system
     close();
   }
 
+  /** Champ d'adresse du lien (dans « Plus d'outils »). */
+  const linkForm = (close: () => void) => (
+    <form
+      className="flex w-72 max-w-full flex-col gap-2 p-1"
+      onSubmit={(event) => {
+        event.preventDefault();
+        applyLink(close);
+      }}
+    >
+      <input
+        autoFocus
+        defaultValue={state.linkHref}
+        onChange={(event) => setLinkDraft(event.target.value)}
+        onFocus={(event) => setLinkDraft(event.target.value)}
+        placeholder="https://…"
+        aria-label={t("editor.link.url")}
+        className="h-8 rounded border border-input bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-ring"
+      />
+      <div className="flex justify-end gap-2">
+        {state.link && (
+          <button
+            type="button"
+            onClick={() => {
+              chain().extendMarkRange("link").unsetLink().run();
+              close();
+            }}
+            className="flex items-center gap-1 rounded px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
+          >
+            <Unlink className="size-3.5" />
+            {t("editor.link.remove")}
+          </button>
+        )}
+        <button type="submit" className="rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90">
+          {t("editor.link.apply")}
+        </button>
+      </div>
+    </form>
+  );
+
   return (
     <div
       role="toolbar"
       aria-label={t("editor.toolbar")}
       className="sticky top-0 z-30 flex flex-wrap items-center gap-0.5 border-b bg-card/95 px-2 py-1.5 backdrop-blur"
     >
-      <ToolButton icon={Undo2} label={t("editor.undo")} disabled={!state.canUndo} onClick={() => chain().undo().run()} />
-      <ToolButton icon={Redo2} label={t("editor.redo")} disabled={!state.canRedo} onClick={() => chain().redo().run()} />
-      <Separator />
+      {/* Sans `history`, Annuler / Rétablir sont posés ailleurs (en-tête de la note). */}
+      {history && (
+        <>
+          <ToolButton icon={Undo2} label={t("editor.undo")} disabled={!state.canUndo} onClick={() => chain().undo().run()} />
+          <ToolButton icon={Redo2} label={t("editor.redo")} disabled={!state.canRedo} onClick={() => chain().redo().run()} />
+          <Separator />
+        </>
+      )}
 
       {/* Style de paragraphe */}
       {!system && (
@@ -408,57 +527,14 @@ export function NoteToolbar({ editor, system = false }: { editor: Editor; system
       <ToolButton icon={AlignRight} label={t("editor.align.right")} active={state.align === "right"} onClick={() => chain().setTextAlign("right").run()} />
       </>
       )}
+      {/* Listes : toujours dans la barre. Citation et lien sont rangés dans « Plus d'outils » (…). */}
       <Separator />
-
       <ToolButton icon={List} label={t("editor.bulletList")} active={state.bullet} onClick={() => chain().toggleBulletList().run()} />
       <ToolButton icon={ListOrdered} label={t("editor.orderedList")} active={state.ordered} onClick={() => chain().toggleOrderedList().run()} />
       <ToolButton icon={ListChecks} label={t("editor.taskList")} active={state.task} onClick={() => chain().toggleTaskList().run()} />
 
       {!system && (
       <>
-      <Separator />
-
-      <ToolButton icon={Quote} label={t("editor.quote")} active={state.quote} onClick={() => chain().toggleBlockquote().run()} />
-
-      <ToolMenu icon={Link2} label={t("editor.link.label")} active={state.link}>
-        {(close) => (
-          <form
-            className="flex w-72 flex-col gap-2 p-1"
-            onSubmit={(event) => {
-              event.preventDefault();
-              applyLink(close);
-            }}
-          >
-            <input
-              autoFocus
-              defaultValue={state.linkHref}
-              onChange={(event) => setLinkDraft(event.target.value)}
-              onFocus={(event) => setLinkDraft(event.target.value)}
-              placeholder="https://…"
-              aria-label={t("editor.link.url")}
-              className="h-8 rounded border border-input bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-ring"
-            />
-            <div className="flex justify-end gap-2">
-              {state.link && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    chain().extendMarkRange("link").unsetLink().run();
-                    close();
-                  }}
-                  className="flex items-center gap-1 rounded px-2 py-1 text-xs text-muted-foreground hover:bg-accent"
-                >
-                  <Unlink className="size-3.5" />
-                  {t("editor.link.remove")}
-                </button>
-              )}
-              <button type="submit" className="rounded bg-primary px-3 py-1 text-xs text-primary-foreground hover:bg-primary/90">
-                {t("editor.link.apply")}
-              </button>
-            </div>
-          </form>
-        )}
-      </ToolMenu>
       <Separator />
 
       {/* Tableau */}
@@ -511,7 +587,10 @@ export function NoteToolbar({ editor, system = false }: { editor: Editor; system
         icon={MoreHorizontal}
         label={t("editor.more")}
         alignRight
-        active={state.sup || state.sub || state.code || state.codeBlock || state.align === "justify"}
+        active={state.sup || state.sub || state.code || state.codeBlock || state.align === "justify" || state.quote || state.link}
+        onToggle={(open) => {
+          if (!open) setLinkOpen(false);
+        }}
         wide
       >
         {(close) => {
@@ -538,8 +617,25 @@ export function NoteToolbar({ editor, system = false }: { editor: Editor; system
               </button>
             );
           };
+          // « Lien » : le champ d'adresse s'affiche dans le menu.
+          if (linkOpen) return linkForm(close);
           return (
             <>
+              {/* Citation et lien : rangés ici pour alléger la barre. */}
+              {item(Quote, t("editor.quote"), state.quote, () => chain().toggleBlockquote().run())}
+              <button
+                type="button"
+                role="menuitem"
+                aria-haspopup="dialog"
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => setLinkOpen(true)}
+                className={cn("flex h-8 w-full items-center gap-2 rounded px-2 text-left text-sm hover:bg-accent", state.link && "text-primary")}
+              >
+                <Link2 className="size-4" />
+                <span className="flex-1">{t("editor.link.label")}</span>
+                {state.link && <span aria-hidden>✓</span>}
+              </button>
+              <div className="my-1 h-px bg-border" />
               {item(SupIcon, t("editor.superscript"), state.sup, () => chain().toggleSuperscript().run())}
               {item(SubIcon, t("editor.subscript"), state.sub, () => chain().toggleSubscript().run())}
               {item(Code, t("editor.code"), state.code, () => chain().toggleCode().run())}

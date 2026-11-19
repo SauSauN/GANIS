@@ -180,6 +180,7 @@
     "invalidType": "Unknown location type.",
     "parentNotFound": "The parent location was not found.",
     "parentCycle": "A location cannot be placed inside itself or inside a place it contains.",
+    "tooDeep": "Locations can’t be nested more than {{max}} levels deep.",
     "unknownField": "Unknown sheet field.",
     "typeNameRequired": "Enter the type's name.",
     "invalidCategory": "Unknown category.",
@@ -346,6 +347,7 @@
     "structure": "Unable to load the structure.",
     "trash": "Unable to load the trash.",
     "manga": "Unable to load the manga data.",
+    "series": "Could not load the series script.",
     "placeLinks": "Unable to load character–location links.",
     "search": "Search failed.",
     "manuscript": "Unable to assemble the manuscript.",
@@ -408,6 +410,7 @@
     "parentNotFound": "The parent element can’t be found.",
     "parentNotSpecies": "A specific animal or plant can’t group anything: choose a species.",
     "parentCycle": "An element can’t be placed inside itself or inside an element it contains.",
+    "tooDeep": "Elements can’t be nested more than {{max}} levels deep.",
     "invalidCategory": "Unknown category.",
     "noCategory": "Keep at least one category (or turn the module off).",
     "invalidLevel": "Unknown detail level.",
@@ -441,5 +444,8 @@
   },
   "sheets": {
     "invalidModule": "Unknown module."
+  },
+  "profile": {
+    "tooLong": "A profile field is too long."
   }
 }

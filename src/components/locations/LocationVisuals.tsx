@@ -2,7 +2,10 @@ import { useRef, useState, type DragEvent } from "react";
 import { useConfirmImageRemoval } from "@/components/common/useConfirmImageRemoval";
 import { PaletteFrame } from "@/components/common/PaletteFrame";
 import { useTranslation } from "react-i18next";
-import { ImagePlus, Loader2, Trash2 } from "lucide-react";
+import { ImagePlus, Loader2, Maximize2, Trash2 } from "lucide-react";
+import { ImageDialog } from "@/components/common/ImageDialog";
+import { frameStyle, portraitFrameKey } from "@/lib/imageFrame";
+import { useImageFrame } from "@/stores/imageFrameStore";
 import {
   categoryBackdrop,
   categoryTint,
@@ -79,6 +82,7 @@ export function LocationThumb({
   className?: string;
 }) {
   const url = useLocationImageUrl(projectId, location);
+  const frame = useImageFrame(projectId, portraitFrameKey("location", location.id));
   const category = findType(location.type, customTypes)?.category;
   const Icon = typeIcon(location.type, category);
 
@@ -93,7 +97,7 @@ export function LocationThumb({
       aria-hidden="true"
     >
       {url ? (
-        <img src={url} alt="" className="size-full object-cover" />
+        <img src={url} alt="" className="size-full object-cover" style={frameStyle(frame)} />
       ) : (
         <Icon className={THUMB_ICONS[size]} />
       )}
@@ -118,6 +122,11 @@ interface BannerPickerProps {
   onRemove: () => void;
   /** Grande image de la fiche : remplit la hauteur de la carte (écran large). */
   tall?: boolean;
+  /** Projet et clé du cadrage (fiche enregistrée) : un clic sur l'image l'ouvre en grand. */
+  projectId?: string;
+  frameKey?: string;
+  /** Nom de la fiche (titre de la fenêtre de l'image). */
+  name?: string;
 }
 
 /**
@@ -136,8 +145,11 @@ export function BannerPicker({
   tall = false,
   onPick,
   onRemove,
+  projectId,
+  frameKey,
+  name = "",
 }: BannerPickerProps) {
-  const { t } = useTranslation("locations");
+  const { t } = useTranslation(["locations", "common"]);
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -168,8 +180,13 @@ export function BannerPicker({
   // Un seul élément qui change d'état : sans image, un clic en ajoute une ;
   // avec une image, un clic la retire. Le survol montre l'action. On peut
   // aussi déposer une image (elle remplace l'actuelle).
-  const actionLabel = url ? t("image.remove") : t("image.choose");
-  const ActionIcon = url ? Trash2 : ImagePlus;
+  // Fiche enregistrée : un clic ouvre l'image en grand (cadrer, remplacer,
+  // retirer). À la création, un clic la retire.
+  const [viewing, setViewing] = useState(false);
+  const canView = Boolean(url && projectId && frameKey);
+  const frame = useImageFrame(projectId, frameKey);
+  const actionLabel = url ? (canView ? t("common:image.open") : t("image.remove")) : t("image.choose");
+  const ActionIcon = url ? (canView ? Maximize2 : Trash2) : ImagePlus;
 
   const removal = useConfirmImageRemoval(() => onRemove());
 
@@ -179,7 +196,7 @@ export function BannerPicker({
       <button
         type="button"
         disabled={locked}
-        onClick={() => (url ? removal.ask() : inputRef.current?.click())}
+        onClick={() => (url ? (canView ? setViewing(true) : removal.ask()) : inputRef.current?.click())}
         onDragOver={onDragOver}
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
@@ -196,7 +213,7 @@ export function BannerPicker({
         style={url ? undefined : categoryBackdrop(category)}
       >
         {url ? (
-          <img src={url} alt="" className="size-full object-cover" />
+          <img src={url} alt="" className="size-full object-cover" style={frameStyle(frame)} />
         ) : (
           <Icon
             className={cn(
@@ -248,6 +265,18 @@ export function BannerPicker({
         <p role="alert" className="text-center text-xs text-destructive">
           {error}
         </p>
+      )}
+      {viewing && url && projectId && frameKey && (
+        <ImageDialog
+          open
+          onClose={() => setViewing(false)}
+          projectId={projectId}
+          frameKey={frameKey}
+          url={url}
+          name={name}
+          onReplace={onPick}
+          onRemove={onRemove}
+        />
       )}
       {removal.dialog}
     </div>

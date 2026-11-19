@@ -8,6 +8,7 @@ import { TreeGuides } from "@/components/common/TreeGuides";
 import { activeGuide } from "@/lib/treeGuides";
 import { cn } from "@/lib/utils";
 import { useProjectLocations } from "@/stores/locationStore";
+import { useSheetDisplay } from "@/stores/sheetDisplayStore";
 
 interface SideBarLocationsProps {
   projectId: string;
@@ -24,10 +25,17 @@ export function SideBarLocations({ projectId, activeTab, onOpenFeature }: SideBa
   const { t } = useTranslation("locations");
   const { locations, settings, loaded } = useProjectLocations(projectId);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  // Paramètres du projet › Lieux : arborescence (défaut) ou simple liste.
+  const { panelTree } = useSheetDisplay(projectId, "location");
 
   const rows = useMemo(
-    () => flattenTree(buildLocationTree(locations), collapsed),
-    [locations, collapsed],
+    () =>
+      panelTree
+        ? flattenTree(buildLocationTree(locations), collapsed)
+        : [...locations]
+            .sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" }))
+            .map((location) => ({ location, depth: 0, children: [] })),
+    [locations, collapsed, panelTree],
   );
   const guideOf = activeGuide(
     rows.map((row) => row.depth),
@@ -58,7 +66,7 @@ export function SideBarLocations({ projectId, activeTab, onOpenFeature }: SideBa
       ) : locations.length === 0 ? (
         <p className="px-4 text-xs text-muted-foreground">{t("sidebar.empty")}</p>
       ) : (
-        <ul className="min-h-0 flex-1 overflow-y-auto px-2 pb-2" role="tree">
+        <ul className="min-h-0 flex-1 overflow-y-auto px-2 pb-2" role={panelTree ? "tree" : undefined}>
           {rows.map(({ location, depth, children }, index) => {
             const tabId = locationTabId(location.id);
             const active = activeTab === tabId;
@@ -69,25 +77,28 @@ export function SideBarLocations({ projectId, activeTab, onOpenFeature }: SideBa
                 {(onContextMenu) => (
                   <li
                     onContextMenu={onContextMenu}
-                    role="treeitem"
-                    aria-level={depth + 1}
-                    aria-expanded={children.length > 0 ? open : undefined}
+                    role={panelTree ? "treeitem" : undefined}
+                    aria-level={panelTree ? depth + 1 : undefined}
+                    aria-expanded={panelTree && children.length > 0 ? open : undefined}
                     className="relative flex items-center"
                     style={{ paddingLeft: `${depth * 0.875}rem` }}
                   >
                     <TreeGuides depth={depth} active={guideOf(index)} />
-                    <button
-                      type="button"
-                      tabIndex={children.length > 0 ? 0 : -1}
-                      onClick={() => toggle(location.id)}
-                      aria-label={open ? t("list.collapse") : t("list.expand")}
-                      className={cn(
-                        "flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent",
-                        children.length === 0 && "invisible",
+                    {/* Simple liste : pas de flèche (rien à replier). */}
+                    {panelTree && (
+                      <button
+                        type="button"
+                        tabIndex={children.length > 0 ? 0 : -1}
+                        onClick={() => toggle(location.id)}
+                        aria-label={open ? t("list.collapse") : t("list.expand")}
+                        className={cn(
+                          "flex size-6 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-sidebar-accent",
+                          children.length === 0 && "invisible",
                       )}
                     >
                       {open ? <ChevronDown className="size-3.5" /> : <ChevronRight className="size-3.5" />}
                     </button>
+                    )}
 
                     <button
                       type="button"
