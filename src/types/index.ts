@@ -20,8 +20,22 @@ export interface User {
   username: string;
   email?: string | null;
   role: Role;
+  /** Profil d'auteur (facultatif ; chiffré sur l'appareil). */
+  profile?: AuthorProfile;
   createdAt: string; // RFC 3339, UTC
   updatedAt: string; // RFC 3339, UTC
+}
+
+/** Informations facultatives ajoutées au compte par l'auteur. Un champ vide n'est pas renseigné. */
+export interface AuthorProfile {
+  /** Nom d'auteur (nom de plume). */
+  penName: string;
+  /** Prénom et nom. */
+  fullName: string;
+  /** Site web ou réseau social. */
+  website: string;
+  /** Courte biographie. */
+  bio: string;
 }
 
 /**

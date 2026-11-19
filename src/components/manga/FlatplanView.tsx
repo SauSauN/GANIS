@@ -1,4 +1,5 @@
 import { useMemo, useState, type ReactNode } from "react";
+import { SEGMENTED_GROUP, SEGMENTED_ITEM, SEGMENTED_ON } from "@/components/common/segmented";
 import { useTranslation } from "react-i18next";
 import {
   AlertTriangle,
@@ -385,7 +386,7 @@ function Segmented<T extends string>({
   onChange: (value: T) => void;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} title={label} className="inline-flex h-8 items-center rounded-lg border bg-background p-0.5">
+    <div role="radiogroup" aria-label={label} title={label} className={SEGMENTED_GROUP}>
       {options.map((option) => {
         const Icon = option.icon;
         const checked = option.value === value;
@@ -399,8 +400,8 @@ function Segmented<T extends string>({
             title={option.label}
             onClick={() => onChange(option.value)}
             className={cn(
-              "flex h-full items-center gap-1.5 rounded-md px-2 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-              checked && "bg-primary text-primary-foreground hover:text-primary-foreground",
+              SEGMENTED_ITEM,
+              checked && SEGMENTED_ON,
             )}
           >
             <Icon className="size-4" aria-hidden="true" />

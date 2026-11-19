@@ -6,6 +6,7 @@ import { Folder, FolderLock, Pin, RefreshCw, Trash2 } from "lucide-react";
 import { ConfirmDialog } from "@/components/notes/ConfirmDialog";
 import { FolderSelect, formatNoteDate } from "@/components/notes/FolderSelect";
 import { NoteEditor } from "@/components/notes/editor/NoteEditor";
+import { NoteHistoryButtons, Separator } from "@/components/notes/editor/NoteToolbar";
 import { Button } from "@/components/ui/button";
 import { api, ApiError } from "@/lib/api";
 import { makeExcerpt, MAX_NOTE_TITLE, parseNoteContent } from "@/lib/notes";
@@ -160,8 +161,12 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
     setContentVersion(versionRef.current);
   }, []);
 
-  const onEditorReady = useCallback((editor: Editor) => {
-    editorRef.current = editor;
+  /** Éditeur prêt, pour Annuler / Rétablir dans l'en-tête. */
+  const [editor, setEditor] = useState<Editor | null>(null);
+
+  const onEditorReady = useCallback((ready: Editor) => {
+    editorRef.current = ready;
+    setEditor(ready);
   }, []);
 
   // --- Actions immédiates --------------------------------------------------------
@@ -219,7 +224,8 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
   return (
     <main className="relative flex min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]">
       <div className="mx-auto w-full max-w-5xl px-6 py-6 pb-24 lg:px-10">
-        <header className="mb-4 space-y-3">
+        {/* En-tête dans une carte de la même couleur que la zone d'écriture (voir NoteEditor). */}
+        <header className="mb-4 space-y-3 rounded-xl border bg-card px-6 py-4 shadow-sm sm:px-10">
           {note.system && (
             <p className="flex items-start gap-2 rounded-lg border border-primary/30 bg-primary/5 px-3 py-2 text-sm">
               <FolderLock className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
@@ -251,12 +257,19 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
               />
             </label>
 
-            <span aria-hidden="true">·</span>
+            <Separator />
             <span className="min-w-0 truncate px-1 tabular-nums">
               {t("edit.updated", { date: formatNoteDate(note.updatedAt, i18n.language) })}
             </span>
 
             <div className="ml-auto flex shrink-0 items-center gap-0.5">
+              {/* Annuler / Rétablir à gauche des autres actions, séparés par un trait. */}
+              {editor && !editor.isDestroyed && (
+                <>
+                  <NoteHistoryButtons editor={editor} />
+                  <Separator />
+                </>
+              )}
               <Button
                 variant="ghost"
                 size="icon-sm"
@@ -290,7 +303,7 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
                   </Button>
                 </>
               )}
-              <span className="mx-1.5 h-4 w-px bg-border" aria-hidden="true" />
+              <Separator />
               {/* Toujours le même bouton (pas de fond qui apparaît, pas d'animation) :
                   seule la couleur du texte signale qu'il y a quelque chose à enregistrer. */}
               <SaveButton
@@ -313,6 +326,7 @@ export function NoteEditView({ projectId, noteId, onClose, onOpenFeature }: Note
           onChange={onEditorChange}
           onReady={onEditorReady}
           system={note.system}
+          history={false}
         />
       </div>
 

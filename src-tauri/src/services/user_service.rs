@@ -1,7 +1,7 @@
 //! Service de gestion des utilisateurs.
 
 use crate::error::{AppError, AppResult};
-use crate::models::user::{Role, User};
+use crate::models::user::{AuthorProfile, Role, User};
 use crate::security::{aad, crypto, crypto::SecretKey};
 use sqlx::SqlitePool;
 
@@ -27,7 +27,72 @@ pub fn reveal(mut user: User, key: &SecretKey) -> AppResult<User> {
         user.email = Some(crypto::open_text(key, &email_aad(&user.id), &sealed)?);
     }
 
+    if let Some(sealed) = user.profile_sealed.take() {
+        let json = crypto::open_text(key, &profile_aad(&user.id), &sealed)?;
+        // Profil illisible (format inconnu) : on repart d'un profil vide plutôt que de bloquer la connexion.
+        user.profile = serde_json::from_str(&json).unwrap_or_default();
+    }
+
     Ok(user)
+}
+
+// ----------------------------------------------------------------------------
+// Profil d'auteur chiffré
+// ----------------------------------------------------------------------------
+
+fn profile_aad(user_id: &str) -> String {
+    aad::field("users", "profile", user_id)
+}
+
+/// Nettoie un profil saisi : espaces retirés aux bords, longueurs vérifiées.
+pub fn normalize_profile(profile: AuthorProfile) -> AppResult<AuthorProfile> {
+    let clean = AuthorProfile {
+        pen_name: profile.pen_name.trim().to_string(),
+        full_name: profile.full_name.trim().to_string(),
+        website: profile.website.trim().to_string(),
+        bio: profile.bio.trim().to_string(),
+    };
+
+    let too_long = clean.pen_name.chars().count() > AuthorProfile::MAX_NAME
+        || clean.full_name.chars().count() > AuthorProfile::MAX_NAME
+        || clean.website.chars().count() > AuthorProfile::MAX_WEBSITE
+        || clean.bio.chars().count() > AuthorProfile::MAX_BIO;
+
+    if too_long {
+        return Err(AppError::validation("Un champ du profil est trop long.").with_key("profile.tooLong"));
+    }
+
+    Ok(clean)
+}
+
+/// Chiffre le profil d'auteur d'un compte (`None` s'il est vide).
+pub fn seal_profile(key: &SecretKey, user_id: &str, profile: &AuthorProfile) -> AppResult<Option<String>> {
+    if profile.is_empty() {
+        return Ok(None);
+    }
+
+    let json = serde_json::to_string(profile)
+        .map_err(|e| AppError::internal(format!("Profil illisible : {e}")))?;
+    Ok(Some(crypto::seal_text(key, &profile_aad(user_id), &json)?))
+}
+
+/// Enregistre le profil d'auteur chiffré d'un utilisateur (`None` l'efface).
+pub async fn update_profile_sealed(pool: &SqlitePool, id: &str, profile_sealed: Option<&str>) -> AppResult<User> {
+    let result = sqlx::query("UPDATE users SET profile_sealed = ?, updated_at = ? WHERE id = ?")
+        .bind(profile_sealed)
+        .bind(crate::utils::now_utc())
+        .bind(id)
+        .execute(pool)
+        .await
+        .map_err(|e| AppError::database(e).with_detail("Échec de la mise à jour du profil"))?;
+
+    if result.rows_affected() == 0 {
+        return Err(AppError::not_found("Utilisateur non trouvé.").with_key("user.notFound"));
+    }
+
+    find_by_id(pool, id)
+        .await?
+        .ok_or_else(|| AppError::internal("Utilisateur introuvable après la mise à jour."))
 }
 
 /// Récupère un utilisateur par son identifiant.
@@ -39,6 +104,7 @@ pub async fn find_by_id(pool: &SqlitePool, id: &str) -> AppResult<Option<User>> 
             username,
             email,
             email_sealed,
+            profile_sealed,
             role,
             password_hash,
             password_salt,
@@ -71,6 +137,7 @@ pub async fn find_by_username(
             username,
             email,
             email_sealed,
+            profile_sealed,
             role,
             password_hash,
             password_salt,
@@ -105,6 +172,7 @@ pub async fn list_all(pool: &SqlitePool) -> AppResult<Vec<User>> {
             username,
             email,
             email_sealed,
+            profile_sealed,
             role,
             password_hash,
             password_salt,
@@ -278,4 +346,60 @@ pub async fn delete_by_id(pool: &SqlitePool, id: &str) -> AppResult<()> {
         })?;
 
     Ok(())
+}
+
+#[cfg(test)]
+mod profile_tests {
+    use super::*;
+
+    fn user(id: &str) -> User {
+        User {
+            id: id.to_string(),
+            username: "auteur".to_string(),
+            email: None,
+            email_sealed: None,
+            profile_sealed: None,
+            profile: AuthorProfile::default(),
+            role: Role::User,
+            password_hash: String::new(),
+            password_salt: String::new(),
+            created_at: String::new(),
+            updated_at: String::new(),
+        }
+    }
+
+    #[test]
+    fn profil_chiffre_puis_dechiffre() {
+        let key = SecretKey::generate();
+        let profile = AuthorProfile {
+            pen_name: "C. Durand".into(),
+            full_name: "Camille Durand".into(),
+            website: "https://exemple.fr".into(),
+            bio: "Autrice de romans policiers.".into(),
+        };
+
+        let sealed = seal_profile(&key, "u1", &profile).unwrap().expect("profil non vide");
+        assert!(!sealed.contains("Durand"), "le profil ne doit pas être en clair");
+
+        let mut stored = user("u1");
+        stored.profile_sealed = Some(sealed.clone());
+        assert_eq!(reveal(stored, &key).unwrap().profile, profile);
+
+        // Lié au compte : illisible sous l'identifiant d'un autre compte.
+        let mut other = user("u2");
+        other.profile_sealed = Some(sealed);
+        assert!(reveal(other, &key).is_err());
+    }
+
+    #[test]
+    fn profil_vide_efface_et_trop_long_refuse() {
+        let key = SecretKey::generate();
+        assert_eq!(seal_profile(&key, "u1", &AuthorProfile::default()).unwrap(), None);
+
+        let clean = normalize_profile(AuthorProfile { pen_name: "  Nom  ".into(), ..Default::default() }).unwrap();
+        assert_eq!(clean.pen_name, "Nom");
+
+        let long = AuthorProfile { bio: "a".repeat(AuthorProfile::MAX_BIO + 1), ..Default::default() };
+        assert!(normalize_profile(long).is_err());
+    }
 }

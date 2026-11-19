@@ -444,5 +444,8 @@
   },
   "sheets": {
     "invalidModule": "Module inconnu."
+  },
+  "profile": {
+    "tooLong": "Un champ du profil est trop long."
   }
 }

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
+import { SEGMENTED_GROUP, SEGMENTED_ITEM, SEGMENTED_ON } from "@/components/common/segmented";
 import { useTranslation } from "react-i18next";
 import {
   ArrowRight,
@@ -276,7 +277,8 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
         >
           {toc ? <PanelLeftClose /> : <PanelLeftOpen />}
         </Button>
-        <div className="flex overflow-hidden rounded-md border text-xs" role="tablist" aria-label={t("tour.order")}>
+        {/* Même sélecteur que le Chemin de fer : cadre, choix actif en bleu. */}
+        <div className={SEGMENTED_GROUP} role="tablist" aria-label={t("tour.order")}>
           {modes.map((m) => (
             <button
               key={m}
@@ -288,13 +290,13 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
                 setMode(m);
                 if (m === "lane" && current) setLaneId(current.laneId);
               }}
-              className={cn("min-h-8 px-3 font-medium hover:bg-muted", mode === m && "bg-foreground text-background hover:bg-foreground")}
+              className={cn(SEGMENTED_ITEM, mode === m && SEGMENTED_ON)}
             >
               {t(`reading.modes.${m as "structure" | "lane"}`)}
             </button>
           ))}
         </div>
-        <div className="flex overflow-hidden rounded-md border text-xs" role="group" aria-label={t("reading.display")}>
+        <div className={SEGMENTED_GROUP} role="group" aria-label={t("reading.display")}>
           <button
             type="button"
             aria-pressed={!continuous}
@@ -304,7 +306,7 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
               setContinuous(false);
               setPref(MODE_KEY, "step");
             }}
-            className={cn("inline-flex min-h-8 items-center px-2.5 hover:bg-muted", !continuous && "bg-muted")}
+            className={cn(SEGMENTED_ITEM, !continuous && SEGMENTED_ON)}
           >
             <StepForward className="size-4" />
           </button>
@@ -317,7 +319,7 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
               setContinuous(true);
               setPref(MODE_KEY, "continuous");
             }}
-            className={cn("inline-flex min-h-8 items-center px-2.5 hover:bg-muted", continuous && "bg-muted")}
+            className={cn(SEGMENTED_ITEM, continuous && SEGMENTED_ON)}
           >
             <Rows3 className="size-4" />
           </button>

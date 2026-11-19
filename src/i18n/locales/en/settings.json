@@ -78,6 +78,20 @@
       "passwordRequired": "Enter your password to confirm.",
       "confirmRequired": "Tick the box to confirm.",
       "failed": "Unable to delete the account."
+    },
+    "profile": {
+      "title": "Author profile",
+      "description": "Optional. This information introduces you as an author; it is encrypted and stays on this device.",
+      "penName": "Author name",
+      "penNamePlaceholder": "E.g. the name on your books",
+      "fullName": "Full name",
+      "fullNamePlaceholder": "First and last name",
+      "website": "Website or social link",
+      "websitePlaceholder": "E.g. https://mysite.com",
+      "bio": "Biography",
+      "bioPlaceholder": "A few lines about you",
+      "updated": "Author profile saved.",
+      "failed": "Couldn't save the author profile."
     }
   },
   "appearance": {

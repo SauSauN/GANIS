@@ -78,6 +78,20 @@
       "passwordRequired": "Saisissez votre mot de passe pour confirmer.",
       "confirmRequired": "Cochez la case pour confirmer.",
       "failed": "Impossible de supprimer le compte."
+    },
+    "profile": {
+      "title": "Profil d'auteur",
+      "description": "Facultatif. Ces informations vous présentent comme auteur ; elles sont chiffrées et restent sur cet appareil.",
+      "penName": "Nom d'auteur",
+      "penNamePlaceholder": "Ex. le nom qui figure sur vos livres",
+      "fullName": "Nom complet",
+      "fullNamePlaceholder": "Prénom et nom",
+      "website": "Site web ou réseau",
+      "websitePlaceholder": "Ex. https://monsite.fr",
+      "bio": "Biographie",
+      "bioPlaceholder": "Quelques lignes pour vous présenter",
+      "updated": "Profil d'auteur enregistré.",
+      "failed": "Impossible d'enregistrer le profil d'auteur."
     }
   },
   "appearance": {

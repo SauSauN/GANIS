@@ -22,6 +22,15 @@ const MANGA = "Manga E2E";
 const SERIE = "Série E2E";
 const PUBLIC = "Projet public E2E";
 
+/** Hauteur d'un choix des sélecteurs (Graphe / Matrice / Liste, Par plan / Par trame…) : la même partout. */
+const SEGMENTED_HEIGHT = 26;
+async function expectSegmentedHeight(choice: import("@playwright/test").Locator) {
+  const box = await choice.boundingBox();
+  expect(box).toBeTruthy();
+  // Moins d'un pixel d'écart : arrondis de l'affichage (mise à l'échelle de Windows).
+  expect(Math.abs(box!.height - SEGMENTED_HEIGHT)).toBeLessThan(1);
+}
+
 let app: GanisApp;
 let page: Page;
 
@@ -424,6 +433,7 @@ test.describe("Personnages", () => {
     await root.selectOption({ label: "Aldric VENN" });
     await expect(root).toHaveValue(/.+/);
     await layout.selectOption({ label: "Réseau" });
+    await expectSegmentedHeight(view().getByRole("radio", { name: "Graphe" }));
   });
 });
 
@@ -648,6 +658,7 @@ test.describe("Découpage et trame", () => {
     await view().getByRole("tab", { name: "Par trame" }).click();
     await expect(view().getByRole("combobox", { name: "Trame à parcourir" })).toBeVisible();
     if (process.env.GANIS_E2E_SHOTS) await view().screenshot({ path: `${process.env.GANIS_E2E_SHOTS}/lecture-par-trame.png` });
+    await expectSegmentedHeight(view().getByRole("tab", { name: "Par trame" }));
     await view().getByRole("tab", { name: "Par plan" }).click();
   });
 
@@ -705,6 +716,39 @@ test.describe("Notes", () => {
     await editeur.click();
     await page.keyboard.type("Le climat y est froid toute l'année.");
     await save();
+
+    // « Plus d'outils » (…) : s'ouvre, se ferme et se rouvre sans faire planter l'onglet.
+    const plus = view().getByRole("button", { name: "Plus d'outils" });
+    await plus.click();
+    await plus.click();
+    await plus.click();
+    await view().getByRole("menuitem", { name: "Lien" }).click();
+    await expect(view().getByLabel("Adresse du lien").or(view().getByPlaceholder("https://…"))).toBeVisible();
+    // Le menu (avec le champ du lien) reste dans la zone de la note.
+    const zone = await view().locator(".note-editor").first().boundingBox();
+    const menu = await view().locator(".note-editor [role=menu]").first().boundingBox();
+    expect(zone && menu).toBeTruthy();
+    expect(menu!.x).toBeGreaterThanOrEqual(zone!.x);
+    expect(menu!.x + menu!.width).toBeLessThanOrEqual(zone!.x + zone!.width + 0.5);
+    await page.keyboard.press("Escape");
+    await plus.click();
+    await expect(view().getByRole("menuitemcheckbox", { name: "Citation" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByText("Cet onglet n'a pas pu s'afficher")).toHaveCount(0);
+
+    // Clic droit dans le texte : le menu de l'app (pas celui du navigateur).
+    await editeur.click({ button: "right" });
+    const edition = page.getByRole("menu", { name: "Édition" });
+    await expect(edition).toBeVisible();
+    for (const action of ["Couper", "Copier", "Coller", "Tout sélectionner"]) {
+      await expect(edition.getByRole("menuitem", { name: action })).toBeVisible();
+    }
+    await edition.getByRole("menuitem", { name: "Tout sélectionner" }).click();
+    await expect(edition).toHaveCount(0);
+    // Texte sélectionné : Copier devient possible.
+    await editeur.click({ button: "right" });
+    await expect(page.getByRole("menu", { name: "Édition" }).getByRole("menuitem", { name: "Copier" })).toBeEnabled();
+    await page.keyboard.press("Escape");
   });
 
   test("liste des notes et recherche", async () => {
@@ -839,6 +883,8 @@ test.describe("Manga", () => {
       await expect(tabs().getByRole("tab", { name: new RegExp(feature) })).toBeVisible();
       await expect(page.getByText(/Une erreur (est survenue|d'affichage)/)).toHaveCount(0);
     }
+    await openFeature("Scénario", "Chemin de fer");
+    await expectSegmentedHeight(view().getByRole("radio", { name: "Scénario et dessin" }));
   });
 
   test("continuité du manga : case par case et tableau des présences", async () => {
@@ -969,6 +1015,20 @@ test.describe("Paramètres généraux", () => {
         await expect(main).toContainText(section);
       }
     }
+  });
+
+  test("compte : profil d'auteur enregistré et affiché", async () => {
+    await go("/settings");
+    const main = page.getByRole("main").first();
+    const compte = page.getByRole("button", { name: /Compte/ }).or(page.getByRole("tab", { name: /Compte/ })).first();
+    if (await compte.isVisible().catch(() => false)) await compte.click();
+
+    await page.getByLabel("Nom d'auteur").fill("C. Durand");
+    await page.getByLabel("Biographie").fill("Autrice de romans policiers.");
+    await page.getByRole("button", { name: "Enregistrer" }).first().click();
+    await expect(page.getByText("Profil d'auteur enregistré.")).toBeVisible();
+    // Repris dans « Informations du compte ».
+    await expect(main).toContainText("C. Durand");
   });
 
   test("packages : les thèmes système et le choix d'un thème", async () => {

@@ -119,6 +119,7 @@ pub fn run() {
             //commands::users::update_user_role,
             //commands::users::delete_user,
             commands::users::update_profile,
+            commands::users::update_author_profile,
             commands::users::change_password,
             commands::users::delete_account,
             commands::projects::create_project,

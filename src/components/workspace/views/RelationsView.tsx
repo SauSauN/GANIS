@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { SEGMENTED_GROUP, SEGMENTED_ITEM, SEGMENTED_ON } from "@/components/common/segmented";
 import { useTranslation } from "react-i18next";
 import {
   ArrowLeftRight,
@@ -699,7 +700,7 @@ function ModeSwitch({ mode, onChange }: { mode: ViewMode; onChange: (mode: ViewM
   const icons = { graph: Network, matrix: Grid3x3, list: List };
 
   return (
-    <div role="radiogroup" aria-label="Affichage" className="flex h-8 items-stretch rounded-lg border bg-muted/40 p-0.5">
+    <div role="radiogroup" aria-label="Affichage" className={SEGMENTED_GROUP}>
       {(["graph", "matrix", "list"] as const).map((value) => {
         const Icon = icons[value];
         return (
@@ -709,10 +710,7 @@ function ModeSwitch({ mode, onChange }: { mode: ViewMode; onChange: (mode: ViewM
             role="radio"
             aria-checked={mode === value}
             onClick={() => onChange(value)}
-            className={cn(
-              "inline-flex items-center gap-2 rounded-md px-3 text-sm font-medium transition-colors",
-              mode === value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
-            )}
+            className={cn(SEGMENTED_ITEM, mode === value && SEGMENTED_ON)}
           >
             <Icon className="size-4" />
             {t(`view.views.${value}`)}
