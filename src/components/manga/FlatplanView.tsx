@@ -9,11 +9,8 @@ import {
   CheckCircle2,
   FileText,
   Hash,
-  Image as ImageIcon,
-  Layers,
   ListTree,
   Loader2,
-  PenLine,
   RotateCw,
   ScrollText,
   X,
@@ -181,12 +178,15 @@ export function FlatplanView({ project, feature, onOpenFeature }: FlatplanViewPr
 
   const loading = !structure || (panels === null && !error);
   const control = cn(fieldClass, "h-8 w-auto");
+  const ready = !loading && items.length > 0;
+  const extrasCount = volumeExtras.front.length + volumeExtras.back.length + (volumeExtras.cover ? 1 : 0) + (volumeExtras.backCover ? 1 : 0);
 
   return (
     <main className="flex min-h-0 flex-1 flex-col">
       <h1 className="sr-only">{feature.label}</h1>
       {/* Barre d'outils : réglages à gauche, chiffres et actions à droite. */}
-      <div className="flex flex-wrap items-center gap-2 border-b bg-card/60 px-3 py-1.5">
+      {/* Même hauteur que la barre de « Lecture de l'histoire » (py-2, boutons de 32 px). */}
+      <div className="flex flex-wrap items-center gap-3 border-b bg-card/60 px-3 py-2">
         {groups.length > 1 && (
           <select aria-label={t("flatplan.volume")} title={t("flatplan.volume")} value={group?.volume?.id ?? ""} onChange={(e) => setVolumeId(e.target.value)} className={cn(control, "max-w-56")}>
             {groups.map((g) => (
@@ -201,45 +201,59 @@ export function FlatplanView({ project, feature, onOpenFeature }: FlatplanViewPr
           value={mode}
           onChange={changeMode}
           options={[
-            { value: "script", label: t("flatplan.modeScript"), icon: FileText },
-            { value: "production", label: t("flatplan.modeProduction"), icon: Brush },
+            // L'avancement est dans le bouton du mode : pas de compteurs en plus dans la barre.
+            {
+              value: "script",
+              label: ready ? `${t("flatplan.modeScript")} — ${t("flatplan.stats.scripted", { count: scripted })} / ${pages.length}` : t("flatplan.modeScript"),
+              icon: FileText,
+              count: ready ? `${scripted}/${pages.length}` : undefined,
+            },
+            {
+              value: "production",
+              label: ready ? `${t("flatplan.modeProduction")} — ${t("flatplan.stats.drawn", { count: drawn })} / ${items.length}` : t("flatplan.modeProduction"),
+              icon: Brush,
+              count: ready ? `${drawn}/${items.length}` : undefined,
+            },
           ]}
         />
         <InfoTip>{mode === "production" ? <StageLegend /> : <ScriptLegend />}</InfoTip>
 
-        {!loading && items.length > 0 && (
-          <div className="ml-auto flex items-center gap-3" aria-label={t("flatplan.summary", { pages: t("flatplan.pages", { count: items.length }), scripted, drawn })}>
-            <Stat icon={Layers} value={items.length} label={t("flatplan.pages", { count: items.length })} />
-            <Stat icon={PenLine} value={scripted} label={t("flatplan.stats.scripted", { count: scripted })} />
-            <Stat icon={ImageIcon} value={drawn} label={t("flatplan.stats.drawn", { count: drawn })} />
-          </div>
-        )}
-        <div className={cn("flex items-center gap-1", (loading || items.length === 0) && "ml-auto")}>
-          <ToolbarToggle
-            active={panel === "alerts"}
-            onClick={() => setPanel(panel === "alerts" ? null : "alerts")}
-            label={alerts.length ? t("flatplan.stats.alerts", { count: alerts.length }) : t("flatplan.noAlerts")}
-            icon={alerts.length ? AlertTriangle : CheckCircle2}
-            tone={alerts.length ? "warning" : "success"}
-            count={alerts.length || undefined}
-          />
-          <ToolbarToggle
-            active={panel === "extras"}
-            onClick={() => setPanel(panel === "extras" ? null : "extras")}
-            label={t("flatplan.extras")}
-            icon={BookImage}
-            count={volumeExtras.front.length + volumeExtras.back.length + (volumeExtras.cover ? 1 : 0) + (volumeExtras.backCover ? 1 : 0) || undefined}
-          />
-          <ScriptExportMenu compact fileBase={group?.volume ? `${project.name} — ${labelOf(group.volume)}` : project.name} build={buildExport} disabled={loading || pages.length === 0} />
-          {/* Réglages qu'on fixe une fois pour toutes : rangés dans « … ». */}
+        <div className="ml-auto flex items-center gap-1">
+          {/* Ce qui sert de temps en temps : rangé dans « … ». */}
           <ActionMenu
             label={t("flatplan.more")}
             items={[
-              { id: "rtl", label: t("flatplan.rtl"), icon: ArrowLeft, checked: direction === "rtl", run: () => setDirection(project.id, "rtl") },
-              { id: "ltr", label: t("flatplan.ltr"), icon: ArrowRight, checked: direction === "ltr", run: () => setDirection(project.id, "ltr") },
+              {
+                id: "alerts",
+                label: t("flatplan.alerts"),
+                icon: ready && alerts.length > 0 ? AlertTriangle : CheckCircle2,
+                hint: ready && alerts.length > 0 ? String(alerts.length) : undefined,
+                checked: panel === "alerts" ? true : undefined,
+                disabled: loading,
+                run: () => setPanel(panel === "alerts" ? null : "alerts"),
+              },
+              {
+                id: "extras",
+                label: t("flatplan.extras"),
+                icon: BookImage,
+                hint: extrasCount ? String(extrasCount) : undefined,
+                checked: panel === "extras" ? true : undefined,
+                disabled: loading,
+                run: () => setPanel(panel === "extras" ? null : "extras"),
+              },
+              // Un seul interrupteur : activé = manga (droite à gauche), sinon BD.
+              {
+                id: "direction",
+                label: t("flatplan.rtl"),
+                icon: direction === "rtl" ? ArrowLeft : ArrowRight,
+                separated: true,
+                toggle: direction === "rtl",
+                run: () => setDirection(project.id, direction === "rtl" ? "ltr" : "rtl"),
+              },
               { id: "folio", label: t("flatplan.firstFolioMenu", { folio: firstFolio }), icon: Hash, separated: true, run: () => setEditingFolio(true) },
             ]}
           />
+          <ScriptExportMenu compact fileBase={group?.volume ? `${project.name} — ${labelOf(group.volume)}` : project.name} build={buildExport} disabled={loading || pages.length === 0} />
         </div>
       </div>
 
@@ -366,7 +380,8 @@ function Segmented<T extends string>({
 }: {
   label: string;
   value: T;
-  options: Array<{ value: T; label: string; icon: LucideIcon }>;
+  /** `count` : petit compteur affiché après l'icône (« 18/24 »). */
+  options: Array<{ value: T; label: string; icon: LucideIcon; count?: string }>;
   onChange: (value: T) => void;
 }) {
   return (
@@ -384,11 +399,12 @@ function Segmented<T extends string>({
             title={option.label}
             onClick={() => onChange(option.value)}
             className={cn(
-              "flex h-full items-center rounded-md px-2 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
+              "flex h-full items-center gap-1.5 rounded-md px-2 text-muted-foreground transition-colors hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
               checked && "bg-primary text-primary-foreground hover:text-primary-foreground",
             )}
           >
             <Icon className="size-4" aria-hidden="true" />
+            {option.count && <span className="text-xs tabular-nums" aria-hidden="true">{option.count}</span>}
           </button>
         );
       })}
@@ -435,53 +451,6 @@ function FirstFolioDialog({ value, onSave, onClose }: { value: number; onSave: (
         </DialogFooter>
       </form>
     </Dialog>
-  );
-}
-
-/** Chiffre de la barre d'outils, avec son icône ; le détail au survol. */
-function Stat({ icon: Icon, value, label }: { icon: LucideIcon; value: number; label: string }) {
-  return (
-    <span className="inline-flex items-center gap-1 text-sm text-muted-foreground tabular-nums" title={label}>
-      <Icon className="size-4" aria-hidden="true" />
-      {value}
-      <span className="sr-only">{label}</span>
-    </span>
-  );
-}
-
-/** Bouton qui ouvre un panneau sous la barre, avec un compteur. */
-function ToolbarToggle({
-  active,
-  onClick,
-  label,
-  icon: Icon,
-  count,
-  tone,
-}: {
-  active: boolean;
-  onClick: () => void;
-  label: string;
-  icon: LucideIcon;
-  count?: number;
-  tone?: "warning" | "success";
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      aria-label={label}
-      title={label}
-      onClick={onClick}
-      className={cn(
-        "inline-flex h-8 items-center gap-1 rounded-md px-2 text-sm transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none",
-        active && "bg-muted",
-        tone === "warning" && "text-warning",
-        tone === "success" && "text-success",
-      )}
-    >
-      <Icon className="size-4" aria-hidden="true" />
-      {count !== undefined && <span className="text-xs font-medium tabular-nums">{count}</span>}
-    </button>
   );
 }
 

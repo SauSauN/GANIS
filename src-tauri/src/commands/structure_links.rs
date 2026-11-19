@@ -39,6 +39,19 @@ pub async fn link_structure_character(
     structure_link_service::link_character(&pool, &node_id, &character_id, &role).await
 }
 
+/// État d'un personnage lié à un élément (continuité).
+#[tauri::command(rename_all = "camelCase")]
+pub async fn set_structure_character_state(
+    state: State<'_, AppState>,
+    project_id: String,
+    node_id: String,
+    character_id: String,
+    value: String,
+) -> AppResult<()> {
+    let pool = project_pool(&state, &project_id).await?;
+    structure_link_service::set_character_state(&pool, &node_id, &character_id, &value).await
+}
+
 /// Retire un personnage d'un élément.
 #[tauri::command(rename_all = "camelCase")]
 pub async fn unlink_structure_character(

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { VersionsButton } from "@/components/history/VersionsDialog";
+import { portraitFrameKey } from "@/lib/imageFrame";
 import { useTranslation } from "react-i18next";
 import { Loader2, Save, Trash2, UserX } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -260,6 +261,7 @@ export function CharacterEditView({
             error: portraitError,
             onPick: (file) => void pickPortrait(file),
             onRemove: () => void dropPortrait(),
+            frameKey: portraitFrameKey("character", character.id),
           }}
           gallery={
             <CharacterGallery

@@ -359,5 +359,43 @@
     "openPlot": "Ouvrir la trame",
     "edit": "Modifier",
     "fromDocuments": "Texte repris des documents de l'élément"
+  },
+  "continuity": {
+    "tabs": {
+      "path": "Parcours d'un personnage",
+      "presence": "Tableau des présences"
+    },
+    "character": "Personnage",
+    "location": "Lieu",
+    "allLocations": "Tous les lieux",
+    "appearances_one": "{{count}} apparition",
+    "appearances_other": "{{count}} apparitions",
+    "choose": "Aucun personnage n'apparaît encore. Dans la fiche d'une scène, liez des personnages (Liens avec l'univers), puis notez leur état dans la carte Continuité.",
+    "none": "Aucune apparition dans ce lieu.",
+    "state": "État",
+    "noState": "Rien de noté",
+    "changed": "État changé",
+    "was": "avant : {{state}}",
+    "speaks_one": "{{count}} réplique",
+    "speaks_other": "{{count}} répliques",
+    "speaksOnly": "parle",
+    "columns": "Colonnes",
+    "presenceHint": "Chaque case compte les éléments où le personnage apparaît (le chapitre et son contenu). Cliquez sur un nom pour voir son parcours.",
+    "noColumns": "Aucun élément à ce niveau.",
+    "absent": "Absent",
+    "first": "Première apparition : {{where}}",
+    "last": "Dernière : {{where}}",
+    "sheet": {
+      "title": "Continuité",
+      "description": "L'état des personnages dans cet élément : blessure, tenue, objet porté, ce qu'ils savent…",
+      "placeholder": "Ex. bras en écharpe, porte la clé",
+      "empty": "Liez d'abord des personnages à cet élément (Liens avec l'univers) : vous noterez ici leur état.",
+      "previous": "Avant : {{state}}",
+      "stateOf": "État de {{name}}"
+    },
+    "noRows": "Aucun personnage n'apparaît dans ces éléments.",
+    "presenceHintManga": "Chaque case compte les pages où le personnage apparaît (présent dans une case ou qui parle). Cliquez sur un nom pour voir sa continuité case par case.",
+    "characters_one": "{{count}} personnage",
+    "characters_other": "{{count}} personnages"
   }
 }

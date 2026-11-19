@@ -16,6 +16,8 @@ interface ExportMenuProps {
   fileBase: string;
   /** Document à exporter, construit au moment du clic. */
   build: () => ExportDocument;
+  /** Export Fountain en plus (scénario de série) : texte construit au clic, et son libellé. */
+  fountain?: { label: string; build: () => string };
   disabled?: boolean;
 }
 
@@ -23,14 +25,14 @@ interface ExportMenuProps {
  * Bouton « Exporter » : Word, PDF ou texte brut. Le fichier est créé dans
  * GANIS, puis enregistré à l'emplacement choisi dans la fenêtre du système.
  */
-export function ExportMenu({ label, dialogTitle, fileBase, build, disabled }: ExportMenuProps) {
+export function ExportMenu({ label, dialogTitle, fileBase, build, fountain, disabled }: ExportMenuProps) {
   const { t } = useTranslation("novel");
   const [busy, setBusy] = useState(false);
 
-  async function run(format: ExportFormat) {
+  async function run(format: ExportFormat | "fountain") {
     setBusy(true);
     try {
-      const bytes = await renderDocument(build(), format);
+      const bytes = format === "fountain" ? new TextEncoder().encode(fountain?.build() ?? "") : await renderDocument(build(), format);
       const file = await api.saveExportFile(exportFileName(fileBase, format), dialogTitle, bytes);
       if (file) toast({ tone: "success", message: t("manuscript.exported", { file }) });
     } catch (e) {
@@ -63,6 +65,7 @@ export function ExportMenu({ label, dialogTitle, fileBase, build, disabled }: Ex
         { id: "docx", label: t("manuscript.exportWord"), icon: FileText, run: () => void run("docx") },
         { id: "pdf", label: t("manuscript.exportPdf"), icon: FileType, run: () => void run("pdf") },
         { id: "txt", label: t("manuscript.exportText"), icon: FileText, separated: true, run: () => void run("txt") },
+        ...(fountain ? [{ id: "fountain", label: fountain.label, icon: FileText, run: () => void run("fountain") }] : []),
       ]}
     />
   );

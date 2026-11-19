@@ -116,6 +116,7 @@ export function WorldGallery({
       disabled={disabled}
       onAdd={(files) => void add(files)}
       onRemove={(id) => void remove(id)}
+      projectId={projectId}
     />
   );
 }

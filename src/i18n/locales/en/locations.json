@@ -428,7 +428,7 @@
     "empty": {
       "title": "No locations yet",
       "description": "Start with the largest (a continent, a kingdom), then place the other locations inside.",
-      "create": "Create a location"
+      "create": "New location"
     },
     "allCategoriesOption": "All categories",
     "categoryFilter": "Filter by category"

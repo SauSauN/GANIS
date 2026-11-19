@@ -283,6 +283,21 @@ pub struct StructureNode {
     /// storyboard, pencils, inks, tones, lettering, done ; `None` : rien de
     /// commencé (voir `manga_production_service`).
     pub production_stage: Option<String>,
+    /// Logline d'un épisode (série).
+    pub logline: String,
+    /// Durée visée d'un épisode, en minutes (série) ; `None` : aucune.
+    pub runtime_goal: Option<i64>,
+    /// Statut d'écriture d'un épisode (série) : idea, outline, draft,
+    /// revision, final ; `None` : idée.
+    pub episode_status: Option<String>,
+    /// Scénariste attribué à un épisode (série).
+    pub writer: String,
+    /// En-tête d'une scène (série) : int, ext, intExt.
+    pub scene_place: Option<String>,
+    /// Lieu de la scène (série) : fiche de lieu, sans clé étrangère.
+    pub scene_location_id: Option<String>,
+    /// Moment de la scène (série) : day, night, morning…
+    pub scene_time: Option<String>,
     pub created_at: String,
     pub updated_at: String,
 }
@@ -370,7 +385,8 @@ fn check_level(level: i64, count: usize) -> AppResult<()> {
 
 const NODE_COLUMNS: &str = "id, parent_id, level, title, summary, position, numbered, number, \
      content_words, word_goal, writing_status, narrative_person, narrative_tense, \
-     narrative_goal, page_goal, script_status, rhythm, page_turn, production_stage, created_at, updated_at";
+     narrative_goal, page_goal, script_status, rhythm, page_turn, production_stage, \
+     logline, runtime_goal, episode_status, writer, scene_place, scene_location_id, scene_time, created_at, updated_at";
 
 pub(crate) async fn find_node(pool: &SqlitePool, id: &str) -> AppResult<Option<StructureNode>> {
     let sql = format!("SELECT {NODE_COLUMNS} FROM structure_nodes WHERE id = ?");

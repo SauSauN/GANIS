@@ -244,8 +244,78 @@ export interface StructureNode {
   pageTurn: boolean;
   /** Dernière étape de fabrication terminée d'une page (manga) ; `null` : rien de commencé. */
   productionStage: ProductionStage | null;
+  /** Logline d'un épisode (série). */
+  logline: string;
+  /** Durée visée d'un épisode, en minutes (série) ; `null` : aucune. */
+  runtimeGoal: number | null;
+  /** Statut d'écriture d'un épisode (série) ; `null` : idée. */
+  episodeStatus: EpisodeStatus | null;
+  /** Scénariste attribué à un épisode (série). */
+  writer: string;
+  /** En-tête d'une scène (série) : intérieur / extérieur. */
+  scenePlace: ScenePlace | null;
+  /** Lieu d'une scène (série) : fiche de lieu (peut ne plus exister). */
+  sceneLocationId: string | null;
+  /** Moment d'une scène (série). */
+  sceneTime: SceneTime | null;
   createdAt: string; // RFC 3339, UTC
   updatedAt: string; // RFC 3339, UTC
+}
+
+// ----------------------------------------------------------------------------
+// Série : fiche d'épisode et scénario des scènes (voir `series_service.rs`)
+// ----------------------------------------------------------------------------
+
+export const EPISODE_STATUSES = ["idea", "outline", "draft", "revision", "final"] as const;
+export type EpisodeStatus = (typeof EPISODE_STATUSES)[number];
+
+export const SCENE_PLACES = ["int", "ext", "intExt"] as const;
+export type ScenePlace = (typeof SCENE_PLACES)[number];
+
+export const SCENE_TIMES = ["day", "night", "morning", "evening", "dawn", "dusk", "continuous", "later"] as const;
+export type SceneTime = (typeof SCENE_TIMES)[number];
+
+/** Éléments du scénario : action, réplique, transition, plan, note (non imprimée). */
+export const SCREENPLAY_KINDS = ["action", "dialogue", "transition", "shot", "note"] as const;
+export type ScreenplayKind = (typeof SCREENPLAY_KINDS)[number];
+
+export interface SceneBlock {
+  id: string;
+  sceneId: string;
+  position: number;
+  kind: ScreenplayKind;
+  /** Personnage qui parle (dialogue seulement). */
+  characterId: string | null;
+  /** Didascalie de la réplique (dialogue seulement). */
+  parenthetical: string;
+  content: string;
+}
+
+export interface SceneScript {
+  scene: StructureNode;
+  blocks: SceneBlock[];
+}
+
+export interface SceneBlockInput {
+  id?: string | null;
+  kind: ScreenplayKind;
+  characterId?: string | null;
+  parenthetical?: string;
+  content: string;
+}
+
+export interface SceneScriptInput {
+  place: ScenePlace | null;
+  locationId: string | null;
+  time: SceneTime | null;
+  blocks: SceneBlockInput[];
+}
+
+export interface EpisodeFields {
+  logline: string;
+  runtimeGoal: number | null;
+  episodeStatus: EpisodeStatus | null;
+  writer: string;
 }
 
 // ----------------------------------------------------------------------------
@@ -507,6 +577,8 @@ export interface NodeCharacterLink {
   nodeId: string;
   characterId: string;
   role: NodeCharacterRole;
+  /** État du personnage dans l'élément (continuité) ; vide : rien à noter. */
+  state: string;
   createdAt: string; // RFC 3339, UTC
 }
 
@@ -1210,6 +1282,8 @@ export interface SheetDisplay {
   module: SheetModule;
   showStory: boolean;
   showPlot: boolean;
+  /** Panneau du milieu en arborescence (par défaut) ou en simple liste (lieux, objets…). */
+  panelTree: boolean;
 }
 
 /** Sortes de fiches qu'un terme du glossaire peut citer. */

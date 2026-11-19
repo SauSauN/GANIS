@@ -333,6 +333,7 @@
     "speaks_other": "{{count}} répliques",
     "noState": "—",
     "state": "État",
-    "where": "Lieu et moment"
+    "where": "Lieu et moment",
+    "tabPanels": "Case par case"
   }
 }

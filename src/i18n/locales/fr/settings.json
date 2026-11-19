@@ -181,6 +181,16 @@
         "gold": "Or"
       },
       "reset": "Revenir au cadre blanc par défaut"
+    },
+    "moduleOrder": {
+      "title": "Ordre des modules",
+      "description": "L'ordre des modules dans la barre de gauche, sur cet appareil. Un module absent d'un projet (type de projet, module du monde désactivé) garde sa place quand il apparaît. La recherche reste toujours à la fin.",
+      "projectType": "Module du type de projet (Manuscrit, Scénario)",
+      "moveUp": "Monter « {{name}} »",
+      "moveDown": "Descendre « {{name}} »",
+      "reset": "Revenir à l'ordre par défaut",
+      "previous": "Ancien ordre",
+      "previousHint": "Détails, Personnages, Lieux et les modules du monde d'abord, puis Découpage, Trame, le module du type de projet et Notes."
     }
   },
   "developer": {

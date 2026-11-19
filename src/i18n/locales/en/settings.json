@@ -181,6 +181,16 @@
         "gold": "Gold"
       },
       "reset": "Back to the default white frame"
+    },
+    "moduleOrder": {
+      "title": "Module order",
+      "description": "The order of the modules in the left bar, on this device. A module a project doesn't have (project type, disabled world module) keeps its place when it shows up. Search always stays last.",
+      "projectType": "Project type module (Manuscript, Script)",
+      "moveUp": "Move “{{name}}” up",
+      "moveDown": "Move “{{name}}” down",
+      "reset": "Back to the default order",
+      "previous": "Previous order",
+      "previousHint": "Details, Characters, Locations and the world modules first, then Structure, Plot, the project type module and Notes."
     }
   },
   "developer": {

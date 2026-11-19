@@ -30,6 +30,7 @@
 
 use crate::error::{AppError, AppResult};
 use crate::services::character_service::{decode_image, DetailLevel, Portrait};
+use crate::services::nesting;
 use crate::utils::{new_id, now_utc};
 use base64::engine::general_purpose::STANDARD as BASE64;
 use base64::Engine;
@@ -469,6 +470,15 @@ async fn clean_input(
                     )
                     .with_key("location.parentCycle"));
                 }
+            }
+
+            if nesting::too_deep(pool, "locations", parent, self_id).await? {
+                return Err(AppError::validation(format!(
+                    "Un lieu ne peut pas être rangé sur plus de {} niveaux.",
+                    nesting::MAX_NESTING
+                ))
+                .with_key("location.tooDeep")
+                .with_param("max", nesting::MAX_NESTING));
             }
 
             Some(parent.to_owned())

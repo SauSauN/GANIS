@@ -21,7 +21,15 @@ export interface ExportRun {
 
 export type ExportBlock =
   | { type: "heading"; level: 1 | 2 | 3; text: string; pageBreakBefore?: boolean }
-  | { type: "paragraph"; runs: ExportRun[]; indent?: boolean; /** Retrait à gauche (scénario) : 1, 2… */ inset?: number }
+  | {
+      type: "paragraph";
+      runs: ExportRun[];
+      indent?: boolean;
+      /** Retrait à gauche (scénario) : 1, 2… */
+      inset?: number;
+      /** Aligné à droite (transition d'un scénario de série). */
+      align?: "right";
+    }
   /** Séparateur de scène (* * *). */
   | { type: "sceneBreak" };
 
@@ -37,6 +45,8 @@ export interface ExportDocument {
    * retraits pour les champs et les textes des cases).
    */
   layout?: "manuscript" | "script";
+  /** Police à chasse fixe (scénario de série, dans Word). */
+  monospace?: boolean;
   blocks: ExportBlock[];
 }
 
@@ -111,7 +121,10 @@ export function documentToText(document: ExportDocument): string {
       else if (block.level === 2) lines.push("", block.text, "-".repeat(Math.min(60, block.text.length)));
       else lines.push("", block.text);
     } else if (block.type === "sceneBreak") lines.push("", "* * *", "");
-    else if (script) lines.push("    ".repeat(block.inset ?? 0) + block.runs.map((run) => run.text).join(""));
+    else if (script) {
+      const text = block.runs.map((run) => run.text).join("");
+      lines.push(block.align === "right" ? text.padStart(60) : "    ".repeat(block.inset ?? 0) + text);
+    }
     else lines.push(block.runs.map((run) => run.text).join(""), "");
   }
   return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim() + "\n";
@@ -161,6 +174,7 @@ export async function documentToDocx(document: ExportDocument): Promise<Uint8Arr
     } else if (block.type === "paragraph" && script) {
       children.push(
         new Paragraph({
+          alignment: block.align === "right" ? AlignmentType.RIGHT : undefined,
           indent: block.inset ? { left: 567 * block.inset } : undefined,
           spacing: { line: 276, after: 80 },
           children: runsOf(block.runs),
@@ -194,7 +208,7 @@ export async function documentToDocx(document: ExportDocument): Promise<Uint8Arr
     creator: "GANIS",
     title: document.title,
     styles: {
-      default: { document: { run: { font: "Times New Roman", size: 24 } } },
+      default: { document: { run: { font: document.monospace ? "Courier New" : "Times New Roman", size: 24 } } },
       paragraphStyles: [
         { id: "Heading1", name: "Heading 1", basedOn: "Normal", next: "Normal", run: { size: 36, bold: true } },
         { id: "Heading2", name: "Heading 2", basedOn: "Normal", next: "Normal", run: { size: 30, bold: true } },
@@ -255,6 +269,7 @@ export async function documentToPdf(document: ExportDocument): Promise<Uint8Arra
       content.push({
         text: block.runs.map((run) => ({ text: run.text, bold: run.bold, italics: run.italics, decoration: run.underline ? "underline" : undefined })),
         lineHeight: 1.2,
+        alignment: block.align === "right" ? "right" : undefined,
         margin: [24 * (block.inset ?? 0), 0, 0, 4],
       });
     } else if (block.type === "heading") {

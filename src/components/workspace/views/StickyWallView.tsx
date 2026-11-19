@@ -251,27 +251,27 @@ export function StickyWallView({ projectId, feature }: StickyWallViewProps) {
     <main className="flex min-h-0 flex-1 flex-col">
       <h1 className="sr-only">{feature.label}</h1>
 
-      <div className="flex flex-wrap items-center gap-3 border-b bg-card/60 px-4 py-2">
-        {/* Un seul bouton : il propose la couleur, puis ajoute le post-it. */}
-        <ColorMenu
-          label={t("wall.add")}
-          options={STICKY_COLORS.map((item) => ({ value: item, swatch: STICKY_STYLES[item].swatch, label: t(`colors.${item}`) }))}
-          value={null}
-          onSelect={(color) => {
-            if (color && isStickyColor(color)) void add(color);
-          }}
-          trigger={
-            <span className="inline-flex h-8 items-center gap-1.5 rounded-md border bg-background px-2.5 text-sm font-medium shadow-xs hover:bg-muted">
-              <Plus className="size-4" aria-hidden="true" />
-              {t("wall.add")}
-            </span>
-          }
-        />
-        {/* Mode d'emploi du mur derrière un « i », à côté des boutons d'ajout. */}
+      <div className="flex flex-wrap items-center gap-3 border-b bg-card/60 px-3 py-2">
+        {/* Mode d'emploi du mur derrière un « i », puis le nombre de post-it ; l'ajout à droite. */}
         <InfoTip>{t("wall.hint")}</InfoTip>
-        {loaded && (
-          <span className="ml-auto text-xs text-muted-foreground">{t("wall.count", { count: stickies.length })}</span>
-        )}
+        {loaded && <span className="text-xs text-muted-foreground">{t("wall.count", { count: stickies.length })}</span>}
+        {/* Un seul bouton : il propose la couleur, puis ajoute le post-it. */}
+        <div className="ml-auto">
+          <ColorMenu
+            label={t("wall.add")}
+            options={STICKY_COLORS.map((item) => ({ value: item, swatch: STICKY_STYLES[item].swatch, label: t(`colors.${item}`) }))}
+            value={null}
+            onSelect={(color) => {
+              if (color && isStickyColor(color)) void add(color);
+            }}
+            trigger={
+              <span className="inline-flex h-8 items-center gap-1.5 rounded-lg bg-primary px-2.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/80">
+                <Plus className="size-4" aria-hidden="true" />
+                {t("wall.add")}
+              </span>
+            }
+          />
+        </div>
       </div>
 
       {error && (
@@ -290,7 +290,8 @@ export function StickyWallView({ projectId, feature }: StickyWallViewProps) {
         ref={wallRef}
         className="relative isolate min-h-0 flex-1 overflow-auto overscroll-contain [scrollbar-gutter:stable]"
         style={{
-          backgroundColor: "var(--muted)",
+          // Même fond que la zone de « Lecture de l'histoire » : la barre ressort pareil.
+          backgroundColor: "var(--background)",
           backgroundImage: "radial-gradient(color-mix(in oklab, var(--foreground) 14%, transparent) 1px, transparent 1px)",
           backgroundSize: "22px 22px",
         }}

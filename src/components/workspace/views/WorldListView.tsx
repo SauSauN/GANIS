@@ -1,5 +1,8 @@
+import { FilterResults } from "@/components/common/FilterResults";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { portraitFrameKey } from "@/lib/imageFrame";
+import { useImageFrame } from "@/stores/imageFrameStore";
 import { ChevronDown, ChevronRight, LayoutGrid, ListTree, Loader2, Plus, Search, Settings2, UserRound } from "lucide-react";
 import { ProfileCard } from "@/components/common/ProfileCard";
 import { Button } from "@/components/ui/button";
@@ -12,6 +15,7 @@ import { MODULE_ICONS, categoryBackdrop, typeIcon } from "@/components/world/wor
 import type { WorldLabels } from "@/components/world/useWorldLabels";
 import { parseList } from "@/lib/characters";
 import { cn } from "@/lib/utils";
+import { TreeGuides } from "@/components/common/TreeGuides";
 import {
   buildWorldTree,
   catalogOf,
@@ -27,6 +31,9 @@ import { useWorldEntries, useWorldImageUrl, useWorldStore } from "@/stores/world
 import type { CustomLocationType, SpeciesNature, WorldEntry, WorldModule } from "@/types";
 
 type Layout = "tree" | "grid";
+
+/** Niveaux d'imbrication au maximum (même limite côté application). */
+const MAX_NESTING = 15;
 
 /** Affichage choisi pour chaque module, mémorisé sur l'appareil. */
 const layoutKey = (module: WorldModule) => `ganis.world.${module}.layout`;
@@ -280,6 +287,17 @@ export function WorldListView({
         </div>
       </div>
 
+      {filtering && (
+        <FilterResults
+          count={cards.length}
+          onClear={() => {
+            setQuery("");
+            setCategory(null);
+            setNature(null);
+          }}
+        />
+      )}
+
       {(layout === "tree" ? rows.length : cards.length) === 0 ? (
 <div className="rounded-xl border border-dashed px-6 py-14 text-center text-sm text-muted-foreground">
           <ModuleIcon className="mx-auto mb-3 size-8 opacity-40" aria-hidden="true" />
@@ -301,7 +319,7 @@ export function WorldListView({
           ))}
         </ul>
       ) : (
-        <ul className="divide-y rounded-xl border bg-card" role="tree">
+        <ul className="divide-y overflow-hidden rounded-xl border bg-card" role="tree">
           {rows.map(({ entry, depth, children }) => {
             const open = !collapsed.has(entry.id);
             const dimmed = visible !== null && !matches(entry);
@@ -312,9 +330,11 @@ export function WorldListView({
                 role="treeitem"
                 aria-level={depth + 1}
                 aria-expanded={children.length > 0 ? open : undefined}
-                className={cn("group flex items-center gap-2 px-3 py-2", dimmed && "opacity-50")}
+                className={cn("group relative flex items-center gap-2 px-3 py-2 hover:bg-muted/40", dimmed && "opacity-50")}
                 style={{ paddingLeft: `${0.75 + depth * 1.5}rem` }}
               >
+                {/* Lignes verticales vers les fiches qui contiennent celle-ci (sous la flèche de chacune). */}
+                <TreeGuides depth={depth} step={1.5} offset={1.5} subtle />
                 <button
                   type="button"
                   tabIndex={children.length > 0 && !filtering ? 0 : -1}
@@ -335,7 +355,7 @@ export function WorldListView({
                 >
                   <WorldThumb projectId={projectId} module={module} entry={entry} customTypes={customTypes} size="sm" />
                   <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-1.5 truncate text-sm font-medium">
+                    <span className="flex items-center gap-1.5 truncate text-sm font-medium group-hover:text-primary">
                       {entry.name}
                       {entry.characterId && (
                         <UserRound className="size-3.5 shrink-0 text-primary" aria-label={t("animalCharacter.badge")} />
@@ -356,7 +376,7 @@ export function WorldListView({
                   </span>
                 </button>
 
-                {(!hasNature(module) || entry.nature === "species") && (
+                {(!hasNature(module) || entry.nature === "species") && depth + 1 < MAX_NESTING && (
                   <Button
                     type="button"
                     size="icon-sm"
@@ -401,6 +421,7 @@ function WorldCard({
 }) {
   const { t } = useTranslation("world");
   const url = useWorldImageUrl(projectId, module, entry);
+  const frame = useImageFrame(projectId, portraitFrameKey(module, entry.id));
   const category = findType(module, entry.type, customTypes)?.category;
   const summary = entry.fields.description?.trim();
   const unusualStatus = entry.status && entry.status !== defaultStatus(module, entry.nature);
@@ -408,6 +429,7 @@ function WorldCard({
   return (
     <ProfileCard
       url={url}
+      frame={frame}
       palette={parseList(entry.fields.colorPalette)}
       backdrop={categoryBackdrop(module, category)}
       icon={typeIcon(module, entry.type, category)}

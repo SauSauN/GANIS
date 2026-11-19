@@ -428,7 +428,7 @@
     "empty": {
       "title": "Aucun lieu pour l'instant",
       "description": "Commencez par le plus vaste (un continent, un royaume), puis placez les autres lieux à l'intérieur.",
-      "create": "Créer un lieu"
+      "create": "Nouveau lieu"
     },
     "allCategoriesOption": "Toutes les catégories",
     "categoryFilter": "Filtrer par catégorie"

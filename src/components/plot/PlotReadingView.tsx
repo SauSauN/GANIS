@@ -294,15 +294,6 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
             </button>
           ))}
         </div>
-        {mode === "lane" && (
-          <select aria-label={t("tour.pickLane")} value={effectiveLane ?? ""} onChange={(e) => setLaneId(e.target.value)} className={cn(fieldClass, "h-8 w-44 min-w-0")}>
-            {data.lanes.map((l) => (
-              <option key={l.id} value={l.id}>
-                {l.name}
-              </option>
-            ))}
-          </select>
-        )}
         <div className="flex overflow-hidden rounded-md border text-xs" role="group" aria-label={t("reading.display")}>
           <button
             type="button"
@@ -331,6 +322,16 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
             <Rows3 className="size-4" />
           </button>
         </div>
+        {/* Trame suivie : après les deux réglages, pour ne pas s'intercaler entre eux. */}
+        {mode === "lane" && (
+          <select aria-label={t("tour.pickLane")} value={effectiveLane ?? ""} onChange={(e) => setLaneId(e.target.value)} className={cn(fieldClass, "h-8 w-44 min-w-0")}>
+            {data.lanes.map((l) => (
+              <option key={l.id} value={l.id}>
+                {l.name}
+              </option>
+            ))}
+          </select>
+        )}
 
         <div className="ml-auto flex items-center gap-1.5">
           {list.length > 0 && (

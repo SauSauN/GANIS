@@ -1,5 +1,8 @@
+import { FilterResults } from "@/components/common/FilterResults";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { portraitFrameKey } from "@/lib/imageFrame";
+import { useImageFrame } from "@/stores/imageFrameStore";
 import {
   ChevronDown,
   ChevronRight,
@@ -35,6 +38,7 @@ import {
 } from "@/lib/locations";
 import { parseList } from "@/lib/characters";
 import { cn } from "@/lib/utils";
+import { TreeGuides } from "@/components/common/TreeGuides";
 import { useLocationImageUrl, useLocationStore, useProjectLocations } from "@/stores/locationStore";
 import type { CustomLocationType, Location } from "@/types";
 
@@ -45,6 +49,9 @@ interface LocationListViewProps {
 }
 
 type Layout = "tree" | "grid";
+
+/** Niveaux d'imbrication au maximum (même limite côté application). */
+const MAX_NESTING = 15;
 
 /** Affichage choisi, mémorisé sur l'appareil. */
 const LAYOUT_KEY = "ganis.locations.layout";
@@ -272,6 +279,16 @@ export function LocationListView({ projectId, feature, onOpenFeature }: Location
         </div>
       </div>
 
+      {filtering && (
+        <FilterResults
+          count={matching.length}
+          onClear={() => {
+            setQuery("");
+            setCategory(null);
+          }}
+        />
+      )}
+
       {matching.length === 0 ? (
 <div className="rounded-xl border border-dashed px-6 py-14 text-center text-sm text-muted-foreground">
           <MapPinned className="mx-auto mb-3 size-8 opacity-40" aria-hidden="true" />
@@ -347,9 +364,11 @@ function TreeRow({
       role="treeitem"
       aria-expanded={hasChildren ? expanded : undefined}
       aria-level={depth + 1}
-      className={cn("group flex items-center gap-2 border-b pr-3 last:border-b-0 hover:bg-muted/40", dimmed && "opacity-55")}
+      className={cn("group relative flex items-center gap-2 border-b pr-3 last:border-b-0 hover:bg-muted/40", dimmed && "opacity-55")}
       style={{ paddingLeft: `${0.5 + depth * 1.5}rem` }}
     >
+      {/* Lignes verticales vers les lieux qui contiennent celui-ci (sous la flèche de chacun). */}
+      <TreeGuides depth={depth} step={1.5} offset={1.25} subtle />
       <button
         type="button"
         tabIndex={hasChildren && onToggle ? 0 : -1}
@@ -384,10 +403,11 @@ function TreeRow({
 
       <button
         type="button"
+        disabled={depth + 1 >= MAX_NESTING}
         onClick={onAddInside}
         title={t("list.addInside", { name: location.name })}
         aria-label={t("list.addInside", { name: location.name })}
-        className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-secondary hover:text-foreground focus-visible:opacity-100"
+        className="flex size-7 shrink-0 items-center justify-center rounded-md text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100 hover:bg-secondary hover:text-foreground focus-visible:opacity-100 disabled:invisible"
       >
         <Plus className="size-4" />
       </button>
@@ -412,6 +432,7 @@ function GridCard({
 }) {
   const { t } = useTranslation("locations");
   const url = useLocationImageUrl(projectId, location);
+  const frame = useImageFrame(projectId, portraitFrameKey("location", location.id));
   const category = findType(location.type, customTypes)?.category;
   const Icon = typeIcon(location.type, category);
   const summary = location.fields.description?.trim();
@@ -419,6 +440,7 @@ function GridCard({
   return (
     <ProfileCard
       url={url}
+      frame={frame}
       palette={parseList(location.fields.colorPalette)}
       backdrop={categoryBackdrop(category)}
       icon={Icon}

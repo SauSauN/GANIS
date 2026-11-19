@@ -1,6 +1,6 @@
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Loader2, Waypoints, type LucideIcon } from "lucide-react";
+import { BookOpen, ListTree, Loader2, Waypoints, type LucideIcon } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cardClass, cardContentClass, cardHeaderClass } from "@/components/workspace/views/PageShell";
 import { errorText } from "@/lib/errors";
@@ -16,9 +16,24 @@ import { TitleWithInfo } from "@/components/common/TitleWithInfo";
  */
 export function SheetDisplayCard({ projectId, module }: { projectId: string; module: SheetModule }) {
   const { t } = useTranslation("projectSettings");
-  const { showStory, showPlot, loaded } = useSheetDisplay(projectId, module);
+  const { showStory, showPlot, panelTree, loaded } = useSheetDisplay(projectId, module);
   const save = useSheetDisplayStore((s) => s.save);
-  const [busy, setBusy] = useState<"story" | "plot" | null>(null);
+  const savePanelTree = useSheetDisplayStore((s) => s.savePanelTree);
+  const [busy, setBusy] = useState<"story" | "plot" | "tree" | null>(null);
+  // Les personnages n'ont pas d'arborescence (une fiche n'en contient pas d'autres).
+  const hasTree = module !== "character";
+
+  async function toggleTree() {
+    setBusy("tree");
+    try {
+      await savePanelTree(projectId, module, !panelTree);
+      notifySaved(t("sheetDisplay.saved"), `settings:sheets.${module}`);
+    } catch (e) {
+      notifyError(errorText(e, "projectSettings:sheetDisplay.failed"), `settings:sheets.${module}`);
+    } finally {
+      setBusy(null);
+    }
+  }
 
   async function toggle(which: "story" | "plot") {
     setBusy(which);
@@ -47,6 +62,17 @@ export function SheetDisplayCard({ projectId, module }: { projectId: string; mod
         </TitleWithInfo>
       </CardHeader>
       <CardContent className={`${cardContentClass} space-y-3`}>
+        {hasTree && (
+          <SwitchRow
+            icon={ListTree}
+            label={t("sheetDisplay.panelTree")}
+            hint={panelTree ? t("sheetDisplay.panelTreeOn") : t("sheetDisplay.panelTreeOff")}
+            checked={panelTree}
+            busy={busy === "tree"}
+            disabled={!loaded || busy !== null}
+            onToggle={() => void toggleTree()}
+          />
+        )}
         <SwitchRow
           icon={Waypoints}
           label={t("sheetDisplay.plot")}

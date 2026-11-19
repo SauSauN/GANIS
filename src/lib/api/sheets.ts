@@ -8,4 +8,7 @@ export const sheetsApi = {
 
   setSheetDisplay: (projectId: string, module: SheetModule, showStory: boolean, showPlot: boolean) =>
     call<SheetDisplay>("set_sheet_display", { projectId, module, showStory, showPlot }),
+
+  /** Panneau du milieu en arborescence ou en simple liste (lieux, objets…). */
+  setPanelTree: (projectId: string, module: SheetModule, tree: boolean) => call<SheetDisplay>("set_panel_tree", { projectId, module, tree }),
 };

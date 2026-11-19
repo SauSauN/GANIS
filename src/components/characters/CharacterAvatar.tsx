@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { avatarColor, fullName, initials } from "@/lib/characters";
 import { cn } from "@/lib/utils";
 import { usePortraitUrl } from "@/stores/characterStore";
+import { frameStyle, portraitFrameKey, type ImageFrame } from "@/lib/imageFrame";
+import { useImageFrame } from "@/stores/imageFrameStore";
 import type { Character } from "@/types";
 
 export type AvatarSize = "xs" | "panel" | "sm" | "md" | "lg" | "xl" | "2xl" | "fill";
@@ -32,13 +34,15 @@ interface AvatarFaceProps {
   className?: string;
   /** Style ajouté (couleur du cadre…). */
   style?: CSSProperties;
+  /** Cadrage de la photo (zone affichée). */
+  frame?: ImageFrame | null;
 }
 
 /**
  * Avatar d'un personnage : sa photo, ou à défaut ses initiales sur une
  * couleur propre au personnage.
  */
-export function AvatarFace({ colorKey, name, url, size = "md", square = false, className, style }: AvatarFaceProps) {
+export function AvatarFace({ colorKey, name, url, size = "md", square = false, className, style, frame }: AvatarFaceProps) {
   const { t } = useTranslation("characters");
 
   const shape = cn(
@@ -47,6 +51,16 @@ export function AvatarFace({ colorKey, name, url, size = "md", square = false, c
     SIZES[size],
     className,
   );
+
+  const framed = frameStyle(frame);
+  if (url && framed) {
+    // Photo cadrée : l'image agrandie est découpée par le cadre.
+    return (
+      <span className={cn(shape, "block bg-muted")} style={style}>
+        <img src={url} alt={t("portrait.alt", { name })} draggable={false} className="size-full object-cover" style={framed} />
+      </span>
+    );
+  }
 
   if (url) {
     return (
@@ -81,12 +95,14 @@ interface CharacterAvatarProps {
 /** Avatar d'un personnage enregistré (sa photo est chargée à la demande). */
 export function CharacterAvatar({ projectId, character, size, className }: CharacterAvatarProps) {
   const url = usePortraitUrl(projectId, character);
+  const frame = useImageFrame(projectId, portraitFrameKey("character", character.id));
 
   return (
     <AvatarFace
       colorKey={character.id}
       name={fullName(character)}
       url={url}
+      frame={frame}
       size={size}
       className={className}
     />

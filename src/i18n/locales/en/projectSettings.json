@@ -9,7 +9,7 @@
       "description": "Progress, favorite, archiving and visibility."
     },
     "danger": {
-      "label": "Export, duplication and deletion",
+      "label": "Project management",
       "description": "Export as .ganix, duplicate or move the project to the trash."
     },
     "characters": {
@@ -156,6 +156,9 @@
     "hidden": "Hidden on sheets.",
     "note": "Only the display changes: links with the structure and plot events are kept and still used everywhere else (structure, board, reading, search).",
     "saved": "Sheet display saved.",
-    "failed": "Couldn’t save the sheet display."
+    "failed": "Couldn’t save the sheet display.",
+    "panelTree": "Middle panel as a tree",
+    "panelTreeOn": "Entries placed inside another show below it, linked by lines. Turn off for a simple alphabetical list, like characters.",
+    "panelTreeOff": "Simple alphabetical list, like characters. The “List” view always keeps the tree."
   }
 }

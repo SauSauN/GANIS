@@ -1,7 +1,9 @@
 import { useRef, useState, type DragEvent } from "react";
 import { useConfirmImageRemoval } from "@/components/common/useConfirmImageRemoval";
 import { useTranslation } from "react-i18next";
-import { ImagePlus, Loader2, Trash2 } from "lucide-react";
+import { ImagePlus, Loader2, Maximize2, Trash2 } from "lucide-react";
+import { ImageDialog } from "@/components/common/ImageDialog";
+import { useImageFrame } from "@/stores/imageFrameStore";
 import { AvatarFace, type AvatarSize } from "@/components/characters/CharacterAvatar";
 import { PORTRAIT_ACCEPT } from "@/lib/portraitImage";
 import { cn } from "@/lib/utils";
@@ -23,6 +25,9 @@ interface PortraitPickerProps {
   frame?: boolean;
   onPick: (file: File) => void;
   onRemove: () => void;
+  /** Projet et clé du cadrage (personnage enregistré) : un clic sur la photo l'ouvre en grand. */
+  projectId?: string;
+  frameKey?: string;
 }
 
 /**
@@ -41,8 +46,13 @@ export function PortraitPicker({
   frame = false,
   onPick,
   onRemove,
+  projectId,
+  frameKey,
 }: PortraitPickerProps) {
-  const { t } = useTranslation("characters");
+  const { t } = useTranslation(["characters", "common"]);
+  const [viewing, setViewing] = useState(false);
+  const canView = Boolean(url && projectId && frameKey);
+  const frameValue = useImageFrame(projectId, frameKey);
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -79,15 +89,17 @@ export function PortraitPicker({
   // Un seul élément qui change d'état : sans image, un clic en ajoute une ;
   // avec une image, un clic la retire. Le survol montre l'action. On peut
   // aussi déposer une image (elle remplace l'actuelle).
-  const actionLabel = url ? t("portrait.remove") : t("portrait.add");
-  const ActionIcon = url ? Trash2 : ImagePlus;
+  // Personnage enregistré : un clic ouvre la photo en grand (cadrer,
+  // remplacer, retirer). À la création, un clic la retire.
+  const actionLabel = url ? (canView ? t("common:image.open") : t("portrait.remove")) : t("portrait.add");
+  const ActionIcon = url ? (canView ? Maximize2 : Trash2) : ImagePlus;
 
   return (
     <div className={cn("flex shrink-0 flex-col items-center gap-2", frame && "w-full")}>
       <button
         type="button"
         disabled={locked}
-        onClick={() => (url ? removal.ask() : inputRef.current?.click())}
+        onClick={() => (url ? (canView ? setViewing(true) : removal.ask()) : inputRef.current?.click())}
         onDragOver={onDragOver}
         onDragLeave={() => setDragOver(false)}
         onDrop={onDrop}
@@ -111,6 +123,7 @@ export function PortraitPicker({
             colorKey={colorKey}
             name={name}
             url={url}
+            frame={frameValue}
             size={frame ? "fill" : size}
             square={frame}
             // Photo de la fiche : cadre réglable (Paramètres › Apparence),
@@ -165,6 +178,18 @@ export function PortraitPicker({
         <p role="alert" className="text-center text-xs text-destructive">
           {error}
         </p>
+      )}
+      {viewing && url && projectId && frameKey && (
+        <ImageDialog
+          open
+          onClose={() => setViewing(false)}
+          projectId={projectId}
+          frameKey={frameKey}
+          url={url}
+          name={name}
+          onReplace={onPick}
+          onRemove={onRemove}
+        />
       )}
       {removal.dialog}
     </div>

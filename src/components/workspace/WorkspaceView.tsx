@@ -8,6 +8,7 @@ import {
   HOME_TAB,
   NOVEL_FEATURES,
   MANGA_FEATURES,
+  SERIES_FEATURES,
   SETTINGS_PREFIX,
   featureAvailable,
   findFeature,
@@ -60,6 +61,9 @@ const ImportView = lazy(() => import("@/components/novel/ImportView").then((modu
 const FlatplanView = lazy(() => import("@/components/manga/FlatplanView").then((module) => ({ default: module.FlatplanView })));
 const ScriptProgressView = lazy(() => import("@/components/manga/ScriptProgressView").then((module) => ({ default: module.ScriptProgressView })));
 const ProductionView = lazy(() => import("@/components/manga/ProductionView").then((module) => ({ default: module.ProductionView })));
+const StoryContinuityView = lazy(() => import("@/components/structure/StoryContinuityView").then((module) => ({ default: module.StoryContinuityView })));
+const SeriesReadView = lazy(() => import("@/components/series/SeriesReadView").then((module) => ({ default: module.SeriesReadView })));
+const SeriesProgressView = lazy(() => import("@/components/series/SeriesProgressView").then((module) => ({ default: module.SeriesProgressView })));
 const ContinuityView = lazy(() => import("@/components/manga/ContinuityView").then((module) => ({ default: module.ContinuityView })));
 // Lecture complète (film, série, jeu vidéo, JDR, projet libre).
 const StoryReadView = lazy(() => import("@/components/structure/StoryReadView").then((module) => ({ default: module.StoryReadView })));
@@ -175,6 +179,10 @@ function WorkspaceContent({
     return null;
   }
 
+  if (tabId === "manuscript.continuity") {
+    return <StoryContinuityView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
   if (tabId === "manuscript.read") {
     return <ManuscriptView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
   }
@@ -223,6 +231,25 @@ function WorkspaceContent({
     return <ContinuityView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
+  // ---------------------------------------------------------------------------
+  // Série (réservé aux projets de série ; l'onglet se ferme sinon)
+  // ---------------------------------------------------------------------------
+  if (SERIES_FEATURES.has(tabId) && project.type !== "series") {
+    return null;
+  }
+
+  if (tabId === "screenplay.read") {
+    return <SeriesReadView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "screenplay.continuity") {
+    return <StoryContinuityView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "screenplay.progress") {
+    return <SeriesProgressView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
   if (tabId === "plot.board") {
     return <PlotBoard projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
   }
@@ -231,6 +258,11 @@ function WorkspaceContent({
     return <PlotReadingView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
+
+  if (tabId === "structure.continuity") {
+    if (!featureAvailable(tabId, project.type)) return null;
+    return <StoryContinuityView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
 
   if (tabId === "structure.read") {
     if (!featureAvailable(tabId, project.type)) return null;

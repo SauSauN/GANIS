@@ -656,7 +656,7 @@
       "inside": "Will be stored in “{{name}}”."
     },
     "list": {
-      "create": "Create an object",
+      "create": "New object",
       "emptyTitle": "No objects yet",
       "emptyDescription": "Weapons, vehicles, phones, magic items… Create the ones that matter in your story.",
       "count_one": "{{count}} object",
@@ -869,7 +869,7 @@
       "inside": "Will be attached to “{{name}}”."
     },
     "list": {
-      "create": "Create an entry",
+      "create": "New entry",
       "emptyTitle": "No animals or plants yet",
       "emptyDescription": "Create the species first (grey wolves, moon roses), then the specific animals and plants of your story.",
       "count_one": "{{count}} entry",
@@ -1105,7 +1105,7 @@
       "inside": "Will be a branch of “{{name}}”."
     },
     "list": {
-      "create": "Create a faction",
+      "create": "New faction",
       "emptyTitle": "No factions yet",
       "emptyDescription": "Guilds, orders, clans, armies, cults, secret societies… Create the groups that drive your story.",
       "count_one": "{{count}} faction",
@@ -1308,7 +1308,7 @@
       "inside": "Will be attached to “{{name}}”."
     },
     "list": {
-      "create": "Create a sheet",
+      "create": "New sheet",
       "emptyTitle": "No peoples, cultures or religions yet",
       "emptyDescription": "Peoples and races, cultures, languages, religions and deities… Create the soul of your world.",
       "count_one": "{{count}} sheet",
@@ -1504,7 +1504,7 @@
       "inside": "Will be attached to “{{name}}”."
     },
     "list": {
-      "create": "Create a sheet",
+      "create": "New sheet",
       "emptyTitle": "No magic or powers yet",
       "emptyDescription": "Magic systems, energies, superpowers, schools, spells and techniques… Set the rules of your world.",
       "count_one": "{{count}} sheet",

@@ -17,6 +17,10 @@ import type {
   ExtraPagePlacement,
   ProductionStage,
   PageScript,
+  SceneBlock,
+  SceneScript,
+  SceneScriptInput,
+  EpisodeFields,
   PageScriptInput,
   Panel,
   FindOptions,
@@ -29,7 +33,7 @@ import type {
   NovelFields,
 } from "@/types";
 
-/** Découpage du récit, roman et manga. */
+/** Découpage du récit, roman, manga et série. */
 export const structureApi = {
   // -------------------------------------------------------------------------
   // Découpage du récit
@@ -76,6 +80,24 @@ export const structureApi = {
 
   /** Ajoute un manuscrit découpé à la fin du plan. */
   importManuscript: (projectId: string, plan: ImportNode[]) => call<ImportResult>("import_manuscript", { projectId, plan }),
+
+  // --------------------------------------------------------------------------
+  // Série : scénario des scènes et fiche des épisodes
+  // --------------------------------------------------------------------------
+
+  /** Scénario d'une scène : en-tête et éléments. */
+  getSceneScript: (projectId: string, sceneId: string) => call<SceneScript>("get_scene_script", { projectId, sceneId }),
+
+  /** Enregistre le scénario d'une scène d'un bloc. */
+  saveSceneScript: (projectId: string, sceneId: string, input: SceneScriptInput) =>
+    call<SceneScript>("save_scene_script", { projectId, sceneId, input }),
+
+  /** Tout le scénario de la série. */
+  getSeriesBlocks: (projectId: string) => call<SceneBlock[]>("get_series_blocks", { projectId }),
+
+  /** Logline, durée visée, statut et scénariste d'un épisode. */
+  setSeriesEpisode: (projectId: string, nodeId: string, fields: EpisodeFields) =>
+    call<StructureNode>("set_series_episode", { projectId, nodeId, fields }),
 
   // --------------------------------------------------------------------------
   // Manga / BD : scénario par page et par case
@@ -222,6 +244,10 @@ export const structureApi = {
   /** Lie un personnage à un élément (ou change son rôle). */
   linkStructureCharacter: (projectId: string, nodeId: string, characterId: string, role: NodeCharacterRole) =>
     call<void>("link_structure_character", { projectId, nodeId, characterId, role }),
+
+  /** État d'un personnage lié à un élément (continuité). */
+  setStructureCharacterState: (projectId: string, nodeId: string, characterId: string, value: string) =>
+    call<void>("set_structure_character_state", { projectId, nodeId, characterId, value }),
 
   /** Retire un personnage d'un élément. */
   unlinkStructureCharacter: (projectId: string, nodeId: string, characterId: string) =>

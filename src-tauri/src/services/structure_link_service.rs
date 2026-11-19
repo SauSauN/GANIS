@@ -47,8 +47,13 @@ pub struct NodeCharacter {
     pub node_id: String,
     pub character_id: String,
     pub role: String,
+    /// État du personnage dans l'élément (continuité) ; vide : rien à noter.
+    pub state: String,
     pub created_at: String,
 }
+
+/// Longueur maximale de l'état d'un personnage dans un élément.
+const MAX_STATE_CHARS: usize = 300;
 
 /// Lieu lié à un élément.
 #[derive(Debug, Clone, Serialize, sqlx::FromRow)]
@@ -99,7 +104,7 @@ async fn check_node(pool: &SqlitePool, node_id: &str) -> AppResult<()> {
 /// Tous les liens, dans l'ordre de création.
 pub async fn list_links(pool: &SqlitePool) -> AppResult<StructureLinks> {
     let characters = sqlx::query_as::<_, NodeCharacter>(
-        "SELECT node_id, character_id, role, created_at FROM structure_node_characters \
+        "SELECT node_id, character_id, role, state, created_at FROM structure_node_characters \
          ORDER BY created_at, character_id",
     )
     .fetch_all(pool)
@@ -142,6 +147,27 @@ pub async fn link_character(pool: &SqlitePool, node_id: &str, character_id: &str
     .execute(pool)
     .await?;
 
+    Ok(())
+}
+
+/// État d'un personnage lié à un élément (continuité). Le personnage doit
+/// déjà être lié ; un changement de rôle garde l'état.
+pub async fn set_character_state(pool: &SqlitePool, node_id: &str, character_id: &str, state: &str) -> AppResult<()> {
+    let state = state.trim();
+    if state.chars().count() > MAX_STATE_CHARS {
+        return Err(AppError::validation("Ce texte est trop long.")
+            .with_key("structureLink.stateTooLong")
+            .with_param("max", MAX_STATE_CHARS));
+    }
+    let result = sqlx::query("UPDATE structure_node_characters SET state = ? WHERE node_id = ? AND character_id = ?")
+        .bind(state)
+        .bind(node_id)
+        .bind(character_id)
+        .execute(pool)
+        .await?;
+    if result.rows_affected() == 0 {
+        return Err(not_found("structureLink.notFound", "Ce personnage n'est pas lié à cet élément."));
+    }
     Ok(())
 }
 
@@ -253,6 +279,26 @@ mod tests {
 
     async fn add(pool: &SqlitePool, sql: &str) {
         sqlx::query(sql).execute(pool).await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn the_state_of_a_linked_character_is_kept_when_its_role_changes() {
+        let pool = pool().await;
+        add(&pool, "INSERT INTO characters (id, first_name, last_name, role, status, fields, created_at, updated_at) VALUES ('c1', 'Aldric', '', 'main', 'alive', '{}', 'x', 'x')").await;
+        let scene = structure_service::create_node(&pool, ProjectType::Novel, None, 2, "", None).await.unwrap();
+
+        // Pas encore lié : rien à mettre à jour.
+        assert!(set_character_state(&pool, &scene.id, "c1", "blessé").await.is_err());
+
+        link_character(&pool, &scene.id, "c1", "present").await.unwrap();
+        set_character_state(&pool, &scene.id, "c1", "  bras en écharpe  ").await.unwrap();
+        link_character(&pool, &scene.id, "c1", "pov").await.unwrap();
+        let link = list_links(&pool).await.unwrap().characters.remove(0);
+        assert_eq!((link.role.as_str(), link.state.as_str()), ("pov", "bras en écharpe"));
+
+        assert!(set_character_state(&pool, &scene.id, "c1", &"x".repeat(MAX_STATE_CHARS + 1)).await.is_err());
+        set_character_state(&pool, &scene.id, "c1", "").await.unwrap();
+        assert_eq!(list_links(&pool).await.unwrap().characters[0].state, "");
     }
 
     #[tokio::test]
