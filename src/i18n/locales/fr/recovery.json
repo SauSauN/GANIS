@@ -19,7 +19,7 @@
     "copyFailed": "Impossible de copier la clé. Notez-la à la main.",
     "saveFailed": "Impossible d'enregistrer le fichier. Copiez la clé ou notez-la à la main.",
     "warningTitle": "Elle ne sera plus jamais affichée.",
-    "warning": "Notez-la sur papier ou rangez le fichier hors de cet ordinateur. Sans votre mot de passe ni cette clé, vos projets seront définitivement perdus : personne ne pourra les récupérer, pas même un administrateur.",
+    "warning": "Notez-la sur papier ou rangez le fichier hors de cet ordinateur. Sans votre mot de passe ni cette clé, vos projets seront définitivement perdus : personne ne pourra les récupérer.",
     "oldKeyRevoked": "L'ancienne clé ne fonctionne plus.",
     "check": "Pour confirmer que vous l'avez notée, saisissez le groupe n° {{number}}",
     "continue": "J'ai noté ma clé, continuer"

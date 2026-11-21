@@ -2,7 +2,8 @@
   "back": "Retour",
   "nav": {
     "label": "Sections des paramètres",
-    "title": "Paramètres généraux"
+    "title": "Paramètres généraux",
+    "guest": "Espace public"
   },
   "sections": {
     "account": {
@@ -33,7 +34,6 @@
       "createdAt": "Compte créé le"
     },
     "roles": {
-      "admin": "Administrateur",
       "developer": "Développeur",
       "user": "Utilisateur"
     },
@@ -248,8 +248,7 @@
     },
     "active": {
       "title": "Mode développeur activé",
-      "description": "Votre compte a accès aux outils de création de packages.",
-      "roleAdmin": "En tant qu'administrateur, vous disposez déjà de tous les outils de développement."
+      "description": "Votre compte a accès aux outils de création de packages."
     },
     "tools": {
       "title": "Créer un plugin",

@@ -212,6 +212,7 @@ export function ProjectTrashList({ projects, loading }: ProjectTrashListProps) {
 
       {/* Confirmation de la suppression définitive */}
       <Dialog
+        role="alertdialog"
         open={confirming !== null}
         guardInput={false}
         onOpenChange={(open) => {

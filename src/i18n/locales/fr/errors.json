@@ -77,7 +77,6 @@
     "passwordLetterDigit": "Le mot de passe doit contenir au moins une lettre et un chiffre.",
     "emailInvalid": "L'adresse e-mail n'est pas valide.",
     "setupDone": "La configuration initiale a déjà été effectuée.",
-    "setupRequired": "La configuration initiale de GANIS n'est pas terminée : créez d'abord le compte administrateur.",
     "usernameTaken": "Ce nom d'utilisateur est déjà utilisé.",
     "emailTaken": "Cette adresse e-mail est déjà utilisée.",
     "currentPasswordWrong": "Le mot de passe actuel est incorrect.",
@@ -108,14 +107,7 @@
     "notFound": "Le synopsis du projet est introuvable."
   },
   "user": {
-    "notFound": "Utilisateur non trouvé.",
-    "ownRole": "Vous ne pouvez pas modifier votre propre rôle.",
-    "invalidRole": "Le rôle demandé n'est pas valide.",
-    "deleteSelf": "Vous ne pouvez pas supprimer votre propre compte.",
-    "lastAdminRole": "Impossible de retirer le rôle du dernier administrateur.",
-    "lastAdminDelete": "Impossible de supprimer le dernier administrateur.",
-    "adminKeepsDeveloper": "Un administrateur conserve toujours les outils de développement.",
-    "lastAdminLeaving": "Le dernier administrateur ne peut pas supprimer son compte tant que d'autres comptes existent."
+    "notFound": "Utilisateur non trouvé."
   },
   "package": {
     "notFound": "Package introuvable.",

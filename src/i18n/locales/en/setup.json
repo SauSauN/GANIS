@@ -1,9 +1,9 @@
 {
   "title": "Welcome to GANIS",
-  "description": "Create the administrator account to get started. It will be used to manage the other accounts on this computer. Everything is stored locally, with no Internet connection.",
+  "description": "Create your account to get started. Each account manages its own projects. Everything is stored locally, with no Internet connection.",
   "username": {
     "label": "Username",
-    "placeholder": "administrator",
+    "placeholder": "your name",
     "hint": "3 to 50 characters: letters, digits, “_” and “-”."
   },
   "email": {
@@ -16,7 +16,7 @@
     "warning": "Remember it well: without it, your projects cannot be recovered."
   },
   "confirm": "Confirm password",
-  "submit": "Create administrator account",
+  "submit": "Create my account",
   "submitting": "Creating…",
   "errors": {
     "failed": "An error occurred during setup."

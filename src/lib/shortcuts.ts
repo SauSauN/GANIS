@@ -166,14 +166,19 @@ export type HelpDialog = "guide" | "shortcuts" | "about" | "center" | "whatsNew"
 
 interface HelpState {
   open: HelpDialog | null;
+  /** Onglet affiché dans l'espace de travail (`null` : aucun) ; l'aide s'ouvre sur sa rubrique. */
+  tab: string | null;
   show: (dialog: HelpDialog) => void;
   close: () => void;
+  setTab: (tab: string | null) => void;
 }
 
 export const useHelpStore = create<HelpState>((set) => ({
   open: null,
+  tab: null,
   show: (dialog) => set({ open: dialog }),
   close: () => set({ open: null }),
+  setTab: (tab) => set({ tab }),
 }));
 
 const GUIDE_SEEN_KEY = "ganis-guide-seen";

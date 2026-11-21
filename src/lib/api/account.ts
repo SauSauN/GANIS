@@ -16,54 +16,18 @@ export const accountApi = {
   appInfo: () => call<AppInfo>("app_info"),
 
   // -------------------------------------------------------------------------
-  // Phase 2 — Configuration initiale & administration
+  // Phase 2 — Configuration initiale
   // -------------------------------------------------------------------------
 
   /**
-   * Crée le premier compte administrateur.
+   * Crée le premier compte (un compte « Utilisateur » comme les autres).
    * Retourne aussi sa clé de récupération, à montrer une seule fois.
    */
-  setupAdmin: (input: {
+  setupFirstAccount: (input: {
     username: string;
     password: string;
     email?: string;
-  }) => call<AccountCreated>("setup_admin", { input }),
-
-  // Commandes d'administration désactivées côté Rust (mises en commentaire
-  // dans src-tauri/src/lib.rs). À décommenter en même temps qu'elles.
-  // /**
-  //  * Liste les comptes utilisateurs locaux.
-  //  *
-  //  * La protection administrateur est effectuée côté Rust.
-  //  */
-  // listUsers: () => call<User[]>("list_users"),
-  //
-  // /**
-  //  * Modifie le rôle d'un utilisateur.
-  //  *
-  //  * La vérification des droits administrateur est effectuée
-  //  * côté backend Rust.
-  //  */
-  // updateUserRole: (userId: string, role: User["role"]) =>
-  //   call<User>("update_user_role", {
-  //     userId,
-  //     role,
-  //   }),
-  //
-  // /**
-  //  * Crée un compte avec un rôle précis (administrateur uniquement).
-  //  */
-  // createUser: (input: {
-  //   username: string;
-  //   password: string;
-  //   email?: string;
-  //   role: Role;
-  // }) => call<User>("create_user", { input }),
-  //
-  // /**
-  //  * Supprime un compte local, avec ses projets (administrateur uniquement).
-  //  */
-  // deleteUser: (userId: string) => call<void>("delete_user", { userId }),
+  }) => call<AccountCreated>("setup_first_account", { input }),
 
   /**
    * Indique si au moins un compte utilisateur existe.
@@ -193,7 +157,7 @@ export const accountApi = {
   // Commande de diagnostic désactivée côté Rust (mise en commentaire
   // dans src-tauri/src/lib.rs). À décommenter en même temps qu'elle.
   // /**
-  //  * Rapport de diagnostic (administrateur ou développeur).
+  //  * Rapport de diagnostic (développeur).
   //  */
   // getDiagnostics: () => call<Diagnostics>("get_diagnostics"),
 };

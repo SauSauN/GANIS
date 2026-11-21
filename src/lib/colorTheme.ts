@@ -125,7 +125,9 @@ export function paletteToVars(palette: ThemePalette): Record<string, string> {
     "--success": readableOn(p.success, [p.background, p.card, p.secondary]),
     "--warning": readableOn(p.warning, [p.background, p.card, p.secondary]),
     "--border": p.border,
-    "--input": p.border,
+    // Bordure des champs : elle seule les délimite, donc au moins 3:1 sur
+    // les fonds (WCAG 1.4.11). Les séparateurs (--border) restent discrets.
+    "--input": visibleOn(p.border, [p.background, p.card]),
     "--ring": p.primary,
     "--chart-1": p.primary,
     "--chart-2": `color-mix(in oklab, ${p.primary} 65%, ${p.background})`,
@@ -534,6 +536,9 @@ export function contrastRatio(a: string, b: string): number | null {
 /** Contraste minimal recommandé pour le texte courant (WCAG AA). */
 export const MIN_TEXT_CONTRAST = 4.5;
 
+/** Contraste minimal des éléments d'interface : bordure d'un champ (WCAG 1.4.11). */
+export const MIN_UI_CONTRAST = 3;
+
 function hexToHsl(hex: string): [number, number, number] {
   const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
   const max = Math.max(r, g, b);
@@ -584,6 +589,24 @@ export function readableOn(color: string, backgrounds: string[], target = MIN_TE
   let current = color.toUpperCase();
   for (let step = 0; step < 100 && worst(current) < target; step++) {
     l = darkSurface ? Math.min(1, l + 0.01) : Math.max(0, l - 0.01);
+    current = hslToHex([h, s, l]);
+  }
+  return current;
+}
+/**
+ * Couleur d'un élément d'interface (bordure d'un champ) ajustée juste assez
+ * pour atteindre `target` avec chacun des fonds : pas plus, pour rester
+ * discrète. Couleur inchangée si elle suffit déjà ou n'est pas valide.
+ */
+export function visibleOn(color: string, backgrounds: string[], target = MIN_UI_CONTRAST): string {
+  const fonds = backgrounds.filter(isHexColor);
+  if (!isHexColor(color) || fonds.length === 0) return color;
+  const darkSurface = luminance(fonds[0]) < 0.2;
+  const worst = (c: string) => Math.min(...fonds.map((b) => contrastRatio(c, b) ?? 21));
+  const [h, s, l0] = hexToHsl(color);
+  let current = color.toUpperCase();
+  for (let step = 1; step <= 400 && worst(current) < target; step++) {
+    const l = darkSurface ? Math.min(1, l0 + step * 0.0025) : Math.max(0, l0 - step * 0.0025);
     current = hslToHex([h, s, l]);
   }
   return current;

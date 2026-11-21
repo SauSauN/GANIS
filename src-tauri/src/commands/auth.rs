@@ -53,8 +53,7 @@ impl From<LoginOutcome> for LoginResponse {
 
 /// Inscription publique.
 ///
-/// Crée toujours un compte « Utilisateur ». Refusée tant que la
-/// configuration initiale (compte administrateur) n'est pas faite.
+/// Crée toujours un compte « Utilisateur ».
 #[tauri::command]
 pub async fn register(
     state: State<'_, AppState>,
@@ -97,17 +96,18 @@ pub async fn has_any_user(state: State<'_, AppState>) -> AppResult<bool> {
     crate::db::app_db::has_any_user(&state.app_db).await
 }
 
-/// Crée le premier compte administrateur (configuration initiale).
+/// Crée le premier compte (configuration initiale), un compte
+/// « Utilisateur » comme les suivants : chacun administre ses projets.
 ///
 /// Ne réussit que si aucun compte n'existe. La vérification et la
 /// création sont atomiques : deux demandes simultanées ne peuvent pas
-/// créer deux administrateurs.
+/// toutes deux aboutir.
 #[tauri::command]
-pub async fn setup_admin(
+pub async fn setup_first_account(
     state: State<'_, AppState>,
     input: RegisterInput,
 ) -> AppResult<AccountCreatedResponse> {
-    auth_service::setup_first_admin(
+    auth_service::setup_first_account(
         &state.app_db,
         &input.username,
         &input.password,

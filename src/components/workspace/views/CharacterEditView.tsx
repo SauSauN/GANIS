@@ -344,7 +344,7 @@ export function CharacterEditView({
         />
       </form>
 
-      <Dialog open={confirmDelete} onOpenChange={(open) => !open && !deleting && setConfirmDelete(false)}>
+      <Dialog role="alertdialog" open={confirmDelete} onOpenChange={(open) => !open && !deleting && setConfirmDelete(false)}>
         <DialogHeader>
           <DialogTitle>{t("edit.deleteTitle", { name })}</DialogTitle>
           <DialogDescription>{t("edit.deleteDescription")}</DialogDescription>

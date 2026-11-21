@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { RecoveryKeyPanel } from "@/components/auth/RecoveryKeyPanel";
+import { FieldError, PasswordInput, useAccountValidation } from "@/components/auth/AccountFields";
 import { Feather } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,24 +17,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api, ApiError } from "@/lib/api";
 import { RECOVERY_KEY_ENABLED } from "@/lib/recoveryKey";
-import {
-  checkEmail,
-  checkPassword,
-  checkUsername,
-  type ValidationIssue,
-} from "@/lib/validators";
 import { useAuthStore } from "@/stores/authStore";
 import { useSetupStore } from "@/stores/setupStore";
 
 /**
- * Erreur affichée sous le formulaire.
- *
- * On garde le code du problème (pas le texte) : le message suit la langue
- * si elle change pendant qu'il est affiché. `text` ne sert qu'aux erreurs
- * renvoyées par Rust (encore en français).
+ * Erreur du formulaire entier, affichée sous les champs (les erreurs de
+ * saisie, elles, s'affichent sous chaque champ). `text` ne sert qu'aux
+ * erreurs renvoyées par Rust (encore en français).
  */
 type SetupError =
-  | { issue: ValidationIssue }
   | { key: "failed" }
   | { text: string };
 
@@ -41,10 +33,11 @@ type SetupError =
  * Assistant de configuration initiale (§37.9).
  *
  * Affiché au premier lancement, lorsqu'aucun compte n'existe encore
- * (voir `SetupGate`). Crée le compte administrateur, puis connecte
+ * (voir `SetupGate`). Crée le premier compte, un compte « Utilisateur »
+ * comme les suivants (chacun administre ses projets), puis connecte
  * directement l'utilisateur.
  *
- * La protection réelle est côté Rust : `setup_admin` échoue dès qu'un
+ * La protection réelle est côté Rust : `setup_first_account` échoue dès qu'un
  * compte existe, même si deux demandes arrivent en même temps.
  */
 export default function Setup() {
@@ -64,32 +57,24 @@ export default function Setup() {
   // Clé de récupération du compte créé, montrée une seule fois.
   const [recoveryKey, setRecoveryKey] = useState<string | null>(null);
 
-  function validate(): ValidationIssue | null {
-    return (
-      checkUsername(username) ??
-      checkPassword(password) ??
-      (password !== confirm ? "passwordMismatch" : null) ??
-      checkEmail(email)
-    );
-  }
+  // Une erreur sous chaque champ, reliée au champ (voir `AccountFields`).
+  const validation = useAccountValidation(
+    { username, email, password, confirm },
+    { username: "setup-username", email: "setup-email", password: "setup-password", confirm: "setup-confirm" },
+  );
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     setError(null);
 
-    const issue = validate();
-
-    if (issue) {
-      setError({ issue });
-      return;
-    }
+    if (!validation.validateAll()) return;
 
     setLoading(true);
 
     let created: { recoveryKey: string | null };
 
     try {
-      created = await api.setupAdmin({
+      created = await api.setupFirstAccount({
         username: username.trim(),
         password,
         email: email.trim() || undefined,
@@ -136,9 +121,7 @@ export default function Setup() {
 
   const errorMessage = !error
     ? null
-    : "issue" in error
-      ? t(`common:validation.${error.issue}`)
-      : "key" in error
+    : "key" in error
         ? t("errors.failed")
         : error.text;
 
@@ -177,14 +160,15 @@ export default function Setup() {
             <div className="space-y-2">
               <Label htmlFor="setup-username">{t("username.label")}</Label>
               <Input
-                id="setup-username"
                 autoComplete="username"
                 autoFocus
                 value={username}
+                {...validation.fieldProps("username", "setup-username-hint")}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder={t("username.placeholder")}
               />
-              <p className="text-xs text-muted-foreground">
+              <FieldError id={validation.errorId("username")} issue={validation.shown("username")} />
+              <p id="setup-username-hint" className="text-xs text-muted-foreground">
                 {t("username.hint")}
               </p>
             </div>
@@ -192,26 +176,27 @@ export default function Setup() {
             <div className="space-y-2">
               <Label htmlFor="setup-email">{t("email.label")}</Label>
               <Input
-                id="setup-email"
                 type="email"
                 autoComplete="email"
                 value={email}
+                {...validation.fieldProps("email")}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t("email.placeholder")}
               />
+              <FieldError id={validation.errorId("email")} issue={validation.shown("email")} />
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="setup-password">{t("password.label")}</Label>
-              <Input
-                id="setup-password"
+              <PasswordInput
                 placeholder={t("common:placeholders.newPassword")}
-                type="password"
                 autoComplete="new-password"
                 value={password}
+                {...validation.fieldProps("password", "setup-password-hint")}
                 onChange={(e) => setPassword(e.target.value)}
               />
-              <p className="text-xs text-muted-foreground">
+              <FieldError id={validation.errorId("password")} issue={validation.shown("password")} />
+              <p id="setup-password-hint" className="text-xs text-muted-foreground">
                 {t("password.hint")}
                 {!RECOVERY_KEY_ENABLED && <> {t("password.warning")}</>}
               </p>
@@ -219,14 +204,14 @@ export default function Setup() {
 
             <div className="space-y-2">
               <Label htmlFor="setup-confirm">{t("confirm")}</Label>
-              <Input
-                id="setup-confirm"
+              <PasswordInput
                 placeholder={t("common:placeholders.confirmPassword")}
-                type="password"
                 autoComplete="new-password"
                 value={confirm}
+                {...validation.fieldProps("confirm")}
                 onChange={(e) => setConfirm(e.target.value)}
               />
+              <FieldError id={validation.errorId("confirm")} issue={validation.shown("confirm")} />
             </div>
 
             {errorMessage && (

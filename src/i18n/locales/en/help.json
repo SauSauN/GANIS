@@ -239,7 +239,21 @@
     "privacy": "Your data",
     "credits": "Credits",
     "dictionaries": "Spelling dictionaries: French, Grammalecte (Olivier R., MPL 2.0); English, SCOWL (wordlist.sourceforge.net).",
-    "openHelp": "GANIS help"
+    "openHelp": "GANIS help",
+    "updates": {
+      "title": "Updates",
+      "check": "Check for updates",
+      "checking": "Checking…",
+      "upToDate": "GANIS is up to date (version {{version}}).",
+      "available": "GANIS version {{version}} is available.",
+      "download": "Download version {{version}}",
+      "downloadShort": "Download",
+      "none": "No version has been published yet.",
+      "failed": "Could not check: no connection, or the server is not responding. Try again later.",
+      "openFailed": "The download page could not be opened.",
+      "auto": "Check at startup (at most once a day)",
+      "privacy": "This is GANIS's only network connection: it only reads the latest version number from {{host}}. Nothing about your account or projects is sent, and nothing installs by itself."
+    }
   },
   "whatsNew": {
     "title": "What's new",
@@ -448,6 +462,7 @@
         "items": [
           "The editor offers headings, fonts, sizes, colours, lists, tables and links. Less common tools are in the “…” menu at the end of the bar.",
           "Sticky-note box: a coloured block in the text. Linked boxes: steps joined by arrows, with “+” to insert more. Diagram: boxes you move and connect with the mouse.",
+          "Mention a project item, in a note or in a novel scene's text: “$$” followed by a few letters searches the whole project. A letter between two “$” shows one kind only: “$c$” characters, “$l$” locations, “$s$” structure, “$w$” world (items, wildlife, factions, peoples, magic), “$n$” notes, “$i$” gallery images. French letters work too: “$p$” characters, “$d$” structure, “$u$” world. Clicking the link opens the sheet.",
           "File notes in folders by dragging them in the panel; pin the most important ones.",
           "The sticky-note wall holds loose ideas: move them by their strip, resize them by their corner."
         ]

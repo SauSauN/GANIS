@@ -10,7 +10,7 @@ use tauri::State;
 
 /// Retourne le rapport de diagnostic de l'application.
 ///
-/// Réservé aux rôles administrateur et développeur : le contrôle est
+/// Réservé au rôle développeur : le contrôle est
 /// effectué côté Rust, indépendamment de l'interface.
 #[tauri::command]
 pub async fn get_diagnostics(

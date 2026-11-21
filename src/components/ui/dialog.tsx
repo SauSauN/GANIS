@@ -15,6 +15,11 @@ interface DialogProps {
    * perdre. Les boutons de la fenêtre (« Annuler »…) ferment sans question.
    */
   guardInput?: boolean;
+  /**
+   * `alertdialog` pour une confirmation (suppression, perte de données…) :
+   * les lecteurs d'écran l'annoncent comme une alerte qui attend une réponse.
+   */
+  role?: "dialog" | "alertdialog";
 }
 
 /** Identifiants du titre et de la description, pour `aria-labelledby`. */
@@ -37,13 +42,13 @@ const FOCUSABLE =
 
 /**
  * Fenêtre modale accessible (§31) :
- * - `role="dialog"` + `aria-modal`, nommée par son `DialogTitle` ;
+ * - `role="dialog"` (ou `alertdialog` pour une confirmation) + `aria-modal`, nommée par son `DialogTitle` ;
  * - le focus entre dans la fenêtre à l'ouverture, y reste (Tab / Maj+Tab)
  *   et revient à l'élément d'origine à la fermeture ;
  * - Échap ou un clic sur le fond ferment la fenêtre ; si une saisie a été
  *   faite, une confirmation est demandée d'abord (`guardInput`).
  */
-function Dialog({ open, onOpenChange, children, className, guardInput = true }: DialogProps) {
+function Dialog({ open, onOpenChange, children, className, guardInput = true, role = "dialog" }: DialogProps) {
   const { t } = useTranslation("common");
   const panelRef = React.useRef<HTMLDivElement>(null);
   /** Une saisie a eu lieu depuis l'ouverture. */
@@ -148,7 +153,7 @@ function Dialog({ open, onOpenChange, children, className, guardInput = true }: 
     >
       <div
         ref={panelRef}
-        role="dialog"
+        role={role}
         aria-modal="true"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}

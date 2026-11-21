@@ -143,5 +143,9 @@
     "results_one": "{{count}} résultat",
     "results_other": "{{count}} résultats",
     "clear": "Effacer les filtres"
+  },
+  "password": {
+    "show": "Afficher le mot de passe",
+    "hide": "Masquer le mot de passe"
   }
 }

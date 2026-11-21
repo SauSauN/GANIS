@@ -19,7 +19,7 @@
     "copyFailed": "The key could not be copied. Write it down by hand.",
     "saveFailed": "The file could not be saved. Copy the key or write it down by hand.",
     "warningTitle": "It will never be shown again.",
-    "warning": "Write it on paper or keep the file away from this computer. Without your password or this key, your projects will be lost for good: nobody can recover them, not even an administrator.",
+    "warning": "Write it on paper or keep the file away from this computer. Without your password or this key, your projects will be lost for good: nobody can recover them.",
     "oldKeyRevoked": "The previous key no longer works.",
     "check": "To confirm you wrote it down, type group no. {{number}}",
     "continue": "I wrote down my key, continue"

@@ -230,7 +230,83 @@ export function forceLayout(
     temperature = Math.max(temperature * 0.97, 1);
   }
 
-  return Object.fromEntries(ids.map((id, i) => [id, { x: Math.round(pos[i].x), y: Math.round(pos[i].y) }]));
+  return fillSpace(Object.fromEntries(ids.map((id, i) => [id, { x: pos[i].x, y: pos[i].y }])));
+}
+
+/** Proportions visées pour un dessin « force » (largeur / hauteur d'un écran). */
+const TARGET_ASPECT = 1.6;
+
+/**
+ * Remet un dessin « force » à la forme de l'écran.
+ *
+ * Une chaîne de relations donne souvent une longue diagonale : une fois
+ * recadrée, elle laisse les deux tiers de la zone vides et rend les noms
+ * minuscules. On tourne le dessin selon son axe principal (horizontal),
+ * on étire l'axe court jusqu'à des proportions d'écran, puis on ramène
+ * l'écart entre voisins à `SPACING` : le dessin occupe la zone et se lit
+ * sans zoomer. Un dessin tout en ligne devient un cercle.
+ */
+export function fillSpace(positions: Positions): Positions {
+  const ids = Object.keys(positions);
+  const n = ids.length;
+  if (n <= 2) return roundPositions(positions);
+
+  const points = ids.map((id) => positions[id]);
+  const mean = {
+    x: points.reduce((sum, p) => sum + p.x, 0) / n,
+    y: points.reduce((sum, p) => sum + p.y, 0) / n,
+  };
+
+  // Axe principal (analyse en composantes principales 2×2).
+  let sxx = 0;
+  let syy = 0;
+  let sxy = 0;
+  for (const p of points) {
+    const dx = p.x - mean.x;
+    const dy = p.y - mean.y;
+    sxx += dx * dx;
+    syy += dy * dy;
+    sxy += dx * dy;
+  }
+  const angle = 0.5 * Math.atan2(2 * sxy, sxx - syy);
+  const cos = Math.cos(angle);
+  const sin = Math.sin(angle);
+
+  let rotated = points.map((p) => {
+    const dx = p.x - mean.x;
+    const dy = p.y - mean.y;
+    return { x: dx * cos + dy * sin, y: -dx * sin + dy * cos };
+  });
+
+  const spread = (axis: "x" | "y") => Math.sqrt(rotated.reduce((sum, p) => sum + p[axis] * p[axis], 0) / n);
+  const major = spread("x");
+  const minor = spread("y");
+
+  // Tout en ligne : rien à étirer, un cercle se lit mieux.
+  if (major < 1 || minor < major * 0.02) return circleLayout(ids);
+
+  // Axe court étiré jusqu'aux proportions de l'écran (jamais écrasé).
+  const stretch = Math.max(1, major / (minor * TARGET_ASPECT));
+  rotated = rotated.map((p) => ({ x: p.x, y: p.y * stretch }));
+
+  // Écart typique entre voisins ramené à SPACING : ni amas, ni vide.
+  const nearest = rotated.map((p, i) =>
+    Math.min(...rotated.filter((_, j) => j !== i).map((q) => Math.hypot(p.x - q.x, p.y - q.y))),
+  );
+  const sorted = [...nearest].sort((a, b) => a - b);
+  const median = sorted[Math.floor(n / 2)];
+  const closest = Math.max(sorted[0], 0.01);
+  // Le plus proche voisin reste à au moins 70 % de SPACING.
+  const scale = Math.max(SPACING / Math.max(median, 0.01), (SPACING * 0.7) / closest);
+  const capped = Math.min(scale, (SPACING * 2.5) / closest);
+
+  return roundPositions(Object.fromEntries(ids.map((id, i) => [id, { x: rotated[i].x * capped, y: rotated[i].y * capped }])));
+}
+
+function roundPositions(positions: Positions): Positions {
+  return Object.fromEntries(
+    Object.entries(positions).map(([id, p]) => [id, { x: Math.round(p.x), y: Math.round(p.y) }]),
+  );
 }
 
 /**

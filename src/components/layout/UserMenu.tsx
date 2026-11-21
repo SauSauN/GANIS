@@ -103,6 +103,7 @@ export function UserMenu() {
   const { t } = useTranslation("usermenu");
 
   const user = useAuthStore((state) => state.user);
+  const guest = useAuthStore((state) => state.guest);
   const logout = useAuthStore((state) => state.logout);
 
   // Ouvert au clic (convention des menus), fermé au clic extérieur ou avec Échap.
@@ -129,7 +130,10 @@ export function UserMenu() {
     };
   }, [open]);
 
-  if (!user) {
+  // Sans compte (espace public, après « Commencer ») : le menu donne aussi
+  // accès aux paramètres généraux et aux packages. La langue reste dans la
+  // barre du haut et « Se connecter » à côté du menu.
+  if (!user && !guest) {
     return null;
   }
 
@@ -154,7 +158,7 @@ export function UserMenu() {
         <UserIcon className="h-4 w-4" />
 
         <span className="hidden max-w-32 truncate sm:inline">
-          {user.username}
+          {user ? user.username : t("guest")}
         </span>
       </button>
 
@@ -177,20 +181,24 @@ export function UserMenu() {
           {t("packages")}
         </button>
 
-        {/* Langue de l'interface (une fois connecté ; avant, dans la barre du haut) */}
-        <LanguageItem />
+        {user && (
+          <>
+            {/* Langue de l'interface (une fois connecté ; avant, dans la barre du haut) */}
+            <LanguageItem />
 
-        <div className="my-1 h-px bg-border" />
+            <div className="my-1 h-px bg-border" />
 
-        <button
-          type="button"
-          data-close
-          onClick={handleLogout}
-          className={cn(itemClass, "text-destructive hover:bg-destructive/10")}
-        >
-          <LogOut className="h-4 w-4" />
-          {t("logout")}
-        </button>
+            <button
+              type="button"
+              data-close
+              onClick={handleLogout}
+              className={cn(itemClass, "text-destructive hover:bg-destructive/10")}
+            >
+              <LogOut className="h-4 w-4" />
+              {t("logout")}
+            </button>
+          </>
+        )}
       </div>
       )}
     </div>

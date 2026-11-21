@@ -13,7 +13,7 @@
   },
   "editor": {
     "toolbar": "Mise en forme de la note",
-    "placeholder": "Écrivez votre note… (« $$ » pour citer un personnage, un lieu ou un élément du découpage)",
+    "placeholder": "Écrivez votre note… (« $$ » pour citer un élément du projet, « $c$ » un personnage, « $l$ » un lieu…)",
     "undo": "Annuler (Ctrl+Z)",
     "redo": "Rétablir (Ctrl+Y)",
     "block": {
@@ -190,10 +190,19 @@
     "label": "Éléments du projet",
     "open": "Ouvrir « {{name}} »",
     "missing": "Cet élément n'existe plus",
+    "imageMissing": "Cette image n'est plus dans la galerie",
+    "openGallery": "Ouvrir la galerie",
     "kinds": {
       "character": "Personnage",
       "location": "Lieu",
-      "node": "Découpage"
+      "node": "Découpage",
+      "item": "Objet",
+      "species": "Faune et flore",
+      "faction": "Faction",
+      "people": "Peuple",
+      "magic": "Magie",
+      "note": "Note",
+      "image": "Image"
     }
   },
   "spell": {

@@ -2,7 +2,7 @@ import { useEffect, type MouseEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useMatch } from "react-router-dom";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Activity, Blocks, LogIn, Moon, Play, Search, Settings, Square, Sun, Undo2 } from "lucide-react";
+import { Activity, LogIn, Moon, Play, Search, Square, Sun, Undo2 } from "lucide-react";
 import ganisLogo from "@/assets/ganis-logo.png";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
 import { MenuBar } from "@/components/layout/MenuBar";
@@ -43,8 +43,6 @@ export function TitleBar() {
   /** Dans l'application : connecté, ou sans compte après « Commencer ». */
   const inApp = Boolean(user) || guest;
 
-  const onSettingsPage = useMatch("/settings") !== null;
-  const onPackagesPage = useMatch("/packages/*") !== null;
   const onDashboard = useMatch("/dashboard") !== null;
 
   const match = useMatch("/workspace/:projectId");
@@ -234,34 +232,6 @@ export function TitleBar() {
           </button>
         )}
 
-        {/* Packages (thèmes) */}
-        {user && (
-          <button
-            type="button"
-            onClick={() => navigate("/packages")}
-            aria-label={t("packages")}
-            title={t("packages")}
-            aria-current={onPackagesPage ? "page" : undefined}
-            className={cn(iconButton, onPackagesPage && "bg-secondary text-foreground")}
-          >
-            <Blocks className="h-4 w-4" />
-          </button>
-        )}
-
-        {/* Paramètres généraux (compte, apparence) */}
-        {user && (
-          <button
-            type="button"
-            onClick={() => navigate("/settings")}
-            aria-label={t("settings")}
-            title={t("settings")}
-            aria-current={onSettingsPage ? "page" : undefined}
-            className={cn(iconButton, onSettingsPage && "bg-secondary text-foreground")}
-          >
-            <Settings className="h-4 w-4" />
-          </button>
-        )}
-
         {/* Sans compte : connexion */}
         {!user && guest && (
           <button
@@ -274,7 +244,8 @@ export function TitleBar() {
           </button>
         )}
 
-        {/* Menu du compte : paramètres, administration, déconnexion */}
+        {/* Menu du compte : seul accès aux paramètres généraux et aux packages
+            (pas d'icônes en double dans la barre), langue, déconnexion. */}
         <UserMenu />
       </div>
 

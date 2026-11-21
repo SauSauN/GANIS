@@ -166,6 +166,18 @@ describe("couleurs d'état lisibles", () => {
     }
   });
 
+  it("chaque thème intégré donne une bordure de champ à 3:1 au moins sur ses fonds", () => {
+    for (const theme of BUILTIN_THEMES) {
+      for (const mode of ["light", "dark"] as const) {
+        const p = theme.theme[mode];
+        const vars = paletteToVars(p);
+        for (const bg of [p.background, p.card]) {
+          expect(contrastRatio(vars["--input"], bg), `${theme.id} ${mode} --input sur ${bg}`).toBeGreaterThanOrEqual(3);
+        }
+      }
+    }
+  });
+
   it("une couleur trop pâle d'un thème personnalisé est ajustée sans changer de teinte", () => {
     const fixed = readableOn("#FBBF24", ["#FAFAFD", "#FFFFFF", "#EEEFFD"]);
     expect(contrastRatio(fixed, "#FFFFFF")).toBeGreaterThanOrEqual(4.5);

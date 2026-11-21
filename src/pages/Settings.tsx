@@ -35,6 +35,9 @@ const navItemClass = (selected: boolean) =>
     selected && "bg-sidebar-accent font-medium",
   );
 
+/** Sections ouvertes sans compte (espace public) : réglages de l'appareil. */
+const GUEST_SECTIONS: SectionId[] = ["appearance", "saving"];
+
 function isSectionId(value: string | null): value is SectionId {
   return SECTIONS.some((section) => section.id === value);
 }
@@ -59,8 +62,11 @@ export default function Settings() {
   const user = useAuthStore((state) => state.user);
   const panelWidth = clampPanelWidth(usePanelWidth());
 
+  // Sans compte : ni « Compte » ni « Développeur », qui en dépendent.
+  const sections = user ? SECTIONS : SECTIONS.filter(({ id }) => GUEST_SECTIONS.includes(id));
   const requested = params.get("section");
-  const section: SectionId = isSectionId(requested) ? requested : "account";
+  const section: SectionId =
+    isSectionId(requested) && sections.some(({ id }) => id === requested) ? requested : sections[0].id;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col bg-background">
@@ -76,12 +82,12 @@ export default function Settings() {
           <div className="px-4 py-3">
             <p className="text-xs text-muted-foreground">{t("nav.title")}</p>
             <p className="truncate text-sm font-semibold">
-              {user?.username}
+              {user?.username ?? t("nav.guest")}
             </p>
           </div>
 
           <ul className="px-2">
-            {SECTIONS.map(({ id, icon: Icon }) => (
+            {sections.map(({ id, icon: Icon }) => (
               <li key={id}>
                 <button
                   type="button"

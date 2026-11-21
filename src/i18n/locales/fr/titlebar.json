@@ -1,14 +1,12 @@
 {
   "home": "Accueil",
   "toggleTheme": "Changer de thème",
-  "settings": "Paramètres généraux",
   "window": {
     "minimize": "Réduire",
     "maximize": "Agrandir",
     "restore": "Restaurer",
     "close": "Fermer"
   },
-  "packages": "Packages",
   "backToProject": "Revenir au projet « {{name}} »",
   "activity": "Rythme de travail",
   "guest": {

@@ -772,7 +772,7 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
       {/* =====================================================================
           CONFIRMATION DE RENUMÉROTATION
           ===================================================================== */}
-      <Dialog open={renumbering} onOpenChange={(open) => !open && setRenumbering(false)}>
+      <Dialog role="alertdialog" open={renumbering} onOpenChange={(open) => !open && setRenumbering(false)}>
         <DialogHeader>
           <DialogTitle>{t("numbering.confirmTitle")}</DialogTitle>
           <DialogDescription>{t("numbering.confirmDescription")}</DialogDescription>
@@ -789,7 +789,7 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
       {/* =====================================================================
           CONFIRMATION DE SUPPRESSION
           ===================================================================== */}
-      <Dialog open={toDelete !== null} onOpenChange={(open) => !open && setToDelete(null)}>
+      <Dialog role="alertdialog" open={toDelete !== null} onOpenChange={(open) => !open && setToDelete(null)}>
         <DialogHeader>
           <DialogTitle>{t("plan.delete.title", { title: toDelete ? headingOf(toDelete).label : "" })}</DialogTitle>
           <DialogDescription>

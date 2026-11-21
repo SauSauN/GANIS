@@ -1,14 +1,12 @@
 {
   "home": "Home",
   "toggleTheme": "Toggle theme",
-  "settings": "General settings",
   "window": {
     "minimize": "Minimize",
     "maximize": "Maximize",
     "restore": "Restore",
     "close": "Close"
   },
-  "packages": "Packages",
   "backToProject": "Back to project “{{name}}”",
   "activity": "Work rhythm",
   "guest": {

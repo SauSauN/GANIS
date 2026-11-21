@@ -15,6 +15,7 @@ import {
   useInternalNode,
   useNodesInitialized,
   useReactFlow,
+  useStore,
   type Connection,
   type Edge,
   type EdgeProps,
@@ -44,6 +45,29 @@ import type { Character, Relation } from "@/types";
 /** Largeur d'un nœud et rayon de son avatar (px). */
 const NODE_WIDTH = 168;
 const AVATAR_RADIUS = 40;
+
+/**
+ * Lisibilité au zoom.
+ *
+ * - Les noms ne descendent pas sous ~12 px à l'écran : en dessous de
+ *   `NAME_MIN_ZOOM`, l'étiquette est agrandie d'autant (jusqu'à ×2,2).
+ * - Les libellés des liens sont masqués sous `EDGE_LABEL_MIN_ZOOM` plutôt
+ *   que réduits à quelques pixels.
+ * - Le cadrage automatique ne descend pas sous `FIT_MIN_ZOOM` : un très
+ *   grand graphe se parcourt, il ne se réduit pas jusqu'à l'illisible.
+ */
+const NAME_MIN_ZOOM = 0.85;
+const EDGE_LABEL_MIN_ZOOM = 0.6;
+const FIT_MIN_ZOOM = 0.45;
+
+/** Agrandissement des noms au zoom courant (arrondi : peu de rendus). */
+function useNameScale(): number {
+  return useStore((state) => {
+    const zoom = state.transform[2];
+    if (zoom >= NAME_MIN_ZOOM) return 1;
+    return Math.round(Math.min(NAME_MIN_ZOOM / zoom, 2.2) * 10) / 10;
+  });
+}
 
 // ----------------------------------------------------------------------------
 // Thème clair / sombre de React Flow
@@ -80,6 +104,8 @@ type CharacterNodeData = {
 type CharacterNodeType = Node<CharacterNodeData, "character">;
 
 const CharacterNode = memo(function CharacterNode({ data }: NodeProps<CharacterNodeType>) {
+  const nameScale = useNameScale();
+
   return (
     <div
       className={cn(
@@ -113,9 +139,10 @@ const CharacterNode = memo(function CharacterNode({ data }: NodeProps<CharacterN
 
       <span
         className={cn(
-          "max-w-full truncate rounded-md bg-background/90 px-2 py-0.5 text-center text-sm font-semibold shadow-sm",
+          "max-w-full origin-top truncate rounded-md bg-background/90 px-2 py-0.5 text-center text-sm font-semibold shadow-sm",
           data.selected && "text-primary",
         )}
+        style={nameScale > 1 ? { transform: `scale(${nameScale})` } : undefined}
       >
         {fullName(data.character)}
       </span>
@@ -167,6 +194,7 @@ function RelationEdge({ id, source, target, data, markerEnd, selected }: EdgePro
   const from = avatarCenter(useInternalNode(source));
   const to = avatarCenter(useInternalNode(target));
   const colors = useRelationColors();
+  const labelReadable = useStore((state) => state.transform[2] >= EDGE_LABEL_MIN_ZOOM);
 
   if (!from || !to || !data) return null;
 
@@ -212,7 +240,7 @@ function RelationEdge({ id, source, target, data, markerEnd, selected }: EdgePro
         }}
       />
 
-      {data.showLabel && !data.dimmed && (
+      {data.showLabel && labelReadable && !data.dimmed && (
         <EdgeLabelRenderer>
           <div
             className="nodrag nopan pointer-events-none absolute rounded-full border-2 bg-background/95 px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap shadow-sm"
@@ -331,7 +359,7 @@ function GraphCanvas(props: RelationGraphProps) {
 
   useEffect(() => {
     if (!initialized) return;
-    const timer = window.setTimeout(() => void fitView({ padding: 0.25, duration: 300 }), 30);
+    const timer = window.setTimeout(() => void fitView({ padding: 0.12, minZoom: FIT_MIN_ZOOM, duration: 300 }), 30);
     return () => window.clearTimeout(timer);
   }, [initialized, layoutKey, characters.length, fitView]);
 
@@ -391,6 +419,7 @@ function GraphCanvas(props: RelationGraphProps) {
       minZoom={0.15}
       maxZoom={2.5}
       fitView
+      fitViewOptions={{ padding: 0.12, minZoom: FIT_MIN_ZOOM }}
       proOptions={{ hideAttribution: true }}
       deleteKeyCode={null}
       // Fond de la page (comme « Lecture de l'histoire ») : React Flow impose

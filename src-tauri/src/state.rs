@@ -199,28 +199,14 @@ impl AppState {
             .ok_or_else(AppError::unauthorized)
     }
 
-    /// Vérifie que l'utilisateur connecté est administrateur.
-    // Gestion des comptes par l'administrateur : désactivée (voir `lib.rs`), gardée pour être rétablie.
-    #[allow(dead_code)]
-    pub async fn require_admin(&self) -> AppResult<User> {
-        let user = self.require_user().await?;
-
-        if user.role != Role::Admin {
-            return Err(AppError::forbidden());
-        }
-
-        Ok(user)
-    }
-
-    /// Vérifie que l'utilisateur connecté possède le rôle
-    /// administrateur ou développeur.
+    /// Vérifie que l'utilisateur connecté possède le rôle développeur.
     ///
     /// Utile pour les outils de diagnostic et les fonctionnalités
     /// réservées aux rôles techniques.
     pub async fn require_developer(&self) -> AppResult<User> {
         let user = self.require_user().await?;
 
-        if !matches!(user.role, Role::Admin | Role::Developer) {
+        if user.role != Role::Developer {
             return Err(AppError::forbidden());
         }
 

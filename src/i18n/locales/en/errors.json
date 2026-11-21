@@ -77,7 +77,6 @@
     "passwordLetterDigit": "Password must contain at least one letter and one digit.",
     "emailInvalid": "This email address is not valid.",
     "setupDone": "Initial setup has already been completed.",
-    "setupRequired": "GANIS initial setup is not finished: create the administrator account first.",
     "usernameTaken": "This username is already taken.",
     "emailTaken": "This email address is already in use.",
     "currentPasswordWrong": "The current password is incorrect.",
@@ -108,14 +107,7 @@
     "notFound": "The project synopsis cannot be found."
   },
   "user": {
-    "notFound": "User not found.",
-    "ownRole": "You cannot change your own role.",
-    "invalidRole": "The requested role is not valid.",
-    "deleteSelf": "You cannot delete your own account.",
-    "lastAdminRole": "Cannot remove the role of the last administrator.",
-    "lastAdminDelete": "Cannot delete the last administrator.",
-    "adminKeepsDeveloper": "An administrator always keeps the development tools.",
-    "lastAdminLeaving": "The last administrator cannot delete their account while other accounts exist."
+    "notFound": "User not found."
   },
   "package": {
     "notFound": "Package not found.",

@@ -13,7 +13,7 @@
   },
   "editor": {
     "toolbar": "Note formatting",
-    "placeholder": "Write your note… (type “$$” to mention a character, location or structure item)",
+    "placeholder": "Write your note… (“$$” to mention a project item, “$c$” a character, “$l$” a location…)",
     "undo": "Undo (Ctrl+Z)",
     "redo": "Redo (Ctrl+Y)",
     "block": {
@@ -190,10 +190,19 @@
     "label": "Project items",
     "open": "Open “{{name}}”",
     "missing": "This item no longer exists",
+    "imageMissing": "This image is no longer in the gallery",
+    "openGallery": "Open the gallery",
     "kinds": {
       "character": "Character",
       "location": "Location",
-      "node": "Structure"
+      "node": "Structure",
+      "item": "Item",
+      "species": "Wildlife",
+      "faction": "Faction",
+      "people": "People",
+      "magic": "Magic",
+      "note": "Note",
+      "image": "Image"
     }
   },
   "spell": {

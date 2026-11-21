@@ -148,6 +148,7 @@ export function VisibilityCard({
 
       {/* Confirmation : privé → public */}
       <Dialog
+        role="alertdialog"
         open={confirmOpen}
         onOpenChange={(open) => {
           if (!busy) setConfirmOpen(open);
@@ -184,6 +185,7 @@ export function VisibilityCard({
 
       {/* Confirmation renforcée : public → privé */}
       <Dialog
+        role="alertdialog"
         open={privateOpen}
         guardInput={false}
         onOpenChange={(open) => {

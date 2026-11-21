@@ -4,14 +4,17 @@ import { PluginKey } from "@tiptap/pm/state";
 import { NodeViewWrapper, ReactNodeViewRenderer, ReactRenderer, type ReactNodeViewProps } from "@tiptap/react";
 import Suggestion, { type SuggestionProps } from "@tiptap/suggestion";
 import { useTranslation } from "react-i18next";
-import { ListTree, MapPin, UserRound, type LucideIcon } from "lucide-react";
-import { isMentionKind, matchMentions, useNoteLinksContext, type MentionItem, type MentionKind } from "@/components/notes/editor/noteLinks";
+import { Drama, Flag, Image as ImageIcon, ListTree, MapPin, Package, PawPrint, StickyNote, UserRound, Zap, type LucideIcon } from "lucide-react";
+import { isMentionKind, isMentionTrigger, matchMentions, useNoteLinksContext, type MentionItem, type MentionKind } from "@/components/notes/editor/noteLinks";
 import { cn } from "@/lib/utils";
 
 /*
- * « $$ » dans une note : en tapant « $$ » puis quelques lettres, la note
- * propose les personnages, lieux et éléments du découpage qui
- * correspondent (la liste se met à jour à chaque lettre). Choisir un
+ * « $ » dans une note : en tapant « $$ » puis quelques lettres, la note
+ * propose les éléments du projet qui correspondent (la liste se met à
+ * jour à chaque lettre). Une lettre entre les deux « $ » ne propose qu'une
+ * sorte d'éléments : `$c$` personnages, `$l$` lieux, `$s$` découpage,
+ * `$w$` univers, `$n$` notes, `$i$` images (et en français `$p$`, `$d$`,
+ * `$u$` ; voir `MENTION_TRIGGERS`). Choisir un
  * élément (clic, Entrée ou Tab) le remplace par un lien vers sa fiche.
  *
  * Rien n'est complété d'office : si aucun élément ne correspond, la liste
@@ -22,6 +25,13 @@ export const MENTION_ICONS: Record<MentionKind, LucideIcon> = {
   character: UserRound,
   location: MapPin,
   node: ListTree,
+  item: Package,
+  species: PawPrint,
+  faction: Flag,
+  people: Drama,
+  magic: Zap,
+  note: StickyNote,
+  image: ImageIcon,
 };
 
 export interface EntityMentionOptions {
@@ -171,9 +181,12 @@ export const EntityMention = Node.create<EntityMentionOptions>({
       Suggestion<MentionItem, MentionItem>({
         editor: this.editor,
         pluginKey: mentionKey,
-        char: "$$",
+        // Un seul « $ » : la suite (« $ », « c$ »…) dit quoi proposer. Un « $ »
+        // seul (un prix) n'ouvre rien : la saisie reste normale.
+        char: "$",
         allowSpaces: true,
         allowedPrefixes: null,
+        allow: ({ state, range }) => isMentionTrigger(state.doc.textBetween(range.from, range.to, "")),
         decorationClass: "note-mention-query",
         items: ({ query }) => matchMentions(getItems(), query),
         command: ({ editor, range, props }) => {

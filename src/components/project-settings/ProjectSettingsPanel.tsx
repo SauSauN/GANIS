@@ -720,6 +720,7 @@ function DangerSection({ project }: { project: Project }) {
 
       {/* Confirmation */}
       <Dialog
+        role="alertdialog"
         open={confirmOpen}
         onOpenChange={(open) => {
           if (!deleting) {

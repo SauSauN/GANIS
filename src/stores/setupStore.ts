@@ -7,10 +7,10 @@ import { errorText } from "@/lib/errors";
  *
  * Au démarrage, l'application demande à Rust s'il existe au moins un
  * compte. S'il n'en existe aucun, l'assistant de configuration (page
- * /setup) est imposé pour créer le compte administrateur.
+ * /setup) est imposé pour créer le premier compte.
  *
  * Ce store ne sert qu'à l'affichage : la création du premier
- * administrateur est de toute façon protégée côté Rust.
+ * compte est de toute façon protégée côté Rust.
  */
 
 interface SetupState {
@@ -25,7 +25,7 @@ interface SetupState {
   /** Interroge Rust pour savoir si un compte existe. */
   check: () => Promise<void>;
 
-  /** À appeler une fois le compte administrateur créé. */
+  /** À appeler une fois le premier compte créé. */
   markDone: () => void;
 }
 

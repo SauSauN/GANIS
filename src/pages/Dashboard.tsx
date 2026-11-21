@@ -758,6 +758,7 @@ export default function Dashboard() {
 
       {/* Confirmation de suppression */}
       <Dialog
+        role="alertdialog"
         open={deleting !== null}
         onOpenChange={(open) => {
           if (!open && !deletingBusy) setDeleting(null);

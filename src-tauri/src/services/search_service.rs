@@ -91,29 +91,55 @@ fn document_text(content: &str) -> String {
 }
 
 /// Valeurs texte d'un objet JSON de champs (`fields`), sans les identifiants.
+///
+/// Les listes (traits, alias…) deviennent un texte lisible « A, B, C », même
+/// quand elles sont rangées sous forme de texte JSON (`"[\"A\",\"B\"]"`) :
+/// l'extrait affiché ne montre jamais de crochets ni de guillemets.
 fn fields_text(fields: &str) -> String {
     let Ok(Value::Object(map)) = serde_json::from_str::<Value>(fields) else {
         return String::new();
     };
     let mut out = String::new();
     for value in map.values() {
-        match value {
-            Value::String(text) if !looks_like_id(text) => {
-                out.push_str(text);
-                out.push(' ');
-            }
-            Value::Array(items) => {
-                for item in items {
-                    if let Value::String(text) = item {
-                        out.push_str(text);
-                        out.push(' ');
-                    }
-                }
-            }
-            _ => {}
+        let text = value_text(value);
+        if !text.is_empty() {
+            out.push_str(&text);
+            out.push(' ');
         }
     }
     out
+}
+
+/// Texte lisible d'une valeur de champ (vide pour un identifiant, un nombre…).
+fn value_text(value: &Value) -> String {
+    match value {
+        Value::String(text) if looks_like_id(text) => String::new(),
+        Value::String(text) => {
+            let trimmed = text.trim();
+            // Liste ou objet rangé en texte JSON : on le déplie.
+            if (trimmed.starts_with('[') && trimmed.ends_with(']'))
+                || (trimmed.starts_with('{') && trimmed.ends_with('}'))
+            {
+                if let Ok(inner @ (Value::Array(_) | Value::Object(_))) = serde_json::from_str::<Value>(trimmed) {
+                    return value_text(&inner);
+                }
+            }
+            text.clone()
+        }
+        Value::Array(items) => items
+            .iter()
+            .map(value_text)
+            .filter(|text| !text.is_empty())
+            .collect::<Vec<_>>()
+            .join(", "),
+        Value::Object(map) => map
+            .values()
+            .map(value_text)
+            .filter(|text| !text.is_empty())
+            .collect::<Vec<_>>()
+            .join(" "),
+        _ => String::new(),
+    }
 }
 
 /// Identifiant (UUID) : ne doit pas être cherché comme du texte.
@@ -301,6 +327,15 @@ mod tests {
     use crate::db::migrations::{run_migrations, PROJECT_MIGRATOR};
     use crate::services::note_service::{self, NoteUpdate};
     use sqlx::sqlite::SqlitePoolOptions;
+
+    #[test]
+    fn list_fields_are_readable() {
+        let fields = r#"{"traits":"[\"Brillante\",\"Combative\",\"Orgueilleuse\"]","alias":["Léna","La Rouge"]}"#;
+        let text = fields_text(fields);
+        assert!(text.contains("Brillante, Combative, Orgueilleuse"), "{text}");
+        assert!(text.contains("Léna, La Rouge"), "{text}");
+        assert!(!text.contains('[') && !text.contains('"'), "{text}");
+    }
 
     #[test]
     fn folding_and_document_text() {

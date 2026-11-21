@@ -55,7 +55,7 @@ export function UnsavedChangesDialog({
   const step = question.hasNext ? "closeTabs" : reason;
 
   return (
-    <Dialog open onOpenChange={(next) => !next && !busy && onCancel()}>
+    <Dialog role="alertdialog" open onOpenChange={(next) => !next && !busy && onCancel()}>
       <DialogHeader>
         {question.total > 1 && (
           <p className="text-xs font-medium text-muted-foreground">

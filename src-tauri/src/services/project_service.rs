@@ -384,8 +384,8 @@ pub async fn list_projects_for_user(
 
 /// Identifiants des projets d'un utilisateur (sans rien déchiffrer).
 ///
-/// Sert à un administrateur qui supprime un compte : il n'a pas la clé de
-/// ce compte, et n'a besoin que des dossiers à effacer.
+/// Sert à la suppression d'un compte : seuls les dossiers à effacer sont
+/// nécessaires.
 pub async fn list_project_ids_for_user(
     pool: &SqlitePool,
     owner_id: &str,

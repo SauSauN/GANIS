@@ -148,7 +148,6 @@ export function MenuBar() {
         kind: "item",
         id: "settings",
         label: t("file.settings"),
-        disabled: !signedIn,
         onSelect: () => navigate("/settings"),
       },
       SEPARATOR,

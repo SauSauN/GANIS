@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { EmailCodeForm } from "@/components/auth/EmailCodeForm";
 import { RecoveryKeyPanel } from "@/components/auth/RecoveryKeyPanel";
+import { FieldError, PasswordInput, useAccountValidation } from "@/components/auth/AccountFields";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -15,12 +16,6 @@ import {
 import { notifyError } from "@/lib/notify";
 import { RECOVERY_KEY_ENABLED } from "@/lib/recoveryKey";
 import { useAuthStore } from "@/stores/authStore";
-import {
-  checkEmail,
-  checkPassword,
-  checkUsername,
-  type ValidationIssue,
-} from "@/lib/validators";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -30,9 +25,12 @@ export default function Register() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
-  // On garde le code du problème (pas le texte) : le message suit la langue
-  // même si elle change pendant qu'il est affiché.
-  const [localIssue, setLocalIssue] = useState<ValidationIssue | null>(null);
+  // Une erreur sous chaque champ (code du problème, traduit à l'affichage :
+  // le message suit la langue si elle change pendant qu'il est affiché).
+  const validation = useAccountValidation(
+    { username, email, password, confirm },
+    { username: "username", email: "email", password: "password", confirm: "confirm" },
+  );
   // Clé de récupération du compte créé, montrée une seule fois.
   const [recoveryKey, setRecoveryKey] = useState<string | null>(null);
   // Adresse en cours de vérification par code (récupération par e-mail).
@@ -45,21 +43,12 @@ export default function Register() {
 
   /** Vrai si l'adresse saisie servira à la récupération par e-mail. */
   const withEmailRecovery = EMAIL_RECOVERY_ENABLED && email.trim() !== "";
-
-  function validate(): ValidationIssue | null {
-    return (
-      checkUsername(username) ??
-      checkPassword(password) ??
-      (password !== confirm ? "passwordMismatch" : null) ??
-      checkEmail(email)
-    );
-  }
+  /** Sans clé ni e-mail de récupération : le mot de passe ne se retrouve pas. */
+  const showPasswordWarning = !RECOVERY_KEY_ENABLED && !withEmailRecovery;
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    const problem = validate();
-    setLocalIssue(problem);
-    if (problem) return;
+    if (!validation.validateAll()) return;
 
     // Adresse donnée : elle est d'abord vérifiée par un code, puis le
     // compte est créé avec sa récupération par e-mail (`createAccount`).
@@ -110,10 +99,9 @@ export default function Register() {
     }
   }
 
-  // Les erreurs renvoyées par Rust restent pour l'instant en français.
-  const shownError = localIssue
-    ? t(`common:validation.${localIssue}`)
-    : error;
+  // Erreur du formulaire entier (nom déjà pris…), renvoyée par Rust
+  // (encore en français).
+  const shownError = error;
 
   if (verifyingEmail && !recoveryKey) {
     return (
@@ -157,7 +145,7 @@ export default function Register() {
     <main className="relative flex flex-1 items-center justify-center bg-background px-4 py-6">
 
       <Card className="w-full max-w-sm">
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} noValidate>
           <CardHeader>
             <CardTitle>{t("title")}</CardTitle>
             <CardDescription>{t("subtitle")}</CardDescription>
@@ -166,29 +154,37 @@ export default function Register() {
           <CardContent className="mt-4 space-y-4">
             <div className="space-y-2">
               <Label htmlFor="username">{t("username")}</Label>
-              <Input id="username" placeholder={t("common:placeholders.chooseUsername")} autoComplete="username" value={username}
+              <Input placeholder={t("common:placeholders.chooseUsername")} autoComplete="username" value={username}
+                {...validation.fieldProps("username")}
                 onChange={(e) => setUsername(e.target.value)} />
+              <FieldError id={validation.errorId("username")} issue={validation.shown("username")} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="email">{t("email")}</Label>
-              <Input id="email" placeholder={t("common:placeholders.email")} type="email" autoComplete="email" value={email}
+              <Input placeholder={t("common:placeholders.email")} type="email" autoComplete="email" value={email}
+                {...validation.fieldProps("email", EMAIL_RECOVERY_ENABLED ? "email-hint" : undefined)}
                 onChange={(e) => setEmail(e.target.value)} />
+              <FieldError id={validation.errorId("email")} issue={validation.shown("email")} />
               {EMAIL_RECOVERY_ENABLED && (
-                <p className="text-xs text-muted-foreground">{t("recovery:email.signup.emailHint")}</p>
+                <p id="email-hint" className="text-xs text-muted-foreground">{t("recovery:email.signup.emailHint")}</p>
               )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">{t("password")}</Label>
-              <Input id="password" placeholder={t("common:placeholders.newPassword")} type="password" autoComplete="new-password" value={password}
+              <PasswordInput placeholder={t("common:placeholders.newPassword")} autoComplete="new-password" value={password}
+                {...validation.fieldProps("password", showPasswordWarning ? "password-hint" : undefined)}
                 onChange={(e) => setPassword(e.target.value)} />
-              {!RECOVERY_KEY_ENABLED && !withEmailRecovery && (
-                <p className="text-xs text-muted-foreground">{t("passwordWarning")}</p>
+              <FieldError id={validation.errorId("password")} issue={validation.shown("password")} />
+              {showPasswordWarning && (
+                <p id="password-hint" className="text-xs text-muted-foreground">{t("passwordWarning")}</p>
               )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="confirm">{t("confirm")}</Label>
-              <Input id="confirm" placeholder={t("common:placeholders.confirmPassword")} type="password" autoComplete="new-password" value={confirm}
+              <PasswordInput placeholder={t("common:placeholders.confirmPassword")} autoComplete="new-password" value={confirm}
+                {...validation.fieldProps("confirm")}
                 onChange={(e) => setConfirm(e.target.value)} />
+              <FieldError id={validation.errorId("confirm")} issue={validation.shown("confirm")} />
             </div>
 
             {shownError && <p role="alert" className="text-sm text-destructive">{shownError}</p>}

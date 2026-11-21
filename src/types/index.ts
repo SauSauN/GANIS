@@ -9,7 +9,7 @@
 // Utilisateurs & authentification
 // ----------------------------------------------------------------------------
 
-export type Role = "admin" | "developer" | "user";
+export type Role = "developer" | "user";
 
 /**
  * Utilisateur tel qu'exposé par le backend (correspond à `UserPublic` en Rust).
@@ -1023,7 +1023,7 @@ export interface AppInfo {
 
 /**
  * Rapport de diagnostic (correspond à `Diagnostics` en Rust).
- * Réservé aux rôles administrateur et développeur.
+ * Réservé au rôle développeur.
  */
 export interface Diagnostics {
   appVersion: string;
@@ -1040,7 +1040,6 @@ export interface Diagnostics {
   };
   counts: {
     users: number;
-    admins: number;
     developers: number;
     activeSessions: number;
     projects: number;

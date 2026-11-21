@@ -79,6 +79,7 @@ import { useStructureStore } from "@/stores/structureStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useWritingTracker } from "@/stores/writingStore";
 import { errorText } from "@/lib/errors";
+import { useHelpStore } from "@/lib/shortcuts";
 import { READING_FEATURES, readingFeatureFor } from "@/lib/storyReading";
 
 /**
@@ -238,6 +239,12 @@ export default function Workspace() {
       ? startTab
       : (layout.tabs[0] ?? null),
   );
+
+  // L'aide s'ouvre sur la rubrique de l'onglet affiché (voir `helpSectionOfTab`).
+  useEffect(() => {
+    useHelpStore.getState().setTab(activeTab);
+    return () => useHelpStore.getState().setTab(null);
+  }, [activeTab]);
 
   /**
    * Devient vrai dès que le projet a été vu dans le store.

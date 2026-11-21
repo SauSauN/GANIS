@@ -6,7 +6,8 @@ import { ContextMenu } from "@/components/common/ContextMenu";
 import { runEditAction, type EditAction } from "@/lib/editCommands";
 import { toast } from "@/stores/toastStore";
 import { noteExtensions } from "@/components/notes/editor/extensions";
-import { NoteLinksContext, useNoteLinks } from "@/components/notes/editor/noteLinks";
+import { MentionImageDialog } from "@/components/notes/editor/MentionImageDialog";
+import { NoteLinksContext, useNoteLinks, type MentionItem } from "@/components/notes/editor/noteLinks";
 import { NoteToolbar } from "@/components/notes/editor/NoteToolbar";
 import { ignoreWord, refreshSpelling, type SpellMenuRequest } from "@/components/notes/editor/SpellCheck";
 import { addPersonalWord, spellLanguage, suggestWords } from "@/lib/spellcheck";
@@ -23,7 +24,7 @@ interface NoteEditorProps {
   onChange: (editor: Editor) => void;
   /** Appelé une fois l'éditeur prêt et rempli. */
   onReady?: (editor: Editor) => void;
-  /** Ouvre la fiche d'un élément cité avec « $$ ». */
+  /** Ouvre la fiche d'un élément cité avec « $$ », « $c$ »… */
   onOpenFeature?: (featureId: string) => void;
   /** Note système : titres fixes, mise en forme de l'écriture seulement. */
   system?: boolean;
@@ -38,7 +39,8 @@ interface NoteEditorProps {
  * remplace jamais ce que l'utilisateur est en train de taper.
  *
  * L'orthographe est vérifiée dans la langue du logiciel ; « $$ » propose
- * les personnages, lieux et éléments du découpage à citer.
+ * les éléments du projet à citer, « $c$ », « $l$ »… une seule sorte
+ * (voir `EntityMention`).
  */
 export function NoteEditor({ projectId, initialContent, onChange, onReady, onOpenFeature, system = false, history = true }: NoteEditorProps) {
   const { t, i18n } = useTranslation("notes");
@@ -47,7 +49,9 @@ export function NoteEditor({ projectId, initialContent, onChange, onReady, onOpe
   const onReadyRef = useRef(onReady);
   onReadyRef.current = onReady;
 
-  const links = useNoteLinks(projectId, onOpenFeature);
+  /** Image de la galerie citée, vue en grand. */
+  const [viewing, setViewing] = useState<MentionItem | null>(null);
+  const links = useNoteLinks(projectId, onOpenFeature, setViewing);
   const linksRef = useRef(links);
   linksRef.current = links;
   const languageRef = useRef(i18n.language);
@@ -143,6 +147,12 @@ export function NoteEditor({ projectId, initialContent, onChange, onReady, onOpe
           ]}
         />
       )}
+      <MentionImageDialog
+        projectId={projectId}
+        image={viewing}
+        onClose={() => setViewing(null)}
+        onOpenGallery={onOpenFeature ? () => onOpenFeature("gallery") : undefined}
+      />
     </NoteLinksContext.Provider>
   );
 }

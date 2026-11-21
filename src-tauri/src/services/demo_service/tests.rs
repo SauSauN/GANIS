@@ -25,9 +25,9 @@ async fn env() -> TestEnv {
     TestEnv { state: AppState::new(app_db, dir.clone()), dir }
 }
 
-/// Crée l'administrateur et le compte « alice », connecté.
+/// Crée le premier compte et le compte « alice », connecté.
 async fn alice(env: &TestEnv) -> Viewer {
-    auth_service::setup_first_admin(&env.state.app_db, "admin", "admin1234", None).await.unwrap();
+    auth_service::setup_first_account(&env.state.app_db, "admin", "admin1234", None).await.unwrap();
     auth_service::register_user(&env.state.app_db, "alice", "motdepasse1", None).await.unwrap();
     auth_service::login_user(&env.state, "alice", "motdepasse1").await.unwrap();
     env.state.viewer().await

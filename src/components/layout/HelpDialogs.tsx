@@ -35,6 +35,16 @@ import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } fr
 import { writeText as writeNativeClipboard } from "@tauri-apps/plugin-clipboard-manager";
 import { api, isTauri } from "@/lib/api";
 import { notifyError, notifySaved } from "@/lib/notify";
+import { toast } from "@/stores/toastStore";
+import {
+  checkForUpdate,
+  openReleasePage,
+  setAutoUpdateCheck,
+  shouldAutoCheck,
+  UPDATE_HOST,
+  useAutoUpdateCheck,
+  type UpdateCheck,
+} from "@/lib/updates";
 import { buildReport } from "@/lib/problemReport";
 import { RELEASES, releaseId, shouldShowWhatsNew } from "@/lib/releaseNotes";
 import { useSaveStatusStore } from "@/lib/saveStatus";
@@ -42,6 +52,7 @@ import { useAuthStore } from "@/stores/authStore";
 import { formatCombo, REFERENCE, SHORTCUTS, useHelpStore, type AppAction, type KeyCombo } from "@/lib/shortcuts";
 import { useKeyLabels } from "@/lib/keyLabels";
 import { cn } from "@/lib/utils";
+import { CENTER_SECTIONS, helpSectionOfTab, type CenterSection } from "@/components/layout/helpSection";
 
 // ----------------------------------------------------------------------------
 // Guide de démarrage
@@ -279,6 +290,63 @@ function ShortcutsDialog({ open, onClose }: { open: boolean; onClose: () => void
 // À propos
 // ----------------------------------------------------------------------------
 
+/**
+ * « Vérifier les mises à jour » : manuel, plus une option automatique
+ * désactivée par défaut. Le texte dit quel serveur est contacté et que
+ * c'est la seule connexion de GANIS (voir `lib/updates.ts`).
+ */
+function UpdateSection({ version }: { version: string | null }) {
+  const { t } = useTranslation("help");
+  const auto = useAutoUpdateCheck();
+  const [state, setState] = useState<
+    { step: "idle" } | { step: "checking" } | { step: "done"; result: UpdateCheck } | { step: "failed" }
+  >({ step: "idle" });
+
+  async function check() {
+    if (!version) return;
+    setState({ step: "checking" });
+    try {
+      setState({ step: "done", result: await checkForUpdate(version) });
+    } catch {
+      setState({ step: "failed" });
+    }
+  }
+
+  const result = state.step === "done" ? state.result : null;
+
+  return (
+    <section>
+      <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("about.updates.title")}</h3>
+      <div className="mt-2 flex flex-wrap items-center gap-2">
+        <Button variant="outline" size="sm" disabled={!version || state.step === "checking"} onClick={() => void check()}>
+          {state.step === "checking" ? t("about.updates.checking") : t("about.updates.check")}
+        </Button>
+        {result?.status === "available" && (
+          <Button size="sm" onClick={() => void openReleasePage(result.url).catch(() => notifyError(t("about.updates.openFailed")))}>
+            {t("about.updates.download", { version: result.latest })}
+          </Button>
+        )}
+      </div>
+      <p role="status" aria-live="polite" className="mt-2 text-xs leading-5 text-muted-foreground empty:hidden">
+        {state.step === "failed" && t("about.updates.failed")}
+        {result?.status === "upToDate" && t("about.updates.upToDate", { version })}
+        {result?.status === "available" && t("about.updates.available", { version: result.latest })}
+        {result?.status === "none" && t("about.updates.none")}
+      </p>
+      <label className="mt-2 flex items-start gap-2 text-xs leading-5">
+        <input
+          type="checkbox"
+          className="mt-0.5 size-4 shrink-0 accent-primary"
+          checked={auto}
+          onChange={(event) => setAutoUpdateCheck(event.target.checked)}
+        />
+        <span>{t("about.updates.auto")}</span>
+      </label>
+      <p className="mt-1 text-xs leading-5 text-muted-foreground">{t("about.updates.privacy", { host: UPDATE_HOST })}</p>
+    </section>
+  );
+}
+
 function AboutDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const { t } = useTranslation(["help", "common", "projects"]);
   const show = useHelpStore((state) => state.show);
@@ -293,35 +361,40 @@ function AboutDialog({ open, onClose }: { open: boolean; onClose: () => void }) 
   }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-lg" guardInput={false}>
-      <div className="flex flex-col items-center gap-2 text-center">
-        <img src={ganisLogo} alt="" aria-hidden="true" className="size-16 object-contain" />
-        <DialogTitle>GANIS</DialogTitle>
-        <DialogDescription>{t("about.tagline")}</DialogDescription>
-        {version && <p className="rounded-full bg-muted px-2.5 py-0.5 text-xs tabular-nums">{t("about.version", { version })}</p>}
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-4xl" guardInput={false}>
+      {/* Fenêtre large : le texte s'étend en largeur, tout tient sans défilement. */}
+      <div className="flex items-center gap-4">
+        <img src={ganisLogo} alt="" aria-hidden="true" className="size-14 shrink-0 object-contain" />
+        <div className="min-w-0 flex-1 space-y-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <DialogTitle>GANIS</DialogTitle>
+            {version && <p className="rounded-full bg-muted px-2.5 py-0.5 text-xs tabular-nums">{t("about.version", { version })}</p>}
+          </div>
+          <DialogDescription>{t("about.tagline")}</DialogDescription>
+        </div>
       </div>
 
-      <p className="mt-5 text-sm leading-6">{t("about.description")}</p>
-
       <div className="mt-5 space-y-4 text-sm">
-        <section>
-          <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("about.types")}</h3>
-          <ul className="mt-2 flex flex-wrap gap-1.5">
-            {ABOUT_TYPES.map((type) => (
-              <li key={type} className="rounded-full border px-2.5 py-0.5 text-xs">
-                {t(`projects:types.${type}`)}
-              </li>
-            ))}
-          </ul>
-        </section>
-        <section>
-          <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("about.privacy")}</h3>
-          <p className="mt-1 leading-6 text-muted-foreground">{t("about.offline")}</p>
-        </section>
-        <section>
-          <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("about.credits")}</h3>
-          <p className="mt-1 text-xs leading-5 text-muted-foreground">{t("about.dictionaries")}</p>
-        </section>
+          <p className="leading-6">{t("about.description")}</p>
+          <section>
+            <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("about.types")}</h3>
+            <ul className="mt-2 flex flex-wrap gap-1.5">
+              {ABOUT_TYPES.map((type) => (
+                <li key={type} className="rounded-full border px-2.5 py-0.5 text-xs">
+                  {t(`projects:types.${type}`)}
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section>
+            <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("about.privacy")}</h3>
+            <p className="mt-1 leading-6 text-muted-foreground">{t("about.offline")}</p>
+          </section>
+          <UpdateSection version={version} />
+          <section>
+            <h3 className="text-xs font-semibold tracking-wide text-muted-foreground uppercase">{t("about.credits")}</h3>
+            <p className="mt-1 text-xs leading-5 text-muted-foreground">{t("about.dictionaries")}</p>
+          </section>
       </div>
 
       <DialogFooter className="mt-6">
@@ -341,9 +414,6 @@ const ABOUT_TYPES = ["novel", "manga", "film", "series", "game", "rpg", "custom"
 // ----------------------------------------------------------------------------
 // Aide intégrée (une rubrique par module + questions fréquentes)
 // ----------------------------------------------------------------------------
-
-const CENTER_SECTIONS = ["workspace", "details", "characters", "locations", "items", "species", "factions", "peoples", "magic", "structure", "reading", "plot", "notes", "search", "history", "files", "settings", "about", "faq"] as const;
-type CenterSection = (typeof CENTER_SECTIONS)[number];
 
 interface SectionContent {
   title: string;
@@ -365,8 +435,11 @@ function HelpCenterDialog({ open, onClose }: { open: boolean; onClose: () => voi
   const [query, setQuery] = useState("");
   const tr = t as unknown as (key: string, options?: Record<string, unknown>) => unknown;
 
+  // À chaque ouverture : la rubrique de l'onglet affiché (voir `helpSectionOfTab`).
   useEffect(() => {
-    if (open) setQuery("");
+    if (!open) return;
+    setQuery("");
+    setSection(helpSectionOfTab(useHelpStore.getState().tab));
   }, [open]);
 
   const contentOf = (id: CenterSection): SectionContent | FaqContent =>
@@ -496,7 +569,7 @@ function WhatsNewDialog({ open, onClose }: { open: boolean; onClose: () => void 
   const tr = t as unknown as (key: string, options?: Record<string, unknown>) => unknown;
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-xl" guardInput={false}>
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-5xl" guardInput={false}>
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2">
           <Megaphone className="size-5 text-primary" aria-hidden="true" />
@@ -608,7 +681,7 @@ function ReportDialog({ open, onClose }: { open: boolean; onClose: () => void })
   }
 
   return (
-    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-2xl">
+    <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-5xl">
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2">
           <Bug className="size-5 text-primary" aria-hidden="true" />
@@ -617,8 +690,9 @@ function ReportDialog({ open, onClose }: { open: boolean; onClose: () => void })
         <DialogDescription>{t("report.description")}</DialogDescription>
       </DialogHeader>
 
-      <div className="mt-5 space-y-4">
-        <div className="space-y-2">
+      {/* Deux colonnes : la description à gauche, l'aperçu à droite. */}
+      <div className="mt-5 grid gap-x-6 gap-y-4 md:grid-cols-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="report-description" className="block text-sm font-medium">
             {t("report.whatLabel")}
           </label>
@@ -627,9 +701,10 @@ function ReportDialog({ open, onClose }: { open: boolean; onClose: () => void })
             value={description}
             onChange={(event) => setDescription(event.target.value)}
             placeholder={t("report.whatPlaceholder")}
-            rows={3}
-            className="w-full resize-y rounded-md border border-input bg-background px-3 py-2 text-sm leading-6 outline-none focus:ring-2 focus:ring-ring"
+            rows={8}
+            className="w-full flex-1 resize-none rounded-md border border-input bg-background px-3 py-2 text-sm leading-6 outline-none focus:ring-2 focus:ring-ring"
           />
+          <p className="text-sm text-muted-foreground">{t("report.howToSend")}</p>
         </div>
 
         <div className="space-y-2">
@@ -640,16 +715,14 @@ function ReportDialog({ open, onClose }: { open: boolean; onClose: () => void })
             id="report-preview"
             readOnly
             value={report}
-            rows={10}
+            rows={11}
             aria-describedby="report-privacy"
-            className="w-full resize-y rounded-md border border-input bg-muted/40 px-3 py-2 text-xs leading-5 outline-none focus:ring-2 focus:ring-ring"
+            className="w-full resize-none rounded-md border border-input bg-muted/40 px-3 py-2 text-xs leading-5 outline-none focus:ring-2 focus:ring-ring"
           />
           <p id="report-privacy" className="text-xs text-muted-foreground">
             {t("report.privacy")}
           </p>
         </div>
-
-        <p className="text-sm text-muted-foreground">{t("report.howToSend")}</p>
       </div>
 
       <DialogFooter className="mt-6 gap-2">
@@ -671,15 +744,32 @@ export function HelpDialogs() {
   const close = useHelpStore((state) => state.close);
   const show = useHelpStore((state) => state.show);
 
+  const { t } = useTranslation("help");
+
   // Après une mise à jour : les nouveautés s'ouvrent seules, une fois.
+  // Option « Vérifier au démarrage » (désactivée par défaut) : au plus une
+  // fois par jour, un message signale une nouvelle version.
   useEffect(() => {
     api
       .appInfo()
       .then((info) => {
         if (shouldShowWhatsNew(info.version) && useHelpStore.getState().open === null) show("whatsNew");
+        if (isTauri() && shouldAutoCheck()) {
+          checkForUpdate(info.version)
+            .then((result) => {
+              if (result.status !== "available") return;
+              toast({
+                tone: "info",
+                message: t("about.updates.available", { version: result.latest }),
+                action: { label: t("about.updates.downloadShort"), run: () => openReleasePage(result.url) },
+                duration: 15000,
+              });
+            })
+            .catch(() => {}); // hors connexion : rien à signaler
+        }
       })
       .catch(() => {});
-  }, [show]);
+  }, [show, t]);
 
   return (
     <>

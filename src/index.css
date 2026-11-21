@@ -79,7 +79,7 @@
     --success: #05704E;
     --warning: #92400E;
     --border: #E0E2F4;             /* dérivé */
-    --input: #E0E2F4;              /* dérivé */
+    --input: #848CD3;              /* dérivé : 3:1 sur les fonds (WCAG 1.4.11) */
     --ring: #5B65DC;
     --chart-1: #5B65DC;
     --chart-2: #7C85F2;
@@ -119,7 +119,7 @@
     --success: #34D399;
     --warning: #FBBF24;
     --border: #2A3157;             /* dérivé */
-    --input: #2A3157;              /* dérivé */
+    --input: #5361AC;              /* dérivé : 3:1 sur les fonds (WCAG 1.4.11) */
     --ring: #7C85F2;
     --chart-1: #7C85F2;
     --chart-2: #5B65DC;

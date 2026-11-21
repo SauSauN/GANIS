@@ -115,14 +115,9 @@ export default function App() {
                   path="/workspace/:projectId"
                   element={<Workspace />}
                 />
-              </Route>
 
-              {/* ============================================================ */}
-              {/* Routes privées (connexion nécessaire)                         */}
-              {/* ============================================================ */}
-
-              <Route element={<ProtectedRoute />}>
-                {/* Paramètres (compte, apparence) */}
+                {/* Paramètres généraux : sans compte, seulement ce qui est
+                    propre à l'appareil (apparence, enregistrement). */}
                 <Route
                   path="/settings"
                   element={<Settings />}
@@ -133,7 +128,13 @@ export default function App() {
                   path="/packages"
                   element={<Packages />}
                 />
+              </Route>
 
+              {/* ============================================================ */}
+              {/* Routes privées (connexion nécessaire)                         */}
+              {/* ============================================================ */}
+
+              <Route element={<ProtectedRoute />}>
                 {/* Rythme de travail (bouton de la barre du haut, sur le tableau de bord) */}
                 <Route
                   path="/activity"

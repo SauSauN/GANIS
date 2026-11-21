@@ -158,77 +158,12 @@ pub async fn find_by_username(
     Ok(user)
 }
 
-/// Liste tous les utilisateurs.
-///
-/// Cette fonction est appelée uniquement par une commande qui vérifie
-/// auparavant les droits administrateur.
-// Gestion des comptes par l'administrateur : désactivée (voir `lib.rs`), gardée pour être rétablie.
-#[allow(dead_code)]
-pub async fn list_all(pool: &SqlitePool) -> AppResult<Vec<User>> {
-    let users = sqlx::query_as::<_, User>(
-        r#"
-        SELECT
-            id,
-            username,
-            email,
-            email_sealed,
-            profile_sealed,
-            role,
-            password_hash,
-            password_salt,
-            created_at,
-            updated_at
-        FROM users
-        ORDER BY created_at DESC
-        "#,
-    )
-    .fetch_all(pool)
-    .await
-    .map_err(|e| {
-        AppError::database(e).with_detail("Échec de la liste des utilisateurs")
-    })?;
-
-    Ok(users)
-}
-
-/// Compte les comptes ayant le rôle administrateur.
-pub async fn count_admins(pool: &SqlitePool) -> AppResult<i64> {
-    let count: i64 = sqlx::query_scalar(
-        "SELECT COUNT(*) FROM users WHERE role = 'admin'",
-    )
-    .fetch_one(pool)
-    .await
-    .map_err(|e| {
-        AppError::database(e)
-            .with_detail("Échec du comptage des administrateurs")
-    })?;
-
-    Ok(count)
-}
-
-/// Met à jour le rôle d'un utilisateur.
-///
-/// Refuse de retirer le rôle administrateur au dernier administrateur :
-/// l'application doit toujours conserver au moins un compte capable
-/// de gérer les comptes locaux.
+/// Met à jour le rôle d'un utilisateur (mode développeur).
 pub async fn update_role(
     pool: &SqlitePool,
     id: &str,
     role: Role,
 ) -> AppResult<User> {
-    let target = find_by_id(pool, id)
-        .await?
-        .ok_or_else(|| AppError::not_found("Utilisateur non trouvé.").with_key("user.notFound"))?;
-
-    if target.role == Role::Admin
-        && role != Role::Admin
-        && count_admins(pool).await? <= 1
-    {
-        return Err(AppError::validation(
-            "Impossible de retirer le rôle du dernier administrateur.",
-        ).with_key("user.lastAdminRole"));
-    }
-
     let result = sqlx::query(
         r#"
         UPDATE users
@@ -324,18 +259,8 @@ pub async fn update_password(
 /// Supprime un utilisateur.
 ///
 /// Ses sessions et ses projets sont supprimés par les clés étrangères
-/// `ON DELETE CASCADE`. Refuse de supprimer le dernier administrateur.
+/// `ON DELETE CASCADE`.
 pub async fn delete_by_id(pool: &SqlitePool, id: &str) -> AppResult<()> {
-    let target = find_by_id(pool, id)
-        .await?
-        .ok_or_else(|| AppError::not_found("Utilisateur non trouvé.").with_key("user.notFound"))?;
-
-    if target.role == Role::Admin && count_admins(pool).await? <= 1 {
-        return Err(AppError::validation(
-            "Impossible de supprimer le dernier administrateur.",
-        ).with_key("user.lastAdminDelete"));
-    }
-
     sqlx::query("DELETE FROM users WHERE id = ?")
         .bind(id)
         .execute(pool)

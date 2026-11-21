@@ -11,14 +11,14 @@
 //! Toutes les règles de validation sont appliquées ici, côté Rust. L'interface
 //! les vérifie aussi, mais uniquement pour le confort de l'utilisateur.
 //!
-//! Trois façons de créer un compte, chacune avec une condition vérifiée
-//! dans la même requête SQL que l'insertion (donc sans condition de course) :
+//! Deux façons de créer un compte, toujours « Utilisateur » (pas
+//! d'administrateur : chacun administre ses propres projets). La condition
+//! est vérifiée dans la même requête SQL que l'insertion :
 //!
-//! | Fonction                 | Rôle            | Condition                       |
-//! |--------------------------|-----------------|---------------------------------|
-//! | `setup_first_admin`      | Administrateur  | aucun compte n'existe encore    |
-//! | `register_user`          | Utilisateur     | un administrateur existe déjà   |
-//! | `create_user_with_role`  | au choix        | aucune (réservé aux admins)     |
+//! | Fonction              | Condition                    |
+//! |-----------------------|------------------------------|
+//! | `setup_first_account` | aucun compte n'existe encore |
+//! | `register_user`       | aucune                       |
 
 use crate::db::app_db;
 use crate::error::{AppError, AppResult};
@@ -204,13 +204,10 @@ pub fn normalize_email(email: Option<&str>) -> AppResult<Option<String>> {
 /// Condition vérifiée par SQLite au moment même de l'insertion.
 #[derive(Debug, Clone, Copy)]
 enum Precondition {
-    /// Aucune condition (création de comptes par l'administrateur, désactivée).
-    #[allow(dead_code)]
+    /// Aucune condition (inscription publique).
     None,
-    /// La table `users` doit être vide (premier administrateur).
+    /// La table `users` doit être vide (premier compte).
     NoUserYet,
-    /// Au moins un administrateur doit exister (inscription publique).
-    AdminExists,
 }
 
 impl Precondition {
@@ -218,9 +215,6 @@ impl Precondition {
         match self {
             Precondition::None => "1",
             Precondition::NoUserYet => "NOT EXISTS (SELECT 1 FROM users)",
-            Precondition::AdminExists => {
-                "EXISTS (SELECT 1 FROM users WHERE role = 'admin')"
-            }
         }
     }
 
@@ -230,19 +224,12 @@ impl Precondition {
                 AppError::internal("Insertion d'utilisateur ignorée sans condition")
             }
             Precondition::NoUserYet => already_configured(),
-            Precondition::AdminExists => setup_not_done(),
         }
     }
 }
 
 fn already_configured() -> AppError {
     AppError::conflict("La configuration initiale a déjà été effectuée.").with_key("auth.setupDone")
-}
-
-fn setup_not_done() -> AppError {
-    AppError::validation(
-        "La configuration initiale de GANIS n'est pas terminée : créez d'abord le compte administrateur.",
-    ).with_key("auth.setupRequired")
 }
 
 fn username_taken() -> AppError {
@@ -283,9 +270,8 @@ pub struct CreatedAccount {
 ///
 /// Avec `keyring`, le trousseau du compte (clé de compte, verrous mot de
 /// passe et clé de récupération) est créé dans la même transaction que le
-/// compte, et l'e-mail est chiffré. Sans trousseau (compte créé par un
-/// administrateur), il sera créé à la première connexion de l'utilisateur :
-/// l'administrateur ne voit donc jamais sa clé de récupération.
+/// compte, et l'e-mail est chiffré. Sans trousseau, il sera créé à la
+/// première connexion de l'utilisateur.
 async fn create_account(
     pool: &SqlitePool,
     username: &str,
@@ -395,11 +381,12 @@ fn with_recovery_key(
     Ok(CreatedAccount { user, recovery_key })
 }
 
-/// Crée le premier compte administrateur (configuration initiale, §37.9).
+/// Crée le premier compte (configuration initiale, §37.9) : un compte
+/// « Utilisateur », comme tous les autres.
 ///
 /// Échoue si un compte existe déjà, y compris lorsque deux demandes
 /// arrivent en même temps : une seule peut aboutir.
-pub async fn setup_first_admin(
+pub async fn setup_first_account(
     pool: &SqlitePool,
     username: &str,
     password: &str,
@@ -415,7 +402,7 @@ pub async fn setup_first_admin(
             username,
             password,
             email,
-            Role::Admin,
+            Role::User,
             Precondition::NoUserYet,
             true,
         )
@@ -424,19 +411,12 @@ pub async fn setup_first_admin(
 }
 
 /// Inscription publique : crée toujours un compte « Utilisateur ».
-///
-/// Refusée tant que la configuration initiale n'a pas créé
-/// le compte administrateur.
 pub async fn register_user(
     pool: &SqlitePool,
     username: &str,
     password: &str,
     email: Option<&str>,
 ) -> AppResult<CreatedAccount> {
-    if user_service::count_admins(pool).await? == 0 {
-        return Err(setup_not_done());
-    }
-
     with_recovery_key(
         create_account(
             pool,
@@ -444,21 +424,16 @@ pub async fn register_user(
             password,
             email,
             Role::User,
-            Precondition::AdminExists,
+            Precondition::None,
             true,
         )
         .await?,
     )
 }
 
-/// Crée un compte avec un rôle précis.
-///
-/// Réservé aux administrateurs : la commande appelante vérifie ce droit.
-/// Le trousseau du compte sera créé à la première connexion de
-/// l'utilisateur, qui recevra alors lui-même sa clé de récupération.
-// Gestion des comptes par l'administrateur : désactivée (voir `lib.rs`), gardée pour être rétablie.
-#[allow(dead_code)]
-pub async fn create_user_with_role(
+/// Tests : compte sans trousseau, comme ceux d'avant le chiffrement.
+#[cfg(test)]
+pub async fn create_account_without_keyring(
     pool: &SqlitePool,
     username: &str,
     password: &str,
@@ -552,9 +527,6 @@ async fn set_password(
 /// compris ceux de la corbeille) sont effacés ; la session est fermée.
 /// Retourne les identifiants des projets supprimés : l'appelant efface
 /// leurs dossiers. Les projets publics ne sont pas touchés.
-///
-/// Le dernier administrateur ne peut pas partir tant que d'autres comptes
-/// existent : ils n'auraient plus personne pour les gérer.
 pub async fn delete_own_account(state: &AppState, password: &str) -> AppResult<Vec<String>> {
     let (session_user, _account_key) = state.require_session().await?;
 
@@ -564,20 +536,6 @@ pub async fn delete_own_account(state: &AppState, password: &str) -> AppResult<V
 
     if !verify_password_off_thread(password, &user.password_hash).await? {
         return Err(current_password_wrong());
-    }
-
-    if user.role == Role::Admin && user_service::count_admins(&state.app_db).await? <= 1 {
-        let accounts: i64 = sqlx::query_scalar("SELECT COUNT(*) FROM users")
-            .fetch_one(&state.app_db)
-            .await
-            .map_err(|e| AppError::database(e).with_detail("Comptage des comptes"))?;
-
-        if accounts > 1 {
-            return Err(AppError::validation(
-                "Le dernier administrateur ne peut pas supprimer son compte tant que d'autres comptes existent.",
-            )
-            .with_key("user.lastAdminLeaving"));
-        }
     }
 
     let project_ids =
@@ -600,8 +558,7 @@ pub async fn delete_own_account(state: &AppState, password: &str) -> AppResult<V
 pub struct LoginOutcome {
     pub user: UserPublic,
     /// Présente uniquement si le compte vient d'être chiffré à cette
-    /// connexion (compte créé avant le chiffrement, ou par un
-    /// administrateur) et que les clés de récupération sont activées
+    /// connexion (compte créé avant le chiffrement) et que les clés de récupération sont activées
     /// (`RECOVERY_KEY_ON_SIGNUP`) : elle doit être montrée une seule fois.
     pub recovery_key: Option<RecoveryKey>,
 }
@@ -678,7 +635,7 @@ pub async fn login_user(
     let _token = session_service::create_session(&state.app_db, &user.id).await?;
 
     // C'est cet état qui est consulté par `require_user`,
-    // `require_admin`, `require_developer` et `require_session` (state.rs).
+    // `require_developer` et `require_session` (state.rs).
     state.open_session(user.clone(), account_key.clone()).await;
 
     // Projets antérieurs au chiffrement : chiffrés maintenant. Un échec
@@ -930,7 +887,7 @@ pub async fn enable_email_recovery(
             .await?
             {
                 Some(result) => result,
-                // Compte sans trousseau (créé par un administrateur) : il
+                // Compte sans trousseau (créé avant le chiffrement) : il
                 // doit d'abord se connecter une fois.
                 None => return Err(email_recovery_login_first()),
             }

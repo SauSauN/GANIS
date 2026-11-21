@@ -58,7 +58,7 @@ The interface is available in **French and English**.
 - **Changing visibility**: *Project settings › Status and organisation › Visibility*.
   - Public → private: immediate when signed in; otherwise GANIS asks you to sign in on the spot, then makes the project private. If signing in goes through account creation or the setup wizard, the change is applied on arrival at the dashboard.
   - Private → public: requires explicit confirmation (*Cancel* / *Make public*).
-- **Local accounts**: the first account is an administrator, created by the setup wizard; other accounts can then register. There are three roles: `admin`, `developer` and `user`. Anyone can delete their own account (*Settings › Account*, password required): the account and its private projects are erased. The last administrator cannot leave while other accounts exist.
+- **Local accounts**: there is no administrator: each account manages its own projects. The first account is created by the setup wizard; other accounts can then register. There are two roles: `user` and `developer` (anyone can turn developer mode on or off in *Settings*). Anyone can delete their own account (*Settings › Account*, password required): the account and its private projects are erased.
 - **Automatic lock** (optional, *Settings › Account*): after 5 to 60 minutes of inactivity, the account key is wiped from memory and the password is required to continue. Open tabs and unsaved input are kept.
 - **Recovery key**: handed over when the account is created; it restores access if the password is forgotten. It can be regenerated from the settings.
 - **Dashboard**: create, duplicate, delete and favourite projects.
@@ -234,7 +234,7 @@ npm run tauri dev
 
 This starts Vite (through `beforeDevCommand` in `src-tauri/tauri.conf.json`), compiles the Rust side and opens the GANIS window. The first run takes several minutes, because SQLCipher and OpenSSL are compiled with the application; later runs are incremental.
 
-On first launch, GANIS opens the **Setup** screen to create the administrator account.
+On first launch, GANIS opens the **Setup** screen to create the first account.
 
 > `npm run dev` alone only serves the interface on `http://localhost:1420`, without the Rust commands: accounts, projects and the database do not work there. Use `npm run tauri dev` to run the real application.
 

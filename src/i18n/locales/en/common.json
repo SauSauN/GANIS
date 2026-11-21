@@ -143,5 +143,9 @@
     "results_one": "{{count}} result",
     "results_other": "{{count}} results",
     "clear": "Clear filters"
+  },
+  "password": {
+    "show": "Show password",
+    "hide": "Hide password"
   }
 }

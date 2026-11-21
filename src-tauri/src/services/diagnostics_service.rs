@@ -31,7 +31,6 @@ pub struct DatabaseDiagnostics {
 #[serde(rename_all = "camelCase")]
 pub struct Counts {
     pub users: i64,
-    pub admins: i64,
     pub developers: i64,
     pub active_sessions: i64,
     pub projects: i64,
@@ -62,7 +61,7 @@ async fn count(pool: &SqlitePool, sql: &str, context: &str) -> AppResult<i64> {
 
 /// Construit le rapport de diagnostic.
 ///
-/// La commande appelante vérifie le rôle administrateur ou développeur.
+/// La commande appelante vérifie le rôle développeur.
 pub async fn collect(pool: &SqlitePool) -> AppResult<Diagnostics> {
     let sqlite_version =
         sqlx::query_scalar::<_, String>("SELECT sqlite_version()")
@@ -125,12 +124,6 @@ pub async fn collect(pool: &SqlitePool) -> AppResult<Diagnostics> {
 
     let counts = Counts {
         users: count(pool, "SELECT COUNT(*) FROM users", "Comptage des utilisateurs").await?,
-        admins: count(
-            pool,
-            "SELECT COUNT(*) FROM users WHERE role = 'admin'",
-            "Comptage des administrateurs",
-        )
-        .await?,
         developers: count(
             pool,
             "SELECT COUNT(*) FROM users WHERE role = 'developer'",

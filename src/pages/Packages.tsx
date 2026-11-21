@@ -258,7 +258,8 @@ function InstalledView() {
         theme.origin === "mine" ? () => navigate(`/packages/themes/${theme.id}`) : undefined
       }
       onCustomize={
-        theme.origin === "system"
+        // L'éditeur de thème demande un compte : pas de bouton sans compte.
+        theme.origin === "system" && user
           ? () => navigate(`/packages/themes/new?from=${encodeURIComponent(theme.id)}`)
           : undefined
       }
@@ -359,7 +360,7 @@ function InstalledView() {
         </section>
       )}
 
-      <Dialog open={toDelete !== null} onOpenChange={(open) => !open && setToDelete(null)}>
+      <Dialog role="alertdialog" open={toDelete !== null} onOpenChange={(open) => !open && setToDelete(null)}>
         <DialogHeader>
           <DialogTitle>{t("delete.title")}</DialogTitle>
           <DialogDescription>

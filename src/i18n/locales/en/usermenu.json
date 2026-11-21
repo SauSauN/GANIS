@@ -3,5 +3,6 @@
   "settings": "General settings",
   "logout": "Sign out",
   "packages": "Packages",
-  "language": "Language"
+  "language": "Language",
+  "guest": "Public space"
 }

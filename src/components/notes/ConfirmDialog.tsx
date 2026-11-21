@@ -40,6 +40,7 @@ export function ConfirmDialog({ open, title, description, confirmLabel, onCancel
 
   return (
     <Dialog
+      role="alertdialog"
       open={open}
       onOpenChange={(value) => {
         if (!value && !busy) {

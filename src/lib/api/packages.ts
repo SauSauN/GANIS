@@ -13,13 +13,13 @@ export const packagesApi = {
 
   /**
    * Passe le compte connecté au rôle développeur (« Devenir Développeur »).
-   * Sans effet pour un développeur ou un administrateur.
+   * Sans effet pour un développeur.
    */
   becomeDeveloper: () => call<User>("become_developer"),
 
   /**
    * Repasse le compte connecté au rôle utilisateur. Les thèmes créés sont
-   * conservés. Refusé pour un administrateur.
+   * conservés.
    */
   leaveDeveloperMode: () => call<User>("leave_developer_mode"),
 
@@ -29,7 +29,7 @@ export const packagesApi = {
   listMyPackages: () => call<UserPackage[]>("list_my_packages"),
 
   /**
-   * Crée un thème (développeur ou administrateur, vérifié par Rust).
+   * Crée un thème (développeur, vérifié par Rust).
    */
   createThemePackage: (input: {
     name: string;

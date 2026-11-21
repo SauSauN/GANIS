@@ -1,14 +1,14 @@
 //! Commandes Tauri des packages (§20) et du mode développeur (§8.3).
 //!
 //! Les droits sont vérifiés ici, côté Rust :
-//! - seul un développeur (ou un administrateur) voit, crée ou modifie ses
+//! - seul un développeur voit, crée ou modifie ses
 //!   packages ; hors mode développeur, la liste est vide ;
 //! - tout utilisateur connecté peut supprimer ses propres packages.
 //!
 //! L'identifiant de l'auteur vient toujours de la session, jamais de
 //! l'interface.
 
-use crate::error::{AppError, AppResult};
+use crate::error::AppResult;
 use crate::models::package::{ThemeData, UserPackage};
 use crate::models::user::{Role, UserPublic};
 use crate::services::{package_service, user_service};
@@ -28,8 +28,7 @@ pub struct ThemePackageInput {
 
 /// Passe le compte connecté au rôle développeur (« Devenir Développeur »).
 ///
-/// Sans effet pour un développeur ou un administrateur : un administrateur
-/// a déjà tous les droits d'un développeur et ne perd jamais son rôle ici.
+/// Sans effet pour un développeur.
 #[tauri::command(rename_all = "camelCase")]
 pub async fn become_developer(state: State<'_, AppState>) -> AppResult<UserPublic> {
     let current = state.require_user().await?;
@@ -52,21 +51,13 @@ pub async fn become_developer(state: State<'_, AppState>) -> AppResult<UserPubli
 /// développeur »).
 ///
 /// Les thèmes créés sont conservés : ils réapparaissent si le compte
-/// redevient développeur. Sans effet pour un utilisateur ; refusé pour un
-/// administrateur, qui ne peut pas perdre son rôle par ce biais.
+/// redevient développeur. Sans effet pour un utilisateur.
 #[tauri::command(rename_all = "camelCase")]
 pub async fn leave_developer_mode(state: State<'_, AppState>) -> AppResult<UserPublic> {
     let current = state.require_user().await?;
 
-    match current.role {
-        Role::User => return Ok(UserPublic::from(current)),
-        Role::Admin => {
-            return Err(AppError::validation(
-                "Un administrateur conserve toujours les outils de développement.",
-            )
-            .with_key("user.adminKeepsDeveloper"))
-        }
-        Role::Developer => {}
+    if current.role == Role::User {
+        return Ok(UserPublic::from(current));
     }
 
     let stored = user_service::update_role(&state.app_db, &current.id, Role::User).await?;
@@ -94,7 +85,7 @@ pub async fn list_my_packages(state: State<'_, AppState>) -> AppResult<Vec<UserP
     package_service::list_for_owner(&state.app_db, &user).await
 }
 
-/// Crée un thème (développeur ou administrateur).
+/// Crée un thème (développeur).
 #[tauri::command(rename_all = "camelCase")]
 pub async fn create_theme_package(
     state: State<'_, AppState>,
@@ -112,7 +103,7 @@ pub async fn create_theme_package(
     .await
 }
 
-/// Modifie un thème du compte connecté (développeur ou administrateur).
+/// Modifie un thème du compte connecté (développeur).
 #[tauri::command(rename_all = "camelCase")]
 pub async fn update_theme_package(
     state: State<'_, AppState>,

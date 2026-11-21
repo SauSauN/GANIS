@@ -15,7 +15,7 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { launchGanis, type GanisApp } from "./ganis-app";
 
-const ADMIN = { username: "admin_e2e", password: "motdepasse1" };
+const FIRST = { username: "auteur_e2e", password: "motdepasse1" };
 const AUTRE = { username: "autre_e2e", password: "autrepasse2" };
 const ROMAN = "Roman E2E";
 const MANGA = "Manga E2E";
@@ -103,7 +103,7 @@ async function save() {
   await expect(page.getByRole("contentinfo").getByRole("status")).toContainText(/Enregistré|Prêt/);
 }
 
-async function login(user = ADMIN) {
+async function login(user = FIRST) {
   await go("/login");
   await page.getByLabel("Nom d'utilisateur").fill(user.username);
   await page.getByLabel("Mot de passe", { exact: true }).fill(user.password);
@@ -181,14 +181,14 @@ test.describe("Premier lancement", () => {
     await expect(page.getByRole("button", { name: "Commencer" })).toBeVisible();
   });
 
-  test("sans compte, « Se connecter » mène à la création de l'administrateur", async () => {
+  test("sans compte, « Se connecter » mène à la création du premier compte", async () => {
     await page.getByRole("button", { name: "Se connecter" }).click();
     await page.waitForURL(/#\/setup/);
-    await expect(page.getByRole("button", { name: "Créer le compte administrateur" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Créer mon compte" })).toBeVisible();
   });
 
-  test("le formulaire de l'administrateur refuse les saisies invalides", async () => {
-    const submit = page.getByRole("button", { name: "Créer le compte administrateur" });
+  test("le formulaire du premier compte refuse les saisies invalides", async () => {
+    const submit = page.getByRole("button", { name: "Créer mon compte" });
 
     await page.getByLabel("Nom d'utilisateur").fill("a!");
     await page.getByLabel("Mot de passe", { exact: true }).fill("court");
@@ -196,17 +196,17 @@ test.describe("Premier lancement", () => {
     await submit.click();
     await expect(page).toHaveURL(/#\/setup/);
 
-    await page.getByLabel("Nom d'utilisateur").fill(ADMIN.username);
-    await page.getByLabel("Mot de passe", { exact: true }).fill(ADMIN.password);
+    await page.getByLabel("Nom d'utilisateur").fill(FIRST.username);
+    await page.getByLabel("Mot de passe", { exact: true }).fill(FIRST.password);
     await page.getByLabel("Confirmer le mot de passe").fill("pas-le-meme1");
     await submit.click();
     await expect(page).toHaveURL(/#\/setup/);
   });
 
-  test("création du compte administrateur et guide de démarrage", async () => {
-    await page.getByLabel("Mot de passe", { exact: true }).fill(ADMIN.password);
-    await page.getByLabel("Confirmer le mot de passe").fill(ADMIN.password);
-    await page.getByRole("button", { name: "Créer le compte administrateur" }).click();
+  test("création du premier compte et guide de démarrage", async () => {
+    await page.getByLabel("Mot de passe", { exact: true }).fill(FIRST.password);
+    await page.getByLabel("Confirmer le mot de passe").fill(FIRST.password);
+    await page.getByRole("button", { name: "Créer mon compte" }).click();
     await page.waitForURL(/#\/dashboard/);
 
     const guide = page.getByRole("dialog", { name: "Guide de démarrage" });
@@ -219,7 +219,7 @@ test.describe("Premier lancement", () => {
     await guide.getByRole("button", { name: "Fermer le guide" }).click();
     await expect(guide).toBeHidden();
 
-    await expect(page.getByRole("heading", { name: `Bonjour, ${ADMIN.username}` })).toBeVisible();
+    await expect(page.getByRole("heading", { name: `Bonjour, ${FIRST.username}` })).toBeVisible();
     await expect(page.getByRole("button", { name: "Espace privé" })).toBeVisible();
     await expect(page.getByText("Aucun projet pour l'instant")).toBeVisible();
   });
@@ -442,7 +442,7 @@ test.describe("Détails du projet", () => {
     await galerie.getByRole("button", { name: "Ouvrir le dossier Cartes" }).hover();
     await galerie.getByRole("button", { name: "Actions du dossier Cartes" }).click();
     await page.getByRole("menuitem", { name: "Supprimer le dossier" }).click();
-    await page.getByRole("dialog").last().getByRole("button", { name: "Supprimer le dossier" }).click();
+    await page.getByRole("alertdialog").last().getByRole("button", { name: "Supprimer le dossier" }).click();
     await expect(galerie.getByRole("button", { name: "Ouvrir le dossier Cartes" })).toHaveCount(0);
     await galerie.getByRole("button", { name: "Ouvrir le dossier Sans dossier" }).click();
     await expect(photos).toHaveCount(3);
@@ -1247,14 +1247,14 @@ test.describe("Comptes et espaces", () => {
     await go("/dashboard");
     await logout();
     await go("/login");
-    await page.getByLabel("Nom d'utilisateur").fill(ADMIN.username);
+    await page.getByLabel("Nom d'utilisateur").fill(FIRST.username);
     await page.getByLabel("Mot de passe", { exact: true }).fill("mauvais-mdp9");
     await page.locator("form").getByRole("button", { name: /Se connecter/ }).click();
     await expect(page.getByRole("alert").or(page.getByText(/incorrect|invalide/i)).first()).toBeVisible();
     await expect(page).toHaveURL(/#\/login/);
   });
 
-  test("connexion de l'administrateur : ses projets privés sont là", async () => {
+  test("connexion du premier compte : ses projets privés sont là", async () => {
     await login();
     await expect(page.getByRole("main")).toContainText(ROMAN);
     await expect(page.getByRole("main")).toContainText(MANGA);
@@ -1277,7 +1277,7 @@ test.describe("Comptes et espaces", () => {
     await expect(card(PUBLIC)).toBeVisible();
   });
 
-  test("créer un second compte : il ne voit pas les projets de l'administrateur", async () => {
+  test("créer un second compte : il ne voit pas les projets du premier compte", async () => {
     await go("/register");
     await page.getByLabel("Nom d'utilisateur").fill(AUTRE.username);
     await page.getByLabel("Mot de passe", { exact: true }).fill(AUTRE.password);
@@ -1296,7 +1296,7 @@ test.describe("Comptes et espaces", () => {
   test("un nom d'utilisateur déjà pris est refusé", async () => {
     await logout();
     await go("/register");
-    await page.getByLabel("Nom d'utilisateur").fill(ADMIN.username);
+    await page.getByLabel("Nom d'utilisateur").fill(FIRST.username);
     await page.getByLabel("Mot de passe", { exact: true }).fill("encoreun1");
     await page.getByLabel(/Confirmer/).fill("encoreun1");
     await page.locator("form").getByRole("button").last().click();

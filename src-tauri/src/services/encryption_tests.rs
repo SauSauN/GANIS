@@ -32,11 +32,11 @@ async fn env() -> TestEnv {
     }
 }
 
-/// Crée l'administrateur puis un utilisateur, et lui crée une clé de
+/// Crée le premier compte puis un utilisateur, et lui crée une clé de
 /// récupération depuis ses paramètres ; retourne cette clé. L'utilisateur
 /// est déconnecté à la fin.
 async fn register_alice(env: &TestEnv) -> String {
-    auth_service::setup_first_admin(&env.state.app_db, "admin", "admin1234", None)
+    auth_service::setup_first_account(&env.state.app_db, "admin", "admin1234", None)
         .await
         .unwrap();
 
@@ -366,12 +366,12 @@ async fn insert_legacy_project(env: &TestEnv, owner_id: &str, name: &str, text: 
 async fn legacy_account_and_projects_are_encrypted_at_first_login() {
     let env = env().await;
 
-    auth_service::setup_first_admin(&env.state.app_db, "admin", "admin1234", None)
+    auth_service::setup_first_account(&env.state.app_db, "admin", "admin1234", None)
         .await
         .unwrap();
 
     // Compte sans trousseau, e-mail en clair : comme avant le chiffrement.
-    let legacy = auth_service::create_user_with_role(
+    let legacy = auth_service::create_account_without_keyring(
         &env.state.app_db,
         "ancien",
         "motdepasse1",
@@ -490,7 +490,7 @@ async fn recovery_attempts_are_limited() {
 async fn account_without_recovery_key_cannot_be_recovered() {
     let env = env().await;
 
-    auth_service::setup_first_admin(&env.state.app_db, "admin", "admin1234", None)
+    auth_service::setup_first_account(&env.state.app_db, "admin", "admin1234", None)
         .await
         .unwrap();
     auth_service::register_user(&env.state.app_db, "bob", "motdepasse2", None)
@@ -919,14 +919,9 @@ async fn projects_older_than_thirty_days_in_trash_are_purged() {
 }
 
 #[tokio::test]
-async fn user_can_delete_own_account_with_projects_but_not_the_last_admin() {
+async fn user_can_delete_own_account_with_projects() {
     let env = env().await;
     register_alice(&env).await;
-
-    // L'administrateur, seul administrateur alors qu'Alice existe : refusé.
-    login(&env, "admin", "admin1234").await;
-    assert!(auth_service::delete_own_account(&env.state, "admin1234").await.is_err());
-    auth_service::logout_user(&env.state).await.unwrap();
 
     login(&env, "alice", "motdepasse1").await;
     let kept = create_project_with_text(&env, "Projet d'Alice", "Texte").await;
@@ -992,4 +987,20 @@ async fn email_recovery_keeps_the_projects() {
         .unwrap_err();
     assert_eq!(error.key, Some("emailRecovery.invalid"));
     login(&env, "alice", "nouveau123").await;
+}
+
+#[tokio::test]
+async fn first_account_is_a_plain_user_and_anyone_can_register() {
+    let env = env().await;
+
+    // Inscription possible sans configuration préalable : pas d'administrateur.
+    let created = auth_service::register_user(&env.state.app_db, "bea", "motdepasse1", None)
+        .await
+        .unwrap();
+    assert_eq!(created.user.role, Role::User);
+
+    // Le premier compte n'est plus possible une fois un compte créé.
+    assert!(auth_service::setup_first_account(&env.state.app_db, "autre", "motdepasse1", None)
+        .await
+        .is_err());
 }

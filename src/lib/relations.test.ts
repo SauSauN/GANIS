@@ -131,6 +131,18 @@ describe("dispositions", () => {
     expect(d("a", "b")).toBeLessThan(d("a", "e"));
   });
 
+  it("force : une chaîne occupe l'écran au lieu d'une diagonale", () => {
+    const chain = Array.from({ length: 9 }, (_, i) => `p${i}`);
+    const chainLinks = chain.slice(1).map((id, i) => ({ source: chain[i], target: id, weight: 5 }));
+    const p = forceLayout(chain, chainLinks);
+    const xs = Object.values(p).map((q) => q.x);
+    const ys = Object.values(p).map((q) => q.y);
+    const width = Math.max(...xs) - Math.min(...xs);
+    const height = Math.max(...ys) - Math.min(...ys);
+    expect(width / height).toBeLessThan(2.5);
+    expect(minDistance(p)).toBeGreaterThan(150);
+  });
+
   it("groupes : un cercle par groupe, sans chevauchement", () => {
     const { positions, centers } = groupLayout([
       { key: "main", ids: ["a", "b", "c"] },

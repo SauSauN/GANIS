@@ -19,9 +19,6 @@ use serde::{Deserialize, Serialize};
 #[sqlx(type_name = "TEXT")]
 #[sqlx(rename_all = "lowercase")]
 pub enum Role {
-    /// Administrateur : gestion des comptes et paramètres généraux.
-    Admin,
-
     /// Développeur : accès aux outils de diagnostic et de test.
     Developer,
 
@@ -40,7 +37,6 @@ impl Role {
     /// utilisée par la base de données.
     pub fn as_str(&self) -> &'static str {
         match self {
-            Role::Admin => "admin",
             Role::Developer => "developer",
             Role::User => "user",
         }

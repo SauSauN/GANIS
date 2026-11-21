@@ -91,7 +91,7 @@ export function StructureTemplatePicker({
 
       {showHint && <p className="text-xs text-muted-foreground">{t("template.hint")}</p>}
 
-      <Dialog open={pending !== null} onOpenChange={(open) => !open && setPending(null)}>
+      <Dialog role="alertdialog" open={pending !== null} onOpenChange={(open) => !open && setPending(null)}>
         <DialogHeader>
           <DialogTitle>{t("template.replaceTitle")}</DialogTitle>
           <DialogDescription>{t("template.replaceDescription", { name: pendingName })}</DialogDescription>

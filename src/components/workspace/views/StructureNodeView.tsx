@@ -880,7 +880,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
         </div>
       </div>
 
-      <Dialog open={confirmDelete} onOpenChange={(open) => !open && !deleting && setConfirmDelete(false)}>
+      <Dialog role="alertdialog" open={confirmDelete} onOpenChange={(open) => !open && !deleting && setConfirmDelete(false)}>
         <DialogHeader>
           <DialogTitle>{t("plan.delete.title", { title: name })}</DialogTitle>
           <DialogDescription>

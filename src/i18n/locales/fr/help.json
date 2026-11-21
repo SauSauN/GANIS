@@ -239,7 +239,21 @@
     "privacy": "Vos données",
     "credits": "Crédits",
     "dictionaries": "Dictionnaires orthographiques : français, Grammalecte (Olivier R., MPL 2.0) ; anglais, SCOWL (wordlist.sourceforge.net).",
-    "openHelp": "Aide de GANIS"
+    "openHelp": "Aide de GANIS",
+    "updates": {
+      "title": "Mises à jour",
+      "check": "Vérifier les mises à jour",
+      "checking": "Vérification…",
+      "upToDate": "GANIS est à jour (version {{version}}).",
+      "available": "La version {{version}} de GANIS est disponible.",
+      "download": "Télécharger la version {{version}}",
+      "downloadShort": "Télécharger",
+      "none": "Aucune version publiée pour l'instant.",
+      "failed": "Vérification impossible : pas de connexion, ou le serveur ne répond pas. Réessayez plus tard.",
+      "openFailed": "La page de téléchargement n'a pas pu s'ouvrir.",
+      "auto": "Vérifier au démarrage (au plus une fois par jour)",
+      "privacy": "C'est la seule connexion de GANIS : elle lit seulement le numéro de la dernière version sur {{host}}. Rien n'est envoyé sur votre compte ni vos projets, et rien ne s'installe tout seul."
+    }
   },
   "whatsNew": {
     "title": "Nouveautés",
@@ -448,6 +462,7 @@
         "items": [
           "L'éditeur propose titres, polices, tailles, couleurs, listes, tableaux et liens. Les outils moins courants sont dans le menu « … » au bout de la barre.",
           "Encadré post-it : un bloc coloré au milieu du texte. Cases enchaînées : une suite d'étapes reliées par des flèches, avec « + » pour en insérer. Schéma : des boîtes reliées, que l'on déplace et relie à la souris.",
+          "Citer un élément du projet, dans une note ou le texte d'une scène de roman : « $$ » puis quelques lettres propose tout le projet. Une lettre entre deux « $ » ne propose qu'une sorte : « $c$ » personnages, « $l$ » lieux, « $s$ » découpage, « $w$ » univers (objets, faune et flore, factions, peuples, magie), « $n$ » notes, « $i$ » images de la galerie. Les lettres françaises marchent aussi : « $p$ » personnages, « $d$ » découpage, « $u$ » univers. Un clic sur le lien ouvre la fiche.",
           "Rangez les notes dans des dossiers par glisser-déposer dans le panneau ; épinglez les plus importantes.",
           "Le mur de post-it accueille les idées en vrac : déplacez-les par leur bandeau, agrandissez-les par leur coin."
         ]

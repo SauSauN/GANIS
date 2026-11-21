@@ -3,5 +3,6 @@
   "settings": "Paramètres généraux",
   "logout": "Se déconnecter",
   "packages": "Packages",
-  "language": "Langue"
+  "language": "Langue",
+  "guest": "Espace public"
 }

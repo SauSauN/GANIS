@@ -1,9 +1,9 @@
 {
   "title": "Bienvenue dans GANIS",
-  "description": "Créez le compte administrateur pour commencer. Il permettra de gérer les autres comptes de cet ordinateur. Tout reste enregistré localement, sans connexion à Internet.",
+  "description": "Créez votre compte pour commencer. Chaque compte administre ses propres projets. Tout reste enregistré localement, sans connexion à Internet.",
   "username": {
     "label": "Nom d'utilisateur",
-    "placeholder": "administrateur",
+    "placeholder": "votre nom",
     "hint": "3 à 50 caractères : lettres, chiffres, « _ » et « - »."
   },
   "email": {
@@ -16,7 +16,7 @@
     "warning": "Retenez-le bien : sans lui, vos projets ne pourront pas être récupérés."
   },
   "confirm": "Confirmer le mot de passe",
-  "submit": "Créer le compte administrateur",
+  "submit": "Créer mon compte",
   "submitting": "Création…",
   "errors": {
     "failed": "Une erreur est survenue lors de la configuration."

@@ -2,7 +2,8 @@
   "back": "Back",
   "nav": {
     "label": "Settings sections",
-    "title": "General settings"
+    "title": "General settings",
+    "guest": "Public space"
   },
   "sections": {
     "account": {
@@ -33,7 +34,6 @@
       "createdAt": "Account created on"
     },
     "roles": {
-      "admin": "Administrator",
       "developer": "Developer",
       "user": "User"
     },
@@ -248,8 +248,7 @@
     },
     "active": {
       "title": "Developer mode is on",
-      "description": "Your account has access to package creation tools.",
-      "roleAdmin": "As an administrator, you already have every development tool."
+      "description": "Your account has access to package creation tools."
     },
     "tools": {
       "title": "Create a plugin",

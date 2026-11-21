@@ -392,7 +392,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
         />
       </form>
 
-      <Dialog open={confirmDelete} onOpenChange={(open) => !open && !deleting && setConfirmDelete(false)}>
+      <Dialog role="alertdialog" open={confirmDelete} onOpenChange={(open) => !open && !deleting && setConfirmDelete(false)}>
         <DialogHeader>
           <DialogTitle>{t("edit.deleteTitle", { name: location.name })}</DialogTitle>
           <DialogDescription>

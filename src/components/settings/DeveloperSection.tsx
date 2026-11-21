@@ -52,7 +52,7 @@ const UPCOMING: { id: "iconPack" | "list" | "template" | "plugin"; icon: LucideI
  *
  * - Utilisateur : présentation du mode développeur et bouton
  *   « Devenir développeur » (le rôle est changé par Rust).
- * - Développeur ou administrateur : accès à la création de plugins.
+ * - Développeur : accès à la création de plugins.
  *   Pour l'instant, seul le plugin de thème est disponible.
  */
 export function DeveloperSection() {
@@ -139,7 +139,7 @@ function BecomeDeveloper() {
         </Button>
       </CardFooter>
 
-      <Dialog open={confirming} onOpenChange={(open) => !busy && setConfirming(open)}>
+      <Dialog role="alertdialog" open={confirming} onOpenChange={(open) => !busy && setConfirming(open)}>
         <DialogHeader>
           <DialogTitle>{t("developer.become.confirmTitle")}</DialogTitle>
           <DialogDescription>
@@ -166,7 +166,6 @@ function BecomeDeveloper() {
 function DeveloperTools() {
   const { t } = useTranslation("settings");
   const navigate = useNavigate();
-  const user = useAuthStore((s) => s.user);
   const { mine, loaded } = useInstalledThemes();
 
   return (
@@ -177,9 +176,7 @@ function DeveloperTools() {
         <div>
           <h2 className="text-sm font-semibold">{t("developer.active.title")}</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            {user?.role === "admin"
-              ? t("developer.active.roleAdmin")
-              : t("developer.active.description")}
+            {t("developer.active.description")}
           </p>
         </div>
       </section>
@@ -245,8 +242,7 @@ function DeveloperTools() {
         </CardFooter>
       </Card>
 
-      {/* Un administrateur garde toujours les outils : rien à quitter. */}
-      {user?.role === "developer" && <LeaveDeveloper />}
+      <LeaveDeveloper />
     </div>
   );
 }
@@ -304,7 +300,7 @@ function LeaveDeveloper() {
         </Button>
       </CardFooter>
 
-      <Dialog open={confirming} onOpenChange={(open) => !busy && setConfirming(open)}>
+      <Dialog role="alertdialog" open={confirming} onOpenChange={(open) => !busy && setConfirming(open)}>
         <DialogHeader>
           <DialogTitle>{t("developer.leave.confirmTitle")}</DialogTitle>
           <DialogDescription>{t("developer.leave.confirmText")}</DialogDescription>
