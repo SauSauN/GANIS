@@ -32,6 +32,7 @@ import {
 } from "@/components/workspace/views/PageShell";
 import {
   MAX_NAME_LENGTH,
+  characterTabId,
   draftFromCharacter,
   fullName,
   nameError,
@@ -49,6 +50,7 @@ import {
 } from "@/stores/characterStore";
 import { errorText } from "@/lib/errors";
 import { notifyError, notifySaved } from "@/lib/notify";
+import { useSheetPreview, useSheetPreviewStore } from "@/stores/sheetPreviewStore";
 
 interface CharacterEditViewProps {
   projectId: string;
@@ -78,6 +80,9 @@ export function CharacterEditView({
 
   const { detailLevel, loaded, error: loadError, reload } = useProjectCharacters(projectId);
   const character = useProjectCharacter(projectId, characterId);
+  /** Aperçu (bouton œil de la barre d'onglets) : l'essentiel à la place du formulaire. */
+  const preview = useSheetPreview(characterTabId(characterId));
+  const togglePreview = useSheetPreviewStore((state) => state.toggle);
   const portraitUrl = usePortraitUrl(projectId, character);
 
   const updateCharacter = useCharacterStore((state) => state.updateCharacter);
@@ -245,6 +250,8 @@ export function CharacterEditView({
       <form onSubmit={onSubmit} noValidate>
         <CharacterSheet
           projectId={projectId}
+          preview={preview}
+          onExitPreview={() => togglePreview(characterTabId(characterId))}
           draft={draft}
           onChange={setDraft}
           level={detailLevel ?? "basic"}

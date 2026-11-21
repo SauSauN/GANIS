@@ -1,5 +1,6 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { isFilled, SheetSummary, useLinkedNames, type SummaryGroup, type SummaryRow } from "@/components/common/SheetSummary";
 import {
   BookOpen,
   ChevronRight,
@@ -90,6 +91,14 @@ interface LocationSheetProps {
   /** Ouvre les paramètres des types personnalisés. */
   onManageTypes?: () => void;
   disabled?: boolean;
+  /**
+   * Aperçu (bouton livre / crayon de la barre d'onglets) : les sections du
+   * formulaire sont cachées ; un bloc montre l'essentiel, à la hauteur de la
+   * carte de présentation.
+   */
+  preview?: boolean;
+  /** Quitter l'aperçu (bouton « Modifier la fiche » du bloc). */
+  onExitPreview?: () => void;
 }
 
 /** Libellé + champ, avec un identifiant commun. */
@@ -201,8 +210,11 @@ export function LocationSheet({
   onOpenLocation,
   onManageTypes,
   disabled,
+  preview = false,
+  onExitPreview,
 }: LocationSheetProps) {
   const { t } = useTranslation("locations");
+  const names = useLinkedNames(projectId);
   const [changingType, setChangingType] = useState(false);
 
   const customTypes = settings.customTypes;
@@ -249,8 +261,49 @@ export function LocationSheet({
     );
   }
 
+  /** Valeur lisible d'un champ rempli (les longs textes ne font pas partie de l'essentiel). */
+  function summaryRow(field: LocationField | undefined): SummaryRow | null {
+    if (!field || field.kind === "longText" || field.kind === "colors") return null;
+    const value = draft.fields[field.key];
+    if (!isFilled(value, field.kind === "tags")) return null;
+    const text = value.trim();
+    const label = labels.field(field.key);
+    switch (field.kind) {
+      case "tags":
+        return { key: field.key, label, value: text, kind: "tags" };
+      case "choice":
+        return { key: field.key, label, value: labels.option(field.key, text) };
+      case "reference":
+        return { key: field.key, label, value: names.node(text) };
+      case "location":
+        return { key: field.key, label, value: names.location(text) };
+      case "character":
+        return { key: field.key, label, value: names.character(text) };
+      default:
+        return { key: field.key, label, value: text };
+    }
+  }
+  const rows = (fields: Array<LocationField | undefined>) => fields.map(summaryRow).filter((row): row is SummaryRow => row !== null);
+
+  /** L'essentiel du lieu : identité, puis sa catégorie et son type. */
+  const summaryGroups: SummaryGroup[] = [
+    {
+      id: "identity",
+      icon: Fingerprint,
+      title: t("sections.identity.title"),
+      rows: [
+        { key: "type", label: t("form.type"), value: labels.type(draft.type) },
+        { key: "status", label: t("form.status"), value: labels.status(draft.status) },
+        { key: "parent", label: t("form.parent"), value: path.length ? path.map((item) => item.name).join(" › ") : t("profile.topLevel") },
+        ...rows(parts.identity.filter((key) => key !== "description").map(fieldByKey)),
+      ],
+    },
+    ...(category && ownFields.length > 0 ? [{ id: "category", icon: CategoryIcon, title: labels.category(category), rows: rows(ownFields) }] : []),
+    ...(specificFields.length > 0 ? [{ id: "type", icon: TypeIcon, title: t("sections.type.title", { type: labels.type(draft.type) }), rows: rows(specificFields) }] : []),
+  ];
+
   return (
-    <div className="grid items-start gap-8 @xl:grid-cols-[17rem_minmax(0,1fr)]">
+    <div className={cn("grid gap-8 @xl:grid-cols-[17rem_minmax(0,1fr)]", preview ? "items-stretch" : "items-start")}>
       {/* ================================================================
           CARTE DE PRÉSENTATION
           ================================================================ */}
@@ -318,6 +371,17 @@ export function LocationSheet({
         </CardContent>
       </Card>
 
+      {/* ================================================================
+          APERÇU : l'essentiel à la place des sections du formulaire
+          ================================================================ */}
+      {preview ? (
+        <SheetSummary
+          description={isFilled(draft.fields.description) ? draft.fields.description.trim() : null}
+          groups={summaryGroups}
+          onEdit={onExitPreview}
+        />
+      ) : (
+      <>
       {/* ================================================================
           SECTIONS
           ================================================================ */}
@@ -465,6 +529,8 @@ export function LocationSheet({
 
         {footer}
       </div>
+      </>
+      )}
 
       <Dialog open={changingType} onOpenChange={setChangingType} className="max-w-5xl">
         <DialogHeader>

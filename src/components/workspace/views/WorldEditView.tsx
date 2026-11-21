@@ -20,6 +20,7 @@ import { WorldThumb } from "@/components/world/WorldVisuals";
 import { useWorldLabels } from "@/components/world/useWorldLabels";
 import { errorText } from "@/lib/errors";
 import { notifyError, notifySaved } from "@/lib/notify";
+import { useSheetPreview, useSheetPreviewStore } from "@/stores/sheetPreviewStore";
 import { GALLERY_MAX_SIDE, PortraitError, preparePortrait } from "@/lib/portraitImage";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
 import {
@@ -59,6 +60,9 @@ export function WorldEditView({
 }) {
   const { t } = useTranslation(["world", "common", "characters"]);
   const sheetDisplay = useSheetDisplay(projectId, module);
+  /** Aperçu (bouton livre / crayon de la barre d'onglets) : l'essentiel à la place du formulaire. */
+  const preview = useSheetPreview(worldTabId(module, entryId));
+  const togglePreview = useSheetPreviewStore((state) => state.toggle);
   const { entries, settings, loaded, error: loadError, reload } = useWorldEntries(projectId, module);
   const entry = useWorldEntry(projectId, module, entryId);
   const imageUrl = useWorldImageUrl(projectId, module, entry);
@@ -253,6 +257,8 @@ export function WorldEditView({
         <WorldSheet
           projectId={projectId}
           module={module}
+          preview={preview}
+          onExitPreview={() => togglePreview(worldTabId(module, entryId))}
           draft={draft}
           onChange={setDraft}
           selfId={entry.id}

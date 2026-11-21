@@ -205,6 +205,13 @@
       "reset": "Back to the default order",
       "previous": "Previous order",
       "previousHint": "Details, Characters, Locations and the world modules first, then Structure, Plot, the project type module and Notes."
+    },
+    "sheetPreview": {
+      "title": "Profile preview",
+      "description": "The button on the right of the tab bar (an open book, then a pencil) switches a profile (character, location, object, fauna and flora, faction, people, magic) to its preview: the essentials, read-only. A second click brings back the form. By default, this choice applies to every profile.",
+      "toggle": "Preview profile by profile",
+      "on": "On: only the profile shown switches to its preview (or back to the form).",
+      "off": "Off: switching to the preview, or back to the form, applies to every profile."
     }
   },
   "developer": {

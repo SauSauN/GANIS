@@ -142,10 +142,11 @@ pub async fn update_editorial(
     Ok(saved)
 }
 
-/// Extensions acceptées pour un export (manuscrit, pitch, résumés).
-const EXPORT_EXTENSIONS: [&str; 5] = ["docx", "pdf", "txt", "md", "fountain"];
+/// Extensions acceptées pour un export (manuscrit, pitch, résumés) et pour
+/// une image téléchargée depuis l'application (galerie, logo, fiches).
+const EXPORT_EXTENSIONS: [&str; 10] = ["docx", "pdf", "txt", "md", "fountain", "png", "jpg", "jpeg", "webp", "gif"];
 
-/// Enregistre un fichier exporté (Word, PDF, texte) à l'emplacement choisi
+/// Enregistre un fichier exporté (Word, PDF, texte, image) à l'emplacement choisi
 /// dans la fenêtre du système. Corps binaire ; en-têtes : `x-file-name`,
 /// `x-dialog-title`. Renvoie le nom du fichier écrit, ou `None` si
 /// l'utilisateur a annulé.

@@ -76,7 +76,7 @@
     },
     "gallery": {
       "label": "Galerie",
-      "description": "Le logo du projet et les images de l'univers et de l'histoire : affiches, cartes du monde, ambiances, croquis… (30 au maximum, glisser-déposer accepté)."
+      "description": "Le logo du projet et les images de l'univers et de l'histoire : affiches, cartes du monde, ambiances, croquis… rangées en dossiers (30 images par dossier, glisser-déposer accepté)."
     },
     "characters": {
       "create": {

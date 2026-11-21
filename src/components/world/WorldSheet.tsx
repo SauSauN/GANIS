@@ -1,5 +1,6 @@
 import { useEffect, useId, useState, type CSSProperties, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { isFilled, SheetSummary, useLinkedNames, type SummaryGroup, type SummaryRow } from "@/components/common/SheetSummary";
 import { BookOpen, ChevronRight, EyeOff, Fingerprint, Images, Repeat2, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -64,6 +65,14 @@ interface WorldSheetProps {
   onOpenEntry?: (id: string) => void;
   onManage?: () => void;
   disabled?: boolean;
+  /**
+   * Aperçu (bouton livre / crayon de la barre d'onglets) : les sections du
+   * formulaire sont cachées ; un bloc montre l'essentiel, à la hauteur de la
+   * carte de présentation.
+   */
+  preview?: boolean;
+  /** Quitter l'aperçu (bouton « Modifier la fiche » du bloc). */
+  onExitPreview?: () => void;
 }
 
 function Field({
@@ -154,8 +163,11 @@ export function WorldSheet({
   onOpenEntry,
   onManage,
   disabled,
+  preview = false,
+  onExitPreview,
 }: WorldSheetProps) {
   const { t } = useTranslation("world");
+  const names = useLinkedNames(projectId);
   const [changingType, setChangingType] = useState(false);
   const [galleryOpen, setGalleryOpen] = useCollapsible(`ganis.worldSheet.${module}.gallery.collapsed`);
 
@@ -209,8 +221,40 @@ export function WorldSheet({
   const parentKey = module === "species" ? (nature === "individual" ? "individual" : "species") : module;
   const displayName = draft.name.trim() || labels.text("profile.new");
 
+  /** Valeur lisible d'un champ rempli (les longs textes ne font pas partie de l'essentiel). */
+  function summaryRow(field: WorldField | undefined): SummaryRow | null {
+    if (!field || !fieldFitsNature(field, nature) || field.kind === "longText" || field.kind === "colors") return null;
+    const value = draft.fields[field.key];
+    if (!isFilled(value, field.kind === "tags")) return null;
+    const text = value.trim();
+    const label = labels.field(field.key);
+    if (field.kind === "tags") return { key: field.key, label, value: text, kind: "tags" };
+    if (field.kind === "choice") return { key: field.key, label, value: labels.option(field.key, text) };
+    if (field.kind === "reference") return { key: field.key, label, value: names.node(text) };
+    return { key: field.key, label, value: text };
+  }
+  const rows = (fields: Array<WorldField | undefined>) => fields.map(summaryRow).filter((row): row is SummaryRow => row !== null);
+
+  /** L'essentiel de la fiche : identité, puis sa catégorie et son type. */
+  const summaryGroups: SummaryGroup[] = [
+    {
+      id: "identity",
+      icon: Fingerprint,
+      title: t("sections.identity.title"),
+      rows: [
+        ...(nature ? [{ key: "nature", label: t("natures.title"), value: labels.nature(nature) }] : []),
+        { key: "type", label: t("form.type"), value: labels.type(draft.type) },
+        { key: "status", label: t("form.status"), value: labels.status(draft.status) },
+        ...(path.length ? [{ key: "parent", label: t(`parent.${parentKey}.label`), value: path.map((item) => item.name).join(" › ") }] : []),
+        ...rows(parts.identity.filter((key) => key !== "description").map((key) => fieldByKey(module, key))),
+      ],
+    },
+    ...(category && ownFields.length > 0 ? [{ id: "category", icon: CategoryIcon, title: labels.category(category), rows: rows(ownFields) }] : []),
+    ...(specificFields.length > 0 ? [{ id: "type", icon: TypeIcon, title: t("sections.type.title", { type: labels.type(draft.type) }), rows: rows(specificFields) }] : []),
+  ];
+
   return (
-    <div className="grid items-start gap-8 @xl:grid-cols-[17rem_minmax(0,1fr)]">
+    <div className={cn("grid gap-8 @xl:grid-cols-[17rem_minmax(0,1fr)]", preview ? "items-stretch" : "items-start")}>
       {/* Carte de présentation */}
       <Card className={cn(cardClass, profileCardClass)}>
         <CardContent className="flex flex-col items-center gap-4 px-5 py-5 text-center">
@@ -274,6 +318,15 @@ export function WorldSheet({
         </CardContent>
       </Card>
 
+      {/* Aperçu : l'essentiel à la place des sections du formulaire */}
+      {preview ? (
+        <SheetSummary
+          description={isFilled(draft.fields.description) ? draft.fields.description.trim() : null}
+          groups={summaryGroups}
+          onEdit={onExitPreview}
+        />
+      ) : (
+      <>
       {/* Sections */}
       <div className="@container min-w-0 space-y-8">
         <Section
@@ -448,6 +501,8 @@ export function WorldSheet({
         {extra}
         {footer}
       </div>
+      </>
+      )}
 
       <Dialog open={changingType} onOpenChange={setChangingType} className="max-w-5xl">
         <DialogHeader>

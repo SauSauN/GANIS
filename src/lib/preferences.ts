@@ -432,6 +432,41 @@ export function usePreviewTabsEnabled(): boolean {
 }
 
 // ----------------------------------------------------------------------------
+// Aperçu des fiches personnage (bouton livre / crayon de la barre d'onglets)
+// ----------------------------------------------------------------------------
+
+const SHEET_PREVIEW_EACH_KEY = "ganis-sheet-preview-each";
+const SHEET_PREVIEW_EACH_EVENT = "ganis:sheet-preview-each-change";
+
+/**
+ * Faux (par défaut) : passer en aperçu, ou revenir au formulaire, vaut pour
+ * toutes les fiches personnage. Vrai : seulement pour la fiche affichée.
+ */
+export function getSheetPreviewEach(): boolean {
+  try {
+    return localStorage.getItem(SHEET_PREVIEW_EACH_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+/** Aperçu fiche par fiche (vrai) ou pour toutes les fiches (faux). */
+export function setSheetPreviewEach(each: boolean) {
+  try {
+    localStorage.setItem(SHEET_PREVIEW_EACH_KEY, String(each));
+  } catch {
+    /* ignoré */
+  }
+
+  window.dispatchEvent(new Event(SHEET_PREVIEW_EACH_EVENT));
+}
+
+/** Réglage de l'aperçu des fiches, mis à jour dès qu'il change. */
+export function useSheetPreviewEach(): boolean {
+  return useSyncExternalStore(subscribeTo(SHEET_PREVIEW_EACH_EVENT), getSheetPreviewEach);
+}
+
+// ----------------------------------------------------------------------------
 // Cadre des photos de profil (personnages, lieux, fiches du monde)
 // ----------------------------------------------------------------------------
 

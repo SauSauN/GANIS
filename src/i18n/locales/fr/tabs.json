@@ -9,13 +9,14 @@
     "closeNamed": "Fermer l'onglet {{name}}",
     "maximizeHint": "Double-clic : agrandir",
     "restoreHint": "Double-clic : rétablir la disposition",
-    "restore": "Rétablir la disposition"
-  },
-  "nav": {
-    "left_one": "Afficher l'onglet masqué à gauche ({{count}} masqué)",
-    "left_other": "Afficher l'onglet masqué à gauche ({{count}} masqués)",
-    "right_one": "Afficher l'onglet masqué à droite ({{count}} masqué)",
-    "right_other": "Afficher l'onglet masqué à droite ({{count}} masqués)"
+    "restore": "Rétablir la disposition",
+    "preview": "Aperçu de la fiche (l'essentiel)",
+    "previewEmpty": "Remplissez la fiche : l'essentiel s'affichera ici.",
+    "previewTitle": "Aperçu de la fiche",
+    "previewEmptyTitle": "Rien à montrer pour l'instant",
+    "fillSheet": "Remplir la fiche",
+    "editSheet": "Modifier la fiche",
+    "backToForm": "Modifier la fiche (revenir au formulaire)"
   },
   "menu": {
     "label": "Actions de l'onglet {{name}}",

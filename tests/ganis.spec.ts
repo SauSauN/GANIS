@@ -337,6 +337,122 @@ test.describe("Détails du projet", () => {
     await expect(view()).toContainText("royaume de Lunéa");
   });
 
+  test("galerie : photos, dossiers, nom, description, rangement et ordre", async () => {
+    await openFeature("Détails", "Galerie");
+    const galerie = view().getByTestId("project-gallery");
+    await expect(galerie).toContainText("Ajoutez vos premières images");
+
+    const png = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAECAIAAAA8r+mnAAAARElEQVR4nA3JMQHAQAwDMSMJEiMJEiN5JAZxcxC1WiWJERYrIp6oOCGZMTZrYp6pOf8RJjhsSHih4fJHmeKyJeWVlisfdEwxYUlDjK4AAAAASUVORK5CYII=",
+      "base64",
+    );
+    await galerie.getByTestId("gallery-images-input").setInputFiles([
+      { name: "carte.png", mimeType: "image/png", buffer: png },
+      { name: "affiche.png", mimeType: "image/png", buffer: png },
+    ]);
+    // Onglet « Photos » (par défaut) : les photos seules ; le nom du fichier sert de nom.
+    const photos = galerie.getByRole("list", { name: "Images de l'univers" }).getByRole("listitem");
+    await expect(photos).toHaveCount(2);
+    await expect(photos.nth(0).getByRole("button")).toHaveAccessibleName(/^carte/);
+    await expect(photos.nth(1).getByRole("button")).toHaveAccessibleName(/^affiche/);
+    await expect(galerie.getByTestId("gallery-place")).toHaveText("Photos");
+    if (process.env.GANIS_E2E_SHOTS) await view().screenshot({ path: `${process.env.GANIS_E2E_SHOTS}/galerie-photos.png` });
+
+    // Onglet « Dossiers » : seulement « Nouveau dossier » ; un seul niveau (pas de sous-dossiers).
+    await galerie.getByRole("tab", { name: "Dossiers" }).click();
+    await expect(galerie.getByTestId("gallery-place")).toHaveText("Dossiers");
+    await expect(galerie.getByRole("button", { name: "Ajouter des images" })).toHaveCount(0);
+    await galerie.getByRole("button", { name: "Nouveau dossier" }).click();
+    await page.getByRole("dialog").last().getByLabel("Nom du dossier").fill("Cartes");
+    await page.getByRole("dialog").last().getByRole("button", { name: "Créer" }).click();
+    if (process.env.GANIS_E2E_SHOTS) await view().screenshot({ path: `${process.env.GANIS_E2E_SHOTS}/galerie-dossiers.png` });
+
+    // Dossier système « Logo » (toujours là) : une seule image, le logo du projet.
+    await galerie.getByRole("button", { name: "Ouvrir le dossier Logo" }).click();
+    await expect(galerie.getByTestId("gallery-place")).toHaveText("Logo");
+    await expect(galerie.getByTestId("gallery-folder-count")).toHaveText("0 / 1 image");
+    await galerie.getByTestId("gallery-logo-input").setInputFiles({ name: "logo.png", mimeType: "image/png", buffer: png });
+    await expect(galerie.getByTestId("gallery-logo")).toBeVisible();
+    await expect(galerie.getByTestId("gallery-folder-count")).toHaveText("1 / 1 image");
+    await expect(galerie.getByRole("button", { name: "Remplacer le logo" })).toBeVisible();
+    // Pas de menu … : on ne le renomme pas, on ne le supprime pas.
+    await galerie.getByRole("button", { name: "Retour à Dossiers" }).click();
+    await expect(galerie.getByRole("button", { name: "Actions du dossier Logo" })).toHaveCount(0);
+
+    // Dans un dossier : son nombre d'images, et « Ajouter des images » y range directement.
+    await galerie.getByRole("button", { name: "Ouvrir le dossier Cartes" }).click();
+    await expect(galerie.getByTestId("gallery-place")).toHaveText("Cartes");
+    await expect(galerie.getByTestId("gallery-folder-count")).toHaveText("0 / 30 images");
+    await expect(galerie).toContainText("Ce dossier est vide");
+    await expect(galerie.getByRole("button", { name: "Nouveau dossier" })).toHaveCount(0);
+    await galerie.getByTestId("gallery-images-input").setInputFiles([{ name: "port.png", mimeType: "image/png", buffer: png }]);
+    await expect(photos).toHaveCount(1);
+    await expect(galerie.getByTestId("gallery-folder-count")).toHaveText("1 / 30 images");
+
+    // Retour, puis « Sans dossier » : renommer, décrire et ranger une photo.
+    await galerie.getByRole("button", { name: "Retour à Dossiers" }).click();
+    await galerie.getByRole("button", { name: "Ouvrir le dossier Sans dossier" }).click();
+    await expect(photos).toHaveCount(2);
+    await photos.nth(0).getByRole("button").click();
+    const fenetre = page.getByRole("dialog").last();
+    await expect(fenetre.getByTestId("gallery-dialog-image")).toBeVisible();
+    if (process.env.GANIS_E2E_SHOTS) await page.screenshot({ path: `${process.env.GANIS_E2E_SHOTS}/galerie-fenetre.png` });
+    // La photo tient dans la fenêtre : pas de barre de défilement.
+    expect(await fenetre.evaluate((el) => el.scrollHeight - el.clientHeight)).toBeLessThanOrEqual(1);
+    // On peut la télécharger (fenêtre « Enregistrer sous » du système, pas ouverte ici).
+    await expect(fenetre.getByRole("button", { name: "Télécharger" })).toBeVisible();
+    // Le formulaire est caché : la photo d'abord ; « Modifier » l'affiche.
+    await expect(fenetre.getByLabel("Nom")).toHaveCount(0);
+    await fenetre.getByRole("button", { name: "Modifier" }).click();
+    await fenetre.getByLabel("Nom").fill("Carte du royaume");
+    await fenetre.getByLabel("Dossier").selectOption({ label: "Cartes" });
+    await fenetre.getByLabel("Description").fill("Le royaume de Lunéa et ses provinces.");
+    await fenetre.getByRole("button", { name: "Enregistrer" }).click();
+    await expect(page.getByText("Image enregistrée.")).toBeVisible();
+    // Rangée dans « Cartes », elle quitte « Sans dossier » : sa fenêtre se ferme.
+    await expect(fenetre.getByTestId("gallery-dialog-image")).toHaveCount(0);
+    await expect(photos).toHaveCount(1);
+
+    await galerie.getByRole("button", { name: "Retour à Dossiers" }).click();
+    await galerie.getByRole("button", { name: "Ouvrir le dossier Cartes" }).click();
+    await expect(photos).toHaveCount(2);
+    await expect(galerie.getByTestId("gallery-folder-count")).toHaveText("2 / 30 images");
+    if (process.env.GANIS_E2E_SHOTS) await view().screenshot({ path: `${process.env.GANIS_E2E_SHOTS}/galerie-dossier.png` });
+
+    // Onglet « Photos » : toutes les photos ; glisser la seconde avant la première.
+    await galerie.getByRole("tab", { name: "Photos" }).click();
+    await expect(photos).toHaveCount(3);
+    await photos.nth(1).dragTo(photos.nth(0));
+    await expect(photos.nth(0).getByRole("button")).toHaveAccessibleName(/^affiche/);
+    await expect(photos.nth(1).getByRole("button")).toHaveAccessibleName(/^Carte du royaume/);
+
+    // Fermer puis rouvrir l'onglet : tout a été enregistré.
+    await page.keyboard.press("Control+w");
+    await openFeature("Détails", "Galerie");
+    await galerie.getByRole("tab", { name: "Dossiers" }).click();
+    await galerie.getByRole("button", { name: "Ouvrir le dossier Cartes" }).click();
+    await expect(photos).toHaveCount(2);
+    await photos.nth(0).getByRole("button").click();
+    await page.getByRole("dialog").last().getByRole("button", { name: "Modifier" }).click();
+    await expect(page.getByRole("dialog").last().getByLabel("Description")).toHaveValue("Le royaume de Lunéa et ses provinces.");
+    await page.getByRole("dialog").last().getByRole("button", { name: "Fermer" }).click();
+
+    // Supprimer « Cartes » : ses photos reviennent dans « Sans dossier ».
+    await galerie.getByRole("button", { name: "Retour à Dossiers" }).click();
+    await galerie.getByRole("button", { name: "Ouvrir le dossier Cartes" }).hover();
+    await galerie.getByRole("button", { name: "Actions du dossier Cartes" }).click();
+    await page.getByRole("menuitem", { name: "Supprimer le dossier" }).click();
+    await page.getByRole("dialog").last().getByRole("button", { name: "Supprimer le dossier" }).click();
+    await expect(galerie.getByRole("button", { name: "Ouvrir le dossier Cartes" })).toHaveCount(0);
+    await galerie.getByRole("button", { name: "Ouvrir le dossier Sans dossier" }).click();
+    await expect(photos).toHaveCount(3);
+    await galerie.getByRole("tab", { name: "Photos" }).click();
+
+    // Le logo s'affiche sur l'accueil du projet, à côté de son nom.
+    await openFeature("Détails", "Accueil du projet");
+    await expect(view().getByTestId("project-logo")).toBeVisible();
+  });
+
   test("glossaire : ajouter un terme et le retrouver", async () => {
     await openFeature("Détails", "Glossaire");
     await view().getByRole("button", { name: "Nouveau terme" }).first().click();
@@ -389,8 +505,45 @@ test.describe("Personnages", () => {
     const fiche = view();
     await expect(field(fiche, "Prénom")).toHaveValue("Mira");
     await field(fiche, "Prénom").fill("Mirabelle");
+    await field(fiche, "Âge").fill("27 ans");
+    await field(fiche, "Profession / Activité").fill("Cartographe du roi");
+    await field(fiche, "Description générale").fill("Une cartographe curieuse, toujours une plume à la main, qui note chaque détour du chemin. https://exemple.fr/une-adresse-tres-longue-sans-aucun-espace-qui-depasserait-largement-la-largeur-du-bloc");
     await save();
     await expect(activeTab()).toContainText("Mirabelle");
+
+    // Bouton œil (à droite de la barre d'onglets, seulement sur une fiche personnage) :
+    // l'essentiel à la place des panneaux du formulaire, dans le même onglet.
+    // Deux états, deux icônes : « Aperçu de la fiche » (livre), puis « Modifier la fiche » (crayon).
+    const oeil = page.getByTestId("preview-toggle");
+    await expect(oeil).toHaveAccessibleName(/Aperçu de la fiche/);
+    await oeil.click();
+    await expect(oeil).toHaveAttribute("aria-pressed", "true");
+    await expect(oeil).toHaveAccessibleName(/Modifier la fiche/);
+    await expect(fiche.getByTestId("sheet-summary")).toBeVisible();
+    await expect(field(fiche, "Prénom")).toHaveCount(0);
+    const apercu = fiche.getByTestId("sheet-summary");
+    await expect(apercu).toContainText("Cartographe du roi");
+    await expect(apercu).toContainText("Une cartographe curieuse");
+    // Un texte trop long passe à la ligne : rien ne dépasse vers la droite.
+    const debord = await apercu.evaluate((bloc) =>
+      Array.from(bloc.querySelectorAll<HTMLElement>("p, dd, dt, span")).some((el) => el.getBoundingClientRect().right > bloc.getBoundingClientRect().right + 1),
+    );
+    expect(debord).toBe(false);
+    if (process.env.GANIS_E2E_SHOTS) await page.screenshot({ path: `${process.env.GANIS_E2E_SHOTS}/apercu-personnage.png` });
+    // Par défaut, l'aperçu vaut pour toutes les fiches : Aldric aussi est en aperçu.
+    await tabs().getByRole("tab", { name: /Aldric VENN/ }).click();
+    await expect(view().getByTestId("sheet-summary")).toBeVisible();
+    await expect(page.getByTestId("preview-toggle")).toHaveAttribute("aria-pressed", "true");
+    await tabs().getByRole("tab", { name: /Mirabelle/ }).click();
+    // Un second clic sur l'œil ramène le formulaire…
+    await oeil.click();
+    await expect(apercu).toHaveCount(0);
+    await expect(field(fiche, "Prénom")).toHaveValue("Mirabelle");
+    // … tout comme « Modifier la fiche » dans l'aperçu.
+    await oeil.click();
+    await apercu.getByRole("button", { name: "Modifier la fiche" }).click();
+    await expect(apercu).toHaveCount(0);
+    await expect(oeil).toHaveAttribute("aria-pressed", "false");
   });
 
   test("liste, recherche et affichage en tableau", async () => {
@@ -456,6 +609,16 @@ test.describe("Lieux", () => {
   test("créer des lieux", async () => {
     await createLocation("Lunéa", "Territoires politiques", "Royaume");
     await createLocation("Port-Brume", "Agglomérations", "Port");
+    // Une fiche de lieu a aussi son aperçu : l'essentiel à la place du formulaire.
+    const bouton = page.getByTestId("preview-toggle");
+    await expect(bouton).toHaveAccessibleName(/Aperçu de la fiche/);
+    await bouton.click();
+    const apercu = view().getByTestId("sheet-summary");
+    await expect(apercu).toBeVisible();
+    await expect(apercu).toContainText("Port");
+    if (process.env.GANIS_E2E_SHOTS) await page.screenshot({ path: `${process.env.GANIS_E2E_SHOTS}/apercu-lieu.png` });
+    await bouton.click();
+    await expect(apercu).toHaveCount(0);
   });
 
   test("liste et recherche des lieux", async () => {
@@ -824,13 +987,22 @@ test.describe("Outils du projet", () => {
       await passDetailLevel();
       // Choix du type, quand le module en propose.
       const type = view().getByRole("combobox").first();
+      // La liste des types s'affiche un instant après « Continuer » : on l'attend (si le module en propose).
+      await type.waitFor({ state: "visible", timeout: 5000 }).catch(() => {});
       if (await type.isVisible().catch(() => false)) {
-        const valeur = await type.locator("option:not([disabled])").first().getAttribute("value");
-        if (valeur !== null) await type.selectOption(valeur);
+        // Une vraie option (pas l'intitulé « Choisir parmi N types… », sans valeur).
+        const valeur = await type.locator('option:not([disabled]):not([value=""])').first().getAttribute("value");
+        if (valeur) await type.selectOption(valeur);
       }
       await field(view(), "Nom").fill(nom);
       await view().getByRole("button", { name: /^Créer/ }).last().click();
       await expect(activeTab()).toContainText(nom);
+      // Chaque fiche du monde a aussi son aperçu (livre / crayon).
+      const bouton = page.getByTestId("preview-toggle");
+      await bouton.click();
+      await expect(view().getByTestId("sheet-summary")).toBeVisible();
+      await bouton.click();
+      await expect(view().getByTestId("sheet-summary")).toHaveCount(0);
     }
   });
 
@@ -1015,6 +1187,16 @@ test.describe("Paramètres généraux", () => {
         await expect(main).toContainText(section);
       }
     }
+
+    // Apparence : aperçu des fiches personnage pour toutes (par défaut) ou fiche par fiche.
+    const apparence = page.getByRole("button", { name: /Apparence/ }).or(page.getByRole("tab", { name: /Apparence/ })).first();
+    if (await apparence.isVisible().catch(() => false)) await apparence.click();
+    const parFiche = page.getByRole("switch", { name: "Aperçu fiche par fiche" });
+    await expect(parFiche).toHaveAttribute("aria-checked", "false");
+    await parFiche.click();
+    await expect(parFiche).toHaveAttribute("aria-checked", "true");
+    await parFiche.click();
+    await expect(parFiche).toHaveAttribute("aria-checked", "false");
   });
 
   test("compte : profil d'auteur enregistré et affiché", async () => {

@@ -9,13 +9,14 @@
     "closeNamed": "Close tab {{name}}",
     "maximizeHint": "Double-click: maximize",
     "restoreHint": "Double-click: restore layout",
-    "restore": "Restore layout"
-  },
-  "nav": {
-    "left_one": "Show hidden tab on the left ({{count}} hidden)",
-    "left_other": "Show hidden tab on the left ({{count}} hidden)",
-    "right_one": "Show hidden tab on the right ({{count}} hidden)",
-    "right_other": "Show hidden tab on the right ({{count}} hidden)"
+    "restore": "Restore layout",
+    "preview": "Profile preview (the essentials)",
+    "previewEmpty": "Fill in the profile: the essentials will appear here.",
+    "previewTitle": "Profile preview",
+    "previewEmptyTitle": "Nothing to show yet",
+    "fillSheet": "Fill in the profile",
+    "editSheet": "Edit the profile",
+    "backToForm": "Edit the profile (back to the form)"
   },
   "menu": {
     "label": "Actions for tab {{name}}",

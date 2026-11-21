@@ -787,8 +787,23 @@ export interface CharacterLocationInput {
 /** Image de la galerie de l'univers d'un projet, sans son contenu. */
 export interface ProjectImage {
   id: string;
+  /** Nom de l'image. */
   caption: string | null;
+  /** Description libre. */
+  description: string | null;
+  /** Dossier où l'image est rangée (`null` : à la racine de la galerie). */
+  folderId: string | null;
   createdAt: string;
+}
+
+/** Dossier (ou sous-dossier) de la galerie du projet. Même forme que les dossiers de notes. */
+export interface GalleryFolder {
+  id: string;
+  parentId: string | null;
+  name: string;
+  position: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 /** Image de la galerie d'un lieu, sans son contenu. */

@@ -87,13 +87,18 @@
     "notFound": "Projet non trouvé.",
     "nameEmpty": "Le nom du projet ne peut pas être vide.",
     "nameTooLong": "Le nom du projet ne peut pas dépasser 200 caractères.",
-    "descriptionTooLong": "La description du projet ne peut pas dépasser 5000 caractères.",
+    "descriptionTooLong": "La description ne peut pas dépasser {{max}} caractères.",
     "dataMissing": "Les données de ce projet sont introuvables.",
     "purgePublicConfirm": "Ce projet public est partagé avec les autres personnes qui utilisent cet ordinateur : confirmez sa suppression définitive.",
     "makePrivateConfirm": "Pour rendre ce projet privé, retapez son nom : il ne sera plus accessible aux autres personnes qui utilisent cet ordinateur.",
     "imageNotFound": "Image introuvable.",
-    "galleryFull": "La galerie est pleine ({{max}} images au maximum).",
-    "captionTooLong": "La légende ne peut pas dépasser {{max}} caractères."
+    "galleryFull": "Ce dossier est plein ({{max}} images au maximum).",
+    "captionTooLong": "La légende ne peut pas dépasser {{max}} caractères.",
+    "galleryChanged": "La galerie a changé : rechargez-la puis recommencez.",
+    "galleryFolderNotFound": "Dossier introuvable.",
+    "galleryFolderNameEmpty": "Le nom du dossier ne peut pas être vide.",
+    "galleryFolderNameTooLong": "Le nom du dossier ne peut pas dépasser {{max}} caractères.",
+    "galleryFolderCycle": "Un dossier ne peut pas aller dans un de ses sous-dossiers."
   },
   "synopsis": {
     "tooManyTags": "{{field}} : {{max}} éléments au maximum.",

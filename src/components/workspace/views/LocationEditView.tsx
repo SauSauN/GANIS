@@ -55,6 +55,7 @@ import {
 } from "@/stores/locationStore";
 import { errorText } from "@/lib/errors";
 import { notifyError, notifySaved } from "@/lib/notify";
+import { useSheetPreview, useSheetPreviewStore } from "@/stores/sheetPreviewStore";
 
 interface LocationEditViewProps {
   projectId: string;
@@ -75,6 +76,9 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
 
   const { locations, settings, loaded, error: loadError, reload } = useProjectLocations(projectId);
   const location = useProjectLocation(projectId, locationId);
+  /** Aperçu (bouton livre / crayon de la barre d'onglets) : l'essentiel à la place du formulaire. */
+  const preview = useSheetPreview(locationTabId(locationId));
+  const togglePreview = useSheetPreviewStore((state) => state.toggle);
   const imageUrl = useLocationImageUrl(projectId, location);
   const labels = useLocationLabels(settings.customTypes);
 
@@ -286,6 +290,8 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
       <form onSubmit={onSubmit} noValidate>
         <LocationSheet
           projectId={projectId}
+          preview={preview}
+          onExitPreview={() => togglePreview(locationTabId(locationId))}
           draft={draft}
           onChange={setDraft}
           selfId={location.id}

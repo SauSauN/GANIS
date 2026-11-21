@@ -59,7 +59,11 @@
     "zoomOut": "Zoom out (−10%)",
     "zoomReset": "Zoom: {{value}}%. Back to 100%",
     "zoomResetHint": "Back to 100%",
-    "percent": "{{value}}%"
+    "percent": "{{value}}%",
+    "download": "Download",
+    "downloadTitle": "Save the image",
+    "downloaded": "Image saved: {{file}}",
+    "downloadFailed": "Couldn't save the image."
   },
   "loading": "Loading…",
   "crash": {

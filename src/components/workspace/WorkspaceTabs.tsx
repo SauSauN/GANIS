@@ -23,8 +23,8 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import {
-  ChevronLeft,
-  ChevronRight,
+  BookOpenText,
+  SquarePen,
   Circle,
   Maximize2,
   Minimize2,
@@ -73,6 +73,13 @@ interface WorkspaceTabsProps {
   onToggleMaximize: (id: string) => void;
   /** Rétablit la disposition (bouton de la barre, quand c'est agrandi). */
   onRestore: () => void;
+  /**
+   * Aperçu de l'onglet actif (bouton œil, à droite de la barre). Fourni
+   * seulement quand l'onglet actif est une fiche personnage.
+   */
+  onPreview?: () => void;
+  /** Vrai : l'aperçu est affiché (l'œil est allumé ; un clic revient au formulaire). */
+  previewActive?: boolean;
 }
 
 // ----------------------------------------------------------------------------
@@ -98,21 +105,6 @@ function revealInBar(scroller: HTMLElement, item: HTMLElement, smooth: boolean) 
   if (target !== null) {
     scroller.scrollTo({ left: Math.max(0, target), behavior: smooth ? "smooth" : "auto" });
   }
-}
-
-/** Onglets entièrement ou en partie cachés de chaque côté de la barre. */
-function hiddenSides(scroller: HTMLElement): { left: number; right: number } {
-  const view = scroller.getBoundingClientRect();
-  let left = 0;
-  let right = 0;
-
-  scroller.querySelectorAll<HTMLElement>("[data-tab-item]").forEach((item) => {
-    const rect = item.getBoundingClientRect();
-    if (rect.left < view.left - 1) left += 1;
-    else if (rect.right > view.right + 1) right += 1;
-  });
-
-  return { left, right };
 }
 
 const tabClass = (active: boolean, pinned: boolean) =>
@@ -348,43 +340,6 @@ function SortableTab({
         </button>
       )}
     </div>
-  );
-}
-
-// ----------------------------------------------------------------------------
-// Flèches de navigation
-// ----------------------------------------------------------------------------
-
-interface NavButtonProps {
-  direction: "left" | "right";
-  /** Nombre d'onglets masqués de ce côté. */
-  hidden: number;
-  onClick: () => void;
-}
-
-/** Flèche affichée uniquement quand des onglets sont masqués de son côté. */
-function NavButton({ direction, hidden, onClick }: NavButtonProps) {
-  const { t } = useTranslation("tabs");
-  const left = direction === "left";
-  const Icon = left ? ChevronLeft : ChevronRight;
-
-  const label = left
-    ? t("nav.left", { count: hidden })
-    : t("nav.right", { count: hidden });
-
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      title={label}
-      onClick={onClick}
-      className={cn(
-        "flex w-8 shrink-0 items-center justify-center border-border text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground",
-        left ? "border-r" : "border-l",
-      )}
-    >
-      <Icon className="h-4 w-4" />
-    </button>
   );
 }
 
@@ -659,6 +614,8 @@ export function WorkspaceTabs({
   maximized,
   onToggleMaximize,
   onRestore,
+  onPreview,
+  previewActive = false,
 }: WorkspaceTabsProps) {
   const { t } = useTranslation("tabs");
 
@@ -672,30 +629,6 @@ export function WorkspaceTabs({
   const scrollerRef = useRef<HTMLDivElement>(null);
 
   const count = tabs.length;
-
-  /** Onglets cachés de chaque côté : décident des flèches. */
-  const [hidden, setHidden] = useState({ left: 0, right: 0 });
-
-  const measure = () => {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    const next = hiddenSides(scroller);
-    setHidden((current) => (current.left === next.left && current.right === next.right ? current : next));
-  };
-
-  // Mesure après chaque rendu (onglets ajoutés, fermés, renommés) et quand
-  // la barre change de largeur.
-  useLayoutEffect(() => {
-    measure();
-  });
-
-  useEffect(() => {
-    const scroller = scrollerRef.current;
-    if (!scroller || typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(() => measure());
-    observer.observe(scroller);
-    return () => observer.disconnect();
-  }, []);
 
   // Molette d'une souris (défilement vertical) : la barre défile de côté.
   // Le pavé tactile envoie déjà un défilement horizontal, géré nativement.
@@ -724,19 +657,6 @@ export function WorkspaceTabs({
     if (scroller && item) revealInBar(scroller, item, !firstReveal.current);
     firstReveal.current = false;
   }, [activeTab, count]);
-
-  /** Flèche : ramène le prochain onglet caché de ce côté. */
-  function step(direction: -1 | 1) {
-    const scroller = scrollerRef.current;
-    if (!scroller) return;
-    const view = scroller.getBoundingClientRect();
-    const items = Array.from(scroller.querySelectorAll<HTMLElement>("[data-tab-item]"));
-    const target =
-      direction < 0
-        ? items.filter((item) => item.getBoundingClientRect().left < view.left - 1).pop()
-        : items.find((item) => item.getBoundingClientRect().right > view.right + 1);
-    if (target) revealInBar(scroller, target, true);
-  }
 
   // Après un déplacement, on rend le focus à l'élément qui l'avait.
   const pendingFocus = useRef<string | null>(null);
@@ -814,10 +734,6 @@ export function WorkspaceTabs({
       ref={barRef}
       className="flex h-9 shrink-0 border-b border-border bg-card"
     >
-      {hidden.left > 0 && (
-        <NavButton direction="left" hidden={hidden.left} onClick={() => step(-1)} />
-      )}
-
       <DndContext
         id="workspace-tabs"
         sensors={sensors}
@@ -833,7 +749,6 @@ export function WorkspaceTabs({
             ref={scrollerRef}
             role="tablist"
             aria-label={t("listLabel")}
-            onScroll={measure}
             className="flex min-w-0 flex-1 items-end overflow-x-auto overflow-y-hidden overscroll-x-contain no-scrollbar"
           >
             {tabs.map((tab, index) => {
@@ -868,8 +783,23 @@ export function WorkspaceTabs({
         </SortableContext>
       </DndContext>
 
-      {hidden.right > 0 && (
-        <NavButton direction="right" hidden={hidden.right} onClick={() => step(1)} />
+      {/* Fiche personnage : aperçu en lecture (œil). */}
+      {/* Deux états, deux icônes : un livre ouvert pour passer à l'aperçu,
+          un crayon pour revenir au formulaire. */}
+      {onPreview && (
+        <button
+          type="button"
+          onClick={onPreview}
+          title={previewActive ? t("tab.backToForm") : t("tab.preview")}
+          aria-label={previewActive ? t("tab.backToForm") : t("tab.preview")}
+          aria-pressed={previewActive}
+          data-testid="preview-toggle"
+          // Mêmes couleurs que l'onglet actif (fond de la page, icône bleue) ;
+          // l'état se lit à l'icône : livre (aperçu) ou crayon (formulaire).
+          className="flex w-9 shrink-0 items-center justify-center border-l border-border bg-background text-primary hover:bg-secondary"
+        >
+          {previewActive ? <SquarePen className="h-4 w-4" /> : <BookOpenText className="h-4 w-4" />}
+        </button>
       )}
 
       {/* Agrandi : rétablir la disposition (même effet qu'un double-clic) */}

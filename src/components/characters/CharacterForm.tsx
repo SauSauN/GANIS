@@ -10,6 +10,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { CharacterSummary } from "@/components/characters/CharacterSummary";
 import { Label } from "@/components/ui/label";
 import { PortraitPicker } from "@/components/characters/PortraitPicker";
 import { PlaceField } from "@/components/locations/PlaceField";
@@ -72,6 +73,13 @@ interface CharacterSheetProps {
   /** Boutons sous les sections. */
   footer: ReactNode;
   disabled?: boolean;
+  /**
+   * Aperçu (bouton œil de la barre d'onglets) : les panneaux du formulaire
+   * sont cachés ; un bloc montre l'essentiel, à la hauteur du profil.
+   */
+  preview?: boolean;
+  /** Quitter l'aperçu (bouton « Modifier la fiche » du bloc). */
+  onExitPreview?: () => void;
 }
 
 const LEVEL_ICONS: Record<CharacterDetailLevel, LucideIcon> = {
@@ -148,6 +156,8 @@ export function CharacterSheet({
   galleryCount,
   footer,
   disabled,
+  preview = false,
+  onExitPreview,
 }: CharacterSheetProps) {
   const { t } = useTranslation("characters");
   const listLabel = useListLabel();
@@ -374,7 +384,7 @@ export function CharacterSheet({
   }
 
   return (
-    <div className="grid items-start gap-8 @xl:grid-cols-[17rem_minmax(0,1fr)]">
+    <div className={cn("grid gap-8 @xl:grid-cols-[17rem_minmax(0,1fr)]", preview ? "items-stretch" : "items-start")}>
       {/* ================================================================
           CARTE DE PROFIL
           ================================================================ */}
@@ -425,6 +435,13 @@ export function CharacterSheet({
         </CardContent>
       </Card>
 
+      {/* ================================================================
+          APERÇU (œil) : l'essentiel à la place des panneaux du formulaire
+          ================================================================ */}
+      {preview ? (
+        <CharacterSummary projectId={projectId} draft={draft} levels={levels} onEdit={onExitPreview} />
+      ) : (
+      <>
       {/* ================================================================
           SECTIONS PAR NIVEAU
           ================================================================ */}
@@ -525,6 +542,8 @@ export function CharacterSheet({
 
         {footer}
       </div>
+      </>
+      )}
     </div>
   );
 }

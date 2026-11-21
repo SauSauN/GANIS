@@ -76,7 +76,7 @@
     },
     "gallery": {
       "label": "Gallery",
-      "description": "The project logo and images of your world and story: posters, world maps, mood boards, sketches… (up to 30, drag and drop works)."
+      "description": "The project logo and the images of the world and the story: posters, world maps, moods, sketches… organised in folders (30 images per folder, drag and drop accepted)."
     },
     "characters": {
       "create": {

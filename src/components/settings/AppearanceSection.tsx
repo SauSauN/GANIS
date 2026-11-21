@@ -27,6 +27,8 @@ import {
   usePanelImageSize,
   usePanelMenuEnabled,
   usePreviewTabsEnabled,
+  useSheetPreviewEach,
+  setSheetPreviewEach,
   setPreviewTabsEnabled,
   DEFAULT_PROFILE_FRAME,
   PROFILE_FRAME_WIDTHS,
@@ -231,6 +233,7 @@ export function AppearanceSection() {
       <ProfileFrameCard />
 
       <PreviewTabsCard />
+      <SheetPreviewCard />
 
       <ModuleOrderCard />
 
@@ -537,6 +540,55 @@ function PreviewTabsCard() {
               className={cn(
                 "inline-block h-5 w-5 rounded-full bg-background shadow transition-transform",
                 enabled ? "translate-x-5" : "translate-x-0",
+              )}
+            />
+          </button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+/**
+ * Aperçu des fiches personnage (bouton livre / crayon de la barre
+ * d'onglets) : pour toutes les fiches (par défaut) ou fiche par fiche.
+ */
+function SheetPreviewCard() {
+  const { t } = useTranslation("settings");
+  const each = useSheetPreviewEach();
+
+  return (
+    <Card className={cardClass}>
+      <CardHeader className={cardHeaderClass}>
+        <TitleWithInfo info={t("appearance.sheetPreview.description")}>{t("appearance.sheetPreview.title")}</TitleWithInfo>
+      </CardHeader>
+
+      <CardContent className="px-6 py-6">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p id="sheet-preview-label" className="text-sm font-medium">
+              {t("appearance.sheetPreview.toggle")}
+            </p>
+            <p className="text-sm text-muted-foreground">
+              {each ? t("appearance.sheetPreview.on") : t("appearance.sheetPreview.off")}
+            </p>
+          </div>
+
+          <button
+            type="button"
+            role="switch"
+            aria-checked={each}
+            aria-labelledby="sheet-preview-label"
+            onClick={() => setSheetPreviewEach(!each)}
+            className={cn(
+              "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border-2 border-transparent transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+              each ? "bg-primary" : "bg-input",
+            )}
+          >
+            <span
+              className={cn(
+                "inline-block h-5 w-5 rounded-full bg-background shadow transition-transform",
+                each ? "translate-x-5" : "translate-x-0",
               )}
             />
           </button>

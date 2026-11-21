@@ -10,6 +10,7 @@ import { ExternalDocumentsWatcher } from "@/components/documents/ExternalDocumen
 import { UnsavedChangesDialog } from "@/components/layout/UnsavedChangesDialog";
 import { useUnsavedQueue } from "@/components/layout/useUnsavedQueue";
 import { SideBar } from "@/components/layout/SideBar";
+import { hasSheetPreview, useSheetPreview, useSheetPreviewStore } from "@/stores/sheetPreviewStore";
 import { StatusBar } from "@/components/layout/StatusBar";
 import {
   HOME_TAB,
@@ -384,6 +385,10 @@ export default function Workspace() {
    * qu'au moment où la commande est exécutée.
    */
   const activeDirty = activeTab !== null && activeTab in unsavedEntries;
+  /** Onglet actif sur une fiche (personnage, lieu, monde) : bouton livre / crayon, aperçu dans la fiche. */
+  const previewSheetId = hasSheetPreview(activeTab) ? activeTab : null;
+  const previewActive = useSheetPreview(previewSheetId);
+  const togglePreview = useSheetPreviewStore((state) => state.toggle);
   /** Lecture complète en cours : son onglet est affiché seul (bouton ▶ enfoncé). */
   const reading = maximized && activeTab !== null && READING_FEATURES.has(activeTab);
   const createTarget = NEW_TARGETS[activeModule] ?? null;
@@ -889,6 +894,8 @@ export default function Workspace() {
             maximized={isMaximized}
             onToggleMaximize={toggleMaximize}
             onRestore={() => setMaximized(false)}
+            onPreview={previewSheetId ? () => togglePreview(previewSheetId) : undefined}
+            previewActive={previewActive}
           />
 
           {/* =======================================================

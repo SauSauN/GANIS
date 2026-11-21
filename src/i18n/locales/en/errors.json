@@ -87,13 +87,18 @@
     "notFound": "Project not found.",
     "nameEmpty": "Project name cannot be empty.",
     "nameTooLong": "Project name cannot exceed 200 characters.",
-    "descriptionTooLong": "Project description cannot exceed 5000 characters.",
+    "descriptionTooLong": "The description cannot exceed {{max}} characters.",
     "dataMissing": "This project's data cannot be found.",
     "purgePublicConfirm": "This public project is shared with the other people who use this computer: confirm its permanent deletion.",
     "makePrivateConfirm": "To make this project private, type its name again: other people who use this computer will no longer have access to it.",
     "imageNotFound": "Image not found.",
-    "galleryFull": "The gallery is full ({{max}} images at most).",
-    "captionTooLong": "The caption cannot exceed {{max}} characters."
+    "galleryFull": "This folder is full ({{max}} images at most).",
+    "captionTooLong": "The caption cannot exceed {{max}} characters.",
+    "galleryChanged": "The gallery has changed: reload it and try again.",
+    "galleryFolderNotFound": "Folder not found.",
+    "galleryFolderNameEmpty": "The folder name cannot be empty.",
+    "galleryFolderNameTooLong": "The folder name cannot exceed {{max}} characters.",
+    "galleryFolderCycle": "A folder cannot go into one of its subfolders."
   },
   "synopsis": {
     "tooManyTags": "{{field}}: {{max}} items maximum.",

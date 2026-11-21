@@ -205,6 +205,13 @@
       "reset": "Revenir à l'ordre par défaut",
       "previous": "Ancien ordre",
       "previousHint": "Détails, Personnages, Lieux et les modules du monde d'abord, puis Découpage, Trame, le module du type de projet et Notes."
+    },
+    "sheetPreview": {
+      "title": "Aperçu des fiches",
+      "description": "Le bouton à droite de la barre d'onglets (un livre ouvert, puis un crayon) passe une fiche (personnage, lieu, objet, faune et flore, faction, peuple, magie) en aperçu : l'essentiel, en lecture. Un second clic la ramène au formulaire. Par défaut, ce choix vaut pour toutes les fiches.",
+      "toggle": "Aperçu fiche par fiche",
+      "on": "Activé : seule la fiche affichée passe en aperçu (ou revient au formulaire).",
+      "off": "Désactivé : passer en aperçu, ou revenir au formulaire, s'applique à toutes les fiches."
     }
   },
   "developer": {

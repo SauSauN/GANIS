@@ -3,6 +3,7 @@ import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { Crop, ImagePlus, Trash2, X } from "lucide-react";
 import { FrameEditor, IMAGE_ACTIONS_CLASS, IMAGE_DIALOG_WIDTH_CLASS, IMAGE_STAGE_CLASS } from "@/components/common/FrameEditor";
+import { ImageDownloadButton } from "@/components/common/ImageDownloadButton";
 import { InfoTip } from "@/components/common/InfoTip";
 import { cn } from "@/lib/utils";
 import { useConfirmImageRemoval } from "@/components/common/useConfirmImageRemoval";
@@ -105,6 +106,7 @@ export function ImageDialog({ open, onClose, projectId, frameKey, url, name, onR
                   <Trash2 />
                   {t("image.remove")}
                 </Button>
+                <ImageDownloadButton url={url} name={name} className="h-8" />
                 <Button type="button" variant="outline" onClick={() => inputRef.current?.click()}>
                   <ImagePlus />
                   {t("image.replace")}

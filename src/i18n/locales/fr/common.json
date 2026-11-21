@@ -59,7 +59,11 @@
     "zoomOut": "Dézoomer (−10 %)",
     "zoomReset": "Zoom : {{value}} %. Revenir à 100 %",
     "zoomResetHint": "Revenir à 100 %",
-    "percent": "{{value}} %"
+    "percent": "{{value}} %",
+    "download": "Télécharger",
+    "downloadTitle": "Enregistrer l'image",
+    "downloaded": "Image enregistrée : {{file}}",
+    "downloadFailed": "Impossible d'enregistrer l'image."
   },
   "loading": "Chargement…",
   "crash": {
