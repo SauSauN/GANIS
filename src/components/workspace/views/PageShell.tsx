@@ -58,10 +58,30 @@ interface PageShellProps {
   info?: ReactNode;
   /** Éléments à droite du titre (bouton…). */
   actions?: ReactNode;
+  /**
+   * Barre d'outils collée en haut de la page, sur toute sa largeur, comme
+   * celles du mur de post-it ou de la lecture de l'histoire. Seul le
+   * contenu en dessous défile.
+   */
+  toolbar?: ReactNode;
   children: ReactNode;
 }
 
-export function PageShell({ title, description, info, actions, children }: PageShellProps) {
+export function PageShell({ title, description, info, actions, toolbar, children }: PageShellProps) {
+  if (toolbar) {
+    return (
+      <main className="flex min-h-0 flex-1 flex-col">
+        {title && <h1 className="sr-only">{title}</h1>}
+        <div className="flex flex-wrap items-center gap-3 border-b bg-card/60 px-3 py-2">{toolbar}</div>
+        <div className="relative flex min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]">
+          <div className="@container mx-auto w-full max-w-5xl 2xl:max-w-7xl min-[137.5rem]:max-w-[100rem] px-6 pt-12 pb-24 lg:px-10">
+            {children}
+          </div>
+        </div>
+      </main>
+    );
+  }
+
   return (
     <main className="relative flex min-h-0 flex-1 overflow-y-auto overscroll-contain [scrollbar-gutter:stable]">
       {/* `@container` : les fiches s'organisent selon la place de la page

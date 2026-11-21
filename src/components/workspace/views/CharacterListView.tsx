@@ -1,4 +1,5 @@
 import { FilterResults } from "@/components/common/FilterResults";
+import { SEGMENTED_GROUP, SEGMENTED_ITEM, SEGMENTED_ON } from "@/components/common/segmented";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { portraitFrameKey } from "@/lib/imageFrame";
@@ -262,7 +263,7 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
           </select>
         </label>
 
-        <div role="radiogroup" aria-label={t("list.layoutLabel")} className="inline-flex rounded-md border p-0.5">
+        <div role="radiogroup" aria-label={t("list.layoutLabel")} className={cn(SEGMENTED_GROUP, "h-9")}>
           {([
             ["grid", LayoutGrid],
             ["table", Rows3],
@@ -275,10 +276,7 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
               title={t(`list.layout.${value}`)}
               aria-label={t(`list.layout.${value}`)}
               onClick={() => updatePrefs({ layout: value })}
-              className={cn(
-                "flex size-7 items-center justify-center rounded transition-colors",
-                prefs.layout === value ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground",
-              )}
+              className={cn(SEGMENTED_ITEM, "aspect-square justify-center px-0", prefs.layout === value && SEGMENTED_ON)}
             >
               <Icon className="size-3.5" />
             </button>

@@ -93,12 +93,13 @@ export function ContinuityView({ project, feature, onOpenFeature }: ContinuityVi
     return c ? fullName(c) || "—" : "—";
   };
 
-  const select = "h-9 rounded-md border border-input bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-ring";
+  const select = "h-8 rounded-md border border-input bg-background px-2 text-sm outline-none focus:ring-2 focus:ring-ring";
 
   return (
-    <PageShell title={feature.label}>
-      <div className="space-y-5">
-        <div className="flex flex-wrap items-end gap-4">
+    <PageShell
+      title={feature.label}
+      toolbar={
+        <>
           <ContinuityModeSwitch
             mode={tab}
             onMode={setTab}
@@ -109,9 +110,9 @@ export function ContinuityView({ project, feature, onOpenFeature }: ContinuityVi
             <ContinuityLevelSelect levels={levels} level={columnLevel} onLevel={setLevel} hint={t("structure:continuity.presenceHintManga")} />
           ) : (
             <>
-              <label className="space-y-1.5 text-sm font-medium">
-                <span className="block">{t("continuity.character")}</span>
-                <select value={selected} onChange={(e) => setCharacterId(e.target.value)} className={cn(select, "w-64")}>
+              <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="shrink-0">{t("continuity.character")}</span>
+                <select value={selected} onChange={(e) => setCharacterId(e.target.value)} className={cn(select, "w-64 text-foreground")}>
                   {appearing.length === 0 && <option value="">—</option>}
                   {appearing.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -120,9 +121,9 @@ export function ContinuityView({ project, feature, onOpenFeature }: ContinuityVi
                   ))}
                 </select>
               </label>
-              <label className="space-y-1.5 text-sm font-medium">
-                <span className="block">{t("continuity.location")}</span>
-                <select value={locationId} onChange={(e) => setLocationId(e.target.value)} className={cn(select, "w-56")}>
+              <label className="flex items-center gap-2 text-sm text-muted-foreground">
+                <span className="shrink-0">{t("continuity.location")}</span>
+                <select value={locationId} onChange={(e) => setLocationId(e.target.value)} className={cn(select, "w-56 text-foreground")}>
                   <option value="">{t("continuity.allLocations")}</option>
                   {locations.map((l) => (
                     <option key={l.id} value={l.id}>
@@ -133,13 +134,15 @@ export function ContinuityView({ project, feature, onOpenFeature }: ContinuityVi
               </label>
             </>
           )}
-          <p className="ml-auto pb-2 text-sm text-muted-foreground tabular-nums">
+          <p className="ml-auto text-xs text-muted-foreground tabular-nums">
             {tab === "presence"
               ? table && t("structure:continuity.characters", { count: table.rows.length })
               : selected && t("continuity.appearances", { count: rows.length })}
           </p>
-        </div>
-
+        </>
+      }
+    >
+      <div className="space-y-5">
         {tab === "presence" ? (
           table && (
             <PresenceTable

@@ -1,4 +1,5 @@
 import { FilterResults } from "@/components/common/FilterResults";
+import { SEGMENTED_GROUP, SEGMENTED_ITEM, SEGMENTED_ON } from "@/components/common/segmented";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { portraitFrameKey } from "@/lib/imageFrame";
@@ -254,7 +255,7 @@ export function LocationListView({ projectId, feature, onOpenFeature }: Location
           </Button>
         )}
 
-        <div className="inline-flex rounded-md border p-0.5" role="group">
+        <div className={cn(SEGMENTED_GROUP, "h-9")} role="group">
           {(
             [
               ["tree", ListTree],
@@ -268,10 +269,7 @@ export function LocationListView({ projectId, feature, onOpenFeature }: Location
               onClick={() => chooseLayout(item)}
               title={t(`list.${item}`)}
               aria-label={t(`list.${item}`)}
-              className={cn(
-                "flex size-7 items-center justify-center rounded transition-colors",
-                layout === item ? "bg-secondary text-foreground" : "text-muted-foreground hover:text-foreground",
-              )}
+              className={cn(SEGMENTED_ITEM, "aspect-square justify-center px-0", layout === item && SEGMENTED_ON)}
             >
               <Icon className="size-3.5" aria-hidden="true" />
             </button>

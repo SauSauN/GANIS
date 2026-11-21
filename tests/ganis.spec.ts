@@ -857,6 +857,7 @@ test.describe("Découpage et trame", () => {
     const parcours = view().getByTestId("continuity-path");
     await expect(parcours).toContainText("La lettre");
     await expect(parcours).toContainText("Blessé à l'épaule");
+    if (process.env.GANIS_E2E_SHOTS) await page.screenshot({ path: `${process.env.GANIS_E2E_SHOTS}/continuite-roman.png` });
     await view().getByRole("tab", { name: "Tableau des présences" }).click();
     // La scène de ce projet est à la racine du plan, hors de tout chapitre : colonnes par scène.
     await view().getByLabel("Colonnes").selectOption({ label: "Scènes" });
@@ -1066,6 +1067,7 @@ test.describe("Manga", () => {
     await expect(page.getByText(/Une erreur (est survenue|d'affichage)/)).toHaveCount(0);
     await view().getByRole("tab", { name: "Case par case" }).click();
     await expect(view().getByLabel("Personnage")).toBeVisible();
+    if (process.env.GANIS_E2E_SHOTS) await page.screenshot({ path: `${process.env.GANIS_E2E_SHOTS}/continuite-scenario.png` });
   });
 
   test("découpage manga : ajouter un tome", async () => {
