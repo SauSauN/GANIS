@@ -359,5 +359,43 @@
     "openPlot": "Open the plot",
     "edit": "Edit",
     "fromDocuments": "Text taken from the item's documents"
+  },
+  "continuity": {
+    "tabs": {
+      "path": "Character path",
+      "presence": "Presence chart"
+    },
+    "character": "Character",
+    "location": "Location",
+    "allLocations": "All locations",
+    "appearances_one": "{{count}} appearance",
+    "appearances_other": "{{count}} appearances",
+    "choose": "No character appears yet. In a scene's sheet, link characters (Links with the world), then note their state in the Continuity card.",
+    "none": "No appearance in this location.",
+    "state": "State",
+    "noState": "Nothing noted",
+    "changed": "State changed",
+    "was": "before: {{state}}",
+    "speaks_one": "{{count}} line",
+    "speaks_other": "{{count}} lines",
+    "speaksOnly": "speaks",
+    "columns": "Columns",
+    "presenceHint": "Each cell counts the elements where the character appears (the chapter and its content). Click a name to see their path.",
+    "noColumns": "No element at this level.",
+    "absent": "Absent",
+    "first": "First appearance: {{where}}",
+    "last": "Last: {{where}}",
+    "sheet": {
+      "title": "Continuity",
+      "description": "The state of characters in this element: injury, outfit, object carried, what they know…",
+      "placeholder": "E.g. arm in a sling, carries the key",
+      "empty": "First link characters to this element (Links with the world): you'll note their state here.",
+      "previous": "Before: {{state}}",
+      "stateOf": "State of {{name}}"
+    },
+    "noRows": "No character appears in these elements.",
+    "presenceHintManga": "Each cell counts the pages where the character appears (present in a panel or speaking). Click a name to see their panel-by-panel continuity.",
+    "characters_one": "{{count}} character",
+    "characters_other": "{{count}} characters"
   }
 }

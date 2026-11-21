@@ -89,6 +89,24 @@ function fieldsOf(value: string | number | null): Record<string, string> {
 
 const str = (value: string | number | null | undefined) => (value === null || value === undefined ? "" : String(value));
 
+/** Scénario d'une scène de série (JSON d'une version), un élément par ligne. */
+export function screenplayText(value: string | number | null, named: (id: string) => string): string {
+  if (typeof value !== "string") return "";
+  try {
+    const blocks = JSON.parse(value) as Array<{ kind: string; characterId: string | null; parenthetical: string; content: string }>;
+    return blocks
+      .map((block) => {
+        if (block.kind !== "dialogue") return block.content;
+        const who = block.characterId ? named(block.characterId) : "";
+        const paren = block.parenthetical ? ` (${block.parenthetical})` : "";
+        return `${who}${paren} : ${block.content}`.trim();
+      })
+      .join("\n");
+  } catch {
+    return "";
+  }
+}
+
 /** Cases d'une page de manga (JSON d'une version), lisibles case par case. */
 export function panelsText(value: string | number | null, named: (id: string) => string): string {
   if (typeof value !== "string") return "";
@@ -132,6 +150,13 @@ export function readableFields(kind: VersionKind, row: Row, resolve: (id: string
         ...(row.content ? [{ key: "content", label: "versions:fields.text", text: htmlText(row.content) }] : []),
         // Manga : cases de la page (entrée absente des versions anciennes).
         ...(row.manga_panels ? [{ key: "panels", label: "versions:fields.panels", text: panelsText(row.manga_panels, named) }] : []),
+        // Série : en-tête et scénario de la scène (absents des versions anciennes).
+        ...(row.scene_place || row.scene_time || row.scene_location_id
+          ? [{ key: "sceneHeading", label: "versions:fields.sceneHeading", text: [str(row.scene_place), row.scene_location_id ? named(str(row.scene_location_id)) : "", str(row.scene_time)].filter(Boolean).join(" · ") }]
+          : []),
+        ...(row.series_scene_blocks && row.series_scene_blocks !== "[]"
+          ? [{ key: "screenplay", label: "versions:fields.screenplay", text: screenplayText(row.series_scene_blocks, named) }]
+          : []),
       ];
     case "editorial":
       return [

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type DragEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { ImagePlus, Loader2, RefreshCw, Trash2 } from "lucide-react";
+import { ImagePlus, Loader2, Maximize2, RefreshCw, Trash2 } from "lucide-react";
+import { ImageDialog } from "@/components/common/ImageDialog";
 
 import { useConfirmImageRemoval } from "@/components/common/useConfirmImageRemoval";
 import { GalleryGrid, MAX_GALLERY_IMAGES } from "@/components/characters/fields/GalleryField";
@@ -71,6 +72,8 @@ export function ProjectLogo({ project }: { project: Project }) {
  */
 export function ProjectLogoEditor({ project }: { project: Project }) {
   const { t } = useTranslation("workspaceHome");
+  const { t: tc } = useTranslation("common");
+  const [viewing, setViewing] = useState(false);
   const imageError = useImageError();
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -150,6 +153,15 @@ export function ProjectLogoEditor({ project }: { project: Project }) {
             <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/55 opacity-0 backdrop-blur-[2px] transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
               <button
                 type="button"
+                onClick={() => setViewing(true)}
+                aria-label={tc("image.open")}
+                title={tc("image.open")}
+                className="flex size-9 items-center justify-center rounded-full bg-background/90 text-foreground shadow-sm hover:bg-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              >
+                <Maximize2 className="size-4" />
+              </button>
+              <button
+                type="button"
                 onClick={() => inputRef.current?.click()}
                 aria-label={t("logo.change")}
                 title={t("logo.change")}
@@ -209,6 +221,17 @@ export function ProjectLogoEditor({ project }: { project: Project }) {
         <p role="alert" className="max-w-56 text-xs text-destructive">
           {error}
         </p>
+      )}
+      {viewing && url && (
+        <ImageDialog
+          open
+          onClose={() => setViewing(false)}
+          projectId={project.id}
+          url={url}
+          name={project.name}
+          onReplace={(file) => void pick(file)}
+          onRemove={() => remove()}
+        />
       )}
       {removal.dialog}
     </div>
@@ -305,6 +328,7 @@ export function ProjectGallery({ projectId, label }: { projectId: string; label:
         error={error}
         onAdd={(files) => void add(files)}
         onRemove={(id) => void remove(id)}
+        projectId={projectId}
       />
     </div>
   );

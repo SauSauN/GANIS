@@ -110,16 +110,18 @@ export function ManuscriptView({ project, feature, onOpenFeature }: ManuscriptVi
         <Button variant="ghost" size="icon-sm" onClick={toggleToc} aria-label={t("manuscript.toc")} aria-expanded={toc} title={t("manuscript.toc")}>
           {toc ? <PanelLeftClose /> : <PanelLeftOpen />}
         </Button>
-        <div className="min-w-0">
-          <p className="text-sm font-medium tabular-nums">
+        {/* Une seule ligne (résumé puis objectif) : même hauteur que les autres barres. */}
+        <div className="flex min-w-0 items-center gap-3">
+          <p className="truncate text-sm font-medium tabular-nums">
             {t("manuscript.summary", { words: t("words", { count: total }), minutes: readingMinutes(total) })}
           </p>
           {percent !== null && goal && (
-            <div className="mt-1 flex items-center gap-2">
-              <ProgressBar percent={percent} className="w-40" />
-              <span className="text-xs text-muted-foreground tabular-nums">
-                {t("manuscript.goalLine", { percent: t("percent", { value: percent }), goal: goal.toLocaleString() })}
-              </span>
+            <div
+              className="flex shrink-0 items-center gap-2"
+              title={t("manuscript.goalLine", { percent: t("percent", { value: percent }), goal: goal.toLocaleString() })}
+            >
+              <ProgressBar percent={percent} className="w-28" />
+              <span className="text-xs text-muted-foreground tabular-nums">{t("percent", { value: percent })}</span>
             </div>
           )}
         </div>

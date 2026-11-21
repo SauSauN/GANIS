@@ -126,6 +126,7 @@ export function ContextMenu({
             >
               {Icon ? <Icon className="size-4 shrink-0" /> : <span className="size-4" />}
               <span className="flex-1 truncate">{item.label}</span>
+              {item.hint && <kbd className="shrink-0 text-[0.7rem] text-muted-foreground">{item.hint}</kbd>}
             </button>
           </div>
         );

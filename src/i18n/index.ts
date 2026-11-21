@@ -41,6 +41,7 @@ import enViews from "./locales/en/views.json";
 import enWelcome from "./locales/en/welcome.json";
 import enNovel from "./locales/en/novel.json";
 import enManga from "./locales/en/manga.json";
+import enSeries from "./locales/en/series.json";
 import enWorkspace from "./locales/en/workspace.json";
 import enWorkspaceHome from "./locales/en/workspaceHome.json";
 import enWorld from "./locales/en/world.json";
@@ -84,6 +85,7 @@ import frViews from "./locales/fr/views.json";
 import frWelcome from "./locales/fr/welcome.json";
 import frNovel from "./locales/fr/novel.json";
 import frManga from "./locales/fr/manga.json";
+import frSeries from "./locales/fr/series.json";
 import frWorkspace from "./locales/fr/workspace.json";
 import frWorkspaceHome from "./locales/fr/workspaceHome.json";
 import frWorld from "./locales/fr/world.json";
@@ -170,6 +172,7 @@ export const resources = {
     welcome: frWelcome,
     novel: frNovel,
     manga: frManga,
+    series: frSeries,
     workspace: frWorkspace,
     workspaceHome: frWorkspaceHome,
     world: frWorld,
@@ -215,6 +218,7 @@ export const resources = {
     welcome: enWelcome,
     novel: enNovel,
     manga: enManga,
+    series: enSeries,
     workspace: enWorkspace,
     workspaceHome: enWorkspaceHome,
     world: enWorld,
@@ -309,6 +313,7 @@ void i18n.use(initReactI18next).init({
     "welcome",
     "novel",
     "manga",
+    "series",
     "workspace",
     "workspaceHome",
     "world",

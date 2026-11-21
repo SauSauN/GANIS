@@ -42,7 +42,24 @@
   "image": {
     "removeTitle": "Retirer cette image ?",
     "removeBody": "L'image sera supprimée du projet. Elle ne va pas dans la corbeille : pour la retrouver, il faudra l'ajouter de nouveau.",
-    "removeConfirm": "Retirer l'image"
+    "removeConfirm": "Retirer l'image",
+    "open": "Voir l'image",
+    "view": "Image de {{name}}",
+    "frame": "Cadrer",
+    "frameTitle": "Cadrer l'image",
+    "frameHint": "Faites glisser l'image pour choisir la zone affichée, et zoomez avec les boutons − / +, la molette ou le pavé tactile. L'image elle-même n'est pas modifiée : vous pourrez la recadrer à tout moment.",
+    "zoom": "Zoom",
+    "reset": "Recentrer",
+    "replace": "Remplacer",
+    "remove": "Retirer",
+    "framed": "Cadrage enregistré.",
+    "preview": "Aperçu",
+    "frameThumb": "Cadrer la vignette",
+    "zoomIn": "Zoomer (+10 %)",
+    "zoomOut": "Dézoomer (−10 %)",
+    "zoomReset": "Zoom : {{value}} %. Revenir à 100 %",
+    "zoomResetHint": "Revenir à 100 %",
+    "percent": "{{value}} %"
   },
   "loading": "Chargement…",
   "crash": {
@@ -117,5 +134,10 @@
     "deleteStructure": "« {{name}} » et tout ce qu'il contient (texte compris) iront dans la corbeille. Vous pourrez les restaurer depuis là.",
     "deleteLane": "La trame « {{name}} » et tous ses événements seront supprimés. Vous pourrez annuler juste après.",
     "customize": "Personnaliser"
+  },
+  "filters": {
+    "results_one": "{{count}} résultat",
+    "results_other": "{{count}} résultats",
+    "clear": "Effacer les filtres"
   }
 }

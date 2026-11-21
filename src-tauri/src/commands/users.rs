@@ -1,7 +1,7 @@
 //! Commandes Tauri liées à la gestion des utilisateurs.
 
 use crate::error::{AppError, AppResult};
-use crate::models::user::{Role, UserPublic};
+use crate::models::user::{AuthorProfile, Role, UserPublic};
 use crate::services::{auth_service, project_service, project_storage, user_service};
 use crate::state::AppState;
 use serde::Deserialize;
@@ -167,6 +167,30 @@ pub async fn update_profile(
     let stored =
         user_service::update_email(&state.app_db, &current.id, sealed.as_deref())
             .await?;
+
+    // Garde la session en mémoire synchronisée avec la base.
+    let updated = state.refresh_current_user(stored).await?;
+
+    Ok(UserPublic::from(updated))
+}
+
+/// Met à jour le profil d'auteur de l'utilisateur connecté (nom d'auteur,
+/// nom complet, site web, biographie).
+///
+/// Le profil est chiffré avec la clé du compte. Tous les champs vides
+/// l'effacent.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn update_author_profile(
+    state: State<'_, AppState>,
+    profile: AuthorProfile,
+) -> AppResult<UserPublic> {
+    let (current, account_key) = state.require_session().await?;
+
+    let profile = user_service::normalize_profile(profile)?;
+    let sealed = user_service::seal_profile(&account_key, &current.id, &profile)?;
+
+    let stored =
+        user_service::update_profile_sealed(&state.app_db, &current.id, sealed.as_deref()).await?;
 
     // Garde la session en mémoire synchronisée avec la base.
     let updated = state.refresh_current_user(stored).await?;

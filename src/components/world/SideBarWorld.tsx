@@ -8,6 +8,7 @@ import { activeGuide } from "@/lib/treeGuides";
 import { buildWorldTree, flattenWorldTree, groupWorldTreeByCategory, worldTabId } from "@/lib/world";
 import { cn } from "@/lib/utils";
 import { useWorldEntries } from "@/stores/worldStore";
+import { useSheetDisplay } from "@/stores/sheetDisplayStore";
 import type { WorldModule } from "@/types";
 
 /** Clé d'un groupe replié (catégorie, ou `null` pour les types inconnus). */
@@ -57,6 +58,12 @@ export function SideBarWorld({
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
   const [closedGroups, setClosedGroups] = useState<Set<string>>(() => recallGroups(module));
   const headingId = `sidebar-world-${module}`;
+  // Paramètres du projet : arborescence par catégorie (défaut) ou simple liste.
+  const { panelTree } = useSheetDisplay(projectId, module);
+  const sorted = useMemo(
+    () => [...entries].sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: "base" })),
+    [entries],
+  );
 
   const groups = useMemo(
     () => groupWorldTreeByCategory(module, buildWorldTree(entries), settings.customTypes),
@@ -93,6 +100,34 @@ export function SideBarWorld({
         <p className="px-4 text-xs text-muted-foreground">{t("sidebar.loading")}</p>
       ) : entries.length === 0 ? (
         <p className="px-4 text-xs text-muted-foreground">{t(`${module}.sidebar.empty`)}</p>
+      ) : !panelTree ? (
+        // Simple liste par ordre alphabétique, comme les personnages.
+        <ul className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
+          {sorted.map((entry) => {
+            const tabId = worldTabId(module, entry.id);
+            const active = activeTab === tabId;
+            return (
+              <WorldItemMenu key={entry.id} projectId={projectId} module={module} entry={entry} onOpen={() => onOpenFeature(tabId)} onOpenFeature={onOpenFeature}>
+                {(onContextMenu) => (
+                  <li onContextMenu={onContextMenu}>
+                    <button
+                      type="button"
+                      aria-current={active ? "page" : undefined}
+                      onClick={() => onOpenFeature(tabId)}
+                      className={cn(
+                        "flex w-full min-w-0 items-center gap-2 rounded-md px-2 py-1 text-sm hover:bg-sidebar-accent",
+                        active && "bg-sidebar-accent font-medium",
+                      )}
+                    >
+                      <WorldThumb projectId={projectId} module={module} entry={entry} customTypes={settings.customTypes} size="panel" />
+                      <span className="flex-1 truncate text-left">{entry.name}</span>
+                    </button>
+                  </li>
+                )}
+              </WorldItemMenu>
+            );
+          })}
+        </ul>
       ) : (
         <ul className="min-h-0 flex-1 overflow-y-auto px-2 pb-2" role="tree">
           {groups.map((group) => {

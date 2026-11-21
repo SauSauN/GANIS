@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from "react";
+import { SEGMENTED_GROUP, SEGMENTED_ITEM, SEGMENTED_ON } from "@/components/common/segmented";
 import { useTranslation } from "react-i18next";
 import { BookOpen, ChevronLeft, ChevronRight, X } from "lucide-react";
 import type { PlotLinks } from "@/components/plot/usePlotLinks";
@@ -91,7 +92,7 @@ export function PlotTour({ data, links, state, onChange, onClose, onOpenFeature 
       className="absolute bottom-4 left-1/2 z-40 max-h-[46vh] w-[min(580px,calc(100%-24px))] -translate-x-1/2 overflow-y-auto rounded-xl border bg-popover p-4 text-sm shadow-2xl"
     >
       <div className="flex items-center gap-2 text-xs text-muted-foreground">
-        <div className="flex overflow-hidden rounded-md border" role="tablist" aria-label={t("tour.order")}>
+        <div className={SEGMENTED_GROUP} role="tablist" aria-label={t("tour.order")}>
           {modes.map((mode) => (
             <button
               key={mode}
@@ -100,7 +101,7 @@ export function PlotTour({ data, links, state, onChange, onClose, onOpenFeature 
               aria-selected={state.mode === mode}
               title={t(`tour.modes.${mode}Hint`)}
               onClick={() => onChange({ ...state, mode, laneId: mode === "lane" ? event.laneId : state.laneId, startId: event.id })}
-              className={cn("min-h-7 px-2.5 font-medium hover:bg-muted", state.mode === mode && "bg-foreground text-background hover:bg-foreground")}
+              className={cn(SEGMENTED_ITEM, state.mode === mode && SEGMENTED_ON)}
             >
               {t(`tour.modes.${mode}`)}
             </button>

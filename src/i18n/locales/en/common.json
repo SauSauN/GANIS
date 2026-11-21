@@ -42,7 +42,24 @@
   "image": {
     "removeTitle": "Remove this image?",
     "removeBody": "The image will be deleted from the project. It doesn't go to the trash: to get it back, you'll have to add it again.",
-    "removeConfirm": "Remove image"
+    "removeConfirm": "Remove image",
+    "open": "View image",
+    "view": "Image of {{name}}",
+    "frame": "Frame",
+    "frameTitle": "Frame the image",
+    "frameHint": "Drag the image to choose the visible area, and zoom with the − / + buttons, the mouse wheel or the touchpad. The image itself isn't changed: you can reframe it at any time.",
+    "zoom": "Zoom",
+    "reset": "Recenter",
+    "replace": "Replace",
+    "remove": "Remove",
+    "framed": "Framing saved.",
+    "preview": "Preview",
+    "frameThumb": "Frame the thumbnail",
+    "zoomIn": "Zoom in (+10%)",
+    "zoomOut": "Zoom out (−10%)",
+    "zoomReset": "Zoom: {{value}}%. Back to 100%",
+    "zoomResetHint": "Back to 100%",
+    "percent": "{{value}}%"
   },
   "loading": "Loading…",
   "crash": {
@@ -117,5 +134,10 @@
     "deleteStructure": "“{{name}}” and everything it contains (text included) will go to the trash. You can restore them from there.",
     "deleteLane": "The “{{name}}” plotline and all its events will be deleted. You can undo right after.",
     "customize": "Customise"
+  },
+  "filters": {
+    "results_one": "{{count}} result",
+    "results_other": "{{count}} results",
+    "clear": "Clear filters"
   }
 }

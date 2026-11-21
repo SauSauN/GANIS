@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
+import { portraitFrameKey } from "@/lib/imageFrame";
 import { FolderTree, Loader2, PackageX, Plus, Save, Trash2 } from "lucide-react";
 import { VersionsButton } from "@/components/history/VersionsDialog";
 import { Button } from "@/components/ui/button";
@@ -266,6 +267,7 @@ export function WorldEditView({
             error: bannerError,
             onPick: (file) => void pickBanner(file),
             onRemove: () => void dropBanner(),
+            frameKey: portraitFrameKey(module, entry.id),
           }}
           gallery={
             <WorldGallery

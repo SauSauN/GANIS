@@ -15,6 +15,8 @@ export interface MenuItem {
   separated?: boolean;
   /** Option à cocher (choix parmi plusieurs) : cochée ou non ; absent : simple action. */
   checked?: boolean;
+  /** Interrupteur (activé ou non) : le menu reste ouvert pour voir le changement. */
+  toggle?: boolean;
   run: () => void;
 }
 
@@ -128,11 +130,11 @@ export function ActionMenu({ label, items, trigger, className }: ActionMenuProps
                   {item.separated && <div role="separator" className="my-1 h-px bg-border" />}
                   <button
                     type="button"
-                    role={item.checked === undefined ? "menuitem" : "menuitemradio"}
-                    aria-checked={item.checked}
+                    role={item.toggle !== undefined ? "menuitemcheckbox" : item.checked === undefined ? "menuitem" : "menuitemradio"}
+                    aria-checked={item.toggle ?? item.checked}
                     disabled={item.disabled}
                     onClick={() => {
-                      dismiss(false);
+                      if (item.toggle === undefined) dismiss(false);
                       item.run();
                     }}
                     className={cn(
@@ -144,6 +146,22 @@ export function ActionMenu({ label, items, trigger, className }: ActionMenuProps
                     <span className="flex-1">{item.label}</span>
                     {item.hint && <kbd className="text-[0.7rem] text-muted-foreground">{item.hint}</kbd>}
                     {item.checked && <Check className="size-4 shrink-0 text-primary" aria-hidden="true" />}
+                    {item.toggle !== undefined && (
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "relative inline-flex h-4 w-7 shrink-0 items-center rounded-full transition-colors",
+                          item.toggle ? "bg-primary" : "bg-muted-foreground/40",
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "size-3 rounded-full bg-background shadow-sm transition-transform",
+                            item.toggle ? "translate-x-3.5" : "translate-x-0.5",
+                          )}
+                        />
+                      </span>
+                    )}
                   </button>
                 </div>
               );

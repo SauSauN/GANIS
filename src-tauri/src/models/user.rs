@@ -47,6 +47,35 @@ impl Role {
     }
 }
 
+/// Profil d'auteur : informations facultatives ajoutées au compte.
+///
+/// Stocké chiffré (JSON) dans `users.profile_sealed`, déchiffré dans la
+/// session. Un champ vide n'est pas renseigné.
+#[derive(Debug, Clone, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", default)]
+pub struct AuthorProfile {
+    /// Nom d'auteur (nom de plume), tel qu'il apparaît sur les œuvres.
+    pub pen_name: String,
+    /// Nom complet (prénom et nom).
+    pub full_name: String,
+    /// Site web ou réseau social.
+    pub website: String,
+    /// Courte biographie.
+    pub bio: String,
+}
+
+impl AuthorProfile {
+    /// Longueurs maximales (en caractères).
+    pub const MAX_NAME: usize = 100;
+    pub const MAX_WEBSITE: usize = 200;
+    pub const MAX_BIO: usize = 1000;
+
+    /// Aucun champ renseigné.
+    pub fn is_empty(&self) -> bool {
+        self.pen_name.is_empty() && self.full_name.is_empty() && self.website.is_empty() && self.bio.is_empty()
+    }
+}
+
 /// Représente un utilisateur dans la base de données de l'application.
 ///
 /// `password_hash` et `password_salt` ne sont jamais sérialisés
@@ -66,6 +95,16 @@ pub struct User {
     #[serde(skip)]
     #[sqlx(default)]
     pub email_sealed: Option<String>,
+
+    /// Profil d'auteur chiffré avec la clé du compte (jamais envoyé à l'interface).
+    #[serde(skip)]
+    #[sqlx(default)]
+    pub profile_sealed: Option<String>,
+
+    /// Profil d'auteur déchiffré (session seulement ; jamais lu tel quel en base).
+    #[serde(skip)]
+    #[sqlx(skip)]
+    pub profile: AuthorProfile,
 
     pub role: Role,
 
@@ -103,6 +142,10 @@ pub struct UserPublic {
     pub email: Option<String>,
     pub role: Role,
 
+    /// Profil d'auteur (déchiffré). Nom JSON/frontend : `profile`.
+    #[serde(default)]
+    pub profile: AuthorProfile,
+
     /// Nom JSON/frontend : `createdAt`.
     #[serde(rename = "createdAt")]
     pub created_at: String,
@@ -119,6 +162,7 @@ impl From<User> for UserPublic {
             username: user.username,
             email: user.email,
             role: user.role,
+            profile: user.profile,
             created_at: user.created_at,
             updated_at: user.updated_at,
         }

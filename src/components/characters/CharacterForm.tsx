@@ -52,6 +52,8 @@ export interface PortraitControls {
   error?: string | null;
   onPick: (file: File) => void;
   onRemove: () => void;
+  /** Clé du cadrage (fiche enregistrée) : un clic sur l'image l'ouvre en grand pour la cadrer, la remplacer ou la retirer. */
+  frameKey?: string;
 }
 
 interface CharacterSheetProps {
@@ -390,6 +392,8 @@ export function CharacterSheet({
             ringColors={palette}
             onPick={portrait.onPick}
             onRemove={portrait.onRemove}
+            projectId={projectId}
+            frameKey={portrait.frameKey}
           />
           </div>
 

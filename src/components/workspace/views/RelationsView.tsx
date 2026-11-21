@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { SEGMENTED_GROUP, SEGMENTED_ITEM, SEGMENTED_ON } from "@/components/common/segmented";
 import { useTranslation } from "react-i18next";
 import {
   ArrowLeftRight,
@@ -294,24 +295,51 @@ export function RelationsView({ projectId, feature, onOpenFeature }: RelationsVi
       )}
     >
       {/* En-tête : une seule ligne */}
-      <header className="flex h-16 shrink-0 items-center gap-3 border-b px-5">
-        <div className="flex min-w-0 items-baseline gap-3">
-          <h1 className="sr-only">{feature.label}</h1>
-          {ready && (
-            <span className="shrink-0 text-sm text-muted-foreground">{t("view.count", { count: relations.length })}</span>
-          )}
-        </div>
+      {/* Même hauteur que la barre de « Lecture de l'histoire » (py-2, contrôles de 32 px). */}
+      <header className="flex shrink-0 items-center gap-3 border-b bg-card/60 px-3 py-2">
+        <h1 className="sr-only">{feature.label}</h1>
+        {/* Graphe / Matrice / Liste tout à gauche, puis la disposition du graphe. */}
+        {ready && characters.length >= 2 && <ModeSwitch mode={prefs.mode} onChange={(mode) => updatePrefs({ mode })} />}
 
-        <div className="mx-auto">
-          {ready && characters.length >= 2 && <ModeSwitch mode={prefs.mode} onChange={(mode) => updatePrefs({ mode })} />}
-        </div>
+        {/* Disposition du graphe, dans la barre (et non posée sur le graphe) : même hauteur que les autres barres. */}
+        {ready && characters.length >= 2 && prefs.mode === "graph" && (
+          <div className="flex items-center gap-2">
+            <select
+              aria-label={t("view.layoutLabel")}
+              title={t(`view.layoutHints.${prefs.layout}`)}
+              value={prefs.layout}
+              onChange={(e) => updatePrefs({ layout: e.target.value as GraphLayout })}
+              className={cn(fieldClass, "h-8 w-auto")}
+            >
+              {GRAPH_LAYOUTS.map((layout) => (
+                <option key={layout} value={layout} title={t(`view.layoutHints.${layout}`)}>
+                  {t(`view.layouts.${layout}`)}
+                </option>
+              ))}
+            </select>
+            {(prefs.layout === "ego" || prefs.layout === "tree") && (
+              <select
+                aria-label={prefs.layout === "tree" ? t("view.treeOf") : t("view.center")}
+                value={(prefs.layout === "tree" ? treeRoot : effectiveCenter) ?? ""}
+                onChange={(e) => setCenterId(e.target.value || null)}
+                className={cn(fieldClass, "h-8 w-48")}
+              >
+                {characters.map((c) => (
+                  <option key={c.id} value={c.id}>{fullName(c)}</option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
+
+        {/* Le reste à droite. */}
+        <div className="ml-auto" />
 
         {ready && characters.length >= 2 && (
           <>
             <div className="relative">
               <Button
                 variant={filtersOpen || activeFilters > 0 ? "secondary" : "ghost"}
-                size="lg"
                 aria-expanded={filtersOpen}
                 onClick={() => setFiltersOpen((open) => !open)}
               >
@@ -358,7 +386,7 @@ export function RelationsView({ projectId, feature, onOpenFeature }: RelationsVi
 
             <Button
               variant="ghost"
-              size="icon-lg"
+              size="icon"
               onClick={() => setFullscreen((value) => !value)}
               title={fullscreen ? t("view.exitFullscreen") : t("view.fullscreen")}
               aria-label={fullscreen ? t("view.exitFullscreen") : t("view.fullscreen")}
@@ -368,7 +396,7 @@ export function RelationsView({ projectId, feature, onOpenFeature }: RelationsVi
           </>
         )}
 
-        <Button size="lg" onClick={() => openCreate(selectedId ?? "")} disabled={characters.length < 2}>
+        <Button onClick={() => openCreate(selectedId ?? "")} disabled={characters.length < 2}>
           <Plus />
           {t("view.newRelation")}
         </Button>
@@ -434,32 +462,6 @@ export function RelationsView({ projectId, feature, onOpenFeature }: RelationsVi
 
           {prefs.mode === "graph" && (
             <>
-              {/* Disposition : posée sur le graphe (ou l'arbre) */}
-              <div className="absolute top-4 left-4 z-10 flex flex-wrap items-center gap-2">
-                <Segmented
-                  value={prefs.layout}
-                  options={GRAPH_LAYOUTS.map((layout) => ({
-                    value: layout,
-                    label: t(`view.layouts.${layout}`),
-                    title: t(`view.layoutHints.${layout}`),
-                  }))}
-                  onChange={(layout) => updatePrefs({ layout })}
-                />
-
-                {(prefs.layout === "ego" || prefs.layout === "tree") && (
-                  <select
-                    aria-label={prefs.layout === "tree" ? t("view.treeOf") : t("view.center")}
-                    value={(prefs.layout === "tree" ? treeRoot : effectiveCenter) ?? ""}
-                    onChange={(e) => setCenterId(e.target.value || null)}
-                    className={cn(fieldClass, "h-10 w-52 bg-card shadow-sm")}
-                  >
-                    {characters.map((c) => (
-                      <option key={c.id} value={c.id}>{fullName(c)}</option>
-                    ))}
-                  </select>
-                )}
-              </div>
-
               {prefs.layout !== "tree" && relations.length === 0 && (
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                   <div className="pointer-events-auto max-w-sm rounded-2xl border bg-card/95 px-8 py-7 text-center shadow-lg">
@@ -698,7 +700,7 @@ function ModeSwitch({ mode, onChange }: { mode: ViewMode; onChange: (mode: ViewM
   const icons = { graph: Network, matrix: Grid3x3, list: List };
 
   return (
-    <div role="radiogroup" aria-label="Affichage" className="flex rounded-lg border bg-muted/40 p-1">
+    <div role="radiogroup" aria-label="Affichage" className={SEGMENTED_GROUP}>
       {(["graph", "matrix", "list"] as const).map((value) => {
         const Icon = icons[value];
         return (
@@ -708,47 +710,13 @@ function ModeSwitch({ mode, onChange }: { mode: ViewMode; onChange: (mode: ViewM
             role="radio"
             aria-checked={mode === value}
             onClick={() => onChange(value)}
-            className={cn(
-              "inline-flex items-center gap-2 rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors",
-              mode === value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground",
-            )}
+            className={cn(SEGMENTED_ITEM, mode === value && SEGMENTED_ON)}
           >
             <Icon className="size-4" />
             {t(`view.views.${value}`)}
           </button>
         );
       })}
-    </div>
-  );
-}
-
-function Segmented<T extends string>({
-  value,
-  options,
-  onChange,
-}: {
-  value: T;
-  options: Array<{ value: T; label: string; title?: string }>;
-  onChange: (value: T) => void;
-}) {
-  return (
-    <div role="radiogroup" className="flex rounded-lg border bg-card p-1 shadow-sm">
-      {options.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          role="radio"
-          aria-checked={value === option.value}
-          title={option.title}
-          onClick={() => onChange(option.value)}
-          className={cn(
-            "rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors",
-            value === option.value ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:bg-muted hover:text-foreground",
-          )}
-        >
-          {option.label}
-        </button>
-      ))}
     </div>
   );
 }

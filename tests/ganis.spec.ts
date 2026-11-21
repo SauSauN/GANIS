@@ -19,7 +19,17 @@ const ADMIN = { username: "admin_e2e", password: "motdepasse1" };
 const AUTRE = { username: "autre_e2e", password: "autrepasse2" };
 const ROMAN = "Roman E2E";
 const MANGA = "Manga E2E";
+const SERIE = "Série E2E";
 const PUBLIC = "Projet public E2E";
+
+/** Hauteur d'un choix des sélecteurs (Graphe / Matrice / Liste, Par plan / Par trame…) : la même partout. */
+const SEGMENTED_HEIGHT = 26;
+async function expectSegmentedHeight(choice: import("@playwright/test").Locator) {
+  const box = await choice.boundingBox();
+  expect(box).toBeTruthy();
+  // Moins d'un pixel d'écart : arrondis de l'affichage (mise à l'échelle de Windows).
+  expect(Math.abs(box!.height - SEGMENTED_HEIGHT)).toBeLessThan(1);
+}
 
 let app: GanisApp;
 let page: Page;
@@ -416,11 +426,14 @@ test.describe("Personnages", () => {
 
   test("arbre généalogique d'un personnage", async () => {
     await openFeature("Personnages", "Relations entre personnages");
-    await view().getByRole("radio", { name: "Arbre" }).click();
+    // La disposition est une liste déroulante dans la barre du haut.
+    const layout = view().getByRole("combobox", { name: "Disposition" });
+    await layout.selectOption({ label: "Arbre" });
     const root = view().getByRole("combobox", { name: "Arbre de" });
     await root.selectOption({ label: "Aldric VENN" });
     await expect(root).toHaveValue(/.+/);
-    await view().getByRole("radio", { name: "Réseau" }).click();
+    await layout.selectOption({ label: "Réseau" });
+    await expectSegmentedHeight(view().getByRole("radio", { name: "Graphe" }));
   });
 });
 
@@ -454,6 +467,147 @@ test.describe("Lieux", () => {
     await view().getByPlaceholder("Rechercher un lieu…").fill("zzz");
     await expect(view()).toContainText("Aucun lieu ne correspond");
     await view().getByPlaceholder("Rechercher un lieu…").fill("");
+  });
+
+  test("image d'un lieu : la voir en grand, la cadrer, le cadrage s'applique", async () => {
+    await openModule("Lieux");
+    await features().getByRole("button", { name: /Port-Brume/ }).first().click();
+    await expect(activeTab()).toContainText("Port-Brume");
+
+    // Une image en paysage (8 × 4) : dans un cadre carré, on peut la déplacer en largeur.
+    const png = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAgAAAAECAIAAAA8r+mnAAAARElEQVR4nA3JMQHAQAwDMSMJEiMJEiN5JAZxcxC1WiWJERYrIp6oOCGZMTZrYp6pOf8RJjhsSHih4fJHmeKyJeWVlisfdEwxYUlDjK4AAAAASUVORK5CYII=",
+      "base64",
+    );
+    await view().locator('input[type="file"]').first().setInputFiles({ name: "port.png", mimeType: "image/png", buffer: png });
+    const voir = view().getByRole("button", { name: "Voir l'image" });
+    await expect(voir).toBeVisible();
+
+    // Un clic l'ouvre en grand, avec Cadrer, Remplacer et Retirer.
+    await voir.click();
+    // La fenêtre de l'image (et non la bulle d'aide « i », elle aussi une fenêtre).
+    const fenetre = page.getByRole("dialog", { name: /^(Image de Port-Brume|Cadrer l'image)$/ });
+    await expect(fenetre.getByTestId("image-dialog-full")).toBeVisible();
+    const tailleVue = (await fenetre.boundingBox())!;
+    await expect(fenetre.getByRole("button", { name: "Remplacer" })).toBeVisible();
+    await expect(fenetre.getByRole("button", { name: "Retirer" })).toBeVisible();
+
+    // Cadrer : zoom et déplacement au clavier, puis enregistrer.
+    await fenetre.getByRole("button", { name: "Cadrer" }).click();
+    const cadre = fenetre.getByTestId("frame-editor");
+    // La vue en grand et le cadrage ont la même taille : la fenêtre ne saute pas.
+    await expect(cadre).toBeVisible();
+    const tailleCadrage = (await fenetre.boundingBox())!;
+    expect(Math.abs(tailleCadrage.width - tailleVue.width)).toBeLessThan(2);
+    expect(Math.abs(tailleCadrage.height - tailleVue.height)).toBeLessThan(2);
+    const apercu = cadre.locator("img");
+    const position = async () => Number((await apercu.getAttribute("style"))?.match(/object-position: ([\d.]+)%/)?.[1]);
+    const box = (await cadre.boundingBox())!;
+    const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+
+    const zoom = async () => Number((await apercu.getAttribute("style"))?.match(/scale\(([\d.]+)\)/)?.[1] ?? 1);
+    await page.mouse.move(centre.x, centre.y);
+
+    // Pavé tactile, pincer : le système l'envoie comme une molette avec Ctrl, en petits pas.
+    // L'image zoome, et pas la page entière.
+    const zoomPage = await page.evaluate(() => window.visualViewport?.scale ?? 1);
+    const avantPincer = await zoom();
+    await page.keyboard.down("Control");
+    for (let i = 0; i < 15; i++) await page.mouse.wheel(0, -3);
+    await page.keyboard.up("Control");
+    await expect.poll(zoom).toBeGreaterThan(avantPincer * 1.3);
+    expect(await page.evaluate(() => window.visualViewport?.scale ?? 1)).toBe(zoomPage);
+
+    // Pavé tactile, deux doigts : beaucoup de petits mouvements qui s'additionnent.
+    const avantDeuxDoigts = await zoom();
+    for (let i = 0; i < 20; i++) await page.mouse.wheel(0, 4);
+    await expect.poll(zoom).toBeLessThan(avantDeuxDoigts * 0.8);
+
+    // Zoom au maximum (molette) : c'est là qu'un pixel de souris compte le moins.
+    for (let i = 0; i < 25; i++) await page.mouse.wheel(0, -100);
+    await expect(apercu).toHaveAttribute("style", /scale\(5\)/);
+
+    // Glisser au clic gauche, pixel par pixel : l'image suit la souris.
+    const avant = await position();
+    await page.mouse.down();
+    for (let i = 1; i <= 30; i++) await page.mouse.move(centre.x + i, centre.y);
+    await page.mouse.up();
+    // Vers la droite : on découvre la gauche de l'image (le point gardé recule).
+    await expect.poll(position).toBeLessThan(avant - 0.5);
+    const apresGlisser = await position();
+
+    // Les flèches du clavier déplacent aussi l'image, dans leur sens (← : l'image part à gauche).
+    await cadre.focus();
+    await page.keyboard.press("ArrowLeft");
+    await expect.poll(position).toBeGreaterThan(apresGlisser);
+
+    // Boutons du zoom : à 500 %, « + » est grisé ; un clic sur le pourcentage revient à 100 %…
+    const valeur = fenetre.getByTestId("zoom-value");
+    await expect(valeur).toHaveText("500 %");
+    await expect(fenetre.getByRole("button", { name: /^Zoomer/ })).toBeDisabled();
+    await valeur.click();
+    await expect(valeur).toHaveText("100 %");
+    await expect(fenetre.getByRole("button", { name: /^Dézoomer/ })).toBeDisabled();
+    // … puis « + » avance de 10 % en 10 % : 150 % pour la suite.
+    for (let i = 0; i < 5; i++) await fenetre.getByRole("button", { name: /^Zoomer/ }).click();
+    await expect(valeur).toHaveText("150 %");
+    await expect(apercu).toHaveAttribute("style", /scale\(1\.5/);
+    // Le mode d'emploi est dans le « i », en haut à côté du titre.
+    await expect(fenetre.getByRole("button", { name: "Plus d'informations" })).toBeVisible();
+    await fenetre.getByRole("button", { name: "Enregistrer" }).click();
+    await expect(fenetre.getByTestId("image-dialog-full")).toBeVisible();
+    await fenetre.getByRole("button", { name: "Fermer" }).click();
+    await expect(fenetre).toBeHidden();
+
+    // Le cadrage s'applique à l'image de la fiche…
+    const image = voir.locator("img");
+    await expect(image).toHaveAttribute("style", /scale\(1\.5/);
+    // … et dans la liste des lieux.
+    await openFeature("Lieux", "Liste des lieux");
+    await expect(view().locator('img[style*="scale(1.5"]').first()).toBeVisible();
+  });
+
+  test("arborescence : lignes dans la liste, panneau en arbre ou en simple liste", async () => {
+    // Port-Brume est situé dans Lunéa.
+    await openModule("Lieux");
+    await features().getByRole("button", { name: /Port-Brume/ }).first().click();
+    await field(view(), "Situé dans").selectOption({ label: "Lunéa" });
+    await save();
+
+    // Vue « Liste » : Port-Brume sous Lunéa, relié par une ligne verticale.
+    await openFeature("Lieux", "Liste des lieux");
+    const liste = view().getByRole("tree");
+    await expect(liste.getByRole("treeitem", { level: 2 })).toContainText("Port-Brume");
+    await expect(liste.getByRole("treeitem", { level: 2 }).locator("span.absolute.w-px")).toHaveCount(1);
+    if (process.env.GANIS_E2E_SHOTS) await liste.screenshot({ path: `${process.env.GANIS_E2E_SHOTS}/liste-arbre.png` });
+
+    // Panneau du milieu : en arborescence par défaut.
+    await openModule("Lieux");
+    await expect(features().getByRole("treeitem", { name: /Port-Brume/ })).toHaveAttribute("aria-level", "2");
+
+    // Paramètres du projet › Lieux : simple liste dans le panneau.
+    await openModule("Paramètres du projet");
+    await features().getByRole("button", { name: "Lieux", exact: true }).click();
+    const reglage = view().getByRole("switch", { name: "Panneau du milieu en arborescence" });
+    await expect(reglage).toHaveAttribute("aria-checked", "true");
+    await reglage.click();
+    await expect(reglage).toHaveAttribute("aria-checked", "false");
+
+    await openModule("Lieux");
+    await expect(features().getByRole("treeitem")).toHaveCount(0);
+    await expect(features().getByRole("button", { name: "Port-Brume", exact: true })).toBeVisible();
+    if (process.env.GANIS_E2E_SHOTS) await features().screenshot({ path: `${process.env.GANIS_E2E_SHOTS}/panneau-liste.png` });
+    // La vue « Liste » garde son arborescence.
+    await openFeature("Lieux", "Liste des lieux");
+    await expect(view().getByRole("tree").getByRole("treeitem", { level: 2 })).toContainText("Port-Brume");
+
+    // Retour à l'arborescence (le réglage par défaut) pour la suite.
+    await openModule("Paramètres du projet");
+    await features().getByRole("button", { name: "Lieux", exact: true }).click();
+    await view().getByRole("switch", { name: "Panneau du milieu en arborescence" }).click();
+    await openModule("Lieux");
+    await expect(features().getByRole("treeitem", { name: /Port-Brume/ })).toHaveAttribute("aria-level", "2");
+    if (process.env.GANIS_E2E_SHOTS) await features().screenshot({ path: `${process.env.GANIS_E2E_SHOTS}/panneau-arbre.png` });
   });
 });
 
@@ -500,6 +654,12 @@ test.describe("Découpage et trame", () => {
   test("lecture de l'histoire", async () => {
     await openFeature("Trame", "Lecture de l'histoire");
     await expect(tabs().getByRole("tab", { name: /Lecture de l'histoire/ })).toBeVisible();
+    // « Par trame » : la liste des trames apparaît (après l'interrupteur pas à pas / continu).
+    await view().getByRole("tab", { name: "Par trame" }).click();
+    await expect(view().getByRole("combobox", { name: "Trame à parcourir" })).toBeVisible();
+    if (process.env.GANIS_E2E_SHOTS) await view().screenshot({ path: `${process.env.GANIS_E2E_SHOTS}/lecture-par-trame.png` });
+    await expectSegmentedHeight(view().getByRole("tab", { name: "Par trame" }));
+    await view().getByRole("tab", { name: "Par plan" }).click();
   });
 
   test("manuscrit, suivi de rédaction et dossier éditorial (roman)", async () => {
@@ -508,6 +668,36 @@ test.describe("Découpage et trame", () => {
       await expect(tabs().getByRole("tab", { name: new RegExp(feature) })).toBeVisible();
       await expect(page.getByText("Une erreur")).toHaveCount(0);
     }
+  });
+
+  test("continuité : l'état d'un personnage dans une scène, puis son parcours", async () => {
+    await openModule("Découpage");
+    await features().getByRole("button", { name: /La lettre/ }).first().click();
+    await expect(activeTab()).toContainText("La lettre");
+
+    await view().getByRole("button", { name: "Ajouter un lien" }).click();
+    await page.getByRole("menuitem", { name: "Personnages" }).click();
+    const dialog = page.getByRole("dialog").last();
+    await dialog.getByLabel("Personnages").selectOption({ label: "Aldric VENN" });
+    await dialog.getByRole("button", { name: "Enregistrer" }).click();
+    await expect(dialog).toBeHidden();
+
+    const etat = view().getByLabel("État de Aldric VENN");
+    await etat.fill("Blessé à l'épaule");
+    await etat.press("Enter");
+    await page.waitForTimeout(300);
+
+    // Roman : la continuité est dans le Manuscrit, pas en double dans le Découpage.
+    await openModule("Découpage");
+    await expect(features().getByRole("button", { name: /^Continuité/ })).toHaveCount(0);
+    await openFeature("Manuscrit", "Continuité");
+    const parcours = view().getByTestId("continuity-path");
+    await expect(parcours).toContainText("La lettre");
+    await expect(parcours).toContainText("Blessé à l'épaule");
+    await view().getByRole("tab", { name: "Tableau des présences" }).click();
+    // La scène de ce projet est à la racine du plan, hors de tout chapitre : colonnes par scène.
+    await view().getByLabel("Colonnes").selectOption({ label: "Scènes" });
+    await expect(view().getByTestId("presence-table")).toContainText("Aldric VENN");
   });
 });
 
@@ -526,6 +716,39 @@ test.describe("Notes", () => {
     await editeur.click();
     await page.keyboard.type("Le climat y est froid toute l'année.");
     await save();
+
+    // « Plus d'outils » (…) : s'ouvre, se ferme et se rouvre sans faire planter l'onglet.
+    const plus = view().getByRole("button", { name: "Plus d'outils" });
+    await plus.click();
+    await plus.click();
+    await plus.click();
+    await view().getByRole("menuitem", { name: "Lien" }).click();
+    await expect(view().getByLabel("Adresse du lien").or(view().getByPlaceholder("https://…"))).toBeVisible();
+    // Le menu (avec le champ du lien) reste dans la zone de la note.
+    const zone = await view().locator(".note-editor").first().boundingBox();
+    const menu = await view().locator(".note-editor [role=menu]").first().boundingBox();
+    expect(zone && menu).toBeTruthy();
+    expect(menu!.x).toBeGreaterThanOrEqual(zone!.x);
+    expect(menu!.x + menu!.width).toBeLessThanOrEqual(zone!.x + zone!.width + 0.5);
+    await page.keyboard.press("Escape");
+    await plus.click();
+    await expect(view().getByRole("menuitemcheckbox", { name: "Citation" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(page.getByText("Cet onglet n'a pas pu s'afficher")).toHaveCount(0);
+
+    // Clic droit dans le texte : le menu de l'app (pas celui du navigateur).
+    await editeur.click({ button: "right" });
+    const edition = page.getByRole("menu", { name: "Édition" });
+    await expect(edition).toBeVisible();
+    for (const action of ["Couper", "Copier", "Coller", "Tout sélectionner"]) {
+      await expect(edition.getByRole("menuitem", { name: action })).toBeVisible();
+    }
+    await edition.getByRole("menuitem", { name: "Tout sélectionner" }).click();
+    await expect(edition).toHaveCount(0);
+    // Texte sélectionné : Copier devient possible.
+    await editeur.click({ button: "right" });
+    await expect(page.getByRole("menu", { name: "Édition" }).getByRole("menuitem", { name: "Copier" })).toBeEnabled();
+    await page.keyboard.press("Escape");
   });
 
   test("liste des notes et recherche", async () => {
@@ -660,6 +883,17 @@ test.describe("Manga", () => {
       await expect(tabs().getByRole("tab", { name: new RegExp(feature) })).toBeVisible();
       await expect(page.getByText(/Une erreur (est survenue|d'affichage)/)).toHaveCount(0);
     }
+    await openFeature("Scénario", "Chemin de fer");
+    await expectSegmentedHeight(view().getByRole("radio", { name: "Scénario et dessin" }));
+  });
+
+  test("continuité du manga : case par case et tableau des présences", async () => {
+    await openFeature("Scénario", "Continuité");
+    await view().getByRole("tab", { name: "Tableau des présences" }).click();
+    await expect(view().getByLabel("Colonnes")).toBeVisible();
+    await expect(page.getByText(/Une erreur (est survenue|d'affichage)/)).toHaveCount(0);
+    await view().getByRole("tab", { name: "Case par case" }).click();
+    await expect(view().getByLabel("Personnage")).toBeVisible();
   });
 
   test("découpage manga : ajouter un tome", async () => {
@@ -669,6 +903,89 @@ test.describe("Manga", () => {
     const enregistrer = view().getByRole("button", { name: "Enregistrer" }).first();
     if (await enregistrer.isVisible().catch(() => false)) await enregistrer.click();
     await expect(view()).toContainText(/Tome/);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Série : scénario d'une scène, fiche d'un épisode, lecture et suivi
+// ---------------------------------------------------------------------------
+
+test.describe("Série", () => {
+  test("créer un projet série : le module Scénario remplace le Manuscrit", async () => {
+    await go("/dashboard");
+    await createProject(SERIE, "Série");
+    await expect(modules().getByRole("button", { name: "Scénario" })).toBeVisible();
+    await expect(modules().getByRole("button", { name: "Manuscrit" })).toHaveCount(0);
+  });
+
+  test("découpage : une saison, un épisode et une scène", async () => {
+    await openFeature("Découpage", "Plan du récit");
+    await view().getByRole("button", { name: "Ajouter : Saison" }).first().click();
+    await expect(features().getByRole("treeitem", { name: "Saison 1" })).toBeVisible();
+    // Chaque élément est créé dans la fiche de son parent : l'épisode dans la
+    // saison, la scène dans l'épisode.
+    for (const [parent, enfant] of [["Saison 1", "Épisode"], ["Épisode 1", "Scène"]]) {
+      await features().getByRole("button", { name: parent }).click();
+      await expect(activeTab()).toContainText(parent);
+      await view().getByRole("button", { name: `Ajouter : ${enfant}` }).last().click();
+      await expect(features().getByRole("treeitem", { name: `${enfant} 1` })).toBeVisible();
+    }
+  });
+
+  test("scénario d'une scène : en-tête, action et réplique", async () => {
+    await features().getByRole("button", { name: "Scène 1" }).click();
+    await expect(activeTab()).toContainText("Scène 1");
+    await view().getByLabel("Int. / Ext.").selectOption({ label: "Ext." });
+    await view().getByLabel("Moment").selectOption({ label: "Nuit" });
+    await expect(view().getByTestId("scene-heading")).toHaveText("EXT. — NUIT");
+
+    await view().getByRole("button", { name: "Action", exact: true }).click();
+    await view().getByLabel("Action", { exact: true }).last().fill("La pluie fouette le phare.");
+    await page.keyboard.press("Control+Enter");
+    await view().getByLabel("Action", { exact: true }).last().fill("Une silhouette approche.");
+    await view().getByRole("button", { name: "Réplique", exact: true }).click();
+    await view().getByLabel("Réplique", { exact: true }).last().fill("Qui va là ?");
+    await save();
+    await expect(view()).toContainText(/≈/);
+  });
+
+  test("fiche de l'épisode : logline et durée visée", async () => {
+    await features().getByRole("button", { name: "Épisode 1" }).click();
+    await expect(activeTab()).toContainText("Épisode 1");
+    await view().getByLabel("Logline").fill("Le gardien du phare reçoit une visite.");
+    await view().getByLabel("Durée visée (minutes)").fill("52");
+    await view().getByLabel("Durée visée (minutes)").press("Enter");
+    await view().getByRole("radio", { name: "1re version" }).click();
+    await expect(view().getByRole("radio", { name: "1re version" })).toHaveAttribute("aria-checked", "true");
+    await expect(view()).toContainText("1 scène écrite sur 1.");
+  });
+
+  test("lecture du scénario et suivi des épisodes", async () => {
+    await openFeature("Scénario", "Lecture du scénario");
+    const script = view().getByTestId("series-script");
+    await expect(script).toContainText("EXT. — NUIT");
+    await expect(script).toContainText("La pluie fouette le phare.");
+    await expect(script).toContainText("Qui va là ?");
+    await expect(view().getByRole("button", { name: "Exporter" })).toBeVisible();
+
+    await openFeature("Scénario", "Continuité");
+    await expect(view().getByRole("tab", { name: "Parcours d'un personnage" })).toBeVisible();
+    await expect(page.getByText(/Une erreur (est survenue|d'affichage)/)).toHaveCount(0);
+
+    await openFeature("Scénario", "Suivi des épisodes");
+    await expect(view()).toContainText("Épisode 1");
+    await expect(view()).toContainText("Le gardien du phare reçoit une visite.");
+    await expect(view()).toContainText("1 / 1");
+    await expect(page.getByText(/Une erreur (est survenue|d'affichage)/)).toHaveCount(0);
+  });
+
+  test("la recherche globale trouve le texte d'une scène", async () => {
+    await page.getByRole("button", { name: "Rechercher dans le projet" }).click();
+    const recherche = features().getByRole("searchbox", { name: /Rechercher dans le projet/ });
+    await recherche.fill("silhouette");
+    await expect(features()).toContainText("Scène 1");
+    await recherche.fill("qui va la");
+    await expect(features()).toContainText("Scène 1");
   });
 });
 
@@ -687,14 +1004,31 @@ test.describe("Paramètres généraux", () => {
 
   test("les sections des paramètres s'ouvrent", async () => {
     await go("/settings");
-    await expect(page.getByRole("main")).toContainText(/Compte|Apparence/);
+    // Les paramètres s'ouvrent par-dessus l'espace de travail : son onglet
+    // actif (une page avec sa propre zone principale) reste dessous.
+    const main = page.getByRole("main").first();
+    await expect(main).toContainText(/Compte|Apparence/);
     for (const section of ["Compte", "Apparence", "Enregistrement"]) {
       const lien = page.getByRole("button", { name: new RegExp(section) }).or(page.getByRole("tab", { name: new RegExp(section) })).first();
       if (await lien.isVisible().catch(() => false)) {
         await lien.click();
-        await expect(page.getByRole("main")).toContainText(section);
+        await expect(main).toContainText(section);
       }
     }
+  });
+
+  test("compte : profil d'auteur enregistré et affiché", async () => {
+    await go("/settings");
+    const main = page.getByRole("main").first();
+    const compte = page.getByRole("button", { name: /Compte/ }).or(page.getByRole("tab", { name: /Compte/ })).first();
+    if (await compte.isVisible().catch(() => false)) await compte.click();
+
+    await page.getByLabel("Nom d'auteur").fill("C. Durand");
+    await page.getByLabel("Biographie").fill("Autrice de romans policiers.");
+    await page.getByRole("button", { name: "Enregistrer" }).first().click();
+    await expect(page.getByText("Profil d'auteur enregistré.")).toBeVisible();
+    // Repris dans « Informations du compte ».
+    await expect(main).toContainText("C. Durand");
   });
 
   test("packages : les thèmes système et le choix d'un thème", async () => {

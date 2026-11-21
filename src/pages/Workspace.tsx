@@ -35,6 +35,7 @@ import {
   setRailExpanded,
   getPreviewTabsEnabled,
   usePreviewTabsEnabled,
+  useModuleOrder,
   useRailExpanded,
 } from "@/lib/preferences";
 import {
@@ -156,6 +157,7 @@ export default function Workspace() {
    * Le choix est mémorisé sur l'appareil.
    */
   const railExpanded = useRailExpanded();
+  const moduleOrder = useModuleOrder();
 
   /**
    * Onglet actif à l'arrivée : celui qu'on avait quitté plus tôt dans la
@@ -489,7 +491,7 @@ export default function Workspace() {
     const reserved = (id: string) => !featureAvailable(id, projectType);
     for (const tabId of layoutRef.current.tabs.filter(reserved)) forceCloseTab(tabId);
     setActiveModule((current) =>
-      (current === "manuscript" && projectType !== "novel") || (current === "script" && projectType !== "manga") ? "details" : current,
+      (current === "manuscript" && projectType !== "novel") || (current === "script" && projectType !== "manga") || (current === "screenplay" && projectType !== "series") ? "details" : current,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectType]);
@@ -818,7 +820,7 @@ export default function Workspace() {
             ========================================================= */}
         {!isMaximized && (
         <ActivityBar
-          modules={modulesFor(project.type, worldModules).filter((module) => module.id !== "search")}
+          modules={modulesFor(project.type, worldModules, moduleOrder).filter((module) => module.id !== "search")}
           active={activeModule}
           linked={linkedModule}
           panelOpen={panelOpen}
@@ -957,7 +959,7 @@ export default function Workspace() {
 
       {/* Palette de commandes (Ctrl+K) et choix de création (Ctrl+N) */}
       <CommandPalette
-        modules={modulesFor(project.type, worldModules)}
+        modules={modulesFor(project.type, worldModules, moduleOrder)}
         open={paletteOpen}
         onClose={() => setPaletteOpen(false)}
         projectId={project.id}

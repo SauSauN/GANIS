@@ -128,6 +128,7 @@ export function LocationGallery({ label, projectId, locationId, disabled }: Loca
       disabled={disabled}
       onAdd={(files) => void add(files)}
       onRemove={(id) => void remove(id)}
+      projectId={projectId}
     />
   );
 }

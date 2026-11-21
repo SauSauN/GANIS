@@ -656,7 +656,7 @@
       "inside": "Sera rangé dans « {{name}} »."
     },
     "list": {
-      "create": "Créer un objet",
+      "create": "Nouvel objet",
       "emptyTitle": "Aucun objet pour l'instant",
       "emptyDescription": "Armes, véhicules, téléphones, objets magiques… Créez ceux qui comptent dans votre histoire.",
       "count_one": "{{count}} objet",
@@ -869,7 +869,7 @@
       "inside": "Sera rattaché à « {{name}} »."
     },
     "list": {
-      "create": "Créer une fiche",
+      "create": "Nouvelle fiche",
       "emptyTitle": "Aucun animal ni aucune plante pour l'instant",
       "emptyDescription": "Créez d'abord les espèces (les loups gris, la rose de lune), puis les animaux et les plantes précis de votre histoire.",
       "count_one": "{{count}} fiche",
@@ -1105,7 +1105,7 @@
       "inside": "Sera une branche de « {{name}} »."
     },
     "list": {
-      "create": "Créer une faction",
+      "create": "Nouvelle faction",
       "emptyTitle": "Aucune faction pour l'instant",
       "emptyDescription": "Guildes, ordres, clans, armées, cultes, sociétés secrètes… Créez les groupes qui font bouger votre histoire.",
       "count_one": "{{count}} faction",
@@ -1308,7 +1308,7 @@
       "inside": "Sera rattachée à « {{name}} »."
     },
     "list": {
-      "create": "Créer une fiche",
+      "create": "Nouvelle fiche",
       "emptyTitle": "Aucun peuple, aucune culture ni religion pour l'instant",
       "emptyDescription": "Peuples et races, cultures, langues, religions et divinités… Créez ce qui fait l'âme de votre univers.",
       "count_one": "{{count}} fiche",
@@ -1504,7 +1504,7 @@
       "inside": "Sera rattachée à « {{name}} »."
     },
     "list": {
-      "create": "Créer une fiche",
+      "create": "Nouvelle fiche",
       "emptyTitle": "Aucune magie ni aucun pouvoir pour l'instant",
       "emptyDescription": "Systèmes de magie, énergies, super-pouvoirs, écoles, sorts et techniques… Posez les règles de votre univers.",
       "count_one": "{{count}} fiche",

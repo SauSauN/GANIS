@@ -15,6 +15,8 @@ interface SheetDisplayState {
   items: SheetDisplay[] | null;
   fetch: (projectId: string) => Promise<void>;
   save: (projectId: string, module: SheetModule, showStory: boolean, showPlot: boolean) => Promise<void>;
+  /** Panneau du milieu en arborescence ou en simple liste. */
+  savePanelTree: (projectId: string, module: SheetModule, tree: boolean) => Promise<void>;
   reset: () => void;
 }
 
@@ -42,6 +44,12 @@ export const useSheetDisplayStore = create<SheetDisplayState>((set, get) => ({
     set((state) => ({ items: [...(state.items ?? []).filter((item) => item.module !== module), saved] }));
   },
 
+  savePanelTree: async (projectId, module, tree) => {
+    const saved = await api.setPanelTree(projectId, module, tree);
+    if (get().projectId !== projectId) return;
+    set((state) => ({ items: [...(state.items ?? []).filter((item) => item.module !== module), saved] }));
+  },
+
   reset: () => {
     latest++;
     set({ projectId: null, items: null });
@@ -61,5 +69,6 @@ export function useSheetDisplay(projectId: string, module: SheetModule) {
   }, [mine, projectId, fetch]);
 
   const item = items?.find((entry) => entry.module === module);
-  return { showStory: item?.showStory ?? false, showPlot: item?.showPlot ?? false, loaded: items !== null };
+  // Arborescence par défaut, y compris tant que le réglage n'est pas lu.
+  return { showStory: item?.showStory ?? false, showPlot: item?.showPlot ?? false, panelTree: item?.panelTree ?? true, loaded: items !== null };
 }

@@ -42,6 +42,7 @@
 use crate::error::{AppError, AppResult};
 use crate::services::character_service::{self, decode_image, CharacterInput, DetailLevel, Portrait};
 use crate::services::location_service::{CustomType, CustomTypeInput};
+use crate::services::nesting;
 use crate::services::trash_service::Snapshot;
 use crate::services::world_link_service;
 use crate::utils::{new_id, now_utc};
@@ -596,6 +597,15 @@ async fn clean_input(
                     )
                     .with_key("world.parentCycle"));
                 }
+            }
+
+            if nesting::too_deep(pool, module.table(), parent, self_id).await? {
+                return Err(AppError::validation(format!(
+                    "Un élément ne peut pas être rangé sur plus de {} niveaux.",
+                    nesting::MAX_NESTING
+                ))
+                .with_key("world.tooDeep")
+                .with_param("max", nesting::MAX_NESTING));
             }
 
             Some(parent.to_owned())
@@ -1473,6 +1483,33 @@ mod tests {
             assert_eq!(settings.detail_level, Some(DetailLevel::Basic));
             assert!(settings.enabled);
         }
+    }
+
+    #[tokio::test]
+    async fn nesting_is_limited_to_fifteen_levels() {
+        let pool = pool().await;
+        let m = Module::Faction;
+
+        // 15 niveaux : acceptés.
+        let mut ids = Vec::new();
+        let mut parent: Option<String> = None;
+        for level in 1..=15 {
+            let entry = create_entry(&pool, m, &WorldEntryInput { parent_id: parent.clone(), ..input(&format!("N{level}"), "guard") })
+                .await
+                .unwrap();
+            parent = Some(entry.id.clone());
+            ids.push(entry.id);
+        }
+
+        // Un 16e niveau : refusé.
+        assert!(create_entry(&pool, m, &WorldEntryInput { parent_id: parent.clone(), ..input("N16", "guard") }).await.is_err());
+
+        // Une branche de 2 niveaux ne peut pas descendre sous le niveau 14.
+        let top = create_entry(&pool, m, &input("Haut", "guard")).await.unwrap();
+        create_entry(&pool, m, &WorldEntryInput { parent_id: Some(top.id.clone()), ..input("Bas", "guard") }).await.unwrap();
+        let moved = |p: &str| WorldEntryInput { parent_id: Some(p.to_owned()), ..input("Haut", "guard") };
+        assert!(update_entry(&pool, m, &top.id, &moved(&ids[13])).await.is_err());
+        assert!(update_entry(&pool, m, &top.id, &moved(&ids[12])).await.is_ok());
     }
 
     #[tokio::test]
