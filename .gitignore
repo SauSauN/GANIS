@@ -74,3 +74,8 @@ dist-ssr
 *.bak
 # Archives de projet GANIS : NE PAS ignorer les .ganix (format d'échange officiel)
 # !*.ganix
+
+# Configuration locale (clés Supabase)
+.env
+.env.local
+.env.*.local

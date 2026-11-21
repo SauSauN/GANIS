@@ -124,6 +124,34 @@ export const accountApi = {
     dialogTitle: string;
   }) => call<boolean>("save_recovery_key_file", { input }),
 
+  // -------------------------------------------------------------------------
+  // Récupération par e-mail (Supabase)
+  // -------------------------------------------------------------------------
+
+  /**
+   * Active (ou renouvelle) la récupération par e-mail. Le mot de passe est
+   * vérifié par Rust ; le secret retourné doit être envoyé à Supabase puis
+   * oublié. Un ancien secret cesse de fonctionner.
+   */
+  enableEmailRecovery: (input: { username: string; password: string }) =>
+    call<{ userId: string; secret: string }>("enable_email_recovery", { input }),
+
+  /** Désactive la récupération par e-mail du compte connecté. */
+  disableEmailRecovery: () => call<void>("disable_email_recovery"),
+
+  /** Vrai si le compte connecté peut être récupéré par e-mail. */
+  hasEmailRecovery: () => call<boolean>("has_email_recovery"),
+
+  /**
+   * Mot de passe oublié, par e-mail : `secrets` sont ceux rendus par
+   * Supabase après vérification du code.
+   */
+  recoverWithEmail: (input: {
+    username: string;
+    secrets: string[];
+    newPassword: string;
+  }) => call<void>("recover_with_email", { input }),
+
   /**
    * Ferme la session locale courante.
    */

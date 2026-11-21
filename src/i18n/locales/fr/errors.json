@@ -452,5 +452,9 @@
   },
   "profile": {
     "tooLong": "Un champ du profil est trop long."
+  },
+  "emailRecovery": {
+    "invalid": "Aucun compte de cet appareil ne correspond à ce nom d'utilisateur et à cette adresse e-mail.",
+    "loginFirst": "Connectez-vous une première fois avant d'activer la récupération par e-mail."
   }
 }

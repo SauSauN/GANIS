@@ -1,11 +1,18 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
+import { EmailCodeForm } from "@/components/auth/EmailCodeForm";
 import { RecoveryKeyPanel } from "@/components/auth/RecoveryKeyPanel";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  EMAIL_RECOVERY_ENABLED,
+  enableEmailRecovery,
+  endEmailSession,
+} from "@/lib/emailRecovery";
+import { notifyError } from "@/lib/notify";
 import { RECOVERY_KEY_ENABLED } from "@/lib/recoveryKey";
 import { useAuthStore } from "@/stores/authStore";
 import {
@@ -17,7 +24,7 @@ import {
 
 export default function Register() {
   const navigate = useNavigate();
-  const { t } = useTranslation(["register", "common"]);
+  const { t } = useTranslation(["register", "common", "recovery"]);
   const { register, loading, error, clearError } = useAuthStore();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -28,8 +35,16 @@ export default function Register() {
   const [localIssue, setLocalIssue] = useState<ValidationIssue | null>(null);
   // Clé de récupération du compte créé, montrée une seule fois.
   const [recoveryKey, setRecoveryKey] = useState<string | null>(null);
+  // Adresse en cours de vérification par code (récupération par e-mail).
+  const [verifyingEmail, setVerifyingEmail] = useState(false);
 
   useEffect(() => clearError(), [clearError]);
+
+  // La session Supabase éventuelle est fermée en quittant la page.
+  useEffect(() => () => void endEmailSession(), []);
+
+  /** Vrai si l'adresse saisie servira à la récupération par e-mail. */
+  const withEmailRecovery = EMAIL_RECOVERY_ENABLED && email.trim() !== "";
 
   function validate(): ValidationIssue | null {
     return (
@@ -46,13 +61,42 @@ export default function Register() {
     setLocalIssue(problem);
     if (problem) return;
 
+    // Adresse donnée : elle est d'abord vérifiée par un code, puis le
+    // compte est créé avec sa récupération par e-mail (`createAccount`).
+    if (withEmailRecovery) {
+      clearError();
+      setVerifyingEmail(true);
+      return;
+    }
+
+    await createAccount(null);
+  }
+
+  /** Crée le compte ; avec `supabaseUserId`, active aussi la récupération par e-mail. */
+  async function createAccount(supabaseUserId: string | null) {
     const created = await register({
       username: username.trim(),
       password,
       email: email.trim() || undefined,
     });
 
-    if (!created) return;
+    if (!created) {
+      // Erreur affichée sur le formulaire (nom déjà pris…).
+      setVerifyingEmail(false);
+      return;
+    }
+
+    if (supabaseUserId) {
+      try {
+        await enableEmailRecovery({ supabaseUserId, username: username.trim(), password });
+      } catch {
+        // Le compte existe : la récupération pourra être activée depuis
+        // les paramètres du compte.
+        notifyError(t("recovery:email.errors.signupSetupFailed"));
+      } finally {
+        await endEmailSession();
+      }
+    }
 
     // Le mot de passe n'a plus à rester en mémoire.
     setPassword("");
@@ -70,6 +114,27 @@ export default function Register() {
   const shownError = localIssue
     ? t(`common:validation.${localIssue}`)
     : error;
+
+  if (verifyingEmail && !recoveryKey) {
+    return (
+      <main className="flex flex-1 items-center justify-center bg-background px-4 py-6">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle>{t("recovery:email.signup.title")}</CardTitle>
+            <CardDescription>{t("recovery:email.signup.subtitle")}</CardDescription>
+          </CardHeader>
+          <CardContent className="mt-4">
+            <EmailCodeForm
+              email={email}
+              createUser
+              onVerified={createAccount}
+              onBack={() => setVerifyingEmail(false)}
+            />
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
 
   if (recoveryKey) {
     return (
@@ -108,12 +173,15 @@ export default function Register() {
               <Label htmlFor="email">{t("email")}</Label>
               <Input id="email" placeholder={t("common:placeholders.email")} type="email" autoComplete="email" value={email}
                 onChange={(e) => setEmail(e.target.value)} />
+              {EMAIL_RECOVERY_ENABLED && (
+                <p className="text-xs text-muted-foreground">{t("recovery:email.signup.emailHint")}</p>
+              )}
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">{t("password")}</Label>
               <Input id="password" placeholder={t("common:placeholders.newPassword")} type="password" autoComplete="new-password" value={password}
                 onChange={(e) => setPassword(e.target.value)} />
-              {!RECOVERY_KEY_ENABLED && (
+              {!RECOVERY_KEY_ENABLED && !withEmailRecovery && (
                 <p className="text-xs text-muted-foreground">{t("passwordWarning")}</p>
               )}
             </div>

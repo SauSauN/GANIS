@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { notifyError, notifySaved } from "@/lib/notify";
 import { CalendarDays, Feather, Mail, ShieldCheck, Trash2, User as UserIcon } from "lucide-react";
+import { EmailCodeForm } from "@/components/auth/EmailCodeForm";
 import { RecoveryKeyPanel } from "@/components/auth/RecoveryKeyPanel";
 import {
   cardClass,
@@ -28,6 +29,12 @@ import {
   type ValidationIssue,
 } from "@/lib/validators";
 import { IDLE_LOCK_DELAYS, setIdleLock, useIdleLock, type IdleLockDelay } from "@/lib/preferences";
+import {
+  EMAIL_RECOVERY_ENABLED,
+  EmailRecoveryError,
+  enableEmailRecovery,
+  endEmailSession,
+} from "@/lib/emailRecovery";
 import { RECOVERY_KEY_ENABLED } from "@/lib/recoveryKey";
 import { useAuthStore } from "@/stores/authStore";
 import { TitleWithInfo } from "@/components/common/TitleWithInfo";
@@ -48,7 +55,10 @@ type AccountMessage =
   | "account.delete.confirmRequired"
   | "account.delete.failed"
   | "account.profile.updated"
-  | "account.profile.failed";
+  | "account.profile.failed"
+  | "account.emailRecovery.enabled"
+  | "account.emailRecovery.disabled"
+  | "account.emailRecovery.failed";
 
 /**
  * Retour affiché sous un formulaire.
@@ -323,6 +333,152 @@ function RecoveryKeyCard({ username }: { username: string }) {
           </Button>
         </CardFooter>
       </form>
+    </Card>
+  );
+}
+
+/**
+ * Récupération par e-mail : un code envoyé à l'adresse choisie permettra
+ * de choisir un nouveau mot de passe sans perdre les projets (voir
+ * `lib/emailRecovery.ts`). L'adresse est vérifiée par un code avant
+ * l'activation ; le mot de passe actuel est demandé.
+ */
+function EmailRecoveryCard({ user }: { user: User }) {
+  const { t } = useTranslation(["settings", "recovery", "common"]);
+
+  const [active, setActive] = useState<boolean | null>(null);
+  const [email, setEmail] = useState(user.email ?? "");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [step, setStep] = useState<"form" | "code">("form");
+  const [busy, setBusy] = useState(false);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    api
+      .hasEmailRecovery()
+      .then((value) => !cancelled && setActive(value))
+      .catch(() => !cancelled && setActive(false));
+    return () => {
+      cancelled = true;
+      void endEmailSession();
+    };
+  }, []);
+
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    setFeedback(null);
+
+    const issue: ValidationIssue | null = email.trim() ? checkEmail(email) : "emailInvalid";
+    if (issue) {
+      setFeedback({ kind: "error", issue });
+      return;
+    }
+    if (!currentPassword) {
+      setFeedback({ kind: "error", key: "account.recovery.currentRequired" });
+      return;
+    }
+
+    setStep("code");
+  }
+
+  async function onVerified(supabaseUserId: string) {
+    try {
+      await enableEmailRecovery({ supabaseUserId, username: user.username, password: currentPassword });
+      setActive(true);
+      setFeedback({ kind: "success", key: "account.emailRecovery.enabled" });
+    } catch (e) {
+      setFeedback(
+        e instanceof EmailRecoveryError
+          ? { kind: "error", text: t(`recovery:email.errors.${e.issue}`) }
+          : failure(e, "account.emailRecovery.failed"),
+      );
+    } finally {
+      setCurrentPassword("");
+      setStep("form");
+      await endEmailSession();
+    }
+  }
+
+  async function disable() {
+    setBusy(true);
+    try {
+      await api.disableEmailRecovery();
+      setActive(false);
+      setFeedback({ kind: "success", key: "account.emailRecovery.disabled" });
+    } catch (e) {
+      setFeedback(failure(e, "account.emailRecovery.failed"));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Card className={cardClass}>
+      <CardHeader className={cardHeaderClass}>
+        <TitleWithInfo info={t("account.emailRecovery.description")}>{t("account.emailRecovery.title")}</TitleWithInfo>
+      </CardHeader>
+
+      <CardContent className="space-y-6 px-6 py-6">
+        <p className="text-sm text-muted-foreground">
+          {active === null
+            ? "…"
+            : active
+              ? t("account.emailRecovery.statusOn")
+              : t("account.emailRecovery.statusOff")}
+        </p>
+
+        {step === "code" ? (
+          <div className="max-w-md">
+            <EmailCodeForm
+              email={email}
+              createUser
+              onVerified={onVerified}
+              onBack={() => setStep("form")}
+            />
+          </div>
+        ) : (
+          <form id="email-recovery-form" onSubmit={handleSubmit} noValidate className="grid max-w-2xl gap-x-6 gap-y-5 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="email-recovery-address">{t("account.emailRecovery.email")}</Label>
+              <Input
+                id="email-recovery-address"
+                type="email"
+                autoComplete="email"
+                placeholder={t("common:placeholders.email")}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="email-recovery-password">{t("account.recovery.current")}</Label>
+              <Input
+                id="email-recovery-password"
+                type="password"
+                autoComplete="current-password"
+                placeholder={t("common:placeholders.currentPassword")}
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+              />
+            </div>
+          </form>
+        )}
+
+        <FeedbackMessage feedback={feedback} />
+      </CardContent>
+
+      {step === "form" && (
+        <CardFooter className={cn(cardFooterClass, "gap-2")}>
+          {active && (
+            <Button type="button" variant="ghost" disabled={busy} onClick={() => void disable()}>
+              {t("account.emailRecovery.disable")}
+            </Button>
+          )}
+          <Button type="submit" form="email-recovery-form" variant="outline" disabled={busy}>
+            {active ? t("account.emailRecovery.renew") : t("account.emailRecovery.enable")}
+          </Button>
+        </CardFooter>
+      )}
     </Card>
   );
 }
@@ -713,6 +869,9 @@ export function AccountSection() {
 
       {/* Désactivée pour l'instant : voir RECOVERY_KEY_ENABLED. */}
       {RECOVERY_KEY_ENABLED && <RecoveryKeyCard username={user.username} />}
+
+      {/* Récupération par e-mail : seulement si Supabase est configuré. */}
+      {EMAIL_RECOVERY_ENABLED && <EmailRecoveryCard user={user} />}
 
       {/* ==================================================================
           VERROUILLAGE AUTOMATIQUE

@@ -45,5 +45,43 @@
       "usernameRequired": "Le nom d'utilisateur est requis.",
       "keyFormat": "La clé de récupération doit contenir 6 groupes de 6 caractères (lettres et chiffres)."
     }
+  },
+  "email": {
+    "code": {
+      "sentTo": "Un code à 6 chiffres a été envoyé à {{email}}. Il est valable quelques minutes.",
+      "label": "Code reçu par e-mail",
+      "hint": "Pensez à regarder dans les courriers indésirables.",
+      "verify": "Vérifier le code",
+      "verifying": "Vérification…",
+      "resend": "Renvoyer le code",
+      "resendIn": "Renvoyer dans {{seconds}} s",
+      "sending": "Envoi…",
+      "back": "Retour"
+    },
+    "signup": {
+      "title": "Vérifiez votre adresse e-mail",
+      "subtitle": "Ce code confirme l'adresse qui vous permettra de choisir un nouveau mot de passe si vous oubliez le vôtre.",
+      "emailHint": "Facultatif, mais conseillé : un code envoyé à cette adresse vous permettra de choisir un nouveau mot de passe sans perdre vos projets."
+    },
+    "recover": {
+      "subtitle": "Indiquez votre nom d'utilisateur et l'adresse e-mail de récupération : vous recevrez un code pour choisir un nouveau mot de passe. Vos projets sont conservés.",
+      "passwordSubtitle": "Adresse vérifiée. Choisissez votre nouveau mot de passe.",
+      "email": "Adresse e-mail de récupération",
+      "emailHint": "Celle donnée à la création du compte ou dans Paramètres › Compte.",
+      "sendCode": "Recevoir un code",
+      "useKey": "J'ai une clé de récupération"
+    },
+    "errors": {
+      "usernameRequired": "Le nom d'utilisateur est requis.",
+      "emailRequired": "L'adresse e-mail est requise.",
+      "codeFormat": "Le code contient 6 chiffres.",
+      "codeInvalid": "Code incorrect ou expiré. Vérifiez-le ou demandez-en un nouveau.",
+      "rateLimited": "Trop de demandes. Patientez quelques minutes avant de redemander un code.",
+      "noAccount": "Aucune récupération par e-mail n'est enregistrée pour cette adresse.",
+      "network": "Le serveur de récupération ne répond pas. Vérifiez votre connexion à Internet.",
+      "notConfigured": "La récupération par e-mail n'est pas configurée dans cette version de GANIS.",
+      "saveFailed": "L'adresse est vérifiée, mais le serveur n'a pas pu enregistrer la récupération. Réessayez.",
+      "signupSetupFailed": "Compte créé, mais la récupération par e-mail n'a pas pu être activée. Activez-la dans Paramètres › Compte."
+    }
   }
 }

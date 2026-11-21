@@ -92,6 +92,19 @@
       "bioPlaceholder": "A few lines about you",
       "updated": "Author profile saved.",
       "failed": "Couldn't save the author profile."
+    },
+    "emailRecovery": {
+      "title": "Email recovery",
+      "description": "If you forget your password, a code sent to this address will let you choose a new one without losing your projects. The server only keeps a secret that is useless without this computer. Note: anyone with access to this mailbox and this computer could open your account.",
+      "statusOn": "On: a code sent by email lets you choose a new password.",
+      "statusOff": "Off: without your password, your private projects could not be recovered.",
+      "email": "Recovery email address",
+      "enable": "Enable",
+      "renew": "Change address",
+      "disable": "Disable",
+      "enabled": "Email recovery enabled.",
+      "disabled": "Email recovery disabled.",
+      "failed": "Could not change email recovery."
     }
   },
   "appearance": {

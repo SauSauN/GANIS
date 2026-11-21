@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { EMAIL_RECOVERY_ENABLED } from "@/lib/emailRecovery";
 import { RECOVERY_KEY_ENABLED } from "@/lib/recoveryKey";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -97,9 +98,9 @@ export default function Login() {
             <div className="space-y-2">
               <div className="flex items-baseline justify-between gap-2">
                 <Label htmlFor="password">{t("password")}</Label>
-                {RECOVERY_KEY_ENABLED && (
+                {(EMAIL_RECOVERY_ENABLED || RECOVERY_KEY_ENABLED) && (
                   <Link
-                    to="/recover"
+                    to={EMAIL_RECOVERY_ENABLED ? "/recover-email" : "/recover"}
                     className="text-xs text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
                   >
                     {t("forgotPassword")}

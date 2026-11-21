@@ -15,6 +15,7 @@ import Welcome from "@/pages/Welcome";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import Recover from "@/pages/Recover";
+import RecoverEmail from "@/pages/RecoverEmail";
 import Setup from "@/pages/Setup";
 import Dashboard from "@/pages/Dashboard";
 import Workspace from "@/pages/Workspace";
@@ -88,6 +89,12 @@ export default function App() {
               <Route
                 path="/recover"
                 element={<Recover />}
+              />
+
+              {/* Mot de passe oublié : code envoyé par e-mail (Supabase) */}
+              <Route
+                path="/recover-email"
+                element={<RecoverEmail />}
               />
 
               {/* ============================================================ */}

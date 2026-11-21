@@ -951,3 +951,45 @@ async fn user_can_delete_own_account_with_projects_but_not_the_last_admin() {
     // Le compte n'existe plus : connexion impossible.
     assert!(auth_service::login_user(&env.state, "alice", "motdepasse1").await.is_err());
 }
+
+#[tokio::test]
+async fn email_recovery_keeps_the_projects() {
+    let env = env().await;
+    register_alice(&env).await;
+
+    // Activée juste après l'inscription, sans session (mot de passe vérifié).
+    let escrow = auth_service::enable_email_recovery(&env.state, "alice", "motdepasse1")
+        .await
+        .unwrap();
+    assert!(auth_service::enable_email_recovery(&env.state, "alice", "mauvais123").await.is_err());
+
+    login(&env, "alice", "motdepasse1").await;
+    assert!(auth_service::has_email_recovery(&env.state).await.unwrap());
+    let id = create_project_with_text(&env, "Projet", "Gardé par e-mail").await;
+    auth_service::logout_user(&env.state).await.unwrap();
+
+    // Un secret étranger (autre compte sur la même adresse) est ignoré.
+    let other = crate::security::crypto::SecretKey::generate().to_base64().to_string();
+    let secrets = vec![other.clone(), escrow.secret.to_string()];
+
+    auth_service::recover_with_email(&env.state, "alice", &secrets, "nouveau123")
+        .await
+        .unwrap();
+    login(&env, "alice", "nouveau123").await;
+    assert_eq!(read_text(&env, &id).await, "Gardé par e-mail");
+
+    // Désactivée : le secret du serveur n'ouvre plus rien.
+    auth_service::disable_email_recovery(&env.state).await.unwrap();
+    auth_service::logout_user(&env.state).await.unwrap();
+    let error = auth_service::recover_with_email(&env.state, "alice", &secrets, "encore123")
+        .await
+        .unwrap_err();
+    assert_eq!(error.key, Some("emailRecovery.invalid"));
+
+    // Mauvais secrets seulement : refusé, mot de passe inchangé.
+    let error = auth_service::recover_with_email(&env.state, "alice", &[other], "encore123")
+        .await
+        .unwrap_err();
+    assert_eq!(error.key, Some("emailRecovery.invalid"));
+    login(&env, "alice", "nouveau123").await;
+}

@@ -45,5 +45,43 @@
       "usernameRequired": "Username is required.",
       "keyFormat": "The recovery key must contain 6 groups of 6 characters (letters and digits)."
     }
+  },
+  "email": {
+    "code": {
+      "sentTo": "A 6-digit code was sent to {{email}}. It is valid for a few minutes.",
+      "label": "Code received by email",
+      "hint": "Remember to check your spam folder.",
+      "verify": "Verify code",
+      "verifying": "Verifying…",
+      "resend": "Resend code",
+      "resendIn": "Resend in {{seconds}} s",
+      "sending": "Sending…",
+      "back": "Back"
+    },
+    "signup": {
+      "title": "Verify your email address",
+      "subtitle": "This code confirms the address that will let you choose a new password if you forget yours.",
+      "emailHint": "Optional but recommended: a code sent to this address will let you choose a new password without losing your projects."
+    },
+    "recover": {
+      "subtitle": "Enter your username and recovery email address: you will receive a code to choose a new password. Your projects are kept.",
+      "passwordSubtitle": "Address verified. Choose your new password.",
+      "email": "Recovery email address",
+      "emailHint": "The one given when the account was created or in Settings › Account.",
+      "sendCode": "Get a code",
+      "useKey": "I have a recovery key"
+    },
+    "errors": {
+      "usernameRequired": "The username is required.",
+      "emailRequired": "The email address is required.",
+      "codeFormat": "The code has 6 digits.",
+      "codeInvalid": "Wrong or expired code. Check it or ask for a new one.",
+      "rateLimited": "Too many requests. Wait a few minutes before asking for a new code.",
+      "noAccount": "No email recovery is registered for this address.",
+      "network": "The recovery server is not responding. Check your Internet connection.",
+      "notConfigured": "Email recovery is not configured in this version of GANIS.",
+      "saveFailed": "The address is verified, but the server could not save the recovery. Try again.",
+      "signupSetupFailed": "Account created, but email recovery could not be enabled. Enable it in Settings › Account."
+    }
   }
 }

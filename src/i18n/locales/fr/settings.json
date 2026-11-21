@@ -92,6 +92,19 @@
       "bioPlaceholder": "Quelques lignes pour vous présenter",
       "updated": "Profil d'auteur enregistré.",
       "failed": "Impossible d'enregistrer le profil d'auteur."
+    },
+    "emailRecovery": {
+      "title": "Récupération par e-mail",
+      "description": "Si vous oubliez votre mot de passe, un code envoyé à cette adresse vous permettra d'en choisir un nouveau sans perdre vos projets. Le serveur ne garde qu'un secret, inutile sans cet ordinateur. Attention : toute personne qui accède à cette boîte mail et à cet ordinateur pourrait ouvrir votre compte.",
+      "statusOn": "Activée : un code envoyé par e-mail permet de choisir un nouveau mot de passe.",
+      "statusOff": "Désactivée : sans votre mot de passe, vos projets privés ne pourraient pas être récupérés.",
+      "email": "Adresse e-mail de récupération",
+      "enable": "Activer",
+      "renew": "Changer d'adresse",
+      "disable": "Désactiver",
+      "enabled": "Récupération par e-mail activée.",
+      "disabled": "Récupération par e-mail désactivée.",
+      "failed": "Impossible de modifier la récupération par e-mail."
     }
   },
   "appearance": {

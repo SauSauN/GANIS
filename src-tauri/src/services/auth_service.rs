@@ -867,6 +867,202 @@ pub async fn regenerate_recovery_key(
     Ok(recovery_key)
 }
 
+// ----------------------------------------------------------------------------
+// Récupération par e-mail (Supabase)
+// ----------------------------------------------------------------------------
+
+/// Nombre maximal de secrets essayés par une récupération par e-mail : une
+/// même adresse peut servir à plusieurs comptes de cet appareil, mais une
+/// liste démesurée bloquerait le calcul (Argon2id à chaque essai).
+const EMAIL_RECOVERY_MAX_SECRETS: usize = 10;
+
+/// Secret du verrou « email », à confier au serveur de récupération puis à
+/// oublier. `user_id` identifie le compte local dans la table du serveur.
+pub struct EmailRecoverySecret {
+    pub user_id: String,
+    pub secret: Zeroizing<String>,
+}
+
+fn email_recovery_login_first() -> AppError {
+    AppError::validation(
+        "Connectez-vous une première fois avant d'activer la récupération par e-mail.",
+    )
+    .with_key("emailRecovery.loginFirst")
+}
+
+fn invalid_email_recovery() -> AppError {
+    AppError::new(
+        crate::error::ErrorCode::Unauthorized,
+        "Aucun compte de cet appareil ne correspond à ce nom d'utilisateur et à cette adresse e-mail.",
+    )
+    .with_key("emailRecovery.invalid")
+}
+
+/// Active (ou renouvelle) la récupération par e-mail d'un compte.
+///
+/// Le mot de passe ouvre la clé du compte, qu'un nouveau secret aléatoire
+/// referme dans le verrou « email ». Le secret est retourné une seule fois :
+/// l'interface l'envoie à Supabase et ne le garde pas. Un ancien secret
+/// cesse aussitôt de fonctionner.
+///
+/// Ne demande pas de session : sert aussi juste après l'inscription, avant
+/// la première connexion. Mêmes protections que la connexion (tentatives
+/// limitées, même message que le compte existe ou non).
+pub async fn enable_email_recovery(
+    state: &AppState,
+    username: &str,
+    password: &str,
+) -> AppResult<EmailRecoverySecret> {
+    let username = username.trim();
+
+    state.login_throttle.check(username)?;
+
+    let candidate = user_service::find_by_username(&state.app_db, username).await?;
+
+    let unlocked = match &candidate {
+        Some(user) => {
+            match keyring_service::unlock(
+                &state.app_db,
+                &user.id,
+                SlotKind::Password,
+                password.as_bytes(),
+            )
+            .await?
+            {
+                Some(result) => result,
+                // Compte sans trousseau (créé par un administrateur) : il
+                // doit d'abord se connecter une fois.
+                None => return Err(email_recovery_login_first()),
+            }
+        }
+        None => {
+            keyring_service::burn_equivalent_work(password.as_bytes()).await;
+            None
+        }
+    };
+
+    let (Some(user), Some(account_key)) = (candidate, unlocked) else {
+        state.login_throttle.record_failure(username);
+        tracing::warn!("Échec d'activation de la récupération par e-mail");
+
+        return Err(AppError::invalid_credentials());
+    };
+
+    state.login_throttle.record_success(username);
+
+    let secret = SecretKey::generate();
+    let slot =
+        NewSlot::seal_off_thread(&user.id, SlotKind::Email, secret.as_bytes(), &account_key).await?;
+
+    let mut conn = state.app_db.acquire().await?;
+    keyring_service::replace_slot(&mut conn, &user.id, &slot).await?;
+
+    tracing::info!("Récupération par e-mail activée");
+
+    Ok(EmailRecoverySecret {
+        user_id: user.id,
+        secret: secret.to_base64(),
+    })
+}
+
+/// Désactive la récupération par e-mail du compte connecté. Le secret
+/// gardé par le serveur n'ouvre plus rien.
+pub async fn disable_email_recovery(state: &AppState) -> AppResult<()> {
+    let (user, _account_key) = state.require_session().await?;
+
+    keyring_service::delete_slot(&state.app_db, &user.id, SlotKind::Email).await?;
+
+    tracing::info!("Récupération par e-mail désactivée");
+
+    Ok(())
+}
+
+/// Indique si le compte connecté peut être récupéré par e-mail.
+pub async fn has_email_recovery(state: &AppState) -> AppResult<bool> {
+    let (user, _account_key) = state.require_session().await?;
+
+    keyring_service::has_slot(&state.app_db, &user.id, SlotKind::Email).await
+}
+
+/// Mot de passe oublié, par e-mail : l'interface a vérifié le code envoyé
+/// par Supabase, qui lui a rendu les secrets gardés pour cette adresse. Le
+/// premier qui ouvre le verrou « email » du compte permet de choisir un
+/// nouveau mot de passe. Tous les projets sont conservés.
+///
+/// Mêmes protections que la récupération par clé.
+pub async fn recover_with_email(
+    state: &AppState,
+    username: &str,
+    secrets: &[String],
+    new_password: &str,
+) -> AppResult<()> {
+    let username = username.trim();
+
+    state.recovery_throttle.check(username)?;
+
+    validate_new_password(new_password)?;
+
+    // Secrets mal formés ignorés : ils ne viennent pas de GANIS.
+    let secrets: Vec<SecretKey> = secrets
+        .iter()
+        .take(EMAIL_RECOVERY_MAX_SECRETS)
+        .filter_map(|encoded| SecretKey::from_base64(encoded.trim()).ok())
+        .collect();
+
+    let candidate = user_service::find_by_username(&state.app_db, username).await?;
+
+    let mut unlocked = None;
+
+    match &candidate {
+        Some(user) => {
+            for secret in &secrets {
+                match keyring_service::unlock(
+                    &state.app_db,
+                    &user.id,
+                    SlotKind::Email,
+                    secret.as_bytes(),
+                )
+                .await?
+                {
+                    Some(Some(key)) => {
+                        unlocked = Some(key);
+                        break;
+                    }
+                    Some(None) => continue,
+                    None => {
+                        // Pas de verrou « email » : même coût qu'un essai.
+                        keyring_service::burn_equivalent_work(secret.as_bytes()).await;
+                        break;
+                    }
+                }
+            }
+        }
+        None => keyring_service::burn_equivalent_work(b"ganis").await,
+    }
+
+    let (Some(user), Some(account_key)) = (candidate, unlocked) else {
+        state.recovery_throttle.record_failure(username);
+        tracing::warn!("Échec de récupération par e-mail");
+
+        return Err(invalid_email_recovery());
+    };
+
+    state.recovery_throttle.record_success(username);
+    state.login_throttle.record_success(username);
+
+    set_password(&state.app_db, &user.id, new_password, &account_key).await?;
+
+    session_service::delete_user_sessions(&state.app_db, &user.id).await?;
+
+    if state.current_user().await.is_some_and(|current| current.id == user.id) {
+        state.close_session().await;
+    }
+
+    tracing::info!("Compte récupéré par e-mail");
+
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -452,5 +452,9 @@
   },
   "profile": {
     "tooLong": "A profile field is too long."
+  },
+  "emailRecovery": {
+    "invalid": "No account on this device matches this username and email address.",
+    "loginFirst": "Sign in once before enabling email recovery."
   }
 }

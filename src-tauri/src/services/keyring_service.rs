@@ -7,6 +7,7 @@
 //! |-------------|---------------------------|--------------------------------------|
 //! | `password`  | mot de passe              | connexion normale                    |
 //! | `recovery`  | clé de récupération       | mot de passe oublié                  |
+//! | `email`     | secret gardé par Supabase | mot de passe oublié, code par e-mail |
 //!
 //! Ajouter une nouvelle façon d'ouvrir le compte (par exemple un serveur de
 //! récupération par e-mail) revient à ajouter un type de verrou ici.
@@ -24,6 +25,10 @@ use sqlx::{SqliteConnection, SqlitePool};
 pub enum SlotKind {
     Password,
     Recovery,
+    /// Secret aléatoire de 32 octets confié au serveur de récupération
+    /// (Supabase), qui ne le rend qu'après vérification d'un code envoyé
+    /// par e-mail. Il n'est jamais gardé sur cet appareil.
+    Email,
 }
 
 impl SlotKind {
@@ -31,6 +36,7 @@ impl SlotKind {
         match self {
             SlotKind::Password => "password",
             SlotKind::Recovery => "recovery",
+            SlotKind::Email => "email",
         }
     }
 }
@@ -212,6 +218,34 @@ pub async fn insert_slot(conn: &mut SqliteConnection, user_id: &str, slot: &NewS
 /// récupération). La clé du compte enfermée doit être la même.
 pub async fn replace_slot(conn: &mut SqliteConnection, user_id: &str, slot: &NewSlot) -> AppResult<()> {
     write_slot(conn, user_id, slot, true).await
+}
+
+/// Supprime le verrou de ce type, s'il existe. Retourne `true` s'il y en
+/// avait un. Ne doit jamais servir au verrou `password`.
+pub async fn delete_slot(pool: &SqlitePool, user_id: &str, kind: SlotKind) -> AppResult<bool> {
+    debug_assert!(kind != SlotKind::Password);
+
+    let result = sqlx::query("DELETE FROM user_key_slots WHERE user_id = ? AND kind = ?")
+        .bind(user_id)
+        .bind(kind.as_str())
+        .execute(pool)
+        .await
+        .map_err(|e| AppError::database(&e).with_detail(format!("Suppression du verrou : {e}")))?;
+
+    Ok(result.rows_affected() > 0)
+}
+
+/// Indique si le compte a un verrou de ce type.
+pub async fn has_slot(pool: &SqlitePool, user_id: &str, kind: SlotKind) -> AppResult<bool> {
+    let found: Option<i64> =
+        sqlx::query_scalar("SELECT 1 FROM user_key_slots WHERE user_id = ? AND kind = ?")
+            .bind(user_id)
+            .bind(kind.as_str())
+            .fetch_optional(pool)
+            .await
+            .map_err(|e| AppError::database(&e).with_detail(format!("Lecture du verrou : {e}")))?;
+
+    Ok(found.is_some())
 }
 
 #[derive(sqlx::FromRow)]
@@ -424,6 +458,40 @@ mod tests {
             .unwrap()
             .unwrap();
         assert_eq!(key.as_bytes(), keyring.account_key.as_bytes());
+    }
+
+    #[tokio::test]
+    async fn email_slot_opens_the_account_key_and_can_be_removed() {
+        let pool = pool_with_user("u1").await;
+        let keyring = build_keyring("u1", "motdepasse1", false).unwrap();
+        save_all(&pool, "u1", &keyring).await;
+
+        let secret = SecretKey::generate();
+        let slot = NewSlot::seal("u1", SlotKind::Email, secret.as_bytes(), &keyring.account_key)
+            .unwrap();
+        let mut conn = pool.acquire().await.unwrap();
+        replace_slot(&mut conn, "u1", &slot).await.unwrap();
+        drop(conn);
+
+        assert!(has_slot(&pool, "u1", SlotKind::Email).await.unwrap());
+
+        let key = unlock(&pool, "u1", SlotKind::Email, secret.as_bytes())
+            .await
+            .unwrap()
+            .unwrap()
+            .unwrap();
+        assert_eq!(key.as_bytes(), keyring.account_key.as_bytes());
+
+        // Un autre secret n'ouvre rien.
+        let other = SecretKey::generate();
+        assert!(matches!(
+            unlock(&pool, "u1", SlotKind::Email, other.as_bytes()).await.unwrap(),
+            Some(None)
+        ));
+
+        assert!(delete_slot(&pool, "u1", SlotKind::Email).await.unwrap());
+        assert!(!has_slot(&pool, "u1", SlotKind::Email).await.unwrap());
+        assert!(unlock(&pool, "u1", SlotKind::Email, secret.as_bytes()).await.unwrap().is_none());
     }
 
     #[tokio::test]

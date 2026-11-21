@@ -145,6 +145,53 @@ pub async fn regenerate_recovery_key(
         .map(|key| key.display())
 }
 
+/// Secret de récupération par e-mail, à envoyer au serveur puis à oublier.
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct EmailRecoverySecretResponse {
+    pub user_id: String,
+    pub secret: String,
+}
+
+/// Active (ou renouvelle) la récupération par e-mail. Le mot de passe est
+/// demandé ; le secret retourné n'est montré qu'à cet instant.
+#[tauri::command]
+pub async fn enable_email_recovery(
+    state: State<'_, AppState>,
+    input: LoginInput,
+) -> AppResult<EmailRecoverySecretResponse> {
+    let created =
+        auth_service::enable_email_recovery(&state, &input.username, &input.password).await?;
+
+    Ok(EmailRecoverySecretResponse {
+        user_id: created.user_id,
+        secret: created.secret.to_string(),
+    })
+}
+
+/// Désactive la récupération par e-mail du compte connecté.
+#[tauri::command]
+pub async fn disable_email_recovery(state: State<'_, AppState>) -> AppResult<()> {
+    auth_service::disable_email_recovery(&state).await
+}
+
+/// Indique si le compte connecté peut être récupéré par e-mail.
+#[tauri::command]
+pub async fn has_email_recovery(state: State<'_, AppState>) -> AppResult<bool> {
+    auth_service::has_email_recovery(&state).await
+}
+
+/// Mot de passe oublié, par e-mail : choisit un nouveau mot de passe avec
+/// les secrets rendus par le serveur après vérification du code.
+#[tauri::command]
+pub async fn recover_with_email(
+    state: State<'_, AppState>,
+    input: RecoverWithEmailInput,
+) -> AppResult<()> {
+    auth_service::recover_with_email(&state, &input.username, &input.secrets, &input.new_password)
+        .await
+}
+
 // ----------------------------------------------------------------------------
 // Types d'entrée pour les commandes
 // ----------------------------------------------------------------------------
@@ -167,6 +214,14 @@ pub struct LoginInput {
 pub struct RecoverAccountInput {
     pub username: String,
     pub recovery_key: String,
+    pub new_password: String,
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct RecoverWithEmailInput {
+    pub username: String,
+    pub secrets: Vec<String>,
     pub new_password: String,
 }
 
