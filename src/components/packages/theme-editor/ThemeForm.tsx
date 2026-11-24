@@ -1,3 +1,4 @@
+import { NumberStepper } from "@/components/common/NumberStepper";
 import { useMemo, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -449,22 +450,19 @@ export function ThemeForm({
             onOpenChange={(open) => setSectionOpen("shape", open)}
 >
             <CardContent className="space-y-3 px-6 py-6">
-              <div className="flex items-baseline justify-between">
+              <div className="flex items-center justify-between gap-3">
                 <Label htmlFor="theme-radius">{t("editor.shape.radius")}</Label>
-                <span className="text-sm tabular-nums text-muted-foreground">
-                  {t("editor.shape.value", { value: theme.radius })}
-                </span>
+                <NumberStepper
+                  id="theme-radius"
+                  value={theme.radius}
+                  min={RADIUS_MIN}
+                  max={RADIUS_MAX}
+                  step={RADIUS_STEP}
+                  format={(value) => t("editor.shape.value", { value })}
+                  onChange={(value) => value !== null && setTheme({ ...theme, radius: value })}
+                  valueClassName="w-24"
+                />
               </div>
-              <input
-                id="theme-radius"
-                type="range"
-                min={RADIUS_MIN}
-                max={RADIUS_MAX}
-                step={RADIUS_STEP}
-                value={theme.radius}
-                onChange={(e) => setTheme({ ...theme, radius: Number(e.target.value) })}
-                className="w-full accent-primary"
-              />
             </CardContent>
           </CollapsibleCard>
         </div>

@@ -114,6 +114,12 @@ impl AppState {
     /// Ferme la session : oublie l'utilisateur, efface la clé du compte et
     /// ferme les bases des projets ouverts.
     pub async fn close_session(&self) {
+        // Copies de travail des documents ouverts ailleurs (en clair) : elles
+        // ne survivent pas à la session. Les modifications ont été reprises
+        // avant (`auth_service::logout_user`).
+        if let Some(user) = self.current_user.lock().await.take() {
+            crate::services::document_service::remove_open_copies_of(&self.data_dir, &user.id);
+        }
         *self.current_user.lock().await = None;
         // La clé est effacée de la mémoire à sa destruction (`Zeroizing`).
         *self.account_key.lock().await = None;

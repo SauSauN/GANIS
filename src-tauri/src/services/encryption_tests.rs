@@ -36,14 +36,14 @@ async fn env() -> TestEnv {
 /// récupération depuis ses paramètres ; retourne cette clé. L'utilisateur
 /// est déconnecté à la fin.
 async fn register_alice(env: &TestEnv) -> String {
-    auth_service::setup_first_account(&env.state.app_db, "admin", "admin1234", None)
+    auth_service::setup_first_account(&env.state.app_db, "admin", "encre-grise-1234", None)
         .await
         .unwrap();
 
     let created = auth_service::register_user(
         &env.state.app_db,
         "alice",
-        "motdepasse1",
+        "plume-violette-1",
         Some("alice@exemple.fr"),
     )
     .await
@@ -55,8 +55,8 @@ async fn register_alice(env: &TestEnv) -> String {
         keyring_service::RECOVERY_KEY_ON_SIGNUP
     );
 
-    login(env, "alice", "motdepasse1").await;
-    let key = auth_service::regenerate_recovery_key(&env.state, "motdepasse1")
+    login(env, "alice", "plume-violette-1").await;
+    let key = auth_service::regenerate_recovery_key(&env.state, "plume-violette-1")
         .await
         .unwrap()
         .display();
@@ -145,7 +145,7 @@ async fn project_data_is_encrypted_on_disk_and_readable_after_login() {
     let env = env().await;
     register_alice(&env).await;
 
-    assert_eq!(login(&env, "alice", "motdepasse1").await, None);
+    assert_eq!(login(&env, "alice", "plume-violette-1").await, None);
 
     let id = create_project_with_text(&env, "Mon roman secret", "Le trésor est sous le chêne").await;
 
@@ -161,7 +161,7 @@ async fn project_data_is_encrypted_on_disk_and_readable_after_login() {
     // Une fois déconnecté, la clé n'est plus en mémoire.
     assert!(env.state.require_account_key().await.is_err());
 
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
 
     assert_eq!(read_text(&env, &id).await, "Le trésor est sous le chêne");
 
@@ -179,14 +179,14 @@ async fn project_data_is_encrypted_on_disk_and_readable_after_login() {
 async fn another_account_cannot_open_the_project() {
     let env = env().await;
     register_alice(&env).await;
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     let id = create_project_with_text(&env, "Projet", "Texte").await;
     auth_service::logout_user(&env.state).await.unwrap();
 
-    auth_service::register_user(&env.state.app_db, "bob", "motdepasse2", None)
+    auth_service::register_user(&env.state.app_db, "bob", "plume-violette-2", None)
         .await
         .unwrap();
-    login(&env, "bob", "motdepasse2").await;
+    login(&env, "bob", "plume-violette-2").await;
 
     let bob = env.state.require_user().await.unwrap();
     assert!(project_storage::pool_for_user(&env.state, &id, &bob.id).await.is_err());
@@ -207,41 +207,41 @@ async fn forgotten_password_is_recovered_with_the_recovery_key() {
     let env = env().await;
     let recovery_key = register_alice(&env).await;
 
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     let id = create_project_with_text(&env, "Projet", "Rien n'est perdu").await;
     auth_service::logout_user(&env.state).await.unwrap();
 
     // Mauvaise clé : refus.
     let wrong = "000000-000000-000000-000000-000000-000000";
-    assert!(auth_service::recover_account(&env.state, "alice", wrong, "nouveau123")
+    assert!(auth_service::recover_account(&env.state, "alice", wrong, "encre-sepia-123")
         .await
         .is_err());
 
     // Compte inconnu : même refus.
-    assert!(auth_service::recover_account(&env.state, "inconnu", &recovery_key, "nouveau123")
+    assert!(auth_service::recover_account(&env.state, "inconnu", &recovery_key, "encre-sepia-123")
         .await
         .is_err());
 
     // Bonne clé, saisie en minuscules et sans tirets.
     let typed = recovery_key.replace('-', " ").to_lowercase();
-    auth_service::recover_account(&env.state, "alice", &typed, "nouveau123")
+    auth_service::recover_account(&env.state, "alice", &typed, "encre-sepia-123")
         .await
         .unwrap();
 
     // L'ancien mot de passe ne fonctionne plus, le nouveau oui.
-    assert!(auth_service::login_user(&env.state, "alice", "motdepasse1")
+    assert!(auth_service::login_user(&env.state, "alice", "plume-violette-1")
         .await
         .is_err());
-    login(&env, "alice", "nouveau123").await;
+    login(&env, "alice", "encre-sepia-123").await;
 
     assert_eq!(read_text(&env, &id).await, "Rien n'est perdu");
 
     // La clé de récupération reste valable.
     auth_service::logout_user(&env.state).await.unwrap();
-    auth_service::recover_account(&env.state, "alice", &recovery_key, "encore123")
+    auth_service::recover_account(&env.state, "alice", &recovery_key, "encre-noire-123")
         .await
         .unwrap();
-    login(&env, "alice", "encore123").await;
+    login(&env, "alice", "encre-noire-123").await;
     assert_eq!(read_text(&env, &id).await, "Rien n'est perdu");
 }
 
@@ -250,25 +250,25 @@ async fn changing_password_keeps_projects_and_recovery_key() {
     let env = env().await;
     let recovery_key = register_alice(&env).await;
 
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     let id = create_project_with_text(&env, "Projet", "Toujours là").await;
 
-    assert!(auth_service::change_password(&env.state, "faux12345", "nouveau123")
+    assert!(auth_service::change_password(&env.state, "faux12345", "encre-sepia-123")
         .await
         .is_err());
-    auth_service::change_password(&env.state, "motdepasse1", "nouveau123")
+    auth_service::change_password(&env.state, "plume-violette-1", "encre-sepia-123")
         .await
         .unwrap();
     auth_service::logout_user(&env.state).await.unwrap();
 
-    login(&env, "alice", "nouveau123").await;
+    login(&env, "alice", "encre-sepia-123").await;
     assert_eq!(read_text(&env, &id).await, "Toujours là");
     auth_service::logout_user(&env.state).await.unwrap();
 
-    auth_service::recover_account(&env.state, "alice", &recovery_key, "autre1234")
+    auth_service::recover_account(&env.state, "alice", &recovery_key, "encre-bleue-1234")
         .await
         .unwrap();
-    login(&env, "alice", "autre1234").await;
+    login(&env, "alice", "encre-bleue-1234").await;
     assert_eq!(read_text(&env, &id).await, "Toujours là");
 }
 
@@ -276,14 +276,14 @@ async fn changing_password_keeps_projects_and_recovery_key() {
 async fn regenerated_recovery_key_replaces_the_old_one() {
     let env = env().await;
     let old_key = register_alice(&env).await;
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     let id = create_project_with_text(&env, "Projet", "Contenu").await;
 
     assert!(auth_service::regenerate_recovery_key(&env.state, "mauvais123")
         .await
         .is_err());
 
-    let new_key = auth_service::regenerate_recovery_key(&env.state, "motdepasse1")
+    let new_key = auth_service::regenerate_recovery_key(&env.state, "plume-violette-1")
         .await
         .unwrap()
         .display();
@@ -291,14 +291,14 @@ async fn regenerated_recovery_key_replaces_the_old_one() {
 
     auth_service::logout_user(&env.state).await.unwrap();
 
-    assert!(auth_service::recover_account(&env.state, "alice", &old_key, "nouveau123")
+    assert!(auth_service::recover_account(&env.state, "alice", &old_key, "encre-sepia-123")
         .await
         .is_err());
-    auth_service::recover_account(&env.state, "alice", &new_key, "nouveau123")
+    auth_service::recover_account(&env.state, "alice", &new_key, "encre-sepia-123")
         .await
         .unwrap();
 
-    login(&env, "alice", "nouveau123").await;
+    login(&env, "alice", "encre-sepia-123").await;
     assert_eq!(read_text(&env, &id).await, "Contenu");
 }
 
@@ -306,7 +306,7 @@ async fn regenerated_recovery_key_replaces_the_old_one() {
 async fn duplicated_project_has_its_own_key() {
     let env = env().await;
     register_alice(&env).await;
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     let id = create_project_with_text(&env, "Original", "Texte copié").await;
 
     let (user, key) = env.state.require_session().await.unwrap();
@@ -366,7 +366,7 @@ async fn insert_legacy_project(env: &TestEnv, owner_id: &str, name: &str, text: 
 async fn legacy_account_and_projects_are_encrypted_at_first_login() {
     let env = env().await;
 
-    auth_service::setup_first_account(&env.state.app_db, "admin", "admin1234", None)
+    auth_service::setup_first_account(&env.state.app_db, "admin", "encre-grise-1234", None)
         .await
         .unwrap();
 
@@ -374,7 +374,7 @@ async fn legacy_account_and_projects_are_encrypted_at_first_login() {
     let legacy = auth_service::create_account_without_keyring(
         &env.state.app_db,
         "ancien",
-        "motdepasse1",
+        "plume-violette-1",
         Some("ancien@exemple.fr"),
         Role::User,
     )
@@ -382,11 +382,20 @@ async fn legacy_account_and_projects_are_encrypted_at_first_login() {
     .unwrap();
 
     let id = insert_legacy_project(&env, &legacy.id, "Vieux projet", "Écrit avant").await;
-    assert!(app_db_contains(&env, "ancien@exemple.fr"));
+
+    // E-mail en clair dans sa colonne ; le fichier `app.db`, lui, est déjà
+    // chiffré par la clé d'appareil.
+    let stored: Option<String> = sqlx::query_scalar("SELECT email FROM users WHERE id = ?")
+        .bind(&legacy.id)
+        .fetch_one(&env.state.app_db)
+        .await
+        .unwrap();
+    assert_eq!(stored.as_deref(), Some("ancien@exemple.fr"));
+    assert!(!app_db_contains(&env, "ancien@exemple.fr"));
 
     // Première connexion : le trousseau est créé. La clé de récupération
     // n'est donnée (une seule fois) que si l'option est activée.
-    let given = login(&env, "ancien", "motdepasse1").await;
+    let given = login(&env, "ancien", "plume-violette-1").await;
     assert_eq!(given.is_some(), keyring_service::RECOVERY_KEY_ON_SIGNUP);
     auth_service::logout_user(&env.state).await.unwrap();
 
@@ -416,7 +425,7 @@ async fn legacy_account_and_projects_are_encrypted_at_first_login() {
     assert!(!app_db_contains(&env, "Vieux projet"));
 
     // Connexion suivante : plus de clé à montrer, données intactes.
-    assert_eq!(login(&env, "ancien", "motdepasse1").await, None);
+    assert_eq!(login(&env, "ancien", "plume-violette-1").await, None);
     assert_eq!(read_text(&env, &id).await, "Écrit avant");
 
     let (user, key) = env.state.require_session().await.unwrap();
@@ -429,15 +438,15 @@ async fn legacy_account_and_projects_are_encrypted_at_first_login() {
     assert_eq!(project.description, "Ancienne description");
 
     // Une clé de récupération créée ensuite fonctionne pour ce compte.
-    let recovery_key = auth_service::regenerate_recovery_key(&env.state, "motdepasse1")
+    let recovery_key = auth_service::regenerate_recovery_key(&env.state, "plume-violette-1")
         .await
         .unwrap()
         .display();
     auth_service::logout_user(&env.state).await.unwrap();
-    auth_service::recover_account(&env.state, "ancien", &recovery_key, "nouveau123")
+    auth_service::recover_account(&env.state, "ancien", &recovery_key, "encre-sepia-123")
         .await
         .unwrap();
-    login(&env, "ancien", "nouveau123").await;
+    login(&env, "ancien", "encre-sepia-123").await;
     assert_eq!(read_text(&env, &id).await, "Écrit avant");
 }
 
@@ -445,7 +454,7 @@ async fn legacy_account_and_projects_are_encrypted_at_first_login() {
 async fn interrupted_encryption_is_completed() {
     let env = env().await;
     register_alice(&env).await;
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     let user = env.state.require_user().await.unwrap();
     let id = create_project_with_text(&env, "Projet", "Survit à la panne").await;
 
@@ -476,11 +485,11 @@ async fn recovery_attempts_are_limited() {
     let wrong = "000000-000000-000000-000000-000000-000000";
 
     for _ in 0..5 {
-        let _ = auth_service::recover_account(&env.state, "alice", wrong, "nouveau123").await;
+        let _ = auth_service::recover_account(&env.state, "alice", wrong, "encre-sepia-123").await;
     }
 
     // Bloqué, même avec la bonne clé.
-    let error = auth_service::recover_account(&env.state, "alice", &recovery_key, "nouveau123")
+    let error = auth_service::recover_account(&env.state, "alice", &recovery_key, "encre-sepia-123")
         .await
         .unwrap_err();
     assert_eq!(error.code, crate::error::ErrorCode::Forbidden);
@@ -490,10 +499,10 @@ async fn recovery_attempts_are_limited() {
 async fn account_without_recovery_key_cannot_be_recovered() {
     let env = env().await;
 
-    auth_service::setup_first_account(&env.state.app_db, "admin", "admin1234", None)
+    auth_service::setup_first_account(&env.state.app_db, "admin", "encre-grise-1234", None)
         .await
         .unwrap();
-    auth_service::register_user(&env.state.app_db, "bob", "motdepasse2", None)
+    auth_service::register_user(&env.state.app_db, "bob", "plume-violette-2", None)
         .await
         .unwrap();
 
@@ -503,19 +512,19 @@ async fn account_without_recovery_key_cannot_be_recovered() {
 
     // Aucune clé n'existe : toute clé est refusée, avec le message habituel.
     let any_key = crate::security::recovery_key::RecoveryKey::generate().display();
-    let error = auth_service::recover_account(&env.state, "bob", &any_key, "nouveau123")
+    let error = auth_service::recover_account(&env.state, "bob", &any_key, "encre-sepia-123")
         .await
         .unwrap_err();
     assert_eq!(error.key, Some("recovery.invalid"));
 
     // Le mot de passe d'origine fonctionne toujours.
-    assert_eq!(login(&env, "bob", "motdepasse2").await, None);
+    assert_eq!(login(&env, "bob", "plume-violette-2").await, None);
 }
 #[tokio::test]
 async fn an_unreadable_project_does_not_hide_the_others() {
     let env = env().await;
     register_alice(&env).await;
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     let damaged = create_project_with_text(&env, "Abîmé", "Texte").await;
     create_project_with_text(&env, "Intact", "Texte").await;
 
@@ -540,7 +549,7 @@ async fn ganix_export_then_import_gives_a_new_encrypted_project() {
 
     let env = env().await;
     register_alice(&env).await;
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     let id = create_project_with_text(&env, "Exporté", "Texte voyageur").await;
 
     // Export : fichier lisible par tout GANIS, donc non chiffré.
@@ -572,7 +581,7 @@ async fn ganix_export_then_import_gives_a_new_encrypted_project() {
     )
     .await
     .unwrap();
-    assert!(outcome.backup_file.is_none());
+    assert!(outcome.backup.is_none());
     let copy = outcome.project;
     assert_ne!(copy.id, id);
     assert_eq!(copy.name, "Exporté (importé)");
@@ -623,14 +632,19 @@ async fn ganix_export_then_import_gives_a_new_encrypted_project() {
     assert_eq!(read_text(&env, &id).await, "Texte voyageur");
     assert!(!project_db::is_plaintext_sqlite(&db_path(&env, &id)));
 
-    // La sauvegarde contient l'état d'avant le remplacement.
-    let backup = ganix_service::backup_dir(&env.dir).join(outcome.backup_file.unwrap());
-    assert!(backup.to_string_lossy().contains("Renommé - avant import"));
-    let preview = ganix_service::stage_import(&env.dir, &env.state.app_db, &user.id, &backup)
-        .await
-        .unwrap();
-    assert_eq!(preview.name, "Renommé");
-    ganix_service::cancel_import(&env.dir, &preview.staging_id).unwrap();
+    // La sauvegarde est une copie chiffrée de l'état d'avant, dans la
+    // corbeille des projets ; aucun .ganix en clair n'est écrit.
+    let backup_id = outcome.backup.unwrap().id;
+    assert!(!ganix_service::legacy_backup_dir(&env.dir).exists());
+    assert!(!project_db::is_plaintext_sqlite(&db_path(&env, &backup_id)));
+
+    let viewer = crate::state::Viewer::Account { user_id: user.id.clone(), key: key.clone() };
+    let trash = project_service::list_trash_for_viewer(&env.state.app_db, &viewer).await.unwrap();
+    let backup = trash.iter().find(|p| p.id == backup_id).expect("sauvegarde dans la corbeille");
+    assert!(backup.name.starts_with("Renommé (avant import du "));
+
+    project_service::restore_for_viewer(&env.state.app_db, &backup_id, &viewer).await.unwrap();
+    assert_eq!(read_text(&env, &backup_id).await, "Modifié depuis");
 
     // Aucun dossier de travail laissé à côté des projets.
     let leftovers: Vec<_> = std::fs::read_dir(env.dir.join("projets"))
@@ -735,7 +749,7 @@ async fn private_projects_stay_hidden_from_guests_and_public_ones_are_shared() {
 
     let public_id = create_public_project_with_text(&env, "Commun", "Texte public").await;
 
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     let private_id = create_project_with_text(&env, "Secret d'Alice", "Texte privé").await;
 
     // Connectée : Alice voit son projet privé et le projet public.
@@ -772,18 +786,18 @@ async fn public_project_can_become_private_and_back() {
 
     let id = create_public_project_with_text(&env, "À adopter", "Contenu conservé").await;
 
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     let (user, key) = env.state.require_session().await.unwrap();
 
     // Public → privé : rattaché à Alice, nom chiffré, données intactes.
     // Sans le nom retapé, rien ne change : le projet reste public.
     let refused = project_service::set_visibility(
-        &env.state.app_db, &id, &user.id, &key, ProjectVisibility::Private, None,
+        &env.state.app_db, &id, &user.id, &key, ProjectVisibility::Private, None, None,
     )
     .await;
     assert!(refused.is_err());
     let refused = project_service::set_visibility(
-        &env.state.app_db, &id, &user.id, &key, ProjectVisibility::Private, Some("autre nom"),
+        &env.state.app_db, &id, &user.id, &key, ProjectVisibility::Private, Some("autre nom"), None,
     )
     .await;
     assert!(refused.is_err());
@@ -794,7 +808,7 @@ async fn public_project_can_become_private_and_back() {
         .is_public());
 
     let private = project_service::set_visibility(
-        &env.state.app_db, &id, &user.id, &key, ProjectVisibility::Private, Some("  à ADOPTER "),
+        &env.state.app_db, &id, &user.id, &key, ProjectVisibility::Private, Some("  à ADOPTER "), None,
     )
     .await
     .unwrap();
@@ -807,9 +821,9 @@ async fn public_project_can_become_private_and_back() {
     assert!(read_text_as_viewer(&env, &id).await.is_none());
 
     // Privé → public : de nouveau ouvrable sans connexion.
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     let (user, key) = env.state.require_session().await.unwrap();
-    project_service::set_visibility(&env.state.app_db, &id, &user.id, &key, ProjectVisibility::Public, None)
+    project_service::set_visibility(&env.state.app_db, &id, &user.id, &key, ProjectVisibility::Public, None, None)
         .await
         .unwrap();
     auth_service::logout_user(&env.state).await.unwrap();
@@ -817,11 +831,70 @@ async fn public_project_can_become_private_and_back() {
     assert_eq!(read_text_as_viewer(&env, &id).await.as_deref(), Some("Contenu conservé"));
 }
 #[tokio::test]
+async fn public_project_made_private_gets_a_new_key() {
+    let env = env().await;
+    register_alice(&env).await;
+
+    let id = create_public_project_with_text(&env, "Secret partagé", "Texte à protéger").await;
+
+    // Clé publique, telle qu'une ancienne copie de `app.db` la contient.
+    let stored = project_service::find_stored_for_viewer(&env.state.app_db, &id, &env.state.viewer().await)
+        .await
+        .unwrap()
+        .unwrap();
+    let old_key = crate::security::crypto::SecretKey::from_base64(stored.public_key.as_deref().unwrap()).unwrap();
+    assert!(project_db::opens_with_key(&db_path(&env, &id), &old_key).await);
+
+    login(&env, "alice", "plume-violette-1").await;
+
+    // Sans le nom retapé : refusé, la base garde sa clé.
+    assert!(project_storage::change_visibility(&env.state, &id, ProjectVisibility::Private, None)
+        .await
+        .is_err());
+    assert!(project_db::opens_with_key(&db_path(&env, &id), &old_key).await);
+
+    let private = project_storage::change_visibility(
+        &env.state,
+        &id,
+        ProjectVisibility::Private,
+        Some("secret partagé"),
+    )
+    .await
+    .unwrap();
+    assert!(!private.is_public());
+
+    // L'ancienne clé n'ouvre plus rien ; les données sont intactes.
+    assert!(!project_db::opens_with_key(&db_path(&env, &id), &old_key).await);
+    assert!(!db_path(&env, &id).with_file_name("project.db.rekeying").exists());
+    env.state.close_project_pools().await;
+    assert_eq!(read_text(&env, &id).await, "Texte à protéger");
+}
+
+#[tokio::test]
+async fn interrupted_rekey_is_finished_or_dropped() {
+    let env = env().await;
+    register_alice(&env).await;
+    login(&env, "alice", "plume-violette-1").await;
+
+    let id = create_project_with_text(&env, "Projet", "Contenu").await;
+    let dir = project_storage::project_dir(&env.state, &id).unwrap();
+
+    // Copie abandonnée (clé jamais enregistrée) : supprimée, base intacte.
+    let stray = crate::security::crypto::SecretKey::generate();
+    let pool = project_storage::pool_for_request(&env.state, &id).await.unwrap();
+    project_db::export_encrypted(&pool, &dir.join("project.db.rekeying"), &stray).await.unwrap();
+    env.state.close_project_pools().await;
+
+    assert_eq!(read_text(&env, &id).await, "Contenu");
+    assert!(!dir.join("project.db.rekeying").exists());
+}
+
+#[tokio::test]
 async fn deleted_project_goes_to_trash_then_can_be_restored_or_purged() {
     let env = env().await;
     register_alice(&env).await;
 
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     let kept = create_project_with_text(&env, "À restaurer", "Texte gardé").await;
     let gone = create_project_with_text(&env, "À effacer", "Texte effacé").await;
     let viewer = env.state.viewer().await;
@@ -923,7 +996,7 @@ async fn user_can_delete_own_account_with_projects() {
     let env = env().await;
     register_alice(&env).await;
 
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     let kept = create_project_with_text(&env, "Projet d'Alice", "Texte").await;
     let trashed = create_project_with_text(&env, "Dans la corbeille", "Texte").await;
     let viewer = env.state.viewer().await;
@@ -933,7 +1006,7 @@ async fn user_can_delete_own_account_with_projects() {
     assert!(auth_service::delete_own_account(&env.state, "mauvais1").await.is_err());
     assert!(env.state.current_user().await.is_some());
 
-    let ids = auth_service::delete_own_account(&env.state, "motdepasse1").await.unwrap();
+    let ids = auth_service::delete_own_account(&env.state, "plume-violette-1").await.unwrap();
     assert_eq!(ids.len(), 2);
     assert!(ids.contains(&kept) && ids.contains(&trashed));
     assert!(env.state.current_user().await.is_none());
@@ -944,7 +1017,7 @@ async fn user_can_delete_own_account_with_projects() {
     }
 
     // Le compte n'existe plus : connexion impossible.
-    assert!(auth_service::login_user(&env.state, "alice", "motdepasse1").await.is_err());
+    assert!(auth_service::login_user(&env.state, "alice", "plume-violette-1").await.is_err());
 }
 
 #[tokio::test]
@@ -953,12 +1026,12 @@ async fn email_recovery_keeps_the_projects() {
     register_alice(&env).await;
 
     // Activée juste après l'inscription, sans session (mot de passe vérifié).
-    let escrow = auth_service::enable_email_recovery(&env.state, "alice", "motdepasse1")
+    let escrow = auth_service::enable_email_recovery(&env.state, "alice", "plume-violette-1")
         .await
         .unwrap();
     assert!(auth_service::enable_email_recovery(&env.state, "alice", "mauvais123").await.is_err());
 
-    login(&env, "alice", "motdepasse1").await;
+    login(&env, "alice", "plume-violette-1").await;
     assert!(auth_service::has_email_recovery(&env.state).await.unwrap());
     let id = create_project_with_text(&env, "Projet", "Gardé par e-mail").await;
     auth_service::logout_user(&env.state).await.unwrap();
@@ -967,26 +1040,26 @@ async fn email_recovery_keeps_the_projects() {
     let other = crate::security::crypto::SecretKey::generate().to_base64().to_string();
     let secrets = vec![other.clone(), escrow.secret.to_string()];
 
-    auth_service::recover_with_email(&env.state, "alice", &secrets, "nouveau123")
+    auth_service::recover_with_email(&env.state, "alice", &secrets, "encre-sepia-123")
         .await
         .unwrap();
-    login(&env, "alice", "nouveau123").await;
+    login(&env, "alice", "encre-sepia-123").await;
     assert_eq!(read_text(&env, &id).await, "Gardé par e-mail");
 
     // Désactivée : le secret du serveur n'ouvre plus rien.
     auth_service::disable_email_recovery(&env.state).await.unwrap();
     auth_service::logout_user(&env.state).await.unwrap();
-    let error = auth_service::recover_with_email(&env.state, "alice", &secrets, "encore123")
+    let error = auth_service::recover_with_email(&env.state, "alice", &secrets, "encre-noire-123")
         .await
         .unwrap_err();
     assert_eq!(error.key, Some("emailRecovery.invalid"));
 
     // Mauvais secrets seulement : refusé, mot de passe inchangé.
-    let error = auth_service::recover_with_email(&env.state, "alice", &[other], "encore123")
+    let error = auth_service::recover_with_email(&env.state, "alice", &[other], "encre-noire-123")
         .await
         .unwrap_err();
     assert_eq!(error.key, Some("emailRecovery.invalid"));
-    login(&env, "alice", "nouveau123").await;
+    login(&env, "alice", "encre-sepia-123").await;
 }
 
 #[tokio::test]
@@ -994,13 +1067,13 @@ async fn first_account_is_a_plain_user_and_anyone_can_register() {
     let env = env().await;
 
     // Inscription possible sans configuration préalable : pas d'administrateur.
-    let created = auth_service::register_user(&env.state.app_db, "bea", "motdepasse1", None)
+    let created = auth_service::register_user(&env.state.app_db, "bea", "plume-violette-1", None)
         .await
         .unwrap();
     assert_eq!(created.user.role, Role::User);
 
     // Le premier compte n'est plus possible une fois un compte créé.
-    assert!(auth_service::setup_first_account(&env.state.app_db, "autre", "motdepasse1", None)
+    assert!(auth_service::setup_first_account(&env.state.app_db, "autre", "plume-violette-1", None)
         .await
         .is_err());
 }

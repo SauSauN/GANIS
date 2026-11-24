@@ -139,5 +139,10 @@
     "moving_other": "Moving {{count}} documents…",
     "moved_one": "{{count}} document moved to “{{target}}”.",
     "moved_other": "{{count}} documents moved to “{{target}}”."
+  },
+  "received": {
+    "title": "Document from an imported project",
+    "description": "\"{{name}}\" came with an imported project (.ganix). A document from someone else may be booby-trapped: only open it if you trust the person who sent it.\n\nWindows will open it like a downloaded file (Office Protected View, macros blocked).",
+    "confirm": "Open anyway"
   }
 }

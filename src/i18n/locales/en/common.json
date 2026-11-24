@@ -33,11 +33,12 @@
     "usernameTooShort": "Username must be at least 3 characters long.",
     "usernameTooLong": "Username must not exceed 50 characters.",
     "usernameInvalidChars": "Username can only contain letters, digits, hyphens and underscores.",
-    "passwordTooShort": "Password must be at least 8 characters long.",
+    "passwordTooShort": "Password must be at least 12 characters long.",
     "passwordTooLong": "Password must not exceed 128 characters.",
     "passwordNeedsLetterAndDigit": "Password must contain at least one letter and one digit.",
     "passwordMismatch": "The two passwords do not match.",
-    "emailInvalid": "This email address is not valid."
+    "emailInvalid": "This email address is not valid.",
+    "passwordWeak": "This password is too easy to guess: avoid common words (\"password\", \"qwerty\"…) and your username."
   },
   "image": {
     "removeTitle": "Remove this image?",
@@ -94,7 +95,7 @@
     "chooseUsername": "E.g. nelly_writer (at least 3 characters)",
     "password": "Your password",
     "currentPassword": "Your current password",
-    "newPassword": "At least 8 characters",
+    "newPassword": "At least 12 characters",
     "confirmPassword": "Type the same password again",
     "email": "E.g. name@example.com",
     "projectName": "E.g. The Moon Rose",
@@ -147,5 +148,12 @@
   "password": {
     "show": "Show password",
     "hide": "Hide password"
+  },
+  "confirm": {
+    "dontAskAgain": "Don't ask again on this computer"
+  },
+  "stepper": {
+    "decrease": "Decrease",
+    "increase": "Increase"
   }
 }

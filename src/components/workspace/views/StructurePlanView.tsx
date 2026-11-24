@@ -1,3 +1,4 @@
+import { NumberStepper } from "@/components/common/NumberStepper";
 import {
   useCallback,
   useEffect,
@@ -18,12 +19,12 @@ import {
   IdCard,
   ListOrdered,
   ListTree,
-  Loader2,
   Pencil,
   Plus,
   Settings2,
   Trash2,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -395,7 +396,7 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
     return (
       <Shell feature={feature}>
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <LoadingDots className="h-4 w-4" />
           {t("plan.loading")}
         </p>
       </Shell>
@@ -700,14 +701,14 @@ export function StructurePlanView({ project, feature, onOpenFeature }: Structure
                       levelOf(levels, node.level)?.numbering !== "none" && (
                         <div className="max-w-40 space-y-1.5">
                           <Label htmlFor={`node-number-${node.id}`}>{t("plan.edit.number")}</Label>
-                          <Input
+                          <NumberStepper
                             id={`node-number-${node.id}`}
                             placeholder={t("common:placeholders.number")}
-                            type="number"
+                            value={draft.number.trim() === "" || !Number.isFinite(Number(draft.number)) ? null : Number(draft.number)}
                             min={0}
                             max={MAX_NUMBER}
-                            value={draft.number}
-                            onChange={(e) => setDraft({ ...draft, number: e.target.value })}
+                            allowEmpty
+                            onChange={(value) => setDraft({ ...draft, number: value === null ? "" : String(Math.trunc(value)) })}
                           />
                         </div>
                       )}

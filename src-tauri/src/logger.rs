@@ -30,8 +30,15 @@ pub fn init(log_dir: &Path) -> Result<LogGuard, String> {
     // Console uniquement en développement
     let console_layer = cfg!(debug_assertions).then(|| fmt::layer().with_target(false));
 
+    // Requêtes SQL jamais journalisées : le texte d'une requête peut
+    // contenir une clé de chiffrement (`PRAGMA key = x'…'`, `ATTACH … KEY`)
+    // ou des données de l'utilisateur.
+    let filter = tracing_subscriber::filter::Targets::new()
+        .with_default(level)
+        .with_target("sqlx::query", LevelFilter::OFF);
+
     tracing_subscriber::registry()
-        .with(level)
+        .with(filter)
         .with(file_layer)
         .with(console_layer)
         .try_init()

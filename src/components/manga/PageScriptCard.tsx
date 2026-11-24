@@ -10,11 +10,11 @@ import {
   ChevronUp,
   Copy,
   LayoutPanelTop,
-  Loader2,
   Plus,
   Trash2,
   X,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { InfoTip } from "@/components/common/InfoTip";
 import { ActionMenu, type MenuItem } from "@/components/documents/ActionMenu";
 import { Button } from "@/components/ui/button";
@@ -104,7 +104,7 @@ export function PageScriptCard({ draft, failed, onChange, characters, locations,
         </p>
       ) : !draft || !stats ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          <LoadingDots className="size-4" aria-hidden="true" />
           {t("page.loading")}
         </p>
       ) : (
@@ -600,7 +600,7 @@ function MovePanelDialog({
               }
             }}
           >
-            {busy ? <Loader2 className="animate-spin" /> : <ArrowRightLeft />}
+            {busy ? <LoadingDots /> : <ArrowRightLeft />}
             {t("panel.moveToConfirm")}
           </Button>
         </DialogFooter>

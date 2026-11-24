@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CharactersEmptyState } from "@/components/characters/CharactersEmptyState";
 import { SEGMENTED_GROUP, SEGMENTED_ITEM, SEGMENTED_ON } from "@/components/common/segmented";
 import { useTranslation } from "react-i18next";
 import {
@@ -7,7 +8,6 @@ import {
   ExternalLink,
   Grid3x3,
   List,
-  Loader2,
   Maximize2,
   Minimize2,
   Network,
@@ -15,9 +15,9 @@ import {
   RotateCcw,
   Search,
   SlidersHorizontal,
-  UserPlus,
   X,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { CharacterAvatar } from "@/components/characters/CharacterAvatar";
@@ -411,18 +411,17 @@ export function RelationsView({ projectId, feature, onOpenFeature }: RelationsVi
             </div>
           ) : (
             <p className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" />
+              <LoadingDots className="size-4" />
               {t("view.loading")}
             </p>
           )}
         </div>
       ) : characters.length < 2 ? (
-        <div className="m-6 max-w-xl rounded-xl border bg-card p-6">
-          <p className="text-muted-foreground">{t("view.noCharacters")}</p>
-          <Button className="mt-4" size="lg" onClick={() => onOpenFeature("characters.create")}>
-            <UserPlus />
-            {t("view.createCharacter")}
-          </Button>
+        // Même écran vide que la liste des personnages (cadre en tirets, bouton pour en créer).
+        <div className="min-h-0 flex-1 overflow-y-auto [scrollbar-gutter:stable]">
+          <div className="mx-auto w-full max-w-5xl px-6 py-8 lg:px-10">
+            <CharactersEmptyState message={t("view.noCharacters")} onCreate={() => onOpenFeature("characters.create")} />
+          </div>
         </div>
       ) : (
         <div className="relative min-h-0 flex-1">

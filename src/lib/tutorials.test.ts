@@ -54,12 +54,14 @@ describe("registre", () => {
   it("le mode de démarrage suit le type de projet", () => {
     expect(tutorialForProject("novel")).toBe("novel");
     expect(tutorialForProject("manga")).toBe("manga");
-    for (const type of ["film", "series", "game", "rpg", "custom"]) expect(tutorialForProject(type)).toBe("story");
+    expect(tutorialForProject("film")).toBe("film");
+    for (const type of ["series", "game", "rpg", "custom"]) expect(tutorialForProject(type)).toBe("story");
   });
 
   it("les modules du roman et du manga mènent à leur mode de démarrage", () => {
     expect(tutorialForModule("manuscript")).toBe("novel");
     expect(tutorialForModule("script")).toBe("manga");
+    expect(tutorialForModule("film")).toBe("film");
     expect(tutorialForModule("items")).toBe("items");
     expect(tutorialForModule("species")).toBe("species");
     expect(tutorialForModule("search")).toBeNull();

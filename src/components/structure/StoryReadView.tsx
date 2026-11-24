@@ -1,7 +1,8 @@
 import { doubleClickHint } from "@/lib/doubleClick";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { BookOpenText, FileText, ListTree, Loader2, PanelLeftClose, PanelLeftOpen, PenLine, RefreshCw, Waypoints } from "lucide-react";
+import { BookOpenText, FileText, ListTree, PanelLeftClose, PanelLeftOpen, PenLine, RefreshCw, Waypoints } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { ExportMenu } from "@/components/novel/ExportMenu";
 import { useManuscript } from "@/components/novel/useManuscript";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
@@ -121,7 +122,7 @@ export function StoryReadView({ project, feature, onOpenFeature }: StoryReadView
   if (!structure || !manuscript.ready) {
     return (
       <main className="flex min-h-0 flex-1 items-center justify-center text-sm text-muted-foreground" role="status">
-        <Loader2 className="mr-2 size-4 animate-spin" aria-hidden="true" />
+        <LoadingDots className="mr-2 size-4" aria-hidden="true" />
         {t("reading.loading")}
       </main>
     );
@@ -141,7 +142,7 @@ export function StoryReadView({ project, feature, onOpenFeature }: StoryReadView
         <div className="ml-auto flex items-center gap-2">
           {manuscript.loading && (
             <span className="flex items-center gap-1.5 text-xs text-muted-foreground" role="status">
-              <Loader2 className="size-3.5 animate-spin" />
+              <LoadingDots className="size-3.5" />
               {t("reading.loadingDocuments")}
             </span>
           )}

@@ -47,6 +47,16 @@ describe("documents", () => {
     expect(canOpenExternally("sans-extension")).toBe(false);
   });
 
+  it("only opens known document types (allow list)", () => {
+    expect(canOpenExternally("planche.clip")).toBe(true);
+    expect(canOpenExternally("Scène.FDX")).toBe(true);
+    expect(canOpenExternally("aide.chm")).toBe(false);
+    expect(canOpenExternally("disque.iso")).toBe(false);
+    expect(canOpenExternally("macro.docm")).toBe(false);
+    expect(canOpenExternally("page.html")).toBe(false);
+    expect(canOpenExternally("dessin.svg")).toBe(false);
+  });
+
   it("reorders and keeps the pages of a chapter", () => {
     expect(moveInList(["a", "b", "c"], 0, 1)).toEqual(["b", "a", "c"]);
     expect(moveInList(["a", "b", "c"], 2, -2)).toEqual(["c", "a", "b"]);

@@ -1,4 +1,5 @@
-import { Loader2, Save } from "lucide-react";
+import { Save } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { useTranslation } from "react-i18next";
 import { Button } from "@/components/ui/button";
 
@@ -17,12 +18,12 @@ interface SaveButtonProps {
 
 /**
  * Bouton « Enregistrer » de largeur stable : pendant l'enregistrement, le
- * libellé ne change pas (seule l'icône tourne), pour que rien ne bouge
+ * libellé ne change pas (seule l'icône devient trois points qui rebondissent), pour que rien ne bouge
  * autour. Le résultat est annoncé par une notification (`notify.ts`).
  */
 export function SaveButton({ saving, disabled, onClick, type = "button", size = "sm", className, label, variant }: SaveButtonProps) {
   const { t } = useTranslation("common");
-  const Icon = saving ? Loader2 : Save;
+  const Icon = saving ? LoadingDots : Save;
 
   return (
     <Button
@@ -34,7 +35,7 @@ export function SaveButton({ saving, disabled, onClick, type = "button", size = 
       disabled={saving || disabled}
       aria-busy={saving || undefined}
     >
-      <Icon className={saving ? "mr-1.5 size-4 animate-spin" : "mr-1.5 size-4"} aria-hidden="true" />
+      <Icon className="mr-1.5 size-4" aria-hidden="true" />
       {label ?? t("actions.save")}
     </Button>
   );

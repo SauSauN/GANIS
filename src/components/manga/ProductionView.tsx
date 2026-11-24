@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { ListTree, Loader2, ScrollText } from "lucide-react";
+import { ListTree, ScrollText } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { SelectionBar, SelectionCheckbox } from "@/components/common/SelectionBar";
 import { StageLegend, StageSelect, useExtraName } from "@/components/manga/ProductionParts";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
@@ -133,7 +134,7 @@ export function ProductionView({ project, feature, onOpenFeature }: ProductionVi
   if (!structure || (extras === null && !extrasError)) {
     return (
       <main className="flex min-h-0 flex-1 items-center justify-center text-muted-foreground" role="status">
-        <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+        <LoadingDots className="size-4" aria-hidden="true" />
       </main>
     );
   }

@@ -1,6 +1,7 @@
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { BookOpen, ListTree, Loader2, Waypoints, type LucideIcon } from "lucide-react";
+import { BookOpen, ListTree, Waypoints, type LucideIcon } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cardClass, cardContentClass, cardHeaderClass } from "@/components/workspace/views/PageShell";
 import { errorText } from "@/lib/errors";
@@ -125,7 +126,7 @@ function SwitchRow({
         </p>
         <p className="text-xs leading-5 text-muted-foreground">{hint}</p>
       </div>
-      {busy && <Loader2 className="mt-1 size-4 animate-spin text-muted-foreground" aria-hidden="true" />}
+      {busy && <LoadingDots className="mt-1 size-4 text-muted-foreground" aria-hidden="true" />}
       <button
         type="button"
         role="switch"

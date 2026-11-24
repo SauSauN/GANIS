@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2, MapPin, Plus } from "lucide-react";
+import { MapPin, Plus } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import { PendingGallery, type PendingImage } from "@/components/characters/fields/GalleryField";
 import { LocationSheet } from "@/components/locations/LocationSheet";
@@ -202,7 +203,7 @@ export function LocationCreateView({ projectId, feature, onOpenFeature }: Locati
           </div>
         ) : (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            <LoadingDots className="size-4" aria-hidden="true" />
             {t("list.loading")}
           </p>
         )}
@@ -226,7 +227,7 @@ export function LocationCreateView({ projectId, feature, onOpenFeature }: Locati
           </CardContent>
           <CardFooter className={`${cardFooterClass} gap-4`}>
             <Button onClick={() => void confirmLevel()} disabled={levelSaving}>
-              {levelSaving && <Loader2 className="animate-spin" />}
+              {levelSaving && <LoadingDots />}
               {t("levels.continue")}
             </Button>
           </CardFooter>
@@ -307,7 +308,7 @@ export function LocationCreateView({ projectId, feature, onOpenFeature }: Locati
           footer={
             <div className="flex min-h-10 flex-wrap items-center gap-4">
               <Button type="submit" disabled={saving || bannerBusy}>
-                {saving ? <Loader2 className="animate-spin" /> : <Plus />}
+                {saving ? <LoadingDots /> : <Plus />}
                 {saving ? t("create.saving") : t("create.save")}
               </Button>
 

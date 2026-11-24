@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2, X } from "lucide-react";
+import { X } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { errorText, loadDocumentBlob } from "@/lib/documents";
@@ -200,7 +201,7 @@ function LazyPage({ projectId, page, fitHeight, label }: { projectId: string; pa
         <img src={url} alt={label} className={cn(fitHeight ? "h-full w-auto object-contain" : "h-auto w-full")} />
       ) : (
         <div className="flex aspect-[2/3] w-full max-w-xl items-center justify-center bg-white/5 text-sm text-neutral-400">
-          {error ?? <Loader2 className="size-5 animate-spin" aria-label={label} />}
+          {error ?? <LoadingDots className="size-5" aria-label={label} />}
         </div>
       )}
     </div>

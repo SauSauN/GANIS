@@ -298,6 +298,8 @@ pub struct StructureNode {
     pub scene_location_id: Option<String>,
     /// Moment de la scène (série) : day, night, morning…
     pub scene_time: Option<String>,
+    /// Échéance d'un épisode (série) : AAAA-MM-JJ ; `None` : aucune.
+    pub due_date: Option<String>,
     pub created_at: String,
     pub updated_at: String,
 }
@@ -386,7 +388,7 @@ fn check_level(level: i64, count: usize) -> AppResult<()> {
 const NODE_COLUMNS: &str = "id, parent_id, level, title, summary, position, numbered, number, \
      content_words, word_goal, writing_status, narrative_person, narrative_tense, \
      narrative_goal, page_goal, script_status, rhythm, page_turn, production_stage, \
-     logline, runtime_goal, episode_status, writer, scene_place, scene_location_id, scene_time, created_at, updated_at";
+     logline, runtime_goal, episode_status, writer, scene_place, scene_location_id, scene_time, due_date, created_at, updated_at";
 
 pub(crate) async fn find_node(pool: &SqlitePool, id: &str) -> AppResult<Option<StructureNode>> {
     let sql = format!("SELECT {NODE_COLUMNS} FROM structure_nodes WHERE id = ?");
@@ -1127,6 +1129,51 @@ pub async fn move_node(
     Ok(())
 }
 
+/// Place un élément sous `parent_id`, au rang `index` parmi ses nouveaux
+/// voisins (tableau de liège : une scène glissée dans une autre séquence).
+///
+/// Le nouveau parent doit être au niveau juste au-dessus de l'élément (ou
+/// aucun pour le premier niveau) ; les rangs des voisins sont recalculés.
+pub async fn place_node(pool: &SqlitePool, id: &str, parent_id: Option<&str>, index: usize) -> AppResult<StructureNode> {
+    let mut tx = pool.begin().await?;
+    let sql = format!("SELECT {NODE_COLUMNS} FROM structure_nodes WHERE id = ?");
+    let node = sqlx::query_as::<_, StructureNode>(&sql).bind(id).fetch_optional(&mut *tx).await?.ok_or_else(node_not_found)?;
+
+    let parent_level: Option<i64> = match parent_id {
+        Some(parent) => Some(
+            sqlx::query_scalar("SELECT level FROM structure_nodes WHERE id = ?")
+                .bind(parent)
+                .fetch_optional(&mut *tx)
+                .await?
+                .ok_or_else(node_not_found)?,
+        ),
+        None => None,
+    };
+    let fits = match parent_level {
+        Some(level) => level + 1 == node.level,
+        None => node.level == 0 || node.parent_id.is_none(),
+    };
+    if !fits {
+        return Err(AppError::validation("Cet élément ne peut pas aller à cet endroit du plan.").with_key("structure.invalidPlace"));
+    }
+
+    let mut siblings: Vec<String> =
+        sqlx::query_scalar("SELECT id FROM structure_nodes WHERE parent_id IS ? AND id <> ? ORDER BY position, created_at")
+            .bind(parent_id)
+            .bind(id)
+            .fetch_all(&mut *tx)
+            .await?;
+    siblings.insert(index.min(siblings.len()), id.to_owned());
+
+    let now = now_utc();
+    sqlx::query("UPDATE structure_nodes SET parent_id = ?, updated_at = ? WHERE id = ?").bind(parent_id).bind(&now).bind(id).execute(&mut *tx).await?;
+    for (position, sibling) in siblings.iter().enumerate() {
+        sqlx::query("UPDATE structure_nodes SET position = ? WHERE id = ?").bind(position as i64).bind(sibling).execute(&mut *tx).await?;
+    }
+    tx.commit().await?;
+    find_node(pool, id).await?.ok_or_else(node_not_found)
+}
+
 /// Supprime un élément et tout ce qu'il contient.
 pub async fn delete_node(pool: &SqlitePool, id: &str) -> AppResult<String> {
     let mut tx = pool.begin().await?;
@@ -1293,6 +1340,34 @@ mod tests {
         let s = get_structure(&pool, ProjectType::Novel).await.unwrap();
         assert_eq!(titles(&s, None), ["C", "A", "B"]);
         assert_eq!(titles(&s, Some(&a.id)), ["dans A"]);
+    }
+
+    #[tokio::test]
+    async fn a_node_can_be_placed_in_another_parent_of_the_same_level() {
+        let pool = pool().await;
+        let q1 = create_node(&pool, ProjectType::Film, None, 0, "Q1", None).await.unwrap();
+        let q2 = create_node(&pool, ProjectType::Film, None, 0, "Q2", None).await.unwrap();
+        let a = create_node(&pool, ProjectType::Film, Some(&q1.id), 1, "A", None).await.unwrap();
+        let b = create_node(&pool, ProjectType::Film, Some(&q1.id), 1, "B", None).await.unwrap();
+        let c = create_node(&pool, ProjectType::Film, Some(&q2.id), 1, "C", None).await.unwrap();
+
+        place_node(&pool, &b.id, Some(&q2.id), 0).await.unwrap();
+        let s = get_structure(&pool, ProjectType::Film).await.unwrap();
+        assert_eq!(titles(&s, Some(&q1.id)), ["A"]);
+        assert_eq!(titles(&s, Some(&q2.id)), ["B", "C"]);
+
+        place_node(&pool, &a.id, Some(&q2.id), 99).await.unwrap();
+        let s = get_structure(&pool, ProjectType::Film).await.unwrap();
+        assert_eq!(titles(&s, Some(&q2.id)), ["B", "C", "A"]);
+
+        place_node(&pool, &c.id, Some(&q2.id), 0).await.unwrap();
+        let s = get_structure(&pool, ProjectType::Film).await.unwrap();
+        assert_eq!(titles(&s, Some(&q2.id)), ["C", "B", "A"]);
+
+        // Une scène ne va pas sous une scène, ni une séquence sous une séquence.
+        assert!(place_node(&pool, &a.id, Some(&b.id), 0).await.is_err());
+        assert!(place_node(&pool, &q1.id, Some(&q2.id), 0).await.is_err());
+        assert!(place_node(&pool, "inconnu", Some(&q2.id), 0).await.is_err());
     }
 
     #[tokio::test]

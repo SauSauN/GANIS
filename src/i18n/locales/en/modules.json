@@ -36,6 +36,9 @@
     "screenplay": {
       "label": "Screenplay"
     },
+    "film": {
+      "label": "Screenplay"
+    },
     "items": {
       "label": "Objects",
       "empty": "No objects yet."
@@ -90,6 +93,10 @@
       "relations": {
         "label": "Character relationships",
         "description": "Family ties, friendships, rivalries and alliances."
+      },
+      "arcs": {
+        "label": "Arcs",
+        "description": "What each character believes at the start, what they understand at the end, and how they change chapter by chapter."
       }
     },
     "locations": {
@@ -146,6 +153,10 @@
       "reading": {
         "label": "Story reading",
         "description": "The story in reading order, with its characters, locations, chapters and notes."
+      },
+      "timeline": {
+        "label": "Timeline",
+        "description": "The plot’s events placed by date, with your world’s eras and the characters’ ages."
       }
     },
     "manuscript": {
@@ -208,6 +219,44 @@
       "continuity": {
         "label": "Continuity",
         "description": "Where each character appears, in which state, with their lines, scene by scene; presence chart by episode."
+      },
+      "board": {
+        "label": "Index cards",
+        "description": "One card per scene, one column per episode; drag them to reorganise the season."
+      },
+      "breakdown": {
+        "label": "Breakdown",
+        "description": "Breakdown sheet for each scene and shooting schedule by set and time of day, across episodes: shows shoot in blocks."
+      },
+      "import": {
+        "label": "Import a screenplay",
+        "description": "Bring in a Fountain or Final Draft (.fdx) episode: scenes, lines, characters and locations."
+      }
+    },
+    "film": {
+      "read": {
+        "label": "Script reading",
+        "description": "The whole film in screenplay format, scenes numbered; export to Word, PDF, text and Fountain with a title page."
+      },
+      "progress": {
+        "label": "Film tracking",
+        "description": "Film sheet, estimated vs target runtime, runtime of each act, status of the sequences, lines per character."
+      },
+      "continuity": {
+        "label": "Continuity",
+        "description": "Where each character appears, in which state, with their lines, scene by scene; presence chart by sequence."
+      },
+      "breakdown": {
+        "label": "Breakdown",
+        "description": "Breakdown sheet for each scene and shooting schedule by set and time of day; exports for production."
+      },
+      "board": {
+        "label": "Index cards",
+        "description": "One card per scene, coloured by act; drag them to reorganise the film."
+      },
+      "import": {
+        "label": "Import a screenplay",
+        "description": "Bring in a Fountain or Final Draft (.fdx) screenplay: scenes, lines, characters and locations."
       }
     },
     "items": {
@@ -259,6 +308,10 @@
         "label": "Magic and powers",
         "description": "All the rules of power in your world, with their schools and techniques."
       }
+    },
+    "boards": {
+      "label": "Inspiration boards",
+      "description": "Gallery images, colours, quotes and notes, arranged freely for the story's mood."
     }
   }
 }

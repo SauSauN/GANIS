@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { api } from "@/lib/api";
+import { api, isTauri } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import {
   checkEmail,
@@ -58,7 +58,8 @@ type AccountMessage =
   | "account.profile.failed"
   | "account.emailRecovery.enabled"
   | "account.emailRecovery.disabled"
-  | "account.emailRecovery.failed";
+  | "account.emailRecovery.failed"
+  | "account.deviceKey.failed";
 
 /**
  * Retour affiché sous un formulaire.
@@ -333,6 +334,61 @@ function RecoveryKeyCard({ username }: { username: string }) {
           </Button>
         </CardFooter>
       </form>
+    </Card>
+  );
+}
+
+/**
+ * Clé de secours de cet ordinateur : la base de l'application est chiffrée
+ * avec une clé liée à ce compte Windows (voir `security/device_key.rs`).
+ * Après une réinstallation de Windows, seul ce fichier permet de retrouver
+ * les données.
+ */
+function DeviceKeyBackupCard() {
+  const { t, i18n } = useTranslation(["settings", "common"]);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState<string | null>(null);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+
+  async function save() {
+    setSaving(true);
+    setFeedback(null);
+    try {
+      const file = await api.saveDeviceKeyBackup({
+        language: i18n.language.startsWith("en") ? "en" : "fr",
+        dialogTitle: t("account.deviceKey.dialogTitle"),
+      });
+      if (file) setSaved(file);
+    } catch (e) {
+      setFeedback(failure(e, "account.deviceKey.failed"));
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <Card className={cardClass}>
+      <CardHeader className={cardHeaderClass}>
+        <TitleWithInfo info={t("account.deviceKey.description")}>{t("account.deviceKey.title")}</TitleWithInfo>
+      </CardHeader>
+
+      <CardContent className="space-y-3 px-6 py-6 text-sm text-muted-foreground">
+        <p>{t("account.deviceKey.intro")}</p>
+        <p>{t("account.deviceKey.keepSafe")}</p>
+        {saved && (
+          <p role="status" className="text-foreground">
+            {t("account.deviceKey.saved", { file: saved })}
+          </p>
+        )}
+        <FeedbackMessage feedback={feedback} />
+      </CardContent>
+
+      <CardFooter className={cardFooterClass}>
+        <Button type="button" variant="outline" disabled={saving} onClick={() => void save()}>
+          <ShieldCheck />
+          {saving ? t("account.deviceKey.saving") : t("account.deviceKey.save")}
+        </Button>
+      </CardFooter>
     </Card>
   );
 }
@@ -677,7 +733,7 @@ export function AccountSection() {
     }
 
     const issue =
-      checkPassword(newPassword) ??
+      checkPassword(newPassword, user?.username) ??
       (newPassword !== confirmPassword ? "passwordMismatch" : null);
 
     if (issue) {
@@ -872,6 +928,9 @@ export function AccountSection() {
 
       {/* Récupération par e-mail : seulement si Supabase est configuré. */}
       {EMAIL_RECOVERY_ENABLED && <EmailRecoveryCard user={user} />}
+
+      {/* Clé de secours des données de cet ordinateur (clé d'appareil). */}
+      {isTauri() && <DeviceKeyBackupCard />}
 
       {/* ==================================================================
           VERROUILLAGE AUTOMATIQUE

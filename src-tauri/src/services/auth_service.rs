@@ -26,31 +26,38 @@ use crate::models::user::{Role, User, UserPublic};
 use crate::security::crypto::SecretKey;
 use crate::security::recovery_key::RecoveryKey;
 use crate::services::keyring_service::{self, NewKeyring, NewSlot, SlotKind};
-use crate::services::{project_storage, session_service, user_service};
+use crate::services::{document_service, history_service, project_storage, session_service, user_service};
 use crate::state::AppState;
 use crate::utils::{new_id, now_utc, run_blocking};
-use argon2::password_hash::{
-    rand_core::OsRng, PasswordHash, PasswordHasher, PasswordVerifier, SaltString,
-};
+#[cfg(test)]
+use argon2::password_hash::{rand_core::OsRng, PasswordHasher, SaltString};
+use argon2::password_hash::{PasswordHash, PasswordVerifier};
 use argon2::Argon2;
 use sqlx::SqlitePool;
-use std::sync::OnceLock;
 use zeroize::Zeroizing;
 
 const USERNAME_MIN_CHARS: usize = 3;
 const USERNAME_MAX_CHARS: usize = 50;
-const PASSWORD_MIN_CHARS: usize = 8;
+pub const PASSWORD_MIN_CHARS: usize = 12;
 const PASSWORD_MAX_CHARS: usize = 128;
 const EMAIL_MAX_CHARS: usize = 254;
 
 // ----------------------------------------------------------------------------
 // Mots de passe
 // ----------------------------------------------------------------------------
+//
+// Le mot de passe est vérifié en ouvrant le verrou « mot de passe » du
+// compte (Argon2id, 64 Mio, voir `keyring_service`) : s'il s'ouvre, le mot
+// de passe est bon. Aucun autre hash du mot de passe n'est gardé, car un
+// hash moins coûteux serait la cible d'une personne qui copie `app.db`.
+//
+// Seuls les comptes d'avant le chiffrement (sans verrou) ont encore un hash
+// dans `users.password_hash` : il sert une dernière fois, à la connexion qui
+// crée leur verrou, puis il est effacé.
 
-/// Hache un mot de passe avec Argon2id et un sel unique.
-///
-/// Le hash retourné est au format PHC (il contient déjà le sel). Le sel est
-/// aussi retourné à part, pour remplir la colonne `password_salt`.
+/// Hache un mot de passe avec Argon2id et un sel unique (comptes de test
+/// d'avant le chiffrement uniquement).
+#[cfg(test)]
 fn hash_password(password: &str) -> AppResult<(String, String)> {
     let salt = SaltString::generate(&mut OsRng);
 
@@ -62,44 +69,91 @@ fn hash_password(password: &str) -> AppResult<(String, String)> {
     Ok((password_hash, salt.to_string()))
 }
 
-/// Vérifie un mot de passe contre un hash au format PHC.
-fn verify_password(password: &str, hash: &str) -> AppResult<bool> {
-    let parsed = PasswordHash::new(hash)
-        .map_err(|e| AppError::internal(e).with_detail("Hash de mot de passe invalide"))?;
+/// Vérifie un mot de passe contre un hash au format PHC (comptes d'avant le
+/// chiffrement). Un hash vide ou illisible ne correspond à rien.
+fn verify_legacy_password(password: &str, hash: &str) -> bool {
+    let Ok(parsed) = PasswordHash::new(hash) else {
+        return false;
+    };
 
-    Ok(Argon2::default()
+    Argon2::default()
         .verify_password(password.as_bytes(), &parsed)
-        .is_ok())
+        .is_ok()
 }
 
-/// [`hash_password`] sur un fil dédié (Argon2 bloquerait le moteur async).
-async fn hash_password_off_thread(password: &str) -> AppResult<(String, String)> {
-    let password = Zeroizing::new(password.to_owned());
-
-    run_blocking(move || hash_password(&password)).await
-}
-
-/// [`verify_password`] sur un fil dédié (Argon2 bloquerait le moteur async).
-async fn verify_password_off_thread(password: &str, hash: &str) -> AppResult<bool> {
+/// [`verify_legacy_password`] sur un fil dédié (Argon2 bloquerait le moteur
+/// async).
+async fn verify_legacy_password_off_thread(password: &str, hash: &str) -> AppResult<bool> {
     let password = Zeroizing::new(password.to_owned());
     let hash = hash.to_owned();
 
-    run_blocking(move || verify_password(&password, &hash)).await
+    run_blocking(move || Ok(verify_legacy_password(&password, &hash))).await
 }
 
-/// Hash factice, calculé une seule fois.
-///
-/// Sert à faire une vérification Argon2 même quand le nom d'utilisateur est
-/// inconnu : la réponse prend alors autant de temps que pour un vrai compte,
-/// ce qui empêche de deviner les comptes existants en mesurant le temps.
-fn dummy_hash() -> &'static str {
-    static DUMMY: OnceLock<String> = OnceLock::new();
+/// Résultat de la vérification d'un mot de passe.
+enum PasswordCheck {
+    /// Mot de passe bon : clé du compte, et clé de récupération si le
+    /// verrou vient d'être créé (compte d'avant le chiffrement).
+    Valid(SecretKey, Option<RecoveryKey>),
+    Invalid,
+}
 
-    DUMMY.get_or_init(|| {
-        hash_password("ganis-mot-de-passe-factice-0")
-            .map(|(hash, _)| hash)
-            .unwrap_or_default()
-    })
+/// Vérifie le mot de passe d'un compte en ouvrant son verrou.
+///
+/// Un compte d'avant le chiffrement (sans verrou) est vérifié une dernière
+/// fois avec son ancien hash ; son verrou est alors créé et le hash effacé.
+async fn check_password(pool: &SqlitePool, user: &User, password: &str) -> AppResult<PasswordCheck> {
+    match keyring_service::unlock(pool, &user.id, SlotKind::Password, password.as_bytes()).await? {
+        Some(Some(key)) => {
+            forget_legacy_hash(pool, user).await?;
+            Ok(PasswordCheck::Valid(key, None))
+        }
+        Some(None) => Ok(PasswordCheck::Invalid),
+        None => {
+            if !verify_legacy_password_off_thread(password, &user.password_hash).await? {
+                return Ok(PasswordCheck::Invalid);
+            }
+
+            let (key, recovery_key) = create_missing_keyring(pool, user, password).await?;
+            Ok(PasswordCheck::Valid(key, recovery_key))
+        }
+    }
+}
+
+/// Efface l'ancien hash du mot de passe (le verrou suffit à le vérifier).
+async fn forget_legacy_hash(pool: &SqlitePool, user: &User) -> AppResult<()> {
+    if user.password_hash.is_empty() && user.password_salt.is_empty() {
+        return Ok(());
+    }
+
+    sqlx::query("UPDATE users SET password_hash = '', password_salt = '' WHERE id = ?")
+        .bind(&user.id)
+        .execute(pool)
+        .await
+        .map_err(|e| AppError::database(&e).with_detail(format!("Effacement de l'ancien hash : {e}")))?;
+
+    tracing::info!("Ancien hash du mot de passe effacé");
+    Ok(())
+}
+
+/// Vérifie le mot de passe actuel du compte connecté (opérations sensibles :
+/// changer de mot de passe, supprimer le compte…).
+///
+/// Les essais sont comptés comme ceux de la connexion : une session laissée
+/// ouverte ne permet pas de deviner le mot de passe en essayant en boucle.
+async fn confirm_current_password(state: &AppState, user: &User, password: &str) -> AppResult<()> {
+    state.login_throttle.check(&user.username)?;
+
+    match check_password(&state.app_db, user, password).await? {
+        PasswordCheck::Valid(..) => {
+            state.login_throttle.record_success(&user.username);
+            Ok(())
+        }
+        PasswordCheck::Invalid => {
+            state.login_throttle.record_failure(&user.username);
+            Err(current_password_wrong())
+        }
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -132,14 +186,18 @@ pub fn validate_username(username: &str) -> AppResult<()> {
 
 /// Valide un nouveau mot de passe.
 ///
-/// 8 à 128 caractères, avec au moins une lettre et un chiffre.
+/// 12 à 128 caractères, avec au moins une lettre et un chiffre, ni trop
+/// courant ni construit sur le nom d'utilisateur (voir `weak_passwords`).
 /// La limite haute évite de faire hacher des entrées démesurées.
-pub fn validate_new_password(password: &str) -> AppResult<()> {
+///
+/// Les comptes existants gardent leur mot de passe : la règle ne s'applique
+/// qu'aux nouveaux mots de passe.
+pub fn validate_new_password(password: &str, username: &str) -> AppResult<()> {
     let length = password.chars().count();
 
     if length < PASSWORD_MIN_CHARS {
         return Err(AppError::validation(
-            "Le mot de passe doit contenir au moins 8 caractères.",
+            "Le mot de passe doit contenir au moins 12 caractères.",
         ).with_key("auth.passwordTooShort"));
     }
 
@@ -156,6 +214,12 @@ pub fn validate_new_password(password: &str) -> AppResult<()> {
         return Err(AppError::validation(
             "Le mot de passe doit contenir au moins une lettre et un chiffre.",
         ).with_key("auth.passwordLetterDigit"));
+    }
+
+    if crate::security::weak_passwords::is_weak(password, username) {
+        return Err(AppError::validation(
+            "Ce mot de passe est trop facile à deviner : évitez les mots courants et votre nom d'utilisateur.",
+        ).with_key("auth.passwordWeak"));
     }
 
     Ok(())
@@ -284,7 +348,7 @@ async fn create_account(
     let username = username.trim();
 
     validate_username(username)?;
-    validate_new_password(password)?;
+    validate_new_password(password, username)?;
 
     let email = normalize_email(email)?;
 
@@ -300,8 +364,17 @@ async fn create_account(
     let id = new_id();
     let now = now_utc();
 
-    // Calculs coûteux (Argon2) avant la transaction.
-    let (password_hash, password_salt) = hash_password_off_thread(password).await?;
+    // Calculs coûteux (Argon2) avant la transaction. Un compte avec
+    // trousseau n'a pas de hash : son verrou vérifie le mot de passe.
+    #[cfg(test)]
+    let (password_hash, password_salt) = if keyring {
+        (String::new(), String::new())
+    } else {
+        let password = Zeroizing::new(password.to_owned());
+        run_blocking(move || hash_password(&password)).await?
+    };
+    #[cfg(not(test))]
+    let (password_hash, password_salt) = (String::new(), String::new());
 
     let new_keyring: Option<NewKeyring> = if keyring {
         Some(
@@ -471,11 +544,9 @@ pub async fn change_password(
         .await?
         .ok_or_else(AppError::unauthorized)?;
 
-    if !verify_password_off_thread(current_password, &user.password_hash).await? {
-        return Err(current_password_wrong());
-    }
+    confirm_current_password(state, &user, current_password).await?;
 
-    validate_new_password(new_password)?;
+    validate_new_password(new_password, &user.username)?;
 
     if new_password == current_password {
         return Err(AppError::validation(
@@ -490,15 +561,16 @@ pub async fn change_password(
     Ok(())
 }
 
-/// Remplace le mot de passe d'un compte : hash de connexion et verrou de
-/// la clé du compte, dans une même transaction.
+/// Remplace le mot de passe d'un compte : nouveau verrou de la clé du
+/// compte, et effacement d'un éventuel ancien hash, dans une même
+/// transaction.
 async fn set_password(
     pool: &SqlitePool,
     user_id: &str,
     new_password: &str,
     account_key: &SecretKey,
 ) -> AppResult<()> {
-    let (password_hash, password_salt) = hash_password_off_thread(new_password).await?;
+    let (password_hash, password_salt) = ("", "");
     let slot = NewSlot::seal_off_thread(
         user_id,
         SlotKind::Password,
@@ -509,7 +581,7 @@ async fn set_password(
 
     let mut tx = pool.begin().await?;
 
-    user_service::update_password(&mut tx, user_id, &password_hash, &password_salt).await?;
+    user_service::update_password(&mut tx, user_id, password_hash, password_salt).await?;
     keyring_service::replace_slot(&mut tx, user_id, &slot).await?;
 
     tx.commit().await?;
@@ -534,9 +606,7 @@ pub async fn delete_own_account(state: &AppState, password: &str) -> AppResult<V
         .await?
         .ok_or_else(AppError::unauthorized)?;
 
-    if !verify_password_off_thread(password, &user.password_hash).await? {
-        return Err(current_password_wrong());
-    }
+    confirm_current_password(state, &user, password).await?;
 
     let project_ids =
         crate::services::project_service::list_project_ids_for_user(&state.app_db, &user.id).await?;
@@ -582,23 +652,20 @@ pub async fn login_user(
 
     let candidate = user_service::find_by_username(&state.app_db, username).await?;
 
+    // Le mot de passe est vérifié en ouvrant le verrou du compte. Pour un
+    // nom inconnu, un calcul de même coût est fait quand même.
     let authenticated = match candidate {
-        Some(user) => {
-            if verify_password_off_thread(password, &user.password_hash).await? {
-                Some(user)
-            } else {
-                None
-            }
-        }
+        Some(user) => match check_password(&state.app_db, &user, password).await? {
+            PasswordCheck::Valid(key, recovery_key) => Some((user, key, recovery_key)),
+            PasswordCheck::Invalid => None,
+        },
         None => {
-            // Même coût de calcul qu'une vraie vérification.
-            let password = Zeroizing::new(password.to_owned());
-            let _ = run_blocking(move || verify_password(&password, dummy_hash())).await;
+            keyring_service::burn_equivalent_work(password.as_bytes()).await;
             None
         }
     };
 
-    let Some(user) = authenticated else {
+    let Some((user, account_key, recovery_key)) = authenticated else {
         state.login_throttle.record_failure(username);
         tracing::warn!("Échec de connexion");
 
@@ -606,26 +673,6 @@ pub async fn login_user(
     };
 
     state.login_throttle.record_success(username);
-
-    // Clé du compte : ouverte par le mot de passe, ou créée si le compte
-    // n'a pas encore de trousseau.
-    let (account_key, recovery_key) =
-        match keyring_service::unlock(&state.app_db, &user.id, SlotKind::Password, password.as_bytes())
-            .await?
-        {
-            Some(Some(key)) => (key, None),
-            Some(None) => {
-                // Le mot de passe est juste mais n'ouvre pas le verrou : les
-                // deux ne sont plus en accord. Cela ne peut venir que d'une
-                // modification extérieure de la base.
-                return Err(AppError::internal(
-                    "Verrou du compte en désaccord avec le mot de passe",
-                ));
-            }
-            None => {
-                create_missing_keyring(&state.app_db, &user, password).await?
-            }
-        };
 
     let user = user_service::reveal(user, &account_key)?;
 
@@ -679,7 +726,11 @@ async fn create_missing_keyring(
         keyring_service::insert_slot(&mut tx, &user.id, slot).await?;
     }
 
-    sqlx::query("UPDATE users SET email = NULL, email_sealed = ? WHERE id = ?")
+    // L'ancien hash du mot de passe est effacé : le verrou le remplace.
+    sqlx::query(
+        "UPDATE users SET email = NULL, email_sealed = ?, password_hash = '', password_salt = '' \
+         WHERE id = ?",
+    )
         .bind(sealed_email.as_deref())
         .bind(&user.id)
         .execute(&mut *tx)
@@ -698,10 +749,41 @@ async fn create_missing_keyring(
 /// efface la clé du compte de la mémoire et ferme ses projets.
 pub async fn logout_user(state: &AppState) -> AppResult<()> {
     if let Some(user) = state.current_user().await {
+        // Tant que la clé du compte est là : dernières modifications des
+        // documents ouverts ailleurs reprises dans les projets.
+        reclaim_open_documents(state, &user.id).await;
         session_service::delete_user_sessions(&state.app_db, &user.id).await?;
     }
 
+    // Ferme la session ; les copies de travail (en clair) sont supprimées.
     state.close_session().await;
+
+    Ok(())
+}
+
+/// Reprend dans leurs projets les documents enregistrés dans une autre
+/// application (Word, Acrobat…) depuis leur dernière reprise, avant que
+/// leurs copies de travail soient supprimées à la fin de la session.
+///
+/// Un échec n'empêche pas la déconnexion : il est seulement journalisé.
+pub async fn reclaim_open_documents(state: &AppState, owner: &str) {
+    for copy in document_service::open_copies_of(&state.data_dir, owner) {
+        if let Err(error) = reclaim_open_document(state, &copy).await {
+            tracing::warn!(error = %error, "Document ouvert ailleurs non repris");
+        }
+    }
+}
+
+async fn reclaim_open_document(state: &AppState, copy: &document_service::OpenCopy) -> AppResult<()> {
+    let (_, bytes) = document_service::check_open_copy(&copy.dir)?;
+    let Some(bytes) = bytes else {
+        return Ok(());
+    };
+
+    let pool = project_storage::pool_for_request(state, &copy.project_id).await?;
+    let document = document_service::replace_content(&pool, &copy.document_id, &bytes, None).await?;
+    document_service::mark_imported(&copy.dir, &bytes)?;
+    history_service::record(&pool, "updated", "document", &document.id, &document.name, &document.node_id).await;
 
     Ok(())
 }
@@ -735,7 +817,7 @@ pub async fn recover_account(
     state.recovery_throttle.check(username)?;
 
     // Vérifications sans coût, qui ne révèlent rien sur le compte.
-    validate_new_password(new_password)?;
+    validate_new_password(new_password, username)?;
     let recovery_key = RecoveryKey::parse(recovery_key)?;
 
     let candidate = user_service::find_by_username(&state.app_db, username).await?;
@@ -803,9 +885,7 @@ pub async fn regenerate_recovery_key(
         .await?
         .ok_or_else(AppError::unauthorized)?;
 
-    if !verify_password_off_thread(current_password, &user.password_hash).await? {
-        return Err(current_password_wrong());
-    }
+    confirm_current_password(state, &user, current_password).await?;
 
     let recovery_key = RecoveryKey::generate();
     let slot = NewSlot::seal_off_thread(
@@ -957,7 +1037,7 @@ pub async fn recover_with_email(
 
     state.recovery_throttle.check(username)?;
 
-    validate_new_password(new_password)?;
+    validate_new_password(new_password, username)?;
 
     // Secrets mal formés ignorés : ils ne viennent pas de GANIS.
     let secrets: Vec<SecretKey> = secrets
@@ -1036,11 +1116,72 @@ mod tests {
 
     #[test]
     fn password_rules() {
-        assert!(validate_new_password("motdepasse1").is_ok());
-        assert!(validate_new_password("court1").is_err());
-        assert!(validate_new_password("seulementdeslettres").is_err());
-        assert!(validate_new_password("12345678").is_err());
-        assert!(validate_new_password(&format!("a1{}", "x".repeat(127))).is_err());
+        assert!(validate_new_password("plume-violette-1", "alice").is_ok());
+        assert!(validate_new_password("court1", "alice").is_err());
+        assert!(validate_new_password("motdepasse1", "alice").is_err());
+        assert!(validate_new_password("seulementdeslettres", "alice").is_err());
+        assert!(validate_new_password("123456789012", "alice").is_err());
+        assert!(validate_new_password("motdepasse123", "alice").is_err());
+        assert!(validate_new_password("alice-plume-12", "alice").is_err());
+        assert!(validate_new_password(&format!("a1{}", "x".repeat(127)), "alice").is_err());
+    }
+
+    #[tokio::test]
+    async fn accounts_keep_no_password_hash() {
+        let pool = sqlx::sqlite::SqlitePoolOptions::new()
+            .max_connections(1)
+            .connect("sqlite::memory:")
+            .await
+            .unwrap();
+        crate::db::migrations::run_migrations(&pool, &crate::db::migrations::APP_MIGRATOR)
+            .await
+            .unwrap();
+
+        let created = register_user(&pool, "alice", "plume-violette-1", None).await.unwrap();
+        let stored = user_service::find_by_id(&pool, &created.user.id).await.unwrap().unwrap();
+
+        assert!(stored.password_hash.is_empty());
+        assert!(stored.password_salt.is_empty());
+        assert!(matches!(
+            check_password(&pool, &stored, "plume-violette-1").await.unwrap(),
+            PasswordCheck::Valid(..)
+        ));
+        assert!(matches!(
+            check_password(&pool, &stored, "plume-violette-2").await.unwrap(),
+            PasswordCheck::Invalid
+        ));
+    }
+
+    #[tokio::test]
+    async fn legacy_hash_is_erased_once_the_keyring_exists() {
+        let pool = sqlx::sqlite::SqlitePoolOptions::new()
+            .max_connections(1)
+            .connect("sqlite::memory:")
+            .await
+            .unwrap();
+        crate::db::migrations::run_migrations(&pool, &crate::db::migrations::APP_MIGRATOR)
+            .await
+            .unwrap();
+
+        let created =
+            create_account_without_keyring(&pool, "bob", "plume-violette-1", None, Role::User)
+                .await
+                .unwrap();
+        let legacy = user_service::find_by_id(&pool, &created.id).await.unwrap().unwrap();
+        assert!(!legacy.password_hash.is_empty());
+
+        assert!(matches!(
+            check_password(&pool, &legacy, "mauvais-essai-1").await.unwrap(),
+            PasswordCheck::Invalid
+        ));
+        assert!(matches!(
+            check_password(&pool, &legacy, "plume-violette-1").await.unwrap(),
+            PasswordCheck::Valid(..)
+        ));
+
+        let migrated = user_service::find_by_id(&pool, &created.id).await.unwrap().unwrap();
+        assert!(migrated.password_hash.is_empty());
+        assert!(keyring_service::has_slot(&pool, &created.id, SlotKind::Password).await.unwrap());
     }
 
     #[test]
@@ -1060,12 +1201,8 @@ mod tests {
     fn password_hash_roundtrip() {
         let (hash, _) = hash_password("secret123").unwrap();
 
-        assert!(verify_password("secret123", &hash).unwrap());
-        assert!(!verify_password("autre123", &hash).unwrap());
-    }
-
-    #[test]
-    fn dummy_hash_is_valid() {
-        assert!(PasswordHash::new(dummy_hash()).is_ok());
+        assert!(verify_legacy_password("secret123", &hash));
+        assert!(!verify_legacy_password("autre123", &hash));
+        assert!(!verify_legacy_password("secret123", ""));
     }
 }

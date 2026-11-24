@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FileUp, Loader2, Upload } from "lucide-react";
+import { FileUp, Upload } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
 import { Button } from "@/components/ui/button";
 import { PageShell } from "@/components/workspace/views/PageShell";
@@ -152,7 +153,7 @@ export function ImportView({ project, feature, onOpenFeature }: ImportViewProps)
             onClick={() => input.current?.click()}
             className="flex w-full flex-col items-center gap-3 rounded-xl border border-dashed bg-card px-6 py-12 text-center transition-colors hover:bg-muted/40 disabled:opacity-60"
           >
-            {busy === "read" ? <Loader2 className="size-8 animate-spin text-muted-foreground" /> : <FileUp className="size-8 text-muted-foreground" />}
+            {busy === "read" ? <LoadingDots className="size-8 text-muted-foreground" /> : <FileUp className="size-8 text-muted-foreground" />}
             <span className="font-medium">{busy === "read" ? t("import.reading") : t("import.choose")}</span>
             {fileName && busy === "read" && <span className="text-sm text-muted-foreground">{fileName}</span>}
           </button>
@@ -179,7 +180,7 @@ export function ImportView({ project, feature, onOpenFeature }: ImportViewProps)
                     {t("import.other")}
                   </Button>
                   <Button disabled={busy !== null || plan.length === 0} onClick={() => void runImport()}>
-                    {busy === "import" ? <Loader2 className="animate-spin" /> : <Upload />}
+                    {busy === "import" ? <LoadingDots /> : <Upload />}
                     {busy === "import" ? t("import.applying") : t("import.apply")}
                   </Button>
                 </div>

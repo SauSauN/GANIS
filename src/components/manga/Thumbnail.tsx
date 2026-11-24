@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { loadDocumentBlob } from "@/lib/documents";
 import type { StructureDocument } from "@/types";
 
@@ -99,7 +99,7 @@ export function Thumbnail({ document, load, alt }: { document: StructureDocument
 
   return (
     <div ref={ref} className="absolute inset-0 flex items-center justify-center bg-white">
-      {url ? <img src={url} alt={alt} className="size-full object-contain" /> : <Loader2 className="size-4 animate-spin text-neutral-400" aria-hidden="true" />}
+      {url ? <img src={url} alt={alt} className="size-full object-contain" /> : <LoadingDots className="size-4 text-neutral-400" aria-hidden="true" />}
     </div>
   );
 }

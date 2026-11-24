@@ -53,7 +53,7 @@ export default function Recover() {
     if (!isRecoveryKeyFormat(recoveryKey)) return { local: "keyFormat" };
 
     const issue =
-      checkPassword(password) ??
+      checkPassword(password, username) ??
       (password !== confirm ? "passwordMismatch" : null);
 
     return issue ? { issue } : null;

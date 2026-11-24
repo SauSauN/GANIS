@@ -19,7 +19,7 @@ function node(id: string, parentId: string | null, level: number, position: numb
 function event(id: string, nodeId: string | null, row: number): PlotEvent {
   return {
     id, laneId: "l", row, title: id, note: "", pivot: false, status: "idea" as PlotEvent["status"], tags: [],
-    characterIds: [], povId: null, locationId: null, entries: [], nodeId, alsoNodeIds: [], noteIds: [], date: "", words: 0,
+    characterIds: [], povId: null, locationId: null, entries: [], nodeId, alsoNodeIds: [], noteIds: [], date: "", year: null, yearEnd: null, yearDetail: null, yearEndDetail: null, words: 0,
   };
 }
 
@@ -40,7 +40,8 @@ describe("lecture complète", () => {
   it("choisit l'onglet de lecture selon le type de projet", () => {
     expect(readingFeatureFor("novel")).toBe("manuscript.read");
     expect(readingFeatureFor("manga")).toBe("script.read");
-    for (const type of ["film", "series", "game", "rpg", "custom"]) expect(readingFeatureFor(type)).toBe("structure.read");
+    expect(readingFeatureFor("film")).toBe("film.read");
+    for (const type of ["series", "game", "rpg", "custom"]) expect(readingFeatureFor(type)).toBe("structure.read");
   });
 
   it("suit l'ordre du plan et omet les éléments vides", () => {

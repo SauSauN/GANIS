@@ -1,6 +1,8 @@
+import { NumberStepper } from "@/components/common/NumberStepper";
 import { useEffect, useState, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
-import { BookOpenText, Loader2, Maximize2, Minimize2, PenLine, Target } from "lucide-react";
+import { BookOpenText, Maximize2, Minimize2, PenLine, Target } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import type { Editor } from "@tiptap/react";
 import { NoteEditor } from "@/components/notes/editor/NoteEditor";
 import { WritingTodayInline } from "@/components/novel/WritingToday";
@@ -100,7 +102,7 @@ export function NovelTextCard({ projectId, label, initialHtml, failed, words, ha
         </p>
       ) : initialHtml === null ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          <LoadingDots className="size-4" aria-hidden="true" />
           {t("text.loading")}
         </p>
       ) : (
@@ -206,8 +208,8 @@ export function NovelWritingCard({ projectId, node, totalWords, isChapter, isSce
     }
   }
 
-  function commitGoal() {
-    const value = goal.trim() === "" ? null : Number.parseInt(goal, 10);
+  function commitGoal(text = goal) {
+    const value = text.trim() === "" ? null : Number.parseInt(text, 10);
     if (value !== null && (!Number.isFinite(value) || value < 0)) {
       setGoal(node.wordGoal ? String(node.wordGoal) : "");
       return;
@@ -244,19 +246,20 @@ export function NovelWritingCard({ projectId, node, totalWords, isChapter, isSce
             {percent !== null && <ProgressBar percent={percent} />}
           </Field>
           <Field label={t("writing.goal")} hint={t("writing.goalHint")} htmlFor={`novel-goal-${node.id}`}>
-            <input
+            <NumberStepper
               id={`novel-goal-${node.id}`}
-              type="number"
+              value={node.wordGoal ?? null}
               min={0}
               step={100}
-              inputMode="numeric"
-              value={goal}
+              allowEmpty
               placeholder={t("writing.goalPlaceholder")}
               disabled={busy}
-              onChange={(e) => setGoal(e.target.value)}
-              onBlur={commitGoal}
-              onKeyDown={(e) => e.key === "Enter" && commitGoal()}
-              className={fieldClass}
+              onChange={(value) => {
+                const text = value === null ? "" : String(Math.round(value));
+                setGoal(text);
+                commitGoal(text);
+              }}
+              valueClassName="w-24"
             />
           </Field>
         </div>

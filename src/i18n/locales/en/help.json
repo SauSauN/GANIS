@@ -313,6 +313,18 @@
     "search": "Search the help…",
     "noMatch": "No topic matches.",
     "sections": {
+      "start": {
+        "title": "Getting started",
+        "intro": "The dashboard gathers your projects: everything starts with “New project”.",
+        "items": [
+          "“New project”: choose the kind of story (novel, manga / comic, film, series, video game, role-playing game or custom project). The kind decides the proposed structure (chapters, pages, scenes…) and the writing tools shown in the left bar.",
+          "Signed in to your account, a project is private and encrypted with your password. In the “Public space” (without an account), it is not encrypted: anyone using GANIS on this computer can open it.",
+          "The dashboard: search, recently opened projects, favourites (star), archived projects for those on hold, and the project trash, where a deleted project stays 30 days.",
+          "Help › Getting started guide tours the workspace in a few steps; Help › Tutorial walks you through your first moves; Help › Keyboard shortcuts lists them all.",
+          "This help opens on the section of the tab you are viewing. Its search finds a word in every section and in the frequently asked questions.",
+          "Help › What's new presents the changes in each version; Help › Report a problem… prepares a report to copy and send."
+        ]
+      },
       "workspace": {
         "title": "The workspace",
         "intro": "A project opens in the workspace: modules on the left, panel in the middle, tabs in the centre.",
@@ -330,7 +342,7 @@
         "intro": "The project home sums up your story; the synopsis tells it.",
         "items": [
           "Project home: logo, description, type, status and synopsis preview.",
-          "Gallery: the project logo (shown on the project home next to the name; it keeps its shape, even a wide one) and images of your world and story (posters, world maps, mood boards, sketches…), up to 30, drag and drop works.",
+          "Gallery: the project logo (shown on the home page, next to the name) and the images of the world and the story (posters, world maps, moods, sketches…), sorted into folders of up to 30 images. Drag and drop works; each image can be downloaded from its preview.",
           "Synopsis: the story summary, with its genres, subgenres and tone.",
           "Glossary: the words of your story (invented terms, places, concepts, titles…), in alphabetical order, with their definition, a category and links to sheets.",
           "History: everything created, edited, deleted or restored in the project, day by day.",
@@ -347,7 +359,11 @@
           "Locations: where the character lives, works, grew up — optionally with the part of the story concerned.",
           "Colour palette: its colours frame the character's portrait.",
           "Powers: for stories where characters have powers, gifts or magic, turn on the “Powers” card in Project settings › Characters. It is added to every sheet, whatever the level of detail.",
-          "Family tree: in Relationships, “Tree” layout, choose a character to see their family only, generation by generation, from “Family” relations whose link is specified. A grandparent, uncle or cousin linked without the people in between makes those members appear as “Not mentioned” ghosts. Double-click a person to open their sheet."
+          "Family tree: in Relationships, “Tree” layout, choose a character to see their family only, generation by generation, from “Family” relations whose link is specified. A grandparent, uncle or cousin linked without the people in between makes those members appear as “Not mentioned” ghosts. Double-click a person to open their sheet.",
+          "Characters › List: every character as a grid or a table, with search, filters by role and status, and sorting.",
+          "Character relations: three views, Graph, Matrix and List. The graph offers several layouts (network, circle, by role, centred on one character, family tree); “Moment in the story” shows the relations at a given time.",
+          "Arcs: pick a character in the middle panel (the ↗ badge shows how many steps their arc has). Set the arc type, the belief at the start, the truth at the end, what they want and what they need.",
+          "Arcs, steps: each step is tied to a chapter or scene, with an inner state from −5 (trapped in their belief) to +5 (they have understood the truth), the character's choice and its consequence. The curve traces this change; clicking a point takes you to its step. Below, compare with the other characters' arcs."
         ]
       },
       "locations": {
@@ -423,14 +439,53 @@
           "Numbers are computed for you; an item can be left out of the numbering (prologue, interlude).",
           "A structure item sheet gathers all its links in “Links with the world”, sorted by kind: characters (point of view, present…), places, and world entries (an item at the heart of the scene, a faction present, a magic mentioned). “Add a link”, in the card title, asks for the kind, then the item and its role; the pencil on a row changes the role or removes the link. A world entry can also be linked to an item from its “Story” section.",
           "Automatic numbering (renumbering on every move) is turned on in the project settings, as is each level's colour.",
-          "An item's sheet shows its summary and its links with the world.",
           "Documents: in an item's sheet, keep its files (manga pages, PDFs, Word files, images, sounds…) with “Add files” or by drag and drop. They are stored in the project (encrypted if the project is private) and exported in the .ganix.",
           "Click a document to read it in GANIS; “Read the pages” chains a chapter's images. “Edit in its application” opens it in Word, Acrobat, Clip Studio…: every save comes back, the previous content stays in the versions.",
-          "Manga / comic: Script › Flatplan shows a volume's pages as spreads, in the chosen reading direction. A page shows the art filed on its sheet; otherwise, art filed on the chapter is shared out in order. The first printed page decides which pages face each other: a reveal planned at the page turn on an even page is flagged.",
-          "Manga / comic: non-story pages (cover, title page, contents, credits, bonus, afterword…) are added below the flatplan. They take their place in the spreads and the page numbers; covers stand apart, without a page number.",
-          "Manga / comic: Script › Production tracking gives each page its step (storyboard, pencils, inks, screentones, lettering, approved), one page or a whole selection at a time. The flatplan can show these steps in colour (“Show: Production”).",
-          "Manga / comic: “Export the script”, in the flatplan, saves the volume script for the artist (Word, PDF or text): characters and locations first, non-story pages, each page's number, panels and texts.",
-          "Manga / comic: a chapter's sheet creates its pages in one go (“Add pages”). File each piece of art on its page's sheet: it shows next to the panels, and the chapter's “Read the pages” chains them. Panels are found by the search and kept in the page's versions."
+          "Structure › Continuity: each character's path item by item (role, state, changes) and the presence table. Link characters in a scene's sheet, then note their state in its “Continuity” card."
+        ]
+      },
+      "manuscript": {
+        "title": "Novel",
+        "intro": "The Novel module gathers the book's text and the tools to write it, track its progress and present it.",
+        "items": [
+          "The text is written in each scene's sheet (“Text” card), or comes from a Word or text document kept on the scene. The scene's “Writing” card holds its word goal, drafting state, point of view and narration (person, tense).",
+          "Novel › Manuscript: the whole book in one piece, in outline order, with contents, word count and reading time. It exports to Word, PDF or text.",
+          "Novel › Progress: words per chapter, the novel's goal and words left, drafting states, point of view. Scenes whose narration differs from the rest of the novel (another person, another tense) are flagged.",
+          "“Today” tracks your daily word goal, the current session (“New session” starts again from zero), your streak and the last 30 days. The status bar shows the words written today.",
+          "Novel › Replace fixes a name or a word in the text of every scene (case, whole word). Tick the occurrences to replace: a version of each changed scene is kept, and “Undo” reverses the whole replacement.",
+          "Novel › Import takes a Word (.docx), Markdown (.md) or text (.txt) file and splits it into parts, chapters and scenes (* * * separators cut scenes). You check the proposed structure before importing, and the import can be undone in one click.",
+          "Novel › Editorial file: a one-line pitch, a short summary and a long summary, to present the novel to a publisher or agent. “From the synopsis” starts from the project synopsis; each text exports on its own and keeps its versions.",
+          "Novel › Continuity: a character's path scene by scene (role, state, changes) and the presence table by chapter. The state is noted in each scene's “Continuity” card."
+        ]
+      },
+      "script": {
+        "title": "Manga / comic",
+        "intro": "The Script module follows a manga or comic page by page, from writing to production.",
+        "items": [
+          "Script › Flatplan shows a volume's pages as spreads, in the chosen reading direction. A page shows the art filed on its sheet; otherwise, art filed on the chapter is shared out in order. The first printed page decides which pages face each other: a reveal planned at the page turn on an even page is flagged.",
+          "Non-story pages (cover, title page, contents, credits, bonus, afterword…) are added below the flatplan. They take their place in the spreads and the page numbers; covers stand apart, without a page number.",
+          "Script › Production tracking gives each page its step (storyboard, pencils, inks, screentones, lettering, approved), one page or a whole selection at a time. The flatplan can show these steps in colour (“Show: Production”).",
+          "“Export the script”, in the flatplan, saves the volume script for the artist (Word, PDF or text): characters and locations first, non-story pages, each page's number, panels and texts.",
+          "A chapter's sheet creates its pages in one go (“Add pages”). File each piece of art on its page's sheet: it shows next to the panels, and the chapter's “Read the pages” chains them. Panels are found by the search and kept in the page's versions.",
+          "Script › Reading: the story chapter by chapter, with each chapter's explanation (its summary), then what its pages show.",
+          "Script › Progress: planned and written pages, statuses and amount of text.",
+          "Script › Continuity: where each character appears, and in what state, panel by panel."
+        ]
+      },
+      "screen": {
+        "title": "Film and series",
+        "intro": "The Screenplay module of a film or series writes in the standard format and prepares the shoot.",
+        "items": [
+          "Film: each scene sheet has its script in standard format (INT. / EXT. heading, location, time; actions, lines, transitions, shots, notes). A sequence sheet tracks its writing status and estimated runtime (one script page per minute).",
+          "Film: Screenplay › Film tracking gathers the film sheet (logline, target runtime, writer), the estimated runtime of the whole film against the target, the runtime and share of each act, the status of the sequences and the lines per character.",
+          "Film: Screenplay › Script reading shows the whole film, scenes numbered, and exports it to Word, PDF, text or Fountain: a title page (writer, logline), without act or sequence titles, like a feature screenplay.",
+          "Film: the film sheet (Screenplay › Film tracking) holds the logline, pitch and statement of intent; “Export the dossier” adds the project synopsis, characters, step outline and treatment, built from the plan, as Word, PDF or text.",
+          "Film: Screenplay › Breakdown gives, for each scene, the characters and their state, the linked sheets, and the extras, props, wardrobe, effects… to plan; the Shooting schedule tab groups scenes by set, interior or exterior, day or night.",
+          "Film: Screenplay › Index cards shows one card per scene, in its act's colour; drag a card to move it, even into another sequence.",
+          "Film: in script reading, “Revisions” locks scene numbers (an added scene becomes 12A) and starts a coloured revision: anything changed afterwards is marked with an asterisk. Choosing an actor keeps only their scenes, for auditions. The PDF export follows the standard format (Courier 12, 55 lines per page, (MORE) and (CONT'D)).",
+          "Film: Screenplay › Import a screenplay brings in a Fountain or Final Draft (.fdx) file; characters and locations are linked to sheets with the same name, or created. In a scene sheet, suggestions follow your typing (transitions, shots, character and location names).",
+          "Series: Screenplay has the same tools as the film — Index cards (one column per episode), Breakdown and shooting schedule across episodes, Fountain or Final Draft import, revisions and locked numbers (episode.scene: 2.5, then 2.5A). Episode tracking shows each episode's due date (in red once passed), speaking time by episode, and “Export the bible” assembles the concept, characters, seasons and their episodes.",
+          "Film: Film tracking places the structure beats (inciting incident, plot points, midpoint, climax) on scenes and tells you whether they fall too early or too late; each character's speaking time shows by act, with their longest absence."
         ]
       },
       "reading": {
@@ -439,7 +494,8 @@
         "items": [
           "Novel: the continuous manuscript, chapter after chapter.",
           "Manga / comic: the story chapter by chapter, like a novel: what each chapter is about (its summary), then what its pages show, one after the other. Panel details (framing, balloons, sound effects…) stay in the page sheets.",
-          "Film, series, video game, role-playing game, custom project: each outline item with its summary, its text or documents, or failing that the plot events attached to it.",
+          "Film: the script in standard format, scene by scene, numbered across the whole film.",
+          "Series, video game, role-playing game, custom project: each outline item with its summary, its text or documents, or failing that the plot events attached to it.",
           "F5 does the same. Press again (or the ■ button) to return to the editing layout.",
           "The reading updates itself: moving a scene in the outline moves it in the reading. It exports to Word, PDF or text."
         ]
@@ -453,7 +509,16 @@
           "Link each event to the project: point of view, characters present, location, structure chapter and notes.",
           "“Story reading” shows the events in reading order (by default the structure's) with everything attached, chapter documents included.",
           "Character, location, structure item and world sheets (items, factions…) show their events in their “Plot” section. In an event’s panel, “Items, fauna and flora, factions…” adds world entries to it.",
-          "Ctrl+Z undoes each action on the board. The “Tension” button shows the tension curve; plot colours are set in Project settings › Plot."
+          "Ctrl+Z undoes each action on the board. The “Tension” button shows the tension curve; plot colours are set in Project settings › Plot.",
+          "Timeline: the plot events placed by their date in the story, one row per plot line, with the eras in the background. It opens year by year at the start of the story; the “Story starts” button takes you back there.",
+          "Zoom: the − / + buttons or + / − keys (one mark gap at a time), or Ctrl + wheel. To move: drag the timeline, use the horizontal wheel (or Shift + wheel), or the overview below the plot lines.",
+          "Click an event on the timeline to see its details and the characters’ ages; ← → move from one event to the next in time. The “Key” button explains the shapes.",
+          "In the timeline toolbar, “Event” and “Eras” open the right panel: the details of the chosen event, or your world’s eras, to create and edit (clicking an era band opens it too). The date precision and the name of the years are set in the project settings › Plot.",
+          "“Walk through” follows the story event by event on the board: in outline order, in reading order, or a single plot line from start to end, with what each event triggers.",
+          "Mysteries: a question the reader wants answered. Plant its clues in events, choose the event of the reveal and track its status (open, solved, dropped).",
+          "Structure templates: three acts, hero's journey… place the acts and the main beats on the board's moments; you can also create your own.",
+          "Automatic pointers: invitations to look at the structure (isolated plot line, untitled event, link going back in time…), never automatic fixes.",
+          "“Events from the structure” creates an event for each item of an outline level (each chapter, for instance), tied to that item and with its summary. The clean view hides the bars to focus on the board."
         ]
       },
       "notes": {
@@ -464,14 +529,15 @@
           "Sticky-note box: a coloured block in the text. Linked boxes: steps joined by arrows, with “+” to insert more. Diagram: boxes you move and connect with the mouse.",
           "Mention a project item, in a note or in a novel scene's text: “$$” followed by a few letters searches the whole project. A letter between two “$” shows one kind only: “$c$” characters, “$l$” locations, “$s$” structure, “$w$” world (items, wildlife, factions, peoples, magic), “$n$” notes, “$i$” gallery images. French letters work too: “$p$” characters, “$d$” structure, “$u$” world. Clicking the link opens the sheet.",
           "File notes in folders by dragging them in the panel; pin the most important ones.",
-          "The sticky-note wall holds loose ideas: move them by their strip, resize them by their corner."
+          "The sticky-note wall holds loose ideas: move them by their strip, resize them by their corner.",
+          "Inspiration board: gallery images, colours, quotes and notes, laid out freely to set the story's mood."
         ]
       },
       "search": {
         "title": "Search",
         "intro": "Find anything in the project.",
         "items": [
-          "The magnifier at the top right, or Ctrl+F, opens search in the middle panel. It looks through characters, locations, structure, notes (including their content) and sticky notes.",
+          "The magnifier at the top right, or Ctrl+F, opens search in the middle panel. It looks through the whole project: characters, locations, world sheets, structure, documents, plot, notes (including their content) and sticky notes.",
           "Accents and capitals don't matter: “chateau” finds “Château”. Several words: all must appear.",
           "Ctrl+K opens the palette, which also offers pages and actions."
         ]
@@ -493,7 +559,7 @@
         "items": [
           "Each private project is encrypted: without your password, its data can't be read. Public projects (created without an account) are not encrypted and can be opened by anyone who uses GANIS on this computer.",
           "Export as .ganix (File › Export) makes a full copy of the project, to keep as a backup or open on another computer. Note: this file is not encrypted.",
-          "Import a .ganix (File › Import) adds the project, or replaces the existing one (a backup is made first).",
+          "Import a .ganix (File › Import) adds the project, or replaces the existing one (the previous version first goes to the project trash, encrypted, for 30 days).",
           "GANIS works fully offline."
         ]
       },
@@ -501,8 +567,8 @@
         "title": "Settings",
         "intro": "Two levels of settings.",
         "items": [
-          "Project settings (bottom of the left bar): information, statuses, character detail level, location types, structure and colours.",
-          "Objects, Fauna and flora, Factions: turn these optional modules on and choose their categories.",
+          "Project settings (bottom of the left bar): information, statuses, character detail level, location types, structure and colours, and Plot (plot line colours, the timeline's date precision and the name of the years).",
+          "Objects, Fauna and flora, Factions, Peoples, Magic: turn these optional modules on and choose their categories.",
           "General settings (gear at the top): account, password, recovery key, language, theme, autosave.",
           "Packages: colour themes for the whole app."
         ]
@@ -585,6 +651,30 @@
         {
           "q": "How do I frame an entry's image with colours?",
           "a": "Add colours in the entry's “Colour palette” field (character, location, object, fauna and flora): a frame of those colours surrounds its image."
+        },
+        {
+          "q": "How do I follow a character's change through the story?",
+          "a": "Characters › Arcs: pick the character in the middle panel, note what they believe at the start and understand at the end, then add a step for each key moment, tied to its chapter, with their inner state. The curve draws itself."
+        },
+        {
+          "q": "How do I change a name throughout my novel?",
+          "a": "Novel › Replace: type the old and the new name, check the ticked occurrences, then “Replace”. A version of each changed scene is kept, and “Undo” reverses everything."
+        },
+        {
+          "q": "How do I bring my Word manuscript into GANIS?",
+          "a": "Novel › Import: choose the file (.docx, .md or .txt), check the proposed split into parts, chapters and scenes, then “Import”. “Undo the import” takes you back."
+        },
+        {
+          "q": "How do I place my events in the story's time?",
+          "a": "Give each event a year (in its details, on the board or on the timeline), then open Plot › Timeline. To go down to the month, day or hour, set the precision in the project settings › Plot."
+        },
+        {
+          "q": "Where do I create the great periods of my world?",
+          "a": "On the timeline, “Eras” button: “Add an era”, then its name, years and colour. It shows as a band above the years."
+        },
+        {
+          "q": "How do I track a mystery's clues?",
+          "a": "On the plot board, create a mystery (its question), plant its clues in events and choose the event where the answer is revealed."
         }
       ]
     }

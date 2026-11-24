@@ -69,7 +69,13 @@
     "writerPlaceholder": "Qui écrit cet épisode ?",
     "scenes_one": "{{written}} scène écrite sur {{count}}.",
     "scenes_other": "{{written}} scènes écrites sur {{count}}.",
-    "status": "Statut"
+    "status": "Statut",
+    "dueDate": "Échéance",
+    "overdue": "Échéance dépassée"
+  },
+  "sequence": {
+    "title": "Avancement de la séquence",
+    "description": "Statut d'écriture, scènes écrites et durée estimée de la séquence."
   },
   "status": {
     "idea": "Idée",
@@ -112,13 +118,218 @@
       "writer": "Scénariste",
       "scenes": "Scènes",
       "duration": "Durée",
-      "goal": "Visée"
+      "goal": "Visée",
+      "due": "Échéance"
     },
     "noSeason": "Sans saison",
     "season": "{{label}} · {{duration}}",
-    "overGoal": "Au-delà de la durée visée",
-    "cast": "Répliques par personnage",
-    "castHint": "Nombre de répliques de chaque personnage sur toute la série.",
-    "noLines": "Aucune réplique attribuée pour l'instant."
+    "overGoal": "Au-delà de la durée visée"
+  },
+  "film": {
+    "all": "Tout le film",
+    "empty": "Aucune scène pour l'instant. Créez des actes, des séquences et des scènes dans le plan.",
+    "writtenBy": "Écrit par {{writer}}",
+    "progressEmpty": "Aucune séquence pour l'instant. Créez des actes et des séquences dans le plan, puis écrivez leurs scènes.",
+    "sequences_one": "{{count}} séquence",
+    "sequences_other": "{{count}} séquences",
+    "sequence": "Séquence",
+    "noAct": "Hors acte",
+    "act": "{{label}} · {{duration}} · {{share}} % du film",
+    "details": {
+      "title": "Fiche du film",
+      "description": "Logline, durée visée et scénariste du film entier ; ils figurent sur la page de titre de l'export.",
+      "loglinePlaceholder": "Le film en une phrase : qui veut quoi, et ce qui l'en empêche.",
+      "ofGoal": "{{duration}} / {{goal}}",
+      "runtimeGoalPlaceholder": "Ex. 100",
+      "writerPlaceholder": "Qui écrit ce film ?"
+    }
+  },
+  "layout": {
+    "more": "(À SUIVRE)",
+    "contd": "(SUITE)"
+  },
+  "revision": {
+    "menu": "Révisions",
+    "label": "Révision {{color}} du {{date}}",
+    "start": "Nouvelle révision ({{color}})",
+    "stop": "Terminer la révision",
+    "lock": "Verrouiller les numéros de scène",
+    "unlock": "Déverrouiller les numéros",
+    "locked": "Numéros verrouillés",
+    "hint": "ce qui change depuis est marqué d'un astérisque.",
+    "colors": {
+      "white": "blanche",
+      "blue": "bleue",
+      "pink": "rose",
+      "yellow": "jaune",
+      "green": "verte",
+      "goldenrod": "dorée",
+      "buff": "chamois",
+      "salmon": "saumon"
+    }
+  },
+  "sides": {
+    "label": "Comédien",
+    "everyone": "Tout le monde",
+    "file": "extraits de {{name}}",
+    "none": "Ce personnage n'apparaît dans aucune scène de la sélection.",
+    "heading_one": "Extraits de {{name}} : {{count}} scène",
+    "heading_other": "Extraits de {{name}} : {{count}} scènes"
+  },
+  "dossier": {
+    "subtitle": "Dossier du film",
+    "logline": "Logline :",
+    "fields": {
+      "pitch": "Pitch",
+      "intention": "Note d'intention"
+    },
+    "hints": {
+      "pitch": "Quelques phrases pour donner envie : l'histoire, le personnage, l'enjeu.",
+      "intention": "Pourquoi ce film, pourquoi vous, et comment vous voulez le filmer."
+    },
+    "export": "Exporter le dossier",
+    "exportTitle": "Exporter le dossier du film",
+    "sequenceMeta_one": "{{count}} scène · {{duration}}",
+    "sequenceMeta_other": "{{count}} scènes · {{duration}}",
+    "characters": "Personnages",
+    "outline": "Séquencier",
+    "treatment": "Traitement",
+    "runtime": "Durée visée : {{duration}}",
+    "roles": {
+      "main": "Personnage principal",
+      "secondary": "Second rôle",
+      "antagonist": "Antagoniste",
+      "mentor": "Mentor",
+      "ally": "Allié",
+      "extra": "Figurant"
+    },
+    "placeholders": {
+      "pitch": "Sur une île bretonne, une saunière doit rallumer les sept feux du phare…",
+      "intention": "J'ai grandi au bord d'un marais salant…"
+    },
+    "synopsis": "Synopsis"
+  },
+  "breakdown": {
+    "subtitle": "Dépouillement",
+    "scheduleSubtitle": "Plan de travail",
+    "tabs": {
+      "scenes": "Par scène",
+      "schedule": "Plan de travail"
+    },
+    "export": "Exporter",
+    "exportTitle": "Exporter le dépouillement",
+    "exportScheduleTitle": "Exporter le plan de travail",
+    "fields": {
+      "extras": "Figurants",
+      "props": "Accessoires",
+      "costumes": "Costumes",
+      "makeup": "Maquillage et coiffure",
+      "vehicles": "Véhicules",
+      "effects": "Effets (spéciaux, visuels)",
+      "sound": "Son et musique",
+      "notes": "Notes de régie"
+    },
+    "placeholders": {
+      "extras": "Vingt pêcheurs, deux enfants…",
+      "props": "Un las de saunier, une lanterne…",
+      "costumes": "Ciré jaune mouillé…",
+      "makeup": "Main bandée, cernes…",
+      "vehicles": "Canot à voile…",
+      "effects": "Brume, anguilles (effet visuel)…",
+      "sound": "Cloche, cornet de brume…",
+      "notes": "Tourner à marée basse…"
+    },
+    "cast": "Personnages",
+    "entries": "Fiches liées",
+    "duration": "Durée",
+    "moment": {
+      "day": "Jour",
+      "night": "Nuit",
+      "unknown": "Moment non précisé"
+    },
+    "noLocation": "Sans lieu",
+    "noCast": "Aucun personnage",
+    "scenes": "Scènes",
+    "filled_one": "{{count}} champ",
+    "filled_other": "{{count}} champs",
+    "scheduleHint": "Les scènes regroupées par décor, intérieur ou extérieur, jour ou nuit : on tourne ensemble ce qui se tourne au même endroit dans la même lumière.",
+    "groupMeta_one": "{{count}} scène · {{duration}}",
+    "groupMeta_other": "{{count}} scènes · {{duration}}",
+    "sceneCount_one": "{{count}} scène",
+    "sceneCount_other": "{{count}} scènes",
+    "groupCount_one": "{{count}} groupe de tournage",
+    "groupCount_other": "{{count}} groupes de tournage"
+  },
+  "board": {
+    "description": "Une carte par scène, de la couleur de son acte. Glissez une carte pour la déplacer ; double-cliquez pour ouvrir la scène.",
+    "hint": "Glisser pour déplacer, double-cliquer pour ouvrir"
+  },
+  "import": {
+    "description": "Reprenez un scénario écrit ailleurs : chaque scène arrive dans la séquence choisie, avec ses répliques.",
+    "choose": "Choisir un scénario",
+    "formats": "Fountain (.fountain, .txt) ou Final Draft (.fdx)",
+    "reading": "Lecture du fichier…",
+    "empty": "Aucune scène trouvée dans ce fichier.",
+    "unreadable": "Ce fichier n'a pas pu être lu.",
+    "found_one": "{{count}} scène trouvée.",
+    "found_other": "{{count}} scènes trouvées.",
+    "characters_one": "{{count}} personnage",
+    "characters_other": "{{count}} personnages",
+    "locations_one": "{{count}} lieu",
+    "locations_other": "{{count}} lieux",
+    "new": "nouveau",
+    "noHeading": "(sans en-tête)",
+    "blocks_one": "{{count}} élément",
+    "blocks_other": "{{count}} éléments",
+    "noSequence": "Créez d'abord une séquence (ou un épisode) dans le plan.",
+    "target": "Ajouter à la fin de",
+    "run": "Importer",
+    "importing": "Import… {{done}} / {{count}}",
+    "cancel": "Annuler",
+    "done": "Import terminé : {{scenes}} scènes, {{characters}} personnages et {{locations}} lieux créés.",
+    "openReading": "Lire le scénario"
+  },
+  "beats": {
+    "title": "Repères de structure",
+    "hint": "Placez chaque moment clé sur une scène : GANIS indique s'il tombe trop tôt ou trop tard par rapport à la durée du film.",
+    "choose": "Choisir une scène…",
+    "names": {
+      "inciting": "Élément déclencheur",
+      "plot1": "Premier pivot",
+      "midpoint": "Point médian",
+      "plot2": "Deuxième pivot",
+      "climax": "Climax"
+    },
+    "expected": "Attendu vers {{minute}} min",
+    "at": "À {{minute}} min ({{share}} %)",
+    "verdict": {
+      "missing": "Non placé",
+      "early": "Trop tôt",
+      "onTime": "Bien placé",
+      "late": "Trop tard"
+    }
+  },
+  "stats": {
+    "title": "Temps de parole",
+    "hint": "Estimé à la page-minute, à partir des répliques ; la plus longue absence est le temps entre deux scènes où le personnage apparaît.",
+    "columns": {
+      "character": "Personnage",
+      "lines": "Répliques",
+      "minutes": "Parole",
+      "scenes": "Scènes",
+      "gap": "Plus longue absence"
+    },
+    "gapFrom": "après {{minute}} min",
+    "none": "Aucune réplique attribuée pour l'instant."
+  },
+  "typing": {
+    "suggestions": "Suggestions"
+  },
+  "bible": {
+    "subtitle": "Bible de la série",
+    "concept": "Concept",
+    "seasons": "Saisons et épisodes",
+    "export": "Exporter la bible",
+    "exportTitle": "Exporter la bible de la série"
   }
 }

@@ -375,7 +375,8 @@ app.ganis.studio/
 ├── app.db                       accounts, key slots, project list, packages
 ├── projets/
 │   └── <uuid>/project.db        a project's encrypted database (SQLCipher)
-├── sauvegardes/                 copy of the old project when a .ganix import replaces it
+
+
 ├── open-documents/              temporary copies of documents opened externally
 ├── staging/                     waiting area for .ganix imports
 └── tmp/                         working files (exports in progress)

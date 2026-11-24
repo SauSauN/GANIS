@@ -470,3 +470,50 @@
         crate::utils::remove_dir_eventually(staging).await;
         crate::utils::remove_dir_eventually(dir).await;
     }
+
+    /// Fuzzing simple : des milliers d'archives abîmées (octets modifiés,
+    /// fichiers tronqués, données au hasard) ne font jamais planter la
+    /// lecture ; elles sont refusées, ou acceptées seulement si elles
+    /// restent intactes.
+    #[tokio::test]
+    async fn damaged_archives_never_crash_the_reader() {
+        let dir = temp_dir("fuzz");
+        let source = encrypted_project(&dir.join("source")).await;
+        let good = dir.join("bon.ganix");
+        write_ganix(&source, &project("P"), &good, &dir.join("work")).await.unwrap();
+        source.close().await;
+
+        let original = std::fs::read(&good).unwrap();
+        let path = dir.join("fuzz.ganix");
+
+        // Générateur pseudo-aléatoire déterministe (xorshift).
+        let mut seed: u64 = 0x9E37_79B9_7F4A_7C15;
+        let mut next = move || {
+            seed ^= seed << 13;
+            seed ^= seed >> 7;
+            seed ^= seed << 17;
+            seed
+        };
+
+        for round in 0..1500 {
+            let mut bytes = original.clone();
+            match round % 3 {
+                0 => {
+                    for _ in 0..=(next() % 8) {
+                        let at = (next() as usize) % bytes.len();
+                        bytes[at] ^= (next() % 255 + 1) as u8;
+                    }
+                }
+                1 => bytes.truncate((next() as usize) % bytes.len()),
+                _ => bytes = (0..(next() % 4096)).map(|_| next() as u8).collect(),
+            }
+
+            std::fs::write(&path, &bytes).unwrap();
+            if verify_archive(&path).is_ok() {
+                // Accepté : seul un octet hors des données utiles a pu changer.
+                assert_eq!(round % 3, 0, "archive tronquée ou aléatoire acceptée (tour {round})");
+            }
+        }
+
+        std::fs::remove_dir_all(dir).ok();
+    }

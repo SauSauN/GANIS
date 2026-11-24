@@ -8,7 +8,8 @@
  * - Manga / BD : l'histoire chapitre par chapitre (`script.read`), à
  *   l'image du roman : l'explication de chaque chapitre, puis ce que
  *   montrent ses pages, sans les détails de case (cadrage, bulles…).
- * - Film, série, jeu vidéo, JDR, projet libre : `structure.read`, compilé
+ * - Film : le scénario au format du long métrage (`film.read`).
+ * - Série, jeu vidéo, JDR, projet libre : `structure.read`, compilé
  *   ici. Chaque élément du découpage donne son titre (« Acte I »,
  *   « Épisode 3 — Le retour »…), son résumé, son texte (fiche, sinon
  *   documents texte) et, à défaut de texte, ce qui s'y passe d'après la
@@ -24,11 +25,12 @@ import type { ProjectType, StructureNode } from "@/types";
 export function readingFeatureFor(type: ProjectType | string | null | undefined): string {
   if (type === "novel") return "manuscript.read";
   if (type === "manga") return "script.read";
+  if (type === "film") return "film.read";
   return "structure.read";
 }
 
 /** Onglets qui sont une lecture complète (bouton ▶ enfoncé). */
-export const READING_FEATURES = new Set(["manuscript.read", "script.read", "structure.read"]);
+export const READING_FEATURES = new Set(["manuscript.read", "script.read", "film.read", "structure.read"]);
 
 export type StoryEntry =
   | {

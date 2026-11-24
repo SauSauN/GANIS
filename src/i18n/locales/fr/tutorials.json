@@ -224,6 +224,76 @@
       }
     }
   },
+  "film": {
+    "title": "Démarrer un projet : {{type}}",
+    "name": "{{type}}",
+    "intro": "Les grandes étapes pour écrire votre film, de la logline au scénario exporté.",
+    "steps": {
+      "start": {
+        "title": "Posez votre histoire",
+        "text": "Commencez par quelques lignes : de quoi parle ce film, et sur quel ton ?",
+        "points": ["Détails › Synopsis du projet : résumé, genres, sous-genres et ton."]
+      },
+      "cast": {
+        "title": "Créez vos personnages",
+        "text": "Une fiche par personnage : ce sont eux qui prendront la parole dans les répliques.",
+        "points": [
+          "Personnages › Créer un personnage, ou Ctrl+N dans le module.",
+          "Créez aussi vos lieux : ils servent à l'en-tête des scènes (INT. CUISINE — NUIT)."
+        ]
+      },
+      "plan": {
+        "title": "Découpez le film",
+        "text": "Le plan propose par défaut : {{levels}}. Vous pouvez renommer ces niveaux dans les paramètres.",
+        "points": ["Découpage › Plan du récit : ajoutez vos actes, leurs séquences, puis leurs scènes."]
+      },
+      "scene": {
+        "title": "Écrivez les scènes",
+        "text": "La fiche de chaque scène a son scénario : l'en-tête, puis les actions, répliques, transitions et plans, au format standard.",
+        "points": [
+          "Ctrl+Entrée passe à l'élément suivant ; après une réplique, l'autre personnage répond.",
+          "La durée s'estime à une page de scénario par minute.",
+          "La fiche d'une séquence suit son statut d'écriture et sa durée."
+        ]
+      },
+      "progress": {
+        "title": "Suivez le film",
+        "text": "Le suivi du film réunit la fiche du film et l'avancement : durée estimée par rapport à la durée visée, durée de chaque acte, statut des séquences.",
+        "points": [
+          "Renseignez la logline, la durée visée et le scénariste : ils figurent sur la page de titre de l'export.",
+          "La part de chaque acte montre un acte trop long."
+        ]
+      },
+      "read": {
+        "title": "Lisez et exportez le scénario",
+        "text": "La lecture du scénario montre tout le film au format du scénario, scènes numérotées.",
+        "points": [
+          "Le bouton ▶ de la barre de titre (F5) l'affiche sur tout l'espace.",
+          "Export Word, PDF, texte ou Fountain (Final Draft, Highland, WriterDuet…)."
+        ]
+      },
+      "continuity": {
+        "title": "Vérifiez la continuité",
+        "text": "Où apparaît chaque personnage, dans quel état, avec ses répliques, scène par scène.",
+        "points": ["Le tableau des présences montre qui apparaît dans quelle séquence."]
+      },
+      "board": {
+        "title": "Réorganisez sur le tableau de liège",
+        "text": "Une carte par scène, de la couleur de son acte : glissez-les d'une séquence à l'autre pour essayer un autre ordre.",
+        "points": ["Double-cliquez sur une carte pour ouvrir la scène."]
+      },
+      "dossier": {
+        "title": "Préparez le dossier du film",
+        "text": "Dans le Suivi du film, la fiche du film réunit la logline, le pitch et la note d'intention ; « Exporter le dossier » y ajoute le synopsis du projet, les personnages, le séquencier et le traitement.",
+        "points": ["Rien n'est écrit deux fois : le séquencier et le traitement viennent des résumés du plan."]
+      },
+      "breakdown": {
+        "title": "Dépouillez pour le tournage",
+        "text": "Pour chaque scène, ce que la régie doit prévoir ; le plan de travail regroupe les scènes par décor et par moment.",
+        "points": ["Verrouillez les numéros de scène et ouvrez une révision en couleur dans la lecture du scénario quand le tournage approche."]
+      }
+    }
+  },
   "characters": {
     "title": "Tutoriel : Personnages",
     "name": "Personnages",

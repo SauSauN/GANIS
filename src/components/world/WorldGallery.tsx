@@ -6,9 +6,10 @@ import { errorText } from "@/lib/errors";
 import { GALLERY_MAX_SIDE, PortraitError, preparePortrait } from "@/lib/portraitImage";
 import { useWorldStore } from "@/stores/worldStore";
 import type { WorldImage, WorldModule } from "@/types";
+import { sessionMap } from "@/lib/sessionCache";
 
 /** Images déjà chargées (par identifiant), gardées le temps de la session. */
-const urlCache = new Map<string, string>();
+const urlCache = sessionMap<string, string>();
 const inflight = new Set<string>();
 
 /**

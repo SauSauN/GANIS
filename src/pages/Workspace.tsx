@@ -18,6 +18,8 @@ import {
   featureAvailable,
   findFeature,
   modulesFor,
+  PROJECT_TYPE_MODULES,
+  projectTypeModuleId,
   type ModuleId,
 } from "@/components/workspace/modules";
 import {
@@ -62,6 +64,7 @@ import {
   useUnsavedStore,
 } from "@/lib/unsavedChanges";
 import { api } from "@/lib/api";
+import { confirmGanixExport } from "@/lib/ganixExport";
 import { useRegisterCommands } from "@/lib/commands";
 import {
   showTutorialOnce,
@@ -75,6 +78,7 @@ import { useReloadStore } from "@/stores/reloadStore";
 import { useCharacterStore } from "@/stores/characterStore";
 import { useEnabledWorldModules, useWorldStore } from "@/stores/worldStore";
 import { useNoteStore } from "@/stores/noteStore";
+import { useBoardStore } from "@/stores/boardStore";
 import { useStructureStore } from "@/stores/structureStore";
 import { useProjectStore } from "@/stores/projectStore";
 import { useWritingTracker } from "@/stores/writingStore";
@@ -267,6 +271,9 @@ export default function Workspace() {
 
   /** Et des notes (le titre de la note). */
   useNoteStore((state) => state.notes);
+
+  /** Et des planches d'inspiration (leur nom). */
+  useBoardStore((state) => state.boards);
 
   /** Et des objets, de la faune et de la flore (nom de la fiche). */
   useWorldStore((state) => state.item.entries);
@@ -503,7 +510,7 @@ export default function Workspace() {
     const reserved = (id: string) => !featureAvailable(id, projectType);
     for (const tabId of layoutRef.current.tabs.filter(reserved)) forceCloseTab(tabId);
     setActiveModule((current) =>
-      (current === "manuscript" && projectType !== "novel") || (current === "script" && projectType !== "manga") || (current === "screenplay" && projectType !== "series") ? "details" : current,
+      PROJECT_TYPE_MODULES.has(current) && current !== projectTypeModuleId(projectType) ? "details" : current,
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [projectType]);
@@ -732,6 +739,7 @@ export default function Workspace() {
   /** Exporte le projet ouvert en `.ganix` (menu Fichier ou Projet). */
   async function exportCurrentProject() {
     if (!project) return;
+    if (!(await confirmGanixExport(project))) return;
     try {
       const file = await api.exportProject(project.id, t("projects:ganix.export.dialogTitle"));
       if (file) {

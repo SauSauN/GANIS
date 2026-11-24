@@ -1,6 +1,7 @@
-import { useEffect, useRef, type KeyboardEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowDown, ArrowUp, Clapperboard, Loader2, Plus, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, Clapperboard, Plus, Trash2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { InfoTip } from "@/components/common/InfoTip";
 import { Button } from "@/components/ui/button";
 import { CollapsibleCard, useCollapsible } from "@/components/workspace/views/CollapsibleCard";
@@ -17,6 +18,7 @@ import {
   type DraftBlock,
   type SceneDraft,
 } from "@/lib/series";
+import { completions, PARENTHETICALS } from "@/lib/screenplayTyping";
 import { cn } from "@/lib/utils";
 import { SCENE_PLACES, SCENE_TIMES, SCREENPLAY_KINDS, type Character, type Location, type ScreenplayKind } from "@/types";
 
@@ -48,6 +50,9 @@ export function SceneScriptCard({ draft, failed, onChange, characters, locations
   const [open, setOpen] = useCollapsible("ganis.nodeSheet.seriesScene.collapsed");
   // Élément à focaliser après un ajout ou une suppression.
   const focusKey = useRef<string | null>(null);
+  // Élément en cours de frappe : ses suggestions s'affichent dessous.
+  const [active, setActive] = useState<string | null>(null);
+  const names = useMemo(() => ({ characters: characters.map((c) => fullName(c)).filter(Boolean), locations: locations.map((l) => l.name) }), [characters, locations]);
   const refs = useRef(new Map<string, HTMLTextAreaElement>());
   useEffect(() => {
     if (!focusKey.current) return;
@@ -128,7 +133,7 @@ export function SceneScriptCard({ draft, failed, onChange, characters, locations
         </p>
       ) : !draft ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          <LoadingDots className="size-4" aria-hidden="true" />
           {t("scene.loading")}
         </p>
       ) : (
@@ -195,6 +200,7 @@ export function SceneScriptCard({ draft, failed, onChange, characters, locations
               <p className="py-4 text-center text-sm text-muted-foreground">{t("scene.empty")}</p>
             )}
 
+            <ParentheticalList />
             <ol className="space-y-3">
               {draft.blocks.map((block, index) => (
                 <li key={block.key} className="group relative" data-kind={block.kind}>
@@ -228,6 +234,7 @@ export function SceneScriptCard({ draft, failed, onChange, characters, locations
                         value={block.parenthetical}
                         placeholder={t("scene.parentheticalPlaceholder")}
                         onChange={(e) => update(index, (b) => ({ ...b, parenthetical: e.target.value }))}
+                        list="ganis-parentheticals"
                         className="block w-full bg-transparent px-8 text-center font-mono text-sm italic outline-none placeholder:text-muted-foreground/50"
                       />
                       <textarea
@@ -238,8 +245,13 @@ export function SceneScriptCard({ draft, failed, onChange, characters, locations
                         placeholder={t("placeholder.dialogue")}
                         onChange={(e) => update(index, (b) => ({ ...b, content: e.target.value }))}
                         onKeyDown={(e) => onKeyDown(e, index)}
+                        onFocus={() => setActive(block.key)}
+                        onBlur={() => setActive((k) => (k === block.key ? null : k))}
                         className={area}
                       />
+                      {active === block.key && (
+                        <Suggestions items={completions("dialogue", block.content, names)} onPick={(value) => update(index, (b) => ({ ...b, content: value }))} />
+                      )}
                     </div>
                   ) : (
                     <textarea
@@ -250,12 +262,21 @@ export function SceneScriptCard({ draft, failed, onChange, characters, locations
                       placeholder={t(`placeholder.${block.kind}`)}
                       onChange={(e) => update(index, (b) => ({ ...b, content: e.target.value }))}
                       onKeyDown={(e) => onKeyDown(e, index)}
+                      onFocus={() => setActive(block.key)}
+                      onBlur={() => setActive((k) => (k === block.key ? null : k))}
                       className={cn(
                         area,
                         block.kind === "transition" && "text-right font-bold uppercase",
                         block.kind === "shot" && "font-bold uppercase",
                         block.kind === "note" && "rounded bg-amber-100/60 px-2 py-1 font-sans italic text-amber-900 dark:bg-amber-400/10 dark:text-amber-200",
                       )}
+                    />
+                  )}
+                  {active === block.key && block.kind !== "dialogue" && (
+                    <Suggestions
+                      align={block.kind === "transition" ? "right" : "left"}
+                      items={completions(block.kind, block.content, names)}
+                      onPick={(value) => update(index, (b) => ({ ...b, content: value }))}
                     />
                   )}
                 </li>
@@ -319,5 +340,42 @@ function BlockTools({ kind, first, last, onKind, onMove, onDelete }: BlockToolsP
         <Trash2 className="size-3.5" />
       </button>
     </div>
+  );
+}
+
+/** Suggestions sous l'élément en cours de frappe ; un clic les écrit (la frappe garde le focus). */
+function Suggestions({ items, onPick, align = "left" }: { items: Array<{ label: string; value: string }>; onPick: (value: string) => void; align?: "left" | "right" }) {
+  const { t } = useTranslation("series");
+  if (!items.length) return null;
+  return (
+    <div className={cn("mt-1 flex flex-wrap gap-1", align === "right" && "justify-end")} role="listbox" aria-label={t("typing.suggestions")}>
+      {items.map((item) => (
+        <button
+          key={item.label}
+          type="button"
+          role="option"
+          aria-selected={false}
+          // Avant la perte du focus : la suggestion s'applique, la frappe continue.
+          onMouseDown={(e) => {
+            e.preventDefault();
+            onPick(item.value);
+          }}
+          className="rounded-full border bg-background px-2 py-0.5 font-mono text-xs text-muted-foreground hover:bg-muted hover:text-foreground"
+        >
+          {item.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+/** Didascalies courantes, proposées dans le champ de la didascalie. */
+export function ParentheticalList() {
+  return (
+    <datalist id="ganis-parentheticals">
+      {PARENTHETICALS.map((p) => (
+        <option key={p} value={p} />
+      ))}
+    </datalist>
   );
 }

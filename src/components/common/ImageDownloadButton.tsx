@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Download, Loader2 } from "lucide-react";
+import { Download } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import { downloadImage } from "@/lib/downloadImage";
 import { errorText } from "@/lib/errors";
@@ -29,7 +30,7 @@ export function ImageDownloadButton({ url, name, className }: { url: string; nam
 
   return (
     <Button type="button" variant="outline" size="sm" onClick={() => void run()} disabled={busy} className={className}>
-      {busy ? <Loader2 className="animate-spin" /> : <Download />}
+      {busy ? <LoadingDots /> : <Download />}
       {t("image.download")}
     </Button>
   );

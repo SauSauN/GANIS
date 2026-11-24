@@ -11,11 +11,11 @@ import {
   ChevronsUpDown,
   LayoutGrid,
   ListTree,
-  Loader2,
   MapPinned,
   Plus,
   Search,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { ProfileCard } from "@/components/common/ProfileCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -186,7 +186,7 @@ export function LocationListView({ projectId, feature, onOpenFeature }: Location
           </div>
         ) : (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            <LoadingDots className="size-4" aria-hidden="true" />
             {t("list.loading")}
           </p>
         )}

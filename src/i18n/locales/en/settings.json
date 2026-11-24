@@ -47,7 +47,7 @@
     },
     "password": {
       "title": "Password",
-      "description": "At least 8 characters, with a letter and a digit. Your projects stay accessible with the new password.",
+      "description": "At least 12 characters, with a letter and a digit, no common word and not your username. Your projects stay accessible with the new password.",
       "current": "Current password",
       "new": "New password",
       "confirm": "Confirm new password",
@@ -105,6 +105,17 @@
       "enabled": "Email recovery enabled.",
       "disabled": "Email recovery disabled.",
       "failed": "Could not change email recovery."
+    },
+    "deviceKey": {
+      "title": "Backup key for this computer",
+      "description": "GANIS data (accounts, public projects) is encrypted with a key tied to this computer and Windows account. Copied elsewhere, the data folder cannot be read.",
+      "intro": "If Windows is reinstalled, or if you move your data to another computer, GANIS will need this backup key to open it again.",
+      "keepSafe": "Save it away from this computer (USB stick, password manager): together with the data folder, it unlocks the part not protected by your password.",
+      "save": "Save the backup key",
+      "saving": "Saving…",
+      "saved": "Backup key saved: {{file}}. Keep this file somewhere safe.",
+      "failed": "The backup key could not be saved.",
+      "dialogTitle": "Save the backup key"
     }
   },
   "appearance": {

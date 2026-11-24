@@ -11,6 +11,9 @@
 //! ```text
 //! npm run seed:roman
 //! npm run seed:manga
+//! npm run seed:film
+//! npm run seed:serie
+//! npm run seed:all      (les quatre)
 //! ```
 //!
 //! (ou, dans `src-tauri` : `cargo test --lib seed_demo_roman -- --ignored --nocapture`).
@@ -80,4 +83,16 @@ async fn seed_demo_roman() {
 #[ignore = "crée un projet dans le dossier de données de GANIS ; à lancer à la main"]
 async fn seed_demo_manga() {
     seed("manga").await;
+}
+
+#[tokio::test(flavor = "current_thread")]
+#[ignore = "crée un projet dans le dossier de données de GANIS ; à lancer à la main"]
+async fn seed_demo_film() {
+    seed("film").await;
+}
+
+#[tokio::test(flavor = "current_thread")]
+#[ignore = "crée un projet dans le dossier de données de GANIS ; à lancer à la main"]
+async fn seed_demo_serie() {
+    seed("serie").await;
 }

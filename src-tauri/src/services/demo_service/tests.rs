@@ -27,9 +27,9 @@ async fn env() -> TestEnv {
 
 /// Crée le premier compte et le compte « alice », connecté.
 async fn alice(env: &TestEnv) -> Viewer {
-    auth_service::setup_first_account(&env.state.app_db, "admin", "admin1234", None).await.unwrap();
-    auth_service::register_user(&env.state.app_db, "alice", "motdepasse1", None).await.unwrap();
-    auth_service::login_user(&env.state, "alice", "motdepasse1").await.unwrap();
+    auth_service::setup_first_account(&env.state.app_db, "admin", "encre-grise-1234", None).await.unwrap();
+    auth_service::register_user(&env.state.app_db, "alice", "plume-violette-1", None).await.unwrap();
+    auth_service::login_user(&env.state, "alice", "plume-violette-1").await.unwrap();
     env.state.viewer().await
 }
 
@@ -59,7 +59,7 @@ fn every_example_parses() {
         assert!(!parsed.data.project.name.is_empty());
         assert!(!parsed.data.card.highlights.is_empty());
     }
-    assert_eq!(ids(), vec!["roman", "manga"]);
+    assert_eq!(ids(), vec!["roman", "manga", "film", "serie"]);
     assert!(source("inconnu").is_err());
 }
 
@@ -262,6 +262,50 @@ async fn the_manga_is_complete_with_its_script() {
     assert_eq!(count(&pool, "SELECT COUNT(*) FROM trash").await, parsed.data.trash.len() as i64);
     assert_eq!(count(&pool, "SELECT COUNT(*) FROM work_days").await, parsed.data.work_days.len() as i64);
     assert!(count(&pool, "SELECT COUNT(*) FROM activity").await > 0);
+
+    // Frise chronologique : chaque événement a son année, le calendrier a ses époques.
+    let plot: serde_json::Value = serde_json::from_str(&crate::services::plot_service::get(&pool).await.unwrap().data).unwrap();
+    assert!(plot["events"].as_array().unwrap().iter().all(|e| e["year"].is_i64()));
+    assert!(plot["eras"].as_array().unwrap().len() >= 3);
+    assert_eq!(plot["yearLabel"], "an");
+    let born: i64 = count(&pool, "SELECT COUNT(*) FROM characters WHERE fields LIKE '%birthDate%'").await;
+    assert!(born >= 10, "{born} personnages ont une date de naissance");
+
+    // Arcs des personnages : un par personnage décrit, étapes placées dans le découpage.
+    let arcs = crate::services::character_arc_service::list(&pool).await.unwrap();
+    assert_eq!(arcs.len(), parsed.data.arcs.len());
+    let node_ids: std::collections::HashSet<String> = structure::get_structure(&pool, ProjectType::Manga).await.unwrap().nodes.into_iter().map(|n| n.id).collect();
+    for arc in &arcs {
+        assert!(count(&pool, &format!("SELECT COUNT(*) FROM characters WHERE id = '{}'", arc.character_id)).await == 1);
+        let doc: serde_json::Value = serde_json::from_str(&arc.data).unwrap();
+        for beat in doc["beats"].as_array().unwrap() {
+            assert!(beat["id"].is_string());
+            assert!(node_ids.contains(beat["nodeId"].as_str().unwrap()), "étape placée hors du découpage");
+        }
+    }
+
+    // Planches d'inspiration : leurs images sont celles de la galerie.
+    let boards = crate::services::board_service::list(&pool).await.unwrap();
+    assert_eq!(boards.len(), parsed.data.boards.len());
+    let gallery_ids: Vec<String> = sqlx::query_scalar("SELECT id FROM project_images").fetch_all(&pool).await.unwrap();
+    let mut placed = 0;
+    for board in &boards {
+        let doc: serde_json::Value = serde_json::from_str(&board.data).unwrap();
+        for item in doc["items"].as_array().unwrap() {
+            if item["kind"] == "image" {
+                assert!(gallery_ids.contains(&item["imageId"].as_str().unwrap().to_owned()));
+                placed += 1;
+            }
+        }
+    }
+    assert!(placed >= 10, "{placed} images placées sur les planches");
+    // Chaque planche est liée à des éléments du projet (personnages, lieux, découpage, notes…).
+    for board in &boards {
+        let doc: serde_json::Value = serde_json::from_str(&board.data).unwrap();
+        let links = doc["links"].as_array().unwrap();
+        assert!(!links.is_empty(), "planche sans lien : {}", board.name);
+        assert!(links.iter().all(|l| !l["id"].as_str().unwrap().starts_with('@')), "référence non résolue");
+    }
 }
 
 #[tokio::test]
@@ -333,4 +377,69 @@ async fn examples_survive_a_ganix_export_and_import() {
         // La copie importée est un projet ordinaire, pas l'exemple.
         assert_eq!(project_service::find_demo_for_viewer(&env.state.app_db, demo, &account).await.unwrap(), Some(original.id.clone()));
     }
+}
+
+/// Au moins dix éléments dans chaque module de chaque exemple : personnages,
+/// lieux, les cinq modules du monde, découpage, notes, post-it, trame,
+/// glossaire, documents, galerie.
+async fn assert_every_module_has_ten(pool: &SqlitePool, demo: &str) {
+    for (what, sql) in [
+        ("personnages", "SELECT COUNT(*) FROM characters"),
+        ("lieux", "SELECT COUNT(*) FROM locations"),
+        ("objets", "SELECT COUNT(*) FROM items"),
+        ("faune et flore", "SELECT COUNT(*) FROM species"),
+        ("factions", "SELECT COUNT(*) FROM factions"),
+        ("peuples", "SELECT COUNT(*) FROM peoples"),
+        ("magie", "SELECT COUNT(*) FROM magic_systems"),
+        ("découpage", "SELECT COUNT(*) FROM structure_nodes"),
+        ("notes", "SELECT COUNT(*) FROM notes"),
+        ("post-it", "SELECT COUNT(*) FROM sticky_notes"),
+        ("glossaire", "SELECT COUNT(*) FROM glossary_terms"),
+        ("documents", "SELECT COUNT(*) FROM structure_documents"),
+        ("galerie", "SELECT COUNT(*) FROM project_images"),
+        ("relations", "SELECT COUNT(*) FROM character_relations"),
+    ] {
+        let n = count(pool, sql).await;
+        assert!(n >= 10, "{demo} : {what} : {n} au lieu d'au moins 10");
+    }
+    let plot: String = sqlx::query_scalar("SELECT data FROM plot WHERE id = 'default'").fetch_one(pool).await.unwrap();
+    let events = serde_json::from_str::<Value>(&plot).unwrap()["events"].as_array().map(Vec::len).unwrap_or(0);
+    assert!(events >= 10, "{demo} : trame : {events} événements au lieu d'au moins 10");
+}
+
+#[tokio::test]
+async fn every_example_fills_every_module() {
+    let env = env().await;
+    for demo in ids() {
+        let project = create(&env.state, &Viewer::Guest, demo).await.unwrap_or_else(|e| panic!("{demo} : {e} ({})", e.detail().unwrap_or_default())).project;
+        let pool = project_storage::pool_for_viewer(&env.state, &project.id, &Viewer::Guest).await.unwrap();
+        assert_every_module_has_ten(&pool, demo).await;
+    }
+}
+
+#[tokio::test]
+async fn the_film_and_the_series_have_their_screenplay() {
+    let env = env().await;
+    for (demo, kind) in [("film", ProjectType::Film), ("serie", ProjectType::Series)] {
+        let project = create(&env.state, &Viewer::Guest, demo).await.unwrap().project;
+        assert_eq!(project.project_type, kind);
+        let pool = project_storage::pool_for_viewer(&env.state, &project.id, &Viewer::Guest).await.unwrap();
+        let parsed = parse(source(demo).unwrap()).unwrap();
+        assert!(parsed.scenes.len() >= 10, "{demo} : au moins dix scènes");
+        // Chaque scène écrite a son scénario, ses personnages et son lieu.
+        let blocks = count(&pool, "SELECT COUNT(*) FROM series_scene_blocks").await;
+        assert_eq!(blocks as usize, parsed.scenes.iter().map(|s| s.blocks.len()).sum::<usize>());
+        assert!(count(&pool, "SELECT COUNT(*) FROM structure_nodes WHERE scene_place IS NOT NULL").await >= 10);
+        assert!(count(&pool, "SELECT COUNT(*) FROM structure_node_characters WHERE state <> ''").await >= 10);
+        assert!(count(&pool, "SELECT COUNT(*) FROM structure_node_entries").await >= 10);
+        assert!(count(&pool, "SELECT COUNT(*) FROM structure_nodes WHERE episode_status IS NOT NULL").await >= 3);
+        assert!(count(&pool, "SELECT COUNT(*) FROM gallery_folders").await >= 3);
+        assert_eq!(count(&pool, "SELECT COUNT(*) FROM project_logo").await, 1);
+    }
+    let other = super::tests::env().await;
+    let film = create(&other.state, &Viewer::Guest, "film").await.unwrap().project;
+    let pool = project_storage::pool_for_viewer(&other.state, &film.id, &Viewer::Guest).await.unwrap();
+    let details = crate::services::series_service::film_details(&pool).await.unwrap();
+    assert_eq!(details.runtime_goal, Some(105));
+    assert!(!details.logline.is_empty() && !details.writer.is_empty());
 }

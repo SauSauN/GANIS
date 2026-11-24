@@ -7,13 +7,13 @@ import { useImageFrame } from "@/stores/imageFrameStore";
 import {
   ArrowDownAZ,
   LayoutGrid,
-  Loader2,
   Plus,
   Rows3,
   Search,
   Users,
   Waypoints,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { AvatarFace, CharacterAvatar } from "@/components/characters/CharacterAvatar";
@@ -203,7 +203,7 @@ export function CharacterListView({ projectId, feature, onOpenFeature }: Charact
           </div>
         ) : (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            <LoadingDots className="size-4" aria-hidden="true" />
             {t("list.loading")}
           </p>
         )}

@@ -1,8 +1,10 @@
+import { LinkedBoardsCard } from "@/components/boards/LinkedBoardsCard";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { VersionsButton } from "@/components/history/VersionsDialog";
 import { portraitFrameKey } from "@/lib/imageFrame";
 import { useTranslation } from "react-i18next";
-import { Loader2, MapPinOff, Network, Plus, Save, Trash2 } from "lucide-react";
+import { MapPinOff, Network, Plus, Save, Trash2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -233,7 +235,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
           </div>
         ) : (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            <LoadingDots className="size-4" aria-hidden="true" />
             {t("edit.loading")}
           </p>
         )}
@@ -327,6 +329,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
           extra={
             <>
               <UniverseLinksCard projectId={projectId} self={{ kind: "location", id: location.id }} onOpenFeature={onOpenFeature} />
+            <LinkedBoardsCard projectId={projectId} target={{ kind: "location", id: location.id }} name={location.name} onOpenFeature={onOpenFeature} />
               {/* « Récit » et « Trame » : masquables dans Paramètres du projet › Lieux. */}
               {sheetDisplay.showStory && (
                 <StoryLinksCard
@@ -348,7 +351,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
           footer={
             <div className="flex min-h-10 flex-wrap items-center gap-4">
               <Button type="submit" disabled={!dirty || saving}>
-                {saving ? <Loader2 className="animate-spin" /> : <Save />}
+                {saving ? <LoadingDots /> : <Save />}
                 {t("common:actions.save")}
               </Button>
 
@@ -419,7 +422,7 @@ export function LocationEditView({ projectId, locationId, onClose, onOpenFeature
             {t("common:actions.cancel")}
           </Button>
           <Button variant="destructive" disabled={deleting} onClick={() => void onDelete()}>
-            {deleting && <Loader2 className="animate-spin" />}
+            {deleting && <LoadingDots />}
             {t("edit.deleteConfirm")}
           </Button>
         </DialogFooter>

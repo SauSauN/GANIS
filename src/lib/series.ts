@@ -3,7 +3,9 @@ import type { ExportBlock, ExportDocument } from "@/lib/novelExport";
 import { buildStructureTree, flattenVisible } from "@/lib/structure";
 import type {
   Character,
+  EpisodeFields,
   EpisodeStatus,
+  FilmDetails,
   Location,
   Project,
   SceneBlock,
@@ -16,16 +18,46 @@ import type {
 } from "@/types";
 
 /*
- * Scénario de série : brouillon d'une scène, en-tête (INT. LIEU — NUIT),
- * durée estimée (règle de la page-minute), ordre des scènes, suivi des
- * épisodes et export (Word, PDF, texte, Fountain).
+ * Scénario de série ou de film : brouillon d'une scène, en-tête (INT. LIEU —
+ * NUIT), durée estimée (règle de la page-minute), ordre des scènes, suivi
+ * des épisodes (série) ou des séquences (film) et export (Word, PDF, texte,
+ * Fountain).
+ *
+ * Un film reprend le découpage de la série : ses actes tiennent la place
+ * des saisons, ses séquences celle des épisodes (Acte › Séquence › Scène).
+ * Sa logline, sa durée visée et son scénariste valent pour le film entier
+ * (`FilmDetails`).
  */
 
 export function isSeriesProject(project: Pick<Project, "type"> | null | undefined): boolean {
   return project?.type === "series";
 }
 
-/** Niveaux du découpage : épisodes et scènes (Saison › Épisode › Scène). */
+export function isFilmProject(project: Pick<Project, "type"> | null | undefined): boolean {
+  return project?.type === "film";
+}
+
+/** Fiche d'un film jamais remplie. */
+export const EMPTY_FILM: FilmDetails = {
+  logline: "",
+  runtimeGoal: null,
+  writer: "",
+  intention: "",
+  pitch: "",
+  beats: {},
+  revision: null,
+  lockedNumbers: {},
+};
+
+/** Projet écrit au format du scénario, scène par scène : série ou film. */
+export function isScreenplayProject(project: Pick<Project, "type"> | null | undefined): boolean {
+  return isSeriesProject(project) || isFilmProject(project);
+}
+
+/**
+ * Niveaux du découpage : épisodes et scènes (Saison › Épisode › Scène) ;
+ * pour un film, séquences et scènes (Acte › Séquence › Scène).
+ */
 export function seriesLevels(levelCount: number) {
   return { episode: chapterLevel(levelCount), scene: sceneLevel(levelCount) };
 }
@@ -43,6 +75,16 @@ export const EPISODE_STATUS_COLORS: Record<EpisodeStatus, string> = {
 };
 
 export const episodeStatusOf = (node: Pick<StructureNode, "episodeStatus">): EpisodeStatus => node.episodeStatus ?? "idea";
+
+/** Fiche d'un épisode telle qu'enregistrée : à compléter des changements, jamais à recomposer à la main. */
+export function episodeFieldsOf(node: Pick<StructureNode, "logline" | "runtimeGoal" | "episodeStatus" | "writer" | "dueDate">): EpisodeFields {
+  return { logline: node.logline, runtimeGoal: node.runtimeGoal, episodeStatus: node.episodeStatus, writer: node.writer, dueDate: node.dueDate ?? null };
+}
+
+/** Échéance dépassée : date passée et épisode pas encore validé. */
+export function isOverdue(node: Pick<StructureNode, "dueDate" | "episodeStatus">, today = new Date().toISOString().slice(0, 10)): boolean {
+  return !!node.dueDate && node.dueDate < today && episodeStatusOf(node) !== "final";
+}
 
 // ----------------------------------------------------------------------------
 // Brouillon d'une scène
@@ -233,6 +275,14 @@ export function scenesInOrder(nodes: StructureNode[], levelCount: number): Scene
     .map((n) => ({ scene: n, episode: ancestorAt(n, episode), season: ancestorAt(n, seasonLevel) }));
 }
 
+/**
+ * Numéro de chaque scène dans tout le scénario (1, 2, 3…), comme sur un
+ * scénario de tournage : il ne change pas quand on n'en affiche qu'une partie.
+ */
+export function sceneNumbers(entries: SceneEntry[]): Map<string, number> {
+  return new Map(entries.map((entry, index) => [entry.scene.id, index + 1]));
+}
+
 /** Épisodes dans l'ordre du plan. */
 export function episodesInOrder(nodes: StructureNode[], levelCount: number): StructureNode[] {
   const { episode } = seriesLevels(levelCount);
@@ -308,6 +358,19 @@ export interface SeriesExportInput {
   locations: Location[];
   nameOf: (character: Character) => string;
   labels: SeriesExportLabels;
+  /**
+   * Fiche du film : l'export suit alors la forme d'un long métrage — une
+   * seule page de titre (scénariste, logline), scènes numérotées, sans titre
+   * d'acte ni de séquence (ils ne s'impriment pas dans un scénario de film).
+   */
+  film?: FilmDetails | null;
+  /** Numéros des scènes dans tout le film (sinon : leur rang dans l'export). */
+  numbers?: Map<string, number | string>;
+}
+
+/** Numéro d'une scène dans l'export d'un film. */
+function numberOf(input: SeriesExportInput, sceneId: string, index: number): number | string {
+  return input.numbers?.get(sceneId) ?? index + 1;
 }
 
 /** Nom d'un personnage en capitales (convention du scénario). */
@@ -323,15 +386,16 @@ export function buildSeriesExport(input: SeriesExportInput): ExportDocument {
   const out: ExportBlock[] = [];
   let currentSeason: string | null | undefined;
   let currentEpisode: string | null | undefined;
+  const film = input.film ?? null;
 
-  for (const entry of input.entries) {
+  input.entries.forEach((entry, index) => {
     const seasonId = entry.season?.id ?? null;
-    if (seasonId !== currentSeason) {
+    if (!film && seasonId !== currentSeason) {
       currentSeason = seasonId;
       if (entry.season) out.push({ type: "heading", level: 1, text: input.labelOf(entry.season), pageBreakBefore: out.length > 0 });
     }
     const episodeId = entry.episode?.id ?? null;
-    if (episodeId !== currentEpisode) {
+    if (!film && episodeId !== currentEpisode) {
       currentEpisode = episodeId;
       if (entry.episode) {
         const firstOfSeason = out.length > 0 && out[out.length - 1].type === "heading" && (out[out.length - 1] as { level: number }).level === 1;
@@ -342,11 +406,11 @@ export function buildSeriesExport(input: SeriesExportInput): ExportDocument {
     }
 
     const heading = sceneHeadingText(entry.scene, locationName, labels) || labels.untitledScene(input.labelOf(entry.scene)).toUpperCase();
-    out.push({ type: "heading", level: 3, text: heading });
+    out.push({ type: "heading", level: 3, text: film ? `${numberOf(input, entry.scene.id, index)}. ${heading}` : heading });
     const blocks = (input.blocks.get(entry.scene.id) ?? []).filter((b) => b.kind !== "note" && b.content.trim());
     if (!blocks.length) {
       out.push({ type: "paragraph", runs: [{ text: labels.noScript, italics: true }] });
-      continue;
+      return;
     }
     for (const block of blocks) {
       const content = block.content.trim();
@@ -362,9 +426,12 @@ export function buildSeriesExport(input: SeriesExportInput): ExportDocument {
         out.push({ type: "paragraph", runs: [{ text: content }] });
       }
     }
-  }
+  });
 
-  return { title: input.project.name, subtitle: [labels.subtitle], titlePage: true, layout: "script", monospace: true, blocks: out };
+  const subtitle = [labels.subtitle];
+  if (film?.writer.trim()) subtitle.push(`${labels.writer} ${film.writer.trim()}`);
+  if (film?.logline.trim()) subtitle.push(film.logline.trim().replace(/\s+/g, " "));
+  return { title: input.project.name, subtitle, titlePage: true, layout: "script", monospace: true, blocks: out };
 }
 
 /**
@@ -375,29 +442,36 @@ export function buildSeriesExport(input: SeriesExportInput): ExportDocument {
 export function buildFountain(input: SeriesExportInput): string {
   const { labels } = input;
   const locationName = (id: string) => input.locations.find((l) => l.id === id)?.name ?? null;
-  const lines: string[] = [`Title: ${input.project.name}`, `Credit: ${labels.subtitle}`, ""];
+  const film = input.film ?? null;
+  const oneLine = (text: string) => text.trim().replace(/\s+/g, " ");
+  const lines: string[] = [`Title: ${input.project.name}`, `Credit: ${labels.subtitle}`];
+  if (film?.writer.trim()) lines.push(`Author: ${oneLine(film.writer)}`);
+  if (film?.logline.trim()) lines.push(`Notes: ${oneLine(film.logline)}`);
+  lines.push("");
+  const header = lines.length;
   let currentSeason: string | null | undefined;
   let currentEpisode: string | null | undefined;
   // Une ligne commençant par un caractère spécial de Fountain est échappée.
   const safe = (text: string) => text.replace(/^([.!@#>~=])/gm, "\\$1");
 
-  for (const entry of input.entries) {
+  input.entries.forEach((entry, index) => {
     const seasonId = entry.season?.id ?? null;
-    if (seasonId !== currentSeason) {
+    if (!film && seasonId !== currentSeason) {
       currentSeason = seasonId;
       if (entry.season) lines.push(`# ${input.labelOf(entry.season)}`, "");
     }
     const episodeId = entry.episode?.id ?? null;
-    if (episodeId !== currentEpisode) {
+    if (!film && episodeId !== currentEpisode) {
       currentEpisode = episodeId;
       if (entry.episode) {
-        if (lines.length > 3) lines.push("===", "");
+        if (lines.length > header) lines.push("===", "");
         lines.push(`## ${input.labelOf(entry.episode)}`, "");
         if (entry.episode.logline.trim()) lines.push(`= ${entry.episode.logline.trim().replace(/\s+/g, " ")}`, "");
       }
     }
     const heading = sceneHeadingText(entry.scene, locationName, labels) || labels.untitledScene(input.labelOf(entry.scene)).toUpperCase();
-    lines.push(`.${heading}`, "");
+    // Fountain : le numéro de scène s'écrit entre dièses en fin d'en-tête.
+    lines.push(film ? `.${heading} #${numberOf(input, entry.scene.id, index)}#` : `.${heading}`, "");
     for (const block of input.blocks.get(entry.scene.id) ?? []) {
       const content = block.content.trim();
       if (!content) continue;
@@ -411,6 +485,6 @@ export function buildFountain(input: SeriesExportInput): string {
       else if (block.kind === "shot") lines.push(`!${content.toUpperCase()}`, "");
       else lines.push(`!${content}`, "");
     }
-  }
+  });
   return lines.join("\n").replace(/\n{3,}/g, "\n\n").trim() + "\n";
 }

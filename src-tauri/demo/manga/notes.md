@@ -119,3 +119,32 @@ Une couleur par lune, voir le document « Charte des lunes » du tome 1.
 === note:brouillon-coupe ===
 # Brouillon sans suite
 Scène du marché où Kaede affronte trois gardes. Coupée au storyboard : faisait doublon avec la poursuite sur les toits.
+
+=== note:lexique ===
+# Lexique des marées
+| Mot | Sens |
+| --- | --- |
+| Ressac | Premier rang de la Lunéa |
+| Raz | Le plus haut rang |
+| Sans-lune | Née sans lune |
+
+Voir aussi le glossaire du projet (Détails › Glossaire).
+
+=== note:planning ===
+# Planning du tome 2
+- [x] Storyboard du chapitre 4
+- [x] Crayonné du chapitre 4
+- [ ] Encrage du chapitre 5
+- [ ] Lettrage du chapitre 6
+
+:::encadré orange
+Remise à l'éditrice : 15 décembre.
+:::
+
+=== note:references ===
+# Références visuelles
+- Les villages de pêcheurs de la mer intérieure de Seto.
+- Les estampes de vagues pour la Lunéa d'argent.
+- Les phares de bois des côtes du Hokkaidō.
+
+Les images sont dans Détails › Galerie, dossier « Références ».

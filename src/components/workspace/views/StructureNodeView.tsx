@@ -1,3 +1,5 @@
+import { LinkedBoardsCard } from "@/components/boards/LinkedBoardsCard";
+import { NumberStepper } from "@/components/common/NumberStepper";
 import { useEffect, useId, useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { VersionsButton } from "@/components/history/VersionsDialog";
@@ -15,7 +17,7 @@ import { EpisodeCard } from "@/components/series/EpisodeCard";
 import { CharacterStatesCard } from "@/components/structure/CharacterStatesCard";
 import { SceneScriptCard } from "@/components/series/SceneScriptCard";
 import { useSceneScript } from "@/components/series/useSceneScript";
-import { episodeProgress, isSeriesProject, seriesLevels } from "@/lib/series";
+import { episodeProgress, isFilmProject, isScreenplayProject, seriesLevels } from "@/lib/series";
 import { useSeriesBlocks } from "@/stores/seriesStore";
 import { usePageScript } from "@/components/manga/usePageScript";
 import { assignArt, isMangaProject, mangaLevels, pagesInOrder, readingOrder } from "@/lib/manga";
@@ -31,7 +33,6 @@ import {
   Globe,
   Info,
   ListTree,
-  Loader2,
   MapPinned,
   Network,
   Plus,
@@ -40,6 +41,7 @@ import {
   Users,
   type LucideIcon,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -163,8 +165,10 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
   const script = usePageScript(projectId, nodeId, isMangaPage);
   const mangaSettings = useMangaSettings(projectId, isMangaPage);
   const { panels: allPanels } = useScriptPanelsIf(projectId, isMangaChapter);
-  // Série : une scène a son scénario ; un épisode, sa fiche et sa durée estimée.
-  const series = useProjectStore((state) => isSeriesProject(state.projects.find((p) => p.id === projectId)));
+  // Série ou film : une scène a son scénario ; un épisode (une séquence pour
+  // un film), sa fiche et sa durée estimée.
+  const series = useProjectStore((state) => isScreenplayProject(state.projects.find((p) => p.id === projectId)));
+  const film = useProjectStore((state) => isFilmProject(state.projects.find((p) => p.id === projectId)));
   const seriesLevel = seriesLevels(levelCount);
   const isSeriesScene = series && node !== null && structure !== null && node.level >= seriesLevel.scene && seriesLevel.episode < seriesLevel.scene;
   const isSeriesEpisode = series && node !== null && structure !== null && node.level === seriesLevel.episode && seriesLevel.episode < seriesLevel.scene;
@@ -466,7 +470,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
           </div>
         ) : (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            <LoadingDots className="size-4" aria-hidden="true" />
             {t("node.loading")}
           </p>
         )}
@@ -655,14 +659,14 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
                 {!autoNumbering && draft.numbered && level?.numbering !== "none" && (
                   <div className="w-36 space-y-1.5">
                     <Label htmlFor={`node-profile-number-${node.id}`}>{t("plan.edit.number")}</Label>
-                    <Input
+                    <NumberStepper
                       id={`node-profile-number-${node.id}`}
                       placeholder={t("common:placeholders.number")}
-                      type="number"
+                      value={draft.number.trim() === "" || !Number.isFinite(Number(draft.number)) ? null : Number(draft.number)}
                       min={0}
                       max={MAX_NUMBER}
-                      value={draft.number}
-                      onChange={(e) => setDraft({ ...draft, number: e.target.value })}
+                      allowEmpty
+                      onChange={(value) => setDraft({ ...draft, number: value === null ? "" : String(Math.trunc(value)) })}
                     />
                   </div>
                 )}
@@ -695,7 +699,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
 
               <div className="flex min-h-10 flex-wrap items-center gap-4 border-t pt-4">
                 <Button type="submit" disabled={!infoDirty || saving}>
-                  {saving ? <Loader2 className="animate-spin" /> : <Save />}
+                  {saving ? <LoadingDots /> : <Save />}
                   {t("common:actions.save")}
                 </Button>
                 {infoDirty && (
@@ -743,6 +747,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             <EpisodeCard
               projectId={projectId}
               node={node}
+              film={film}
               scenes={episodeStats?.scenes ?? 0}
               writtenScenes={episodeStats?.writtenScenes ?? 0}
               minutes={episodeStats?.minutes ?? 0}
@@ -768,6 +773,8 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
           <DocumentsCard projectId={projectId} nodeId={nodeId} name={name} nodeOptions={nodeOptions} readingOrder={chapterReading.length ? chapterReading : undefined} />
 
           <SceneEventsCard projectId={projectId} nodeId={nodeId} name={name} onOpenFeature={onOpenFeature} />
+
+          <LinkedBoardsCard projectId={projectId} target={{ kind: "node", id: nodeId }} name={name} onOpenFeature={onOpenFeature} />
 
           {/* Liens avec l'univers : personnages, lieux et fiches du monde
               (objets, faune et flore, factions, peuples, magie des modules
@@ -892,7 +899,7 @@ export function StructureNodeView({ projectId, nodeId, onClose, onOpenFeature }:
             {t("common:actions.cancel")}
           </Button>
           <Button variant="destructive" disabled={deleting} onClick={() => void onDelete()}>
-            {deleting && <Loader2 className="animate-spin" />}
+            {deleting && <LoadingDots />}
             {t("plan.delete.confirm")}
           </Button>
         </DialogFooter>
@@ -1046,7 +1053,7 @@ function UniverseLinksSection({ name, loading, groups, labelOfNode, onOpenFeatur
     >
       {loading ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          <LoadingDots className="size-4" aria-hidden="true" />
           {t("node.loading")}
         </p>
       ) : (
@@ -1232,7 +1239,7 @@ function NodeLinkDialog({ group, initial, onClose }: { group: LinkGroupSpec; ini
           {t("common:actions.cancel")}
         </Button>
         <Button type="button" disabled={busy || !itemId} onClick={() => void run(() => group.onLink(itemId, role))}>
-          {busy && <Loader2 className="animate-spin" />}
+          {busy && <LoadingDots />}
           {t("common:actions.save")}
         </Button>
       </DialogFooter>

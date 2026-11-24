@@ -1,0 +1,3412 @@
+{
+  "format": 1,
+  "project": {
+    "name": "Les Traboules de minuit",
+    "description": "Projet d'exemple — série. Lyon, 2031 : chaque nuit à 0 h 12, la rame d'une conductrice s'arrête dans une station effacée des plans. Visite guidée : Notes › « À lire d'abord ».",
+    "type": "series",
+    "status": "in_progress"
+  },
+  "card": {
+    "pitch": "Chaque nuit à 0 h 12, la rame d'Inès s'arrête dans une station fantôme sous Lyon, où vit une ville cachée — et sa mère disparue.",
+    "highlights": [
+      "2 saisons, 7 épisodes avec leur fiche, 12 scènes écrites au format du scénario",
+      "12 personnages, 12 lieux, 10 fiches dans chaque module du monde",
+      "Trame en 4 intrigues, galerie de repérages et de casting"
+    ]
+  },
+  "synopsis": {
+    "text": "synopsis",
+    "genres": [
+      "Fantastique",
+      "Thriller"
+    ],
+    "subgenres": [
+      "Fantastique urbain",
+      "Enquête"
+    ],
+    "tones": [
+      "Sombre",
+      "Poétique"
+    ]
+  },
+  "characterSettings": {
+    "detailLevel": "advanced"
+  },
+  "locationSettings": {
+    "detailLevel": "advanced",
+    "customTypes": [
+      {
+        "key": "station",
+        "name": "Station de métro",
+        "category": "built"
+      },
+      {
+        "key": "traboule",
+        "name": "Traboule",
+        "category": "built"
+      },
+      {
+        "key": "atelier",
+        "name": "Atelier",
+        "category": "built"
+      },
+      {
+        "key": "commissariat",
+        "name": "Commissariat",
+        "category": "built"
+      }
+    ]
+  },
+  "world": {
+    "item": {
+      "enabled": true,
+      "categories": [
+        "document",
+        "tool",
+        "magic",
+        "vehicle",
+        "tech"
+      ],
+      "detailLevel": "advanced"
+    },
+    "species": {
+      "enabled": true,
+      "categories": [
+        "fauna",
+        "flora"
+      ],
+      "detailLevel": "advanced"
+    },
+    "faction": {
+      "enabled": true,
+      "categories": [
+        "political",
+        "religious",
+        "economic",
+        "secret",
+        "family",
+        "social",
+        "military"
+      ],
+      "detailLevel": "advanced"
+    },
+    "people": {
+      "enabled": true,
+      "categories": [
+        "people",
+        "culture",
+        "religion"
+      ],
+      "detailLevel": "advanced"
+    },
+    "magic": {
+      "enabled": true,
+      "categories": [
+        "system",
+        "branch",
+        "technique"
+      ],
+      "detailLevel": "advanced"
+    }
+  },
+  "structure": {
+    "autoNumbering": true,
+    "nodes": [
+      {
+        "key": "s1",
+        "title": "La ligne fantôme",
+        "summary": "Inès découvre la station Méridienne et la Cité-Dessous ; elle apprend que sa mère y est peut-être vivante.",
+        "children": [
+          {
+            "key": "e1",
+            "title": "0 h 12",
+            "summary": "Chaque nuit, la rame d'Inès s'arrête à une station qui n'existe pas.",
+            "episode": {
+              "logline": "Une conductrice de nuit voit sa rame s'arrêter, seule, à une station effacée des plans.",
+              "runtimeGoal": 52,
+              "episodeStatus": "final",
+              "writer": "Claire Mermet",
+              "dueDate": "2026-09-30"
+            }
+          },
+          {
+            "key": "e2",
+            "title": "Les disparus du métro",
+            "summary": "Vidal enquête sur une série de disparitions ; Brac annonce l'ouverture de Méridienne.",
+            "episode": {
+              "logline": "Trois personnes disparaissent sur la ligne D ; la commissaire qui a classé l'affaire en 2011 rouvre le dossier.",
+              "runtimeGoal": 52,
+              "episodeStatus": "revision",
+              "writer": "Claire Mermet",
+              "dueDate": "2026-10-31"
+            }
+          },
+          {
+            "key": "e3",
+            "title": "La Fileuse",
+            "summary": "Inès descend dans la Cité-Dessous et rencontre la Fileuse.",
+            "episode": {
+              "logline": "Guidée par une enfant aux pieds nus, Inès découvre une ville entière sous la colline.",
+              "runtimeGoal": 52,
+              "episodeStatus": "draft",
+              "writer": "Yanis Bérard",
+              "dueDate": "2026-11-15"
+            }
+          },
+          {
+            "key": "e4",
+            "title": "Le carnet de Joséphine",
+            "summary": "Le carnet de bord de 2011 ; Margaux Brac apporte les plans.",
+            "episode": {
+              "logline": "Le carnet de sa mère apprend à Inès que Joséphine s'est arrêtée à Méridienne, elle aussi.",
+              "runtimeGoal": 52,
+              "episodeStatus": "draft",
+              "writer": "Yanis Bérard",
+              "dueDate": "2026-12-15"
+            }
+          },
+          {
+            "key": "e5",
+            "title": "La rame rouge",
+            "summary": "Inès arrête sa rame sans freiner ; les deux villes se voient.",
+            "episode": {
+              "logline": "La nuit de l'inauguration, Inès fait ce que sa mère n'avait pas osé faire.",
+              "runtimeGoal": 58,
+              "episodeStatus": "outline",
+              "writer": "Claire Mermet",
+              "dueDate": "2027-01-15"
+            }
+          }
+        ]
+      },
+      {
+        "key": "s2",
+        "title": "Les Oublieux",
+        "summary": "La Cité-Dessous menacée par le Groupe Saint-Clair ; Inès cherche à dénouer le nœud d'oubli de sa mère.",
+        "children": [
+          {
+            "key": "e6",
+            "title": "Ceux d'en bas",
+            "summary": "Les Traboulins montent en ville pour la fête des Lumières.",
+            "episode": {
+              "logline": "Pour la première fois, les Traboulins montent en ville, et la ville ne les voit pas.",
+              "runtimeGoal": 52,
+              "episodeStatus": "idea",
+              "writer": ""
+            }
+          },
+          {
+            "key": "e7",
+            "title": "Le nœud",
+            "summary": "La Fileuse apprend à Inès comment dénouer un nœud d'oubli.",
+            "episode": {
+              "logline": "Pour rendre sa mémoire à Joséphine, Inès doit donner la sienne.",
+              "runtimeGoal": 52,
+              "episodeStatus": "idea",
+              "writer": ""
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "locations": [
+    {
+      "key": "lyon",
+      "name": "Lyon",
+      "type": "metropolis",
+      "status": "existing",
+      "fields": {
+        "description": "Lyon en 2031 : la ville la plus surveillée de France, et la plus trouée.",
+        "population": "Un million et demi",
+        "atmosphere": "Brouillard sur la Saône, néons des quais, cloches de Fourvière.",
+        "colorPalette": [
+          "#1f2a44",
+          "#e0a84a",
+          "#8c2f39"
+        ]
+      },
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          30,
+          40,
+          70
+        ],
+        "ground": [
+          60,
+          60,
+          70
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "fourviere",
+      "name": "Colline de Fourvière",
+      "type": "mountain",
+      "status": "existing",
+      "fields": {
+        "description": "La colline « qui prie », percée de galeries romaines et de caves.",
+        "legends": "On dit qu'elle est creuse comme un fromage."
+      },
+      "parentId": "@loc:lyon"
+    },
+    {
+      "key": "vieux-lyon",
+      "name": "Vieux-Lyon",
+      "type": "district",
+      "status": "existing",
+      "fields": {
+        "description": "Le quartier Renaissance au pied de la colline, ses cours et ses traboules.",
+        "atmosphere": "Pavés mouillés, touristes le jour, personne la nuit."
+      },
+      "parentId": "@loc:lyon"
+    },
+    {
+      "key": "saint-jean",
+      "name": "Station Saint-Jean",
+      "type": "@ltype:station",
+      "status": "existing",
+      "fields": {
+        "description": "Terminus de la ligne D de nuit, sous la cathédrale.",
+        "purpose": "Station de métro",
+        "condition": "intact"
+      },
+      "parentId": "@loc:vieux-lyon"
+    },
+    {
+      "key": "meridienne",
+      "name": "Station Méridienne",
+      "type": "@ltype:station",
+      "status": "hidden",
+      "fields": {
+        "description": "Station fantôme construite en 1978, jamais ouverte, effacée des plans.",
+        "condition": "damaged",
+        "accessSecurity": "Une grille, un code, et la volonté de la station elle-même."
+      },
+      "parentId": "@loc:fourviere",
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          20,
+          25,
+          35
+        ],
+        "ground": [
+          90,
+          80,
+          60
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "dessous",
+      "name": "La Cité-Dessous",
+      "type": "cite",
+      "status": "hidden",
+      "fields": {
+        "description": "La ville des Traboulins, dans les citernes romaines sous Fourvière.",
+        "population": "Quelques centaines",
+        "government": "Le Conseil des Fileuses"
+      },
+      "parentId": "@loc:fourviere",
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          40,
+          30,
+          50
+        ],
+        "ground": [
+          120,
+          90,
+          60
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "rue-boeuf",
+      "name": "Traboule de la rue du Bœuf",
+      "type": "@ltype:traboule",
+      "status": "existing",
+      "fields": {
+        "description": "Passage de 1500 qui relie la rue du Bœuf à la rue Saint-Jean… et parfois ailleurs.",
+        "legends": "À minuit, elle mène là où l'on a perdu quelque chose."
+      },
+      "parentId": "@loc:vieux-lyon"
+    },
+    {
+      "key": "croix-rousse",
+      "name": "Dépôt de la Croix-Rousse",
+      "type": "district",
+      "status": "existing",
+      "fields": {
+        "description": "Le dépôt des rames de nuit, sur la colline « qui travaille ».",
+        "atmosphere": "Odeur d'huile, ateliers sous les néons."
+      },
+      "parentId": "@loc:lyon"
+    },
+    {
+      "key": "atelier",
+      "name": "Atelier des Canuts",
+      "type": "@ltype:atelier",
+      "status": "existing",
+      "fields": {
+        "description": "Dernier atelier de tissage de la Croix-Rousse, quatre métiers Jacquard.",
+        "owner": "La Fileuse",
+        "builtOn": "1840"
+      },
+      "parentId": "@loc:croix-rousse"
+    },
+    {
+      "key": "commissariat",
+      "name": "Commissariat du 5e",
+      "type": "@ltype:commissariat",
+      "status": "existing",
+      "fields": {
+        "description": "Le commissariat du Vieux-Lyon ; la commissaire Vidal y dort plus souvent que chez elle."
+      },
+      "parentId": "@loc:vieux-lyon"
+    },
+    {
+      "key": "saone",
+      "name": "La Saône",
+      "type": "river",
+      "status": "existing",
+      "fields": {
+        "description": "La rivière lente de Lyon ; ses quais cachent trois entrées de la Cité-Dessous.",
+        "waterType": "fresh"
+      },
+      "parentId": "@loc:lyon"
+    },
+    {
+      "key": "basilique",
+      "name": "Basilique de Fourvière",
+      "type": "temple",
+      "status": "existing",
+      "fields": {
+        "description": "La basilique blanche qui veille sur la ville ; sa crypte touche les citernes."
+      },
+      "parentId": "@loc:fourviere"
+    }
+  ],
+  "characters": [
+    {
+      "key": "ines",
+      "firstName": "Inès",
+      "lastName": "Malbec",
+      "role": "main",
+      "status": "alive",
+      "fields": {
+        "age": "29 ans",
+        "gender": "female",
+        "occupation": "Conductrice de la ligne D de nuit",
+        "origin": "@loc:croix-rousse",
+        "firstAppearance": "@node:e1s1",
+        "description": "Cheveux ras, veste de service trop grande, casque audio autour du cou. Elle connaît chaque courbe du tunnel les yeux fermés.",
+        "mainGoal": "Savoir pourquoi sa rame s'arrête, chaque nuit à 0 h 12, à une station qui n'existe pas.",
+        "traits": [
+          "Têtue",
+          "Insomniaque",
+          "Drôle"
+        ],
+        "secret": "Sa mère a disparu dans le métro quand elle avait neuf ans.",
+        "plannedArc": "Saison 1 : de la peur à la curiosité. Saison 2 : choisir entre les deux villes.",
+        "colorPalette": [
+          "#1f2a44",
+          "#e0a84a"
+        ]
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          40,
+          50,
+          80
+        ],
+        "figure": [
+          220,
+          170,
+          80
+        ]
+      }
+    },
+    {
+      "key": "samuel",
+      "firstName": "Samuel",
+      "lastName": "Okoro",
+      "role": "ally",
+      "status": "alive",
+      "fields": {
+        "age": "34 ans",
+        "gender": "male",
+        "occupation": "Agent de maintenance des tunnels",
+        "firstAppearance": "@node:e1s2",
+        "description": "Grand, calme, lampe frontale toujours allumée ; il répare tout et ne croit à rien.",
+        "mainGoal": "Que personne ne se perde dans ses tunnels."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          60,
+          80,
+          70
+        ],
+        "figure": [
+          200,
+          190,
+          170
+        ]
+      }
+    },
+    {
+      "key": "vidal",
+      "firstName": "Hélène",
+      "lastName": "Vidal",
+      "role": "secondary",
+      "status": "alive",
+      "fields": {
+        "age": "51 ans",
+        "gender": "female",
+        "occupation": "Commissaire du 5e arrondissement",
+        "firstAppearance": "@node:e2s1",
+        "description": "Imperméable, chewing-gum à la nicotine, dossiers sous le bras.",
+        "mainGoal": "Fermer l'affaire des disparus du métro avant sa retraite.",
+        "secret": "Elle a enquêté sur la disparition de Joséphine Malbec en 2011 et a classé l'affaire sur ordre."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          150,
+          140,
+          130
+        ],
+        "figure": [
+          40,
+          40,
+          50
+        ]
+      }
+    },
+    {
+      "key": "brac",
+      "firstName": "Augustin",
+      "lastName": "Brac",
+      "role": "antagonist",
+      "status": "alive",
+      "fields": {
+        "age": "58 ans",
+        "gender": "male",
+        "occupation": "Directeur général du réseau Lumen",
+        "firstAppearance": "@node:e2s2",
+        "description": "Costume gris, lunettes sans monture, voix de radio du matin.",
+        "mainGoal": "Ouvrir la ligne Méridienne au public et vendre ses traboules aux promoteurs.",
+        "coreValues": "La mobilité, le rendement, la sécurité."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          180,
+          180,
+          185
+        ],
+        "figure": [
+          50,
+          50,
+          60
+        ]
+      }
+    },
+    {
+      "key": "fileuse",
+      "firstName": "La",
+      "lastName": "Fileuse",
+      "role": "mentor",
+      "status": "alive",
+      "fields": {
+        "nickname": "Mère Soie",
+        "age": "Inconnu",
+        "gender": "female",
+        "occupation": "Doyenne du Conseil des Fileuses",
+        "firstAppearance": "@node:e3s1",
+        "description": "Petite femme aux doigts d'araignée, qui tisse des fils de lumière sur un métier invisible.",
+        "mainGoal": "Que les deux villes se laissent tranquilles."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          80,
+          50,
+          90
+        ],
+        "figure": [
+          230,
+          200,
+          120
+        ]
+      }
+    },
+    {
+      "key": "lilou",
+      "firstName": "Lilou",
+      "lastName": "",
+      "role": "extra",
+      "status": "alive",
+      "fields": {
+        "age": "10 ans",
+        "gender": "female",
+        "occupation": "Petite traboulinne, messagère",
+        "firstAppearance": "@node:e1s2",
+        "description": "Une gamine aux pieds nus qui court plus vite que les rames."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          120,
+          90,
+          60
+        ],
+        "figure": [
+          240,
+          220,
+          200
+        ]
+      }
+    },
+    {
+      "key": "victor",
+      "firstName": "Victor",
+      "lastName": "Delorme",
+      "role": "secondary",
+      "status": "alive",
+      "fields": {
+        "age": "26 ans",
+        "gender": "male",
+        "occupation": "Podcasteur (« Lyon sous Lyon »)",
+        "firstAppearance": "@node:e2s1",
+        "description": "Bonnet, micro-cravate, il enregistre tout, même ce qu'il ne devrait pas."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          200,
+          120,
+          90
+        ],
+        "figure": [
+          60,
+          40,
+          30
+        ]
+      }
+    },
+    {
+      "key": "roche",
+      "firstName": "Anaïs",
+      "lastName": "Roche",
+      "role": "secondary",
+      "status": "alive",
+      "fields": {
+        "age": "44 ans",
+        "gender": "female",
+        "occupation": "Géologue de la Ville",
+        "firstAppearance": "@node:e3s2",
+        "description": "Elle a mesuré que la colline perd un centimètre par an, et personne ne l'écoute."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          170,
+          190,
+          170
+        ],
+        "figure": [
+          60,
+          80,
+          60
+        ]
+      }
+    },
+    {
+      "key": "josephine",
+      "firstName": "Joséphine",
+      "lastName": "Malbec",
+      "role": "secondary",
+      "status": "missing",
+      "fields": {
+        "age": "38 ans en 2011",
+        "gender": "female",
+        "occupation": "Conductrice de métro (ancienne)",
+        "firstAppearance": "@node:e4s2",
+        "description": "La mère d'Inès ; elle conduisait la même ligne, la nuit.",
+        "secret": "Elle vit dans la Cité-Dessous depuis vingt ans et a oublié le dessus."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          60,
+          50,
+          80
+        ],
+        "figure": [
+          210,
+          160,
+          90
+        ]
+      }
+    },
+    {
+      "key": "kader",
+      "firstName": "Kader",
+      "lastName": "Benali",
+      "role": "secondary",
+      "status": "alive",
+      "fields": {
+        "age": "62 ans",
+        "gender": "male",
+        "occupation": "Chef de station à Saint-Jean",
+        "firstAppearance": "@node:e1s1",
+        "description": "Moustache, thermos, radio crachotante ; il a vu passer trente ans de rames."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          160,
+          150,
+          140
+        ],
+        "figure": [
+          90,
+          70,
+          50
+        ]
+      }
+    },
+    {
+      "key": "passeur",
+      "firstName": "Le",
+      "lastName": "Passeur",
+      "role": "antagonist",
+      "status": "unknown",
+      "fields": {
+        "gender": "other",
+        "occupation": "Gardien des traboules",
+        "firstAppearance": "@node:e3s2",
+        "description": "Silhouette masquée de soie noire qui ouvre et ferme les passages.",
+        "mainGoal": "Qu'aucun « dessus » ne reste dans la Cité-Dessous."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          20,
+          20,
+          25
+        ],
+        "figure": [
+          90,
+          90,
+          100
+        ]
+      }
+    },
+    {
+      "key": "margaux",
+      "firstName": "Margaux",
+      "lastName": "Brac",
+      "role": "ally",
+      "status": "alive",
+      "fields": {
+        "age": "24 ans",
+        "gender": "female",
+        "occupation": "Urbaniste stagiaire",
+        "firstAppearance": "@node:e4s1",
+        "description": "La fille de Brac, qui a lu les plans qu'elle n'aurait pas dû lire."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          210,
+          200,
+          220
+        ],
+        "figure": [
+          120,
+          80,
+          140
+        ]
+      }
+    }
+  ],
+  "items": [
+    {
+      "key": "badge",
+      "name": "Badge de conductrice",
+      "type": "key",
+      "status": "intact",
+      "fields": {
+        "description": "Badge magnétique d'Inès ; il ouvre aussi la grille de Méridienne, on ne sait pas pourquoi.",
+        "opens": "Les cabines, le dépôt… et Méridienne.",
+        "firstAppearance": "@node:e1s1"
+      }
+    },
+    {
+      "key": "rame",
+      "name": "Rame 0412",
+      "type": "train",
+      "status": "worn",
+      "fields": {
+        "description": "La vieille rame MPL75 qu'Inès conduit la nuit ; elle s'arrête seule à Méridienne.",
+        "model": "MPL75",
+        "capacity": "Quatre voitures"
+      },
+      "portrait": {
+        "kind": "swatches",
+        "colors": [
+          [
+            180,
+            40,
+            40
+          ],
+          [
+            220,
+            220,
+            220
+          ]
+        ],
+        "width": 400,
+        "height": 120
+      }
+    },
+    {
+      "key": "plan-1978",
+      "name": "Plan de la ligne 1978",
+      "type": "map",
+      "status": "intact",
+      "fields": {
+        "description": "Plan d'origine du réseau, où figure encore la station Méridienne.",
+        "writtenOn": "1978",
+        "firstAppearance": "@node:e2s2"
+      }
+    },
+    {
+      "key": "fil",
+      "name": "Fil de soie lumineuse",
+      "type": "artifact",
+      "status": "intact",
+      "fields": {
+        "description": "Fil tissé par la Fileuse ; tant qu'on le tient, on retrouve son chemin.",
+        "powers": "Il ne casse que si l'on ment.",
+        "rarity": "rare"
+      }
+    },
+    {
+      "key": "dictaphone",
+      "name": "Dictaphone de Victor",
+      "type": "radio",
+      "status": "intact",
+      "fields": {
+        "description": "Le vieux dictaphone à cassette de Victor ; il enregistre les voix de la Cité-Dessous."
+      }
+    },
+    {
+      "key": "carnet-jo",
+      "name": "Carnet de bord de Joséphine",
+      "type": "diary",
+      "status": "damaged",
+      "fields": {
+        "description": "Carnet de service de 2011, retrouvé dans une cabine.",
+        "author": "Joséphine Malbec",
+        "content": "« 0 h 12 : arrêt non prévu. Une enfant sur le quai. »"
+      }
+    },
+    {
+      "key": "lampe",
+      "name": "Lampe frontale de Samuel",
+      "type": "lamp",
+      "status": "worn",
+      "fields": {
+        "description": "Lampe de chantier qu'il n'éteint jamais."
+      }
+    },
+    {
+      "key": "navette",
+      "name": "La navette d'or",
+      "type": "tool",
+      "status": "intact",
+      "fields": {
+        "description": "Navette de tisserand en laiton, signe du Conseil des Fileuses.",
+        "rarity": "unique"
+      }
+    },
+    {
+      "key": "dossier",
+      "name": "Dossier 2011-Méridienne",
+      "type": "contract",
+      "status": "hidden",
+      "fields": {
+        "description": "Le dossier classé de Vidal sur la disparition de Joséphine Malbec."
+      }
+    },
+    {
+      "key": "cle-traboule",
+      "name": "Clé des traboules",
+      "type": "artifact",
+      "status": "lost",
+      "fields": {
+        "description": "Une clé de fer qui ouvre n'importe quelle porte de traboule ; volée au Passeur en 1986.",
+        "powers": "Ouvre les traboules vers la Cité-Dessous."
+      }
+    }
+  ],
+  "species": [
+    {
+      "key": "rats",
+      "name": "Rats blancs de Fourvière",
+      "type": "mammal",
+      "status": "common",
+      "fields": {
+        "description": "Rats albinos des galeries ; ils guident ceux qui se perdent.",
+        "diet": "omnivore",
+        "temperament": "docile"
+      }
+    },
+    {
+      "key": "chauves-souris",
+      "name": "Murin des citernes",
+      "type": "mammal",
+      "status": "rare",
+      "fields": {
+        "description": "Petites chauves-souris qui dorment dans les citernes romaines.",
+        "diet": "carnivore"
+      }
+    },
+    {
+      "key": "araignees",
+      "name": "Araignées-fileuses",
+      "type": "insect",
+      "status": "rare",
+      "fields": {
+        "description": "Araignées dont la soie sert à tisser les fils de lumière.",
+        "abilities": [
+          "Soie lumineuse"
+        ]
+      }
+    },
+    {
+      "key": "lichen-or",
+      "name": "Lichen d'or",
+      "type": "mushroom",
+      "status": "common",
+      "fields": {
+        "description": "Lichen qui éclaire faiblement les tunnels de la Cité-Dessous.",
+        "properties": "Luit quand on parle doucement."
+      }
+    },
+    {
+      "key": "champignons",
+      "name": "Pleurotes des caves",
+      "type": "mushroom",
+      "status": "common",
+      "fields": {
+        "description": "Les champignons qu'on cultive dans les caves des Traboulins.",
+        "edible": "yes"
+      }
+    },
+    {
+      "key": "murier",
+      "name": "Mûrier blanc",
+      "type": "tree",
+      "status": "endangered",
+      "fields": {
+        "description": "Le dernier mûrier de la Croix-Rousse, nourriture des vers à soie.",
+        "uses": [
+          "Soie"
+        ]
+      }
+    },
+    {
+      "key": "vers",
+      "name": "Ver à soie de nuit",
+      "type": "insect",
+      "status": "rare",
+      "fields": {
+        "description": "Variété de bombyx élevée dans l'obscurité ; sa soie luit."
+      }
+    },
+    {
+      "key": "silures",
+      "name": "Silure de la Saône",
+      "type": "fish",
+      "status": "common",
+      "fields": {
+        "description": "Gros poisson-chat des quais ; les Traboulins le pêchent à la main.",
+        "diet": "carnivore"
+      }
+    },
+    {
+      "key": "ombres",
+      "name": "Ombres-chiens",
+      "type": "fantasticCreature",
+      "status": "legendary",
+      "fields": {
+        "description": "Chiens d'ombre qui gardent les traboules pour le Passeur.",
+        "dangerLevel": "high",
+        "temperament": "aggressive"
+      }
+    },
+    {
+      "key": "mousse",
+      "name": "Mousse des voûtes",
+      "type": "magicPlant",
+      "status": "rare",
+      "fields": {
+        "description": "Mousse qui pousse là où une traboule s'ouvre ; elle sert de carte.",
+        "properties": "Pousse vers les passages ouverts."
+      }
+    }
+  ],
+  "factions": [
+    {
+      "key": "lumen",
+      "name": "Réseau Lumen",
+      "type": "company",
+      "status": "rising",
+      "fields": {
+        "description": "La société qui exploite le métro de Lyon.",
+        "goals": "Ouvrir la ligne Méridienne au public en 2032.",
+        "influence": "regional"
+      },
+      "portrait": {
+        "kind": "swatches",
+        "colors": [
+          [
+            20,
+            40,
+            90
+          ],
+          [
+            220,
+            220,
+            230
+          ]
+        ],
+        "width": 400,
+        "height": 120
+      }
+    },
+    {
+      "key": "conseil-fileuses",
+      "name": "Conseil des Fileuses",
+      "type": "council",
+      "status": "active",
+      "fields": {
+        "description": "Les sept doyennes qui gouvernent la Cité-Dessous.",
+        "motto": "Un fil ne se coupe pas",
+        "ranks": [
+          "Apprentie",
+          "Fileuse",
+          "Doyenne"
+        ]
+      }
+    },
+    {
+      "key": "passeurs",
+      "name": "Les Passeurs",
+      "type": "guard",
+      "status": "underground",
+      "fields": {
+        "description": "Ceux qui gardent les traboules et décident qui passe.",
+        "secrets": "Ils ont fait disparaître trois « dessus » depuis 1986."
+      }
+    },
+    {
+      "key": "police",
+      "name": "Police du 5e",
+      "type": "guard",
+      "status": "active",
+      "fields": {
+        "description": "Le commissariat de Vidal ; huit agents pour tout le Vieux-Lyon."
+      }
+    },
+    {
+      "key": "syndicat",
+      "name": "Syndicat des roulants de nuit",
+      "type": "guild",
+      "status": "active",
+      "fields": {
+        "description": "Les conducteurs de nuit ; Inès en est la déléguée malgré elle."
+      }
+    },
+    {
+      "key": "canuts",
+      "name": "Héritiers des Canuts",
+      "type": "brotherhood",
+      "status": "declining",
+      "fields": {
+        "description": "Les familles de tisserands de la Croix-Rousse qui savent pour la Cité-Dessous.",
+        "history": "Ils ont aidé les Traboulins à se cacher pendant la révolte de 1831."
+      }
+    },
+    {
+      "key": "urbex",
+      "name": "Les Explorateurs de Fourvière",
+      "type": "club",
+      "status": "active",
+      "fields": {
+        "description": "Un collectif d'explorateurs urbains ; Victor en fait partie.",
+        "activities": [
+          "Exploration",
+          "Cartographie"
+        ]
+      }
+    },
+    {
+      "key": "promoteurs",
+      "name": "Groupe Saint-Clair",
+      "type": "company",
+      "status": "rising",
+      "fields": {
+        "description": "Promoteur immobilier qui veut transformer les citernes en parking."
+      }
+    },
+    {
+      "key": "confrerie-crypte",
+      "name": "Confrérie de la crypte",
+      "type": "sect",
+      "status": "underground",
+      "fields": {
+        "description": "Des religieux de la basilique qui croient garder une porte de l'enfer."
+      }
+    },
+    {
+      "key": "famille-malbec",
+      "name": "Famille Malbec",
+      "type": "clan",
+      "status": "declining",
+      "fields": {
+        "description": "Trois générations de conductrices de nuit."
+      }
+    }
+  ],
+  "peoples": [
+    {
+      "key": "traboulins",
+      "name": "Les Traboulins",
+      "type": "ethnicGroup",
+      "status": "endangered",
+      "fields": {
+        "description": "Descendants des canuts réfugiés sous la colline en 1834.",
+        "population": "Quatre cents",
+        "customs": "On ne dit jamais son nom à un « dessus ».",
+        "spread": "local"
+      }
+    },
+    {
+      "key": "dessus",
+      "name": "Les « dessus »",
+      "type": "socialClass",
+      "status": "living",
+      "fields": {
+        "description": "Ce que les Traboulins appellent les habitants de la ville d'en haut."
+      }
+    },
+    {
+      "key": "parler",
+      "name": "Le parler des traboules",
+      "type": "language",
+      "status": "endangered",
+      "fields": {
+        "description": "Un mélange de lyonnais, d'argot de canut et de mots inventés.",
+        "vocabulary": "Gone (enfant), traboule (passage), bistanclaque (le bruit du métier)."
+      }
+    },
+    {
+      "key": "tissage",
+      "name": "La religion du fil",
+      "type": "religion",
+      "status": "living",
+      "fields": {
+        "description": "Tout est tissé : les vies, les villes, les chemins.",
+        "rituals": "Nouer un fil à chaque naissance."
+      }
+    },
+    {
+      "key": "fete-lumieres",
+      "name": "La fête des Lumières d'en bas",
+      "type": "tradition",
+      "status": "living",
+      "fields": {
+        "description": "Le 8 décembre, les Traboulins allument des fils de soie pendant que la ville allume ses lumignons."
+      }
+    },
+    {
+      "key": "mythe-colline",
+      "name": "Le mythe de la colline creuse",
+      "type": "mythology",
+      "status": "legendary",
+      "fields": {
+        "description": "La colline serait un métier à tisser géant, et la ville son ouvrage."
+      }
+    },
+    {
+      "key": "tisseuse",
+      "name": "La Grande Tisseuse",
+      "type": "deity",
+      "status": "legendary",
+      "fields": {
+        "description": "Celle qui a tissé la première traboule.",
+        "domains": [
+          "Fils",
+          "Chemins",
+          "Oubli"
+        ]
+      }
+    },
+    {
+      "key": "prophetie-rame",
+      "name": "La prophétie de la rame rouge",
+      "type": "prophecy",
+      "status": "legendary",
+      "fields": {
+        "description": "Une phrase brodée sur un vieux drap.",
+        "prophecyText": "« Quand une rame rouge s'arrêtera d'elle-même, les deux villes se verront. »"
+      }
+    },
+    {
+      "key": "oublieux",
+      "name": "Les Oublieux",
+      "type": "spiritBeings",
+      "status": "living",
+      "fields": {
+        "description": "Les « dessus » restés trop longtemps en bas, qui ont oublié leur nom."
+      }
+    },
+    {
+      "key": "philosophie-fil",
+      "name": "La philosophie du fil",
+      "type": "philosophy",
+      "status": "living",
+      "fields": {
+        "description": "Ne rien couper, tout dénouer.",
+        "principles": "Un conflit est un nœud ; on le dénoue, on ne le tranche pas."
+      }
+    }
+  ],
+  "magic": [
+    {
+      "key": "traboulage",
+      "name": "Le traboulage",
+      "type": "magicSystem",
+      "status": "secret",
+      "fields": {
+        "description": "L'art d'ouvrir les traboules vers ailleurs.",
+        "rules": "Une traboule mène là où l'on a perdu quelque chose ; elle ne s'ouvre qu'à minuit.",
+        "cost": "Un souvenir à chaque passage.",
+        "rarity": "rare"
+      },
+      "portrait": {
+        "kind": "swatches",
+        "colors": [
+          [
+            80,
+            50,
+            90
+          ],
+          [
+            230,
+            200,
+            120
+          ]
+        ],
+        "width": 400,
+        "height": 120
+      }
+    },
+    {
+      "key": "fils",
+      "name": "Le tissage de lumière",
+      "type": "technique",
+      "status": "rare",
+      "fields": {
+        "description": "Tisser des fils de soie lumineuse qui guident, lient ou enferment.",
+        "learning": "Sept ans d'apprentissage auprès d'une Fileuse.",
+        "power": "moderate"
+      },
+      "parentId": "@magic:traboulage"
+    },
+    {
+      "key": "noeud",
+      "name": "Le nœud d'oubli",
+      "type": "forbiddenArt",
+      "status": "forbidden",
+      "fields": {
+        "description": "Nouer le fil d'une personne pour qu'elle oublie le dessus.",
+        "risks": "Le nœud ne se dénoue jamais tout à fait.",
+        "power": "major"
+      },
+      "parentId": "@magic:traboulage"
+    },
+    {
+      "key": "ecoute",
+      "name": "L'écoute des rames",
+      "type": "technique",
+      "status": "rare",
+      "fields": {
+        "description": "Entendre dans le roulement des rames où se trouve chacun.",
+        "whoCanUse": "Les conductrices de nuit, sans le savoir."
+      }
+    },
+    {
+      "key": "sang-malbec",
+      "name": "Le sang Malbec",
+      "type": "bloodline",
+      "status": "rare",
+      "fields": {
+        "description": "Les femmes Malbec arrêtent les rames sans freiner.",
+        "inheritance": "De mère en fille"
+      }
+    },
+    {
+      "key": "minuit",
+      "name": "Le rituel de minuit",
+      "type": "ritual",
+      "status": "active",
+      "fields": {
+        "description": "Toucher la pierre d'une traboule à minuit pile en pensant à ce qu'on a perdu."
+      },
+      "parentId": "@magic:traboulage"
+    },
+    {
+      "key": "appel-rats",
+      "name": "L'appel des rats blancs",
+      "type": "summoning",
+      "status": "rare",
+      "fields": {
+        "description": "Siffler trois notes pour appeler les rats-guides.",
+        "summoned": "Les rats blancs de Fourvière"
+      }
+    },
+    {
+      "key": "ombre",
+      "name": "Devenir ombre",
+      "type": "transformation",
+      "status": "forbidden",
+      "fields": {
+        "description": "Les Passeurs se fondent dans l'ombre des voûtes.",
+        "duration": "Tant qu'il n'y a pas de lumière"
+      }
+    },
+    {
+      "key": "couture",
+      "name": "La couture des passages",
+      "type": "spell",
+      "status": "secret",
+      "fields": {
+        "description": "Recoudre une traboule pour la fermer à jamais.",
+        "power": "devastating"
+      },
+      "parentId": "@magic:fils"
+    },
+    {
+      "key": "lumignon",
+      "name": "La flamme des lumignons",
+      "type": "element",
+      "status": "active",
+      "fields": {
+        "description": "La lumière du 8 décembre protège des Passeurs une nuit par an."
+      }
+    }
+  ],
+  "relations": [
+    {
+      "sourceId": "@char:josephine",
+      "targetId": "@char:ines",
+      "type": "family",
+      "label": "Mère",
+      "directed": true,
+      "intensity": 5,
+      "sentiment": "positive",
+      "familyLink": "parent"
+    },
+    {
+      "sourceId": "@char:brac",
+      "targetId": "@char:margaux",
+      "type": "family",
+      "label": "Père",
+      "directed": true,
+      "intensity": 3,
+      "sentiment": "negative",
+      "familyLink": "parent"
+    },
+    {
+      "sourceId": "@char:samuel",
+      "targetId": "@char:ines",
+      "type": "friendship",
+      "label": "Collègues, puis plus",
+      "directed": false,
+      "intensity": 4,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:kader",
+      "targetId": "@char:ines",
+      "type": "mentor",
+      "label": "Il a formé sa mère",
+      "directed": true,
+      "intensity": 3,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:fileuse",
+      "targetId": "@char:ines",
+      "type": "mentor",
+      "label": "Lui apprend à tisser",
+      "directed": true,
+      "intensity": 4,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:lilou",
+      "targetId": "@char:ines",
+      "type": "friendship",
+      "label": "La guide",
+      "directed": true,
+      "intensity": 3,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:brac",
+      "targetId": "@char:ines",
+      "type": "enmity",
+      "label": "Patron et menace",
+      "directed": true,
+      "intensity": 4,
+      "sentiment": "negative"
+    },
+    {
+      "sourceId": "@char:passeur",
+      "targetId": "@char:ines",
+      "type": "enmity",
+      "label": "Veut la garder en bas",
+      "directed": true,
+      "intensity": 4,
+      "sentiment": "negative"
+    },
+    {
+      "sourceId": "@char:vidal",
+      "targetId": "@char:victor",
+      "type": "professional",
+      "label": "Source agaçante",
+      "directed": false,
+      "intensity": 2,
+      "sentiment": "neutral"
+    },
+    {
+      "sourceId": "@char:vidal",
+      "targetId": "@char:josephine",
+      "type": "secret",
+      "label": "A classé son affaire",
+      "directed": true,
+      "intensity": 4,
+      "sentiment": "negative"
+    },
+    {
+      "sourceId": "@char:margaux",
+      "targetId": "@char:ines",
+      "type": "alliance",
+      "label": "Lui livre les plans",
+      "directed": false,
+      "intensity": 3,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:fileuse",
+      "targetId": "@char:josephine",
+      "type": "secret",
+      "label": "Lui a fait le nœud d'oubli",
+      "directed": true,
+      "intensity": 5,
+      "sentiment": "negative"
+    },
+    {
+      "sourceId": "@char:roche",
+      "targetId": "@char:brac",
+      "type": "rivalry",
+      "label": "La colline s'effondre",
+      "directed": false,
+      "intensity": 3,
+      "sentiment": "negative"
+    }
+  ],
+  "graph": [
+    {
+      "characterId": "@char:ines",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "characterId": "@char:josephine",
+      "x": -60,
+      "y": -220
+    },
+    {
+      "characterId": "@char:samuel",
+      "x": 200,
+      "y": 80
+    },
+    {
+      "characterId": "@char:kader",
+      "x": 240,
+      "y": -120
+    },
+    {
+      "characterId": "@char:fileuse",
+      "x": -240,
+      "y": -60
+    },
+    {
+      "characterId": "@char:lilou",
+      "x": -300,
+      "y": 120
+    },
+    {
+      "characterId": "@char:brac",
+      "x": 320,
+      "y": 240
+    },
+    {
+      "characterId": "@char:margaux",
+      "x": 140,
+      "y": 300
+    },
+    {
+      "characterId": "@char:passeur",
+      "x": -420,
+      "y": -200
+    },
+    {
+      "characterId": "@char:vidal",
+      "x": 460,
+      "y": -40
+    },
+    {
+      "characterId": "@char:victor",
+      "x": 600,
+      "y": 80
+    },
+    {
+      "characterId": "@char:roche",
+      "x": 520,
+      "y": 300
+    }
+  ],
+  "characterLocations": [
+    {
+      "characterId": "@char:ines",
+      "locationId": "@loc:croix-rousse",
+      "type": "lives",
+      "label": "Studio au-dessus du dépôt"
+    },
+    {
+      "characterId": "@char:ines",
+      "locationId": "@loc:saint-jean",
+      "type": "works",
+      "label": "Ligne D de nuit"
+    },
+    {
+      "characterId": "@char:samuel",
+      "locationId": "@loc:croix-rousse",
+      "type": "works"
+    },
+    {
+      "characterId": "@char:kader",
+      "locationId": "@loc:saint-jean",
+      "type": "works",
+      "label": "Chef de station"
+    },
+    {
+      "characterId": "@char:vidal",
+      "locationId": "@loc:commissariat",
+      "type": "works"
+    },
+    {
+      "characterId": "@char:fileuse",
+      "locationId": "@loc:dessous",
+      "type": "rules",
+      "label": "Doyenne"
+    },
+    {
+      "characterId": "@char:fileuse",
+      "locationId": "@loc:atelier",
+      "type": "owns"
+    },
+    {
+      "characterId": "@char:lilou",
+      "locationId": "@loc:dessous",
+      "type": "born"
+    },
+    {
+      "characterId": "@char:josephine",
+      "locationId": "@loc:dessous",
+      "type": "lives",
+      "label": "Depuis 2011"
+    },
+    {
+      "characterId": "@char:passeur",
+      "locationId": "@loc:rue-boeuf",
+      "type": "guards"
+    },
+    {
+      "characterId": "@char:brac",
+      "locationId": "@loc:lyon",
+      "type": "lives"
+    },
+    {
+      "characterId": "@char:roche",
+      "locationId": "@loc:fourviere",
+      "type": "frequents",
+      "label": "Ses capteurs"
+    }
+  ],
+  "worldLinks": [
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:ines",
+      "targetKind": "item",
+      "targetId": "@item:badge",
+      "type": "owns",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:ines",
+      "targetKind": "item",
+      "targetId": "@item:rame",
+      "type": "uses",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:ines",
+      "targetKind": "item",
+      "targetId": "@item:carnet-jo",
+      "type": "owns",
+      "label": "Retrouvé dans la cabine"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:josephine",
+      "targetKind": "item",
+      "targetId": "@item:carnet-jo",
+      "type": "made",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:victor",
+      "targetKind": "item",
+      "targetId": "@item:dictaphone",
+      "type": "owns",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:samuel",
+      "targetKind": "item",
+      "targetId": "@item:lampe",
+      "type": "owns",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:fileuse",
+      "targetKind": "item",
+      "targetId": "@item:navette",
+      "type": "owns",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:vidal",
+      "targetKind": "item",
+      "targetId": "@item:dossier",
+      "type": "owns",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:margaux",
+      "targetKind": "item",
+      "targetId": "@item:plan-1978",
+      "type": "owns",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:passeur",
+      "targetKind": "item",
+      "targetId": "@item:cle-traboule",
+      "type": "seeks",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:brac",
+      "targetKind": "faction",
+      "targetId": "@faction:lumen",
+      "type": "leads",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:fileuse",
+      "targetKind": "faction",
+      "targetId": "@faction:conseil-fileuses",
+      "type": "leads",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:passeur",
+      "targetKind": "faction",
+      "targetId": "@faction:passeurs",
+      "type": "leads",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:vidal",
+      "targetKind": "faction",
+      "targetId": "@faction:police",
+      "type": "leads",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:ines",
+      "targetKind": "faction",
+      "targetId": "@faction:syndicat",
+      "type": "memberOf",
+      "label": "Déléguée"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:victor",
+      "targetKind": "faction",
+      "targetId": "@faction:urbex",
+      "type": "memberOf",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:ines",
+      "targetKind": "magic",
+      "targetId": "@magic:sang-malbec",
+      "type": "related",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:fileuse",
+      "targetKind": "magic",
+      "targetId": "@magic:fils",
+      "type": "masters",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:fileuse",
+      "targetKind": "magic",
+      "targetId": "@magic:noeud",
+      "type": "masters",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:passeur",
+      "targetKind": "magic",
+      "targetId": "@magic:ombre",
+      "type": "masters",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:lilou",
+      "targetKind": "people",
+      "targetId": "@people:traboulins",
+      "type": "belongsTo",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:josephine",
+      "targetKind": "people",
+      "targetId": "@people:oublieux",
+      "type": "belongsTo",
+      "label": ""
+    },
+    {
+      "sourceKind": "faction",
+      "sourceId": "@faction:lumen",
+      "targetKind": "location",
+      "targetId": "@loc:meridienne",
+      "type": "controls",
+      "label": ""
+    },
+    {
+      "sourceKind": "faction",
+      "sourceId": "@faction:conseil-fileuses",
+      "targetKind": "location",
+      "targetId": "@loc:dessous",
+      "type": "basedIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "faction",
+      "sourceId": "@faction:passeurs",
+      "targetKind": "location",
+      "targetId": "@loc:rue-boeuf",
+      "type": "controls",
+      "label": ""
+    },
+    {
+      "sourceKind": "faction",
+      "sourceId": "@faction:lumen",
+      "targetKind": "faction",
+      "targetId": "@faction:promoteurs",
+      "type": "allyOf",
+      "label": ""
+    },
+    {
+      "sourceKind": "faction",
+      "sourceId": "@faction:passeurs",
+      "targetKind": "magic",
+      "targetId": "@magic:noeud",
+      "type": "teaches",
+      "label": ""
+    },
+    {
+      "sourceKind": "species",
+      "sourceId": "@species:rats",
+      "targetKind": "location",
+      "targetId": "@loc:fourviere",
+      "type": "livesIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "species",
+      "sourceId": "@species:araignees",
+      "targetKind": "location",
+      "targetId": "@loc:dessous",
+      "type": "livesIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "species",
+      "sourceId": "@species:ombres",
+      "targetKind": "location",
+      "targetId": "@loc:rue-boeuf",
+      "type": "livesIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "species",
+      "sourceId": "@species:vers",
+      "targetKind": "magic",
+      "targetId": "@magic:fils",
+      "type": "sourceOf",
+      "label": ""
+    },
+    {
+      "sourceKind": "people",
+      "sourceId": "@people:traboulins",
+      "targetKind": "location",
+      "targetId": "@loc:dessous",
+      "type": "livesIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "item",
+      "sourceId": "@item:rame",
+      "targetKind": "location",
+      "targetId": "@loc:croix-rousse",
+      "type": "locatedIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "item",
+      "sourceId": "@item:fil",
+      "targetKind": "magic",
+      "targetId": "@magic:fils",
+      "type": "grants",
+      "label": ""
+    },
+    {
+      "sourceKind": "location",
+      "sourceId": "@loc:rue-boeuf",
+      "targetKind": "magic",
+      "targetId": "@magic:traboulage",
+      "type": "sourceOf",
+      "label": ""
+    }
+  ],
+  "nodeLinks": [
+    {
+      "node": "@node:e1",
+      "characters": {
+        "ines": "pov"
+      },
+      "locations": {
+        "saint-jean": "setting",
+        "meridienne": "setting"
+      },
+      "entries": {
+        "@item:rame": "central",
+        "@item:badge": "present"
+      }
+    },
+    {
+      "node": "@node:e2",
+      "characters": {
+        "vidal": "pov"
+      },
+      "entries": {
+        "@item:dossier": "central",
+        "@faction:lumen": "central",
+        "@item:dictaphone": "present"
+      }
+    },
+    {
+      "node": "@node:e3",
+      "entries": {
+        "@people:traboulins": "central",
+        "@magic:traboulage": "central",
+        "@species:ombres": "present",
+        "@item:fil": "present"
+      }
+    },
+    {
+      "node": "@node:e4",
+      "entries": {
+        "@item:carnet-jo": "central",
+        "@item:plan-1978": "central",
+        "@magic:noeud": "mentioned"
+      }
+    },
+    {
+      "node": "@node:e5",
+      "entries": {
+        "@people:prophetie-rame": "central",
+        "@magic:sang-malbec": "central",
+        "@item:navette": "present"
+      }
+    },
+    {
+      "node": "@node:e6",
+      "characters": {
+        "fileuse": "present"
+      },
+      "entries": {
+        "@people:fete-lumieres": "central",
+        "@magic:lumignon": "central"
+      }
+    },
+    {
+      "node": "@node:e7",
+      "characters": {
+        "ines": "pov",
+        "josephine": "present"
+      },
+      "states": {
+        "josephine": "Mémoire nouée"
+      },
+      "entries": {
+        "@magic:noeud": "central"
+      }
+    },
+    {
+      "node": "@node:e1s2",
+      "entries": {
+        "@species:mousse": "mentioned"
+      }
+    },
+    {
+      "node": "@node:e3s1",
+      "entries": {
+        "@species:lichen-or": "present",
+        "@species:araignees": "present",
+        "@faction:conseil-fileuses": "present"
+      }
+    },
+    {
+      "node": "@node:e3s2",
+      "entries": {
+        "@species:ombres": "central",
+        "@faction:passeurs": "central"
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Traboule",
+      "category": "Lyon",
+      "definition": "Passage qui traverse un immeuble d'une rue à l'autre ; dans la série, parfois vers ailleurs.",
+      "links": [
+        {
+          "kind": "location",
+          "id": "@loc:rue-boeuf"
+        },
+        {
+          "kind": "magic",
+          "id": "@magic:traboulage"
+        }
+      ]
+    },
+    {
+      "term": "Dessus",
+      "category": "Traboulins",
+      "definition": "Habitant de la ville d'en haut.",
+      "links": [
+        {
+          "kind": "people",
+          "id": "@people:dessus"
+        }
+      ]
+    },
+    {
+      "term": "Gone",
+      "category": "Lyonnais",
+      "definition": "Enfant, en parler lyonnais.",
+      "links": [
+        {
+          "kind": "people",
+          "id": "@people:parler"
+        }
+      ]
+    },
+    {
+      "term": "Bistanclaque",
+      "category": "Lyonnais",
+      "definition": "Le bruit des métiers à tisser des canuts.",
+      "links": [
+        {
+          "kind": "location",
+          "id": "@loc:atelier"
+        }
+      ]
+    },
+    {
+      "term": "Canut",
+      "category": "Histoire",
+      "definition": "Ouvrier tisserand de la soie à Lyon au XIXᵉ siècle.",
+      "links": [
+        {
+          "kind": "faction",
+          "id": "@faction:canuts"
+        }
+      ]
+    },
+    {
+      "term": "MPL75",
+      "category": "Métro",
+      "definition": "Modèle de rame du métro de Lyon, mis en service en 1978.",
+      "links": [
+        {
+          "kind": "item",
+          "id": "@item:rame"
+        }
+      ]
+    },
+    {
+      "term": "Manipulateur",
+      "category": "Métro",
+      "definition": "La poignée qui commande la traction et le freinage d'une rame.",
+      "links": [
+        {
+          "kind": "item",
+          "id": "@item:rame"
+        }
+      ]
+    },
+    {
+      "term": "Nœud d'oubli",
+      "category": "Magie",
+      "definition": "Fil noué qui fait oublier le dessus.",
+      "links": [
+        {
+          "kind": "magic",
+          "id": "@magic:noeud"
+        }
+      ]
+    },
+    {
+      "term": "Oublieux",
+      "category": "Traboulins",
+      "definition": "Dessus resté en bas trop longtemps.",
+      "links": [
+        {
+          "kind": "people",
+          "id": "@people:oublieux"
+        },
+        {
+          "kind": "character",
+          "id": "@char:josephine"
+        }
+      ]
+    },
+    {
+      "term": "Lumignon",
+      "category": "Lyon",
+      "definition": "Bougie posée aux fenêtres le 8 décembre.",
+      "links": [
+        {
+          "kind": "magic",
+          "id": "@magic:lumignon"
+        },
+        {
+          "kind": "people",
+          "id": "@people:fete-lumieres"
+        }
+      ]
+    },
+    {
+      "term": "Méridienne",
+      "category": "Métro",
+      "definition": "La station fantôme de 1978.",
+      "links": [
+        {
+          "kind": "location",
+          "id": "@loc:meridienne"
+        }
+      ]
+    }
+  ],
+  "documents": [
+    {
+      "node": "@node:s1",
+      "name": "Bible de la série.docx",
+      "text": "doc:bible",
+      "note": "Version envoyée à la chaîne."
+    },
+    {
+      "node": "@node:s1",
+      "name": "Arche de la saison 1.md",
+      "text": "doc:arche"
+    },
+    {
+      "node": "@node:e1",
+      "name": "Repérage — station Saint-Jean.png",
+      "image": {
+        "kind": "landscape",
+        "sky": [
+          200,
+          200,
+          205
+        ],
+        "ground": [
+          230,
+          230,
+          235
+        ],
+        "width": 480,
+        "height": 320
+      }
+    },
+    {
+      "node": "@node:e1",
+      "name": "Plan de la ligne D.png",
+      "image": {
+        "kind": "swatches",
+        "colors": [
+          [
+            30,
+            90,
+            160
+          ],
+          [
+            220,
+            220,
+            220
+          ],
+          [
+            180,
+            40,
+            40
+          ]
+        ],
+        "width": 500,
+        "height": 120
+      },
+      "note": "Méridienne en pointillé."
+    },
+    {
+      "node": "@node:e2",
+      "name": "Transcription du podcast.txt",
+      "text": "doc:podcast"
+    },
+    {
+      "node": "@node:e2",
+      "name": "Communiqué de Lumen.md",
+      "text": "doc:communique",
+      "earlier": "doc:communique-v1"
+    },
+    {
+      "node": "@node:e3",
+      "name": "Repérage — citernes.png",
+      "image": {
+        "kind": "landscape",
+        "sky": [
+          40,
+          30,
+          50
+        ],
+        "ground": [
+          120,
+          90,
+          60
+        ],
+        "width": 480,
+        "height": 320
+      },
+      "note": "Citernes romaines de Fourvière, visite le 12."
+    },
+    {
+      "node": "@node:e4",
+      "name": "Carnet de Joséphine (fac-similé).docx",
+      "text": "doc:carnet-jo"
+    },
+    {
+      "node": "@node:e5",
+      "name": "Découpage — final saison 1.txt",
+      "text": "doc:decoupage-final"
+    },
+    {
+      "node": "@node:s2",
+      "name": "Pistes saison 2.md",
+      "text": "doc:saison2"
+    },
+    {
+      "node": "@node:e3",
+      "name": "Lexique des Traboulins.md",
+      "text": "doc:lexique"
+    }
+  ],
+  "gallery": {
+    "logo": {
+      "kind": "swatches",
+      "colors": [
+        [
+          30,
+          40,
+          70
+        ],
+        [
+          224,
+          168,
+          74
+        ]
+      ],
+      "width": 200,
+      "height": 200
+    },
+    "folders": [
+      {
+        "key": "lieux",
+        "name": "Lieux"
+      },
+      {
+        "key": "metro",
+        "name": "Métro",
+        "parent": "lieux"
+      },
+      {
+        "key": "dessous",
+        "name": "Cité-Dessous",
+        "parent": "lieux"
+      },
+      {
+        "key": "casting",
+        "name": "Casting"
+      },
+      {
+        "key": "moodboard",
+        "name": "Moodboard"
+      }
+    ],
+    "images": [
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            200,
+            200,
+            205
+          ],
+          "ground": [
+            230,
+            230,
+            235
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Quai de Saint-Jean",
+        "folder": "metro"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            20,
+            25,
+            35
+          ],
+          "ground": [
+            90,
+            80,
+            60
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Méridienne, état actuel",
+        "description": "Décor à construire au studio de Villeurbanne.",
+        "folder": "metro"
+      },
+      {
+        "image": {
+          "kind": "swatches",
+          "colors": [
+            [
+              180,
+              40,
+              40
+            ],
+            [
+              220,
+              220,
+              220
+            ]
+          ],
+          "width": 480,
+          "height": 200
+        },
+        "caption": "Rame rouge MPL75",
+        "folder": "metro"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            40,
+            30,
+            50
+          ],
+          "ground": [
+            120,
+            90,
+            60
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Citerne romaine",
+        "folder": "dessous"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            80,
+            50,
+            90
+          ],
+          "ground": [
+            230,
+            200,
+            120
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Fils de lumière (essai)",
+        "description": "Fibres optiques dans de la soie.",
+        "folder": "dessous"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            60,
+            50,
+            40
+          ],
+          "ground": [
+            140,
+            120,
+            90
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Traboule de la rue du Bœuf",
+        "folder": "lieux"
+      },
+      {
+        "image": {
+          "kind": "portrait",
+          "background": [
+            40,
+            50,
+            80
+          ],
+          "figure": [
+            220,
+            170,
+            80
+          ]
+        },
+        "caption": "Inès",
+        "folder": "casting"
+      },
+      {
+        "image": {
+          "kind": "portrait",
+          "background": [
+            80,
+            50,
+            90
+          ],
+          "figure": [
+            230,
+            200,
+            120
+          ]
+        },
+        "caption": "La Fileuse",
+        "folder": "casting"
+      },
+      {
+        "image": {
+          "kind": "portrait",
+          "background": [
+            20,
+            20,
+            25
+          ],
+          "figure": [
+            90,
+            90,
+            100
+          ]
+        },
+        "caption": "Le Passeur — masque",
+        "folder": "casting"
+      },
+      {
+        "image": {
+          "kind": "swatches",
+          "colors": [
+            [
+              31,
+              42,
+              68
+            ],
+            [
+              224,
+              168,
+              74
+            ],
+            [
+              140,
+              47,
+              57
+            ]
+          ],
+          "width": 480,
+          "height": 160
+        },
+        "caption": "Palette dessus",
+        "folder": "moodboard"
+      },
+      {
+        "image": {
+          "kind": "swatches",
+          "colors": [
+            [
+              80,
+              50,
+              90
+            ],
+            [
+              230,
+              200,
+              120
+            ],
+            [
+              40,
+              30,
+              50
+            ]
+          ],
+          "width": 480,
+          "height": 160
+        },
+        "caption": "Palette dessous",
+        "folder": "moodboard"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            30,
+            40,
+            70
+          ],
+          "ground": [
+            60,
+            60,
+            70
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Lyon la nuit, depuis Fourvière",
+        "folder": "moodboard"
+      }
+    ]
+  },
+  "notes": {
+    "folders": [
+      {
+        "key": "bible",
+        "name": "Bible"
+      },
+      {
+        "key": "salle",
+        "name": "Salle d'écriture"
+      },
+      {
+        "key": "persos",
+        "name": "Personnages",
+        "parent": "bible"
+      },
+      {
+        "key": "prod",
+        "name": "Production"
+      }
+    ],
+    "notes": [
+      {
+        "key": "mode-emploi",
+        "title": "À lire d'abord : ce projet d'exemple",
+        "pinned": true
+      },
+      {
+        "key": "concept",
+        "title": "Le concept en trois phrases",
+        "folder": "bible",
+        "pinned": true
+      },
+      {
+        "key": "regles",
+        "title": "Les règles des traboules",
+        "folder": "bible"
+      },
+      {
+        "key": "ines",
+        "title": "Inès : fiche d'intention",
+        "folder": "persos"
+      },
+      {
+        "key": "brac",
+        "title": "Brac n'est pas un méchant",
+        "folder": "persos"
+      },
+      {
+        "key": "cite",
+        "title": "La vie dans la Cité-Dessous",
+        "folder": "bible"
+      },
+      {
+        "key": "atelier",
+        "title": "Compte rendu d'atelier — épisode 3",
+        "folder": "salle"
+      },
+      {
+        "key": "arcs",
+        "title": "Arcs de la saison 1",
+        "folder": "salle"
+      },
+      {
+        "key": "saison2",
+        "title": "Idées pour la saison 2",
+        "folder": "salle"
+      },
+      {
+        "key": "tournage",
+        "title": "Contraintes de tournage",
+        "folder": "prod"
+      },
+      {
+        "key": "musique",
+        "title": "Musique et son",
+        "folder": "prod"
+      },
+      {
+        "key": "brouillon",
+        "title": "Brouillon abandonné : le chat de Kader",
+        "folder": "salle"
+      }
+    ],
+    "stickies": [
+      {
+        "text": "0 h 12 : toujours la même heure, à la seconde",
+        "color": "yellow",
+        "x": 40,
+        "y": 40
+      },
+      {
+        "text": "Lilou ne doit jamais marcher : elle court",
+        "color": "pink",
+        "x": 300,
+        "y": 40
+      },
+      {
+        "text": "Brac a peur du noir (S2)",
+        "color": "purple",
+        "x": 560,
+        "y": 40
+      },
+      {
+        "text": "Vidal : dernière enquête avant la retraite",
+        "color": "blue",
+        "x": 40,
+        "y": 220
+      },
+      {
+        "text": "Pas de musique dans le tunnel : seulement la rame",
+        "color": "green",
+        "x": 300,
+        "y": 220
+      },
+      {
+        "text": "Ép. 5 : 58 min, négocier avec la chaîne",
+        "color": "orange",
+        "x": 560,
+        "y": 220
+      },
+      {
+        "text": "Samuel et Inès : pas de baiser en S1",
+        "color": "pink",
+        "x": 40,
+        "y": 400
+      },
+      {
+        "text": "Victor : comic relief, mais il a raison",
+        "color": "yellow",
+        "x": 300,
+        "y": 400
+      },
+      {
+        "text": "La Fileuse ment-elle ? Un fil ne casse que si l'on ment…",
+        "color": "purple",
+        "x": 560,
+        "y": 400
+      },
+      {
+        "text": "Titre international : Midnight Passages",
+        "color": "blue",
+        "x": 820,
+        "y": 40
+      },
+      {
+        "text": "Margaux = la conscience de Brac",
+        "color": "green",
+        "x": 820,
+        "y": 220
+      }
+    ]
+  },
+  "plot": {
+    "version": 1,
+    "lanes": [
+      {
+        "id": "ines",
+        "name": "Inès et sa mère",
+        "color": "#e0a84a",
+        "main": true,
+        "hidden": false,
+        "characterId": "@char:ines"
+      },
+      {
+        "id": "enquete",
+        "name": "L'enquête de Vidal",
+        "color": "#3d6fb6",
+        "main": false,
+        "hidden": false,
+        "characterId": "@char:vidal"
+      },
+      {
+        "id": "lumen",
+        "name": "Brac et Méridienne",
+        "color": "#8c2f39",
+        "main": false,
+        "hidden": false,
+        "characterId": "@char:brac"
+      },
+      {
+        "id": "dessous",
+        "name": "La Cité-Dessous",
+        "color": "#6b4f8a",
+        "main": false,
+        "hidden": false,
+        "characterId": "@char:fileuse"
+      }
+    ],
+    "events": [
+      {
+        "id": "h1",
+        "laneId": "dessous",
+        "row": -3,
+        "title": "La révolte des canuts",
+        "note": "Des tisserands se réfugient sous Fourvière.",
+        "pivot": false,
+        "status": "revised",
+        "tags": [
+          "passé"
+        ],
+        "characterIds": [],
+        "povId": null,
+        "locationId": "@loc:dessous",
+        "nodeId": null,
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "1834",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "faction",
+            "id": "@faction:canuts"
+          },
+          {
+            "kind": "people",
+            "id": "@people:traboulins"
+          }
+        ]
+      },
+      {
+        "id": "h2",
+        "laneId": "lumen",
+        "row": -2,
+        "title": "Méridienne est creusée",
+        "note": "Puis abandonnée, et effacée des plans.",
+        "pivot": false,
+        "status": "revised",
+        "tags": [
+          "passé"
+        ],
+        "characterIds": [],
+        "povId": null,
+        "locationId": "@loc:meridienne",
+        "nodeId": null,
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "1978",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "id": "@item:plan-1978"
+          }
+        ]
+      },
+      {
+        "id": "h3",
+        "laneId": "ines",
+        "row": -1,
+        "title": "Joséphine disparaît",
+        "note": "Arrêt non prévu à 0 h 12, une enfant sur le quai.",
+        "pivot": true,
+        "status": "revised",
+        "tags": [
+          "passé"
+        ],
+        "characterIds": [
+          "@char:josephine",
+          "@char:vidal"
+        ],
+        "povId": null,
+        "locationId": "@loc:meridienne",
+        "nodeId": "@node:e4s2",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "14 mars 2011",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "id": "@item:carnet-jo"
+          }
+        ]
+      },
+      {
+        "id": "e1",
+        "laneId": "ines",
+        "row": 0,
+        "title": "0 h 12",
+        "note": "La rame s'arrête seule à Méridienne.",
+        "pivot": true,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:ines",
+          "@char:lilou"
+        ],
+        "povId": "@char:ines",
+        "locationId": "@loc:meridienne",
+        "nodeId": "@node:e1s2",
+        "alsoNodeIds": [
+          "@node:e1s1"
+        ],
+        "noteIds": [],
+        "date": "Nuit 1",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "id": "@item:rame"
+          }
+        ]
+      },
+      {
+        "id": "e2",
+        "laneId": "ines",
+        "row": 1,
+        "title": "La poussière dorée",
+        "note": "Samuel la croit.",
+        "pivot": false,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:ines",
+          "@char:samuel"
+        ],
+        "povId": null,
+        "locationId": "@loc:croix-rousse",
+        "nodeId": "@node:e1s3",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": []
+      },
+      {
+        "id": "v1",
+        "laneId": "enquete",
+        "row": 2,
+        "title": "La voix sur la bande",
+        "note": "Victor apporte son dictaphone.",
+        "pivot": false,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:vidal",
+          "@char:victor"
+        ],
+        "povId": null,
+        "locationId": "@loc:commissariat",
+        "nodeId": "@node:e2s1",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "id": "@item:dictaphone"
+          },
+          {
+            "kind": "item",
+            "id": "@item:dossier"
+          }
+        ]
+      },
+      {
+        "id": "b1",
+        "laneId": "lumen",
+        "row": 2,
+        "title": "Brac annonce Méridienne",
+        "note": "Ouverture en 2032.",
+        "pivot": false,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:brac",
+          "@char:ines",
+          "@char:victor"
+        ],
+        "povId": null,
+        "locationId": "@loc:lyon",
+        "nodeId": "@node:e2s2",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "faction",
+            "id": "@faction:lumen"
+          }
+        ]
+      },
+      {
+        "id": "e3",
+        "laneId": "ines",
+        "row": 3,
+        "title": "La descente",
+        "note": "Inès découvre la Cité-Dessous.",
+        "pivot": true,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:ines",
+          "@char:lilou",
+          "@char:fileuse"
+        ],
+        "povId": "@char:ines",
+        "locationId": "@loc:dessous",
+        "nodeId": "@node:e3s1",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "people",
+            "id": "@people:traboulins"
+          },
+          {
+            "kind": "magic",
+            "id": "@magic:traboulage"
+          }
+        ]
+      },
+      {
+        "id": "d1",
+        "laneId": "dessous",
+        "row": 4,
+        "title": "Le Passeur",
+        "note": "Les ombres-chiens ; le fil de soie.",
+        "pivot": false,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:ines",
+          "@char:passeur"
+        ],
+        "povId": null,
+        "locationId": "@loc:rue-boeuf",
+        "nodeId": "@node:e3s2",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "species",
+            "id": "@species:ombres"
+          },
+          {
+            "kind": "item",
+            "id": "@item:fil"
+          }
+        ]
+      },
+      {
+        "id": "b2",
+        "laneId": "lumen",
+        "row": 5,
+        "title": "Les plans de Margaux",
+        "note": "Brac veut tout bétonner.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:margaux",
+          "@char:samuel",
+          "@char:ines"
+        ],
+        "povId": null,
+        "locationId": "@loc:atelier",
+        "nodeId": "@node:e4s1",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "faction",
+            "id": "@faction:promoteurs"
+          }
+        ]
+      },
+      {
+        "id": "e4",
+        "laneId": "ines",
+        "row": 6,
+        "title": "Joséphine ne la reconnaît pas",
+        "note": "« C'est un poème ? »",
+        "pivot": true,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:ines",
+          "@char:josephine"
+        ],
+        "povId": "@char:ines",
+        "locationId": "@loc:dessous",
+        "nodeId": "@node:e4s2",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "magic",
+            "id": "@magic:noeud"
+          }
+        ]
+      },
+      {
+        "id": "v2",
+        "laneId": "enquete",
+        "row": 6,
+        "title": "Vidal relit 2011",
+        "note": "Elle comprend qui lui a donné l'ordre de classer.",
+        "pivot": false,
+        "status": "idea",
+        "tags": [],
+        "characterIds": [
+          "@char:vidal"
+        ],
+        "povId": null,
+        "locationId": "@loc:commissariat",
+        "nodeId": null,
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": []
+      },
+      {
+        "id": "e5",
+        "laneId": "ines",
+        "row": 8,
+        "title": "La rame rouge",
+        "note": "Inès s'arrête sans freiner.",
+        "pivot": true,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:ines",
+          "@char:brac"
+        ],
+        "povId": null,
+        "locationId": "@loc:meridienne",
+        "nodeId": "@node:e5s1",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "magic",
+            "id": "@magic:sang-malbec"
+          }
+        ]
+      },
+      {
+        "id": "d2",
+        "laneId": "dessous",
+        "row": 9,
+        "title": "Les deux villes se voient",
+        "note": "La prophétie s'accomplit.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:fileuse",
+          "@char:vidal",
+          "@char:brac",
+          "@char:ines"
+        ],
+        "povId": null,
+        "locationId": "@loc:meridienne",
+        "nodeId": "@node:e5s2",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "people",
+            "id": "@people:prophetie-rame"
+          }
+        ]
+      },
+      {
+        "id": "s2a",
+        "laneId": "dessous",
+        "row": 12,
+        "title": "La fête des Lumières d'en bas",
+        "note": "Saison 2.",
+        "pivot": false,
+        "status": "idea",
+        "tags": [],
+        "characterIds": [
+          "@char:fileuse",
+          "@char:lilou"
+        ],
+        "povId": null,
+        "locationId": "@loc:lyon",
+        "nodeId": "@node:e6",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "people",
+            "id": "@people:fete-lumieres"
+          }
+        ]
+      },
+      {
+        "id": "s2b",
+        "laneId": "ines",
+        "row": 13,
+        "title": "Le nœud",
+        "note": "Un souvenir contre un souvenir.",
+        "pivot": false,
+        "status": "idea",
+        "tags": [],
+        "characterIds": [
+          "@char:ines",
+          "@char:josephine",
+          "@char:fileuse"
+        ],
+        "povId": null,
+        "locationId": "@loc:dessous",
+        "nodeId": "@node:e7",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "magic",
+            "id": "@magic:noeud"
+          }
+        ]
+      }
+    ],
+    "links": [
+      {
+        "id": "k1",
+        "from": "h3",
+        "to": "e1",
+        "kind": "influence",
+        "label": "même heure",
+        "note": "0 h 12, comme en 2011."
+      },
+      {
+        "id": "k2",
+        "from": "h2",
+        "to": "b1",
+        "kind": "impact",
+        "label": "le plan de 1978",
+        "note": ""
+      },
+      {
+        "id": "k3",
+        "from": "v1",
+        "to": "v2",
+        "kind": "impact",
+        "label": "le dossier",
+        "note": ""
+      },
+      {
+        "id": "k4",
+        "from": "e3",
+        "to": "e4",
+        "kind": "impact",
+        "label": "la Fileuse",
+        "note": "Elle la mène à Joséphine."
+      },
+      {
+        "id": "k5",
+        "from": "b2",
+        "to": "e5",
+        "kind": "influence",
+        "label": "le béton",
+        "note": "Inès doit agir avant l'inauguration."
+      },
+      {
+        "id": "k6",
+        "from": "e5",
+        "to": "d2",
+        "kind": "impact",
+        "label": "la rame rouge",
+        "note": ""
+      },
+      {
+        "id": "k7",
+        "from": "e4",
+        "to": "s2b",
+        "kind": "influence",
+        "label": "le nœud d'oubli",
+        "note": ""
+      },
+      {
+        "id": "k8",
+        "from": "b1",
+        "to": "e5",
+        "kind": "meeting",
+        "label": "l'inauguration",
+        "note": ""
+      }
+    ],
+    "rowLabels": {
+      "-3": "1834",
+      "-2": "1978",
+      "-1": "2011",
+      "0": "Épisode 1",
+      "2": "Épisode 2",
+      "3": "Épisode 3",
+      "5": "Épisode 4",
+      "8": "Épisode 5",
+      "12": "Saison 2"
+    },
+    "acts": {
+      "0": "Saison 1",
+      "12": "Saison 2"
+    },
+    "tension": {
+      "-1": 6,
+      "0": 5,
+      "1": 3,
+      "2": 5,
+      "3": 6,
+      "4": 8,
+      "5": 5,
+      "6": 8,
+      "8": 9,
+      "9": 10,
+      "12": 4,
+      "13": 7
+    },
+    "readingOrder": [],
+    "readingFollowsStructure": true,
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Vidal doit-elle descendre en saison 1 ?",
+        "done": true,
+        "eventId": "d2"
+      },
+      {
+        "id": "q2",
+        "text": "Qui a donné l'ordre de classer l'affaire en 2011 ?",
+        "done": false,
+        "eventId": "v2"
+      }
+    ],
+    "mysteries": [
+      {
+        "id": "y1",
+        "question": "Pourquoi la rame s'arrête-t-elle à Méridienne ?",
+        "status": "solved",
+        "answer": "Le sang Malbec : les femmes Malbec arrêtent les rames sans freiner.",
+        "payoff": "Inès lâche le manipulateur.",
+        "payoffEventId": "e5"
+      },
+      {
+        "id": "y2",
+        "question": "Où est Joséphine ?",
+        "status": "solved",
+        "answer": "Dans la Cité-Dessous, nouée d'oubli.",
+        "payoff": "L'alcôve de soie.",
+        "payoffEventId": "e4"
+      },
+      {
+        "id": "y3",
+        "question": "Que veut vraiment Brac ?",
+        "status": "solved",
+        "answer": "Bétonner tout ce qui est creux sous la colline.",
+        "payoff": "Les plans de Margaux.",
+        "payoffEventId": "b2"
+      },
+      {
+        "id": "y4",
+        "question": "Qui a noué la mémoire de Joséphine ?",
+        "status": "open",
+        "answer": "",
+        "payoff": "",
+        "payoffEventId": null
+      }
+    ],
+    "clues": [
+      {
+        "id": "i1",
+        "text": "« C'est ce que ta mère disait aussi. »",
+        "eventId": "e1",
+        "mysteryId": "y2"
+      },
+      {
+        "id": "i2",
+        "text": "La poussière dorée sur la lampe.",
+        "eventId": "e2",
+        "mysteryId": "y1"
+      },
+      {
+        "id": "i3",
+        "text": "« Ici. Mais elle ne sait plus qu'elle est ta mère. »",
+        "eventId": "e3",
+        "mysteryId": "y4"
+      },
+      {
+        "id": "i4",
+        "text": "Le dossier 2011-MÉRIDIENNE.",
+        "eventId": "v1",
+        "mysteryId": "y2"
+      }
+    ],
+    "goal": 0,
+    "templates": [
+      {
+        "id": "t1",
+        "name": "Saison feuilletonnante",
+        "steps": [
+          "Incident",
+          "Enquête",
+          "Monde caché",
+          "Révélation intime",
+          "Point de non-retour",
+          "Final de saison"
+        ]
+      }
+    ],
+    "sceneOrder": {}
+  },
+  "versions": [
+    {
+      "kind": "synopsis",
+      "item": "default",
+      "name": "Synopsis du dépôt à la chaîne",
+      "then": "synopsis-v1"
+    },
+    {
+      "kind": "structureNode",
+      "item": "@node:e1s2",
+      "name": "Version lue à la chaîne"
+    }
+  ],
+  "trash": [
+    "@note:brouillon"
+  ],
+  "journal": [
+    {
+      "action": "created",
+      "kind": "structureNode",
+      "item": "@node:e5s2",
+      "label": "Les deux villes"
+    },
+    {
+      "action": "updated",
+      "kind": "structureNode",
+      "item": "@node:e3s1",
+      "label": "La Cité-Dessous"
+    }
+  ],
+  "workDays": [
+    {
+      "day": "2026-11-02",
+      "actions": 18,
+      "minutes": 60,
+      "words": 0
+    },
+    {
+      "day": "2026-11-03",
+      "actions": 25,
+      "minutes": 90,
+      "words": 0
+    },
+    {
+      "day": "2026-11-04",
+      "actions": 30,
+      "minutes": 110,
+      "words": 0
+    },
+    {
+      "day": "2026-11-06",
+      "actions": 12,
+      "minutes": 40,
+      "words": 0
+    },
+    {
+      "day": "2026-11-09",
+      "actions": 40,
+      "minutes": 160,
+      "words": 0
+    },
+    {
+      "day": "2026-11-10",
+      "actions": 22,
+      "minutes": 75,
+      "words": 0
+    },
+    {
+      "day": "2026-11-12",
+      "actions": 15,
+      "minutes": 55,
+      "words": 0
+    },
+    {
+      "day": "2026-11-13",
+      "actions": 33,
+      "minutes": 120,
+      "words": 0
+    },
+    {
+      "day": "2026-11-16",
+      "actions": 28,
+      "minutes": 100,
+      "words": 0
+    },
+    {
+      "day": "2026-11-17",
+      "actions": 10,
+      "minutes": 35,
+      "words": 0
+    },
+    {
+      "day": "2026-11-18",
+      "actions": 37,
+      "minutes": 140,
+      "words": 0
+    },
+    {
+      "day": "2026-11-19",
+      "actions": 20,
+      "minutes": 70,
+      "words": 0
+    }
+  ]
+}

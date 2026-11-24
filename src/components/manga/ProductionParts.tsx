@@ -1,6 +1,7 @@
 import { useEffect, useId, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { ArrowDown, ArrowUp, ImagePlus, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
+import { ArrowDown, ArrowUp, ImagePlus, Pencil, Plus, Trash2, X } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { InfoTip } from "@/components/common/InfoTip";
 import { thumbnailUrl } from "@/components/manga/Thumbnail";
 import { api } from "@/lib/api";
@@ -11,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { fieldClass } from "@/components/workspace/views/PageShell";
 import { errorText } from "@/lib/errors";
+import { sessionMap } from "@/lib/sessionCache";
 import {
   EXTRA_PAGE_KINDS,
   isCoverKind,
@@ -100,7 +102,7 @@ export function StageLegend({ counts }: { counts?: Record<ProductionStage | "non
  * séance (copies en clair d'images chiffrées dans le projet : jamais sur le
  * disque). Une nouvelle version du dessin a une nouvelle clé.
  */
-const artCache = new Map<string, Promise<string | null>>();
+const artCache = sessionMap<string, Promise<string | null>>((url) => void url.then((value) => value && URL.revokeObjectURL(value)));
 
 /** Vignette du dessin d'une page hors récit ; `null` s'il n'y en a pas. */
 export function useExtraArtUrl(projectId: string, extra: Pick<MangaExtraPage, "id" | "hasArt" | "artUpdatedAt"> | null): string | null {
@@ -304,7 +306,7 @@ export function ExtraPageDialog({ projectId, volumeId, extra, volumeExtras, onCl
             {t("common:actions.cancel")}
           </Button>
           <Button type="submit" disabled={busy || Boolean(taken(kind))}>
-            {busy && <Loader2 className="animate-spin" />}
+            {busy && <LoadingDots />}
             {busy ? t("common:actions.saving") : t("common:actions.save")}
           </Button>
         </DialogFooter>

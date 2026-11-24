@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { Loader2, X } from "lucide-react";
+import { X } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { IMAGE_ACTIONS_CLASS, IMAGE_DIALOG_WIDTH_CLASS, IMAGE_STAGE_CLASS } from "@/components/common/FrameEditor";
 import { ImageDownloadButton } from "@/components/common/ImageDownloadButton";
 import { Button } from "@/components/ui/button";
@@ -65,7 +66,7 @@ export function MentionImageDialog({ projectId, image, onClose, onOpenGallery }:
           ) : failed ? (
             <p className="text-sm text-muted-foreground">{t("notes:mentions.imageMissing")}</p>
           ) : (
-            <Loader2 aria-hidden className="size-6 animate-spin text-muted-foreground" />
+            <LoadingDots aria-hidden className="size-6 text-muted-foreground" />
           )}
         </div>
         <div className={cn(IMAGE_ACTIONS_CLASS, "justify-end gap-2")}>

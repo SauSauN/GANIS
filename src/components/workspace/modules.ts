@@ -4,17 +4,21 @@ import {
   BookOpen,
   BookOpenText,
   BookText,
+  CalendarRange,
   Clapperboard,
+  ClipboardList,
   Columns3,
   Drama,
   FileText,
   FileUp,
+  Film,
   Flag,
   GalleryThumbnails,
   History,
   Images,
   Info,
   LayoutGrid,
+  Lightbulb,
   List,
   ListTree,
   MapPin,
@@ -34,6 +38,7 @@ import {
   StickyNote,
   Target,
   Trash2,
+  TrendingUp,
   Tv,
   UserPlus,
   UserRound,
@@ -49,6 +54,8 @@ import { characterIdOfTab, fullName } from "@/lib/characters";
 import { locationIdOfTab } from "@/lib/locations";
 import { worldEntryOfTab, type WorldWorkspaceModuleId } from "@/lib/world";
 import { noteIdOfTab } from "@/lib/notes";
+import { boardIdOfTab } from "@/lib/boards";
+import { useBoardStore } from "@/stores/boardStore";
 import { nodeHeading, numberNodes, resolveLevels, structureNodeIdOfTab } from "@/lib/structure";
 import { useCharacterStore } from "@/stores/characterStore";
 import { useLocationStore } from "@/stores/locationStore";
@@ -87,6 +94,7 @@ export type ModuleId =
   | "manuscript"
   | "script"
   | "screenplay"
+  | "film"
   | "search"
   | "settings";
 
@@ -123,11 +131,13 @@ type FeatureId =
   | "synopsis.edit"
   | "glossary.list"
   | "gallery"
+  | "boards"
   | "trash"
   | "history"
   | "characters.create"
   | "characters.list"
   | "characters.relations"
+  | "characters.arcs"
   | "locations.create"
   | "locations.list"
   | "items.create"
@@ -145,6 +155,7 @@ type FeatureId =
   | "structure.continuity"
   | "plot.board"
   | "plot.reading"
+  | "plot.timeline"
   | "notes.create"
   | "notes.list"
   | "notes.wall"
@@ -161,7 +172,16 @@ type FeatureId =
   | "script.continuity"
   | "screenplay.read"
   | "screenplay.progress"
-  | "screenplay.continuity";
+  | "screenplay.continuity"
+  | "screenplay.board"
+  | "screenplay.breakdown"
+  | "screenplay.import"
+  | "film.read"
+  | "film.progress"
+  | "film.continuity"
+  | "film.breakdown"
+  | "film.board"
+  | "film.import";
 
 /** Modules qui ont une liste (et donc un message de liste vide). */
 type ListModuleId = "characters" | "locations" | "items" | "species" | "factions" | "peoples" | "magic" | "notes";
@@ -230,6 +250,8 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
     defineFeature("notes.create", Plus),
     defineFeature("notes.list", List),
     defineFeature("notes.wall", LayoutGrid),
+    // Images de la galerie, couleurs, citations, notes (voir `lib/boards.ts`).
+    defineFeature("boards", Lightbulb),
   ]),
   // Découpage du récit : ses niveaux (parties, chapitres, scènes ; actes,
   // séquences… ) dépendent du type de projet. Voir `lib/structure.ts`.
@@ -246,12 +268,16 @@ export const WORKSPACE_MODULES: WorkspaceModule[] = [
   // l'histoire et analyse. Voir `lib/plot.ts`.
   defineModule("plot", Waypoints, [
     defineFeature("plot.board", Columns3),
+    // Les mêmes événements, placés par date (voir `timeline` dans lib/plot.ts).
+    defineFeature("plot.timeline", CalendarRange),
     defineFeature("plot.reading", BookOpen),
   ]),
   defineListModule("characters", Users, [
     defineFeature("characters.create", UserPlus),
     defineFeature("characters.list", List),
     defineFeature("characters.relations", Network),
+    // Ce qui change en chaque personnage (voir `lib/arcs.ts`).
+    defineFeature("characters.arcs", TrendingUp),
   ]),
   defineListModule("locations", MapPin, [
     defineFeature("locations.create", Plus),
@@ -301,11 +327,32 @@ export const MANGA_FEATURES = new Set(MANGA_MODULE.features.map((feature) => fea
 export const SERIES_MODULE: WorkspaceModule = defineModule("screenplay", Tv, [
   defineFeature("screenplay.read", BookOpenText),
   defineFeature("screenplay.progress", Target),
+  defineFeature("screenplay.board", LayoutGrid),
+  defineFeature("screenplay.breakdown", ClipboardList),
   defineFeature("screenplay.continuity", Route),
+  defineFeature("screenplay.import", FileUp),
 ]);
 
 /** Fonctionnalités réservées aux séries. */
 export const SERIES_FEATURES = new Set(SERIES_MODULE.features.map((feature) => feature.id));
+
+/**
+ * Scénario de film : lecture et export au format du long métrage, suivi du
+ * film (durée par acte, séquences), continuité. Proposé seulement aux
+ * projets de film ; l'écriture se fait dans la fiche de chaque scène, comme
+ * pour une série (même moteur, voir `lib/series.ts`).
+ */
+export const FILM_MODULE: WorkspaceModule = defineModule("film", Film, [
+  defineFeature("film.read", BookOpenText),
+  defineFeature("film.progress", Target),
+  defineFeature("film.board", LayoutGrid),
+  defineFeature("film.breakdown", ClipboardList),
+  defineFeature("film.continuity", Route),
+  defineFeature("film.import", FileUp),
+]);
+
+/** Fonctionnalités réservées aux films. */
+export const FILM_FEATURES = new Set(FILM_MODULE.features.map((feature) => feature.id));
 
 /**
  * Objets, faune et flore, factions : modules facultatifs, masqués tant que l'auteur ne
@@ -405,7 +452,8 @@ export const PREVIOUS_MODULE_ORDER: readonly ModuleOrderKey[] = [
   "notes",
 ];
 
-const PROJECT_TYPE_MODULES: ReadonlySet<string> = new Set(["manuscript", "script", "screenplay"]);
+/** Modules propres à un type de projet (rangés ensemble dans l'ordre de la barre). */
+export const PROJECT_TYPE_MODULES: ReadonlySet<string> = new Set(["manuscript", "script", "screenplay", "film"]);
 
 /** Clé de rangement d'un module (`null` : il ne se range pas). */
 export function moduleOrderKey(id: string): ModuleOrderKey | null {
@@ -439,6 +487,19 @@ export function applyModuleOrder(modules: WorkspaceModule[], order: readonly str
   return modules.map((module) => (moduleOrderKey(module.id) !== null ? ranked[next++] : module));
 }
 
+/** Module propre à un type de projet, placé juste après la Trame. */
+const PROJECT_TYPE_MODULE: Record<string, WorkspaceModule> = {
+  novel: NOVEL_MODULE,
+  manga: MANGA_MODULE,
+  series: SERIES_MODULE,
+  film: FILM_MODULE,
+};
+
+/** Module propre au type de projet (`null` : il n'en a pas). */
+export function projectTypeModuleId(projectType: string | null | undefined): ModuleId | null {
+  return PROJECT_TYPE_MODULE[projectType ?? ""]?.id ?? null;
+}
+
 function defaultModulesFor(
   projectType: string | null | undefined,
   world: EnabledWorldModules,
@@ -451,21 +512,22 @@ function defaultModulesFor(
   const after = WORKSPACE_MODULES.findIndex((module) => module.id === "locations");
   const base = [...WORKSPACE_MODULES.slice(0, after + 1), ...worldModules, ...WORKSPACE_MODULES.slice(after + 1)];
 
-  const extra = projectType === "novel" ? NOVEL_MODULE : projectType === "manga" ? MANGA_MODULE : projectType === "series" ? SERIES_MODULE : null;
+  const extra = PROJECT_TYPE_MODULE[projectType ?? ""] ?? null;
   if (!extra) return base;
   const index = base.findIndex((module) => module.id === "plot");
   return [...base.slice(0, index + 1), extra, ...base.slice(index + 1)];
 }
 
-/** Lecture complète des types sans module dédié (film, série, jeu vidéo…). */
+/** Lecture complète des types sans module dédié (jeu vidéo, jeu de rôle, projet libre). */
 export const STORY_READ_FEATURE = "structure.read";
 
 /**
- * Continuité des types sans module dédié (film, jeu vidéo, jeu de rôle,
+ * Continuité des types sans module dédié (jeu vidéo, jeu de rôle,
  * personnalisé), dans le Découpage. Le roman l'a dans son Manuscrit
- * (`manuscript.continuity`), la série dans son Scénario
- * (`screenplay.continuity`) ; le manga a la sienne, case par case
- * (`script.continuity`). Les trois premières ouvrent la même vue.
+ * (`manuscript.continuity`), la série et le film dans leur Scénario
+ * (`screenplay.continuity`, `film.continuity`) ; le manga a la sienne, case
+ * par case (`script.continuity`). Toutes sauf celle du manga ouvrent la
+ * même vue.
  */
 export const STORY_CONTINUITY_FEATURE = "structure.continuity";
 
@@ -478,8 +540,9 @@ export function featureAvailable(featureId: string, projectType: string | null |
   if (NOVEL_FEATURES.has(featureId)) return projectType === "novel";
   if (MANGA_FEATURES.has(featureId)) return projectType === "manga";
   if (SERIES_FEATURES.has(featureId)) return projectType === "series";
-  if (featureId === STORY_READ_FEATURE) return projectType !== "novel" && projectType !== "manga";
-  if (featureId === STORY_CONTINUITY_FEATURE) return projectType !== "manga" && projectType !== "novel" && projectType !== "series";
+  if (FILM_FEATURES.has(featureId)) return projectType === "film";
+  if (featureId === STORY_READ_FEATURE) return projectType !== "novel" && projectType !== "manga" && projectType !== "film";
+  if (featureId === STORY_CONTINUITY_FEATURE) return projectType !== "manga" && projectType !== "novel" && projectType !== "series" && projectType !== "film";
   return true;
 }
 
@@ -538,6 +601,7 @@ const ALL_MODULES: WorkspaceModule[] = [
   NOVEL_MODULE,
   MANGA_MODULE,
   SERIES_MODULE,
+  FILM_MODULE,
   SETTINGS_MODULE,
 ];
 
@@ -655,6 +719,22 @@ function noteFeature(tabId: string, noteId: string): WorkspaceFeature {
   };
 }
 
+/** Planche d'inspiration (onglet `board:<id>`) : son libellé est le nom de la planche. */
+function boardFeature(tabId: string, boardId: string): WorkspaceFeature {
+  return {
+    id: tabId,
+    icon: Lightbulb,
+    get label() {
+      const board = useBoardStore.getState().boards.find((item) => item.id === boardId);
+
+      return board ? board.name : i18n.t("modules:features.boards.label");
+    },
+    get description() {
+      return i18n.t("modules:features.boards.description");
+    },
+  };
+}
+
 /** Retrouve une fonctionnalité (et son module) par son identifiant. */
 export function findFeature(
   featureId: string,
@@ -701,6 +781,15 @@ export function findFeature(
     return {
       module: getModule("notes"),
       feature: noteFeature(featureId, noteId),
+    };
+  }
+
+  const boardId = boardIdOfTab(featureId);
+
+  if (boardId) {
+    return {
+      module: getModule("notes"),
+      feature: boardFeature(featureId, boardId),
     };
   }
 

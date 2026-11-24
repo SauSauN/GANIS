@@ -2,7 +2,8 @@ import { useEffect, useRef, useState, type DragEvent } from "react";
 import { createPortal } from "react-dom";
 import { useConfirmImageRemoval } from "@/components/common/useConfirmImageRemoval";
 import { useTranslation } from "react-i18next";
-import { ChevronLeft, ChevronRight, Crop, ImagePlus, Loader2, Trash2, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Crop, ImagePlus, Trash2, X } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { FrameEditor } from "@/components/common/FrameEditor";
 import { InfoTip } from "@/components/common/InfoTip";
 import { Button } from "@/components/ui/button";
@@ -25,6 +26,7 @@ import { cn } from "@/lib/utils";
 import { useCharacterStore } from "@/stores/characterStore";
 import type { GalleryImage } from "@/types";
 import { errorText } from "@/lib/errors";
+import { sessionMap } from "@/lib/sessionCache";
 
 /** Nombre maximal d'images (identique à Rust). */
 export const MAX_GALLERY_IMAGES = 30;
@@ -109,7 +111,7 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
               </button>
             ) : (
               <span className="flex size-full items-center justify-center">
-                <Loader2 className="size-4 animate-spin text-muted-foreground" />
+                <LoadingDots className="size-4 text-muted-foreground" />
               </span>
             )}
 
@@ -133,7 +135,7 @@ export function GalleryGrid({ label, items, busy, error, disabled, onAdd, onRemo
             onClick={() => inputRef.current?.click()}
             className="flex aspect-square flex-col items-center justify-center gap-1 rounded-lg border border-dashed text-xs text-muted-foreground transition-colors hover:border-primary hover:text-primary disabled:pointer-events-none disabled:opacity-50"
           >
-            {busy ? <Loader2 className="size-5 animate-spin" /> : <ImagePlus className="size-5" />}
+            {busy ? <LoadingDots className="size-5" /> : <ImagePlus className="size-5" />}
             {t("gallery.add")}
           </button>
         )}
@@ -283,7 +285,7 @@ function ImageViewer({
         />
       ) : (
         <span className="flex size-40 items-center justify-center">
-          <Loader2 className="size-6 animate-spin text-muted-foreground" />
+          <LoadingDots className="size-6 text-muted-foreground" />
         </span>
       )}
 
@@ -355,7 +357,7 @@ function imageError(t: (key: string) => string, e: unknown): string {
 // ----------------------------------------------------------------------------
 
 /** Images déjà chargées (par identifiant), gardées le temps de la session. */
-const urlCache = new Map<string, string>();
+const urlCache = sessionMap<string, string>();
 
 /** Images en cours de chargement : pas de demande en double. */
 const inflight = new Set<string>();

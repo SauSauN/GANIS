@@ -21,6 +21,9 @@ import type {
   SceneScript,
   SceneScriptInput,
   EpisodeFields,
+  FilmDetails,
+  SceneBreakdown,
+  SceneBreakdownRow,
   PageScriptInput,
   Panel,
   FindOptions,
@@ -98,6 +101,23 @@ export const structureApi = {
   /** Logline, durée visée, statut et scénariste d'un épisode. */
   setSeriesEpisode: (projectId: string, nodeId: string, fields: EpisodeFields) =>
     call<StructureNode>("set_series_episode", { projectId, nodeId, fields }),
+
+  /** Fiche du film : logline, durée visée et scénariste. */
+  getFilmDetails: (projectId: string) => call<FilmDetails>("get_film_details", { projectId }),
+
+  /** Enregistre la fiche du film. */
+  setFilmDetails: (projectId: string, details: FilmDetails) => call<FilmDetails>("set_film_details", { projectId, details }),
+
+  /** Dépouillement de toutes les scènes. */
+  getSceneBreakdowns: (projectId: string) => call<SceneBreakdownRow[]>("get_scene_breakdowns", { projectId }),
+
+  /** Enregistre le dépouillement d'une scène (tout vide : il est retiré). */
+  setSceneBreakdown: (projectId: string, sceneId: string, breakdown: SceneBreakdown) =>
+    call<SceneBreakdown>("set_scene_breakdown", { projectId, sceneId, breakdown }),
+
+  /** Place une scène dans une séquence ou un épisode, au rang donné (tableau de liège). */
+  placeStructureNode: (projectId: string, nodeId: string, parentId: string | null, index: number) =>
+    call<StructureNode>("place_structure_node", { projectId, nodeId, parentId, index }),
 
   // --------------------------------------------------------------------------
   // Manga / BD : scénario par page et par case

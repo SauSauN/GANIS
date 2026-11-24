@@ -3,6 +3,7 @@ import type {
   AccountCreated,
   AuthorProfile,
   AppInfo,
+  DeviceStatus,
   LoginResult,
   User,
 } from "@/types";
@@ -33,6 +34,23 @@ export const accountApi = {
    * Indique si au moins un compte utilisateur existe.
    */
   hasAnyUser: () => call<boolean>("has_any_user"),
+
+  // -------------------------------------------------------------------------
+  // Clé d'appareil (chiffrement de app.db, voir security/device_key.rs)
+  // -------------------------------------------------------------------------
+
+  /** Données verrouillées au démarrage (clé d'appareil indisponible) ? */
+  deviceStatus: () => call<DeviceStatus>("device_status"),
+
+  /**
+   * Données verrouillées : choisit le fichier de clé de secours. S'il
+   * convient, l'application redémarre ; `false` si la fenêtre est fermée.
+   */
+  restoreDeviceKey: (dialogTitle: string) => call<boolean>("restore_device_key", { dialogTitle }),
+
+  /** Enregistre la clé de secours des données de cet ordinateur. */
+  saveDeviceKeyBackup: (input: { language: string; dialogTitle: string }) =>
+    call<string | null>("save_device_key_backup", { input }),
 
   // -------------------------------------------------------------------------
   // Phase 3 — Authentification

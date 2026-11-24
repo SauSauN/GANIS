@@ -1,6 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { PROJECT_SETTINGS_SECTIONS } from "@/components/project-settings/sections";
-import { MODULE_ORDER_KEYS, PREVIOUS_MODULE_ORDER, modulesFor, normalizeModuleOrder, orderSettingsSections } from "@/components/workspace/modules";
+import {
+  MODULE_ORDER_KEYS,
+  PREVIOUS_MODULE_ORDER,
+  featureAvailable,
+  findFeature,
+  modulesFor,
+  normalizeModuleOrder,
+  orderSettingsSections,
+  projectTypeModuleId,
+} from "@/components/workspace/modules";
 
 const ids = (...args: Parameters<typeof modulesFor>) => modulesFor(...args).map((module) => module.id);
 
@@ -78,5 +87,33 @@ describe("ordre des modules", () => {
       "notes",
       "search",
     ]);
+  });
+});
+
+describe("module du film", () => {
+  it("un film a son module Scénario, juste après la Trame", () => {
+    const list = ids("film");
+    expect(list.indexOf("film")).toBe(list.indexOf("plot") + 1);
+    expect(list).not.toContain("screenplay");
+    expect(ids("series")).not.toContain("film");
+    expect(projectTypeModuleId("film")).toBe("film");
+    expect(projectTypeModuleId("game")).toBeNull();
+  });
+
+  it("ses outils remplacent la lecture et la continuité génériques", () => {
+    for (const id of ["film.read", "film.progress", "film.continuity", "film.breakdown", "film.board", "film.import"]) {
+      expect(featureAvailable(id, "film")).toBe(true);
+      expect(featureAvailable(id, "series")).toBe(false);
+    }
+    expect(featureAvailable("structure.read", "film")).toBe(false);
+    expect(featureAvailable("structure.continuity", "film")).toBe(false);
+    expect(featureAvailable("screenplay.read", "film")).toBe(false);
+    expect(featureAvailable("structure.read", "game")).toBe(true);
+    for (const id of ["screenplay.board", "screenplay.breakdown", "screenplay.import"]) {
+      expect(featureAvailable(id, "series")).toBe(true);
+      expect(featureAvailable(id, "film")).toBe(false);
+    }
+    // Le dossier n'a plus d'onglet : il s'exporte depuis le Suivi du film.
+    expect(findFeature("film.dossier")).toBeUndefined();
   });
 });

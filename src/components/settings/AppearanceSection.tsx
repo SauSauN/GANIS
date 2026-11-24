@@ -1,6 +1,7 @@
+import { NumberStepper } from "@/components/common/NumberStepper";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { Blocks, Check, Info, MapPin, Minus, Monitor, Moon, Package, Plus, RotateCcw, Sun, type LucideIcon } from "lucide-react";
+import { Blocks, Check, Info, MapPin, Monitor, Moon, Package, RotateCcw, Sun, type LucideIcon } from "lucide-react";
 import { ThemeSwatch } from "@/components/packages/ThemeSwatch";
 import { useInstalledThemes } from "@/components/packages/useInstalledThemes";
 import { ModuleOrderCard } from "@/components/settings/ModuleOrderCard";
@@ -619,42 +620,18 @@ function PanelImageCard() {
 
       <CardContent className="grid gap-6 px-6 py-6 sm:grid-cols-[1fr_14rem]">
         <div className="space-y-4">
-          <div className="flex items-center gap-3">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-sm"
-              aria-label={t("appearance.panelImage.smaller")}
-              title={t("appearance.panelImage.smaller")}
-              disabled={size <= PANEL_IMAGE_MIN}
-              onClick={() => setPanelImageSize(size - PANEL_IMAGE_STEP)}
-            >
-              <Minus />
-            </Button>
-            <input
-              type="range"
-              min={PANEL_IMAGE_MIN}
-              max={PANEL_IMAGE_MAX}
-              step={PANEL_IMAGE_STEP}
-              value={size}
-              onChange={(e) => setPanelImageSize(Number(e.target.value))}
-              aria-label={t("appearance.panelImage.title")}
-              aria-valuetext={t("appearance.panelImage.value", { size })}
-              className="h-2 flex-1 cursor-pointer accent-primary"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-sm"
-              aria-label={t("appearance.panelImage.larger")}
-              title={t("appearance.panelImage.larger")}
-              disabled={size >= PANEL_IMAGE_MAX}
-              onClick={() => setPanelImageSize(size + PANEL_IMAGE_STEP)}
-            >
-              <Plus />
-            </Button>
-          </div>
-
+          <NumberStepper
+            value={size}
+            min={PANEL_IMAGE_MIN}
+            max={PANEL_IMAGE_MAX}
+            step={PANEL_IMAGE_STEP}
+            format={(value) => t("appearance.panelImage.value", { size: value })}
+            aria-label={t("appearance.panelImage.title")}
+            decreaseLabel={t("appearance.panelImage.smaller")}
+            increaseLabel={t("appearance.panelImage.larger")}
+            onChange={(value) => value !== null && setPanelImageSize(value)}
+            valueClassName="w-24"
+          />
           <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
             <span className="text-muted-foreground">
               {t("appearance.panelImage.value", { size })}

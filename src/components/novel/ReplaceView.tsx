@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2, Replace, Search } from "lucide-react";
+import { Replace, Search } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
 import { Button } from "@/components/ui/button";
 import { PageShell } from "@/components/workspace/views/PageShell";
@@ -190,7 +191,7 @@ export function ReplaceView({ project, feature, onOpenFeature }: ReplaceViewProp
               {t("replace.wholeWord")}
             </label>
             <Button type="submit" className="ml-auto" disabled={busy !== null}>
-              {busy === "search" ? <Loader2 className="animate-spin" /> : <Search />}
+              {busy === "search" ? <LoadingDots /> : <Search />}
               {busy === "search" ? t("replace.searching") : t("replace.search")}
             </Button>
           </div>
@@ -212,7 +213,7 @@ export function ReplaceView({ project, feature, onOpenFeature }: ReplaceViewProp
                     {count === allKeys.length ? t("replace.selectNone") : t("replace.selectAll")}
                   </Button>
                   <Button className="ml-auto" disabled={count === 0 || busy !== null} onClick={() => void replace()}>
-                    {busy === "replace" ? <Loader2 className="animate-spin" /> : <Replace />}
+                    {busy === "replace" ? <LoadingDots /> : <Replace />}
                     {busy === "replace" ? t("replace.applying") : t("replace.apply", { count })}
                   </Button>
                 </>

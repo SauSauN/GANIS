@@ -1,3 +1,4 @@
+import { NumberStepper } from "@/components/common/NumberStepper";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Clapperboard, Plus } from "lucide-react";
@@ -42,7 +43,7 @@ export function MangaChapterCard({ projectId, node, pages, writtenPages }: Manga
   const [open, setOpen] = useCollapsible("ganis.nodeSheet.mangaChapter.collapsed");
   const applyNode = useStructureStore((s) => s.applyNode);
   const [goal, setGoal] = useState(node.narrativeGoal);
-  const [pageGoal, setPageGoal] = useState(node.pageGoal ? String(node.pageGoal) : "");
+
   // Erreurs en notification : la page ne bouge pas.
   const setError = (message: string | null) => {
     if (message) notifyError(message, "manga:chapter");
@@ -55,7 +56,7 @@ export function MangaChapterCard({ projectId, node, pages, writtenPages }: Manga
   const newPageCount = Math.min(MAX_NEW_PAGES, Number.parseInt(newPages, 10) || 0);
 
   useEffect(() => setGoal(node.narrativeGoal), [node.narrativeGoal]);
-  useEffect(() => setPageGoal(node.pageGoal ? String(node.pageGoal) : ""), [node.pageGoal]);
+
 
   const fields: MangaChapterFields = { narrativeGoal: node.narrativeGoal, pageGoal: node.pageGoal, scriptStatus: node.scriptStatus };
 
@@ -71,14 +72,6 @@ export function MangaChapterCard({ projectId, node, pages, writtenPages }: Manga
     }
   }
 
-  function commitPageGoal() {
-    const value = pageGoal.trim() === "" ? null : Number.parseInt(pageGoal, 10);
-    if (value !== null && (!Number.isFinite(value) || value < 0)) {
-      setPageGoal(node.pageGoal ? String(node.pageGoal) : "");
-      return;
-    }
-    if ((value || null) !== node.pageGoal) void save({ pageGoal: value || null });
-  }
 
   async function addPages() {
     if (newPageCount < 1) return;
@@ -121,37 +114,38 @@ export function MangaChapterCard({ projectId, node, pages, writtenPages }: Manga
             </p>
             {percent !== null && <ProgressBar percent={percent} />}
           </div>
-          <label className="space-y-1.5">
+          <div className="space-y-1.5">
             <span className="block text-sm font-medium">{t("chapter.pageGoal")}</span>
-            <input
-              type="number"
+            <NumberStepper
+              value={node.pageGoal ?? null}
               min={0}
-              value={pageGoal}
+              allowEmpty
               placeholder={t("chapter.pageGoalPlaceholder")}
               disabled={busy}
-              onChange={(e) => setPageGoal(e.target.value)}
-              onBlur={commitPageGoal}
-              onKeyDown={(e) => e.key === "Enter" && commitPageGoal()}
-              className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm outline-none focus:ring-2 focus:ring-ring"
+              aria-label={t("chapter.pageGoal")}
+              onChange={(value) => {
+                const goal = value === null ? null : Math.max(0, Math.round(value)) || null;
+                if (goal !== node.pageGoal) void save({ pageGoal: goal });
+              }}
+              valueClassName="w-20"
             />
-          </label>
+          </div>
         </div>
 
         <div className="flex flex-wrap items-end gap-2">
-          <label className="space-y-1.5">
+          <div className="space-y-1.5">
             <span className="block text-sm font-medium">{t("chapter.addPages")}</span>
-            <input
-              type="number"
-              placeholder={t("common:placeholders.number")}
+            <NumberStepper
+              value={newPageCount || null}
               min={1}
               max={MAX_NEW_PAGES}
-              value={newPages}
+              placeholder={t("common:placeholders.number")}
               disabled={busy}
-              onChange={(e) => setNewPages(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && void addPages()}
-              className="h-9 w-24 rounded-md border border-input bg-background px-3 text-right text-sm tabular-nums outline-none focus:ring-2 focus:ring-ring"
+              aria-label={t("chapter.addPages")}
+              onChange={(value) => value !== null && setNewPages(String(Math.round(value)))}
+              valueClassName="w-14"
             />
-          </label>
+          </div>
           <Button variant="outline" disabled={busy || newPageCount < 1} onClick={() => void addPages()}>
             <Plus />
             {t("chapter.addPagesButton", { count: newPageCount })}

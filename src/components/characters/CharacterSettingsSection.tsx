@@ -1,7 +1,8 @@
 import { useId, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { SheetDisplayCard } from "@/components/project-settings/SheetDisplayCard";
-import { Loader2, Plus, RotateCcw, WandSparkles, X } from "lucide-react";
+import { Plus, RotateCcw, WandSparkles, X } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -243,7 +244,7 @@ function PowersCard({ projectId }: { projectId: string }) {
               {powersEnabled ? t("characters.powers.enabledHint") : t("characters.powers.disabledHint")}
             </p>
           </div>
-          {busy && <Loader2 className="mt-1 size-4 animate-spin text-muted-foreground" aria-hidden="true" />}
+          {busy && <LoadingDots className="mt-1 size-4 text-muted-foreground" aria-hidden="true" />}
           <button
             type="button"
             role="switch"

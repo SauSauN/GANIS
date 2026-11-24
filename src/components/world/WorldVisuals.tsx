@@ -1,6 +1,7 @@
 import { useRef, useState, type DragEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { ImagePlus, Loader2, Maximize2, Trash2 } from "lucide-react";
+import { ImagePlus, Maximize2, Trash2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { ImageDialog } from "@/components/common/ImageDialog";
 import { frameStyle, portraitFrameKey } from "@/lib/imageFrame";
 import { useImageFrame } from "@/stores/imageFrameStore";
@@ -227,7 +228,7 @@ export function WorldBanner({
 
         {busy && (
           <span className="absolute inset-0 flex items-center justify-center bg-background/60">
-            <Loader2 className="size-6 animate-spin text-primary" aria-hidden="true" />
+            <LoadingDots className="size-6 text-primary" aria-hidden="true" />
           </span>
         )}
       </button>

@@ -132,6 +132,13 @@ export const projectsApi = {
   inspectGanix: (dialogTitle: string) =>
     call<GanixPreview | null>("inspect_ganix", { dialogTitle }),
 
+  /**
+   * `.ganix` ouvert depuis Windows (double-clic) : vérifié et mis en
+   * attente comme par « Importer ». `null` s'il n'y en a pas. Sans
+   * connexion, erreur `ganix.signInFirst` (le fichier est gardé).
+   */
+  takeOpenedGanix: () => call<GanixPreview | null>("take_opened_ganix"),
+
   /** Ajoute au compte le projet en attente. */
   confirmGanixImport: (stagingId: string, mode: GanixImportMode) =>
     call<GanixImportOutcome>("confirm_ganix_import", { stagingId, mode }),

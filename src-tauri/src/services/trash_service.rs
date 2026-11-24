@@ -382,6 +382,32 @@ pub async fn list(pool: &SqlitePool) -> AppResult<Vec<TrashItem>> {
     .await?)
 }
 
+/// Identifiants des documents (`structure_documents`) copiés dans la
+/// corbeille : ils reviendraient à la restauration de leur entrée. Une
+/// entrée illisible est ignorée (elle ne peut pas non plus être restaurée).
+pub async fn document_ids_in_trash(pool: &SqlitePool) -> AppResult<Vec<String>> {
+    let payloads: Vec<String> = sqlx::query_scalar("SELECT payload FROM trash").fetch_all(pool).await?;
+
+    let mut ids = Vec::new();
+    for payload in payloads {
+        let Ok(snapshot) = serde_json::from_str::<Snapshot>(&payload) else {
+            continue;
+        };
+        for row in snapshot.rows.iter().filter(|row| row.table == "structure_documents") {
+            let id = row
+                .columns
+                .iter()
+                .position(|column| column == "id")
+                .and_then(|index| row.values.get(index));
+            if let Some(Val::Text(id)) = id {
+                ids.push(id.clone());
+            }
+        }
+    }
+
+    Ok(ids)
+}
+
 fn is_constraint_error(error: &sqlx::Error) -> bool {
     match error {
         sqlx::Error::Database(db) => {

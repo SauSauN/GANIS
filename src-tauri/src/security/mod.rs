@@ -28,7 +28,9 @@
 //! (`AppState::account_key`) et en est effacée à la déconnexion.
 
 pub mod crypto;
+pub mod device_key;
 pub mod recovery_key;
+pub mod weak_passwords;
 
 /// Contextes de chiffrement (AAD).
 ///

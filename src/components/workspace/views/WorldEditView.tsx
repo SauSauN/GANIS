@@ -1,7 +1,9 @@
+import { LinkedBoardsCard } from "@/components/boards/LinkedBoardsCard";
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
 import { portraitFrameKey } from "@/lib/imageFrame";
-import { FolderTree, Loader2, PackageX, Plus, Save, Trash2 } from "lucide-react";
+import { FolderTree, PackageX, Plus, Save, Trash2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { VersionsButton } from "@/components/history/VersionsDialog";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -193,7 +195,7 @@ export function WorldEditView({
           </div>
         ) : (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            <LoadingDots className="size-4" aria-hidden="true" />
             {t("edit.loading")}
           </p>
         )}
@@ -287,6 +289,7 @@ export function WorldEditView({
           extra={
             <>
               <UniverseLinksCard projectId={projectId} self={{ kind: module, id: entry.id }} onOpenFeature={onOpenFeature} />
+            <LinkedBoardsCard projectId={projectId} target={{ kind: module, id: entry.id }} name={entry.name} onOpenFeature={onOpenFeature} />
               {/* « Trame » et « Récit » : masquables dans les paramètres du module. */}
               {sheetDisplay.showPlot && (
                 <PlotInStoryCard projectId={projectId} target={{ type: module, id: entry.id }} name={entry.name} onOpenFeature={onOpenFeature} />
@@ -302,7 +305,7 @@ export function WorldEditView({
           footer={
             <div className="flex min-h-10 flex-wrap items-center gap-4">
               <Button type="submit" disabled={!dirty || saving}>
-                {saving ? <Loader2 className="animate-spin" /> : <Save />}
+                {saving ? <LoadingDots /> : <Save />}
                 {t("common:actions.save")}
               </Button>
 
@@ -368,7 +371,7 @@ export function WorldEditView({
             {t("common:actions.cancel")}
           </Button>
           <Button variant="destructive" disabled={deleting} onClick={() => void onDelete()}>
-            {deleting && <Loader2 className="animate-spin" />}
+            {deleting && <LoadingDots />}
             {t("edit.deleteConfirm")}
           </Button>
         </DialogFooter>

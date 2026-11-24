@@ -1,4 +1,5 @@
-//! Projets d'exemple : un roman et un manga complets, créés à la demande.
+//! Projets d'exemple : un roman, un manga, un film et une série complets,
+//! créés à la demande.
 //!
 //! # Données et code séparés
 //!
@@ -31,6 +32,7 @@
 
 pub mod images;
 mod markup;
+mod screenplay;
 mod script;
 
 use std::collections::{BTreeMap, HashMap};
@@ -51,7 +53,9 @@ use crate::services::location_service::{self as locations, CustomTypeInput, Loca
 use crate::services::manga_service::{self as manga, ChapterFields, MangaSettings, PageScriptInput, PanelCharacter, PanelInput, TextInput};
 use crate::services::note_service::{self as notes, NoteUpdate, StickyUpdate};
 use crate::services::novel_service::{self as novel, EditorialUpdate, NovelFields};
+use crate::services::project_image_service as gallery;
 use crate::services::relation_service::{self as relations, GraphPosition, RelationInput};
+use crate::services::series_service::{self as series, BlockInput, EpisodeFields, FilmDetails, SceneScriptInput};
 use crate::services::structure_link_service as node_links;
 use crate::services::structure_service::{self as structure, LevelInput, StructureNode};
 use crate::services::world_link_service::{self as world_links, WorldLinkInput};
@@ -72,7 +76,7 @@ struct Source {
     texts: &'static [(&'static str, &'static str)],
 }
 
-const SOURCES: [Source; 2] = [
+const SOURCES: [Source; 4] = [
     Source {
         id: "roman",
         data: include_str!("../../../demo/roman/projet.json"),
@@ -89,6 +93,24 @@ const SOURCES: [Source; 2] = [
             ("scenario.md", include_str!("../../../demo/manga/scenario.md")),
             ("notes.md", include_str!("../../../demo/manga/notes.md")),
             ("documents.md", include_str!("../../../demo/manga/documents.md")),
+        ],
+    },
+    Source {
+        id: "film",
+        data: include_str!("../../../demo/film/projet.json"),
+        texts: &[
+            ("scenes.md", include_str!("../../../demo/film/scenes.md")),
+            ("notes.md", include_str!("../../../demo/film/notes.md")),
+            ("documents.md", include_str!("../../../demo/film/documents.md")),
+        ],
+    },
+    Source {
+        id: "serie",
+        data: include_str!("../../../demo/serie/projet.json"),
+        texts: &[
+            ("scenes.md", include_str!("../../../demo/serie/scenes.md")),
+            ("notes.md", include_str!("../../../demo/serie/notes.md")),
+            ("documents.md", include_str!("../../../demo/serie/documents.md")),
         ],
     },
 ];
@@ -189,6 +211,58 @@ struct Data {
     /// Jours du calendrier de travail.
     #[serde(default)]
     work_days: Vec<WorkDayDef>,
+    /// Film : logline, durée visée et scénariste du film entier.
+    #[serde(default)]
+    film: Option<FilmDetails>,
+    /// Galerie du projet : logo, dossiers et images.
+    #[serde(default)]
+    gallery: Option<GalleryDef>,
+    /// Arcs des personnages : `character` (`@char:…`) et le document de l'arc
+    /// au format de l'application (`src/lib/arcs.ts` ; étapes : `nodeId` en `@node:…`).
+    #[serde(default)]
+    arcs: Vec<Value>,
+    /// Planches d'inspiration : `name` et `items` au format de l'application
+    /// (`src/lib/boards.ts` ; images : `imageId` en `@gimage:…`).
+    #[serde(default)]
+    boards: Vec<BoardDef>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct BoardDef {
+    name: String,
+    #[serde(default)]
+    items: Vec<Value>,
+    /// Éléments du projet liés à la planche : { kind, id } (id en @sorte:clé).
+    #[serde(default)]
+    links: Vec<Value>,
+}
+
+#[derive(Debug, Default, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct GalleryDef {
+    #[serde(default)]
+    logo: Option<ImageSpec>,
+    #[serde(default)]
+    folders: Vec<FolderDef>,
+    #[serde(default)]
+    images: Vec<GalleryImageDef>,
+}
+
+#[derive(Debug, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+struct GalleryImageDef {
+    /// Clé de l'image (facultative), pour la placer sur une planche (`@gimage:…`).
+    #[serde(default)]
+    key: Option<String>,
+    image: ImageSpec,
+    #[serde(default)]
+    caption: Option<String>,
+    #[serde(default)]
+    description: Option<String>,
+    /// Clé d'un dossier de la galerie (absent : à la racine).
+    #[serde(default)]
+    folder: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -321,6 +395,10 @@ struct NodeDef {
     novel: Option<NovelFields>,
     #[serde(default)]
     manga: Option<ChapterFields>,
+    /// Série : épisode (logline, durée visée, statut, scénariste) ; film :
+    /// statut d'une séquence.
+    #[serde(default)]
+    episode: Option<EpisodeFields>,
     #[serde(default)]
     children: Vec<NodeDef>,
 }
@@ -333,6 +411,12 @@ struct NodeLinksDef {
     characters: BTreeMap<String, String>,
     #[serde(default)]
     locations: BTreeMap<String, String>,
+    /// État d'un personnage dans l'élément (clé du personnage → état).
+    #[serde(default)]
+    states: BTreeMap<String, String>,
+    /// Fiches du monde de l'élément (`@sorte:clé` → rôle).
+    #[serde(default)]
+    entries: BTreeMap<String, String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -449,6 +533,8 @@ struct Parsed {
     data: Data,
     texts: BTreeMap<String, String>,
     pages: Vec<script::PageDef>,
+    /// Série, film : scénario scène par scène.
+    scenes: Vec<screenplay::SceneDef>,
 }
 
 fn parse(source: &Source) -> AppResult<Parsed> {
@@ -458,9 +544,14 @@ fn parse(source: &Source) -> AppResult<Parsed> {
     }
     let mut texts = BTreeMap::new();
     let mut pages = Vec::new();
+    let mut scenes = Vec::new();
     for (name, content) in source.texts {
         if *name == "scenario.md" {
             pages = script::parse(content)?;
+            continue;
+        }
+        if *name == "scenes.md" {
+            scenes = screenplay::parse(content)?;
             continue;
         }
         for (key, body) in markup::sections(content)? {
@@ -469,7 +560,7 @@ fn parse(source: &Source) -> AppResult<Parsed> {
             }
         }
     }
-    Ok(Parsed { data, texts, pages })
+    Ok(Parsed { data, texts, pages, scenes })
 }
 
 // ----------------------------------------------------------------------------
@@ -732,10 +823,17 @@ impl<'a> Builder<'a> {
         self.glossary().await?;
         self.production().await?;
         self.texts().await?;
+        self.scene_scripts().await?;
         self.manuscript().await?;
+        if let Some(film) = &self.parsed.data.film {
+            series::set_film_details(self.pool, film).await?;
+        }
         self.documents().await?;
+        self.gallery().await?;
         self.notes().await?;
         self.plot().await?;
+        self.arcs().await?;
+        self.boards().await?;
         self.versions().await?;
 
         // Toutes les sections de texte ont servi : rien d'oublié.
@@ -894,6 +992,10 @@ impl<'a> Builder<'a> {
             if let Some(fields) = &node.manga {
                 manga::set_chapter_fields(pool, &created.id, fields).await?;
             }
+            let updated = match &node.episode {
+                Some(fields) => series::set_episode_fields(pool, &created.id, fields).await?,
+                None => updated,
+            };
             self.refs.add("node", &node.key, &created.id)?;
             self.nodes.insert(node.key.clone(), updated);
             for child in node.children.iter().rev() {
@@ -912,6 +1014,20 @@ impl<'a> Builder<'a> {
             };
             self.refs.add("node", &page.key, &created.id)?;
             self.nodes.insert(page.key.clone(), updated);
+        }
+
+        // Scènes du scénario (série, film) : ajoutées à leur épisode ou à
+        // leur séquence, dans l'ordre.
+        for scene in &self.parsed.scenes {
+            let parent = self.nodes.get(&scene.parent).cloned().ok_or_else(|| invalid(format!("scène {} : élément inconnu « {} »", scene.key, scene.parent)))?;
+            let created = structure::create_node(pool, self.project_type, Some(&parent.id), parent.level + 1, &scene.title, None).await?;
+            let updated = if scene.summary.is_empty() {
+                created.clone()
+            } else {
+                structure::update_node(pool, &created.id, None, Some(&scene.summary), None, None).await?
+            };
+            self.refs.add("node", &scene.key, &created.id)?;
+            self.nodes.insert(scene.key.clone(), updated);
         }
         Ok(())
     }
@@ -943,7 +1059,7 @@ impl<'a> Builder<'a> {
                 }
             }
             let input: LocationInput = self.refs.resolve_as(&e.body, &format!("lieu {}", e.key))?;
-            let created = locations::create_location(pool, &input).await?;
+            let created = locations::create_location(pool, &input).await.map_err(|err| err.with_detail(format!("lieu {}", e.key)))?;
             self.refs.add("loc", &e.key, &created.id)?;
             if let Some(portrait) = &e.portrait {
                 locations::set_portrait(pool, &created.id, &portrait.base64()?).await?;
@@ -959,7 +1075,7 @@ impl<'a> Builder<'a> {
         for value in &data.characters {
             let e = entry(value, "personnage")?;
             let input: CharacterInput = self.refs.resolve_as(&e.body, &format!("personnage {}", e.key))?;
-            let created = characters::create_character(pool, &input).await?;
+            let created = characters::create_character(pool, &input).await.map_err(|err| err.with_detail(format!("personnage {}", e.key)))?;
             self.refs.add("char", &e.key, &created.id)?;
             if let Some(portrait) = &e.portrait {
                 characters::set_portrait(pool, &created.id, &portrait.base64()?).await?;
@@ -995,7 +1111,7 @@ impl<'a> Builder<'a> {
             for value in list {
                 let e = entry(value, kind)?;
                 let input: WorldEntryInput = self.refs.resolve_as(&e.body, &format!("{kind} {}", e.key))?;
-                let created = world::create_entry(self.pool, module, &input).await?;
+                let created = world::create_entry(self.pool, module, &input).await.map_err(|err| err.with_detail(format!("{kind} {}", e.key)))?;
                 self.refs.add(kind, &e.key, &created.id)?;
                 if let Some(portrait) = &e.portrait {
                     world::set_portrait(self.pool, module, &created.id, &portrait.base64()?).await?;
@@ -1043,6 +1159,17 @@ impl<'a> Builder<'a> {
             }
             for (location, role) in &def.locations {
                 node_links::link_location(pool, &node, &self.refs.id("loc", location)?, role).await?;
+            }
+            for (character, state) in &def.states {
+                let id = self.refs.id("char", character)?;
+                if !def.characters.contains_key(character) {
+                    node_links::link_character(pool, &node, &id, "present").await?;
+                }
+                node_links::set_character_state(pool, &node, &id, state).await?;
+            }
+            for (target, role) in &def.entries {
+                let (kind, key) = reference(target).ok_or_else(|| invalid(format!("fiche du monde : référence attendue, « {target} »")))?;
+                node_links::link_entry(pool, &node, kind, &self.refs.get(kind, key)?, role).await?;
             }
         }
         Ok(())
@@ -1158,6 +1285,55 @@ impl<'a> Builder<'a> {
         Ok(())
     }
 
+    /// Scénario des scènes (série, film) : en-tête, éléments, personnages et
+    /// lieu reliés à la scène.
+    async fn scene_scripts(&mut self) -> AppResult<()> {
+        let pool = self.pool;
+        for scene in &self.parsed.scenes {
+            let node = self.refs.get("node", &scene.key)?;
+            let location_id = scene.location.as_deref().map(|l| self.refs.id("loc", l)).transpose()?;
+            let mut cast: Vec<String> = Vec::new();
+            let mut blocks = Vec::with_capacity(scene.blocks.len());
+            for b in &scene.blocks {
+                let character_id = b.speaker.as_deref().map(|s| self.refs.id("char", s)).transpose()?;
+                if let Some(id) = &character_id {
+                    if !cast.contains(id) {
+                        cast.push(id.clone());
+                    }
+                }
+                blocks.push(BlockInput { id: None, kind: b.kind.to_owned(), character_id, parenthetical: b.parenthetical.clone(), content: b.content.clone() });
+            }
+            let input = SceneScriptInput { place: scene.place.clone(), location_id: location_id.clone(), time: scene.time.clone(), blocks };
+            series::save_scene_script(pool, &node, &input).await?;
+
+            let pov = scene.pov.as_deref().map(|p| self.refs.id("char", p)).transpose()?;
+            if let Some(id) = &pov {
+                if !cast.contains(id) {
+                    cast.push(id.clone());
+                }
+            }
+            let mut states = Vec::new();
+            for (key, state) in &scene.states {
+                let id = self.refs.id("char", key)?;
+                if !cast.contains(&id) {
+                    cast.push(id.clone());
+                }
+                states.push((id, state));
+            }
+            for id in &cast {
+                let role = if pov.as_deref() == Some(id.as_str()) { "pov" } else { "present" };
+                node_links::link_character(pool, &node, id, role).await?;
+            }
+            for (id, state) in states {
+                node_links::set_character_state(pool, &node, &id, state).await?;
+            }
+            if let Some(id) = &location_id {
+                node_links::link_location(pool, &node, id, "setting").await?;
+            }
+        }
+        Ok(())
+    }
+
     async fn manuscript(&mut self) -> AppResult<()> {
         let data = &self.parsed.data;
         if let Some(m) = &data.manuscript {
@@ -1215,6 +1391,32 @@ impl<'a> Builder<'a> {
         Ok(())
     }
 
+    // ---------------------------------------------------------------- Galerie
+
+    async fn gallery(&mut self) -> AppResult<()> {
+        let Some(def) = &self.parsed.data.gallery else { return Ok(()) };
+        let pool = self.pool;
+        if let Some(logo) = &def.logo {
+            gallery::set_logo(pool, &logo.base64()?).await?;
+        }
+        for folder in &def.folders {
+            let parent = folder.parent.as_deref().map(|p| self.refs.id("gfolder", p)).transpose()?;
+            let created = gallery::create_folder(pool, parent.as_deref(), &folder.name).await?;
+            self.refs.add("gfolder", &folder.key, &created.id)?;
+        }
+        for image in &def.images {
+            let folder = image.folder.as_deref().map(|f| self.refs.id("gfolder", f)).transpose()?;
+            let created = gallery::add_gallery_image(pool, &image.image.base64()?, image.caption.as_deref(), folder.as_deref()).await?;
+            if let Some(key) = &image.key {
+                self.refs.add("gimage", key, &created.id)?;
+            }
+            if image.description.is_some() {
+                gallery::update_gallery_image(pool, &created.id, image.caption.as_deref(), image.description.as_deref()).await?;
+            }
+        }
+        Ok(())
+    }
+
     // ------------------------------------------------------------------ Notes
 
     async fn notes(&mut self) -> AppResult<()> {
@@ -1259,6 +1461,48 @@ impl<'a> Builder<'a> {
             let text = resolved.to_string();
             plot_service::validate(&text)?;
             plot_service::save(self.pool, &text).await?;
+        }
+        Ok(())
+    }
+
+    // ------------------------------------------------- Arcs des personnages
+
+    async fn arcs(&mut self) -> AppResult<()> {
+        for value in &self.parsed.data.arcs {
+            let mut arc = self.refs.resolve(value)?;
+            let map = arc.as_object_mut().ok_or_else(|| invalid("arc : objet attendu"))?;
+            let character = map
+                .remove("character")
+                .and_then(|c| c.as_str().map(str::to_owned))
+                .ok_or_else(|| invalid("arc : « character » manquant"))?;
+            // Chaque étape a son identifiant, comme dans l'application.
+            if let Some(beats) = map.get_mut("beats").and_then(Value::as_array_mut) {
+                for beat in beats.iter_mut().filter_map(Value::as_object_mut) {
+                    beat.entry("id").or_insert_with(|| Value::String(crate::utils::new_id()));
+                }
+            }
+            map.entry("version").or_insert(Value::from(1));
+            crate::services::character_arc_service::save(self.pool, &character, &arc.to_string()).await?;
+        }
+        Ok(())
+    }
+
+    // ---------------------------------------------- Planches d'inspiration
+
+    async fn boards(&mut self) -> AppResult<()> {
+        use crate::services::board_service;
+        for def in &self.parsed.data.boards {
+            let board = board_service::create(self.pool, &def.name).await?;
+            let mut items = Vec::with_capacity(def.items.len());
+            for item in &def.items {
+                let mut item = self.refs.resolve(item)?;
+                let map = item.as_object_mut().ok_or_else(|| invalid(format!("planche « {} » : élément : objet attendu", def.name)))?;
+                map.entry("id").or_insert_with(|| Value::String(crate::utils::new_id()));
+                items.push(item);
+            }
+            let links = def.links.iter().map(|link| self.refs.resolve(link)).collect::<AppResult<Vec<_>>>()?;
+            let data = serde_json::json!({ "version": 1, "items": items, "links": links }).to_string();
+            board_service::save_items(self.pool, &board.id, &data).await?;
         }
         Ok(())
     }

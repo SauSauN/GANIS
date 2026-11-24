@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Download, FileText, FileType, Loader2 } from "lucide-react";
+import { Download, FileText, FileType } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { ActionMenu } from "@/components/documents/ActionMenu";
 import { api } from "@/lib/api";
 import { exportFileName } from "@/lib/novel";
@@ -18,6 +19,8 @@ interface ExportMenuProps {
   build: () => ExportDocument;
   /** Export Fountain en plus (scénario de série) : texte construit au clic, et son libellé. */
   fountain?: { label: string; build: () => string };
+  /** Rendu propre au document (scénario au format standard), à la place de `build`. */
+  render?: (format: ExportFormat) => Promise<Uint8Array>;
   disabled?: boolean;
 }
 
@@ -25,14 +28,15 @@ interface ExportMenuProps {
  * Bouton « Exporter » : Word, PDF ou texte brut. Le fichier est créé dans
  * GANIS, puis enregistré à l'emplacement choisi dans la fenêtre du système.
  */
-export function ExportMenu({ label, dialogTitle, fileBase, build, fountain, disabled }: ExportMenuProps) {
+export function ExportMenu({ label, dialogTitle, fileBase, build, fountain, render, disabled }: ExportMenuProps) {
   const { t } = useTranslation("novel");
   const [busy, setBusy] = useState(false);
 
   async function run(format: ExportFormat | "fountain") {
     setBusy(true);
     try {
-      const bytes = format === "fountain" ? new TextEncoder().encode(fountain?.build() ?? "") : await renderDocument(build(), format);
+      const bytes =
+        format === "fountain" ? new TextEncoder().encode(fountain?.build() ?? "") : render ? await render(format) : await renderDocument(build(), format);
       const file = await api.saveExportFile(exportFileName(fileBase, format), dialogTitle, bytes);
       if (file) toast({ tone: "success", message: t("manuscript.exported", { file }) });
     } catch (e) {
@@ -45,7 +49,7 @@ export function ExportMenu({ label, dialogTitle, fileBase, build, fountain, disa
   if (disabled || busy) {
     return (
       <span className="inline-flex h-8 items-center gap-2 rounded-md border px-3 text-sm text-muted-foreground opacity-70">
-        {busy ? <Loader2 className="size-4 animate-spin" /> : <Download className="size-4" />}
+        {busy ? <LoadingDots className="size-4" /> : <Download className="size-4" />}
         {busy ? t("manuscript.exporting") : label}
       </span>
     );

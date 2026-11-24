@@ -653,18 +653,54 @@ fn io_error(context: &str, error: impl std::fmt::Display) -> AppError {
         .with_detail(error.to_string())
 }
 
-/// Extensions qui lanceraient un programme au lieu d'ouvrir un document.
-const UNSAFE_EXTENSIONS: [&str; 34] = [
-    "exe", "com", "bat", "cmd", "msi", "msp", "scr", "pif", "cpl", "dll", "sys", "lnk", "url", "hta", "reg",
-    "ps1", "psm1", "vbs", "vbe", "js", "jse", "wsf", "wsh", "jar", "msc", "inf", "application", "appref-ms",
-    "sh", "command", "app", "desktop", "run", "bin",
+/// Types de documents qui peuvent être ouverts dans une autre application.
+///
+/// Liste blanche : tout autre type est refusé (programmes, scripts, aide
+/// compilée `.chm`, images disque `.iso`, raccourcis…). Une liste noire
+/// oublie toujours un type dangereux. Les formats Office à macros (`.docm`,
+/// `.xlsm`…), les pages web et les SVG (qui peuvent contenir des scripts)
+/// n'y figurent pas.
+///
+/// Garder en accord avec `OPENABLE_EXTENSIONS` (src/lib/documents.ts).
+pub const OPENABLE_EXTENSIONS: &[&str] = &[
+    // Textes et mise en page
+    "doc", "docx", "odt", "ott", "rtf", "txt", "md", "markdown", "pdf", "epub",
+    // Scénarios
+    "fdx", "fountain", "celtx",
+    // Tableaux et présentations
+    "xls", "xlsx", "ods", "csv", "ppt", "pptx", "odp",
+    // Images et dessin
+    "png", "jpg", "jpeg", "gif", "webp", "bmp", "tif", "tiff", "heic", "psd", "kra", "clip", "xcf",
+    "ora", "mdp", "sai", "ai",
+    // Son et vidéo
+    "mp3", "wav", "ogg", "flac", "m4a", "aac", "mp4", "mov", "webm", "mkv", "avi", "m4v",
 ];
 
-/// Vrai si le document peut être ouvert avec l'application associée
-/// (jamais un fichier qui lancerait un programme).
+/// Vrai si le document peut être ouvert avec l'application associée.
 pub fn can_open_externally(name: &str) -> bool {
     let (_, ext) = split_extension(name);
-    !ext.is_empty() && !UNSAFE_EXTENSIONS.contains(&ext.to_ascii_lowercase().as_str())
+    let ext = ext.to_ascii_lowercase();
+    !ext.is_empty() && OPENABLE_EXTENSIONS.contains(&ext.as_str())
+}
+
+/// Pose sur la copie la marque « venu d'Internet » de Windows
+/// (`Zone.Identifier`, zone 3) : Office l'ouvre en Mode protégé et bloque
+/// ses macros, SmartScreen vérifie ce qui pourrait s'exécuter. Sans effet
+/// hors Windows ou sur un disque qui ne gère pas ces marques (FAT).
+fn mark_from_internet(path: &Path) {
+    #[cfg(windows)]
+    {
+        let stream = format!("{}:Zone.Identifier", path.display());
+        if let Err(e) = std::fs::write(stream, "[ZoneTransfer]
+
+ZoneId=3
+
+") {
+            tracing::warn!(error = %e, "Marque « venu d'Internet » non posée");
+        }
+    }
+    #[cfg(not(windows))]
+    let _ = path;
 }
 
 /// Dossier de travail de tous les documents ouverts ailleurs.
@@ -678,9 +714,41 @@ pub fn open_dir(data_dir: &Path, user_id: &str, document_id: &str) -> PathBuf {
     open_root(data_dir).join(clean_name(user_id)).join(clean_name(document_id))
 }
 
-/// Supprime toutes les copies de travail (démarrage de GANIS).
+/// Supprime toutes les copies de travail (démarrage et fermeture de GANIS).
 pub fn clean_open_copies(data_dir: &Path) {
     let _ = std::fs::remove_dir_all(open_root(data_dir));
+}
+
+/// Copie de travail d'un document ouvert ailleurs.
+#[derive(Debug, Clone)]
+pub struct OpenCopy {
+    pub dir: PathBuf,
+    pub project_id: String,
+    pub document_id: String,
+}
+
+/// Copies de travail ouvertes par un compte (`owner` : son identifiant).
+pub fn open_copies_of(data_dir: &Path, owner: &str) -> Vec<OpenCopy> {
+    let Ok(entries) = std::fs::read_dir(open_root(data_dir).join(clean_name(owner))) else {
+        return Vec::new();
+    };
+    entries
+        .flatten()
+        .filter_map(|entry| {
+            let dir = entry.path();
+            let state = read_state(&dir)?;
+            Some(OpenCopy {
+                document_id: entry.file_name().to_string_lossy().into_owned(),
+                project_id: state.project_id,
+                dir,
+            })
+        })
+        .collect()
+}
+
+/// Supprime toutes les copies de travail d'un compte (fin de sa session).
+pub fn remove_open_copies_of(data_dir: &Path, owner: &str) {
+    let _ = std::fs::remove_dir_all(open_root(data_dir).join(clean_name(owner)));
 }
 
 fn file_stamp(path: &Path) -> std::io::Result<(u128, u64)> {
@@ -718,6 +786,7 @@ pub fn write_open_copy(dir: &Path, project_id: &str, name: &str, bytes: &[u8]) -
     let file_name = clean_name(name);
     let path = dir.join(&file_name);
     std::fs::write(&path, bytes).map_err(|e| io_error("Copie du document", e))?;
+    mark_from_internet(&path);
     let (modified_ms, len) = file_stamp(&path).map_err(|e| io_error("Copie du document", e))?;
     write_state(
         dir,
@@ -818,6 +887,14 @@ mod tests {
         assert!(!can_open_externally("script.ps1"));
         assert!(!can_open_externally("raccourci.lnk"));
         assert!(!can_open_externally("sans-extension"));
+        // Liste blanche : ce qui n'est pas un document connu est refusé.
+        assert!(!can_open_externally("aide.chm"));
+        assert!(!can_open_externally("disque.iso"));
+        assert!(!can_open_externally("reglages.settingcontent-ms"));
+        assert!(!can_open_externally("macro.docm"));
+        assert!(!can_open_externally("page.html"));
+        assert!(!can_open_externally("dessin.svg"));
+        assert!(can_open_externally("Scène.FDX"));
     }
 
     #[test]
@@ -924,6 +1001,26 @@ mod tests {
     }
 
     #[test]
+    fn open_copies_are_listed_and_removed_per_account() {
+        let data = std::env::temp_dir().join(format!("ganis-open-{}", new_id()));
+        let doc = new_id();
+        write_open_copy(&open_dir(&data, "alice", &doc), "p1", "Chapitre.docx", b"un").unwrap();
+        write_open_copy(&open_dir(&data, "bob", &new_id()), "p2", "Autre.pdf", b"deux").unwrap();
+
+        let copies = open_copies_of(&data, "alice");
+        assert_eq!(copies.len(), 1);
+        assert_eq!(copies[0].project_id, "p1");
+        assert_eq!(copies[0].document_id, doc);
+
+        remove_open_copies_of(&data, "alice");
+        assert!(open_copies_of(&data, "alice").is_empty());
+        assert_eq!(open_copies_of(&data, "bob").len(), 1);
+
+        clean_open_copies(&data);
+        let _ = std::fs::remove_dir_all(&data);
+    }
+
+    #[test]
     fn external_copy_detects_saves() {
         let dir = std::env::temp_dir().join(format!("ganis-open-{}", new_id()));
         let path = write_open_copy(&dir, "p1", "Chapitre 1.docx", b"one").unwrap();
@@ -945,5 +1042,17 @@ mod tests {
 
         close_open_copy(&dir);
         assert!(!check_open_copy(&dir).unwrap().0.open);
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn open_copy_is_marked_as_coming_from_the_internet() {
+        let dir = std::env::temp_dir().join(format!("ganis-motw-{}", uuid::Uuid::new_v4()));
+        let path = write_open_copy(&dir, "p1", "Chapitre.docx", b"PK").unwrap();
+
+        let mark = std::fs::read_to_string(format!("{}:Zone.Identifier", path.display())).unwrap();
+        assert!(mark.contains("ZoneId=3"));
+
+        close_open_copy(&dir);
     }
 }

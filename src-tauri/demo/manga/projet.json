@@ -11,7 +11,7 @@
   "highlights": [
    "Une histoire complète en 2 tomes, du prologue à l'épilogue, avec 23 personnages",
    "Chaque case écrite : cadrage, rythme, personnages, textes, continuité",
-   "Tous les modules : objets, faune et flore, factions, peuples et religions, magie",
+   "10 espèces, 10 factions, 11 peuples, 10 magies ; galerie de références et model sheets",
    "Trame, mystères, relations, documents, notes, versions, corbeille"
   ]
  },
@@ -798,7 +798,8 @@
     "innerConflict": "Chercher sa mère ou lui en vouloir.",
     "plannedArc": "De la sans-lune qui suit les autres à celle qui trace la route de tous.",
     "powers": "Aucune Lunéa. Elle lit les marées comme une carte et prévoit leurs changements.",
-    "powerLimits": "Ne peut rien plier ni déplacer. Mais le Mangeur de lunes ne peut pas la dévorer."
+    "powerLimits": "Ne peut rien plier ni déplacer. Mais le Mangeur de lunes ne peut pas la dévorer.",
+    "birthDate": "1008-04-12"
    },
    "portrait": {
     "kind": "portrait",
@@ -841,7 +842,8 @@
     ],
     "secret": "Elle porte le sang de la septième lune.",
     "powers": "Sang de la septième lune : la Lunéa de la lune disparue coule en elle.",
-    "powerLimits": "Ne la contrôle pas ; chaque éveil l'épuise."
+    "powerLimits": "Ne la contrôle pas ; chaque éveil l'épuise.",
+    "birthDate": "1016-09-03"
    },
    "portrait": {
     "kind": "portrait",
@@ -872,7 +874,8 @@
     "description": "Le grand-père de Sora, ancien cartographe royal. A passé sa vie à cartographier une marée que personne ne voit.",
     "mainGoal": "Achever la carte des marées.",
     "secret": "Savait où sa fille était partie, et pourquoi.",
-    "formativeEvent": "Le départ de sa fille Rei."
+    "formativeEvent": "Le départ de sa fille Rei.",
+    "birthDate": "0953-01-20"
    },
    "portrait": {
     "kind": "portrait",
@@ -911,7 +914,8 @@
      "#5b4fbf"
     ],
     "powers": "Marée d'argent : elle voit les marées à venir.",
-    "powerLimits": "Chaque vision lui coûte une nuit de sommeil."
+    "powerLimits": "Chaque vision lui coûte une nuit de sommeil.",
+    "birthDate": "0986-06-30"
    },
    "portrait": {
     "kind": "portrait",
@@ -957,7 +961,8 @@
     ],
     "fears": "Arriver une fois de trop trop tard.",
     "powers": "Marée d'argent : Pas de brume, déplacement instantané sur dix pas.",
-    "powerLimits": "Trois fois par nuit au plus, et jamais sous une lune rouge."
+    "powerLimits": "Trois fois par nuit au plus, et jamais sous une lune rouge.",
+    "birthDate": "0996-11-08"
    },
    "portrait": {
     "kind": "portrait",
@@ -991,7 +996,8 @@
      "Scrupuleuse",
      "Anxieuse"
     ],
-    "plannedArc": "Prête serment au chapitre 5, après la mort d'Oboro."
+    "plannedArc": "Prête serment au chapitre 5, après la mort d'Oboro.",
+    "birthDate": "1009-02-14"
    },
    "portrait": {
     "kind": "portrait",
@@ -1035,7 +1041,8 @@
     "innerConflict": "Obéir à son père ou à ce qu'il voit.",
     "plannedArc": "Du rival au roi qui rend le pouvoir aux îles.",
     "powers": "Marée rouge : force décuplée pendant quelques secondes.",
-    "powerLimits": "Le laisse sans forces aussi longtemps."
+    "powerLimits": "Le laisse sans forces aussi longtemps.",
+    "birthDate": "1007-07-21"
    },
    "portrait": {
     "kind": "portrait",
@@ -1070,7 +1077,8 @@
     "traits": [
      "Patient",
      "Implacable"
-    ]
+    ],
+    "birthDate": "0972-03-05"
    },
    "portrait": {
     "kind": "portrait",
@@ -1100,7 +1108,8 @@
     "description": "Colosse silencieux qui ne parle que par gestes. Suit Jin partout, même contre le Régent.",
     "height": "2,05 m",
     "build": "muscular",
-    "distinctiveTrait": "Ne dit pas un mot de toute la série."
+    "distinctiveTrait": "Ne dit pas un mot de toute la série.",
+    "birthDate": "0990-10-17"
    },
    "portrait": {
     "kind": "portrait",
@@ -1139,7 +1148,8 @@
     "traits": [
      "Vantard",
      "Généreux"
-    ]
+    ],
+    "birthDate": "0994-05-29"
    },
    "portrait": {
     "kind": "portrait",
@@ -1173,7 +1183,8 @@
      "Fiable"
     ],
     "powers": "Marée bleue : sent les courants à des milles.",
-    "powerLimits": "Malade sur la terre ferme."
+    "powerLimits": "Malade sur la terre ferme.",
+    "birthDate": "0998-12-02"
    },
    "portrait": {
     "kind": "portrait",
@@ -1224,7 +1235,8 @@
     "traits": [
      "Curieuse",
      "Maladroite en société"
-    ]
+    ],
+    "birthDate": "1007-08-09"
    },
    "portrait": {
     "kind": "portrait",
@@ -1253,7 +1265,8 @@
     "origin": "@loc:brume",
     "firstAppearance": "@node:c2p03",
     "description": "La grand-mère de Mika, qui a connu Haruo jeune et lui doit une dette.",
-    "secret": "A construit le premier astrolabe de remplacement pour Haruo."
+    "secret": "A construit le premier astrolabe de remplacement pour Haruo.",
+    "birthDate": "0950-04-01"
    },
    "portrait": {
     "kind": "portrait",
@@ -1287,7 +1300,8 @@
     "formativeEvent": "A vu le Miroir inversé tuer son maître.",
     "plannedArc": "Meurt au chapitre 5 en protégeant les sœurs.",
     "powers": "Maîtrise des sept marées, même de mémoire pour la septième.",
-    "powerLimits": "Son corps ne supporte plus qu'un seul grand sort."
+    "powerLimits": "Son corps ne supporte plus qu'un seul grand sort.",
+    "birthDate": "0935-02-11"
    },
    "portrait": {
     "kind": "portrait",
@@ -1328,7 +1342,8 @@
     ],
     "secret": "Elle ne sait pas que l'Oracle la trompe depuis huit ans.",
     "powers": "Miroir inversé : retourne la Lunéa d'un adversaire contre lui.",
-    "powerLimits": "Chaque usage nourrit le Mangeur de lunes."
+    "powerLimits": "Chaque usage nourrit le Mangeur de lunes.",
+    "birthDate": "0979-09-23"
    },
    "portrait": {
     "kind": "portrait",
@@ -1363,7 +1378,8 @@
      "Méthodique",
      "Juste, au fond"
     ],
-    "plannedArc": "Change de camp au chapitre 6 quand il comprend le Régent."
+    "plannedArc": "Change de camp au chapitre 6 quand il comprend le Régent.",
+    "birthDate": "0984-01-15"
    },
    "portrait": {
     "kind": "portrait",
@@ -1424,7 +1440,8 @@
     "traits": [
      "Excentrique",
      "Érudite"
-    ]
+    ],
+    "birthDate": "0900-06-21"
    },
    "portrait": {
     "kind": "portrait",
@@ -1453,7 +1470,8 @@
     "origin": "@loc:capitale",
     "firstAppearance": "@node:c4p03",
     "description": "Ancien docker, sans-lune comme Sora, qui organise les canaux de la capitale.",
-    "mainGoal": "Que les sans-lune aient le droit de voter."
+    "mainGoal": "Que les sans-lune aient le droit de voter.",
+    "birthDate": "1000-03-30"
    },
    "portrait": {
     "kind": "portrait",
@@ -1511,7 +1529,8 @@
     "occupation": "Guide des nomades",
     "origin": "@loc:dunes",
     "firstAppearance": "@node:c5p01",
-    "description": "Petite guide nomade qui lit le vent dans le sable et réclame un salaire en bonbons."
+    "description": "Petite guide nomade qui lit le vent dans le sable et réclame un salaire en bonbons.",
+    "birthDate": "1012-10-10"
    }
   },
   {
@@ -1869,6 +1888,51 @@
     "edible": "partly",
     "firstAppearance": "@node:c3p02"
    }
+  },
+  {
+   "key": "tortue",
+   "name": "Tortue-île",
+   "type": "reptile",
+   "status": "legendary",
+   "fields": {
+    "description": "Tortue de mer si vieille qu'un village pousse sur sa carapace.",
+    "dangerLevel": "none",
+    "temperament": "docile",
+    "legends": "Elle a vu la septième lune."
+   }
+  },
+  {
+   "key": "raie",
+   "name": "Raie de lune",
+   "type": "fish",
+   "status": "rare",
+   "fields": {
+    "description": "Raie phosphorescente qui suit la lune d'argent.",
+    "diet": "carnivore"
+   }
+  },
+  {
+   "key": "corail",
+   "name": "Corail-miroir",
+   "type": "aquaticPlant",
+   "status": "rare",
+   "fields": {
+    "description": "Corail qui reflète la lune de celui qui le regarde.",
+    "properties": "Sert à fabriquer les miroirs interdits."
+   }
+  },
+  {
+   "key": "bambou",
+   "name": "Bambou des marées",
+   "type": "tree",
+   "status": "common",
+   "fields": {
+    "description": "Bambou qui pousse d'un pied à chaque marée haute.",
+    "uses": [
+     "Construction",
+     "Flûtes"
+    ]
+   }
   }
  ],
  "factions": [
@@ -2014,6 +2078,26 @@
     "goals": "L'égalité des sans-lune.",
     "membership": "Tout sans-lune qui le demande",
     "firstAppearance": "@node:c4p03"
+   }
+  },
+  {
+   "key": "pecheurs",
+   "name": "Confrérie des pêcheurs de Kazeshima",
+   "type": "guild",
+   "status": "active",
+   "fields": {
+    "description": "Les pêcheurs du village de Sora ; ils prêtent leurs barques sans poser de questions.",
+    "influence": "local"
+   }
+  },
+  {
+   "key": "ecole",
+   "name": "École des cartographes",
+   "type": "academy",
+   "status": "declining",
+   "fields": {
+    "description": "L'école où Haruo a appris à dessiner les marées.",
+    "influence": "regional"
    }
   }
  ],
@@ -3461,6 +3545,13 @@
    "locations": {
     "phare": "setting",
     "mer": "setting"
+   },
+   "states": {
+    "sora": "Huit ans, pieds nus",
+    "rei": "Manteau de voyage, sac de toile"
+   },
+   "entries": {
+    "@magic:septieme": "mentioned"
    }
   },
   {
@@ -3477,6 +3568,11 @@
    "locations": {
     "village": "setting",
     "atelier": "setting"
+   },
+   "entries": {
+    "@item:carte": "central",
+    "@magic:lunea": "present",
+    "@species:renard": "present"
    }
   },
   {
@@ -3495,6 +3591,11 @@
     "brume": "setting",
     "taverne": "setting",
     "guilde-atelier": "setting"
+   },
+   "entries": {
+    "@faction:corbeaux": "central",
+    "@item:corbeau": "present",
+    "@faction:guilde": "present"
    }
   },
   {
@@ -3511,6 +3612,11 @@
     "mer": "setting",
     "archives": "setting",
     "fosse": "mentioned"
+   },
+   "entries": {
+    "@item:carnet": "central",
+    "@magic:miroir": "mentioned",
+    "@species:corail": "mentioned"
    }
   },
   {
@@ -3528,6 +3634,11 @@
     "capitale": "setting",
     "temple": "setting",
     "palais": "setting"
+   },
+   "entries": {
+    "@faction:culte": "central",
+    "@people:voie": "central",
+    "@magic:rite": "present"
    }
   },
   {
@@ -3542,6 +3653,10 @@
    "locations": {
     "dunes": "setting",
     "ruines": "setting"
+   },
+   "entries": {
+    "@people:nomades": "central",
+    "@species:tortue": "mentioned"
    }
   },
   {
@@ -3560,6 +3675,11 @@
    "locations": {
     "ile-blanche": "setting",
     "fosse": "mentioned"
+   },
+   "entries": {
+    "@magic:septieme": "central",
+    "@people:prophetie": "central",
+    "@item:larme": "central"
    }
   },
   {
@@ -3574,6 +3694,33 @@
    "locations": {
     "kazeshima": "setting",
     "village": "setting"
+   },
+   "states": {
+    "sora": "Lunéa blanche"
+   },
+   "entries": {
+    "@species:bambou": "mentioned",
+    "@faction:ecole": "mentioned"
+   }
+  },
+  {
+   "node": "@node:c1p01",
+   "states": {
+    "sora": "Veste bleue, bandeau rouge"
+   },
+   "entries": {
+    "@item:carte": "central",
+    "@species:mouette": "present"
+   }
+  },
+  {
+   "node": "@node:c2p01",
+   "states": {
+    "sora": "Carte sous le bras, trempée"
+   },
+   "entries": {
+    "@faction:pecheurs": "present",
+    "@species:raie": "mentioned"
    }
   }
  ],
@@ -3717,6 +3864,17 @@
     {
      "kind": "people",
      "id": "@people:soeurs"
+    }
+   ]
+  },
+  {
+   "term": "Tortue-île",
+   "category": "Faune",
+   "definition": "Tortue géante qui porte un village.",
+   "links": [
+    {
+     "kind": "species",
+     "id": "@species:tortue"
     }
    ]
   }
@@ -4146,6 +4304,21 @@
     "key": "brouillon-coupe",
     "title": "Brouillon sans suite",
     "folder": "serie"
+   },
+   {
+    "key": "lexique",
+    "title": "Lexique des marées",
+    "folder": "univers"
+   },
+   {
+    "key": "planning",
+    "title": "Planning du tome 2",
+    "folder": "production"
+   },
+   {
+    "key": "references",
+    "title": "Références visuelles",
+    "folder": "production"
    }
   ],
   "stickies": [
@@ -4184,6 +4357,30 @@
     "color": "green",
     "x": 600,
     "y": 240
+   },
+   {
+    "text": "La tortue-île : un chapitre bonus ?",
+    "color": "green",
+    "x": 820,
+    "y": 40
+   },
+   {
+    "text": "Raies de lune pendant la Conjonction",
+    "color": "blue",
+    "x": 820,
+    "y": 250
+   },
+   {
+    "text": "Yuzu doit sourire au moins une fois par chapitre",
+    "color": "pink",
+    "x": 820,
+    "y": 450
+   },
+   {
+    "text": "Couverture tome 2 : fond blanc cassé (7ᵉ lune)",
+    "color": "yellow",
+    "x": 560,
+    "y": 450
    }
   ],
   "systemNotes": true
@@ -4246,7 +4443,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Il y a mille ans",
-    "words": 0
+    "words": 0,
+    "year": 24,
+    "yearEnd": null
    },
    {
     "id": "p2",
@@ -4272,7 +4471,9 @@
     ],
     "noteIds": [],
     "date": "Il y a 8 ans",
-    "words": 0
+    "words": 0,
+    "year": 1016,
+    "yearEnd": 1024
    },
    {
     "id": "e1",
@@ -4293,7 +4494,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Jour 1 — soir",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e2",
@@ -4315,7 +4518,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Jour 1 — nuit",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e3",
@@ -4338,7 +4543,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Jour 4",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e4",
@@ -4359,7 +4566,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Jour 4",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e5",
@@ -4385,7 +4594,9 @@
      "@note:culte"
     ],
     "date": "Jour 9",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e6",
@@ -4406,7 +4617,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Jour 9",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e7",
@@ -4429,7 +4642,9 @@
      "@note:regles-lunea"
     ],
     "date": "Jour 15",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e8",
@@ -4453,7 +4668,9 @@
     ],
     "noteIds": [],
     "date": "Jour 16",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e9",
@@ -4476,7 +4693,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Jour 17",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e10",
@@ -4498,7 +4717,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Jour 30",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e11",
@@ -4518,7 +4739,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Jour 30 — nuit",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e12",
@@ -4540,7 +4763,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Jour 49 — Conjonction",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e13",
@@ -4561,7 +4786,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Jour 49 — Conjonction",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e14",
@@ -4582,7 +4809,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Jour 49 — aube",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e15",
@@ -4603,7 +4832,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Jour 49 — aube",
-    "words": 0
+    "words": 0,
+    "year": 1024,
+    "yearEnd": null
    },
    {
     "id": "e16",
@@ -4625,7 +4856,9 @@
     "alsoNodeIds": [],
     "noteIds": [],
     "date": "Six mois plus tard",
-    "words": 0
+    "words": 0,
+    "year": 1025,
+    "yearEnd": null
    }
   ],
   "links": [
@@ -4825,7 +5058,38 @@
     ]
    }
   ],
-  "sceneOrder": {}
+  "sceneOrder": {},
+  "yearLabel": "an",
+  "eras": [
+   {
+    "id": "era-sept",
+    "name": "L'âge des sept lunes",
+    "from": 0,
+    "to": 24,
+    "color": "#8e5bd6"
+   },
+   {
+    "id": "era-six",
+    "name": "Les siècles à six lunes",
+    "from": 24,
+    "to": 1008,
+    "color": "#2b7de9"
+   },
+   {
+    "id": "era-exil",
+    "name": "L'absence de Rei",
+    "from": 1016,
+    "to": 1024,
+    "color": "#e3a21a"
+   },
+   {
+    "id": "era-conj",
+    "name": "La Conjonction",
+    "from": 1024,
+    "to": 1025,
+    "color": "#e0483d"
+   }
+  ]
  },
  "versions": [
   {
@@ -4930,6 +5194,794 @@
    "actions": 70,
    "minutes": 220,
    "words": 0
+  }
+ ],
+ "gallery": {
+  "logo": {
+   "kind": "swatches",
+   "colors": [
+    [
+     47,
+     127,
+     168
+    ],
+    [
+     233,
+     228,
+     216
+    ]
+   ],
+   "width": 200,
+   "height": 200
+  },
+  "folders": [
+   {
+    "key": "references",
+    "name": "Références"
+   },
+   {
+    "key": "couvertures",
+    "name": "Couvertures"
+   },
+   {
+    "key": "persos",
+    "name": "Personnages"
+   },
+   {
+    "key": "lunes",
+    "name": "Les sept lunes",
+    "parent": "references"
+   }
+  ],
+  "images": [
+   {
+    "key": "village",
+    "image": {
+     "kind": "landscape",
+     "sky": [
+      47,
+      127,
+      168
+     ],
+     "ground": [
+      233,
+      228,
+      216
+     ],
+     "width": 480,
+     "height": 320
+    },
+    "caption": "Village de pêcheurs",
+    "folder": "references"
+   },
+   {
+    "key": "phare",
+    "image": {
+     "kind": "landscape",
+     "sky": [
+      20,
+      40,
+      80
+     ],
+     "ground": [
+      200,
+      210,
+      220
+     ],
+     "width": 480,
+     "height": 320
+    },
+    "caption": "Le phare de Kazeshima",
+    "folder": "references"
+   },
+   {
+    "key": "charte",
+    "image": {
+     "kind": "swatches",
+     "colors": [
+      [
+       233,
+       228,
+       216
+      ],
+      [
+       47,
+       127,
+       168
+      ],
+      [
+       91,
+       79,
+       191
+      ],
+      [
+       179,
+       52,
+       44
+      ],
+      [
+       227,
+       179,
+       65
+      ],
+      [
+       125,
+       135,
+       148
+      ]
+     ],
+     "width": 480,
+     "height": 120
+    },
+    "caption": "Charte des lunes",
+    "folder": "lunes"
+   },
+   {
+    "key": "lune-argent",
+    "image": {
+     "kind": "swatches",
+     "colors": [
+      [
+       200,
+       205,
+       215
+      ]
+     ],
+     "width": 200,
+     "height": 200
+    },
+    "caption": "Lune d'argent",
+    "folder": "lunes"
+   },
+   {
+    "key": "lune-rouge",
+    "image": {
+     "kind": "swatches",
+     "colors": [
+      [
+       179,
+       52,
+       44
+      ]
+     ],
+     "width": 200,
+     "height": 200
+    },
+    "caption": "Lune rouge",
+    "folder": "lunes"
+   },
+   {
+    "key": "septieme",
+    "image": {
+     "kind": "swatches",
+     "colors": [
+      [
+       240,
+       238,
+       230
+      ]
+     ],
+     "width": 200,
+     "height": 200
+    },
+    "caption": "Septième lune",
+    "description": "Blanc cassé : la lune qu'on ne voit plus.",
+    "folder": "lunes"
+   },
+   {
+    "key": "couv1",
+    "image": {
+     "kind": "planche",
+     "panels": 4,
+     "seed": 11
+    },
+    "caption": "Couverture tome 1 — rough",
+    "folder": "couvertures"
+   },
+   {
+    "key": "couv2",
+    "image": {
+     "kind": "planche",
+     "panels": 3,
+     "seed": 23
+    },
+    "caption": "Couverture tome 2 — rough",
+    "folder": "couvertures"
+   },
+   {
+    "key": "sora-ms",
+    "image": {
+     "kind": "portrait",
+     "background": [
+      215,
+      220,
+      228
+     ],
+     "figure": [
+      61,
+      74,
+      92
+     ]
+    },
+    "caption": "Sora — model sheet",
+    "folder": "persos"
+   },
+   {
+    "key": "yuzu-ms",
+    "image": {
+     "kind": "portrait",
+     "background": [
+      240,
+      225,
+      210
+     ],
+     "figure": [
+      227,
+      179,
+      65
+     ]
+    },
+    "caption": "Yuzu — model sheet",
+    "folder": "persos"
+   },
+   {
+    "key": "aya-ms",
+    "image": {
+     "kind": "portrait",
+     "background": [
+      30,
+      30,
+      50
+     ],
+     "figure": [
+      91,
+      79,
+      191
+     ]
+    },
+    "caption": "Aya — model sheet",
+    "folder": "persos"
+   }
+  ]
+ },
+ "arcs": [
+  {
+   "character": "@char:sora",
+   "type": "positive",
+   "lie": "« Sans Lunéa, je ne compte pour personne. »",
+   "truth": "« Je suis la seule à lire la route de tous. »",
+   "want": "Ramener Yuzu avant la Conjonction",
+   "need": "Croire qu'on peut compter sans briller",
+   "beats": [
+    {
+     "nodeId": "@node:pr",
+     "value": -4,
+     "step": "Rester à quai",
+     "choice": "Regarde sa mère partir depuis le phare, sans un mot.",
+     "consequence": "Elle décide de ne plus rien attendre de personne."
+    },
+    {
+     "nodeId": "@node:ch1",
+     "value": -3,
+     "step": "Prendre la carte",
+     "choice": "Accepte la carte des marées de Haruo.",
+     "consequence": "Yuzu est enlevée la même nuit : elle part seule."
+    },
+    {
+     "nodeId": "@node:ch2",
+     "value": -2,
+     "step": "Accepter l'équipage",
+     "choice": "Laisse Daisuke, Mika et Kaede la suivre.",
+     "consequence": "Pour la première fois, on compte sur elle pour la route."
+    },
+    {
+     "nodeId": "@node:ch3",
+     "value": -1,
+     "step": "Écouter la prophétie",
+     "choice": "Ne fuit pas quand Nanami la nomme « sans-lune ».",
+     "consequence": "Elle comprend que son manque est une clé."
+    },
+    {
+     "nodeId": "@node:ch4",
+     "value": -2,
+     "step": "Douter devant Jin",
+     "choice": "Croit Jin quand il dit qu'elle n'a rien à faire au Temple.",
+     "consequence": "Elle se fait capturer ; Jin doit la libérer."
+    },
+    {
+     "nodeId": "@node:ch5",
+     "value": 1,
+     "step": "Lire sans plier",
+     "choice": "Guide l'équipage à travers les Dunes en lisant les marées.",
+     "consequence": "Oboro meurt, mais tout l'équipage survit grâce à elle."
+    },
+    {
+     "nodeId": "@node:ch6",
+     "value": 4,
+     "step": "Fermer le ciel",
+     "choice": "Se place sous la Conjonction, là où personne ne peut la dévorer.",
+     "consequence": "Kagami s'éteint ; Noé devient la septième lune."
+    },
+    {
+     "nodeId": "@node:ep",
+     "value": 5,
+     "step": "Tracer la route",
+     "choice": "Dessine la première carte des sept lunes pour l'archipel.",
+     "consequence": "Elle devient la cartographe de tous."
+    }
+   ]
+  },
+  {
+   "character": "@char:jin",
+   "type": "redemption",
+   "lie": "« Un prince n'a pas d'amis, seulement des sujets. »",
+   "truth": "« Un royaume se tient debout avec ceux qu'on écoute. »",
+   "want": "Prouver sa valeur au Régent",
+   "need": "Choisir ses alliés lui-même",
+   "beats": [
+    {
+     "nodeId": "@node:ch2",
+     "value": -2,
+     "step": "Rival au marché",
+     "choice": "Défie Sora pour la carte des marées.",
+     "consequence": "Il gagne le duel mais perd la carte."
+    },
+    {
+     "nodeId": "@node:ch4",
+     "value": -4,
+     "step": "Obéir au Régent",
+     "choice": "Livre Sora au Temple sur ordre de Masaru.",
+     "consequence": "Il découvre que le Régent sert le Culte."
+    },
+    {
+     "nodeId": "@node:ch4",
+     "value": 1,
+     "step": "Libérer Sora",
+     "choice": "Ouvre la cellule de Sora et trahit son oncle.",
+     "consequence": "Banni, il rejoint l'équipage sans titre."
+    },
+    {
+     "nodeId": "@node:ch5",
+     "value": 2,
+     "step": "Servir la route",
+     "choice": "Rame avec les autres dans les Dunes salées.",
+     "consequence": "L'équipage l'accepte."
+    },
+    {
+     "nodeId": "@node:ch6",
+     "value": 4,
+     "step": "Tenir la ligne",
+     "choice": "Protège Sora pendant qu'elle ferme le ciel.",
+     "consequence": "Il rentre au royaume en allié, pas en maître."
+    }
+   ]
+  },
+  {
+   "character": "@char:aya",
+   "type": "negative",
+   "lie": "« Kagami rendra au monde l'ordre des sept lunes. »",
+   "truth": "« J'ai servi la faim, pas l'ordre. »",
+   "want": "Réveiller Kagami à la Conjonction",
+   "need": "Admettre qu'elle s'est trompée",
+   "beats": [
+    {
+     "nodeId": "@node:ch1",
+     "value": 2,
+     "step": "L'enlèvement",
+     "choice": "Enlève Yuzu, convaincue d'agir pour le bien.",
+     "consequence": "Sora se lance à sa poursuite."
+    },
+    {
+     "nodeId": "@node:ch4",
+     "value": 0,
+     "step": "Acheter le Régent",
+     "choice": "Achète Masaru avec la promesse d'une lune.",
+     "consequence": "Le royaume se divise."
+    },
+    {
+     "nodeId": "@node:ch5",
+     "value": -2,
+     "step": "Tuer Oboro",
+     "choice": "Laisse Oboro mourir pour atteindre la Baleine lunaire.",
+     "consequence": "Elle ne peut plus revenir en arrière."
+    },
+    {
+     "nodeId": "@node:ch6",
+     "value": -5,
+     "step": "L'Oracle démasquée",
+     "choice": "Refuse de libérer Yuzu face à Rei.",
+     "consequence": "Kagami s'éveille et la dévore la première."
+    }
+   ]
+  },
+  {
+   "character": "@char:rei",
+   "type": "flat",
+   "lie": "—",
+   "truth": "« Partir n'efface pas ceux qu'on aime. »",
+   "want": "Retrouver ses filles",
+   "need": "Leur dire pourquoi elle est partie",
+   "beats": [
+    {
+     "nodeId": "@node:pr",
+     "value": 1,
+     "step": "Le départ",
+     "choice": "Part en mer suivre la piste de la septième lune.",
+     "consequence": "Sora grandit en lui en voulant."
+    },
+    {
+     "nodeId": "@node:ch6",
+     "value": 3,
+     "step": "Le retour",
+     "choice": "Démasque l'Oracle devant tout le Temple.",
+     "consequence": "Sora comprend enfin son départ."
+    },
+    {
+     "nodeId": "@node:ep",
+     "value": 5,
+     "step": "Rester",
+     "choice": "Reste à Kazeshima, au phare.",
+     "consequence": "La famille se retrouve."
+    }
+   ]
+  }
+ ],
+ "boards": [
+  {
+   "name": "Ton général — Hanaori",
+   "items": [
+    {
+     "kind": "label",
+     "x": 40,
+     "y": 30,
+     "w": 220,
+     "z": 1,
+     "rot": 0,
+     "imageId": null,
+     "text": "Un archipel qui attend sa septième lune",
+     "by": "",
+     "colors": []
+    },
+    {
+     "kind": "image",
+     "x": 40,
+     "y": 90,
+     "w": 260,
+     "z": 2,
+     "rot": -2,
+     "imageId": "@gimage:village",
+     "text": "Le village de pêcheurs, matin",
+     "by": "",
+     "colors": []
+    },
+    {
+     "kind": "image",
+     "x": 330,
+     "y": 70,
+     "w": 220,
+     "z": 3,
+     "rot": 2,
+     "imageId": "@gimage:phare",
+     "text": "Le phare de Kazeshima",
+     "by": "",
+     "colors": []
+    },
+    {
+     "kind": "palette",
+     "x": 580,
+     "y": 40,
+     "w": 250,
+     "z": 1,
+     "rot": 0,
+     "imageId": null,
+     "text": "Sel, nuit et lanternes",
+     "by": "",
+     "colors": [
+      "#1d2430",
+      "#2f7fa8",
+      "#e3b341",
+      "#c2533b"
+     ]
+    },
+    {
+     "kind": "quote",
+     "x": 580,
+     "y": 180,
+     "w": 260,
+     "z": 4,
+     "rot": 0,
+     "imageId": null,
+     "text": "On ne plie pas la mer. On apprend à la lire.",
+     "by": "Haruo, chapitre 1",
+     "colors": []
+    },
+    {
+     "kind": "note",
+     "x": 60,
+     "y": 330,
+     "w": 210,
+     "z": 5,
+     "rot": -1.5,
+     "imageId": null,
+     "text": "Ambiance : lumière rasante du soir, vent dans les filets, cloches de bateaux. Peu de musique, beaucoup de mer.",
+     "by": "",
+     "colors": []
+    },
+    {
+     "kind": "image",
+     "x": 320,
+     "y": 320,
+     "w": 200,
+     "z": 6,
+     "rot": 1,
+     "imageId": "@gimage:couv1",
+     "text": "Couverture tome 1 — rough",
+     "by": "",
+     "colors": []
+    },
+    {
+     "kind": "image",
+     "x": 560,
+     "y": 330,
+     "w": 200,
+     "z": 7,
+     "rot": -1,
+     "imageId": "@gimage:couv2",
+     "text": "Couverture tome 2 — rough",
+     "by": "",
+     "colors": []
+    }
+   ],
+   "links": [
+    {
+     "kind": "location",
+     "id": "@loc:hanaori"
+    },
+    {
+     "kind": "location",
+     "id": "@loc:village"
+    },
+    {
+     "kind": "location",
+     "id": "@loc:phare"
+    },
+    {
+     "kind": "node",
+     "id": "@node:t1"
+    },
+    {
+     "kind": "note",
+     "id": "@note:references"
+    }
+   ]
+  },
+  {
+   "name": "Sora",
+   "items": [
+    {
+     "kind": "label",
+     "x": 40,
+     "y": 30,
+     "w": 220,
+     "z": 1,
+     "rot": 0,
+     "imageId": null,
+     "text": "Sora, la sans-lune",
+     "by": "",
+     "colors": []
+    },
+    {
+     "kind": "image",
+     "x": 40,
+     "y": 90,
+     "w": 240,
+     "z": 2,
+     "rot": -1,
+     "imageId": "@gimage:sora-ms",
+     "text": "Model sheet",
+     "by": "",
+     "colors": []
+    },
+    {
+     "kind": "palette",
+     "x": 320,
+     "y": 60,
+     "w": 250,
+     "z": 1,
+     "rot": 0,
+     "imageId": null,
+     "text": "Veste bleue, écharpe jaune",
+     "by": "",
+     "colors": [
+      "#2f7fa8",
+      "#e3b341",
+      "#1d2430",
+      "#f4efe6"
+     ]
+    },
+    {
+     "kind": "quote",
+     "x": 320,
+     "y": 190,
+     "w": 260,
+     "z": 3,
+     "rot": 0,
+     "imageId": null,
+     "text": "Je ne plie rien. Mais je sais où tout va.",
+     "by": "Sora, chapitre 5",
+     "colors": []
+    },
+    {
+     "kind": "note",
+     "x": 320,
+     "y": 330,
+     "w": 210,
+     "z": 4,
+     "rot": 1.5,
+     "imageId": null,
+     "text": "Toujours un crayon derrière l'oreille. Elle compte ses pas à voix haute quand elle a peur.",
+     "by": "",
+     "colors": []
+    },
+    {
+     "kind": "image",
+     "x": 600,
+     "y": 90,
+     "w": 200,
+     "z": 5,
+     "rot": 2,
+     "imageId": "@gimage:yuzu-ms",
+     "text": "Yuzu, la petite sœur",
+     "by": "",
+     "colors": []
+    }
+   ],
+   "links": [
+    {
+     "kind": "character",
+     "id": "@char:sora"
+    },
+    {
+     "kind": "character",
+     "id": "@char:yuzu"
+    },
+    {
+     "kind": "note",
+     "id": "@note:charte"
+    }
+   ]
+  },
+  {
+   "name": "Les sept lunes",
+   "items": [
+    {
+     "kind": "label",
+     "x": 40,
+     "y": 30,
+     "w": 220,
+     "z": 1,
+     "rot": 0,
+     "imageId": null,
+     "text": "Charte des lunes",
+     "by": "",
+     "colors": []
+    },
+    {
+     "kind": "image",
+     "x": 40,
+     "y": 90,
+     "w": 300,
+     "z": 2,
+     "rot": 0,
+     "imageId": "@gimage:charte",
+     "text": "Les sept lunes et leur Lunéa",
+     "by": "",
+     "colors": []
+    },
+    {
+     "kind": "image",
+     "x": 370,
+     "y": 80,
+     "w": 180,
+     "z": 3,
+     "rot": -2,
+     "imageId": "@gimage:lune-argent",
+     "text": "Lune d'argent",
+     "by": "",
+     "colors": []
+    },
+    {
+     "kind": "image",
+     "x": 570,
+     "y": 90,
+     "w": 180,
+     "z": 4,
+     "rot": 2,
+     "imageId": "@gimage:lune-rouge",
+     "text": "Lune rouge",
+     "by": "",
+     "colors": []
+    },
+    {
+     "kind": "image",
+     "x": 370,
+     "y": 290,
+     "w": 200,
+     "z": 5,
+     "rot": 0,
+     "imageId": "@gimage:septieme",
+     "text": "La septième lune, vide",
+     "by": "",
+     "colors": []
+    },
+    {
+     "kind": "palette",
+     "x": 600,
+     "y": 300,
+     "w": 250,
+     "z": 1,
+     "rot": 0,
+     "imageId": null,
+     "text": "Ce que Kagami a dévoré",
+     "by": "",
+     "colors": [
+      "#2b2d3a",
+      "#8e5bd6",
+      "#e0483d",
+      "#f2c14e"
+     ]
+    },
+    {
+     "kind": "quote",
+     "x": 60,
+     "y": 330,
+     "w": 260,
+     "z": 6,
+     "rot": 0,
+     "imageId": null,
+     "text": "Quand sept lunes s'aligneront, la faim se réveillera.",
+     "by": "Prophétie de Nanami",
+     "colors": []
+    },
+    {
+     "kind": "image",
+     "x": 330,
+     "y": 500,
+     "w": 180,
+     "z": 7,
+     "rot": -1,
+     "imageId": "@gimage:aya-ms",
+     "text": "Aya, l'Oracle",
+     "by": "",
+     "colors": []
+    }
+   ],
+   "links": [
+    {
+     "kind": "magic",
+     "id": "@magic:lunea"
+    },
+    {
+     "kind": "magic",
+     "id": "@magic:septieme"
+    },
+    {
+     "kind": "character",
+     "id": "@char:aya"
+    },
+    {
+     "kind": "character",
+     "id": "@char:kagami"
+    },
+    {
+     "kind": "node",
+     "id": "@node:ch6"
+    },
+    {
+     "kind": "note",
+     "id": "@note:regles-lunea"
+    }
+   ]
   }
  ]
 }

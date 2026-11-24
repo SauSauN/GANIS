@@ -3,6 +3,8 @@ import { ArrowLeft, ArrowLeftRight, ArrowRight, BookOpen, Copy, ExternalLink, Li
 import { addEvent, createLink, deleteEvent, deleteLane, deleteLink, duplicateEvent, duplicateLane, moveEvent } from "@/components/plot/actions";
 import { EventEntries } from "@/components/plot/EventEntries";
 import { KindIcon } from "@/components/plot/KindIcon";
+import { EventWhenFields } from "@/components/plot/EventWhenFields";
+import { NumberStepper } from "@/components/common/NumberStepper";
 import { area, Field, Fold, Head, input, useMutate, type PlotPanelProps } from "@/components/plot/panelParts";
 import { Button } from "@/components/ui/button";
 import { characterTabId } from "@/lib/characters";
@@ -21,6 +23,7 @@ import {
   rowFromMoment,
   STATUS_COLORS,
   STATUS_ORDER,
+  updateWhen,
   visibleLanes,
   type PlotEvent,
   type PlotLane,
@@ -451,22 +454,40 @@ function EventPanel({ projectId, data, links, onOpenFeature, event, placementOpe
           </Field>
           <Field label={t("event.moment")}>
             {/* 1, 2… : histoire principale ; -1, -2… : passé narratif (0 n'existe pas). */}
-            <input
-              type="number"
+            <NumberStepper
               value={event.row >= 0 ? event.row + 1 : event.row}
               placeholder={t("common:placeholders.moment")}
               title={t("event.momentHint")}
-              onChange={(e) => {
-                const row = rowFromMoment(e.target.value);
+              aria-label={t("event.moment")}
+              onChange={(value) => {
+                if (value === null) return;
+                // Le moment 0 n'existe pas : de 1 on passe à -1 (passé narratif), et inversement.
+                const current = event.row >= 0 ? event.row + 1 : event.row;
+                const moment = Math.round(value) === 0 ? (current > 0 ? -1 : 1) : Math.round(value);
+                const row = rowFromMoment(String(moment));
                 if (row !== null && row !== event.row) moveEvent(projectId, event.id, event.laneId, row);
               }}
-              className={input}
+              size="sm"
+              valueClassName="w-full min-w-[2.5rem]"
+              className="flex w-full"
             />
           </Field>
         </div>
         <Field label={t("event.date")}>
           <input value={event.date} maxLength={80} placeholder={t("event.datePlaceholder")} onChange={(e) => set("date", e.target.value, `ev:${event.id}:date`)} className={input} />
         </Field>
+        {/* Quand : place l'événement sur la frise chronologique (mois, jour, heure selon le projet). */}
+        <EventWhenFields
+          event={event}
+          precision={data.timePrecision}
+          idPrefix={`board-${event.id}`}
+          onChange={(which, patch, key) =>
+            mutate((d) => {
+              const e = eventOf(d, event.id);
+              if (e) updateWhen(e, which, patch);
+            }, key)
+          }
+        />
       </Fold>
 
       <div className="mt-4 flex flex-wrap gap-1.5 border-t pt-3">
@@ -754,21 +775,24 @@ function RowPanel({ projectId, data, row }: PlotPanelProps & { row: number }) {
         />
       </Field>
       <div className="mb-3">
-        <span className="mb-1 block text-xs font-semibold text-muted-foreground">{tension !== undefined ? t("row.tension", { value: tension }) : t("row.tensionNone")}</span>
-        <input
-          type="range"
-          min={0}
-          max={10}
-          step={1}
-          value={tension ?? 5}
-          aria-label={t("board.tension")}
-          onChange={(e) =>
-            mutate((d) => {
-              d.tension[row] = Number.parseInt(e.target.value, 10) || 0;
-            }, `tn:${row}`)
-          }
-          className="w-full accent-primary"
-        />
+        <div className="flex items-center gap-2">
+          <span className="min-w-0 flex-1 text-xs font-semibold text-muted-foreground">{tension !== undefined ? t("row.tension", { value: tension }) : t("row.tensionNone")}</span>
+          <NumberStepper
+            value={tension ?? null}
+            min={0}
+            max={10}
+            placeholder="5"
+            aria-label={t("board.tension")}
+            onChange={(value) =>
+              value !== null &&
+              mutate((d) => {
+                d.tension[row] = Math.round(value);
+              }, `tn:${row}`)
+            }
+            size="sm"
+            valueClassName="w-10"
+          />
+        </div>
         {tension !== undefined && (
           <Button
             variant="ghost"

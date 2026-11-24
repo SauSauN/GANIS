@@ -1,7 +1,8 @@
 import { useEffect, useId, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { Loader2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -228,7 +229,7 @@ export function PlaceLinkDialog({ projectId, linkId, initial, fixed, onClose }: 
             {t("links.dialog.cancel")}
           </Button>
           <Button type="submit" disabled={busy || !ready}>
-            {busy && <Loader2 className="animate-spin" />}
+            {busy && <LoadingDots />}
             {linkId ? t("links.dialog.save") : t("links.dialog.create")}
           </Button>
         </DialogFooter>

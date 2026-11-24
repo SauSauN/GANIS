@@ -1,4 +1,4 @@
-//! Commandes Tauri du scénario de série (voir `services::series_service`).
+//! Commandes Tauri du scénario de série et de film (voir `services::series_service`).
 //!
 //! Chaque commande obtient la base du projet auprès de `project_storage`,
 //! qui vérifie d'abord que le projet est public ou appartient au compte
@@ -7,8 +7,8 @@
 use crate::error::AppResult;
 use crate::services::history_service as history;
 use crate::services::project_storage;
-use crate::services::series_service::{self, EpisodeFields, SceneBlock, SceneScript, SceneScriptInput};
-use crate::services::structure_service::StructureNode;
+use crate::services::series_service::{self, EpisodeFields, FilmDetails, SceneBlock, SceneBreakdown, SceneBreakdownRow, SceneScript, SceneScriptInput};
+use crate::services::structure_service::{self, StructureNode};
 use crate::state::AppState;
 use tauri::State;
 
@@ -52,4 +52,52 @@ pub async fn set_series_episode(
     let saved = series_service::set_episode_fields(&pool, &node_id, &fields).await?;
     history::record(&pool, "updated", "structureNode", &saved.id, &saved.title, "").await;
     Ok(saved)
+}
+
+/// Fiche du film : logline, durée visée et scénariste.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn get_film_details(state: State<'_, AppState>, project_id: String) -> AppResult<FilmDetails> {
+    series_service::film_details(&project_storage::pool_for_request(&state, &project_id).await?).await
+}
+
+/// Enregistre la fiche du film.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn set_film_details(state: State<'_, AppState>, project_id: String, details: FilmDetails) -> AppResult<FilmDetails> {
+    series_service::set_film_details(&project_storage::pool_for_request(&state, &project_id).await?, &details).await
+}
+
+/// Dépouillement de toutes les scènes.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn get_scene_breakdowns(state: State<'_, AppState>, project_id: String) -> AppResult<Vec<SceneBreakdownRow>> {
+    series_service::breakdowns(&project_storage::pool_for_request(&state, &project_id).await?).await
+}
+
+/// Enregistre le dépouillement d'une scène.
+#[tauri::command(rename_all = "camelCase")]
+pub async fn set_scene_breakdown(
+    state: State<'_, AppState>,
+    project_id: String,
+    scene_id: String,
+    breakdown: SceneBreakdown,
+) -> AppResult<SceneBreakdown> {
+    let pool = project_storage::pool_for_request(&state, &project_id).await?;
+    let saved = series_service::set_breakdown(&pool, &scene_id, &breakdown).await?;
+    history::touch_day(&pool).await;
+    Ok(saved)
+}
+
+/// Place une scène dans une séquence (ou un épisode), à un rang donné
+/// (tableau de liège).
+#[tauri::command(rename_all = "camelCase")]
+pub async fn place_structure_node(
+    state: State<'_, AppState>,
+    project_id: String,
+    node_id: String,
+    parent_id: Option<String>,
+    index: usize,
+) -> AppResult<StructureNode> {
+    let pool = project_storage::pool_for_request(&state, &project_id).await?;
+    let placed = structure_service::place_node(&pool, &node_id, parent_id.as_deref(), index).await?;
+    history::record(&pool, "updated", "structureNode", &placed.id, &placed.title, "").await;
+    Ok(placed)
 }

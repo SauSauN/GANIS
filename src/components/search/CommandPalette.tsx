@@ -7,11 +7,11 @@ import {
   CircleHelp,
   Info,
   Keyboard,
-  Loader2,
   Megaphone,
   Search,
   type LucideIcon,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { SearchResults } from "@/components/search/SearchResults";
 import { Dialog, DialogTitle } from "@/components/ui/dialog";
 import { SETTINGS_MODULE, WORKSPACE_MODULES, type WorkspaceModule } from "@/components/workspace/modules";
@@ -163,7 +163,7 @@ export function CommandPalette({ open, onClose, projectId, onOpenFeature, module
     <Dialog open={open} onOpenChange={(value) => !value && onClose()} className="max-w-2xl p-0" guardInput={false}>
       <DialogTitle className="sr-only">{t("palette.title")}</DialogTitle>
       <div className="flex items-center gap-2 border-b px-4">
-        {loading ? <Loader2 className="size-4 animate-spin text-muted-foreground" /> : <Search className="size-4 text-muted-foreground" />}
+        {loading ? <LoadingDots className="size-4 text-muted-foreground" /> : <Search className="size-4 text-muted-foreground" />}
         <input
           autoFocus
           value={query}

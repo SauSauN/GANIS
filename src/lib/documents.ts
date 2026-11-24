@@ -2,9 +2,11 @@ import { useEffect, useState } from "react";
 import { create } from "zustand";
 import i18n from "@/i18n";
 import { errorText as sharedErrorText } from "@/lib/errors";
-import { api } from "@/lib/api";
+import { api, ApiError } from "@/lib/api";
+import { askConfirm } from "@/stores/confirmStore";
 import { toast } from "@/stores/toastStore";
 import type { StructureDocument } from "@/types";
+import { onSessionEnd } from "@/lib/sessionCache";
 
 /*
  * Documents rangés dans le découpage : chapitre de manga, PDF, Word,
@@ -65,16 +67,24 @@ export function formatSize(bytes: number, language = i18n.language): string {
 /** Taille maximale d'un document (comme dans Rust). */
 export const MAX_DOCUMENT_BYTES = 300 * 1024 * 1024;
 
-/** Extensions jamais ouvertes dans une autre application (comme dans Rust). */
-const UNSAFE_EXTENSIONS = new Set([
-  "exe", "com", "bat", "cmd", "msi", "msp", "scr", "pif", "cpl", "dll", "sys", "lnk", "url", "hta", "reg",
-  "ps1", "psm1", "vbs", "vbe", "js", "jse", "wsf", "wsh", "jar", "msc", "inf", "application", "appref-ms",
-  "sh", "command", "app", "desktop", "run", "bin",
+/**
+ * Types de documents qui peuvent être ouverts dans une autre application
+ * (liste blanche, comme `OPENABLE_EXTENSIONS` dans document_service.rs).
+ * Tout autre type (programmes, scripts, `.chm`, `.iso`, formats à macros,
+ * pages web, SVG…) se garde avec « Enregistrer sous… » seulement.
+ */
+export const OPENABLE_EXTENSIONS = new Set([
+  "doc", "docx", "odt", "ott", "rtf", "txt", "md", "markdown", "pdf", "epub",
+  "fdx", "fountain", "celtx",
+  "xls", "xlsx", "ods", "csv", "ppt", "pptx", "odp",
+  "png", "jpg", "jpeg", "gif", "webp", "bmp", "tif", "tiff", "heic", "psd", "kra", "clip", "xcf",
+  "ora", "mdp", "sai", "ai",
+  "mp3", "wav", "ogg", "flac", "m4a", "aac", "mp4", "mov", "webm", "mkv", "avi", "m4v",
 ]);
 
 export function canOpenExternally(name: string): boolean {
   const ext = extensionOf(name).toLowerCase();
-  return ext !== "" && !UNSAFE_EXTENSIONS.has(ext);
+  return ext !== "" && OPENABLE_EXTENSIONS.has(ext);
 }
 
 /** Ordre après avoir déplacé l'élément `index` de `delta` places. */
@@ -259,7 +269,23 @@ export function errorText(error: unknown): string {
  */
 export async function openExternally(projectId: string, document: StructureDocument): Promise<boolean> {
   try {
-    await api.openStructureDocumentExternally(projectId, document.id);
+    try {
+      await api.openStructureDocumentExternally(projectId, document.id);
+    } catch (error) {
+      // Document arrivé avec un projet importé : confirmation d'abord.
+      if (!(error instanceof ApiError) || error.key !== "documents.confirmReceived") throw error;
+
+      const t = i18n.t.bind(i18n) as unknown as (key: string, options?: Record<string, unknown>) => string;
+      const confirmed = await askConfirm({
+        title: t("documents:received.title"),
+        description: t("documents:received.description", { name: document.name }),
+        confirmLabel: t("documents:received.confirm"),
+        tone: "danger",
+      });
+      if (!confirmed) return false;
+
+      await api.openStructureDocumentExternally(projectId, document.id, true);
+    }
     useDocumentStore.getState().startExternal(document.id, { projectId, nodeId: document.nodeId, name: document.name });
     return true;
   } catch (error) {
@@ -283,3 +309,6 @@ export async function finishExternal(projectId: string, documentId: string): Pro
     useDocumentStore.getState().stopExternal(documentId);
   }
 }
+
+// Fin de session (déconnexion, autre compte) : plus rien de ce projet en mémoire.
+onSessionEnd(() => useDocumentStore.setState(useDocumentStore.getInitialState(), true));

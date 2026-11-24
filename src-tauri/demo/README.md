@@ -1,6 +1,6 @@
 # Données des projets d'exemple
 
-Ce dossier contient le **contenu** des deux projets d'exemple de GANIS. Le
+Ce dossier contient le **contenu** des quatre projets d'exemple de GANIS. Le
 code qui les construit est dans `src/services/demo_service/` ; il ne contient
 aucun texte d'exemple.
 
@@ -8,6 +8,16 @@ aucun texte d'exemple.
 |---|---|---|
 | `roman/` | *Les Plaques de verre* (roman) | `projet.json`, `manuscrit.md`, `notes.md`, `documents.md` |
 | `manga/` | *Hanaori — L'Archipel des sept lunes* (manga) | `projet.json`, `scenario.md`, `notes.md`, `documents.md` |
+| `film/` | *Le Sel des Veilleuses* (film) | `projet.json`, `scenes.md`, `notes.md`, `documents.md` |
+| `serie/` | *Les Traboules de minuit* (série) | `projet.json`, `scenes.md`, `notes.md`, `documents.md` |
+
+Chaque exemple remplit **tous les modules** avec au moins dix éléments
+(personnages, lieux, objets, faune et flore, factions, peuples, magie,
+découpage, notes, post-it, trame, glossaire, documents, galerie, relations) :
+`cargo test --lib demo` le vérifie.
+
+Pour les créer dans GANIS (fermé), depuis la racine du dépôt :
+`npm run seed:roman`, `seed:manga`, `seed:film`, `seed:serie`, ou `seed:all`.
 
 Les fichiers sont intégrés au binaire à la compilation (`include_str!`) : une
 modification est prise en compte au prochain `cargo build`. Pour ajouter un
@@ -24,7 +34,8 @@ Le moteur lit `projet.json` et les fichiers de texte, puis crée le projet **par
 les services de l'application**, dans l'ordre où un auteur le ferait :
 projet, synopsis, réglages, découpage (et pages du scénario), lieux,
 personnages, objets et faune, liens, textes des scènes, scénario des pages,
-objectifs, documents, notes, trame, versions nommées.
+objectifs, documents, galerie, notes, trame, arcs des personnages, planches
+d'inspiration, versions nommées.
 
 Chaque valeur passe donc par les mêmes contrôles que dans l'interface. Une
 erreur dans les données (clé inconnue, valeur hors liste, référence vers une
@@ -45,11 +56,13 @@ Objet JSON, clés en camelCase. Toute clé inconnue est refusée.
 | `characterSettings`, `locationSettings` | `detailLevel`, `customTypes` (`key`, `name`, `category`), `lists` ; personnages : `powersEnabled` (carte « Pouvoirs ») |
 | `world` | Par module (`item`, `species`, `faction`, `people`, `magic`) : `enabled`, `categories`, `detailLevel`, `customTypes`, `lists` |
 | `mangaSettings` | Seuils d'alerte : `panelWordsMax`, `pageWordsMax` |
-| `structure` | `levels` (facultatif : niveaux personnalisés), `autoNumbering`, `nodes` (arbre) |
+| `structure` | `levels` (facultatif : niveaux personnalisés), `autoNumbering`, `nodes` (arbre). Un nœud peut porter `novel`, `manga` ou `episode` (série : `logline`, `runtimeGoal`, `episodeStatus`, `writer` ; film : `episodeStatus` d'une séquence) |
 | `locations`, `characters`, `items`, `species`, `factions`, `peoples`, `magic` | Fiches (voir ci-dessous) |
 | `relations`, `graph` | Relations entre personnages ; positions dans le graphe |
 | `characterLocations`, `worldLinks` | Liens personnage-lieu ; liens entre fiches de l'univers |
-| `nodeLinks` | Personnages et lieux d'un élément du découpage (`node`, `characters`, `locations` : clé → rôle) |
+| `nodeLinks` | Personnages et lieux d'un élément du découpage (`node`, `characters`, `locations` : clé → rôle) ; `states` : état d'un personnage dans l'élément (clé → état) ; `entries` : fiches du monde de l'élément (`@sorte:clé` → rôle `central`, `present`, `mentioned`) |
+| `gallery` | Galerie du projet : `logo` (image), `folders` (`key`, `name`, `parent`), `images` (`key` facultative, `image`, `caption`, `description`, `folder`) |
+| `film` | Film : `logline`, `runtimeGoal` (minutes), `writer` du film entier |
 | `glossary` | Termes du glossaire : `term`, `definition`, `category`, `links` (`kind` : `character`, `location`, `item`, `species`, `faction`, `people`, `magic` ; `id` : référence `@sorte:clé`) |
 | `extraPages` | Manga : pages hors récit d'un tome : `volume` (`@node:clé`, absent sans tomes), `placement` (`front`, `back`), `kind` (`cover`, `title`, `toc`, `credits`, `cast`, `foreword`, `bonus`, `afterword`, `preview`, `blank`, `backCover`, `other`), `title`, `notes`, `stage` |
 | `production` | Manga : étape de fabrication des pages : `stage` (`storyboard`, `pencils`, `inks`, `tones`, `lettering`, `done`), `pages` (clés des pages, sans `@`) |
@@ -57,7 +70,7 @@ Objet JSON, clés en camelCase. Toute clé inconnue est refusée.
 | `editorial` | Roman : `pitch`, `summaryShort`, `summaryLong` (clés de sections) |
 | `documents` | Documents rangés dans le découpage (voir ci-dessous) |
 | `notes` | `folders`, `notes` (`key`, `title`, `folder`, `pinned`), `stickies` (post-it), `systemNotes` |
-| `plot` | Trame, au format enregistré par l'application (voir `src/lib/plot.ts`) |
+| `plot` | Trame, au format enregistré par l'application (voir `src/lib/plot.ts`) ; pour la frise chronologique : `year` et `yearEnd` des événements, `eras` (`id`, `name`, `from`, `to`, `color`), `yearLabel` |
 | `versions` | Versions nommées (voir ci-dessous) |
 | `animalCharacters` | Clés d'individus de la faune qui sont aussi des personnages (`@char:clé` les désigne ensuite) |
 | `trash` | Éléments mis à la corbeille à la fin (`@node:…`, `@char:…`, `@note:…`…) |
@@ -200,3 +213,27 @@ continuité: Ce qu'il faut garder d'une case à l'autre.
 - `lieu`, `persos` et les interlocuteurs sont des clés de fiches. Les personnages et lieux d'une page sont reliés à la page automatiquement.
 - Une ligne qui commence par deux espaces continue la ligne précédente ; `//` commence un commentaire.
 - Une page sans case existe dans le découpage avec son résumé, prête à être scénarisée.
+
+## Scénario d'une série ou d'un film (`scenes.md`)
+
+Une scène par bloc ; chaque élément commence par `>` :
+
+```text
+=== scène s01 | dans: q1 | ext | lieu: marais | moment: dusk | pdv: maelle
+titre: Le sel du soir
+résumé: Ce que la scène raconte.
+état: maelle = Foulard rouge ; anna = Fatiguée
+
+> action: Ce que l'on voit et entend à l'écran.
+> maelle: Réplique de Maëlle.
+> maelle (pour elle-même): Réplique avec sa didascalie.
+> transition: CUT TO:
+> plan: GROS PLAN SUR LE LAS
+> note: Note de travail (jamais imprimée).
+```
+
+- La scène est créée sous son épisode ou sa séquence (`dans:` = clé d'un nœud de `projet.json`), dans l'ordre du fichier.
+- En-tête : `int`, `ext` ou `intExt` ; `lieu:` (clé d'un lieu) ; `moment:` (`day`, `night`, `morning`, `evening`, `dawn`, `dusk`, `continuous`, `later`) ; `pdv:` (personnage du point de vue).
+- `titre:`, `résumé:` et `état:` se placent avant les éléments.
+- Les personnages qui parlent, ceux qui ont un état et le lieu de l'en-tête sont reliés à la scène automatiquement.
+- Une ligne qui commence par deux espaces continue la ligne précédente ; `//` commence un commentaire ; ce qui précède la première scène est ignoré.

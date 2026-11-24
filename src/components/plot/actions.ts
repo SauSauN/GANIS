@@ -5,6 +5,7 @@ import {
   laneOf,
   linkOf,
   MIN_ROW,
+  DEFAULT_YEAR,
   newId,
   nextColor,
   occupant,
@@ -57,6 +58,11 @@ export function blankEvent(laneId: string, title: string): PlotEvent {
     alsoNodeIds: [],
     noteIds: [],
     date: "",
+    // Nouvel événement : en l'an 2000 sur la frise, à changer ensuite.
+    year: DEFAULT_YEAR,
+    yearEnd: null,
+    yearDetail: null,
+    yearEndDetail: null,
     words: 0,
   };
 }

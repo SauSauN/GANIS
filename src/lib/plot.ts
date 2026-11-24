@@ -70,9 +70,37 @@ export interface PlotEvent {
   /** Autres scènes où l'événement est raconté à nouveau (souvenir, autre point de vue…). */
   alsoNodeIds: string[];
   noteIds: string[];
-  /** Date dans l'histoire (libre), pour la chronologie. */
+  /** Date dans l'histoire, telle que l'auteur l'écrit (« 3e lune, an 312 »). */
   date: string;
+  /** Année dans le calendrier de l'histoire : place l'événement sur la frise chronologique. */
+  year: number | null;
+  /** Fin d'une période (même calendrier) ; `null` : événement ponctuel. */
+  yearEnd: number | null;
+  /** Mois, jour, heure du début (selon la précision de la frise choisie pour le projet). */
+  yearDetail: YearDetail | null;
+  /** Mois, jour, heure de la fin d'une période. */
+  yearEndDetail: YearDetail | null;
   words: number;
+}
+
+/** Précision de la frise chronologique, réglée dans les paramètres du projet. */
+export type TimePrecision = "year" | "month" | "day" | "hour";
+export const TIME_PRECISIONS: TimePrecision[] = ["year", "month", "day", "hour"];
+
+/** Date dans l'année : mois (1-12), jour du mois, heure (0-23). Un jour suppose un mois, une heure un jour. */
+export interface YearDetail {
+  month: number;
+  day: number | null;
+  hour: number | null;
+}
+
+/** Époque de la frise chronologique (« Guerre des Cendres », an 301 à 318). */
+export interface PlotEra {
+  id: string;
+  name: string;
+  from: number;
+  to: number;
+  color: string;
 }
 
 /** Fiche du monde citée par un événement. */
@@ -160,6 +188,12 @@ export interface PlotData {
   templates: PlotCustomTemplate[];
   /** Ordre des événements à l'intérieur d'un élément du découpage (élément → événements). */
   sceneOrder: Record<string, string[]>;
+  /** Frise chronologique : époques, dans l'ordre. */
+  eras: PlotEra[];
+  /** Nom des années dans l'histoire (« an », « EC »…), affiché sur la frise. */
+  yearLabel: string;
+  /** Jusqu'où la frise descend : l'année (par défaut), le mois, le jour ou l'heure. */
+  timePrecision: TimePrecision;
 }
 
 /** Modèle de structure de l'auteur : ses étapes, réparties du début à la fin. */
@@ -242,6 +276,9 @@ export function blankPlot(mainName: string): PlotData {
     goal: 0,
     templates: [],
     sceneOrder: {},
+    eras: [],
+    yearLabel: "",
+    timePrecision: "year",
   };
 }
 
@@ -349,6 +386,7 @@ export function normalizePlot(raw: unknown, mainName: string): PlotData {
         .slice(0, 20),
       noteIds: ids(e.noteIds),
       date: str(e.date, 80),
+      ...yearsOf(e),
       words: clamp(Number.parseInt(String(e.words), 10) || 0, 0, 10_000_000),
     });
   }
@@ -409,6 +447,7 @@ export function normalizePlot(raw: unknown, mainName: string): PlotData {
     goal: clamp(Number.parseInt(String(o.goal), 10) || 0, 0, 100_000_000),
     templates: templatesOf(o),
     sceneOrder: sceneOrderOf(o, events),
+    ...timelineOf(o),
     ...cluesOf(o, eventIds),
   };
 }
@@ -490,7 +529,368 @@ function cluesOf(o: Record<string, unknown>, eventIds: Set<string>): Pick<PlotDa
 
 /** Réglages gardés même quand la trame n'a encore aucune colonne. */
 function keepExtras(o: Record<string, unknown>): Partial<PlotData> {
-  return { goal: clamp(Number.parseInt(String(o.goal), 10) || 0, 0, 100_000_000), templates: templatesOf(o) };
+  return { goal: clamp(Number.parseInt(String(o.goal), 10) || 0, 0, 100_000_000), templates: templatesOf(o), ...timelineOf(o) };
+}
+
+// ----------------------------------------------------------------------------
+// Frise chronologique (années, époques, naissances)
+// ----------------------------------------------------------------------------
+
+/** Années admises sur la frise (calendrier inventé : négatives comprises). */
+export const MIN_YEAR = -1_000_000;
+export const MAX_YEAR = 1_000_000;
+
+/** Année d'un nouvel événement, et place sur la frise d'un événement sans année. */
+export const DEFAULT_YEAR = 2000;
+
+/** Année lue (nombre entier dans les bornes), sinon `null`. */
+export function readYear(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") return null;
+  const n = typeof value === "number" ? value : Number(String(value).trim());
+  return Number.isInteger(n) && n >= MIN_YEAR && n <= MAX_YEAR ? n : null;
+}
+
+// --- Calendrier (12 mois, années bissextiles, 24 heures) ---------------------
+
+export function isLeapYear(year: number): boolean {
+  return (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0;
+}
+
+const MONTH_DAYS = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+
+export function daysInMonth(year: number, month: number): number {
+  return month === 2 && isLeapYear(year) ? 29 : MONTH_DAYS[month - 1];
+}
+
+function daysInYear(year: number): number {
+  return isLeapYear(year) ? 366 : 365;
+}
+
+/** Jours écoulés depuis le début de l'année jusqu'au premier jour du mois. */
+function daysBeforeMonth(year: number, month: number): number {
+  let days = 0;
+  for (let m = 1; m < month; m++) days += daysInMonth(year, m);
+  return days;
+}
+
+/** Durée approximative de chaque unité, en années (choix des graduations). */
+export const UNIT_YEARS: Record<TimePrecision, number> = { year: 1, month: 1 / 12, day: 1 / 365.25, hour: 1 / 8766 };
+
+/** Les niveaux de précision jusqu'à celui donné compris (« jour » : année, mois, jour). */
+export function precisionAllows(precision: TimePrecision, level: TimePrecision): boolean {
+  return TIME_PRECISIONS.indexOf(level) <= TIME_PRECISIONS.indexOf(precision);
+}
+
+/** Mois, jour, heure lus d'un document enregistré : chacun suppose le précédent, et reste dans le calendrier. */
+function detailOf(value: unknown, year: number | null): YearDetail | null {
+  if (year === null || !value || typeof value !== "object") return null;
+  const v = value as Record<string, unknown>;
+  const month = Number(v.month);
+  if (!Number.isInteger(month) || month < 1 || month > 12) return null;
+  const day = Number(v.day);
+  const okDay = Number.isInteger(day) && day >= 1 && day <= daysInMonth(year, month);
+  const hour = Number(v.hour);
+  const okHour = okDay && v.hour !== null && v.hour !== undefined && Number.isInteger(hour) && hour >= 0 && hour <= 23;
+  return { month, day: okDay ? day : null, hour: okHour ? hour : null };
+}
+
+/**
+ * Instant sur la frise, en années (fraction comprise : 1850,5 = mi-1850),
+ * en ne gardant du mois, du jour et de l'heure que ce que la précision permet.
+ */
+export function instantOf(year: number, detail: YearDetail | null, precision: TimePrecision = "hour"): number {
+  if (!detail || precision === "year") return year;
+  let days = daysBeforeMonth(year, detail.month);
+  let hours = 0;
+  if (precision !== "month" && detail.day !== null) {
+    days += detail.day - 1;
+    if (precision === "hour" && detail.hour !== null) hours = detail.hour;
+  }
+  return year + (days + hours / 24) / daysInYear(year);
+}
+
+/** Date d'un instant de la frise (année, mois, jour, heure), pour l'afficher. */
+export function datePartsOf(instant: number): { year: number; month: number; day: number; hour: number } {
+  const year = Math.floor(instant + 1e-9);
+  let hours = Math.max(0, Math.round((instant - year) * daysInYear(year) * 24));
+  let month = 1;
+  while (month < 12 && hours >= daysInMonth(year, month) * 24) hours -= daysInMonth(year, month++) * 24;
+  const day = Math.min(daysInMonth(year, month), Math.floor(hours / 24) + 1);
+  return { year, month, day, hour: Math.min(23, hours % 24) };
+}
+
+/** Une fin est gardée si elle vient après le début (la même année seulement avec un mois). */
+function endIsValid(year: number, detail: YearDetail | null, yearEnd: number, endDetail: YearDetail | null): boolean {
+  if (yearEnd > year) return true;
+  return yearEnd === year && endDetail !== null && instantOf(yearEnd, endDetail) >= instantOf(year, detail);
+}
+
+/** Années (et mois, jour, heure) d'un événement : une fin seulement après un début, et jamais avant lui. */
+function yearsOf(e: Record<string, unknown>): Pick<PlotEvent, "year" | "yearEnd" | "yearDetail" | "yearEndDetail"> {
+  const year = readYear(e.year);
+  const yearDetail = detailOf(e.yearDetail, year);
+  const end = year === null ? null : readYear(e.yearEnd);
+  const endDetail = detailOf(e.yearEndDetail, end);
+  if (year === null || end === null || !endIsValid(year, yearDetail, end, endDetail)) return { year, yearEnd: null, yearDetail, yearEndDetail: null };
+  return { year, yearEnd: end, yearDetail, yearEndDetail: endDetail };
+}
+
+/** Changement d'une partie de la date d'un événement (début ou fin). */
+export interface WhenPatch {
+  year?: number | null;
+  month?: number | null;
+  day?: number | null;
+  hour?: number | null;
+}
+
+/**
+ * Change le début ou la fin d'un événement en gardant une date cohérente :
+ * un jour suppose un mois, une heure un jour, le jour reste dans le mois,
+ * et une fin qui ne vient plus après le début est retirée. Choisir le mois
+ * de fin sans année de fin la place la même année que le début.
+ */
+export function updateWhen(event: PlotEvent, which: "start" | "end", patch: WhenPatch): void {
+  const start = which === "start";
+  let year = start ? event.year : event.yearEnd;
+  let detail: YearDetail | null = start ? event.yearDetail : event.yearEndDetail;
+  if (patch.year !== undefined) year = patch.year;
+  if (!start && year === null && patch.month !== undefined && patch.month !== null) year = event.year;
+  if (year === null) detail = null;
+  else {
+    let month = patch.month !== undefined ? patch.month : (detail?.month ?? null);
+    let day = patch.day !== undefined ? patch.day : (detail?.day ?? null);
+    let hour = patch.hour !== undefined ? patch.hour : (detail?.hour ?? null);
+    if (month === null) month = day = hour = null;
+    else {
+      if (day !== null) day = Math.min(Math.max(1, day), daysInMonth(year, month));
+      if (day === null) hour = null;
+    }
+    detail = month === null ? null : { month, day, hour: hour === null ? null : Math.min(23, Math.max(0, hour)) };
+  }
+
+  if (start) {
+    event.year = year;
+    event.yearDetail = detail;
+  } else {
+    event.yearEnd = year;
+    event.yearEndDetail = detail;
+  }
+  if (event.year === null || event.yearEnd === null || !endIsValid(event.year, event.yearDetail, event.yearEnd, event.yearEndDetail)) {
+    event.yearEnd = null;
+    event.yearEndDetail = null;
+  }
+}
+
+/** Époques, naissances et nom des années, lus d'un document enregistré. */
+function timelineOf(o: Record<string, unknown>): Pick<PlotData, "eras" | "yearLabel" | "timePrecision"> {
+  const eras: PlotEra[] = [];
+  for (const value of Array.isArray(o.eras) ? o.eras : []) {
+    const e = (value ?? {}) as Record<string, unknown>;
+    const from = readYear(e.from);
+    const to = readYear(e.to);
+    if (from === null || to === null) continue;
+    eras.push({
+      id: idOrNull(e.id) ?? newId(),
+      name: str(e.name, 80),
+      from: Math.min(from, to),
+      to: Math.max(from, to),
+      color: typeof e.color === "string" && COLOR.test(e.color) ? e.color : PLOT_PALETTE[eras.length % PLOT_PALETTE.length],
+    });
+    if (eras.length >= 100) break;
+  }
+  eras.sort((a, b) => a.from - b.from || a.to - b.to);
+
+  const timePrecision = TIME_PRECISIONS.includes(o.timePrecision as TimePrecision) ? (o.timePrecision as TimePrecision) : "year";
+  return { eras, yearLabel: str(o.yearLabel, 20).trim(), timePrecision };
+}
+
+/** Événement placé sur la frise : ses années de début et de fin. */
+export interface TimelineItem {
+  event: PlotEvent;
+  from: number;
+  to: number;
+}
+
+/**
+ * Frise chronologique : tous les événements, du plus ancien au plus récent.
+ * Un événement sans année est placé en l'an 2000 (`DEFAULT_YEAR`) et
+ * figure aussi dans `undated`, pour qu'on lui donne sa vraie année. Le début
+ * du récit est la date du premier événement daté de l'histoire principale
+ * (moment 0 ou après) ; sans aucun, il n'y en a pas.
+ */
+export function timeline(data: PlotData): { items: TimelineItem[]; undated: PlotEvent[]; storyStart: number | null } {
+  const items: TimelineItem[] = [];
+  const undated: PlotEvent[] = [];
+  for (const event of data.events) {
+    if (event.year === null) {
+      undated.push(event);
+      items.push({ event, from: DEFAULT_YEAR, to: DEFAULT_YEAR });
+    } else {
+      // Instants à la précision du projet : un mois saisi puis une précision
+      // ramenée à l'année est gardé, mais ne compte plus sur la frise.
+      const from = instantOf(event.year, event.yearDetail, data.timePrecision);
+      const to = event.yearEnd === null ? from : instantOf(event.yearEnd, event.yearEndDetail, data.timePrecision);
+      items.push({ event, from, to: Math.max(from, to) });
+    }
+  }
+  items.sort((a, b) => a.from - b.from || a.to - b.to || a.event.row - b.event.row);
+  undated.sort((a, b) => a.row - b.row);
+  // Seuls les événements datés comptent : un événement sans année, placé
+  // en l'an 2000 en attendant, ne doit pas fixer le début du récit.
+  const present = items.filter((item) => item.event.row >= 0 && item.event.year !== null);
+  const storyStart = present.length ? Math.min(...present.map((item) => item.from)) : null;
+  return { items, undated, storyStart };
+}
+
+/** Étendue de la frise : toutes les années utilisées (événements, époques), avec une marge. */
+export function timelineRange(data: PlotData, items: TimelineItem[]): { from: number; to: number } | null {
+  const years = [
+    ...items.flatMap((item) => [item.from, item.to]),
+    ...data.eras.flatMap((era) => [era.from, era.to]),
+  ];
+  if (!years.length) return null;
+  let from = Math.min(...years);
+  let to = Math.max(...years);
+  // Précision plus fine que l'année : une étendue d'au moins un mois (mois),
+  // quelques semaines (jour) ou quelques jours (heure), sans arrondi.
+  if (data.timePrecision !== "year") {
+    const minSpan = { month: 1, day: 1 / 12, hour: 3 / 365 }[data.timePrecision];
+    if (to - from < minSpan) {
+      const middle = (from + to) / 2;
+      from = middle - minSpan / 2;
+      to = middle + minSpan / 2;
+    }
+    const margin = Math.max(UNIT_YEARS[data.timePrecision], (to - from) * 0.04);
+    return { from: from - margin, to: to + margin };
+  }
+  if (to - from < 10) {
+    const middle = Math.floor((from + to) / 2);
+    from = middle - 5;
+    to = middle + 5;
+  }
+  const margin = Math.max(1, Math.round((to - from) * 0.04));
+  return { from: from - margin, to: to + margin };
+}
+
+/** Pas des graduations : environ huit, sur des valeurs rondes (1, 2, 5, 10, 20, 50…). */
+export function timelineStep(span: number): number {
+  const raw = Math.max(1, span / 8);
+  const power = 10 ** Math.floor(Math.log10(raw));
+  for (const factor of [1, 2, 5, 10]) if (raw <= factor * power) return factor * power;
+  return 10 * power;
+}
+
+/**
+ * Pas des graduations selon l'échelle à l'écran : la plus petite valeur ronde
+ * (1, 2, 5, 10, 20…) dont l'écart laisse la place de lire l'année
+ * (`minGap` pixels). Au plus fort zoom, chaque année a sa graduation.
+ */
+export function timelineStepAt(pxPerYear: number, minGap: number): number {
+  return timelineStep(Math.max(1, minGap / Math.max(pxPerYear, 1e-9)) * 8);
+}
+
+/** Graduation de la frise : son instant et la date qu'elle marque. */
+export interface TimelineTick {
+  at: number;
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  /** Début de l'unité au-dessus (janvier, 1er du mois, minuit) : on y écrit aussi cette unité. */
+  major: boolean;
+}
+
+/** Pas possibles sous l'année, du plus fin au plus large. */
+const SUB_YEAR_STEPS: Array<{ unit: Exclude<TimePrecision, "year">; step: number }> = [
+  { unit: "hour", step: 1 },
+  { unit: "hour", step: 3 },
+  { unit: "hour", step: 6 },
+  { unit: "hour", step: 12 },
+  { unit: "day", step: 1 },
+  { unit: "day", step: 7 },
+  { unit: "month", step: 1 },
+  { unit: "month", step: 3 },
+  { unit: "month", step: 6 },
+];
+
+/**
+ * Écarts possibles entre deux graduations, en années, du plus large au plus
+ * fin : 100, 50, 20, 10, 5, 2, 1 an, puis 6, 3, 1 mois, 7, 1 jour, 12, 6,
+ * 3, 1 heure, selon la précision du projet. Les boutons − / + du zoom
+ * passent d'un écart au suivant.
+ */
+export function timelineGaps(precision: TimePrecision, span: number): number[] {
+  const gaps: number[] = [];
+  for (let power = 1; power <= Math.max(1, span); power *= 10) for (const factor of [1, 2, 5]) if (factor * power <= Math.max(1, span)) gaps.push(factor * power);
+  gaps.sort((a, b) => b - a);
+  for (const { unit, step } of [...SUB_YEAR_STEPS].reverse()) if (precisionAllows(precision, unit)) gaps.push(UNIT_YEARS[unit] * step);
+  return gaps;
+}
+
+/**
+ * Graduations entre `from` et `to` (instants en années) : l'unité la plus
+ * fine que la précision du projet permet et que l'échelle laisse lire
+ * (`minGap` pixels entre deux), sinon des années rondes.
+ */
+export function timelineTicks(
+  from: number,
+  to: number,
+  pxPerYear: number,
+  minGap: number,
+  precision: TimePrecision,
+): { unit: TimePrecision; step: number; ticks: TimelineTick[] } {
+  const choice = SUB_YEAR_STEPS.find(({ unit, step }) => precisionAllows(precision, unit) && UNIT_YEARS[unit] * step * pxPerYear >= minGap);
+  const ticks: TimelineTick[] = [];
+  if (!choice) {
+    const step = timelineStepAt(pxPerYear, minGap);
+    for (let y = Math.ceil(from / step) * step; y <= to; y += step) ticks.push({ at: y, year: y, month: 1, day: 1, hour: 0, major: true });
+    return { unit: "year", step, ticks };
+  }
+  const { unit, step } = choice;
+  const push = (year: number, month: number, day: number, hour: number, major: boolean) => {
+    const at = instantOf(year, { month, day, hour }, "hour");
+    if (at >= from && at <= to) ticks.push({ at, year, month, day, hour, major });
+  };
+  for (let year = Math.floor(from); year <= Math.floor(to); year++) {
+    for (let month = 1; month <= 12; month++) {
+      const monthStart = instantOf(year, { month, day: 1, hour: 0 });
+      const monthEnd = month === 12 ? year + 1 : instantOf(year, { month: month + 1, day: 1, hour: 0 });
+      if (monthEnd < from || monthStart > to) continue;
+      if (unit === "month") {
+        if ((month - 1) % step === 0) push(year, month, 1, 0, month === 1);
+        continue;
+      }
+      for (let day = 1; day <= daysInMonth(year, month); day++) {
+        if (unit === "day") {
+          // Par semaine : le 1er, le 8, le 15, le 22 (et le 29) de chaque mois.
+          if ((day - 1) % step === 0) push(year, month, day, 0, day === 1);
+          continue;
+        }
+        const dayStart = instantOf(year, { month, day, hour: 0 });
+        if (dayStart + 1 / daysInYear(year) < from || dayStart > to) continue;
+        for (let hour = 0; hour < 24; hour += step) push(year, month, day, hour, hour === 0);
+      }
+    }
+  }
+  return { unit, step, ticks };
+}
+
+/**
+ * Année lue dans un texte libre, comme la date de naissance d'une fiche
+ * (« 12 mars 1890 », « an 299, 3e lune », « 1890-03-12 », « -45 ») : le
+ * nombre le plus long, le dernier s'il y en a plusieurs. `null` sans nombre.
+ */
+export function yearInText(text: string | undefined | null): number | null {
+  const numbers = [...(text ?? "").matchAll(/(^|[^\d-])(-?\d{1,7})/g)].map((m) => m[2]);
+  if (!numbers.length) return null;
+  const longest = numbers.reduce((best, n) => (n.replace("-", "").length >= best.replace("-", "").length ? n : best));
+  return readYear(longest);
+}
+
+/** Âge à une année, d'après l'année de naissance (`null` : inconnue, ou pas encore né). */
+export function ageAt(birthYear: number | null, year: number): number | null {
+  if (birthYear === null || year < birthYear) return null;
+  return year - birthYear;
 }
 
 // ----------------------------------------------------------------------------
@@ -826,19 +1226,6 @@ export function tourList(data: PlotData, mode: TourMode, laneId: string | null, 
   return planOrder(data);
 }
 
-/** Chronologie : les événements datés, du plus ancien au plus récent. */
-export function chronology(data: PlotData): { dated: PlotEvent[]; undated: PlotEvent[] } {
-  const dated: Array<{ event: PlotEvent; time: number }> = [];
-  const undated: PlotEvent[] = [];
-  for (const event of data.events) {
-    const time = event.date ? Date.parse(event.date) : Number.NaN;
-    if (Number.isNaN(time)) undated.push(event);
-    else dated.push({ event, time });
-  }
-  dated.sort((a, b) => a.time - b.time);
-  return { dated: dated.map((item) => item.event), undated };
-}
-
 // ----------------------------------------------------------------------------
 // Repères automatiques
 // ----------------------------------------------------------------------------
@@ -909,9 +1296,12 @@ export function computeIssues(data: PlotData, untitled: string): PlotIssue[] {
     }
   }
 
-  for (const event of data.events) {
-    if (event.date && Number.isNaN(Date.parse(event.date)) && !/[a-zA-Zà-ÿ]/.test(event.date)) {
-      out.push({ target: { type: "event", id: event.id }, key: "badDate", params: { title: title(event), date: event.date }, severity: "warning" });
+  // Frise : un événement de l'histoire placé avant un événement du passé narratif.
+  for (const later of data.events) {
+    if (later.year === null || later.row < 0) continue;
+    const earlier = data.events.find((e) => e.year !== null && e.row < 0 && e.laneId === later.laneId && e.year > later.year!);
+    if (earlier) {
+      out.push({ target: { type: "event", id: later.id }, key: "pastAfterStory", params: { title: title(later), past: title(earlier) }, severity: "warning" });
     }
   }
 

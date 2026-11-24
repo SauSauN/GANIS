@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { FolderTree, Loader2, Plus } from "lucide-react";
+import { FolderTree, Plus } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { LevelPicker } from "@/components/characters/LevelPicker";
@@ -182,7 +183,7 @@ export function WorldCreateView({
           </div>
         ) : (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            <LoadingDots className="size-4" aria-hidden="true" />
             {t("list.loading")}
           </p>
         )}
@@ -207,7 +208,7 @@ export function WorldCreateView({
           </CardContent>
           <CardFooter className={`${cardFooterClass} gap-4`}>
             <Button onClick={() => void confirmLevel()} disabled={levelSaving}>
-              {levelSaving && <Loader2 className="animate-spin" />}
+              {levelSaving && <LoadingDots />}
               {t("levels.continue")}
             </Button>
           </CardFooter>
@@ -277,7 +278,7 @@ export function WorldCreateView({
           footer={
             <div className="flex min-h-10 flex-wrap items-center gap-4">
               <Button type="submit" disabled={saving || bannerBusy}>
-                {saving ? <Loader2 className="animate-spin" /> : <Plus />}
+                {saving ? <LoadingDots /> : <Plus />}
                 {saving ? t("create.saving") : labels.text("create.save")}
               </Button>
               {dirty && (

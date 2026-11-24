@@ -1,3 +1,4 @@
+import { StepperGroup } from "@/components/common/NumberStepper";
 import {
   useCallback,
   useEffect,
@@ -19,9 +20,7 @@ import {
   Eye,
   EyeOff,
   Footprints,
-  Loader2,
   Maximize2,
-  Minus,
   PanelRightClose,
   PanelRightOpen,
   Plus,
@@ -29,6 +28,7 @@ import {
   SlidersHorizontal,
   Undo2,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import {
   addEvent,
   addEventSmart,
@@ -679,7 +679,7 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
           </p>
         ) : (
           <span className="inline-flex items-center gap-2" role="status">
-            <Loader2 className="size-4 animate-spin" />
+            <LoadingDots className="size-4" />
             {t("loading")}
           </span>
         )}
@@ -698,17 +698,17 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
       {/* Barre d'outils : l'essentiel visible, le reste dans « Plus » */}
       {!clean && (
         <div className="flex items-center gap-2 border-b bg-card/60 px-3 py-2">
-          <div className="flex items-center" role="group" aria-label={t("toolbar.zoom")}>
-            <Button variant="ghost" size="icon" onClick={() => setZoom(view.zoom / 1.15)} aria-label={t("toolbar.zoomOut")} title={`${t("toolbar.zoomOut")} (-)`}>
-              <Minus />
-            </Button>
-            <button type="button" onClick={fitZoom} title={`${t("toolbar.fit")} (0)`} className="h-8 min-w-11 rounded-md px-1 text-xs text-muted-foreground tabular-nums hover:bg-muted hover:text-foreground">
+          <StepperGroup
+            label={t("toolbar.zoom")}
+            minusLabel={`${t("toolbar.zoomOut")} (-)`}
+            plusLabel={`${t("toolbar.zoomIn")} (+)`}
+            onMinus={() => setZoom(view.zoom / 1.15)}
+            onPlus={() => setZoom(view.zoom * 1.15)}
+          >
+            <button type="button" onClick={fitZoom} title={`${t("toolbar.fit")} (0)`} className="h-full w-full px-2 tabular-nums hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
               {Math.round(view.zoom * 100)} %
             </button>
-            <Button variant="ghost" size="icon" onClick={() => setZoom(view.zoom * 1.15)} aria-label={t("toolbar.zoomIn")} title={`${t("toolbar.zoomIn")} (+)`}>
-              <Plus />
-            </Button>
-          </div>
+          </StepperGroup>
 
           <span className="h-5 w-px bg-border" aria-hidden="true" />
           <Button variant="ghost" size="icon" disabled={!canUndo} onClick={undo} aria-label={t("toolbar.undo")} title={`${t("toolbar.undo")} (Ctrl+Z)`}>
@@ -1222,13 +1222,16 @@ export function PlotBoard({ projectId, feature, onOpenFeature }: PlotBoardProps)
 
       {clean && (
         <div className="absolute right-4 bottom-4 z-40 flex items-center gap-1.5 rounded-lg border bg-card p-1.5 opacity-60 shadow-md transition-opacity hover:opacity-100 focus-within:opacity-100">
-          <Button variant="ghost" size="icon-sm" onClick={() => setZoom(view.zoom / 1.15)} aria-label={t("toolbar.zoomOut")}>
-            <Minus />
-          </Button>
-          <span className="w-11 text-center text-xs tabular-nums">{Math.round(view.zoom * 100)} %</span>
-          <Button variant="ghost" size="icon-sm" onClick={() => setZoom(view.zoom * 1.15)} aria-label={t("toolbar.zoomIn")}>
-            <Plus />
-          </Button>
+          <StepperGroup
+            size="sm"
+            label={t("toolbar.zoom")}
+            minusLabel={t("toolbar.zoomOut")}
+            plusLabel={t("toolbar.zoomIn")}
+            onMinus={() => setZoom(view.zoom / 1.15)}
+            onPlus={() => setZoom(view.zoom * 1.15)}
+          >
+            {Math.round(view.zoom * 100)} %
+          </StepperGroup>
           <Button variant="ghost" size="icon-sm" onClick={fitZoom} aria-label={t("toolbar.fit")} title={t("toolbar.fit")}>
             <Maximize2 />
           </Button>

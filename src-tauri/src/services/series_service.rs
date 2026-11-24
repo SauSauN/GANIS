@@ -13,7 +13,7 @@
 //! Les durées estimées et l'avancement sont calculés par l'interface, qui a
 //! tout le scénario (`series_blocks`) et le découpage.
 
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeMap, HashMap, HashSet};
 
 use serde::{Deserialize, Serialize};
 use sqlx::{SqliteConnection, SqlitePool};
@@ -55,6 +55,9 @@ pub struct SceneBlock {
     pub character_id: Option<String>,
     pub parenthetical: String,
     pub content: String,
+    /// Dernière modification du texte de l'élément (pas de sa place) : un
+    /// élément modifié pendant une révision de tournage est marqué.
+    pub updated_at: String,
 }
 
 /// Scénario d'une scène.
@@ -91,7 +94,7 @@ pub struct SceneScriptInput {
     pub blocks: Vec<BlockInput>,
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Default, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct EpisodeFields {
     #[serde(default)]
@@ -102,6 +105,9 @@ pub struct EpisodeFields {
     pub episode_status: Option<String>,
     #[serde(default)]
     pub writer: String,
+    /// Échéance (AAAA-MM-JJ) ; vide ou absente : aucune.
+    #[serde(default)]
+    pub due_date: Option<String>,
 }
 
 // ----------------------------------------------------------------------------
@@ -131,7 +137,7 @@ fn choice(value: Option<&str>, allowed: &[&str], key: &'static str) -> AppResult
 async fn blocks_where(conn: &mut SqliteConnection, scene_id: Option<&str>) -> AppResult<Vec<SceneBlock>> {
     let filter = if scene_id.is_some() { "WHERE scene_id = ?" } else { "" };
     let sql = format!(
-        "SELECT id, scene_id, position, kind, character_id, parenthetical, content FROM series_scene_blocks {filter} \
+        "SELECT id, scene_id, position, kind, character_id, parenthetical, content, updated_at FROM series_scene_blocks {filter} \
          ORDER BY scene_id, position, created_at"
     );
     let mut query = sqlx::query_as::<_, SceneBlock>(&sql);
@@ -201,15 +207,21 @@ pub async fn save_scene_script(pool: &SqlitePool, scene_id: &str, input: &SceneS
         match id.filter(|id| existing.contains(id) && !kept.contains(id)) {
             Some(id) => {
                 sqlx::query(
-                    "UPDATE series_scene_blocks SET position = ?, kind = ?, character_id = ?, parenthetical = ?, content = ?, updated_at = ? \
-                     WHERE id = ?",
+                    "UPDATE series_scene_blocks SET \
+                     updated_at = CASE WHEN kind IS ? AND character_id IS ? AND parenthetical IS ? AND content IS ? THEN updated_at ELSE ? END, \
+                     position = ?, kind = ?, character_id = ?, parenthetical = ?, content = ? WHERE id = ?",
                 )
-                .bind(position as i64)
+                // Un élément seulement déplacé garde sa date (révisions).
                 .bind(&kind)
                 .bind(&character)
                 .bind(&parenthetical)
                 .bind(&content)
                 .bind(&now)
+                .bind(position as i64)
+                .bind(&kind)
+                .bind(&character)
+                .bind(&parenthetical)
+                .bind(&content)
                 .bind(&id)
                 .execute(&mut *tx)
                 .await
@@ -332,11 +344,17 @@ pub async fn set_episode_fields(pool: &SqlitePool, id: &str, fields: &EpisodeFie
     let status = choice(fields.episode_status.as_deref(), &EPISODE_STATUSES, "series.invalidStatus")?.filter(|s| s != "idea");
     let logline = text(&fields.logline, MAX_FIELD_CHARS)?;
     let writer = text(fields.writer.trim(), MAX_SHORT_CHARS)?;
-    let result = sqlx::query("UPDATE structure_nodes SET logline = ?, runtime_goal = ?, episode_status = ?, writer = ?, updated_at = ? WHERE id = ?")
+    let due = match fields.due_date.as_deref().map(str::trim) {
+        None | Some("") => None,
+        Some(d) if chrono::NaiveDate::parse_from_str(d, "%Y-%m-%d").is_ok() => Some(d.to_owned()),
+        Some(_) => return Err(invalid("series.invalidDueDate")),
+    };
+    let result = sqlx::query("UPDATE structure_nodes SET logline = ?, runtime_goal = ?, episode_status = ?, writer = ?, due_date = ?, updated_at = ? WHERE id = ?")
         .bind(&logline)
         .bind(goal)
         .bind(&status)
         .bind(&writer)
+        .bind(&due)
         .bind(now_utc())
         .bind(id)
         .execute(pool)
@@ -345,6 +363,208 @@ pub async fn set_episode_fields(pool: &SqlitePool, id: &str, fields: &EpisodeFie
         return Err(node_not_found());
     }
     find_node(pool, id).await?.ok_or_else(node_not_found)
+}
+
+// ----------------------------------------------------------------------------
+// Film (migration `044_film.sql`)
+// ----------------------------------------------------------------------------
+
+/// Moments clés de la structure d'un film (repères placés sur une scène).
+pub const BEATS: [&str; 5] = ["inciting", "plot1", "midpoint", "plot2", "climax"];
+/// Couleurs des révisions de tournage, dans l'ordre d'usage.
+pub const REVISION_COLORS: [&str; 8] = ["white", "blue", "pink", "yellow", "green", "goldenrod", "buff", "salmon"];
+
+/// Révision de tournage en cours : sa couleur et sa date de début.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct FilmRevision {
+    pub color: String,
+    pub since: String,
+}
+
+/// Fiche du film entier : logline, durée visée (minutes), scénariste ;
+/// dossier (pitch, note d'intention — le synopsis est celui du projet) ;
+/// repères de structure ; révision en cours et numéros de scène verrouillés.
+///
+/// Les colonnes `summary_short` et `summary_long` de `045_film_tools.sql`
+/// ne servent plus : le dossier reprend le synopsis du projet.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct FilmDetails {
+    #[serde(default)]
+    pub logline: String,
+    #[serde(default)]
+    pub runtime_goal: Option<i64>,
+    #[serde(default)]
+    pub writer: String,
+    #[serde(default)]
+    pub intention: String,
+    #[serde(default)]
+    pub pitch: String,
+    /// Moment clé (`BEATS`) → scène.
+    #[serde(default)]
+    pub beats: BTreeMap<String, String>,
+    #[serde(default)]
+    pub revision: Option<FilmRevision>,
+    /// Scène → numéro verrouillé (« 12 », « 12A »).
+    #[serde(default)]
+    pub locked_numbers: BTreeMap<String, String>,
+}
+
+const MAX_DOSSIER_CHARS: usize = 50_000;
+const MAX_NUMBER_CHARS: usize = 12;
+
+fn json_map(text: &str) -> BTreeMap<String, String> {
+    serde_json::from_str(text).unwrap_or_default()
+}
+
+/// Fiche du film ; vide si elle n'a jamais été remplie.
+pub async fn film_details(pool: &SqlitePool) -> AppResult<FilmDetails> {
+    type Row = (String, Option<i64>, String, String, String, String, Option<String>, String);
+    let row: Option<Row> = sqlx::query_as(
+        "SELECT logline, runtime_goal, writer, intention, pitch, beats, revision, locked_numbers \
+         FROM film_details WHERE id = 'default'",
+    )
+    .fetch_optional(pool)
+    .await?;
+    Ok(match row {
+        None => FilmDetails::default(),
+        Some((logline, runtime_goal, writer, intention, pitch, beats, revision, locked)) => FilmDetails {
+            logline,
+            runtime_goal,
+            writer,
+            intention,
+            pitch,
+            beats: json_map(&beats),
+            revision: revision.and_then(|r| serde_json::from_str(&r).ok()),
+            locked_numbers: json_map(&locked),
+        },
+    })
+}
+
+/// Enregistre la fiche du film (une durée visée de 0 l'efface).
+pub async fn set_film_details(pool: &SqlitePool, input: &FilmDetails) -> AppResult<FilmDetails> {
+    let goal = match input.runtime_goal {
+        None | Some(0) => None,
+        Some(n) if (1..=MAX_RUNTIME_GOAL).contains(&n) => Some(n),
+        Some(_) => return Err(invalid("series.invalidRuntimeGoal").with_param("max", MAX_RUNTIME_GOAL)),
+    };
+    if input.beats.keys().any(|k| !BEATS.contains(&k.as_str())) {
+        return Err(invalid("series.invalidBeat"));
+    }
+    if let Some(r) = &input.revision {
+        if !REVISION_COLORS.contains(&r.color.as_str()) || r.since.trim().is_empty() {
+            return Err(invalid("series.invalidRevision"));
+        }
+    }
+    if input.locked_numbers.values().any(|n| n.trim().is_empty() || n.chars().count() > MAX_NUMBER_CHARS) {
+        return Err(invalid("series.invalidSceneNumber"));
+    }
+    let saved = FilmDetails {
+        logline: text(&input.logline, MAX_FIELD_CHARS)?,
+        runtime_goal: goal,
+        writer: text(input.writer.trim(), MAX_SHORT_CHARS)?,
+        intention: text(&input.intention, MAX_DOSSIER_CHARS)?,
+        pitch: text(&input.pitch, MAX_FIELD_CHARS)?,
+        beats: input.beats.iter().filter(|(_, v)| !v.trim().is_empty()).map(|(k, v)| (k.clone(), v.clone())).collect(),
+        revision: input.revision.clone(),
+        locked_numbers: input.locked_numbers.iter().map(|(k, v)| (k.clone(), v.trim().to_owned())).collect(),
+    };
+    let revision = saved.revision.as_ref().map(serde_json::to_string).transpose().map_err(|e| AppError::internal(e.to_string()))?;
+    sqlx::query(
+        "INSERT INTO film_details (id, logline, runtime_goal, writer, intention, pitch, beats, revision, locked_numbers, updated_at) \
+         VALUES ('default', ?, ?, ?, ?, ?, ?, ?, ?, ?) \
+         ON CONFLICT(id) DO UPDATE SET logline = excluded.logline, runtime_goal = excluded.runtime_goal, writer = excluded.writer, \
+         intention = excluded.intention, pitch = excluded.pitch, \
+         beats = excluded.beats, revision = excluded.revision, locked_numbers = excluded.locked_numbers, updated_at = excluded.updated_at",
+    )
+    .bind(&saved.logline)
+    .bind(saved.runtime_goal)
+    .bind(&saved.writer)
+    .bind(&saved.intention)
+    .bind(&saved.pitch)
+    .bind(serde_json::to_string(&saved.beats).unwrap_or_else(|_| "{}".into()))
+    .bind(revision)
+    .bind(serde_json::to_string(&saved.locked_numbers).unwrap_or_else(|_| "{}".into()))
+    .bind(now_utc())
+    .execute(pool)
+    .await?;
+    Ok(saved)
+}
+
+// ----------------------------------------------------------------------------
+// Dépouillement (migration `045_film_tools.sql`)
+// ----------------------------------------------------------------------------
+
+/// Dépouillement d'une scène : ce que la régie doit prévoir. Les
+/// personnages, le lieu, le moment et les objets liés viennent du reste
+/// de la fiche ; ici, ce qui n'a pas de fiche.
+#[derive(Debug, Clone, Default, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct SceneBreakdown {
+    #[serde(default)]
+    pub extras: String,
+    #[serde(default)]
+    pub props: String,
+    #[serde(default)]
+    pub costumes: String,
+    #[serde(default)]
+    pub makeup: String,
+    #[serde(default)]
+    pub vehicles: String,
+    #[serde(default)]
+    pub effects: String,
+    #[serde(default)]
+    pub sound: String,
+    #[serde(default)]
+    pub notes: String,
+}
+
+/// Dépouillement d'une scène, avec son identifiant.
+#[derive(Debug, Clone, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct SceneBreakdownRow {
+    pub scene_id: String,
+    pub breakdown: SceneBreakdown,
+}
+
+/// Dépouillement de toutes les scènes qui en ont un.
+pub async fn breakdowns(pool: &SqlitePool) -> AppResult<Vec<SceneBreakdownRow>> {
+    let rows: Vec<(String, String)> = sqlx::query_as("SELECT scene_id, data FROM scene_breakdowns ORDER BY scene_id").fetch_all(pool).await?;
+    Ok(rows
+        .into_iter()
+        .map(|(scene_id, data)| SceneBreakdownRow { scene_id, breakdown: serde_json::from_str(&data).unwrap_or_default() })
+        .collect())
+}
+
+/// Enregistre le dépouillement d'une scène (tout vide : il est retiré).
+pub async fn set_breakdown(pool: &SqlitePool, scene_id: &str, input: &SceneBreakdown) -> AppResult<SceneBreakdown> {
+    find_node(pool, scene_id).await?.ok_or_else(node_not_found)?;
+    let clean = SceneBreakdown {
+        extras: text(&input.extras, MAX_FIELD_CHARS)?,
+        props: text(&input.props, MAX_FIELD_CHARS)?,
+        costumes: text(&input.costumes, MAX_FIELD_CHARS)?,
+        makeup: text(&input.makeup, MAX_FIELD_CHARS)?,
+        vehicles: text(&input.vehicles, MAX_FIELD_CHARS)?,
+        effects: text(&input.effects, MAX_FIELD_CHARS)?,
+        sound: text(&input.sound, MAX_FIELD_CHARS)?,
+        notes: text(&input.notes, MAX_FIELD_CHARS)?,
+    };
+    if clean == SceneBreakdown::default() {
+        sqlx::query("DELETE FROM scene_breakdowns WHERE scene_id = ?").bind(scene_id).execute(pool).await?;
+    } else {
+        let data = serde_json::to_string(&clean).map_err(|e| AppError::internal(e.to_string()))?;
+        sqlx::query(
+            "INSERT INTO scene_breakdowns (scene_id, data, updated_at) VALUES (?, ?, ?) \
+             ON CONFLICT(scene_id) DO UPDATE SET data = excluded.data, updated_at = excluded.updated_at",
+        )
+        .bind(scene_id)
+        .bind(data)
+        .bind(now_utc())
+        .execute(pool)
+        .await?;
+    }
+    Ok(clean)
 }
 
 #[cfg(test)]
@@ -490,18 +710,95 @@ mod tests {
         assert!(scene_script(&pool, &scene.id).await.unwrap().blocks.is_empty(), "rien n'est gardé d'un enregistrement refusé");
 
         let episode = scene.parent_id.clone().unwrap();
-        let fields = EpisodeFields { logline: "Léa revient.".into(), runtime_goal: Some(52), episode_status: Some("draft".into()), writer: " Sam ".into() };
+        let fields = EpisodeFields {
+            logline: "Léa revient.".into(),
+            runtime_goal: Some(52),
+            episode_status: Some("draft".into()),
+            writer: " Sam ".into(),
+            due_date: Some("2026-12-15".into()),
+        };
         let saved = set_episode_fields(&pool, &episode, &fields).await.unwrap();
         assert_eq!(
-            (saved.logline.as_str(), saved.runtime_goal, saved.episode_status.as_deref(), saved.writer.as_str()),
-            ("Léa revient.", Some(52), Some("draft"), "Sam")
+            (saved.logline.as_str(), saved.runtime_goal, saved.episode_status.as_deref(), saved.writer.as_str(), saved.due_date.as_deref()),
+            ("Léa revient.", Some(52), Some("draft"), "Sam", Some("2026-12-15"))
         );
-        let reset = EpisodeFields { logline: String::new(), runtime_goal: Some(0), episode_status: Some("idea".into()), writer: String::new() };
+        let bad = EpisodeFields { due_date: Some("15/12/2026".into()), ..fields.clone() };
+        assert!(set_episode_fields(&pool, &episode, &bad).await.is_err());
+        let reset = EpisodeFields { logline: String::new(), runtime_goal: Some(0), episode_status: Some("idea".into()), writer: String::new(), due_date: Some(String::new()) };
         let saved = set_episode_fields(&pool, &episode, &reset).await.unwrap();
-        assert_eq!((saved.runtime_goal, saved.episode_status), (None, None));
+        assert_eq!((saved.runtime_goal, saved.episode_status, saved.due_date), (None, None, None));
         let bad = EpisodeFields { episode_status: Some("done".into()), ..reset.clone() };
         assert!(set_episode_fields(&pool, &episode, &bad).await.is_err());
         let bad = EpisodeFields { runtime_goal: Some(MAX_RUNTIME_GOAL + 1), ..reset };
         assert!(set_episode_fields(&pool, &episode, &bad).await.is_err());
+    }
+
+    #[tokio::test]
+    async fn keeps_the_details_of_the_film() {
+        let pool = pool().await;
+        assert_eq!(film_details(&pool).await.unwrap(), FilmDetails::default());
+
+        let input = FilmDetails { logline: "Une cheffe doit sauver son restaurant.".into(), runtime_goal: Some(105), writer: " Sam ".into(), ..FilmDetails::default() };
+        let saved = set_film_details(&pool, &input).await.unwrap();
+        assert_eq!(saved.writer, "Sam");
+        assert_eq!(film_details(&pool).await.unwrap(), saved);
+
+        let cleared = set_film_details(&pool, &FilmDetails { runtime_goal: Some(0), ..FilmDetails::default() }).await.unwrap();
+        assert_eq!(cleared, FilmDetails::default());
+        let bad = FilmDetails { runtime_goal: Some(MAX_RUNTIME_GOAL + 1), ..FilmDetails::default() };
+        assert!(set_film_details(&pool, &bad).await.is_err());
+        let long = FilmDetails { writer: "x".repeat(MAX_SHORT_CHARS + 1), ..FilmDetails::default() };
+        assert!(set_film_details(&pool, &long).await.is_err());
+
+        // Dossier, repères, révision et numéros verrouillés.
+        let full = FilmDetails {
+            pitch: "Le pitch.".into(),
+            intention: "Pourquoi ce film.".into(),
+            beats: BTreeMap::from([("plot1".into(), "s4".into()), ("climax".into(), String::new())]),
+            revision: Some(FilmRevision { color: "blue".into(), since: "2026-11-01T00:00:00Z".into() }),
+            locked_numbers: BTreeMap::from([("s1".into(), "1".into()), ("s2".into(), " 1A ".into())]),
+            ..FilmDetails::default()
+        };
+        let saved = set_film_details(&pool, &full).await.unwrap();
+        assert_eq!(saved.beats, BTreeMap::from([("plot1".into(), "s4".into())]), "un repère vide est retiré");
+        assert_eq!(saved.locked_numbers.get("s2").map(String::as_str), Some("1A"));
+        assert_eq!(film_details(&pool).await.unwrap(), saved);
+        for bad in [
+            FilmDetails { beats: BTreeMap::from([("fin".into(), "s1".into())]), ..FilmDetails::default() },
+            FilmDetails { revision: Some(FilmRevision { color: "violet".into(), since: "x".into() }), ..FilmDetails::default() },
+            FilmDetails { locked_numbers: BTreeMap::from([("s1".into(), " ".into())]), ..FilmDetails::default() },
+        ] {
+            assert!(set_film_details(&pool, &bad).await.is_err());
+        }
+    }
+
+    #[tokio::test]
+    async fn keeps_the_breakdown_of_a_scene_and_the_date_of_unchanged_blocks() {
+        let pool = pool().await;
+        let scene = scene(&pool).await;
+        assert!(breakdowns(&pool).await.unwrap().is_empty());
+        let input = SceneBreakdown { extras: "Vingt pêcheurs".into(), effects: "Brume".into(), ..SceneBreakdown::default() };
+        set_breakdown(&pool, &scene.id, &input).await.unwrap();
+        assert_eq!(breakdowns(&pool).await.unwrap(), vec![SceneBreakdownRow { scene_id: scene.id.clone(), breakdown: input }]);
+        set_breakdown(&pool, &scene.id, &SceneBreakdown::default()).await.unwrap();
+        assert!(breakdowns(&pool).await.unwrap().is_empty(), "un dépouillement vide est retiré");
+        assert!(set_breakdown(&pool, "inconnue", &SceneBreakdown::default()).await.is_err());
+
+        // Un élément seulement déplacé garde sa date ; un élément modifié en change.
+        let first = SceneScriptInput { place: None, location_id: None, time: None, blocks: vec![b("action", None, "", "Un."), b("action", None, "", "Deux.")] };
+        let saved = save_scene_script(&pool, &scene.id, &first).await.unwrap();
+        sqlx::query("UPDATE series_scene_blocks SET updated_at = '2000-01-01T00:00:00Z'").execute(&pool).await.unwrap();
+        let swapped = SceneScriptInput {
+            place: None,
+            location_id: None,
+            time: None,
+            blocks: vec![
+                BlockInput { id: Some(saved.blocks[1].id.clone()), ..b("action", None, "", "Deux.") },
+                BlockInput { id: Some(saved.blocks[0].id.clone()), ..b("action", None, "", "Un, modifié.") },
+            ],
+        };
+        let after = save_scene_script(&pool, &scene.id, &swapped).await.unwrap();
+        assert_eq!(after.blocks[0].updated_at, "2000-01-01T00:00:00Z");
+        assert_ne!(after.blocks[1].updated_at, "2000-01-01T00:00:00Z");
     }
 }

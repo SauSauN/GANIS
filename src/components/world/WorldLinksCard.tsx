@@ -1,7 +1,8 @@
 import { useEffect, useId, useMemo, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { Loader2, Trash2 } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { LinkRow } from "@/components/links/LinkRow";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -448,7 +449,7 @@ export function WorldLinkDialog({
             {t("links.dialog.cancel")}
           </Button>
           <Button type="submit" disabled={busy || !ready}>
-            {busy && <Loader2 className="animate-spin" />}
+            {busy && <LoadingDots />}
             {link ? t("links.dialog.save") : t("links.dialog.create")}
           </Button>
         </DialogFooter>

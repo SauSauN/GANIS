@@ -3,9 +3,12 @@ import {
   blockLines,
   buildFountain,
   buildSeriesExport,
+  EMPTY_FILM,
   episodeProgress,
   formatMinutes,
   inputFromSceneDraft,
+  isFilmProject,
+  isScreenplayProject,
   isSeriesProject,
   linesToMinutes,
   newBlock,
@@ -14,6 +17,7 @@ import {
   sceneDraftSignature,
   sceneHeadingText,
   sceneLines,
+  sceneNumbers,
   scenesInOrder,
   withKind,
   type SeriesExportInput,
@@ -54,6 +58,14 @@ describe("projet de série", () => {
     expect(isSeriesProject({ type: "series" })).toBe(true);
     expect(isSeriesProject({ type: "manga" })).toBe(false);
     expect(isSeriesProject(null)).toBe(false);
+  });
+
+  it("écrit un film comme une série, scène par scène", () => {
+    expect(isFilmProject({ type: "film" })).toBe(true);
+    expect(isFilmProject({ type: "series" })).toBe(false);
+    expect(isScreenplayProject({ type: "film" })).toBe(true);
+    expect(isScreenplayProject({ type: "series" })).toBe(true);
+    expect(isScreenplayProject({ type: "novel" })).toBe(false);
   });
 });
 
@@ -173,5 +185,36 @@ describe("export", () => {
     expect(fountain).toContain("[[secret]]");
     expect(fountain).toContain("## Épisode 2");
     expect(fountain).toContain("= Léa revient.");
+  });
+
+  // Film : Acte › Séquence › Scène (mêmes niveaux que Saison › Épisode › Scène).
+  const film = () => ({ ...input(), film: { ...EMPTY_FILM, logline: "Une cheffe   sauve son restaurant.", runtimeGoal: 100, writer: "Sam" } });
+
+  it("numérote les scènes dans tout le film, même filtré", () => {
+    const entries = scenesInOrder(nodes, 3);
+    const numbers = sceneNumbers(entries);
+    expect([numbers.get("c1"), numbers.get("c2"), numbers.get("c3")]).toEqual([1, 2, 3]);
+    const text = documentToText(buildSeriesExport({ ...film(), entries: entries.filter((e) => e.episode?.id === "e2"), numbers }));
+    expect(text).toContain("3. EXT. — JOUR");
+    expect(text).not.toContain("1. ");
+  });
+
+  it("exporte un film comme un long métrage : page de titre, sans actes ni séquences", () => {
+    const doc = buildSeriesExport(film());
+    expect(doc.titlePage).toBe(true);
+    expect(doc.subtitle).toEqual(["Scénario", "Écrit par : Sam", "Une cheffe sauve son restaurant."]);
+    const text = documentToText(doc);
+    for (const part of ["1. INT. CUISINE — NUIT", "2. SCÈNE 2", "LÉA", "CUT TO:"]) expect(text).toContain(part);
+    // Les actes et les séquences ne s'impriment pas, ni la logline d'une séquence.
+    for (const part of ["SAISON 1", "Épisode 1", "Léa revient."]) expect(text).not.toContain(part);
+  });
+
+  it("écrit le Fountain d'un film avec ses numéros de scène", () => {
+    const fountain = buildFountain(film());
+    expect(fountain).toContain("Title: Le Phare\nCredit: Scénario\nAuthor: Sam\nNotes: Une cheffe sauve son restaurant.\n");
+    expect(fountain).toContain(".INT. CUISINE — NUIT #1#");
+    expect(fountain).toContain(".EXT. — JOUR #3#");
+    expect(fountain).not.toContain("## ");
+    expect(fountain).not.toContain("===");
   });
 });

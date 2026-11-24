@@ -15,11 +15,12 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import { launchGanis, type GanisApp } from "./ganis-app";
 
-const FIRST = { username: "auteur_e2e", password: "motdepasse1" };
-const AUTRE = { username: "autre_e2e", password: "autrepasse2" };
+const FIRST = { username: "auteur_e2e", password: "plume-violette-1" };
+const AUTRE = { username: "autre_e2e", password: "autre-plume-22" };
 const ROMAN = "Roman E2E";
 const MANGA = "Manga E2E";
 const SERIE = "Série E2E";
+const FILM = "Film E2E";
 const PUBLIC = "Projet public E2E";
 
 /** Hauteur d'un choix des sélecteurs (Graphe / Matrice / Liste, Par plan / Par trame…) : la même partout. */
@@ -128,6 +129,8 @@ const card = (name: string) =>
 async function openProject(name: string) {
   await go("/dashboard");
   await closeHelp();
+  // Recherche d'abord : le tableau de bord ne montre que les derniers projets ouverts.
+  await page.getByRole("textbox", { name: "Rechercher un projet" }).fill(name);
   await page.getByRole("button", { name, exact: true }).first().click();
   await page.waitForURL(/#\/workspace\//);
   await page.waitForTimeout(500);
@@ -1161,6 +1164,171 @@ test.describe("Série", () => {
     await recherche.fill("qui va la");
     await expect(features()).toContainText("Scène 1");
   });
+
+  test("outils de la série : échéance, temps de parole, bible, tableau, dépouillement, import", async () => {
+    await openFeature("Découpage", "Plan du récit");
+    await features().getByRole("button", { name: "Épisode 1" }).click();
+    await view().getByLabel("Échéance").fill("2020-01-15");
+    await expect(view()).toContainText("Échéance dépassée");
+
+    await openFeature("Scénario", "Suivi des épisodes");
+    await expect(view()).toContainText("15/01/2020");
+    await expect(view().getByTestId("speaking-stats")).toBeVisible();
+    await expect(view().getByTestId("film-beats")).toHaveCount(0);
+    await expect(view().getByRole("button", { name: "Exporter la bible" })).toBeVisible();
+
+    await openFeature("Scénario", "Tableau de liège");
+    await expect(view().getByTestId("scene-board")).toContainText("EXT. — NUIT");
+    await openFeature("Scénario", "Dépouillement");
+    await expect(view().getByTestId("breakdown-scenes")).toContainText("1.1");
+    await openFeature("Scénario", "Importer un scénario");
+    await expect(view().getByRole("button", { name: /Choisir un scénario/ })).toBeVisible();
+
+    // Lecture : numéros épisode.scène, révisions comme pour un film.
+    await openFeature("Scénario", "Lecture du scénario");
+    await expect(view().getByTestId("series-script")).toContainText(/1\.1\s*EXT\. — NUIT/);
+    await expect(view().getByRole("button", { name: "Révisions" })).toBeVisible();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Film : scénario des scènes, fiche du film, lecture et suivi du film
+// ---------------------------------------------------------------------------
+
+test.describe("Film", () => {
+  test("créer un projet film : son module Scénario remplace la lecture générique", async () => {
+    await go("/dashboard");
+    await createProject(FILM, "Film");
+    await expect(modules().getByRole("button", { name: "Scénario" })).toBeVisible();
+    await openFeature("Découpage", "Plan du récit");
+    await expect(features().getByRole("button", { name: /^Lecture complète/ })).toHaveCount(0);
+  });
+
+  test("découpage : un acte, une séquence et une scène", async () => {
+    await view().getByRole("button", { name: "Ajouter : Acte" }).first().click();
+    await expect(features().getByRole("treeitem", { name: "Acte 1" })).toBeVisible();
+    for (const [parent, enfant] of [["Acte 1", "Séquence"], ["Séquence 1", "Scène"]]) {
+      await features().getByRole("button", { name: parent }).click();
+      await expect(activeTab()).toContainText(parent);
+      await view().getByRole("button", { name: `Ajouter : ${enfant}` }).last().click();
+      await expect(features().getByRole("treeitem", { name: `${enfant} 1` })).toBeVisible();
+    }
+  });
+
+  test("scénario d'une scène et avancement de la séquence", async () => {
+    await features().getByRole("button", { name: "Scène 1" }).click();
+    await expect(activeTab()).toContainText("Scène 1");
+    await view().getByLabel("Int. / Ext.").selectOption({ label: "Int." });
+    await view().getByLabel("Moment").selectOption({ label: "Jour" });
+    await expect(view().getByTestId("scene-heading")).toHaveText("INT. — JOUR");
+    await view().getByRole("button", { name: "Action", exact: true }).click();
+    await view().getByLabel("Action", { exact: true }).last().fill("La cuisine s'éveille avant l'aube.");
+    await save();
+
+    await features().getByRole("button", { name: "Séquence 1" }).click();
+    await expect(activeTab()).toContainText("Séquence 1");
+    await expect(view()).toContainText("Avancement de la séquence");
+    // Logline et scénariste sont ceux du film entier, pas de la séquence.
+    await expect(view().getByLabel("Logline")).toHaveCount(0);
+    await view().getByRole("radio", { name: "1re version" }).click();
+    await expect(view().getByRole("radio", { name: "1re version" })).toHaveAttribute("aria-checked", "true");
+    await expect(view()).toContainText("1 scène écrite sur 1.");
+  });
+
+  test("suivi du film : fiche du film et durée par acte", async () => {
+    await openFeature("Scénario", "Suivi du film");
+    await expect(view()).toContainText("Fiche du film");
+    await view().getByLabel("Logline").fill("Une cheffe doit sauver son restaurant en une nuit.");
+    await view().getByLabel("Scénariste").fill("Auteur E2E");
+    await view().getByLabel("Durée visée (minutes)").fill("100");
+    await view().getByLabel("Durée visée (minutes)").press("Enter");
+    await expect(view()).toContainText("Acte 1");
+    await expect(view()).toContainText("% du film");
+    await expect(view()).toContainText("1 séquence");
+    await expect(page.getByText(/Une erreur (est survenue|d'affichage)/)).toHaveCount(0);
+  });
+
+  test("lecture du scénario : page de titre et scènes numérotées", async () => {
+    await openFeature("Scénario", "Lecture du scénario");
+    const titre = view().getByTestId("film-title");
+    await expect(titre).toContainText(FILM);
+    await expect(titre).toContainText("Écrit par Auteur E2E");
+    await expect(titre).toContainText("Une cheffe doit sauver son restaurant en une nuit.");
+    const script = view().getByTestId("series-script");
+    // Numéro de scène des deux côtés de l'en-tête, comme sur la page imprimée.
+    await expect(script).toContainText(/1\s*INT\. — JOUR\s*1/);
+    await expect(script).toContainText("La cuisine s'éveille avant l'aube.");
+    await expect(view().getByRole("button", { name: "Exporter" })).toBeVisible();
+
+    await openFeature("Scénario", "Continuité");
+    await expect(view().getByRole("tab", { name: "Parcours d'un personnage" })).toBeVisible();
+    await expect(page.getByText(/Une erreur (est survenue|d'affichage)/)).toHaveCount(0);
+  });
+
+  test("la fiche du film est conservée", async () => {
+    await openFeature("Détails", "Accueil du projet");
+    await openFeature("Scénario", "Suivi du film");
+    await expect(view().getByLabel("Logline")).toHaveValue("Une cheffe doit sauver son restaurant en une nuit.");
+    await expect(view().getByLabel("Durée visée (minutes)")).toHaveValue("100");
+    // Repères de structure et temps de parole.
+    await expect(view().getByTestId("film-beats")).toBeVisible();
+    await view().getByLabel("Premier pivot").selectOption({ index: 1 });
+    await expect(view().getByTestId("film-beats")).toContainText(/Trop tôt|Bien placé|Trop tard/);
+    await expect(view().getByTestId("speaking-stats")).toBeVisible();
+  });
+
+  test("dossier du film : pitch et note d'intention dans la fiche du film, export du dossier", async () => {
+    await openFeature("Scénario", "Suivi du film");
+    await view().getByLabel("Pitch").fill("Une nuit pour sauver un restaurant.");
+    await view().getByLabel("Note d'intention").fill("Filmer une cuisine comme un champ de bataille.");
+    await view().getByLabel("Note d'intention").blur();
+    await expect(view().getByRole("button", { name: "Exporter le dossier" })).toBeVisible();
+    await openFeature("Détails", "Accueil du projet");
+    await openFeature("Scénario", "Suivi du film");
+    await expect(view().getByLabel("Pitch")).toHaveValue("Une nuit pour sauver un restaurant.");
+    // Plus d'onglet « Dossier du film » : il ferait doublon avec la fiche du film.
+    await expect(features().getByRole("button", { name: /^Dossier du film/ })).toHaveCount(0);
+  });
+
+  test("dépouillement et plan de travail", async () => {
+    await openFeature("Scénario", "Dépouillement");
+    const scenes = view().getByTestId("breakdown-scenes");
+    await scenes.getByRole("button", { name: /INT\. — JOUR/ }).click();
+    await scenes.getByLabel("Figurants").fill("Vingt commis");
+    await scenes.getByLabel("Figurants").blur();
+    await expect(scenes).toContainText("1 champ");
+    await view().getByRole("tab", { name: "Plan de travail" }).click();
+    await expect(view().getByTestId("shooting-schedule")).toContainText("JOUR");
+  });
+
+  test("tableau de liège et révisions de tournage", async () => {
+    await openFeature("Scénario", "Tableau de liège");
+    await expect(view().getByTestId("scene-board")).toContainText("INT. — JOUR");
+
+    await openFeature("Scénario", "Lecture du scénario");
+    await expect(view().getByTestId("runtime-estimate")).toContainText("Durée estimée");
+    await view().getByRole("button", { name: "Révisions" }).click();
+    await page.getByRole("menuitem", { name: "Verrouiller les numéros de scène" }).click();
+    await view().getByRole("button", { name: "Révisions" }).click();
+    await page.getByRole("menuitem", { name: /Nouvelle révision/ }).click();
+    await expect(view().getByTestId("revision-bar")).toContainText("Révision bleue");
+    await expect(view().getByTestId("revision-bar")).toContainText("Numéros verrouillés");
+  });
+
+  test("importer un scénario Fountain", async () => {
+    await openFeature("Scénario", "Importer un scénario");
+    const fountain = "Title: Import E2E\n\nEXT. TERRASSE - NUIT\n\nLe service est fini.\n\nNINO\nOn ferme ?\n";
+    await view().locator('input[type="file"]').setInputFiles({ name: "import.fountain", mimeType: "text/plain", buffer: Buffer.from(fountain) });
+    await expect(view().getByTestId("import-preview")).toContainText("1 scène trouvée.");
+    await expect(view().getByTestId("import-preview")).toContainText("Nino (nouveau)");
+    await view().getByRole("button", { name: "Importer", exact: true }).click();
+    await expect(view().getByRole("status")).toContainText("Import terminé");
+    await view().getByRole("button", { name: "Lire le scénario" }).click();
+    await expect(view().getByTestId("series-script")).toContainText("EXT. TERRASSE — NUIT");
+    await expect(view().getByTestId("series-script")).toContainText("On ferme ?");
+    // Ajoutée après le verrouillage : elle prend une lettre.
+    await expect(view().getByTestId("series-script")).toContainText("1A");
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -1256,8 +1424,14 @@ test.describe("Comptes et espaces", () => {
 
   test("connexion du premier compte : ses projets privés sont là", async () => {
     await login();
-    await expect(page.getByRole("main")).toContainText(ROMAN);
-    await expect(page.getByRole("main")).toContainText(MANGA);
+    // Recherche : le tableau de bord n'affiche que les derniers projets ouverts
+    // (le roman n'en fait plus partie depuis la série et le film).
+    const recherche = page.getByRole("textbox", { name: "Rechercher un projet" });
+    for (const nom of [ROMAN, MANGA]) {
+      await recherche.fill(nom);
+      await expect(page.getByRole("main").getByText(nom, { exact: true }).first()).toBeVisible();
+    }
+    await recherche.fill("");
   });
 
   test("espace public : « Commencer » sans compte ne montre pas les projets privés", async () => {

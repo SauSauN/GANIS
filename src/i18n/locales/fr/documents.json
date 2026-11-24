@@ -139,5 +139,10 @@
     "moving_other": "Déplacement de {{count}} documents…",
     "moved_one": "{{count}} document déplacé vers « {{target}} ».",
     "moved_other": "{{count}} documents déplacés vers « {{target}} »."
+  },
+  "received": {
+    "title": "Document reçu d'un projet importé",
+    "description": "« {{name}} » est arrivé avec un projet importé (.ganix). Un document venu d'ailleurs peut être piégé : ouvrez-le seulement si vous faites confiance à la personne qui vous l'a envoyé.\n\nWindows l'ouvrira comme un fichier téléchargé (Mode protégé d'Office, macros bloquées).",
+    "confirm": "Ouvrir quand même"
   }
 }

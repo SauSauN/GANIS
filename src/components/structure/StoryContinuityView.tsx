@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { History, Loader2 } from "lucide-react";
+import { History } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { ContinuityLevelSelect, ContinuityModeSwitch, type ContinuityMode } from "@/components/structure/ContinuityControls";
 import { PresenceTable } from "@/components/structure/PresenceTable";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
@@ -8,7 +9,7 @@ import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { PageShell } from "@/components/workspace/views/PageShell";
 import { fullName } from "@/lib/characters";
 import { appearanceCounts, characterAppearances, presenceTable, type ContinuityExtra } from "@/lib/continuity";
-import { isSeriesProject } from "@/lib/series";
+import { isScreenplayProject } from "@/lib/series";
 import { chapterLevel } from "@/lib/novel";
 import { structureNodeTabId } from "@/lib/structure";
 import { cn } from "@/lib/utils";
@@ -35,7 +36,8 @@ const select = "h-8 rounded-md border border-input bg-background px-2 text-sm ou
  * - tableau des présences : qui apparaît dans quel chapitre, épisode…
  *
  * Les présences viennent des personnages liés aux éléments (fiche d'un
- * élément) ; pour une série, aussi des répliques et du lieu de l'en-tête.
+ * élément) ; pour une série ou un film, aussi des répliques et du lieu de
+ * l'en-tête.
  */
 export function StoryContinuityView({ project, feature, onOpenFeature }: StoryContinuityViewProps) {
   const { t } = useTranslation("structure");
@@ -43,7 +45,7 @@ export function StoryContinuityView({ project, feature, onOpenFeature }: StoryCo
   const links = useProjectStructureLinks(project.id);
   const { characters } = useProjectCharacters(project.id);
   const { locations } = useProjectLocations(project.id);
-  const series = isSeriesProject(project);
+  const series = isScreenplayProject(project);
   const { blocks } = useSeriesBlocks(project.id, series);
   const [tab, setTab] = useState<ContinuityMode>("path");
   const [characterId, setCharacterId] = useState("");
@@ -53,7 +55,7 @@ export function StoryContinuityView({ project, feature, onOpenFeature }: StoryCo
   const [level, setLevel] = useState<number | null>(null);
   const columnLevel = level ?? chapterLevel(levelCount);
 
-  // Série : répliques par scène et lieu de l'en-tête.
+  // Série ou film : répliques par scène et lieu de l'en-tête.
   const extra = useMemo<ContinuityExtra>(() => {
     if (!series) return {};
     const lines = new Map<string, Map<string, number>>();
@@ -138,7 +140,7 @@ export function StoryContinuityView({ project, feature, onOpenFeature }: StoryCo
       <div className="space-y-5">
         {loading ? (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            <LoadingDots className="size-4" aria-hidden="true" />
           </p>
         ) : (
           <>

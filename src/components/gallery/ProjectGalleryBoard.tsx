@@ -7,14 +7,15 @@ import {
   BadgeCheck,
   Folder,
   FolderPlus,
+  Image as ImageIcon,
   ImagePlus,
   Images,
-  Loader2,
   MoreHorizontal,
   Pencil,
   Trash2,
   X,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { ImageDialog } from "@/components/common/ImageDialog";
 import { ImageDownloadButton } from "@/components/common/ImageDownloadButton";
 import { SEGMENTED_GROUP, SEGMENTED_ITEM, SEGMENTED_ON } from "@/components/common/segmented";
@@ -34,6 +35,7 @@ import { GALLERY_MAX_SIDE, PORTRAIT_ACCEPT, PortraitError, preparePortrait } fro
 import { cn } from "@/lib/utils";
 import { useProjectLogo, useProjectLogoStore } from "@/stores/projectLogoStore";
 import type { GalleryFolder, ProjectImage } from "@/types";
+import { sessionMap } from "@/lib/sessionCache";
 
 /** Nombre maximal d'images par dossier, « Sans dossier » compris (le même que côté Rust, `MAX_GALLERY_IMAGES`). */
 export const MAX_PER_FOLDER = 30;
@@ -66,7 +68,7 @@ const LOGO = "__logo__";
 type Dragged = { kind: "image"; id: string } | { kind: "folder"; id: string };
 
 /** Images déjà chargées (par identifiant), gardées le temps de la session. */
-const urlCache = new Map<string, string>();
+const urlCache = sessionMap<string, string>();
 const inflight = new Set<string>();
 
 /** Déplace `id` juste avant `beforeId` (ou à la fin si `beforeId` est nul). */
@@ -465,13 +467,13 @@ export function ProjectGalleryBoard({ projectId }: { projectId: string }) {
         {/* Dossier « Logo » : une seule image, qu'on ajoute ou qu'on remplace. */}
         {inLogo && (
           <Button onClick={() => logoInputRef.current?.click()} disabled={busy}>
-            {busy ? <Loader2 className="animate-spin" /> : <ImagePlus />}
+            {busy ? <LoadingDots /> : <ImagePlus />}
             {logo ? t("gallery.replaceLogo") : t("gallery.addLogo")}
           </Button>
         )}
         {(tab === "photos" || (insideFolder && !inLogo)) && (
           <Button onClick={() => inputRef.current?.click()} disabled={busy || full} title={full ? t("gallery.full", { max: MAX_PER_FOLDER }) : undefined}>
-            {busy ? <Loader2 className="animate-spin" /> : <ImagePlus />}
+            {busy ? <LoadingDots /> : <ImagePlus />}
             {t("gallery.add")}
           </Button>
         )}
@@ -479,7 +481,7 @@ export function ProjectGalleryBoard({ projectId }: { projectId: string }) {
 
       {!loaded ? (
         <p className="flex items-center gap-2 py-10 text-sm text-muted-foreground" role="status">
-          <Loader2 className="size-4 animate-spin" />
+          <LoadingDots className="size-4" />
           {t("gallery.loading")}
         </p>
       ) : images.length === 0 && folders.length === 0 && tab === "photos" ? (
@@ -833,7 +835,7 @@ function FolderCard({
   );
 }
 
-/** Une photo seule (carrée), son nom au survol. Un clic l'ouvre. */
+/** Une photo seule (carrée), avec une icône d'image et son nom en bas (coupé s'il est trop long). Un clic l'ouvre. */
 function PhotoTile({ image, url, position, onOpen }: { image: ProjectImage; url: string | null; position: number; onOpen: () => void }) {
   const { t } = useTranslation("workspaceHome");
   const name = image.caption || t("gallery.untitled");
@@ -847,10 +849,21 @@ function PhotoTile({ image, url, position, onOpen }: { image: ProjectImage; url:
       className="relative block aspect-square w-full overflow-hidden rounded-xl bg-muted/50 shadow-sm transition-shadow hover:shadow-md focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-none"
     >
       {url ? (
-        <img src={url} alt="" draggable={false} className="size-full object-cover transition-opacity group-hover:opacity-90" />
+        <>
+          <img src={url} alt="" draggable={false} className="size-full object-cover transition-opacity group-hover:opacity-90" />
+          {/* Icône et nom en bas, comme sur les cartes des dossiers. Le nom
+              tient sur une ligne, coupé par « … » : il ne sort jamais de l'image
+              (le nom complet est dans l'info-bulle). */}
+          <span className="pointer-events-none absolute inset-x-0 bottom-0 flex min-w-0 items-center gap-1.5 bg-gradient-to-t from-black/60 to-transparent px-3 pt-8 pb-2.5 text-white" aria-hidden="true">
+            <ImageIcon className="size-4 shrink-0 drop-shadow-sm" data-testid="gallery-photo-icon" />
+            <span className="min-w-0 flex-1 truncate text-left text-sm font-semibold drop-shadow-sm" data-testid="gallery-photo-name">
+              {name}
+            </span>
+          </span>
+        </>
       ) : (
         <span className="flex size-full items-center justify-center">
-          <Loader2 className="size-5 animate-spin text-muted-foreground" />
+          <LoadingDots className="size-5 text-muted-foreground" />
         </span>
       )}
     </button>
@@ -902,7 +915,7 @@ function FolderNameDialog({
             {tc("actions.cancel")}
           </Button>
           <Button type="submit" disabled={!name.trim() || saving}>
-            {saving && <Loader2 className="animate-spin" />}
+            {saving && <LoadingDots />}
             {submitLabel}
           </Button>
         </div>
@@ -1021,7 +1034,7 @@ function GalleryImageDialog({ image, url, folders, isFull, index, total, onClose
               {url ? (
                 <img src={url} alt={name} className="block size-full rounded-md object-contain" data-testid="gallery-dialog-image" />
               ) : (
-                <Loader2 className="size-6 animate-spin text-muted-foreground" />
+                <LoadingDots className="size-6 text-muted-foreground" />
               )}
               <button type="button" onClick={() => void go(-1)} disabled={index === 0 || saving} aria-label={t("gallery.previous")} title={`${t("gallery.previous")} (←)`} className="absolute top-1/2 left-2 flex size-9 -translate-y-1/2 items-center justify-center rounded-full bg-background/90 shadow-sm hover:bg-background disabled:hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none">
                 <ChevronLeft className="size-5" />
@@ -1090,7 +1103,7 @@ function GalleryImageDialog({ image, url, folders, isFull, index, total, onClose
                 {t("gallery.delete")}
               </Button>
               <Button type="submit" disabled={!dirty || saving}>
-                {saving && <Loader2 className="animate-spin" />}
+                {saving && <LoadingDots />}
                 {tc("actions.save")}
               </Button>
             </div>

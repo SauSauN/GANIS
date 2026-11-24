@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2, Search, X } from "lucide-react";
+import { Search, X } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { SearchResults } from "@/components/search/SearchResults";
 import { openSearchHit, useProjectSearch } from "@/lib/search";
 
@@ -56,7 +57,7 @@ export function SideBarSearch({ projectId, onOpenFeature }: SideBarSearchProps) 
           : loading
             ? (
                 <span className="inline-flex items-center gap-1">
-                  <Loader2 className="size-3 animate-spin" /> {t("searching")}
+                  <LoadingDots className="size-3" /> {t("searching")}
                 </span>
               )
             : error

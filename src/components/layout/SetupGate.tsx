@@ -1,9 +1,10 @@
 import { useEffect, type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Navigate, useLocation } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import { useSetupStore } from "@/stores/setupStore";
+import { DeviceLocked } from "@/components/auth/DeviceLocked";
 
 const SETUP_PATH = "/setup";
 
@@ -26,12 +27,18 @@ export function SetupGate({ children }: { children: ReactNode }) {
   const needsSetup = useSetupStore((state) => state.needsSetup);
   const error = useSetupStore((state) => state.error);
   const check = useSetupStore((state) => state.check);
+  const deviceLock = useSetupStore((state) => state.deviceLock);
 
   const location = useLocation();
 
   useEffect(() => {
     void check();
   }, [check]);
+
+  // Données chiffrées sans clé d'appareil : rien d'autre n'est possible.
+  if (deviceLock) {
+    return <DeviceLocked issue={deviceLock} />;
+  }
 
   if (error) {
     return (
@@ -51,7 +58,7 @@ export function SetupGate({ children }: { children: ReactNode }) {
     return (
       <main className="flex flex-1 items-center justify-center bg-background">
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <LoadingDots className="h-4 w-4" />
           {t("startup")}
         </p>
       </main>

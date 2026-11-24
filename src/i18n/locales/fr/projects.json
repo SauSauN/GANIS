@@ -57,7 +57,12 @@
       "exporting": "Export de « {{name}} »…",
       "done": "Projet exporté : {{file}}",
       "failed": "L'export du projet a échoué.",
-      "notEncrypted": "Le fichier .ganix n'est pas chiffré : il s'ouvre sur tout GANIS, depuis n'importe quel compte. Gardez-le en lieu sûr."
+      "notEncrypted": "Le fichier .ganix n'est pas chiffré : il s'ouvre sur tout GANIS, depuis n'importe quel compte. Gardez-le en lieu sûr.",
+      "warning": {
+        "title": "Exporter un projet privé ?",
+        "description": "Le fichier .ganix de « {{name}} » ne sera pas chiffré : toute personne qui l'obtient pourra lire le projet dans GANIS, sans votre mot de passe.\n\nRangez-le en lieu sûr (clé USB, dossier personnel) et ne l'envoyez qu'à des personnes de confiance.",
+        "confirm": "Exporter"
+      }
     },
     "import": {
       "button": "Importer un projet",
@@ -85,7 +90,7 @@
         },
         "replace": {
           "label": "Remplacer mon projet",
-          "description": "Le contenu de votre projet est remplacé par celui du fichier. Une sauvegarde .ganix de la version actuelle est faite avant."
+          "description": "Le contenu de votre projet est remplacé par celui du fichier. Une copie chiffrée de la version actuelle est d'abord placée dans la corbeille des projets (restaurable pendant 30 jours)."
         }
       },
       "replaceConfirm": "Je confirme le remplacement de mon projet actuel.",
@@ -94,7 +99,7 @@
       "confirmReplace": "Remplacer",
       "importing": "Import…",
       "done": "Projet « {{name}} » importé.",
-      "replaced": "Projet « {{name}} » remplacé. Sauvegarde de l'ancienne version : {{file}} (dossier « sauvegardes » de GANIS).",
+      "replaced": "Projet « {{name}} » remplacé. L'ancienne version est dans la corbeille des projets sous le nom « {{backup}} » : restaurable pendant 30 jours.",
       "encryptionNoteReplace": "Les données reçues seront chiffrées avec la clé de votre projet."
     },
     "progress": {

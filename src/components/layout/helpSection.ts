@@ -1,7 +1,7 @@
 import { findFeature, SETTINGS_PREFIX } from "@/components/workspace/modules";
 
 /** Rubriques de l'aide intégrée, dans l'ordre de la liste. Textes : `help.json` → `center.sections.<id>` (et `center.faq`). */
-export const CENTER_SECTIONS = ["workspace", "details", "characters", "locations", "items", "species", "factions", "peoples", "magic", "structure", "reading", "plot", "notes", "search", "history", "files", "settings", "about", "faq"] as const;
+export const CENTER_SECTIONS = ["start", "workspace", "details", "characters", "locations", "items", "species", "factions", "peoples", "magic", "structure", "manuscript", "script", "screen", "reading", "plot", "notes", "search", "history", "files", "settings", "about", "faq"] as const;
 export type CenterSection = (typeof CENTER_SECTIONS)[number];
 
 /** Onglets qui ont leur propre rubrique (sinon : celle de leur module). */
@@ -11,12 +11,11 @@ const TAB_SECTIONS: Record<string, CenterSection> = {
   trash: "history",
 };
 
-/** Modules sans rubrique à eux : celle qui en parle. */
+/** Modules dont la rubrique n'a pas leur nom. */
 const MODULE_SECTIONS: Record<string, CenterSection> = {
-  // Texte du roman, scénario du manga ou de la série : écrits dans le découpage.
-  manuscript: "structure",
-  script: "structure",
-  screenplay: "structure",
+  // Scénario d'une série ou d'un film : une rubrique commune.
+  screenplay: "screen",
+  film: "screen",
 };
 
 /**

@@ -36,6 +36,9 @@
     "screenplay": {
       "label": "Scénario"
     },
+    "film": {
+      "label": "Scénario"
+    },
     "items": {
       "label": "Objets",
       "empty": "Aucun objet pour l'instant."
@@ -90,6 +93,10 @@
       "relations": {
         "label": "Relations entre personnages",
         "description": "Liens familiaux, amicaux, rivalités et alliances."
+      },
+      "arcs": {
+        "label": "Arcs",
+        "description": "Ce que chaque personnage croit au départ, ce qu'il comprend à la fin, et son évolution chapitre par chapitre."
       }
     },
     "locations": {
@@ -146,6 +153,10 @@
       "reading": {
         "label": "Lecture de l'histoire",
         "description": "L'histoire dans l'ordre du lecteur, avec ses personnages, lieux, chapitres et notes."
+      },
+      "timeline": {
+        "label": "Frise chronologique",
+        "description": "Les événements de la trame placés par date, avec les époques de votre monde et l’âge des personnages."
       }
     },
     "manuscript": {
@@ -208,6 +219,44 @@
       "continuity": {
         "label": "Continuité",
         "description": "Où apparaît chaque personnage, dans quel état, avec ses répliques, scène par scène ; tableau des présences par épisode."
+      },
+      "board": {
+        "label": "Tableau de liège",
+        "description": "Une carte par scène, une colonne par épisode ; glissez-les pour réorganiser la saison."
+      },
+      "breakdown": {
+        "label": "Dépouillement",
+        "description": "Fiche de dépouillement de chaque scène et plan de travail par décor et par moment, sur tous les épisodes : on tourne par blocs."
+      },
+      "import": {
+        "label": "Importer un scénario",
+        "description": "Reprendre un épisode Fountain ou Final Draft (.fdx) : scènes, répliques, personnages et lieux."
+      }
+    },
+    "film": {
+      "read": {
+        "label": "Lecture du scénario",
+        "description": "Tout le film au format du scénario, scènes numérotées ; export Word, PDF, texte et Fountain avec page de titre."
+      },
+      "progress": {
+        "label": "Suivi du film",
+        "description": "Fiche du film, durée estimée par rapport à la durée visée, durée de chaque acte, statut des séquences, répliques par personnage."
+      },
+      "continuity": {
+        "label": "Continuité",
+        "description": "Où apparaît chaque personnage, dans quel état, avec ses répliques, scène par scène ; tableau des présences par séquence."
+      },
+      "breakdown": {
+        "label": "Dépouillement",
+        "description": "Fiche de dépouillement de chaque scène et plan de travail par décor et par moment ; exports pour la régie."
+      },
+      "board": {
+        "label": "Tableau de liège",
+        "description": "Une carte par scène, couleur par acte ; glissez-les pour réorganiser le film."
+      },
+      "import": {
+        "label": "Importer un scénario",
+        "description": "Reprendre un scénario Fountain ou Final Draft (.fdx) : scènes, répliques, personnages et lieux."
       }
     },
     "items": {
@@ -259,6 +308,10 @@
         "label": "Liste de la magie et des pouvoirs",
         "description": "Toutes les règles du pouvoir de votre univers, avec leurs écoles et techniques."
       }
+    },
+    "boards": {
+      "label": "Planches d'inspiration",
+      "description": "Images de la galerie, couleurs, citations et notes, disposées librement pour l'ambiance du récit."
     }
   }
 }

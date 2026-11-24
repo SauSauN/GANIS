@@ -54,3 +54,33 @@ Relevé fait par Jeanne Castaing le 4 février 2019.
 | 402 | 5281 – 5309 | avril 1914 | Présentes | Une pochette de trop : la 4417 |
 
 Ligne du registre : « Nos 4402 à 4438 — brisées par le gel dans la salle des mesures, nuit du 15 au 16 janvier 1913. Rayées de l'inventaire. A. Valadier. »
+
+=== doc:courrier-hauts-lieux ===
+# Hauts Lieux — courrier à Mme Marquès
+Madame,
+
+Nous vous confirmons que la reprise du site du pic de Sorgue interviendra le 1ᵉʳ avril 2019. Les collections scientifiques devront avoir quitté les lieux à cette date. Nous serions heureux d'exposer une sélection de plaques dans le hall du futur établissement.
+
+Damien Kerver, président
+
+=== doc:fiche-4417 ===
+Plaque n° 4417
+Champ : Cassiopée
+Date : 9 janvier 1913, 21 h 10
+Pose : 1 h 40
+Opérateur : É. Ferrand
+Mesure : M. L.
+Annotation : « elle a grossi »
+Boîte : 402 (au lieu de 368)
+
+=== doc:article-v1 ===
+Une découverte oubliée à l'observatoire du pic de Sorgue
+
+En 1913, une étoile variable a été découverte sur une plaque de l'observatoire.
+
+=== doc:article ===
+Marthe Lacoste, mesureuse d'étoiles
+
+Le 9 janvier 1913, sur la plaque 4417 de l'observatoire du pic de Sorgue, une mesureuse de vingt-deux ans, Marthe Lacoste, remarque qu'une étoile de Cassiopée a grossi. Elle mesure la même étoile sur trente-six autres plaques : sa lumière augmente, puis retombe. C'est une variable à sursauts, que l'on ne cataloguera qu'en 1934, sous un autre nom.
+
+Cet article rend à Marthe Lacoste la priorité de sa découverte.

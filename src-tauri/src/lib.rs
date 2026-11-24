@@ -45,6 +45,25 @@ fn app_info() -> AppResult<AppInfo> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // Une seule fenêtre GANIS : un `.ganix` ouvert depuis Windows alors
+        // que GANIS tourne déjà est confié à la fenêtre existante (doit
+        // être le premier plugin enregistré).
+        .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+            if let Some(path) = commands::ganix::ganix_in_args(argv, Some(std::path::Path::new(&cwd))) {
+                app.state::<commands::ganix::OpenedGanix>().set(path);
+                let _ = tauri::Emitter::emit(app, commands::ganix::OPENED_EVENT, ());
+            }
+            if let Some(window) = app.get_webview_window("main") {
+                let _ = window.unminimize();
+                let _ = window.show();
+                let _ = window.set_focus();
+            }
+        }))
+        // `.ganix` ouvert par double-clic au lancement de GANIS.
+        .manage(commands::ganix::OpenedGanix(std::sync::Mutex::new(commands::ganix::ganix_in_args(
+            std::env::args(),
+            None,
+        ))))
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
@@ -78,9 +97,21 @@ pub fn run() {
                 _ => app.path().app_data_dir()?,
             };
 
-            let app_db = tauri::async_runtime::block_on(async {
-                db::init_app_db(&data_dir).await
+            let opened = tauri::async_runtime::block_on(async {
+                db::app_db::open_app_db(&data_dir).await
             })?;
+
+            // Base chiffrée sans clé d'appareil utilisable (Windows
+            // réinstallé, dossier copié ailleurs) : l'interface ne propose
+            // que la restauration par clé de secours (`commands::device`).
+            let app_db = match opened {
+                db::app_db::AppDbOpen::Ready(pool) => pool,
+                db::app_db::AppDbOpen::Locked(issue) => {
+                    tracing::warn!(issue = issue.as_str(), "Données verrouillées : clé d'appareil indisponible");
+                    app.manage(commands::device::DeviceLock { data_dir, issue });
+                    return Ok(());
+                }
+            };
 
             // -----------------------------------------------------------------
             // 3. État partagé
@@ -105,7 +136,11 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             app_info,
+            commands::device::device_status,
+            commands::device::restore_device_key,
+            commands::device::save_device_key_backup,
             commands::window::show_snap_layouts,
+            commands::ganix::take_opened_ganix,
             commands::auth::setup_first_account,
             commands::auth::has_any_user,
             commands::auth::register,
@@ -174,6 +209,11 @@ pub fn run() {
             commands::series::save_scene_script,
             commands::series::get_series_blocks,
             commands::series::set_series_episode,
+            commands::series::get_film_details,
+            commands::series::set_film_details,
+            commands::series::get_scene_breakdowns,
+            commands::series::set_scene_breakdown,
+            commands::series::place_structure_node,
             commands::manga::get_page_script,
             commands::manga::save_page_script,
             commands::manga::get_script_panels,
@@ -308,6 +348,13 @@ pub fn run() {
             commands::structure::delete_structure_node,
             commands::plot::get_plot,
             commands::plot::update_plot,
+            commands::arcs_boards::list_character_arcs,
+            commands::arcs_boards::save_character_arc,
+            commands::arcs_boards::list_boards,
+            commands::arcs_boards::create_board,
+            commands::arcs_boards::rename_board,
+            commands::arcs_boards::save_board_items,
+            commands::arcs_boards::delete_board,
             commands::sheets::get_sheet_display,
             commands::sheets::set_sheet_display,
             commands::sheets::set_panel_tree,
@@ -343,6 +390,27 @@ pub fn run() {
             commands::packages::delete_package,
             //commands::diagnostics::get_diagnostics,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while running tauri application")
+        .run(|app, event| {
+            if let tauri::RunEvent::Exit = event {
+                close_open_documents_on_exit(app);
+            }
+        });
+}
+
+/// Fermeture de GANIS : les documents ouverts dans une autre application
+/// sont repris une dernière fois, puis leurs copies de travail (en clair)
+/// sont supprimées, au lieu d'attendre le prochain lancement.
+fn close_open_documents_on_exit(app: &tauri::AppHandle) {
+    let Some(state) = app.try_state::<AppState>() else {
+        return;
+    };
+
+    tauri::async_runtime::block_on(async {
+        if let Some(user) = state.current_user().await {
+            services::auth_service::reclaim_open_documents(&state, &user.id).await;
+        }
+    });
+    services::document_service::clean_open_copies(&state.data_dir);
 }

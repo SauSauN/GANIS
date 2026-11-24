@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Download, Loader2, RotateCcw, Trash2 } from "lucide-react";
+import { Download, RotateCcw, Trash2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
@@ -97,7 +98,7 @@ export function DocumentVersionsDialog({ projectId, document, onClose }: Documen
         </div>
         {versions === null && !error ? (
           <p className="flex items-center gap-2 py-4 text-sm text-muted-foreground" role="status">
-            <Loader2 className="size-4 animate-spin" />
+            <LoadingDots className="size-4" />
             {t("viewer.loading")}
           </p>
         ) : versions && versions.length === 0 ? (
@@ -113,7 +114,7 @@ export function DocumentVersionsDialog({ projectId, document, onClose }: Documen
                     {formatSize(version.size)}
                   </span>
                 </span>
-                {busy === version.id && <Loader2 className="size-4 animate-spin text-muted-foreground" />}
+                {busy === version.id && <LoadingDots className="size-4 text-muted-foreground" />}
                 <Button size="sm" variant="outline" disabled={busy !== null} onClick={() => void restore(version)}>
                   <RotateCcw />
                   {t("versions.restore")}

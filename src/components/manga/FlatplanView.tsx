@@ -1,3 +1,4 @@
+import { NumberStepper } from "@/components/common/NumberStepper";
 import { useMemo, useState, type ReactNode } from "react";
 import { SEGMENTED_GROUP, SEGMENTED_ITEM, SEGMENTED_ON } from "@/components/common/segmented";
 import { useTranslation } from "react-i18next";
@@ -11,12 +12,12 @@ import {
   FileText,
   Hash,
   ListTree,
-  Loader2,
   RotateCw,
   ScrollText,
   X,
   type LucideIcon,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { InfoTip } from "@/components/common/InfoTip";
 import { SCRIPT_STATUS_COLORS, scriptStatusOf } from "@/components/manga/MangaChapterCard";
 import { PageLayoutCells } from "@/components/manga/PageLayoutPreview";
@@ -26,7 +27,6 @@ import { useProjectStructure } from "@/components/structure/useProjectStructure"
 import { ActionMenu } from "@/components/documents/ActionMenu";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import type { WorkspaceFeature } from "@/components/workspace/modules";
 import { fieldClass } from "@/components/workspace/views/PageShell";
 import { documentKind, extensionOf, useDocumentsOf } from "@/lib/documents";
@@ -302,7 +302,7 @@ export function FlatplanView({ project, feature, onOpenFeature }: FlatplanViewPr
           </p>
         ) : loading ? (
           <p className="flex items-center justify-center py-20 text-muted-foreground" role="status">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            <LoadingDots className="size-4" aria-hidden="true" />
           </p>
         ) : items.length === 0 ? (
           <div className="mx-auto flex max-w-md flex-col items-center px-6 py-20 text-center">
@@ -431,16 +431,14 @@ function FirstFolioDialog({ value, onSave, onClose }: { value: number; onSave: (
           <DialogTitle>{t("flatplan.firstFolio")}</DialogTitle>
           <DialogDescription>{t("flatplan.firstFolioHint")}</DialogDescription>
         </DialogHeader>
-        <Input
-          type="number"
+        <NumberStepper
+          value={valid ? parsed : null}
           min={1}
           max={MAX_FIRST_FOLIO}
-          autoFocus
           placeholder={t("common:placeholders.startNumber")}
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
           aria-label={t("flatplan.firstFolio")}
-          className="mt-4 w-24 text-right tabular-nums"
+          onChange={(value) => value !== null && setDraft(String(Math.round(value)))}
+          className="mt-4"
         />
         <DialogFooter className="mt-6 gap-2">
           <Button type="button" variant="ghost" onClick={onClose}>

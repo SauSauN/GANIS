@@ -1,7 +1,8 @@
 import { useId, useMemo, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { BookOpen, Flag, Link2, Loader2, Trash2 } from "lucide-react";
+import { BookOpen, Flag, Link2, Trash2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { ReferenceField } from "@/components/characters/fields/SpecialFields";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
 import { LinkList, LinkMark, LinkRow } from "@/components/links/LinkRow";
@@ -227,7 +228,7 @@ function EntryLinkDialog({
           {t("common:actions.cancel")}
         </Button>
         <Button type="button" disabled={busy || !nodeId} onClick={() => void run(() => linkEntry(projectId, nodeId, kind, entryId, role))}>
-          {busy && <Loader2 className="animate-spin" />}
+          {busy && <LoadingDots />}
           {t("common:actions.save")}
         </Button>
       </DialogFooter>

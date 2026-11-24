@@ -8,8 +8,10 @@ import { ErrorBoundary } from "@/components/layout/ErrorBoundary";
 import { HelpDialogs } from "@/components/layout/HelpDialogs";
 import { IdleLock } from "@/components/layout/IdleLock";
 import { GanixProgress } from "@/components/projects/GanixProgress";
+import { GanixOpenListener } from "@/components/projects/GanixOpenListener";
 import { ShortcutHandler } from "@/components/layout/ShortcutHandler";
 import { Toaster } from "@/components/layout/Toaster";
+import { GlobalConfirm } from "@/components/layout/GlobalConfirm";
 
 import Welcome from "@/pages/Welcome";
 import Login from "@/pages/Login";
@@ -40,9 +42,12 @@ export default function App() {
       <ShortcutHandler />
       <HelpDialogs />
       <Toaster />
+      <GlobalConfirm />
 
       {/* Avancement de l'export / import .ganix */}
       <GanixProgress />
+      {/* .ganix ouvert par double-clic pendant que GANIS tourne */}
+      <GanixOpenListener />
 
       {/* Verrouillage après inactivité (option des paramètres du compte) */}
       <IdleLock />

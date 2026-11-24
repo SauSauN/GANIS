@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Check, CircleAlert, CircleDot, HardDrive, Info, Loader2, Save, WifiOff, X } from "lucide-react";
+import { Check, CircleAlert, CircleDot, HardDrive, Info, Save, WifiOff, X } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -86,7 +87,7 @@ export function StatusBar() {
             state === "unsaved" && "text-foreground",
           )}
         >
-          {state === "saving" && <Loader2 className="h-3 w-3 animate-spin" />}
+          {state === "saving" && <LoadingDots className="h-3 w-3" />}
           {(state === "error" || state === "failed") && <CircleAlert className="h-3 w-3" />}
           {state === "unsaved" && <CircleDot className="h-3 w-3 text-warning" />}
           {(state === "saved" || state === "idle") && <Check className="h-3 w-3 text-success" />}

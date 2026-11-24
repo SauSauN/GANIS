@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FolderLock, Loader2 } from "lucide-react";
+import { FolderLock } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { cardClass, cardContentClass, cardHeaderClass } from "@/components/workspace/views/PageShell";
 import { api } from "@/lib/api";
@@ -65,7 +66,7 @@ export function NoteSettingsSection({ projectId }: { projectId: string }) {
               <span className="flex items-center gap-2 text-sm font-medium">
                 <FolderLock className="size-4 text-muted-foreground" aria-hidden="true" />
                 {t("notes.toggle")}
-                {busy && <Loader2 className="size-4 animate-spin" aria-hidden="true" />}
+                {busy && <LoadingDots className="size-4" aria-hidden="true" />}
               </span>
               <span className="mt-1 block text-xs leading-5 text-muted-foreground">{t("notes.toggleHint")}</span>
             </span>

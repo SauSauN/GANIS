@@ -1,7 +1,9 @@
+import { NumberStepper } from "@/components/common/NumberStepper";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { doubleClickHint, onRowDoubleClick } from "@/lib/doubleClick";
 import { useTranslation } from "react-i18next";
-import { AlertTriangle, ChevronDown, ChevronRight, Loader2 } from "lucide-react";
+import { AlertTriangle, ChevronDown, ChevronRight } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { ProgressBar } from "@/components/novel/NovelSheetCards";
 import { useManuscript } from "@/components/novel/useManuscript";
 import { useProjectStructure } from "@/components/structure/useProjectStructure";
@@ -25,8 +27,6 @@ interface ProgressViewProps {
   onOpenFeature: (featureId: string) => void;
 }
 
-const cellInput =
-  "h-8 w-24 rounded-md border border-input bg-background px-2 text-right text-sm tabular-nums outline-none focus:ring-2 focus:ring-ring";
 
 /**
  * Suivi de rédaction d'un roman : mots et objectifs (manuscrit, parties,
@@ -94,8 +94,8 @@ export function ProgressView({ project, feature, onOpenFeature }: ProgressViewPr
     }
   }
 
-  async function commitManuscriptGoal() {
-    const value = goalDraft.trim() === "" ? null : Number.parseInt(goalDraft, 10);
+  async function commitManuscriptGoal(text = goalDraft) {
+    const value = text.trim() === "" ? null : Number.parseInt(text, 10);
     if (value !== null && (!Number.isFinite(value) || value < 0)) return setGoalDraft(goal ? String(goal) : "");
     if ((value || null) === goal) return;
     try {
@@ -120,7 +120,7 @@ export function ProgressView({ project, feature, onOpenFeature }: ProgressViewPr
     return (
       <PageShell title={feature.label}>
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          <LoadingDots className="size-4" aria-hidden="true" />
           {t("text.loading")}
         </p>
       </PageShell>
@@ -174,16 +174,19 @@ export function ProgressView({ project, feature, onOpenFeature }: ProgressViewPr
           </div>
           <label className="flex flex-col gap-1.5 text-sm font-medium md:items-end">
             {t("progress.goal")}
-            <input
-              type="number"
+            <NumberStepper
+              value={goal ?? null}
               min={0}
               step={1000}
-              value={goalDraft}
+              allowEmpty
               placeholder={t("progress.goalPlaceholder")}
-              onChange={(e) => setGoalDraft(e.target.value)}
-              onBlur={() => void commitManuscriptGoal()}
-              onKeyDown={(e) => e.key === "Enter" && void commitManuscriptGoal()}
-              className="h-9 w-36 rounded-md border border-input bg-background px-3 text-right text-sm font-normal tabular-nums outline-none focus:ring-2 focus:ring-ring"
+              aria-label={t("progress.goal")}
+              onChange={(value) => {
+                const text = value === null ? "" : String(Math.round(value));
+                setGoalDraft(text);
+                void commitManuscriptGoal(text);
+              }}
+              valueClassName="w-24"
             />
           </label>
         </section>
@@ -364,23 +367,25 @@ function NarrationTag({ text, warning }: { text: string; warning: string | null 
 function GoalInput({ value, onCommit, label }: { value: number | null; onCommit: (value: number | null) => void; label: string }) {
   const [draft, setDraft] = useState(value ? String(value) : "");
   useEffect(() => setDraft(value ? String(value) : ""), [value]);
-  const commit = () => {
-    const parsed = draft.trim() === "" ? null : Number.parseInt(draft, 10);
+  const commit = (text = draft) => {
+    const parsed = text.trim() === "" ? null : Number.parseInt(text, 10);
     if (parsed !== null && (!Number.isFinite(parsed) || parsed < 0)) return setDraft(value ? String(value) : "");
     if ((parsed || null) !== value) onCommit(parsed || null);
   };
   return (
-    <input
-      type="number"
+    <NumberStepper
+      value={value ?? null}
       min={0}
       step={100}
+      allowEmpty
       aria-label={label}
-      value={draft}
-      placeholder="—"
-      onChange={(e) => setDraft(e.target.value)}
-      onBlur={commit}
-      onKeyDown={(e) => e.key === "Enter" && commit()}
-      className={cellInput}
+      onChange={(next) => {
+        const text = next === null ? "" : String(Math.round(next));
+        setDraft(text);
+        commit(text);
+      }}
+      size="sm"
+      valueClassName="w-16"
     />
   );
 }

@@ -61,6 +61,34 @@ pub async fn open_db(
     Ok(pool)
 }
 
+/// Vrai si le fichier existe et s'ouvre avec cette clé (lecture seule,
+/// rien n'est créé ni modifié).
+pub async fn opens_with_key(db_path: &Path, key: &SecretKey) -> bool {
+    use sqlx::{ConnectOptions, Connection};
+
+    if !db_path.is_file() {
+        return false;
+    }
+
+    let options = SqliteConnectOptions::new()
+        .filename(db_path)
+        .pragma("key", key.sqlcipher_pragma().to_string())
+        .create_if_missing(false)
+        .read_only(true);
+
+    let Ok(mut conn) = options.connect().await else {
+        return false;
+    };
+
+    let readable = sqlx::query_scalar::<_, i64>("SELECT count(*) FROM sqlite_master")
+        .fetch_one(&mut conn)
+        .await
+        .is_ok();
+
+    let _ = conn.close().await;
+    readable
+}
+
 /// Initialise ou ouvre la base chiffrée d'un projet.
 ///
 /// Le fichier `project.db` est créé dans `project_dir` s'il n'existe pas.

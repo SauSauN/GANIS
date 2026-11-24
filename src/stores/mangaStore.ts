@@ -6,6 +6,7 @@ import { announceDeletion } from "@/lib/trash";
 import { useStructureStore } from "@/stores/structureStore";
 import type { ExtraPageInput, ExtraPagePlacement, ExtraPageUpdate, MangaExtraPage, MangaSettings, Panel, ProductionStage } from "@/types";
 import { errorText } from "@/lib/errors";
+import { onSessionEnd } from "@/lib/sessionCache";
 
 /*
  * Scénario de manga du projet ouvert : seuils d'alerte du volume de texte,
@@ -180,3 +181,6 @@ export function useScriptPanelsIf(projectId: string, enabled: boolean) {
   }, [enabled, fetchPanels, projectId]);
   return { panels };
 }
+
+// Fin de session (déconnexion, autre compte) : plus rien de ce projet en mémoire.
+onSessionEnd(() => useMangaStore.setState(useMangaStore.getInitialState(), true));

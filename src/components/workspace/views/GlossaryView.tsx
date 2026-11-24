@@ -5,7 +5,6 @@ import {
   BookA,
   Drama,
   Flag,
-  Loader2,
   MapPinned,
   Package,
   PawPrint,
@@ -19,6 +18,7 @@ import {
   Zap,
   type LucideIcon,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -165,7 +165,7 @@ export function GlossaryView({ projectId, feature, onOpenFeature }: GlossaryView
 
       {!loaded && error ? null : !loaded ? (
         <p className="flex items-center gap-2 text-sm text-muted-foreground">
-          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+          <LoadingDots className="size-4" aria-hidden="true" />
           {t("loading")}
         </p>
       ) : loaded && terms.length === 0 ? (
@@ -514,7 +514,7 @@ function TermDialog({ projectId, term, categories, sheets, onClose }: TermDialog
             {tc("actions.cancel")}
           </Button>
           <Button type="submit" disabled={busy}>
-            {busy && <Loader2 className="animate-spin" />}
+            {busy && <LoadingDots />}
             {busy ? tc("actions.saving") : tc("actions.save")}
           </Button>
         </DialogFooter>

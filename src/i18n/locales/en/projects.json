@@ -57,7 +57,12 @@
       "exporting": "Exporting “{{name}}”…",
       "done": "Project exported: {{file}}",
       "failed": "The project could not be exported.",
-      "notEncrypted": "The .ganix file is not encrypted: it opens in any GANIS, from any account. Keep it somewhere safe."
+      "notEncrypted": "The .ganix file is not encrypted: it opens in any GANIS, from any account. Keep it somewhere safe.",
+      "warning": {
+        "title": "Export a private project?",
+        "description": "The .ganix file of \"{{name}}\" will not be encrypted: anyone who gets it can read the project in GANIS, without your password.\n\nKeep it somewhere safe (USB stick, personal folder) and only send it to people you trust.",
+        "confirm": "Export"
+      }
     },
     "import": {
       "button": "Import a project",
@@ -85,7 +90,7 @@
         },
         "replace": {
           "label": "Replace my project",
-          "description": "Your project's content is replaced by the file's. A .ganix backup of the current version is made first."
+          "description": "Your project's content is replaced by the file's. An encrypted copy of the current version is first placed in the project trash (restorable for 30 days)."
         }
       },
       "replaceConfirm": "I confirm replacing my current project.",
@@ -94,7 +99,7 @@
       "confirmReplace": "Replace",
       "importing": "Importing…",
       "done": "Project “{{name}}” imported.",
-      "replaced": "Project “{{name}}” replaced. Backup of the previous version: {{file}} (GANIS “sauvegardes” folder).",
+      "replaced": "Project “{{name}}” replaced. The previous version is in the project trash as “{{backup}}”: restorable for 30 days.",
       "encryptionNoteReplace": "The received data will be encrypted with your project's key."
     },
     "progress": {

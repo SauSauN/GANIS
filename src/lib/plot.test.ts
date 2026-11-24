@@ -1,9 +1,20 @@
 import { describe, expect, it } from "vitest";
 import {
   applyTemplate,
+  ageAt,
   blankPlot,
-  chronology,
+  DEFAULT_YEAR,
   computeIssues,
+  timeline,
+  timelineRange,
+  timelineStep,
+  timelineStepAt,
+  timelineGaps,
+  timelineTicks,
+  datePartsOf,
+  instantOf,
+  updateWhen,
+  yearInText,
   dropMissing,
   eventsOfCharacter,
   eventsOfEntry,
@@ -51,6 +62,10 @@ function ev(id: string, laneId: string, row: number, extra: Partial<PlotEvent> =
     alsoNodeIds: [],
     noteIds: [],
     date: "",
+    year: null,
+    yearEnd: null,
+    yearDetail: null,
+    yearEndDetail: null,
     words: 0,
     ...extra,
   };
@@ -193,11 +208,52 @@ describe("plot", () => {
     expect(data.events.find((e) => e.id === "e1")!.nodeId).toBeNull();
   });
 
-  it("dates, templates and version summary", () => {
+  it("timeline: years, story start, eras, ages", () => {
     const data = sample();
-    data.events[0].date = "1987-08-20";
-    data.events[1].date = "1987-05-12";
-    expect(chronology(data).dated.map((e) => e.id)).toEqual(["e2", "e1"]);
+    data.events[0].year = 322;
+    data.events[1].year = 301;
+    data.events[1].yearEnd = 318;
+    const { items, undated, storyStart } = timeline(data);
+    // Les deux événements datés, puis ceux sans année, placés en l'an 2000.
+    expect(items.slice(0, 2).map((i) => [i.event.id, i.from, i.to])).toEqual([["e2", 301, 318], ["e1", 322, 322]]);
+    expect(items.slice(2).every((i) => i.from === DEFAULT_YEAR && i.event.year === null)).toBe(true);
+    expect(items.length).toBe(data.events.length);
+    expect(undated.length).toBe(data.events.length - 2);
+    expect(storyStart).toBe(Math.min(...items.filter((i) => i.event.row >= 0 && i.event.year !== null).map((i) => i.from)));
+    // L'année de naissance vient de la fiche du personnage (texte libre).
+    expect(yearInText("12 mars 1890")).toBe(1890);
+    expect(yearInText("an 299, 3e lune")).toBe(299);
+    expect(yearInText("1890-03-12")).toBe(1890);
+    expect(yearInText("-45")).toBe(-45);
+    expect(yearInText("au printemps")).toBeNull();
+    expect(yearInText(undefined)).toBeNull();
+    expect(ageAt(300, 322)).toBe(22);
+    expect(ageAt(300, 299)).toBeNull();
+    expect(ageAt(null, 322)).toBeNull();
+    expect(timelineStep(50)).toBe(10);
+    // 64 px par année et 64 px entre deux graduations : chaque année.
+    expect(timelineStepAt(64, 64)).toBe(1);
+    expect(timelineStepAt(20, 64)).toBe(5);
+    expect(timelineStepAt(1, 64)).toBe(100);
+    expect(timelineStep(4)).toBe(1);
+    expect(timelineRange(data, items.slice(0, 2))).toEqual({ from: 301 - 1, to: 322 + 1 });
+
+    // Lecture d'un document : années entières, fin après le début, époques triées.
+    const read = normalizePlot(
+      {
+        lanes: [{ id: "l1" }],
+        events: [
+          { id: "a", laneId: "l1", row: 0, year: "312", yearEnd: 300 },
+          { id: "b", laneId: "l1", row: 1, year: 1.5, yearEnd: 4 },
+        ],
+        eras: [{ name: "Exil", from: 330, to: 318 }, { name: "Paix", from: 280, to: 301 }, { name: "?", from: "x", to: 2 }],
+        yearLabel: "  an  ",
+      },
+      "Principale",
+    );
+    expect(read.events.map((e) => [e.year, e.yearEnd])).toEqual([[312, null], [null, null]]);
+    expect(read.eras.map((e) => [e.name, e.from, e.to])).toEqual([["Paix", 280, 301], ["Exil", 318, 330]]);
+    expect(read.yearLabel).toBe("an");
 
     applyTemplate(data, [0, 0.5, 1], ["Début", "Milieu", "Fin"], 9, true);
     expect(data.acts).toEqual({ 0: "Début", 4: "Milieu", 8: "Fin" });
@@ -350,5 +406,84 @@ describe("fiches du monde dans la trame", () => {
     expect(data.events[1].entries).toEqual([]);
     expect(eventsOfEntry(data, "item", "i1").map((e) => e.id)).toEqual(["e1"]);
     expect(eventsOfEntry(data, "magic", "i1")).toEqual([]);
+  });
+});
+
+describe("frise au mois, au jour, à l'heure", () => {
+  it("place un instant dans l'année selon la précision", () => {
+    const detail = { month: 3, day: 2, hour: 12 };
+    expect(instantOf(1850, detail, "year")).toBe(1850);
+    // 1850 n'est pas bissextile : mars commence au 59e jour.
+    expect(instantOf(1850, detail, "month")).toBeCloseTo(1850 + 59 / 365);
+    expect(instantOf(1850, detail, "day")).toBeCloseTo(1850 + 60 / 365);
+    expect(instantOf(1850, detail, "hour")).toBeCloseTo(1850 + 60.5 / 365);
+    expect(datePartsOf(instantOf(2000, { month: 2, day: 29, hour: 23 }))).toEqual({ year: 2000, month: 2, day: 29, hour: 23 });
+  });
+
+  it("garde une date cohérente quand on la change", () => {
+    const e = ev("e", "l", 0, { year: 1850 });
+    updateWhen(e, "start", { month: 2, day: 31 });
+    expect(e.yearDetail).toEqual({ month: 2, day: 28, hour: null });
+    updateWhen(e, "start", { hour: 9 });
+    expect(e.yearDetail?.hour).toBe(9);
+    // Choisir le mois de fin sans année de fin : même année que le début.
+    updateWhen(e, "end", { month: 5 });
+    expect([e.yearEnd, e.yearEndDetail?.month]).toEqual([1850, 5]);
+    // Une fin qui passe avant le début est retirée.
+    updateWhen(e, "start", { month: 7 });
+    expect([e.yearEnd, e.yearEndDetail]).toEqual([null, null]);
+    // Sans mois, plus de jour ni d'heure.
+    updateWhen(e, "start", { month: null });
+    expect(e.yearDetail).toBeNull();
+  });
+
+  it("lit les dates et la précision enregistrées", () => {
+    const read = normalizePlot(
+      {
+        lanes: [{ id: "l1", name: "A" }],
+        timePrecision: "day",
+        events: [
+          { id: "a", laneId: "l1", row: 0, year: 1850, yearDetail: { month: 4, day: 31, hour: 5 } },
+          { id: "b", laneId: "l1", row: 1, year: 1850, yearDetail: { month: 3 }, yearEnd: 1850, yearEndDetail: { month: 6, day: 1 } },
+        ],
+      },
+      "A",
+    );
+    expect(read.timePrecision).toBe("day");
+    // Le 31 avril n'existe pas : ni jour, ni heure.
+    expect(read.events[0].yearDetail).toEqual({ month: 4, day: null, hour: null });
+    expect([read.events[1].yearEnd, read.events[1].yearEndDetail]).toEqual([1850, { month: 6, day: 1, hour: null }]);
+    expect(normalizePlot({ lanes: [], timePrecision: "minute" }, "A").timePrecision).toBe("year");
+  });
+
+  it("choisit les graduations les plus fines que la précision permet", () => {
+    const perYear = 365.25 * 64;
+    const days = timelineTicks(1850, 1850 + 10 / 365, perYear, 64, "day");
+    expect(days.unit).toBe("day");
+    expect(days.ticks[0]).toMatchObject({ year: 1850, month: 1, day: 1, major: true });
+    // Même échelle, précision limitée au mois : pas de graduation par jour.
+    expect(timelineTicks(1850, 1851, perYear, 64, "month").unit).toBe("month");
+    expect(timelineTicks(1850, 1851, perYear, 64, "year").unit).toBe("year");
+    const hours = timelineTicks(1850, 1850 + 1 / 365, 8766 * 64, 64, "hour");
+    expect([hours.unit, hours.step, hours.ticks.length]).toEqual(["hour", 1, 25]);
+  });
+
+  it("chaque palier du zoom donne un écart de graduations différent", () => {
+    const shown = timelineGaps("hour", 100).map((gap) => {
+      const { unit, step } = timelineTicks(1850, 1850.01, (64 / gap) * 1.0001, 64, "hour");
+      return `${step} ${unit}`;
+    });
+    expect(shown).toEqual(["100 year", "50 year", "20 year", "10 year", "5 year", "2 year", "1 year", "6 month", "3 month", "1 month", "7 day", "1 day", "12 hour", "6 hour", "3 hour", "1 hour"]);
+    expect(timelineGaps("year", 10)).toEqual([10, 5, 2, 1]);
+  });
+
+  it("le début du récit ignore les événements sans année", () => {
+    const data = blankPlot("A");
+    const lane = data.lanes[0].id;
+    data.events = [ev("passe", lane, -1, { year: 2100 }), ev("debut", lane, 0, { year: 2150 }), ev("sans", lane, 1, { year: null })];
+    // L'événement sans année est placé en 2000 sur la frise, mais ne fixe pas le début du récit.
+    expect(timeline(data).storyStart).toBe(2150);
+    data.events[1].year = null;
+    expect(timeline(data).storyStart).toBeNull();
   });
 });

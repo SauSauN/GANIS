@@ -313,6 +313,18 @@
     "search": "Chercher dans l'aide…",
     "noMatch": "Aucune rubrique ne correspond.",
     "sections": {
+      "start": {
+        "title": "Bien démarrer",
+        "intro": "Le tableau de bord rassemble vos projets : tout commence par « Nouveau projet ».",
+        "items": [
+          "« Nouveau projet » : choisissez le type d'histoire (roman, manga / BD, film, série, jeu vidéo, jeu de rôle ou projet personnalisé). Le type décide du découpage proposé (chapitres, pages, scènes…) et des outils d'écriture qui apparaissent dans la barre de gauche.",
+          "Connecté à votre compte, un projet est privé et chiffré avec votre mot de passe. Dans l'« Espace public » (sans compte), il n'est pas chiffré : toute personne qui utilise GANIS sur cet ordinateur peut l'ouvrir.",
+          "Le tableau de bord : recherche, projets récemment ouverts, favoris (étoile), projets archivés pour ceux en pause, et corbeille des projets, où un projet supprimé reste 30 jours.",
+          "Aide › Guide de démarrage fait le tour de l'espace de travail en quelques étapes ; Aide › Tutoriel accompagne vos premiers gestes ; Aide › Raccourcis clavier les liste tous.",
+          "Cette aide s'ouvre sur la rubrique de l'onglet affiché. Sa recherche trouve un mot dans toutes les rubriques et dans les questions fréquentes.",
+          "Aide › Nouveautés présente les changements de chaque version ; Aide › Signaler un problème… prépare un rapport à copier et à envoyer."
+        ]
+      },
       "workspace": {
         "title": "L'espace de travail",
         "intro": "Un projet s'ouvre dans l'espace de travail : modules à gauche, panneau au milieu, onglets au centre.",
@@ -330,7 +342,7 @@
         "intro": "L'accueil du projet résume votre histoire ; le synopsis la raconte.",
         "items": [
           "Accueil du projet : logo, description, type, statut et aperçu du synopsis.",
-          "Galerie : le logo du projet (affiché sur l'accueil, à côté du nom ; il garde sa forme, même s'il est long) et les images de l'univers et de l'histoire (affiches, cartes du monde, ambiances, croquis…), 30 au maximum, glisser-déposer accepté.",
+          "Galerie : le logo du projet (affiché sur l'accueil, à côté du nom) et les images de l'univers et de l'histoire (affiches, cartes du monde, ambiances, croquis…), rangées en dossiers de 30 images au plus. Glisser-déposer accepté ; chaque image se télécharge depuis son aperçu.",
           "Synopsis : le résumé de l'histoire, avec ses genres, sous-genres et son ton.",
           "Glossaire : les termes propres à l'histoire (mots inventés, lieux, concepts, titres…), par ordre alphabétique, avec leur définition, une catégorie et des liens vers les fiches.",
           "Historique : tout ce qui a été créé, modifié, supprimé ou restauré dans le projet, jour par jour.",
@@ -347,7 +359,11 @@
           "Lieux : où le personnage vit, travaille, a grandi — avec, si vous le souhaitez, la période du récit concernée.",
           "Palette de couleurs : ses couleurs encadrent le portrait du personnage.",
           "Pouvoirs : pour les histoires où les personnages ont des pouvoirs, des dons ou de la magie, activez la carte « Pouvoirs » dans Paramètres du projet › Personnages. Elle s'ajoute à toutes les fiches, quel que soit le niveau de détail.",
-          "Arbre généalogique : dans Relations, disposition « Arbre », choisissez un personnage pour voir sa famille seulement, génération par génération, d'après les relations « Famille » dont le lien est précisé. Un grand-parent, un oncle ou un cousin relié sans les personnes d'entre eux fait apparaître ces membres en fantômes « Non mentionné ». Un double clic sur une personne ouvre sa fiche."
+          "Arbre généalogique : dans Relations, disposition « Arbre », choisissez un personnage pour voir sa famille seulement, génération par génération, d'après les relations « Famille » dont le lien est précisé. Un grand-parent, un oncle ou un cousin relié sans les personnes d'entre eux fait apparaître ces membres en fantômes « Non mentionné ». Un double clic sur une personne ouvre sa fiche.",
+          "Personnages › Liste : tous les personnages en grille ou en tableau, avec recherche, filtres par rôle et par statut, et tri.",
+          "Relations entre personnages : trois affichages, Graphe, Matrice et Liste. Le graphe propose plusieurs dispositions (réseau, cercle, par rôle, centré sur un personnage, arbre généalogique) ; « Moment de l'histoire » montre les relations à une période donnée.",
+          "Arcs : choisissez un personnage dans le panneau du milieu (la pastille ↗ donne le nombre d'étapes de son arc). Indiquez son type d'arc, sa croyance au départ, la vérité à la fin, ce qu'il veut et ce dont il a besoin.",
+          "Arcs, étapes : chaque étape est reliée à un chapitre ou une scène, avec son état intérieur de −5 (enfermé dans sa croyance) à +5 (il a compris la vérité), le choix du personnage et sa conséquence. La courbe trace cette évolution ; un clic sur un point mène à son étape. En bas, comparez avec les arcs des autres personnages."
         ]
       },
       "locations": {
@@ -423,14 +439,53 @@
           "Les numéros se calculent seuls ; vous pouvez sortir un élément de la numérotation (prologue, interlude).",
           "La fiche d'un élément réunit tous ses liens dans « Liens avec l'univers », rangés par sorte : personnages (point de vue, présents…), lieux, et fiches du monde (un objet au cœur de la scène, une faction présente, une magie citée). « Ajouter un lien », dans le titre de la carte, propose la sorte puis l'élément et son rôle ; le crayon d'une ligne change le rôle ou retire le lien. Une fiche du monde peut aussi se lier à un élément depuis sa section « Récit ».",
           "La numérotation automatique (renumérotation à chaque déplacement) s'active dans les paramètres du projet, tout comme la couleur de chaque niveau.",
-          "La fiche d'un élément montre son résumé et ses liens avec l'univers.",
           "Documents : dans la fiche d'un élément, rangez ses fichiers (pages de manga, PDF, Word, images, sons…) avec « Ajouter des fichiers » ou par glisser-déposer. Ils sont rangés dans le projet (chiffrés si le projet est privé) et exportés dans le .ganix.",
           "Cliquez sur un document pour le lire dans GANIS ; « Lire les pages » enchaîne les images d'un chapitre. « Modifier dans l'application » l'ouvre dans Word, Acrobat, Clip Studio… : chaque enregistrement est repris, l'ancien contenu reste dans les versions.",
-          "Manga / BD : Scénario › Chemin de fer montre les pages d'un tome en planches, dans le sens de lecture choisi. Une page affiche le dessin rangé sur sa fiche ; à défaut, les dessins rangés sur le chapitre sont répartis dans l'ordre. La première page imprimée décide des vis-à-vis : une révélation prévue au tourné sur une page paire est signalée.",
-          "Manga / BD : les pages hors récit (couverture, page de titre, sommaire, crédits, bonus, postface…) s'ajoutent sous le chemin de fer. Elles prennent leur place dans les planches et dans les folios ; les couvertures sont à part, sans folio.",
-          "Manga / BD : Scénario › Suivi de fabrication donne l'étape de chaque page (storyboard, crayonné, encrage, trames, lettrage, validée), une page ou toute une sélection à la fois. Le chemin de fer peut afficher ces étapes en couleur (« Afficher : Fabrication »).",
-          "Manga / BD : « Exporter le scénario », dans le chemin de fer, enregistre le scénario du tome pour le dessinateur (Word, PDF ou texte) : personnages et lieux en tête, pages hors récit, folio de chaque page, cases et textes.",
-          "Manga / BD : la fiche d'un chapitre crée ses pages en une fois (« Ajouter des pages »). Rangez chaque dessin sur la fiche de sa page : il s'affiche à côté des cases, et « Lire les pages » du chapitre les enchaîne. Les cases sont trouvées par la recherche et gardées dans les versions de la page."
+          "Découpage › Continuité : le parcours de chaque personnage élément par élément (rôle, état, changements) et le tableau des présences. Liez les personnages dans la fiche d'une scène, puis notez leur état dans sa carte « Continuité »."
+        ]
+      },
+      "manuscript": {
+        "title": "Roman",
+        "intro": "Le module Roman réunit le texte du livre et les outils pour l'écrire, suivre sa progression et le présenter.",
+        "items": [
+          "Le texte s'écrit dans la fiche de chaque scène (carte « Texte »), ou vient d'un document Word ou texte rangé sur la scène. La carte « Écriture » de la scène note son objectif de mots, son état de rédaction, son point de vue et sa narration (personne, temps).",
+          "Roman › Manuscrit : tout le livre d'un seul tenant, dans l'ordre du plan, avec sommaire, nombre de mots et temps de lecture. Il s'exporte en Word, PDF ou texte.",
+          "Roman › Progression : mots par chapitre, objectif du roman et mots restants, états de rédaction, point de vue. Les scènes dont la narration s'écarte du reste du roman (autre personne, autre temps) sont signalées.",
+          "« Aujourd'hui » suit votre objectif de mots par jour, la séance en cours (« Nouvelle séance » repart de zéro), les jours d'affilée et les 30 derniers jours. La barre d'état affiche les mots écrits dans la journée.",
+          "Roman › Remplacer corrige un nom ou un mot dans le texte de toutes les scènes (casse, mot entier). Cochez les occurrences à remplacer : une version de chaque scène modifiée est gardée, et « Annuler » défait tout le remplacement.",
+          "Roman › Importer reprend un fichier Word (.docx), Markdown (.md) ou texte (.txt) et le découpe en parties, chapitres et scènes (les séparateurs * * * coupent les scènes). Le découpage proposé se vérifie avant l'import, qui s'annule d'un clic.",
+          "Roman › Dossier éditorial : pitch en une phrase, résumé court et résumé long, pour présenter le roman à un éditeur ou un agent. « Depuis le synopsis » part du synopsis du projet ; chaque texte s'exporte à part et garde ses versions.",
+          "Roman › Continuité : le parcours d'un personnage scène par scène (rôle, état, changements) et le tableau des présences par chapitre. L'état se note dans la carte « Continuité » de chaque scène."
+        ]
+      },
+      "script": {
+        "title": "Manga / BD",
+        "intro": "Le module Scénario suit un manga ou une BD page par page, de l'écriture à la fabrication.",
+        "items": [
+          "Scénario › Chemin de fer montre les pages d'un tome en planches, dans le sens de lecture choisi. Une page affiche le dessin rangé sur sa fiche ; à défaut, les dessins rangés sur le chapitre sont répartis dans l'ordre. La première page imprimée décide des vis-à-vis : une révélation prévue au tourné sur une page paire est signalée.",
+          "Les pages hors récit (couverture, page de titre, sommaire, crédits, bonus, postface…) s'ajoutent sous le chemin de fer. Elles prennent leur place dans les planches et dans les folios ; les couvertures sont à part, sans folio.",
+          "Scénario › Suivi de fabrication donne l'étape de chaque page (storyboard, crayonné, encrage, trames, lettrage, validée), une page ou toute une sélection à la fois. Le chemin de fer peut afficher ces étapes en couleur (« Afficher : Fabrication »).",
+          "« Exporter le scénario », dans le chemin de fer, enregistre le scénario du tome pour le dessinateur (Word, PDF ou texte) : personnages et lieux en tête, pages hors récit, folio de chaque page, cases et textes.",
+          "La fiche d'un chapitre crée ses pages en une fois (« Ajouter des pages »). Rangez chaque dessin sur la fiche de sa page : il s'affiche à côté des cases, et « Lire les pages » du chapitre les enchaîne. Les cases sont trouvées par la recherche et gardées dans les versions de la page.",
+          "Scénario › Lecture : l'histoire chapitre par chapitre, avec l'explication de chaque chapitre (son résumé), puis ce que montrent ses pages.",
+          "Scénario › Progression : pages prévues et écrites, statuts et volume de texte.",
+          "Scénario › Continuité : où apparaît chaque personnage, et dans quel état, case par case."
+        ]
+      },
+      "screen": {
+        "title": "Film et série",
+        "intro": "Le module Scénario d'un film ou d'une série écrit au format standard et prépare le tournage.",
+        "items": [
+          "Film : la fiche de chaque scène a son scénario au format standard (en-tête INT. / EXT., lieu, moment ; actions, répliques, transitions, plans, notes). La fiche d'une séquence suit son statut d'écriture et sa durée estimée (une page de scénario par minute).",
+          "Film : Scénario › Suivi du film réunit la fiche du film (logline, durée visée, scénariste), la durée estimée du film entier par rapport à la durée visée, la durée et la part de chaque acte, le statut des séquences et les répliques par personnage.",
+          "Film : Scénario › Lecture du scénario montre tout le film, scènes numérotées, et l'exporte en Word, PDF, texte ou Fountain : une page de titre (scénariste, logline), sans titres d'actes ni de séquences, comme un scénario de long métrage.",
+          "Film : la fiche du film (Scénario › Suivi du film) réunit la logline, le pitch et la note d'intention ; « Exporter le dossier » y ajoute le synopsis du projet, les personnages, le séquencier et le traitement, calculés à partir du plan, en Word, PDF ou texte.",
+          "Film : Scénario › Dépouillement donne, pour chaque scène, les personnages et leur état, les fiches liées, et les figurants, accessoires, costumes, effets… à prévoir ; l'onglet Plan de travail regroupe les scènes par décor, intérieur ou extérieur, jour ou nuit.",
+          "Film : Scénario › Tableau de liège montre une carte par scène, de la couleur de son acte ; glissez une carte pour la déplacer, même dans une autre séquence.",
+          "Film : dans la lecture du scénario, « Révisions » verrouille les numéros de scène (une scène ajoutée devient 12A) et ouvre une révision en couleur : ce qui change ensuite est marqué d'un astérisque. Le choix d'un comédien ne garde que ses scènes, pour les auditions. L'export PDF suit le format standard (Courier 12, 55 lignes par page, « (À SUIVRE) » et « (SUITE) »).",
+          "Film : Scénario › Importer un scénario reprend un fichier Fountain ou Final Draft (.fdx) ; les personnages et les lieux sont reliés aux fiches du même nom, ou créés. Dans la fiche d'une scène, des suggestions accompagnent la frappe (transitions, plans, noms des personnages et des lieux).",
+          "Série : Scénario a les mêmes outils que le film — Tableau de liège (une colonne par épisode), Dépouillement et plan de travail sur tous les épisodes, import Fountain ou Final Draft, révisions et numéros verrouillés (épisode.scène : 2.5, puis 2.5A). Le Suivi des épisodes montre l'échéance de chaque épisode (en rouge une fois dépassée), le temps de parole par épisode, et « Exporter la bible » assemble le concept, les personnages, les saisons et leurs épisodes.",
+          "Film : le Suivi du film place les repères de structure (élément déclencheur, pivots, point médian, climax) sur des scènes et dit s'ils tombent trop tôt ou trop tard ; le temps de parole de chaque personnage s'y lit par acte, avec sa plus longue absence."
         ]
       },
       "reading": {
@@ -439,7 +494,8 @@
         "items": [
           "Roman : le manuscrit continu, chapitre après chapitre.",
           "Manga / BD : l'histoire chapitre par chapitre, à l'image du roman : l'explication de chaque chapitre (son résumé), puis ce que montrent ses pages, à la suite. Les détails des cases (cadrage, bulles, onomatopées…) restent dans les fiches des pages.",
-          "Film, série, jeu vidéo, jeu de rôle, projet personnalisé : chaque élément du plan avec son résumé, son texte ou ses documents, ou à défaut les événements de la trame qui s'y rattachent.",
+          "Film : le scénario au format standard, scène par scène, numérotées dans tout le film.",
+          "Série, jeu vidéo, jeu de rôle, projet personnalisé : chaque élément du plan avec son résumé, son texte ou ses documents, ou à défaut les événements de la trame qui s'y rattachent.",
           "F5 fait la même chose. Un second appui (ou le bouton ■) rend la disposition d'édition.",
           "La lecture se met à jour d'elle-même : déplacer une scène dans le plan la déplace dans la lecture. Elle s'exporte en Word, PDF ou texte."
         ]
@@ -453,7 +509,16 @@
           "Reliez chaque événement au projet : point de vue, personnages présents, lieu, chapitre du découpage et notes.",
           "« Lecture de l'histoire » affiche les événements dans l'ordre du lecteur (par défaut celui du découpage) avec tout ce qui s'y rattache, documents du chapitre compris.",
           "Les fiches des personnages, des lieux, des éléments du découpage et du monde (objets, factions…) montrent leurs événements dans leur section « Trame ». Dans le panneau d'un événement, « Objets, faune et flore, factions… » y ajoute des fiches du monde.",
-          "Ctrl+Z annule chaque geste sur le plateau. Le bouton « Tension » affiche la courbe de tension ; les couleurs des trames se règlent dans Paramètres du projet › Trame."
+          "Ctrl+Z annule chaque geste sur le plateau. Le bouton « Tension » affiche la courbe de tension ; les couleurs des trames se règlent dans Paramètres du projet › Trame.",
+          "Frise chronologique : les événements de la trame placés selon leur date dans l’histoire, une ligne par trame, les époques en fond. Elle s’ouvre an par an sur le début du récit ; le bouton « Début du récit » y ramène.",
+          "Zoom : boutons − / + ou touches + / − (un écart de graduations à la fois), ou Ctrl + molette. Pour se déplacer : glissez la frise, utilisez la molette horizontale (ou Maj + molette), ou la vue d’ensemble sous les trames.",
+          "Cliquez sur un événement de la frise pour voir son détail et l’âge des personnages ; ← → passent d’un événement à l’autre dans le temps. Le bouton « Légende » explique les formes.",
+          "Dans la barre d’outils de la frise, « Événement » et « Époques » ouvrent le panneau de droite : le détail de l’événement choisi, ou les époques de votre monde, à créer et modifier (un clic sur un bandeau d’époque l’ouvre aussi). La précision des dates et le nom des années se règlent dans Paramètres du projet › Trame.",
+          "« Parcourir » suit l'histoire événement par événement sur le plateau : dans l'ordre du plan, dans l'ordre de lecture, ou une seule trame du début à la fin, avec ce que chaque événement déclenche.",
+          "Mystères : une question dont le lecteur attend la réponse. Plantez ses indices dans des événements, choisissez l'événement de la révélation et suivez son statut (ouvert, résolu, abandonné).",
+          "Modèles de structure : trois actes, voyage du héros… placent les actes et les grandes étapes sur les moments du plateau ; vous pouvez aussi créer le vôtre.",
+          "Repères automatiques : des invitations à regarder la structure (trame isolée, événement sans titre, lien qui remonte le temps…), jamais des corrections automatiques.",
+          "« Événements depuis le découpage » crée un événement pour chaque élément d'un niveau du plan (chaque chapitre, par exemple), relié à cet élément et avec son résumé. La vue épurée masque les barres pour se concentrer sur le plateau."
         ]
       },
       "notes": {
@@ -464,14 +529,15 @@
           "Encadré post-it : un bloc coloré au milieu du texte. Cases enchaînées : une suite d'étapes reliées par des flèches, avec « + » pour en insérer. Schéma : des boîtes reliées, que l'on déplace et relie à la souris.",
           "Citer un élément du projet, dans une note ou le texte d'une scène de roman : « $$ » puis quelques lettres propose tout le projet. Une lettre entre deux « $ » ne propose qu'une sorte : « $c$ » personnages, « $l$ » lieux, « $s$ » découpage, « $w$ » univers (objets, faune et flore, factions, peuples, magie), « $n$ » notes, « $i$ » images de la galerie. Les lettres françaises marchent aussi : « $p$ » personnages, « $d$ » découpage, « $u$ » univers. Un clic sur le lien ouvre la fiche.",
           "Rangez les notes dans des dossiers par glisser-déposer dans le panneau ; épinglez les plus importantes.",
-          "Le mur de post-it accueille les idées en vrac : déplacez-les par leur bandeau, agrandissez-les par leur coin."
+          "Le mur de post-it accueille les idées en vrac : déplacez-les par leur bandeau, agrandissez-les par leur coin.",
+          "Tableau d'inspiration : images de la galerie, couleurs, citations et notes, disposées librement pour l'ambiance du récit."
         ]
       },
       "search": {
         "title": "Recherche",
         "intro": "Retrouvez n'importe quoi dans le projet.",
         "items": [
-          "La loupe en haut à droite, ou Ctrl+F, ouvre la recherche dans le panneau du milieu. Elle cherche dans les personnages, les lieux, le découpage, les notes (contenu compris) et les post-it.",
+          "La loupe en haut à droite, ou Ctrl+F, ouvre la recherche dans le panneau du milieu. Elle fouille tout le projet : personnages, lieux, fiches du monde, découpage, documents, trame, notes (contenu compris) et post-it.",
           "Les accents et les majuscules ne comptent pas : « chateau » trouve « Château ». Plusieurs mots : tous doivent apparaître.",
           "Ctrl+K ouvre la palette, qui propose aussi les pages et les actions."
         ]
@@ -493,7 +559,7 @@
         "items": [
           "Chaque projet privé est chiffré : sans votre mot de passe, ses données sont illisibles. Les projets publics (créés sans compte) ne sont pas chiffrés et sont accessibles à toute personne qui utilise GANIS sur cet ordinateur.",
           "Exporter en .ganix (Fichier › Exporter) crée une copie complète du projet, à garder en sauvegarde ou à ouvrir sur un autre ordinateur. Attention : ce fichier n'est pas chiffré.",
-          "Importer un .ganix (Fichier › Importer) ajoute le projet, ou remplace celui qui existe (une sauvegarde est faite avant).",
+          "Importer un .ganix (Fichier › Importer) ajoute le projet, ou remplace celui qui existe (l'ancienne version va d'abord dans la corbeille des projets, chiffrée, pendant 30 jours).",
           "GANIS fonctionne entièrement hors ligne."
         ]
       },
@@ -501,8 +567,8 @@
         "title": "Paramètres",
         "intro": "Deux niveaux de réglages.",
         "items": [
-          "Paramètres du projet (en bas de la barre de gauche) : informations, statuts, niveau de détail des personnages, types de lieux, découpage et couleurs.",
-          "Objets, Faune et flore, Factions : activer ces modules facultatifs et choisir leurs catégories.",
+          "Paramètres du projet (en bas de la barre de gauche) : informations, statuts, niveau de détail des personnages, types de lieux, découpage et couleurs, et Trame (couleurs des trames, précision des dates et nom des années de la frise).",
+          "Objets, Faune et flore, Factions, Peuples, Magie : activer ces modules facultatifs et choisir leurs catégories.",
           "Paramètres généraux (roue dentée en haut) : compte, mot de passe, clé de récupération, langue, thème, enregistrement automatique.",
           "Packages : des thèmes de couleurs pour toute l'application."
         ]
@@ -585,6 +651,30 @@
         {
           "q": "Comment encadrer l'image d'une fiche de couleurs ?",
           "a": "Ajoutez des couleurs dans le champ « Palette de couleurs » de la fiche (personnage, lieu, objet, faune et flore) : un cadre de ces couleurs entoure son image."
+        },
+        {
+          "q": "Comment suivre l'évolution d'un personnage au fil du récit ?",
+          "a": "Personnages › Arcs : choisissez le personnage dans le panneau du milieu, notez ce qu'il croit au départ et ce qu'il comprend à la fin, puis ajoutez une étape par moment clé, reliée à son chapitre, avec son état intérieur. La courbe se trace toute seule."
+        },
+        {
+          "q": "Comment changer un nom dans tout mon roman ?",
+          "a": "Roman › Remplacer : saisissez l'ancien et le nouveau nom, vérifiez les occurrences cochées, puis « Remplacer ». Une version de chaque scène modifiée est gardée, et « Annuler » défait tout."
+        },
+        {
+          "q": "Comment reprendre mon manuscrit Word dans GANIS ?",
+          "a": "Roman › Importer : choisissez le fichier (.docx, .md ou .txt), vérifiez le découpage proposé en parties, chapitres et scènes, puis « Importer ». « Annuler l'import » revient en arrière."
+        },
+        {
+          "q": "Comment placer mes événements dans le temps de l'histoire ?",
+          "a": "Donnez une année à chaque événement (dans son détail, sur le plateau ou sur la frise), puis ouvrez Trame › Frise chronologique. Pour aller jusqu'au mois, au jour ou à l'heure, réglez la précision dans Paramètres du projet › Trame."
+        },
+        {
+          "q": "Où créer les grandes périodes de mon monde ?",
+          "a": "Sur la frise chronologique, bouton « Époques » : « Ajouter une époque », puis son nom, ses années et sa couleur. Elle apparaît en bandeau au-dessus des années."
+        },
+        {
+          "q": "Comment suivre les indices d'un mystère ?",
+          "a": "Sur le plateau de la trame, créez un mystère (sa question), plantez ses indices dans des événements et choisissez l'événement où la réponse est révélée."
         }
       ]
     }

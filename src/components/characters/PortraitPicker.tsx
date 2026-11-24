@@ -1,7 +1,8 @@
 import { useRef, useState, type DragEvent } from "react";
 import { useConfirmImageRemoval } from "@/components/common/useConfirmImageRemoval";
 import { useTranslation } from "react-i18next";
-import { ImagePlus, Loader2, Maximize2, Trash2 } from "lucide-react";
+import { ImagePlus, Maximize2, Trash2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { ImageDialog } from "@/components/common/ImageDialog";
 import { useImageFrame } from "@/stores/imageFrameStore";
 import { AvatarFace, type AvatarSize } from "@/components/characters/CharacterAvatar";
@@ -153,7 +154,7 @@ export function PortraitPicker({
 
         {busy && (
           <span className={cn("absolute inset-0 flex items-center justify-center bg-background/70", round)}>
-            <Loader2 className="size-6 animate-spin text-primary" aria-label={t("portrait.saving")} />
+            <LoadingDots className="size-6 text-primary" aria-label={t("portrait.saving")} />
           </span>
         )}
       </button>

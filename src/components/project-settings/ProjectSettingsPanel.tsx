@@ -5,10 +5,10 @@ import {
   ArchiveRestore,
   Copy,
   Download,
-  Loader2,
   Star,
   Trash2,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -41,6 +41,7 @@ import {
 } from "@/components/project-settings/sections";
 import { VisibilityCard } from "@/components/project-settings/VisibilityCard";
 import { api } from "@/lib/api";
+import { confirmGanixExport } from "@/lib/ganixExport";
 import { cn } from "@/lib/utils";
 import { useUnsavedChanges } from "@/lib/unsavedChanges";
 import { notifyError, notifySaved } from "@/lib/notify";
@@ -404,7 +405,7 @@ function InfoSection({ project }: { project: Project }) {
             type="submit"
             disabled={saving || unchanged}
           >
-            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />}
+            {saving && <LoadingDots className="mr-2 h-4 w-4" aria-hidden="true" />}
             {t("common:actions.save")}
           </Button>
         </CardFooter>
@@ -586,6 +587,8 @@ function DangerSection({ project }: { project: Project }) {
     useState<Feedback | null>(null);
 
   async function handleExport() {
+    if (!(await confirmGanixExport(project))) return;
+
     setExporting(true);
     setExportFeedback(null);
 

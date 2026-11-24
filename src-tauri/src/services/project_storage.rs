@@ -20,7 +20,7 @@
 
 use crate::db::project_db::{self, export_encrypted, init_project_db, open_db, DB_FILE};
 use crate::error::{AppError, AppResult};
-use crate::models::project::Project;
+use crate::models::project::{Project, ProjectVisibility};
 use crate::security::crypto::SecretKey;
 use crate::services::project_service;
 use crate::state::{AppState, Viewer};
@@ -36,6 +36,10 @@ pub(crate) const PROJECTS_DIR: &str = "projets";
 /// Si elle existe au démarrage, un chiffrement a été interrompu : voir
 /// [`finish_interrupted_encryption`].
 const ENCRYPTING_FILE: &str = "project.db.encrypting";
+
+/// Copie de la base rechiffrée avec une nouvelle clé (projet public rendu
+/// privé), en attendant que la nouvelle clé soit enregistrée.
+const REKEY_FILE: &str = "project.db.rekeying";
 
 /// Ancien emplacement (dossier temporaire du système), utilisé avant
 /// que les bases soient rangées dans le dossier de données.
@@ -155,9 +159,15 @@ fn remove_db_files(db_path: &Path, wipe: bool) -> AppResult<()> {
 
 /// Remplace `project.db` (en clair) par la copie chiffrée prête à côté.
 fn swap_in_encrypted_copy(dir: &Path) -> AppResult<()> {
+    swap_in(dir, ENCRYPTING_FILE)
+}
+
+/// Remplace `project.db` par la copie `copy` du même dossier ; l'ancienne
+/// base est écrasée par des zéros avant d'être supprimée.
+fn swap_in(dir: &Path, copy: &str) -> AppResult<()> {
     remove_db_files(&dir.join(DB_FILE), true)?;
 
-    std::fs::rename(dir.join(ENCRYPTING_FILE), dir.join(DB_FILE)).map_err(|e| {
+    std::fs::rename(dir.join(copy), dir.join(DB_FILE)).map_err(|e| {
         AppError::io(&e).with_detail(format!("Mise en place de la base chiffrée impossible : {e}"))
     })
 }
@@ -303,6 +313,7 @@ async fn open_with_key(
     let dir = project_dir(state, project_id)?;
 
     finish_interrupted_encryption(&dir, true)?;
+    finish_interrupted_rekey(&dir, project_key).await?;
 
     // Cas normal : la base existe.
     if dir.join(DB_FILE).exists() {
@@ -326,6 +337,161 @@ async fn open_with_key(
     mark_db_ready(state, project_id).await?;
 
     Ok(pool)
+}
+
+// ----------------------------------------------------------------------------
+// Nouvelle clé (projet public rendu privé)
+// ----------------------------------------------------------------------------
+//
+// La clé d'un projet public est gardée en clair : toute copie ancienne de
+// `app.db` la contient. Quand le projet devient privé, sa base est donc
+// rechiffrée avec une clé neuve, que seul le compte connaît.
+//
+// Ordre des opérations, sûr en cas d'arrêt brutal :
+// 1. copie rechiffrée `project.db.rekeying` (nouvelle clé) ;
+// 2. nouvelle clé enregistrée dans `app.db` ;
+// 3. la copie remplace `project.db`.
+// À l'ouverture suivante, une copie restée là est mise en place si elle
+// s'ouvre avec la clé enregistrée, et supprimée sinon.
+
+/// Termine ou annule un changement de clé interrompu.
+async fn finish_interrupted_rekey(dir: &Path, project_key: &SecretKey) -> AppResult<()> {
+    let copy = dir.join(REKEY_FILE);
+    if !copy.exists() {
+        return Ok(());
+    }
+
+    if project_db::opens_with_key(&copy, project_key).await {
+        tracing::warn!("Changement de clé d'un projet interrompu : achèvement");
+        return swap_in(dir, REKEY_FILE);
+    }
+
+    if project_db::opens_with_key(&dir.join(DB_FILE), project_key).await {
+        tracing::warn!("Changement de clé d'un projet interrompu : copie abandonnée supprimée");
+        return remove_db_files(&copy, false);
+    }
+
+    // Ni l'une ni l'autre ne s'ouvre : rien n'est supprimé.
+    Err(AppError::internal("Base du projet illisible")
+        .with_detail("Ni project.db ni la copie rechiffrée ne s'ouvrent avec la clé du projet"))
+}
+
+/// Rechiffre la base d'un projet avec `new_key`, en enregistrant la clé par
+/// `save_key` entre la copie et son remplacement (voir plus haut).
+///
+/// Les bases ouvertes restent verrouillées pendant toute l'opération :
+/// aucune écriture ne peut se glisser entre la copie et le remplacement.
+pub async fn rekey_storage<T, F, Fut>(
+    state: &AppState,
+    project_id: &str,
+    old_key: &SecretKey,
+    new_key: &SecretKey,
+    save_key: F,
+) -> AppResult<T>
+where
+    F: FnOnce() -> Fut,
+    Fut: std::future::Future<Output = AppResult<T>>,
+{
+    let dir = project_dir(state, project_id)?;
+    let mut pools = state.project_pools.lock().await;
+
+    let has_data = dir.join(DB_FILE).exists() || dir.join(REKEY_FILE).exists();
+
+    if has_data {
+        let pool = match pools.remove(project_id) {
+            Some(pool) => pool,
+            None => open_with_key(state, project_id, old_key).await?,
+        };
+
+        let copy = dir.join(REKEY_FILE);
+        let _ = remove_db_files(&copy, false);
+
+        let exported = export_encrypted(&pool, &copy, new_key).await;
+        pool.close().await;
+
+        if let Err(error) = exported {
+            let _ = remove_db_files(&copy, false);
+            return Err(error);
+        }
+    }
+
+    let saved = match save_key().await {
+        Ok(saved) => saved,
+        Err(error) => {
+            let _ = remove_db_files(&dir.join(REKEY_FILE), false);
+            return Err(error);
+        }
+    };
+
+    if has_data {
+        swap_in(&dir, REKEY_FILE)?;
+    }
+
+    drop(pools);
+    tracing::info!("Projet rechiffré avec une nouvelle clé");
+
+    Ok(saved)
+}
+
+/// Rend un projet privé ou public (voir `project_service::set_visibility`).
+///
+/// Public → privé : l'ancienne clé était gardée en clair dans `app.db` ; la
+/// base est rechiffrée avec une clé neuve (voir [`rekey_storage`]).
+pub async fn change_visibility(
+    state: &AppState,
+    project_id: &str,
+    visibility: ProjectVisibility,
+    confirm_name: Option<&str>,
+) -> AppResult<Project> {
+    let (user, account_key) = state.require_session().await?;
+
+    // Ouvre la base : vérifie l'accès et chiffre au besoin un projet privé
+    // d'avant le chiffrement (sa clé doit exister pour être conservée).
+    pool_for_request(state, project_id).await?;
+
+    // Public → privé : l'ancienne clé était gardée en clair dans `app.db`.
+    // La base est rechiffrée avec une clé neuve avant d'être rattachée au
+    // compte, pour qu'une ancienne copie de `app.db` ne l'ouvre plus.
+    if visibility == ProjectVisibility::Private {
+        let viewer = state.viewer().await;
+        let current = project_service::find_stored_for_viewer(&state.app_db, project_id, &viewer)
+            .await?
+            .ok_or_else(|| AppError::not_found("Projet non trouvé ou non autorisé.").with_key("project.notFound"))?;
+
+        if current.is_public() {
+            // Un projet public garde son nom en clair.
+            if !project_service::name_confirmed(&current.name, confirm_name) {
+                return Err(project_service::make_private_unconfirmed());
+            }
+
+            let old_key = project_service::project_key_for_viewer(&current, &viewer)?;
+            let new_key = SecretKey::generate();
+
+            return rekey_storage(state, project_id, &old_key, &new_key, || {
+                project_service::set_visibility(
+                    &state.app_db,
+                    project_id,
+                    &user.id,
+                    &account_key,
+                    visibility,
+                    confirm_name,
+                    Some(&new_key),
+                )
+            })
+            .await;
+        }
+    }
+
+    project_service::set_visibility(
+        &state.app_db,
+        project_id,
+        &user.id,
+        &account_key,
+        visibility,
+        confirm_name,
+        None,
+    )
+    .await
 }
 
 // ----------------------------------------------------------------------------
@@ -594,6 +760,10 @@ const REMOVE_RETRY_DELAY: std::time::Duration = std::time::Duration::from_millis
 /// Cette fonction n'échoue jamais : le projet est déjà supprimé de la base
 /// de l'application, un fichier impossible à effacer est seulement journalisé.
 pub async fn delete_storage(state: &AppState, project_id: &str) {
+    if let Err(error) = crate::services::received_documents::forget_project(&state.app_db, project_id).await {
+        tracing::warn!(error = %error, "Marques de documents reçus non effacées");
+    }
+
     let cached = state.project_pools.lock().await.remove(project_id);
 
     if let Some(pool) = cached {

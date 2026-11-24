@@ -176,21 +176,7 @@ pub async fn set_project_visibility(
     visibility: ProjectVisibility,
     confirm_name: Option<String>,
 ) -> AppResult<Project> {
-    let (user, account_key) = state.require_session().await?;
-
-    // Ouvre la base : vérifie l'accès et chiffre au besoin un projet privé
-    // d'avant le chiffrement (sa clé doit exister pour être conservée).
-    project_storage::pool_for_request(&state, &project_id).await?;
-
-    project_service::set_visibility(
-        &state.app_db,
-        &project_id,
-        &user.id,
-        &account_key,
-        visibility,
-        confirm_name.as_deref(),
-    )
-    .await
+    project_storage::change_visibility(&state, &project_id, visibility, confirm_name.as_deref()).await
 }
 
 /// Duplique un projet accessible, données (synopsis, etc.) comprises. La

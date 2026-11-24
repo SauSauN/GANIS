@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { create } from "zustand";
 import { api } from "@/lib/api";
 import { isNeutralFrame, normalizeFrame, type ImageFrame } from "@/lib/imageFrame";
+import { onSessionEnd } from "@/lib/sessionCache";
 
 /*
  * Cadrages des images du projet ouvert, chargés une fois et partagés par
@@ -57,3 +58,6 @@ export function useImageFrame(projectId: string | null | undefined, key: string 
   }, [projectId, needsFetch, fetchFrames]);
   return frame;
 }
+
+// Fin de session (déconnexion, autre compte) : plus rien de ce projet en mémoire.
+onSessionEnd(() => useImageFrameStore.setState(useImageFrameStore.getInitialState(), true));

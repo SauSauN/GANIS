@@ -1,3 +1,4 @@
+import { NumberStepper } from "@/components/common/NumberStepper";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Flame, PenLine, RotateCcw } from "lucide-react";
@@ -84,8 +85,8 @@ export function WritingTodayCard({ projectId }: { projectId: string }) {
   const percent = goalPercent(words, goal);
   const max = Math.max(goal ?? 0, ...stats.days.map((d) => d.words), 1);
 
-  async function commit() {
-    const value = draft.trim() === "" ? null : Number.parseInt(draft, 10);
+  async function commit(text = draft) {
+    const value = text.trim() === "" ? null : Number.parseInt(text, 10);
     if (value !== null && (!Number.isFinite(value) || value < 0)) {
       setDraft(goal ? String(goal) : "");
       return;
@@ -115,16 +116,19 @@ export function WritingTodayCard({ projectId }: { projectId: string }) {
           </div>
           <label className="flex flex-col gap-1.5 text-sm font-medium sm:items-end">
             {t("today.goal")}
-            <input
-              type="number"
+            <NumberStepper
+              value={goal ?? null}
               min={0}
               step={100}
-              value={draft}
+              allowEmpty
               placeholder={t("today.goalPlaceholder")}
-              onChange={(e) => setDraft(e.target.value)}
-              onBlur={() => void commit()}
-              onKeyDown={(e) => e.key === "Enter" && void commit()}
-              className="h-9 w-32 rounded-md border border-input bg-background px-3 text-right text-sm font-normal tabular-nums outline-none focus:ring-2 focus:ring-ring"
+              aria-label={t("today.goal")}
+              onChange={(value) => {
+                const text = value === null ? "" : String(Math.round(value));
+                setDraft(text);
+                void commit(text);
+              }}
+              valueClassName="w-20"
             />
           </label>
         </div>

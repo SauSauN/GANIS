@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { api, isTauri } from "@/lib/api";
 import { errorText } from "@/lib/errors";
+import type { DeviceLockIssue } from "@/types";
 
 /*
  * État de la configuration initiale (§37.9).
@@ -22,6 +23,13 @@ interface SetupState {
   needsSetup: boolean | null;
   error: string | null;
 
+  /**
+   * Données verrouillées : la clé d'appareil qui chiffre la base de
+   * l'application est absente ou illisible (`missing`, `unreadable`,
+   * `wrongKey`). Seule la clé de secours permet de continuer.
+   */
+  deviceLock: DeviceLockIssue | null;
+
   /** Interroge Rust pour savoir si un compte existe. */
   check: () => Promise<void>;
 
@@ -32,6 +40,7 @@ interface SetupState {
 export const useSetupStore = create<SetupState>((set) => ({
   needsSetup: null,
   error: null,
+  deviceLock: null,
 
   check: async () => {
     // Hors de Tauri (simple navigateur, mode démo), il n'y a pas de
@@ -42,6 +51,12 @@ export const useSetupStore = create<SetupState>((set) => ({
     }
 
     try {
+      const device = await api.deviceStatus();
+      if (device.locked) {
+        set({ deviceLock: device.issue ?? "missing", needsSetup: null, error: null });
+        return;
+      }
+
       const anyUser = await api.hasAnyUser();
 
       set({ needsSetup: !anyUser, error: null });

@@ -20,6 +20,7 @@ import { useCharacterStore } from "@/stores/characterStore";
 import { useLocationStore } from "@/stores/locationStore";
 import { useNoteStore } from "@/stores/noteStore";
 import { usePlotStore } from "@/stores/plotStore";
+import { useBoardStore, type BoardEntry } from "@/stores/boardStore";
 import { useStructureStore } from "@/stores/structureStore";
 import { useWorldStore } from "@/stores/worldStore";
 import type { PlotLane } from "@/lib/plot";
@@ -291,6 +292,38 @@ export function NoteItemMenu({
               run: () => useNoteStore.getState().deleteNote(projectId, note.id),
             }
       }
+    >
+      {children}
+    </PanelItemActions>
+  );
+}
+
+/**
+ * Planche d'inspiration (module Notes) : ouvrir, renommer, dupliquer,
+ * supprimer. La suppression est définitive (pas de corbeille) ; les images
+ * restent dans la galerie.
+ */
+export function BoardItemMenu({ projectId, board, onOpen, children }: { projectId: string; board: BoardEntry; onOpen: () => void; children: Row }) {
+  const t = usePanelText();
+  const { t: tb } = useTranslation("workspaceHome");
+  return (
+    <PanelItemActions
+      name={board.name}
+      onOpen={onOpen}
+      rename={{
+        fields: [{ key: "name", label: t("panelActions.nameLabel"), value: board.name, maxLength: 100, placeholder: tb("boards.namePlaceholder") }],
+        save: async ({ name }) => {
+          await useBoardStore.getState().rename(projectId, board.id, name);
+        },
+      }}
+      onDuplicate={async () => {
+        const name = tb("boards.copyName", { name: board.name }).slice(0, 100);
+        await useBoardStore.getState().duplicate(projectId, board.id, name);
+      }}
+      remove={{
+        description: tb("boards.deleteBody"),
+        run: () => useBoardStore.getState().remove(projectId, board.id),
+      }}
     >
       {children}
     </PanelItemActions>

@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
+import { NumberStepper } from "@/components/common/NumberStepper";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { AlertTriangle, CheckCircle2, MessageSquareOff } from "lucide-react";
 import { SCRIPT_STATUS_COLORS, scriptStatusOf } from "@/components/manga/MangaChapterCard";
@@ -47,13 +48,6 @@ export function ScriptProgressView({ project, feature, onOpenFeature }: ScriptPr
   const setError = (message: string | null) => {
     if (message) notifyError(message, "manga:progress");
   };
-  const [panelMax, setPanelMax] = useState("");
-  const [pageMax, setPageMax] = useState("");
-
-  useEffect(() => {
-    setPanelMax(settings?.panelWordsMax ? String(settings.panelWordsMax) : "");
-    setPageMax(settings?.pageWordsMax ? String(settings.pageWordsMax) : "");
-  }, [settings]);
 
   const levelCount = structure?.levels.length ?? 0;
   const { chapter: chapterLevel } = mangaLevels(levelCount);
@@ -105,9 +99,13 @@ export function ScriptProgressView({ project, feature, onOpenFeature }: ScriptPr
     }
   }
 
-  async function commitThresholds() {
-    const parse = (v: string) => (v.trim() === "" ? null : Math.max(0, Number.parseInt(v, 10) || 0) || null);
-    const next = { panelWordsMax: parse(panelMax), pageWordsMax: parse(pageMax) };
+  /** Seuils de mots (case, page) ; `null` : aucun seuil. */
+  async function commitThresholds(change: { panelWordsMax?: number | null; pageWordsMax?: number | null }) {
+    const clean = (v: number | null | undefined) => (v === null || v === undefined ? null : Math.max(0, Math.round(v)) || null);
+    const next = {
+      panelWordsMax: "panelWordsMax" in change ? clean(change.panelWordsMax) : (settings?.panelWordsMax ?? null),
+      pageWordsMax: "pageWordsMax" in change ? clean(change.pageWordsMax) : (settings?.pageWordsMax ?? null),
+    };
     if (next.panelWordsMax === settings?.panelWordsMax && next.pageWordsMax === settings?.pageWordsMax) return;
     setError(null);
     try {
@@ -118,7 +116,7 @@ export function ScriptProgressView({ project, feature, onOpenFeature }: ScriptPr
   }
 
   const percent = goalPercent(writtenPages, plannedPages || null);
-  const numberInput = "h-8 w-24 rounded-md border border-input bg-background px-2 text-right text-sm tabular-nums outline-none focus:ring-2 focus:ring-ring";
+
 
   return (
     <PageShell title={feature.label}>
@@ -233,11 +231,11 @@ export function ScriptProgressView({ project, feature, onOpenFeature }: ScriptPr
             <h2 className="font-semibold">{t("progress.volume")}</h2>
             <label className="ml-auto flex items-center gap-2 text-sm">
               {t("progress.panelMax")}
-              <input type="number" min={0} value={panelMax} placeholder={t("progress.none")} onChange={(e) => setPanelMax(e.target.value)} onBlur={() => void commitThresholds()} onKeyDown={(e) => e.key === "Enter" && void commitThresholds()} className={numberInput} />
+              <NumberStepper value={settings?.panelWordsMax ?? null} min={0} step={5} allowEmpty placeholder={t("progress.none")} aria-label={t("progress.panelMax")} onChange={(value) => void commitThresholds({ panelWordsMax: value })} size="sm" valueClassName="w-16" />
             </label>
             <label className="flex items-center gap-2 text-sm">
               {t("progress.pageMax")}
-              <input type="number" min={0} value={pageMax} placeholder={t("progress.none")} onChange={(e) => setPageMax(e.target.value)} onBlur={() => void commitThresholds()} onKeyDown={(e) => e.key === "Enter" && void commitThresholds()} className={numberInput} />
+              <NumberStepper value={settings?.pageWordsMax ?? null} min={0} step={10} allowEmpty placeholder={t("progress.none")} aria-label={t("progress.pageMax")} onChange={(value) => void commitThresholds({ pageWordsMax: value })} size="sm" valueClassName="w-16" />
             </label>
           </header>
           <div className="space-y-3 px-5 py-4">

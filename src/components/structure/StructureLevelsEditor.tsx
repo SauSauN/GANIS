@@ -1,6 +1,8 @@
+import { NumberStepper } from "@/components/common/NumberStepper";
 import { useEffect, useMemo, useState, type ComponentProps } from "react";
 import { useTranslation } from "react-i18next";
-import { BetweenHorizontalEnd, BetweenHorizontalStart, Loader2, Trash2 } from "lucide-react";
+import { BetweenHorizontalEnd, BetweenHorizontalStart, Trash2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -276,20 +278,19 @@ export function StructureLevelsEditor({
               <div className="mt-3 flex flex-wrap items-end gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor={`${prefix}-start`}>{t("levels.start")}</Label>
-                  <Input
+                  <NumberStepper
                     id={`${prefix}-start`}
-                    type="number"
+                    value={level.start}
                     min={0}
                     max={MAX_START}
-                    value={level.start}
                     placeholder={t("common:placeholders.startNumber")}
                     disabled={saving || level.numbering === "none"}
-                    onChange={(e) =>
+                    onChange={(value) =>
+                      value !== null &&
                       update(level.key, {
-                        start: Math.min(MAX_START, Math.max(0, Math.trunc(Number(e.target.value) || 0))),
+                        start: Math.min(MAX_START, Math.max(0, Math.trunc(value))),
                       })
                     }
-                    className="w-24"
                   />
                 </div>
 
@@ -363,7 +364,7 @@ export function StructureLevelsEditor({
 
       <div className="flex flex-wrap gap-2">
         <Button type="button" size="sm" disabled={!dirty || !valid || saving} onClick={() => void save()}>
-          {saving && <Loader2 className="mr-1.5 size-3.5 animate-spin" aria-hidden="true" />}
+          {saving && <LoadingDots className="mr-1.5 size-3.5" aria-hidden="true" />}
           {t("levels.save")}
         </Button>
         {dirty && (

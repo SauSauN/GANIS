@@ -69,7 +69,13 @@
     "writerPlaceholder": "Who writes this episode?",
     "scenes_one": "{{written}} of {{count}} scene written.",
     "scenes_other": "{{written}} of {{count}} scenes written.",
-    "status": "Status"
+    "status": "Status",
+    "dueDate": "Due date",
+    "overdue": "Past due"
+  },
+  "sequence": {
+    "title": "Sequence progress",
+    "description": "Writing status, scenes written and estimated runtime of the sequence."
   },
   "status": {
     "idea": "Idea",
@@ -112,13 +118,218 @@
       "writer": "Writer",
       "scenes": "Scenes",
       "duration": "Runtime",
-      "goal": "Target"
+      "goal": "Target",
+      "due": "Due"
     },
     "noSeason": "No season",
     "season": "{{label}} · {{duration}}",
-    "overGoal": "Over the target runtime",
-    "cast": "Lines per character",
-    "castHint": "Number of lines of each character across the whole series.",
-    "noLines": "No line assigned yet."
+    "overGoal": "Over the target runtime"
+  },
+  "film": {
+    "all": "Whole film",
+    "empty": "No scene yet. Create acts, sequences and scenes in the plan.",
+    "writtenBy": "Written by {{writer}}",
+    "progressEmpty": "No sequence yet. Create acts and sequences in the plan, then write their scenes.",
+    "sequences_one": "{{count}} sequence",
+    "sequences_other": "{{count}} sequences",
+    "sequence": "Sequence",
+    "noAct": "Outside any act",
+    "act": "{{label}} · {{duration}} · {{share}}% of the film",
+    "details": {
+      "title": "Film sheet",
+      "description": "Logline, target runtime and writer of the whole film; they appear on the title page of the export.",
+      "loglinePlaceholder": "The film in one sentence: who wants what, and what stands in the way.",
+      "ofGoal": "{{duration}} / {{goal}}",
+      "runtimeGoalPlaceholder": "E.g. 100",
+      "writerPlaceholder": "Who writes this film?"
+    }
+  },
+  "layout": {
+    "more": "(MORE)",
+    "contd": "(CONT'D)"
+  },
+  "revision": {
+    "menu": "Revisions",
+    "label": "{{color}} revision of {{date}}",
+    "start": "New revision ({{color}})",
+    "stop": "End the revision",
+    "lock": "Lock scene numbers",
+    "unlock": "Unlock scene numbers",
+    "locked": "Numbers locked",
+    "hint": "anything changed since is marked with an asterisk.",
+    "colors": {
+      "white": "White",
+      "blue": "Blue",
+      "pink": "Pink",
+      "yellow": "Yellow",
+      "green": "Green",
+      "goldenrod": "Goldenrod",
+      "buff": "Buff",
+      "salmon": "Salmon"
+    }
+  },
+  "sides": {
+    "label": "Actor",
+    "everyone": "Everyone",
+    "file": "{{name}} sides",
+    "none": "This character appears in no scene of the selection.",
+    "heading_one": "{{name}} sides: {{count}} scene",
+    "heading_other": "{{name}} sides: {{count}} scenes"
+  },
+  "dossier": {
+    "subtitle": "Film dossier",
+    "logline": "Logline:",
+    "fields": {
+      "pitch": "Pitch",
+      "intention": "Statement of intent"
+    },
+    "hints": {
+      "pitch": "A few sentences to make people want more: the story, the character, the stakes.",
+      "intention": "Why this film, why you, and how you want to shoot it."
+    },
+    "export": "Export the dossier",
+    "exportTitle": "Export the film dossier",
+    "sequenceMeta_one": "{{count}} scene · {{duration}}",
+    "sequenceMeta_other": "{{count}} scenes · {{duration}}",
+    "characters": "Characters",
+    "outline": "Step outline",
+    "treatment": "Treatment",
+    "runtime": "Target runtime: {{duration}}",
+    "roles": {
+      "main": "Lead",
+      "secondary": "Supporting",
+      "antagonist": "Antagonist",
+      "mentor": "Mentor",
+      "ally": "Ally",
+      "extra": "Extra"
+    },
+    "placeholders": {
+      "pitch": "On a Breton island, a salt worker must relight the lighthouse's seven lamps…",
+      "intention": "I grew up by a salt marsh…"
+    },
+    "synopsis": "Synopsis"
+  },
+  "breakdown": {
+    "subtitle": "Breakdown",
+    "scheduleSubtitle": "Shooting schedule",
+    "tabs": {
+      "scenes": "By scene",
+      "schedule": "Shooting schedule"
+    },
+    "export": "Export",
+    "exportTitle": "Export the breakdown",
+    "exportScheduleTitle": "Export the shooting schedule",
+    "fields": {
+      "extras": "Extras",
+      "props": "Props",
+      "costumes": "Wardrobe",
+      "makeup": "Makeup and hair",
+      "vehicles": "Vehicles",
+      "effects": "Effects (special, visual)",
+      "sound": "Sound and music",
+      "notes": "Production notes"
+    },
+    "placeholders": {
+      "extras": "Twenty fishermen, two children…",
+      "props": "A salt rake, a lantern…",
+      "costumes": "Wet yellow oilskin…",
+      "makeup": "Bandaged hand, dark circles…",
+      "vehicles": "Sailing dinghy…",
+      "effects": "Fog, eels (visual effect)…",
+      "sound": "Bell, foghorn…",
+      "notes": "Shoot at low tide…"
+    },
+    "cast": "Characters",
+    "entries": "Linked sheets",
+    "duration": "Runtime",
+    "moment": {
+      "day": "Day",
+      "night": "Night",
+      "unknown": "Time not set"
+    },
+    "noLocation": "No location",
+    "noCast": "No character",
+    "scenes": "Scenes",
+    "filled_one": "{{count}} field",
+    "filled_other": "{{count}} fields",
+    "scheduleHint": "Scenes grouped by set, interior or exterior, day or night: what shoots in the same place in the same light is shot together.",
+    "groupMeta_one": "{{count}} scene · {{duration}}",
+    "groupMeta_other": "{{count}} scenes · {{duration}}",
+    "sceneCount_one": "{{count}} scene",
+    "sceneCount_other": "{{count}} scenes",
+    "groupCount_one": "{{count}} shooting group",
+    "groupCount_other": "{{count}} shooting groups"
+  },
+  "board": {
+    "description": "One card per scene, in its act's colour. Drag a card to move it; double-click to open the scene.",
+    "hint": "Drag to move, double-click to open"
+  },
+  "import": {
+    "description": "Bring in a screenplay written elsewhere: each scene lands in the chosen sequence, with its lines.",
+    "choose": "Choose a screenplay",
+    "formats": "Fountain (.fountain, .txt) or Final Draft (.fdx)",
+    "reading": "Reading the file…",
+    "empty": "No scene found in this file.",
+    "unreadable": "This file could not be read.",
+    "found_one": "{{count}} scene found.",
+    "found_other": "{{count}} scenes found.",
+    "characters_one": "{{count}} character",
+    "characters_other": "{{count}} characters",
+    "locations_one": "{{count}} location",
+    "locations_other": "{{count}} locations",
+    "new": "new",
+    "noHeading": "(no heading)",
+    "blocks_one": "{{count}} element",
+    "blocks_other": "{{count}} elements",
+    "noSequence": "First create a sequence (or an episode) in the plan.",
+    "target": "Add at the end of",
+    "run": "Import",
+    "importing": "Importing… {{done}} / {{count}}",
+    "cancel": "Cancel",
+    "done": "Import done: {{scenes}} scenes, {{characters}} characters and {{locations}} locations created.",
+    "openReading": "Read the script"
+  },
+  "beats": {
+    "title": "Structure beats",
+    "hint": "Place each key moment on a scene: GANIS tells you whether it falls too early or too late for the film's runtime.",
+    "choose": "Choose a scene…",
+    "names": {
+      "inciting": "Inciting incident",
+      "plot1": "First plot point",
+      "midpoint": "Midpoint",
+      "plot2": "Second plot point",
+      "climax": "Climax"
+    },
+    "expected": "Expected around {{minute}} min",
+    "at": "At {{minute}} min ({{share}}%)",
+    "verdict": {
+      "missing": "Not placed",
+      "early": "Too early",
+      "onTime": "Well placed",
+      "late": "Too late"
+    }
+  },
+  "stats": {
+    "title": "Speaking time",
+    "hint": "Estimated with the page-a-minute rule from the lines; the longest absence is the time between two scenes where the character appears.",
+    "columns": {
+      "character": "Character",
+      "lines": "Lines",
+      "minutes": "Speaking",
+      "scenes": "Scenes",
+      "gap": "Longest absence"
+    },
+    "gapFrom": "after {{minute}} min",
+    "none": "No line assigned yet."
+  },
+  "typing": {
+    "suggestions": "Suggestions"
+  },
+  "bible": {
+    "subtitle": "Series bible",
+    "concept": "Concept",
+    "seasons": "Seasons and episodes",
+    "export": "Export the bible",
+    "exportTitle": "Export the series bible"
   }
 }

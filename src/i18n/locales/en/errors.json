@@ -72,7 +72,7 @@
     "tooManyAttemptsMinutes": "Too many sign-in attempts. Try again in {{count}} min.",
     "usernameLength": "Username must be between 3 and 50 characters long.",
     "usernameChars": "Username can only contain letters, digits, “_” and “-”.",
-    "passwordTooShort": "Password must be at least 8 characters long.",
+    "passwordTooShort": "Password must be at least 12 characters long.",
     "passwordTooLong": "Password cannot exceed 128 characters.",
     "passwordLetterDigit": "Password must contain at least one letter and one digit.",
     "emailInvalid": "This email address is not valid.",
@@ -80,7 +80,8 @@
     "usernameTaken": "This username is already taken.",
     "emailTaken": "This email address is already in use.",
     "currentPasswordWrong": "The current password is incorrect.",
-    "passwordUnchanged": "The new password must be different from the old one."
+    "passwordUnchanged": "The new password must be different from the old one.",
+    "passwordWeak": "This password is too easy to guess: avoid common words (\"password\", \"qwerty\"…) and your username."
   },
   "project": {
     "notFound": "Project not found.",
@@ -203,6 +204,7 @@
     "notGanix": "This file is not a GANIS project.",
     "tooNew": "This project was created with a newer version of GANIS: update the application to open it.",
     "stagingMissing": "This import is no longer available. Please choose the file again.",
+    "signInFirst": "Sign in to import the project you opened: it will show up next.",
     "migrationFailed": "This project could not be updated for this version of GANIS."
   },
   "structureLink": {
@@ -300,7 +302,7 @@
       "tooLarge": "Split it (one file per chapter or page) or compress it.",
       "tooMany": "Add them in several goes.",
       "fileError": "Check that the file is not open elsewhere and that you can access it.",
-      "unsafeType": "Use “Save as…” if you need to use it elsewhere.",
+      "unsafeType": "Only common documents (Word, PDF, images, audio…) open from GANIS. Use \"Save as…\" for the others.",
       "openFailed": "Install an application for this file type, or use “Save as…”.",
       "nodeNotFound": "Reopen the story outline: the item may have been deleted."
     }
@@ -320,8 +322,9 @@
     "tooLarge": "“{{name}}” is larger than 300 MB.",
     "tooMany": "Too many files at once ({{max}} at most).",
     "fileError": "The file could not be read or written.",
-    "unsafeType": "This file type could start a program: GANIS will not open it.",
-    "openFailed": "No application could open this document."
+    "unsafeType": "For security, this file type does not open from GANIS.",
+    "openFailed": "No application could open this document.",
+    "confirmReceived": "This document comes from an imported project: confirm before opening it in another application."
   },
   "unexpected": "An unexpected error occurred. Try again; if it happens again, restart GANIS.",
   "load": {
@@ -448,5 +451,10 @@
   "emailRecovery": {
     "invalid": "No account on this device matches this username and email address.",
     "loginFirst": "Sign in once before enabling email recovery."
+  },
+  "deviceKey": {
+    "invalidBackup": "This file is not a GANIS backup key.",
+    "wrongBackup": "This backup key does not match the GANIS data on this computer.",
+    "backupInDataDir": "Save the backup key outside the GANIS data folder (USB stick, another folder)."
   }
 }

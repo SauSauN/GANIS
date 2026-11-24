@@ -979,6 +979,14 @@ pub async fn restore_for_viewer(
 
 /// Saisie de confirmation : le nom du projet, retapé (espaces de début et
 /// de fin et majuscules ignorés). Un nom vide ne confirme jamais rien.
+/// Refus : le nom du projet n'a pas été retapé pour le rendre privé.
+pub fn make_private_unconfirmed() -> AppError {
+    AppError::validation(
+        "Pour rendre ce projet privé, retapez son nom : il ne sera plus accessible aux autres personnes qui utilisent cet ordinateur.",
+    )
+    .with_key("project.makePrivateConfirm")
+}
+
 pub fn name_confirmed(name: &str, typed: Option<&str>) -> bool {
     let expected = name.trim().to_lowercase();
 
@@ -1077,9 +1085,11 @@ pub async fn purge_expired(pool: &SqlitePool, cutoff: &str) -> AppResult<Vec<Str
 /// - Privé → public (projet du compte uniquement) : le projet n'appartient
 ///   plus à personne ; nom, description et clé sont gardés en clair.
 ///
-/// La base du projet n'est pas touchée : sa clé reste la même, seule la
-/// façon de la conserver change. Un projet privé d'avant le chiffrement
-/// doit avoir été chiffré avant (ouverture de sa base).
+/// Pour public → privé, `new_private_key` est la nouvelle clé du projet : sa
+/// base vient d'être rechiffrée avec (voir
+/// `project_storage::rekey_storage`), car l'ancienne clé était gardée en
+/// clair. Sans elle, la clé reste la même. Un projet privé d'avant le
+/// chiffrement doit avoir été chiffré avant (ouverture de sa base).
 pub async fn set_visibility(
     pool: &SqlitePool,
     project_id: &str,
@@ -1087,6 +1097,7 @@ pub async fn set_visibility(
     account_key: &SecretKey,
     target: ProjectVisibility,
     confirm_name: Option<&str>,
+    new_private_key: Option<&SecretKey>,
 ) -> AppResult<Project> {
     let viewer = Viewer::Account {
         user_id: owner_id.to_owned(),
@@ -1105,17 +1116,17 @@ pub async fn set_visibility(
     // ouvrable que par ce compte. Les autres personnes de cet ordinateur le
     // perdent : le nom du projet doit avoir été retapé pour confirmer.
     if target == ProjectVisibility::Private && !name_confirmed(&current.name, confirm_name) {
-        return Err(AppError::validation(
-            "Pour rendre ce projet privé, retapez son nom : il ne sera plus accessible aux autres personnes qui utilisent cet ordinateur.",
-        )
-        .with_key("project.makePrivateConfirm"));
+        return Err(make_private_unconfirmed());
     }
 
     let now = crate::utils::now_utc();
 
     let result = match target {
         ProjectVisibility::Private => {
-            let project_key = project_key_for_viewer(&current, &viewer)?;
+            let project_key = match new_private_key {
+                Some(key) => key.clone(),
+                None => project_key_for_viewer(&current, &viewer)?,
+            };
             let wrapped_key = wrap_project_key(account_key, project_id, &project_key)?;
             let sealed = seal_text(account_key, project_id, &current.name, &current.description)?;
 

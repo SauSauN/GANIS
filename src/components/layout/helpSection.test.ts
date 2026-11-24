@@ -31,7 +31,10 @@ describe("rubrique de l'aide selon l'onglet affiché", () => {
     expect(helpSectionOfTab("settings:characters")).toBe("settings");
   });
 
-  it("roman : la rubrique du découpage", () => {
-    expect(helpSectionOfTab("manuscript.progress")).toBe("structure");
+  it("outils d'écriture : la rubrique de leur type de projet", () => {
+    expect(helpSectionOfTab("manuscript.progress")).toBe("manuscript");
+    expect(helpSectionOfTab("script.flatplan")).toBe("script");
+    expect(helpSectionOfTab("film.breakdown")).toBe("screen");
+    expect(helpSectionOfTab("screenplay.board")).toBe("screen");
   });
 });

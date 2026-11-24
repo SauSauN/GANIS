@@ -1,8 +1,10 @@
+import { NumberStepper } from "@/components/common/NumberStepper";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { useReturnFocus } from "@/lib/useReturnFocus";
-import { ArrowLeftRight, ArrowRight, ChevronDown, Loader2, Repeat, Trash2, X } from "lucide-react";
+import { ArrowLeftRight, ArrowRight, ChevronDown, Repeat, Trash2, X } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -412,20 +414,20 @@ export function RelationDialog({
 
               {showDetails && (
                 <div className="space-y-4 border-t px-3 py-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="relation-intensity">
+                  <div className="flex items-center gap-3">
+                    <Label htmlFor="relation-intensity" className="min-w-0 flex-1">
                       {t("intensity.label")} · {t(`intensity.${draft.intensity}` as "intensity.1")}
                     </Label>
-                    <input
+                    <NumberStepper
                       id="relation-intensity"
-                      type="range"
+                      value={draft.intensity}
                       min={1}
                       max={5}
-                      step={1}
-                      value={draft.intensity}
                       disabled={busy}
-                      onChange={(e) => set("intensity", Number(e.target.value))}
-                      className="h-8 w-full accent-primary"
+                      format={(value) => `${value} / 5`}
+                      onChange={(value) => value !== null && set("intensity", Math.round(value) as typeof draft.intensity)}
+                      size="sm"
+                      valueClassName="w-14"
                     />
                   </div>
 
@@ -526,7 +528,7 @@ export function RelationDialog({
               {t("form.cancel")}
             </Button>
             <Button type="submit" size="sm" disabled={busy}>
-              {busy && <Loader2 className="animate-spin" />}
+              {busy && <LoadingDots />}
               {relationId ? t("form.save") : t("form.create")}
             </Button>
           </div>

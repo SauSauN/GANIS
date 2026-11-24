@@ -27,6 +27,7 @@ const WRITE_PREFIXES = [
   "empty_",
   "link_",
   "move_",
+  "place_",
   "purge_",
   "raise_",
   "remove_",

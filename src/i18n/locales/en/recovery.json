@@ -83,5 +83,19 @@
       "saveFailed": "The address is verified, but the server could not save the recovery. Try again.",
       "signupSetupFailed": "Account created, but email recovery could not be enabled. Enable it in Settings › Account."
     }
+  },
+  "device": {
+    "locked": {
+      "title": "GANIS data is locked",
+      "reason": {
+        "missing": "The key that encrypts GANIS data on this computer is missing.",
+        "unreadable": "The key that encrypts GANIS data cannot be read by this Windows account (Windows reinstalled, another account or another computer).",
+        "wrongKey": "This computer's key does not match the GANIS data (data folder from another computer)."
+      },
+      "explanation": "Choose the backup key file saved from Settings › Account. GANIS will then restart with your data.",
+      "restore": "Choose the backup key…",
+      "dialogTitle": "Choose the GANIS backup key",
+      "noBackup": "Without a backup key, this data cannot be opened. Your .ganix exports can still be imported into a new GANIS."
+    }
   }
 }

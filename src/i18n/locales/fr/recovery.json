@@ -83,5 +83,19 @@
       "saveFailed": "L'adresse est vérifiée, mais le serveur n'a pas pu enregistrer la récupération. Réessayez.",
       "signupSetupFailed": "Compte créé, mais la récupération par e-mail n'a pas pu être activée. Activez-la dans Paramètres › Compte."
     }
+  },
+  "device": {
+    "locked": {
+      "title": "Données de GANIS verrouillées",
+      "reason": {
+        "missing": "La clé qui chiffre les données de GANIS sur cet ordinateur a disparu.",
+        "unreadable": "La clé qui chiffre les données de GANIS ne peut pas être lue par ce compte Windows (Windows réinstallé, autre compte ou autre ordinateur).",
+        "wrongKey": "La clé de cet ordinateur ne correspond pas aux données de GANIS (dossier de données venu d'un autre ordinateur)."
+      },
+      "explanation": "Choisissez le fichier de clé de secours enregistré depuis Paramètres › Compte. GANIS redémarrera ensuite avec vos données.",
+      "restore": "Choisir la clé de secours…",
+      "dialogTitle": "Choisir la clé de secours de GANIS",
+      "noBackup": "Sans clé de secours, ces données ne peuvent pas être ouvertes. Vos exports .ganix, eux, restent importables dans un nouveau GANIS."
+    }
   }
 }

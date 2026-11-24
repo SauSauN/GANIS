@@ -1,6 +1,6 @@
 import { lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { ErrorBoundary } from "@/components/layout/ErrorBoundary";
 import { ProjectSettingsPanel } from "@/components/project-settings/ProjectSettingsPanel";
 import type { ProjectSettingsId } from "@/components/project-settings/sections";
@@ -9,6 +9,7 @@ import {
   NOVEL_FEATURES,
   MANGA_FEATURES,
   SERIES_FEATURES,
+  FILM_FEATURES,
   SETTINGS_PREFIX,
   featureAvailable,
   findFeature,
@@ -36,6 +37,7 @@ import { WorkspaceHome } from "@/components/workspace/WorkspaceHome";
 import { characterIdOfTab } from "@/lib/characters";
 import { locationIdOfTab } from "@/lib/locations";
 import { noteIdOfTab } from "@/lib/notes";
+import { boardIdOfTab } from "@/lib/boards";
 import { createFeatureOf, listFeatureOf, WORLD_MODULES, worldEntryOfTab } from "@/lib/world";
 import { structureNodeIdOfTab } from "@/lib/structure";
 import type { Project } from "@/types";
@@ -52,6 +54,9 @@ const GlossaryView = lazy(() => import("@/components/workspace/views/GlossaryVie
 const HistoryView = lazy(() => import("@/components/workspace/views/HistoryView").then((module) => ({ default: module.HistoryView })));
 const StructureNodeView = lazy(() => import("@/components/workspace/views/StructureNodeView").then((module) => ({ default: module.StructureNodeView })));
 const PlotBoard = lazy(() => import("@/components/plot/PlotBoard").then((module) => ({ default: module.PlotBoard })));
+const CharacterArcsView = lazy(() => import("@/components/characters/CharacterArcsView").then((module) => ({ default: module.CharacterArcsView })));
+const InspirationBoardView = lazy(() => import("@/components/boards/InspirationBoardView").then((module) => ({ default: module.InspirationBoardView })));
+const PlotTimelineView = lazy(() => import("@/components/plot/PlotTimelineView").then((module) => ({ default: module.PlotTimelineView })));
 const PlotReadingView = lazy(() => import("@/components/plot/PlotReadingView").then((module) => ({ default: module.PlotReadingView })));
 // Roman : manuscrit continu, suivi de rédaction, dossier éditorial.
 const ManuscriptView = lazy(() => import("@/components/novel/ManuscriptView").then((module) => ({ default: module.ManuscriptView })));
@@ -64,6 +69,9 @@ const ProductionView = lazy(() => import("@/components/manga/ProductionView").th
 const StoryContinuityView = lazy(() => import("@/components/structure/StoryContinuityView").then((module) => ({ default: module.StoryContinuityView })));
 const SeriesReadView = lazy(() => import("@/components/series/SeriesReadView").then((module) => ({ default: module.SeriesReadView })));
 const SeriesProgressView = lazy(() => import("@/components/series/SeriesProgressView").then((module) => ({ default: module.SeriesProgressView })));
+const FilmBreakdownView = lazy(() => import("@/components/series/FilmBreakdownView").then((module) => ({ default: module.FilmBreakdownView })));
+const FilmBoardView = lazy(() => import("@/components/series/FilmBoardView").then((module) => ({ default: module.FilmBoardView })));
+const FilmImportView = lazy(() => import("@/components/series/FilmImportView").then((module) => ({ default: module.FilmImportView })));
 const ContinuityView = lazy(() => import("@/components/manga/ContinuityView").then((module) => ({ default: module.ContinuityView })));
 // Lecture complète (film, série, jeu vidéo, JDR, projet libre).
 const StoryReadView = lazy(() => import("@/components/structure/StoryReadView").then((module) => ({ default: module.StoryReadView })));
@@ -90,7 +98,7 @@ export function WorkspaceView(props: WorkspaceViewProps) {
     <Suspense
       fallback={
         <main className="flex min-h-0 flex-1 items-center justify-center text-sm text-muted-foreground" role="status">
-          <Loader2 className="mr-2 size-4 animate-spin" aria-hidden="true" />
+          <LoadingDots className="mr-2 size-4" aria-hidden="true" />
           {t("loading")}
         </main>
       }
@@ -147,6 +155,26 @@ function WorkspaceContent({
 
   if (tabId === "gallery") {
     return <GalleryView project={project} feature={feature} />;
+  }
+
+  if (tabId === "boards") {
+    return <InspirationBoardView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  // Une planche d'inspiration dans son propre onglet.
+  const boardId = boardIdOfTab(tabId);
+
+  if (boardId) {
+    return (
+      <InspirationBoardView
+        key={boardId}
+        projectId={project.id}
+        boardId={boardId}
+        feature={feature}
+        onOpenFeature={onOpenFeature}
+        onClose={() => onCloseTab(tabId)}
+      />
+    );
   }
 
   if (tabId === "glossary.list") {
@@ -238,6 +266,11 @@ function WorkspaceContent({
     return null;
   }
 
+  // Outils du film : réservés aux projets de film (l'onglet se ferme sinon).
+  if (FILM_FEATURES.has(tabId) && project.type !== "film") {
+    return null;
+  }
+
   if (tabId === "screenplay.read") {
     return <SeriesReadView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
   }
@@ -250,8 +283,42 @@ function WorkspaceContent({
     return <SeriesProgressView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
+  // Outils communs au film et à la série (mêmes vues).
+  if (tabId === "screenplay.board" || tabId === "film.board") {
+    return <FilmBoardView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "screenplay.breakdown" || tabId === "film.breakdown") {
+    return <FilmBreakdownView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "screenplay.import" || tabId === "film.import") {
+    return <FilmImportView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Film (réservé aux projets de film ; mêmes vues que la série, en version
+  // long métrage)
+  // ---------------------------------------------------------------------------
+
+  if (tabId === "film.read") {
+    return <SeriesReadView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "film.continuity") {
+    return <StoryContinuityView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "film.progress") {
+    return <SeriesProgressView project={project} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
   if (tabId === "plot.board") {
     return <PlotBoard projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
+  }
+
+  if (tabId === "plot.timeline") {
+    return <PlotTimelineView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
   if (tabId === "plot.reading") {
@@ -297,6 +364,10 @@ function WorkspaceContent({
         onOpenFeature={onOpenFeature}
       />
     );
+  }
+
+  if (tabId === "characters.arcs") {
+    return <CharacterArcsView projectId={project.id} feature={feature} onOpenFeature={onOpenFeature} />;
   }
 
   if (tabId === "characters.relations") {

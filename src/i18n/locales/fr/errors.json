@@ -72,7 +72,7 @@
     "tooManyAttemptsMinutes": "Trop de tentatives de connexion. Réessayez dans {{count}} min.",
     "usernameLength": "Le nom d'utilisateur doit contenir entre 3 et 50 caractères.",
     "usernameChars": "Le nom d'utilisateur ne peut contenir que des lettres, des chiffres, « _ » et « - ».",
-    "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères.",
+    "passwordTooShort": "Le mot de passe doit contenir au moins 12 caractères.",
     "passwordTooLong": "Le mot de passe ne peut pas dépasser 128 caractères.",
     "passwordLetterDigit": "Le mot de passe doit contenir au moins une lettre et un chiffre.",
     "emailInvalid": "L'adresse e-mail n'est pas valide.",
@@ -80,7 +80,8 @@
     "usernameTaken": "Ce nom d'utilisateur est déjà utilisé.",
     "emailTaken": "Cette adresse e-mail est déjà utilisée.",
     "currentPasswordWrong": "Le mot de passe actuel est incorrect.",
-    "passwordUnchanged": "Le nouveau mot de passe doit être différent de l'ancien."
+    "passwordUnchanged": "Le nouveau mot de passe doit être différent de l'ancien.",
+    "passwordWeak": "Ce mot de passe est trop facile à deviner : évitez les mots courants (« motdepasse », « azerty »…) et votre nom d'utilisateur."
   },
   "project": {
     "notFound": "Projet non trouvé.",
@@ -203,6 +204,7 @@
     "notGanix": "Ce fichier n'est pas un projet GANIS.",
     "tooNew": "Ce projet a été créé avec une version plus récente de GANIS : mettez l'application à jour pour l'ouvrir.",
     "stagingMissing": "Cet import n'est plus disponible. Choisissez à nouveau le fichier.",
+    "signInFirst": "Connectez-vous pour importer le projet que vous avez ouvert : il s'affichera ensuite.",
     "migrationFailed": "Ce projet n'a pas pu être mis à jour pour cette version de GANIS."
   },
   "structureLink": {
@@ -300,7 +302,7 @@
       "tooLarge": "Découpez-le (un fichier par chapitre ou par planche) ou compressez-le.",
       "tooMany": "Ajoutez-les en plusieurs fois.",
       "fileError": "Vérifiez que le fichier n'est pas ouvert ailleurs et que vous avez le droit d'y accéder.",
-      "unsafeType": "Enregistrez-le ailleurs avec « Enregistrer sous… » si vous devez l'utiliser.",
+      "unsafeType": "Seuls les documents courants (Word, PDF, images, sons…) s'ouvrent depuis GANIS. Utilisez « Enregistrer sous… » pour les autres.",
       "openFailed": "Installez une application pour ce type de fichier, ou utilisez « Enregistrer sous… ».",
       "nodeNotFound": "Rouvrez le plan du récit : l'élément a peut-être été supprimé."
     }
@@ -320,8 +322,9 @@
     "tooLarge": "« {{name}} » dépasse 300 Mo.",
     "tooMany": "Trop de fichiers à la fois ({{max}} au plus).",
     "fileError": "Le fichier n'a pas pu être lu ou écrit.",
-    "unsafeType": "Ce type de fichier pourrait lancer un programme : GANIS ne l'ouvre pas.",
-    "openFailed": "Aucune application n'a pu ouvrir ce document."
+    "unsafeType": "Ce type de fichier ne s'ouvre pas depuis GANIS, par sécurité.",
+    "openFailed": "Aucune application n'a pu ouvrir ce document.",
+    "confirmReceived": "Ce document vient d'un projet importé : confirmez avant de l'ouvrir dans une autre application."
   },
   "unexpected": "Une erreur inattendue est survenue. Réessayez ; si elle revient, redémarrez GANIS.",
   "load": {
@@ -448,5 +451,10 @@
   "emailRecovery": {
     "invalid": "Aucun compte de cet appareil ne correspond à ce nom d'utilisateur et à cette adresse e-mail.",
     "loginFirst": "Connectez-vous une première fois avant d'activer la récupération par e-mail."
+  },
+  "deviceKey": {
+    "invalidBackup": "Ce fichier n'est pas une clé de secours GANIS.",
+    "wrongBackup": "Cette clé de secours ne correspond pas aux données de GANIS sur cet ordinateur.",
+    "backupInDataDir": "Enregistrez la clé de secours hors du dossier de données de GANIS (clé USB, autre dossier)."
   }
 }

@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { FileInput, Loader2, Save } from "lucide-react";
+import { FileInput, Save } from "lucide-react";
+import { InfoTip } from "@/components/common/InfoTip";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { VersionsButton } from "@/components/history/VersionsDialog";
 import { ExportMenu } from "@/components/novel/ExportMenu";
 import { Button } from "@/components/ui/button";
@@ -126,7 +128,7 @@ export function EditorialView({ project, feature }: EditorialViewProps) {
           </p>
         ) : (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            <LoadingDots className="size-4" aria-hidden="true" />
             {t("text.loading")}
           </p>
         )}
@@ -140,10 +142,11 @@ export function EditorialView({ project, feature }: EditorialViewProps) {
     const words = countWordsPlain(value);
     return (
       <section className="rounded-xl border bg-card shadow-sm">
-        <header className="flex flex-wrap items-start justify-between gap-3 border-b px-5 py-4">
-          <div className="min-w-0">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b px-5 py-4">
+          {/* Titre de la partie, son explication derrière un « i ». */}
+          <div className="flex min-w-0 items-center gap-1.5">
             <h2 className="font-semibold">{t(`editorial.${key}`)}</h2>
-            <p className="text-sm text-muted-foreground">{t(`editorial.${key}Hint`)}</p>
+            <InfoTip>{t(`editorial.${key}Hint`)}</InfoTip>
           </div>
           <div className="flex items-center gap-2">
             {synopsis && (
@@ -185,12 +188,12 @@ export function EditorialView({ project, feature }: EditorialViewProps) {
   return (
     <PageShell
       title={feature.label}
-      description={t("editorial.intro")}
+      info={t("editorial.intro")}
       actions={
         <div className="flex flex-wrap items-center gap-3">
           <VersionsButton projectId={project.id} kind="editorial" itemId="default" name={feature.label} />
           <Button disabled={!dirty || saving} onClick={() => void save()}>
-            {saving ? <Loader2 className="animate-spin" /> : <Save />}
+            {saving ? <LoadingDots /> : <Save />}
             {t("editorial.save")}
           </Button>
         </div>

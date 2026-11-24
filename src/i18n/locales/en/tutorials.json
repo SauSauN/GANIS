@@ -224,6 +224,76 @@
       }
     }
   },
+  "film": {
+    "title": "Start a project: {{type}}",
+    "name": "{{type}}",
+    "intro": "The main steps to write your film, from the logline to the exported script.",
+    "steps": {
+      "start": {
+        "title": "Set up your story",
+        "text": "Start with a few lines: what is this film about, and in what tone?",
+        "points": ["Details › Project synopsis: summary, genres, subgenres and tone."]
+      },
+      "cast": {
+        "title": "Create your characters",
+        "text": "One sheet per character: they are the ones who will speak the lines.",
+        "points": [
+          "Characters › Create a character, or Ctrl+N in the module.",
+          "Create your locations too: they are used in scene headings (INT. KITCHEN — NIGHT)."
+        ]
+      },
+      "plan": {
+        "title": "Break down the film",
+        "text": "By default the outline offers: {{levels}}. You can rename these levels in the settings.",
+        "points": ["Outline › Story plan: add your acts, their sequences, then their scenes."]
+      },
+      "scene": {
+        "title": "Write the scenes",
+        "text": "Each scene sheet has its script: the heading, then actions, lines, transitions and shots, in standard format.",
+        "points": [
+          "Ctrl+Enter moves to the next element; after a line, the other character answers.",
+          "Runtime is estimated at one script page per minute.",
+          "A sequence sheet tracks its writing status and runtime."
+        ]
+      },
+      "progress": {
+        "title": "Track the film",
+        "text": "Film tracking gathers the film sheet and progress: estimated vs target runtime, runtime of each act, status of the sequences.",
+        "points": [
+          "Fill in the logline, target runtime and writer: they appear on the title page of the export.",
+          "Each act's share reveals an act that runs too long."
+        ]
+      },
+      "read": {
+        "title": "Read and export the script",
+        "text": "Script reading shows the whole film in screenplay format, scenes numbered.",
+        "points": [
+          "The ▶ button in the title bar (F5) shows it full screen.",
+          "Export to Word, PDF, text or Fountain (Final Draft, Highland, WriterDuet…)."
+        ]
+      },
+      "continuity": {
+        "title": "Check continuity",
+        "text": "Where each character appears, in which state, with their lines, scene by scene.",
+        "points": ["The presence chart shows who appears in which sequence."]
+      },
+      "board": {
+        "title": "Rearrange on the index cards",
+        "text": "One card per scene, in its act's colour: drag them between sequences to try another order.",
+        "points": ["Double-click a card to open the scene."]
+      },
+      "dossier": {
+        "title": "Prepare the film dossier",
+        "text": "In Film tracking, the film sheet holds the logline, pitch and statement of intent; “Export the dossier” adds the project synopsis, characters, step outline and treatment.",
+        "points": ["Nothing is written twice: the step outline and treatment come from the plan's summaries."]
+      },
+      "breakdown": {
+        "title": "Break it down for the shoot",
+        "text": "For each scene, what production must plan; the shooting schedule groups scenes by set and time of day.",
+        "points": ["Lock scene numbers and start a coloured revision in script reading as the shoot approaches."]
+      }
+    }
+  },
   "characters": {
     "title": "Tutorial: Characters",
     "name": "Characters",

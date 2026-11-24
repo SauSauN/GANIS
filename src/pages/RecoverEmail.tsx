@@ -75,7 +75,7 @@ export default function RecoverEmail() {
   async function onSubmitPassword(event: FormEvent) {
     event.preventDefault();
 
-    const issue = checkPassword(password) ?? (password !== confirm ? "passwordMismatch" : null);
+    const issue = checkPassword(password, username) ?? (password !== confirm ? "passwordMismatch" : null);
     if (issue) return setProblem({ issue });
 
     setProblem(null);

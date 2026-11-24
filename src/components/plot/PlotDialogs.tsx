@@ -1,3 +1,4 @@
+import { NumberStepper } from "@/components/common/NumberStepper";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { blankEvent } from "@/components/plot/actions";
@@ -86,7 +87,7 @@ export function PlotTemplatesDialog({ open, projectId, data, onClose }: { open: 
       <div className="mt-4 flex flex-wrap items-center gap-4 text-sm">
         <label className="flex items-center gap-2">
           {t("templates.rows")}
-          <input type="number" min={4} value={rows} placeholder={t("common:placeholders.rows")} onChange={(e) => setRows(Math.max(4, Number.parseInt(e.target.value, 10) || 4))} className={cn(fieldClass, "h-8 w-20")} />
+          <NumberStepper value={rows} min={4} placeholder={t("common:placeholders.rows")} aria-label={t("templates.rows")} onChange={(value) => value !== null && setRows(Math.max(4, Math.round(value)))} size="sm" valueClassName="w-12" />
         </label>
         <label className="flex items-center gap-2">
           <input type="checkbox" className="size-4 accent-primary" checked={replace} onChange={(e) => setReplace(e.target.checked)} />

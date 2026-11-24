@@ -33,7 +33,7 @@ function issuesOf(values: AccountValues): Record<AccountField, ValidationIssue |
   return {
     username: checkUsername(values.username),
     email: checkEmail(values.email),
-    password: checkPassword(values.password),
+    password: checkPassword(values.password, values.username),
     confirm: values.password !== values.confirm ? "passwordMismatch" : null,
   };
 }

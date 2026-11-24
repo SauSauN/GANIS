@@ -236,19 +236,20 @@ pub enum ImportMode {
 #[serde(rename_all = "camelCase")]
 pub struct ImportOutcome {
     pub project: Project,
-    /// Remplacement : nom du fichier de sauvegarde de l'ancien projet
-    /// (dans le dossier des sauvegardes de GANIS).
-    pub backup_file: Option<String>,
+    /// Remplacement : la copie chiffrée de l'ancien projet, placée dans la
+    /// corbeille des projets (voir `backup_to_trash`).
+    pub backup: Option<Project>,
 }
 
-/// Dossier des sauvegardes automatiques (remplacement à l'import).
-pub(super) const BACKUP_DIR: &str = "sauvegardes";
+/// Ancien dossier des sauvegardes automatiques, en clair (`.ganix`), avant
+/// qu'elles deviennent des copies chiffrées dans la corbeille.
+pub(super) const LEGACY_BACKUP_DIR: &str = "sauvegardes";
 /// Suffixes des dossiers de projet pendant un remplacement.
 pub(super) const INCOMING_SUFFIX: &str = ".import";
 pub(super) const REPLACED_SUFFIX: &str = ".replaced";
 
-pub fn backup_dir(data_dir: &Path) -> PathBuf {
-    data_dir.join(BACKUP_DIR)
+pub fn legacy_backup_dir(data_dir: &Path) -> PathBuf {
+    data_dir.join(LEGACY_BACKUP_DIR)
 }
 
 pub(super) fn sibling(dir: &Path, suffix: &str) -> PathBuf {
@@ -325,15 +326,20 @@ pub async fn confirm_import(
     } else {
         ImportOutcome {
             project: import_as_new(state, owner_id, account_key, &dir, &manifest, taken, owned).await?,
-            backup_file: None,
+            backup: None,
         }
     };
+
+    // 13 bis. Documents reçus : leur première ouverture dans une autre
+    // application demandera une confirmation (voir `received_documents`).
+    let pool = crate::services::project_storage::pool_for_user(state, &outcome.project.id, owner_id).await?;
+    crate::services::received_documents::mark_project(&state.app_db, &outcome.project.id, &pool).await?;
 
     // 14. Nettoyage et journal (sans chemin ni contenu).
     let _ = std::fs::remove_dir_all(&dir);
     tracing::info!(
         schema = manifest.schema_version,
-        replaced = outcome.backup_file.is_some(),
+        replaced = outcome.backup.is_some(),
         "Projet importé depuis un .ganix"
     );
 
@@ -412,16 +418,7 @@ pub(super) async fn replace_project(
         .ok_or_else(|| AppError::not_found("Projet non trouvé.").with_key("project.notFound"))?;
 
     // 1. Sauvegarde de l'ancien projet.
-    let backups = backup_dir(&state.data_dir);
-    std::fs::create_dir_all(&backups).map_err(|e| io_error("Dossier des sauvegardes", e))?;
-
-    let stem = suggested_file_name(&existing.name);
-    let stem = stem.trim_end_matches(".ganix");
-    let stamp = chrono::Local::now().format("%Y-%m-%d_%H-%M-%S");
-    let backup_name = format!("{stem} - avant import {stamp}.ganix");
-
-    let pool = project_storage::pool_for_user(state, &existing.id, owner_id).await?;
-    write_ganix(&pool, &existing, &backups.join(&backup_name), &work_dir(&state.data_dir)).await?;
+    let backup = backup_to_trash(state, owner_id, account_key, &existing).await?;
 
     // 2. Nouvelle base, à côté de l'ancienne.
     let wrapped = existing
@@ -494,8 +491,57 @@ pub(super) async fn replace_project(
 
     Ok(ImportOutcome {
         project,
-        backup_file: Some(backup_name),
+        backup: Some(backup),
     })
+}
+
+/// Sauvegarde d'un projet avant son remplacement : une copie complète,
+/// **chiffrée** comme tout projet privé (sa propre clé, enfermée par la clé
+/// du compte), placée aussitôt dans la corbeille des projets.
+///
+/// Elle s'y restaure pendant 30 jours, puis elle est effacée comme tout
+/// projet de la corbeille. (Avant, c'était un `.ganix` en clair gardé sans
+/// limite dans le dossier de données.)
+async fn backup_to_trash(
+    state: &AppState,
+    owner_id: &str,
+    account_key: &SecretKey,
+    existing: &Project,
+) -> AppResult<Project> {
+    let stamp = chrono::Local::now().format("%d/%m/%Y %H:%M");
+    let suffix = format!(" (avant import du {stamp})");
+    let max = project_service::MAX_PROJECT_NAME_CHARS - suffix.chars().count();
+    let name = format!("{}{suffix}", existing.name.trim().chars().take(max).collect::<String>());
+
+    let (backup, backup_key) = project_service::create_imported_project(
+        &state.app_db,
+        owner_id,
+        account_key,
+        None,
+        &name,
+        &existing.description,
+        existing.project_type,
+        existing.status,
+    )
+    .await?;
+
+    let viewer = Viewer::Account { user_id: owner_id.to_owned(), key: account_key.clone() };
+
+    let saved = async {
+        project_storage::duplicate_storage(state, &existing.id, &backup.id, &viewer, &backup_key).await?;
+        project_service::trash_for_viewer(&state.app_db, &backup.id, &viewer).await?;
+        project_storage::close_pool(state, &backup.id).await;
+        AppResult::Ok(())
+    }
+    .await;
+
+    if let Err(error) = saved {
+        let _ = project_service::delete_project(&state.app_db, &backup.id, owner_id).await;
+        project_storage::delete_storage(state, &backup.id).await;
+        return Err(error);
+    }
+
+    Ok(backup)
 }
 
 /// Copie chiffrée de la base reçue dans `target_dir`, mise à jour par les

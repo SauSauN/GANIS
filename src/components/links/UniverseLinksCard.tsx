@@ -1,7 +1,8 @@
 import { useId, useMemo, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
-import { Link2, Loader2, MapPin, Network, PawPrint, Plus, Unlink, UserPlus, UserRound } from "lucide-react";
+import { Link2, MapPin, Network, PawPrint, Plus, Unlink, UserPlus, UserRound } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { CharacterAvatar } from "@/components/characters/CharacterAvatar";
 import { ActionMenu, type MenuItem } from "@/components/documents/ActionMenu";
 import { LinkGroup, LinkList, LinkRow } from "@/components/links/LinkRow";
@@ -467,7 +468,7 @@ function AnimalDialog({
         </Button>
         {!animal && (
           <Button type="button" disabled={busy || !picked} onClick={() => void run(() => setCharacter(projectId, picked, characterId))}>
-            {busy && <Loader2 className="animate-spin" />}
+            {busy && <LoadingDots />}
             {t("animalCharacter.link")}
           </Button>
         )}
@@ -531,7 +532,7 @@ function AnimalCharacterDialog({
               })
             }
           >
-            {busy ? <Loader2 className="animate-spin" /> : <UserPlus />}
+            {busy ? <LoadingDots /> : <UserPlus />}
             {t("animalCharacter.create")}
           </Button>
           <div className="space-y-1.5">

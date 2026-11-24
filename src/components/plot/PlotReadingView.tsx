@@ -11,7 +11,6 @@ import {
   FileStack,
   KeyRound,
   ListTree,
-  Loader2,
   MapPin,
   NotebookPen,
   Pencil,
@@ -24,6 +23,7 @@ import {
   StepForward,
   Users,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { CharacterAvatar } from "@/components/characters/CharacterAvatar";
 import { DocumentIcon } from "@/components/documents/DocumentIcon";
 import { DocumentViewer } from "@/components/documents/DocumentViewer";
@@ -240,7 +240,7 @@ export function PlotReadingView({ projectId, feature, onOpenFeature }: PlotReadi
           </p>
         ) : (
           <span className="inline-flex items-center gap-2" role="status">
-            <Loader2 className="size-4 animate-spin" />
+            <LoadingDots className="size-4" />
             {t("loading")}
           </span>
         )}

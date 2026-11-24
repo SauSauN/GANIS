@@ -7,13 +7,13 @@ import {
   ExternalLink,
   FileQuestion,
   History,
-  Loader2,
   Maximize,
   MoveHorizontal,
   Save,
   X,
   ZoomIn,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { DocumentIcon } from "@/components/documents/DocumentIcon";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogDescription, DialogTitle } from "@/components/ui/dialog";
@@ -227,7 +227,7 @@ export function DocumentViewer({ projectId, documents, documentId, onClose, onSh
       <div className="min-h-0 flex-1 bg-muted/40">
         {!content ? (
           <div className="flex h-full items-center justify-center gap-2 text-sm text-muted-foreground" role="status">
-            <Loader2 className="size-4 animate-spin" />
+            <LoadingDots className="size-4" />
             {t("viewer.loading")}
           </div>
         ) : "error" in content ? (
@@ -359,7 +359,7 @@ function WordView({ blob, document, projectId }: { blob: Blob; document: Structu
           </p>
         ) : html === null ? (
           <p className="flex items-center justify-center gap-2 text-sm text-muted-foreground" role="status">
-            <Loader2 className="size-4 animate-spin" />
+            <LoadingDots className="size-4" />
             {t("viewer.loading")}
           </p>
         ) : (
@@ -444,7 +444,7 @@ function TextEditor({ projectId, document, blob, onDirtyChange, saveRef }: TextE
           {dirty ? ` · ${t("viewer.modified")}` : ""}
         </span>
         <Button size="xs" disabled={!dirty || saving} onClick={() => void save()} title={`${t("viewer.save")} (Ctrl+S)`}>
-          {saving ? <Loader2 className="animate-spin" /> : <Save />}
+          {saving ? <LoadingDots /> : <Save />}
           {t("viewer.save")}
         </Button>
       </div>

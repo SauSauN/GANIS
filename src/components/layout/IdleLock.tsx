@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
 import { errorText } from "@/lib/errors";
 import { useIdleLock } from "@/lib/preferences";
+import { forgetSessionCaches } from "@/lib/sessionCache";
 import { saveEntries, useUnsavedStore } from "@/lib/unsavedChanges";
 import { useAuthStore } from "@/stores/authStore";
 import { usePlotStore } from "@/stores/plotStore";
@@ -111,6 +112,10 @@ export function IdleLock() {
     } catch {
       /* la session est fermée côté interface dans tous les cas */
     }
+
+    // Images déchiffrées gardées en cache : oubliées (les vues affichées
+    // gardent leur propre copie et redemandent le reste après déverrouillage).
+    forgetSessionCaches("lock");
 
     setPassword("");
     setError(null);

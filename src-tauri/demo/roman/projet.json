@@ -10,8 +10,8 @@
     "pitch": "Hiver 2019 : en numérisant les plaques de verre d'un observatoire qui ferme, Jeanne découvre qu'on a effacé la découverte d'une mesureuse de 1913.",
     "highlights": [
       "3 parties, 9 chapitres, prologue, épilogue : 19 scènes dont 18 rédigées",
-      "9 personnages, 16 lieux, 7 objets",
-      "Trame en 4 intrigues, passé de 1913, mystères et indices",
+      "12 personnages, 16 lieux, 11 objets, 10 fiches de faune, factions, peuples et savoirs",
+      "Trame en 4 intrigues, passé de 1913, mystères et indices ; glossaire et galerie",
       "Notes de travail : chronologie, glossaire, « qui sait quoi »"
     ]
   },
@@ -77,6 +77,42 @@
         "treasure"
       ],
       "detailLevel": "advanced"
+    },
+    "species": {
+      "enabled": true,
+      "categories": [
+        "fauna",
+        "flora"
+      ],
+      "detailLevel": "intermediate"
+    },
+    "faction": {
+      "enabled": true,
+      "categories": [
+        "political",
+        "economic",
+        "family",
+        "social"
+      ],
+      "detailLevel": "intermediate"
+    },
+    "people": {
+      "enabled": true,
+      "categories": [
+        "people",
+        "culture",
+        "religion"
+      ],
+      "detailLevel": "intermediate"
+    },
+    "magic": {
+      "enabled": true,
+      "categories": [
+        "system",
+        "branch",
+        "technique"
+      ],
+      "detailLevel": "intermediate"
     }
   },
   "structure": {
@@ -1092,6 +1128,90 @@
           35
         ]
       }
+    },
+    {
+      "key": "louise",
+      "firstName": "Louise",
+      "lastName": "Lacoste",
+      "role": "secondary",
+      "status": "dead",
+      "fields": {
+        "age": "19 ans en 1913",
+        "gender": "female",
+        "occupation": "Couturière à Estérac",
+        "firstAppearance": "@node:s4-2",
+        "description": "La sœur cadette de Marthe, à qui toutes les lettres sont adressées.",
+        "mainGoal": "Que sa sœur revienne au village."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          225,
+          215,
+          200
+        ],
+        "figure": [
+          120,
+          90,
+          70
+        ]
+      }
+    },
+    {
+      "key": "jules",
+      "firstName": "Jules",
+      "lastName": "Roux",
+      "role": "secondary",
+      "status": "dead",
+      "fields": {
+        "age": "Gardien de 1911 à 1952",
+        "gender": "male",
+        "occupation": "Gardien de l'observatoire",
+        "firstAppearance": "@node:s6-1",
+        "description": "Le grand-père de Bastien ; c'est lui qui a muré la chambre noire en 1931.",
+        "secret": "Il savait ce que le mur cachait."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          190,
+          185,
+          175
+        ],
+        "figure": [
+          70,
+          60,
+          50
+        ]
+      }
+    },
+    {
+      "key": "clemence",
+      "firstName": "Clémence",
+      "lastName": "Arrou",
+      "role": "ally",
+      "status": "alive",
+      "fields": {
+        "age": "57 ans",
+        "gender": "female",
+        "occupation": "Conservatrice du conservatoire régional",
+        "firstAppearance": "@node:s9-1",
+        "description": "Elle attend les plaques en bas, et défend leur numérisation contre l'Université.",
+        "mainGoal": "Que pas une plaque ne se perde dans le déménagement."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          210,
+          220,
+          225
+        ],
+        "figure": [
+          60,
+          80,
+          100
+        ]
+      }
     }
   ],
   "items": [
@@ -1182,6 +1302,49 @@
       "fields": {
         "description": "Brique noircie tirée du mur de la chambre noire, gravée au couteau par Bastien : « J. R. 1931 ».",
         "firstAppearance": "@node:s8-2"
+      }
+    },
+    {
+      "key": "machine-zeiss",
+      "name": "Machine à mesurer Zeiss",
+      "type": "instrument",
+      "status": "worn",
+      "fields": {
+        "description": "Machine à mesurer les plaques, laiton et verre, 1909. Celle de Marthe.",
+        "firstAppearance": "@node:s1-2",
+        "material": "Laiton, verre, acier"
+      }
+    },
+    {
+      "key": "depeche",
+      "name": "Brouillon de la dépêche d'Émile",
+      "type": "letter",
+      "status": "damaged",
+      "fields": {
+        "description": "Brouillon de télégramme : « Variable nouvelle Cassiopée — découverte Mlle M. Lacoste. »",
+        "author": "Émile Ferrand",
+        "writtenOn": "12 janvier 1913",
+        "firstAppearance": "@node:s7-2"
+      }
+    },
+    {
+      "key": "badge-hauts-lieux",
+      "name": "Badge Hauts Lieux",
+      "type": "key",
+      "status": "intact",
+      "fields": {
+        "description": "Badge d'accès que Kerver distribue aux « partenaires » ; Yanis en porte un.",
+        "opens": "Le chantier de l'hôtel."
+      }
+    },
+    {
+      "key": "scanner",
+      "name": "Le scanner de Jeanne",
+      "type": "computer",
+      "status": "worn",
+      "fields": {
+        "description": "Scanner à plat A3 qu'elle a monté elle-même dans la benne.",
+        "firstAppearance": "@node:s1-1"
       }
     }
   ],
@@ -1601,6 +1764,15 @@
       "locations": {
         "salle-mesures": "setting",
         "hourquette": "mentioned"
+      },
+      "states": {
+        "marthe": "Mitaines, yeux rougis par la loupe",
+        "emile": "Manteau trempé, décidé"
+      },
+      "entries": {
+        "@item:plaque-4417": "central",
+        "@magic:reticule": "present",
+        "@item:machine-zeiss": "present"
       }
     },
     {
@@ -1612,6 +1784,14 @@
       "locations": {
         "gare-haute": "setting",
         "observatoire": "setting"
+      },
+      "states": {
+        "jeanne": "Bonnet de station-service, doudoune trop grande"
+      },
+      "entries": {
+        "@item:scanner": "present",
+        "@magic:benne-rite": "mentioned",
+        "@species:chocard": "mentioned"
       }
     },
     {
@@ -1648,6 +1828,13 @@
       "locations": {
         "salle-machines": "setting",
         "plaquotheque": "setting"
+      },
+      "states": {
+        "bastien": "Jumelles, carnet des isards"
+      },
+      "entries": {
+        "@species:isard": "present",
+        "@species:gypaete": "present"
       }
     },
     {
@@ -1660,6 +1847,14 @@
       },
       "locations": {
         "plaquotheque": "setting"
+      },
+      "states": {
+        "jeanne": "Gants de coton blancs, inquiète"
+      },
+      "entries": {
+        "@item:registre": "central",
+        "@item:plaque-4417": "central",
+        "@faction:mesureuses": "mentioned"
       }
     },
     {
@@ -1712,6 +1907,13 @@
       "locations": {
         "maison-lacoste": "setting",
         "chambre-noire": "mentioned"
+      },
+      "states": {
+        "rose": "Châle, boîte à biscuits sur les genoux"
+      },
+      "entries": {
+        "@faction:famille-lacoste": "present",
+        "@people:occitan": "present"
       }
     },
     {
@@ -1727,6 +1929,11 @@
         "observatoire": "setting",
         "petite-coupole": "setting",
         "bibliotheque": "setting"
+      },
+      "entries": {
+        "@faction:hauts-lieux": "central",
+        "@faction:universite": "present",
+        "@item:badge-hauts-lieux": "present"
       }
     },
     {
@@ -1745,12 +1952,18 @@
       "node": "@node:s6-1",
       "characters": {
         "jeanne": "pov",
-        "bastien": "present"
+        "bastien": "pov"
       },
       "locations": {
         "salle-machines": "setting",
         "chambre-noire": "mentioned",
         "coupole": "mentioned"
+      },
+      "states": {
+        "bastien": "Bleu de travail, clé anglaise"
+      },
+      "entries": {
+        "@faction:famille-roux": "central"
       }
     },
     {
@@ -1789,6 +2002,14 @@
       "locations": {
         "chambre-noire": "setting",
         "coupole": "setting"
+      },
+      "states": {
+        "jeanne": "Couverte de plâtre, lampe frontale",
+        "bastien": "Masse à la main"
+      },
+      "entries": {
+        "@item:boite-zinc": "central",
+        "@item:depeche": "central"
       }
     },
     {
@@ -1804,6 +2025,11 @@
       },
       "locations": {
         "bibliotheque": "setting"
+      },
+      "entries": {
+        "@magic:blink": "central",
+        "@magic:photometrie": "present",
+        "@item:cahier-marthe": "central"
       }
     },
     {
@@ -1856,6 +2082,11 @@
       "locations": {
         "maison-lacoste": "setting",
         "esterac": "setting"
+      },
+      "entries": {
+        "@faction:conseil-esterac": "present",
+        "@people:comete": "mentioned",
+        "@species:marmotte": "mentioned"
       }
     }
   ],
@@ -1939,6 +2170,68 @@
       "text": "doc:reperages-esterac",
       "earlier": "doc:reperages-esterac-v1",
       "note": "Version précédente gardée dans les versions du document."
+    },
+    {
+      "node": "@node:ch1",
+      "name": "Plan de l'observatoire.png",
+      "image": {
+        "kind": "swatches",
+        "colors": [
+          [
+            235,
+            238,
+            242
+          ],
+          [
+            61,
+            74,
+            92
+          ],
+          [
+            181,
+            82,
+            59
+          ]
+        ],
+        "width": 480,
+        "height": 320
+      },
+      "note": "Rez-de-chaussée et coupoles."
+    },
+    {
+      "node": "@node:ch5",
+      "name": "Courrier de Hauts Lieux.md",
+      "text": "doc:courrier-hauts-lieux"
+    },
+    {
+      "node": "@node:ch2",
+      "name": "Fiche technique plaque 4417.txt",
+      "text": "doc:fiche-4417"
+    },
+    {
+      "node": "@node:epilogue",
+      "name": "Article de Jeanne (brouillon).docx",
+      "text": "doc:article",
+      "earlier": "doc:article-v1"
+    },
+    {
+      "node": "@node:p1",
+      "name": "Carte du massif de Sorgue.png",
+      "image": {
+        "kind": "landscape",
+        "sky": [
+          150,
+          170,
+          200
+        ],
+        "ground": [
+          235,
+          238,
+          242
+        ],
+        "width": 480,
+        "height": 320
+      }
     }
   ],
   "notes": {
@@ -2064,6 +2357,30 @@
         "color": "green",
         "x": 610,
         "y": 320
+      },
+      {
+        "text": "Louise : la faire exister dans une seule lettre, pas plus",
+        "color": "pink",
+        "x": 560,
+        "y": 250
+      },
+      {
+        "text": "Les isards = le temps qui passe (Bastien les compte)",
+        "color": "green",
+        "x": 820,
+        "y": 40
+      },
+      {
+        "text": "Clémence en bas : la dernière image du livre ?",
+        "color": "blue",
+        "x": 820,
+        "y": 250
+      },
+      {
+        "text": "Vérifier : un téléphérique s'arrête-t-il à 70 km/h ?",
+        "color": "orange",
+        "x": 560,
+        "y": 450
       }
     ],
     "systemNotes": true
@@ -2924,5 +3241,813 @@
       "name": "Premier jet",
       "then": "révision:s1-1"
     }
-  ]
+  ],
+  "species": [
+    {
+      "key": "isard",
+      "name": "Isard",
+      "type": "mammal",
+      "status": "common",
+      "fields": {
+        "description": "Le chamois des Pyrénées ; Bastien les compte chaque matin à la jumelle.",
+        "diet": "herbivore",
+        "temperament": "wary",
+        "habitat": "Éboulis et crêtes du massif."
+      }
+    },
+    {
+      "key": "gypaete",
+      "name": "Gypaète barbu",
+      "type": "bird",
+      "status": "endangered",
+      "fields": {
+        "description": "Le vautour casseur d'os ; un couple niche sous le pic.",
+        "diet": "carnivore",
+        "firstAppearance": "@node:s2-2"
+      }
+    },
+    {
+      "key": "lagopede",
+      "name": "Lagopède alpin",
+      "type": "bird",
+      "status": "rare",
+      "fields": {
+        "description": "La perdrix des neiges, blanche l'hiver ; Jeanne la prend pour une boule de neige.",
+        "diet": "herbivore"
+      }
+    },
+    {
+      "key": "marmotte",
+      "name": "Marmotte",
+      "type": "mammal",
+      "status": "common",
+      "fields": {
+        "description": "Elles dorment sous la neige tout le roman ; elles se réveillent dans l'épilogue."
+      }
+    },
+    {
+      "key": "chocard",
+      "name": "Chocard à bec jaune",
+      "type": "bird",
+      "status": "common",
+      "fields": {
+        "description": "Les corbeaux du sommet, qui volent le pain sur la terrasse.",
+        "diet": "omnivore",
+        "temperament": "aggressive"
+      }
+    },
+    {
+      "key": "sapin",
+      "name": "Sapin pectiné",
+      "type": "tree",
+      "status": "common",
+      "fields": {
+        "description": "Les forêts sombres sous 1 800 m, que traverse le téléphérique.",
+        "wood": "Bois blanc, léger"
+      }
+    },
+    {
+      "key": "rhododendron",
+      "name": "Rhododendron ferrugineux",
+      "type": "shrub",
+      "status": "common",
+      "fields": {
+        "description": "Il fleurit rose en juin ; Rose Lacoste en a fait son jardin.",
+        "toxicity": "toxic"
+      }
+    },
+    {
+      "key": "gentiane",
+      "name": "Gentiane jaune",
+      "type": "herb",
+      "status": "common",
+      "fields": {
+        "description": "Racine amère dont on fait la liqueur du café d'Estérac.",
+        "uses": [
+          "Liqueur",
+          "Remède"
+        ]
+      }
+    },
+    {
+      "key": "edelweiss",
+      "name": "Edelweiss",
+      "type": "flower",
+      "status": "rare",
+      "fields": {
+        "description": "Marthe en a pressé un dans son cahier de mesures."
+      }
+    },
+    {
+      "key": "lichen-geo",
+      "name": "Lichen géographique",
+      "type": "mushroom",
+      "status": "common",
+      "fields": {
+        "description": "Lichen jaune-vert sur le granit des coupoles ; il pousse d'un millimètre par an.",
+        "properties": "On l'utilise pour dater les rochers."
+      }
+    }
+  ],
+  "factions": [
+    {
+      "key": "universite",
+      "name": "Université de Toulouse",
+      "type": "academy",
+      "status": "declining",
+      "fields": {
+        "description": "Propriétaire de l'observatoire, qui l'a vendu à Hauts Lieux.",
+        "influence": "regional"
+      }
+    },
+    {
+      "key": "hauts-lieux",
+      "name": "Société Hauts Lieux",
+      "type": "company",
+      "status": "rising",
+      "fields": {
+        "description": "La société de Damien Kerver, qui transforme des sommets en hôtels.",
+        "goals": "Un hôtel de luxe dans l'observatoire en 2021.",
+        "influence": "national"
+      }
+    },
+    {
+      "key": "bureau",
+      "name": "Bureau des longitudes",
+      "type": "council",
+      "status": "active",
+      "fields": {
+        "description": "L'institution qui reçoit les découvertes et décide de leur priorité.",
+        "influence": "national"
+      }
+    },
+    {
+      "key": "conseil-esterac",
+      "name": "Conseil municipal d'Estérac",
+      "type": "council",
+      "status": "active",
+      "fields": {
+        "description": "Le maire et ses huit conseillers ; ils voteront la plaque de Marthe.",
+        "influence": "local"
+      }
+    },
+    {
+      "key": "saf",
+      "name": "Société astronomique de France",
+      "type": "club",
+      "status": "active",
+      "fields": {
+        "description": "Les astronomes amateurs ; ils publieront l'article de Jeanne.",
+        "influence": "national"
+      }
+    },
+    {
+      "key": "amis-pic",
+      "name": "Les Amis du pic",
+      "type": "movement",
+      "status": "rising",
+      "fields": {
+        "description": "L'association qui se bat contre la vente du sommet.",
+        "activities": [
+          "Pétitions",
+          "Visites"
+        ]
+      }
+    },
+    {
+      "key": "syndicat-gardiens",
+      "name": "Gardiens des observatoires",
+      "type": "guild",
+      "status": "declining",
+      "fields": {
+        "description": "Une amicale de gardiens de sommets ; il n'en reste que quatre en France."
+      }
+    },
+    {
+      "key": "famille-roux",
+      "name": "Les Roux",
+      "type": "dynasty",
+      "status": "declining",
+      "fields": {
+        "description": "Trois générations de gardiens de l'observatoire.",
+        "lineage": "Jules (1911-1952), Antoine (1952-1990), Bastien (depuis 1990)."
+      }
+    },
+    {
+      "key": "famille-lacoste",
+      "name": "Les Lacoste",
+      "type": "clan",
+      "status": "declining",
+      "fields": {
+        "description": "La famille de Marthe, à Estérac ; il ne reste que Rose."
+      }
+    },
+    {
+      "key": "mesureuses",
+      "name": "Les mesureuses",
+      "type": "brotherhood",
+      "status": "dissolved",
+      "fields": {
+        "description": "Les femmes engagées pour mesurer les plaques, de 1900 à 1930.",
+        "history": "On ne retenait jamais leur nom dans les publications."
+      }
+    }
+  ],
+  "peoples": [
+    {
+      "key": "esteracois",
+      "name": "Les Estéracois",
+      "type": "ethnicGroup",
+      "status": "declining",
+      "fields": {
+        "description": "Les gens de la vallée, éleveurs et guides.",
+        "population": "Deux cents",
+        "spread": "local"
+      }
+    },
+    {
+      "key": "occitan",
+      "name": "L'occitan d'Estérac",
+      "type": "language",
+      "status": "endangered",
+      "fields": {
+        "description": "Un gascon de montagne que Rose parle encore.",
+        "vocabulary": "Estela (étoile), nheu (neige)."
+      }
+    },
+    {
+      "key": "gens-sommet",
+      "name": "Les gens du sommet",
+      "type": "culture",
+      "status": "living",
+      "fields": {
+        "description": "Ceux qui vivent l'hiver à l'observatoire : on mange ensemble, on se tait la nuit."
+      }
+    },
+    {
+      "key": "mesureuses-classe",
+      "name": "Les calculatrices",
+      "type": "socialClass",
+      "status": "extinct",
+      "fields": {
+        "description": "Les femmes « calculatrices » des observatoires, payées à la plaque."
+      }
+    },
+    {
+      "key": "saint-jean",
+      "name": "La Saint-Jean d'Estérac",
+      "type": "tradition",
+      "status": "living",
+      "fields": {
+        "description": "Le feu de la Saint-Jean sur la place ; Rose y a vu Marthe danser."
+      }
+    },
+    {
+      "key": "superstitions",
+      "name": "Les superstitions des gardiens",
+      "type": "tradition",
+      "status": "living",
+      "fields": {
+        "description": "Ne jamais dire « dernière » dans la benne ; toucher la porte de la coupole en sortant."
+      }
+    },
+    {
+      "key": "catholicisme",
+      "name": "La paroisse de la vallée",
+      "type": "religion",
+      "status": "declining",
+      "fields": {
+        "description": "L'église d'Estérac, où Marthe est enterrée."
+      }
+    },
+    {
+      "key": "dame-pic",
+      "name": "La Dame du pic",
+      "type": "mythology",
+      "status": "legendary",
+      "fields": {
+        "description": "Légende d'une femme qui garde les étoiles du sommet ; les gens d'Estérac l'appellent « l'astronome »."
+      }
+    },
+    {
+      "key": "positivisme",
+      "name": "La foi dans la mesure",
+      "type": "philosophy",
+      "status": "living",
+      "fields": {
+        "description": "Ce que croit Jeanne : on ne doit rien affirmer qu'on n'a mesuré.",
+        "principles": "Mesurer deux fois, signer juste."
+      }
+    },
+    {
+      "key": "comete",
+      "name": "La prophétie de la comète de 1910",
+      "type": "prophecy",
+      "status": "legendary",
+      "fields": {
+        "description": "En 1910, une voyante d'Estérac a prédit que « l'étoile de la fille Lacoste » brillerait un siècle plus tard.",
+        "prophecyText": "« Elle brillera quand on dira son nom. »"
+      }
+    }
+  ],
+  "magic": [
+    {
+      "key": "photographie",
+      "name": "La photographie sur plaque",
+      "type": "alchemy",
+      "status": "forgotten",
+      "fields": {
+        "description": "Le savoir chimique des plaques de verre au gélatino-bromure d'argent.",
+        "rules": "La lumière noircit l'argent ; le fixateur arrête le temps.",
+        "rarity": "rare"
+      }
+    },
+    {
+      "key": "developpement",
+      "name": "Le développement",
+      "type": "technique",
+      "status": "forgotten",
+      "fields": {
+        "description": "Révélateur, bain d'arrêt, fixateur : vingt minutes dans le noir.",
+        "materials": "Métol, hydroquinone, hyposulfite."
+      },
+      "parentId": "@magic:photographie"
+    },
+    {
+      "key": "fixage",
+      "name": "Le fixage",
+      "type": "technique",
+      "status": "forgotten",
+      "fields": {
+        "description": "Le bain qui rend la plaque insensible à la lumière.",
+        "risks": "Mal fixée, une plaque jaunit en dix ans."
+      },
+      "parentId": "@magic:photographie"
+    },
+    {
+      "key": "astrometrie",
+      "name": "L'astrométrie",
+      "type": "school",
+      "status": "active",
+      "fields": {
+        "description": "La science de la position des étoiles ; ce que mesurait Marthe."
+      }
+    },
+    {
+      "key": "photometrie",
+      "name": "La photométrie",
+      "type": "school",
+      "status": "active",
+      "fields": {
+        "description": "La science de l'éclat des étoiles ; c'est elle qui montre que l'étoile « a grossi »."
+      }
+    },
+    {
+      "key": "reticule",
+      "name": "La mesure au réticule",
+      "type": "technique",
+      "status": "forgotten",
+      "fields": {
+        "description": "Lire la position d'une étoile au micron, à l'oculaire de la machine Zeiss.",
+        "learning": "Trois mois pour une mesureuse ; Marthe en a mis trois semaines."
+      },
+      "parentId": "@magic:astrometrie"
+    },
+    {
+      "key": "blink",
+      "name": "Le comparateur à clignotement",
+      "type": "technique",
+      "status": "forgotten",
+      "fields": {
+        "description": "Faire alterner deux plaques du même champ : ce qui a changé clignote.",
+        "requirements": "Deux plaques du même champ, à quelques nuits d'écart."
+      },
+      "parentId": "@magic:photometrie"
+    },
+    {
+      "key": "pose",
+      "name": "La pose guidée",
+      "type": "technique",
+      "status": "forgotten",
+      "fields": {
+        "description": "Garder l'étoile guide sous le réticule pendant une heure quarante, à la main."
+      }
+    },
+    {
+      "key": "benne-rite",
+      "name": "Le rite de la benne",
+      "type": "ritual",
+      "status": "active",
+      "fields": {
+        "description": "On touche la porte de la benne en montant, jamais en descendant.",
+        "whoCanUse": "Tout le monde, sauf Hélène, qui n'y croit pas."
+      }
+    },
+    {
+      "key": "ciel-gardiens",
+      "name": "Lire le temps au sommet",
+      "type": "technique",
+      "status": "rare",
+      "fields": {
+        "description": "Les Roux devinent la tempête trois jours avant à la couleur du ciel sur l'Aneto."
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Plaque de verre",
+      "category": "Photographie",
+      "definition": "Négatif photographique sur verre, 13 × 18 cm à l'observatoire.",
+      "links": [
+        {
+          "kind": "item",
+          "id": "@item:plaque-4417"
+        },
+        {
+          "kind": "magic",
+          "id": "@magic:photographie"
+        }
+      ]
+    },
+    {
+      "term": "Mesureuse",
+      "category": "Métier",
+      "definition": "Femme chargée de mesurer la position des étoiles sur les plaques.",
+      "links": [
+        {
+          "kind": "character",
+          "id": "@char:marthe"
+        },
+        {
+          "kind": "faction",
+          "id": "@faction:mesureuses"
+        }
+      ]
+    },
+    {
+      "term": "Plaquothèque",
+      "category": "Observatoire",
+      "definition": "La salle où sont rangées les 11 406 plaques.",
+      "links": [
+        {
+          "kind": "location",
+          "id": "@loc:plaquotheque"
+        }
+      ]
+    },
+    {
+      "term": "Benne",
+      "category": "Observatoire",
+      "definition": "La cabine du téléphérique, le lundi et le jeudi.",
+      "links": [
+        {
+          "kind": "location",
+          "id": "@loc:gare-haute"
+        },
+        {
+          "kind": "magic",
+          "id": "@magic:benne-rite"
+        }
+      ]
+    },
+    {
+      "term": "Variable à sursauts",
+      "category": "Astronomie",
+      "definition": "Étoile dont l'éclat augmente brusquement, puis revient.",
+      "links": [
+        {
+          "kind": "magic",
+          "id": "@magic:photometrie"
+        }
+      ]
+    },
+    {
+      "term": "Nova",
+      "category": "Astronomie",
+      "definition": "Étoile qui s'embrase d'un coup ; ce qu'Hélène voudrait que soit l'étoile de Marthe.",
+      "links": []
+    },
+    {
+      "term": "Réticule",
+      "category": "Instruments",
+      "definition": "Croix de fils fins dans l'oculaire, pour viser une étoile.",
+      "links": [
+        {
+          "kind": "item",
+          "id": "@item:machine-zeiss"
+        },
+        {
+          "kind": "magic",
+          "id": "@magic:reticule"
+        }
+      ]
+    },
+    {
+      "term": "Pochette",
+      "category": "Photographie",
+      "definition": "Enveloppe de papier où l'on range chaque plaque, avec ses annotations.",
+      "links": [
+        {
+          "kind": "item",
+          "id": "@item:plaque-4417"
+        }
+      ]
+    },
+    {
+      "term": "Coupole",
+      "category": "Observatoire",
+      "definition": "Le dôme qui abrite un télescope.",
+      "links": [
+        {
+          "kind": "location",
+          "id": "@loc:coupole"
+        }
+      ]
+    },
+    {
+      "term": "Isard",
+      "category": "Montagne",
+      "definition": "Le chamois des Pyrénées.",
+      "links": [
+        {
+          "kind": "species",
+          "id": "@species:isard"
+        }
+      ]
+    },
+    {
+      "term": "Hauts Lieux",
+      "category": "2019",
+      "definition": "La société qui rachète l'observatoire.",
+      "links": [
+        {
+          "kind": "faction",
+          "id": "@faction:hauts-lieux"
+        },
+        {
+          "kind": "character",
+          "id": "@char:kerver"
+        }
+      ]
+    }
+  ],
+  "gallery": {
+    "logo": {
+      "kind": "swatches",
+      "colors": [
+        [
+          61,
+          74,
+          92
+        ],
+        [
+          232,
+          228,
+          218
+        ]
+      ],
+      "width": 200,
+      "height": 200
+    },
+    "folders": [
+      {
+        "key": "sommet",
+        "name": "Le sommet"
+      },
+      {
+        "key": "1913",
+        "name": "1913"
+      },
+      {
+        "key": "couverture",
+        "name": "Couverture"
+      },
+      {
+        "key": "essais",
+        "name": "Essais",
+        "parent": "couverture"
+      }
+    ],
+    "images": [
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            150,
+            170,
+            200
+          ],
+          "ground": [
+            235,
+            238,
+            242
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Le pic en janvier",
+        "folder": "sommet"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            40,
+            50,
+            80
+          ],
+          "ground": [
+            220,
+            225,
+            235
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "La grande coupole, la nuit",
+        "description": "Référence pour le chapitre 7.",
+        "folder": "sommet"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            200,
+            210,
+            220
+          ],
+          "ground": [
+            90,
+            100,
+            110
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "La benne dans le brouillard",
+        "folder": "sommet"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            120,
+            130,
+            150
+          ],
+          "ground": [
+            210,
+            200,
+            190
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Estérac depuis la route",
+        "folder": "sommet"
+      },
+      {
+        "image": {
+          "kind": "portrait",
+          "background": [
+            200,
+            190,
+            185
+          ],
+          "figure": [
+            60,
+            40,
+            35
+          ]
+        },
+        "caption": "Valadier, d'après une photo de 1910",
+        "folder": "1913"
+      },
+      {
+        "image": {
+          "kind": "portrait",
+          "background": [
+            225,
+            215,
+            200
+          ],
+          "figure": [
+            120,
+            90,
+            70
+          ]
+        },
+        "caption": "Louise Lacoste",
+        "folder": "1913"
+      },
+      {
+        "image": {
+          "kind": "swatches",
+          "colors": [
+            [
+              30,
+              30,
+              30
+            ],
+            [
+              230,
+              230,
+              230
+            ]
+          ],
+          "width": 300,
+          "height": 300
+        },
+        "caption": "Plaque 4417 (négatif)",
+        "description": "Cassiopée ; l'étoile entourée près du bord.",
+        "folder": "1913"
+      },
+      {
+        "image": {
+          "kind": "swatches",
+          "colors": [
+            [
+              61,
+              74,
+              92
+            ],
+            [
+              232,
+              228,
+              218
+            ],
+            [
+              181,
+              82,
+              59
+            ]
+          ],
+          "width": 480,
+          "height": 160
+        },
+        "caption": "Palette de couverture",
+        "folder": "couverture"
+      },
+      {
+        "image": {
+          "kind": "swatches",
+          "colors": [
+            [
+              20,
+              30,
+              60
+            ],
+            [
+              240,
+              230,
+              200
+            ]
+          ],
+          "width": 320,
+          "height": 480
+        },
+        "caption": "Couverture — essai 1",
+        "folder": "essais"
+      },
+      {
+        "image": {
+          "kind": "swatches",
+          "colors": [
+            [
+              60,
+              60,
+              70
+            ],
+            [
+              200,
+              80,
+              60
+            ]
+          ],
+          "width": 320,
+          "height": 480
+        },
+        "caption": "Couverture — essai 2",
+        "folder": "essais"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            90,
+            110,
+            150
+          ],
+          "ground": [
+            240,
+            240,
+            245
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Tempête du 9 mars (ambiance)"
+      }
+    ]
+  }
 }

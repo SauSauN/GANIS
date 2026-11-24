@@ -79,3 +79,6 @@ dist-ssr
 .env
 .env.local
 .env.*.local
+
+# Copies de travail locales de Claude Code
+.claude/worktrees/

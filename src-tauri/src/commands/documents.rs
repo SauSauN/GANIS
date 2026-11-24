@@ -18,6 +18,7 @@ use crate::error::{AppError, AppResult};
 use crate::services::document_service::{self as documents, DocumentVersion, ExternalStatus, StructureDocument};
 use crate::services::history_service as history;
 use crate::services::project_storage;
+use crate::services::received_documents as received;
 use crate::state::AppState;
 use serde::Serialize;
 use sqlx::SqlitePool;
@@ -242,6 +243,8 @@ pub async fn pick_structure_document_replacement(
     }
     let bytes = std::fs::read(&path).map_err(file_error)?;
     let document = documents::replace_content(&pool, &document_id, &bytes, Some(&name)).await?;
+    // Le fichier vient maintenant de l'utilisateur : plus un document reçu.
+    received::clear(&state.app_db, &project_id, &document_id).await?;
     history::record(&pool, "updated", KIND, &document.id, &document.name, &document.node_id).await;
     Ok(Some(document))
 }
@@ -426,13 +429,19 @@ async fn open_dir(state: &AppState, document_id: &str) -> AppResult<PathBuf> {
 }
 
 /// Ouvre le document avec l'application associée à son type (Word,
-/// Acrobat, Clip Studio…). Les fichiers qui pourraient lancer un programme
-/// (`.exe`, `.bat`…) ne sont jamais ouverts.
+/// Acrobat, Clip Studio…). Seuls les types de documents connus sont ouverts
+/// (liste blanche) ; la copie porte la marque « venu d'Internet » de
+/// Windows (Mode protégé d'Office, SmartScreen, macros bloquées).
+///
+/// Un document reçu avec un projet importé n'est ouvert qu'avec
+/// `confirmed` : sinon l'erreur `documents.confirmReceived` demande à
+/// l'interface de faire confirmer l'utilisateur.
 #[tauri::command(rename_all = "camelCase")]
 pub async fn open_structure_document_externally(
     state: State<'_, AppState>,
     project_id: String,
     document_id: String,
+    confirmed: Option<bool>,
 ) -> AppResult<ExternalStatus> {
     let pool = project_pool(&state, &project_id).await?;
     let (document, data) = documents::content(&pool, &document_id).await?;
@@ -441,11 +450,23 @@ pub async fn open_structure_document_externally(
             .with_key("documents.unsafeType"));
     }
 
+    let received = received::is_received(&state.app_db, &project_id, &document_id).await?;
+    if received && confirmed != Some(true) {
+        return Err(AppError::validation(
+            "Ce document vient d'un projet importé : confirmez avant de l'ouvrir dans une autre application.",
+        )
+        .with_key("documents.confirmReceived"));
+    }
+
     let dir = open_dir(&state, &document_id).await?;
     let path = documents::write_open_copy(&dir, &project_id, &document.name, &data)?;
     tauri_plugin_opener::open_path(&path, None::<&str>).map_err(|e| {
         AppError::io(e.to_string()).with_key("documents.openFailed").with_detail(e)
     })?;
+
+    if received {
+        received::clear(&state.app_db, &project_id, &document_id).await?;
+    }
 
     Ok(ExternalStatus { open: true, changed: false, path: path.to_string_lossy().into_owned() })
 }

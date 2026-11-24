@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -196,7 +197,7 @@ export function CharacterCreateView({ projectId, feature, onOpenFeature }: Chara
           </div>
         ) : (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            <LoadingDots className="size-4" aria-hidden="true" />
             {t("list.loading")}
           </p>
         )}
@@ -222,7 +223,7 @@ export function CharacterCreateView({ projectId, feature, onOpenFeature }: Chara
 
           <CardFooter className={`${cardFooterClass} gap-4`}>
             <Button onClick={() => void confirmLevel()} disabled={levelSaving}>
-              {levelSaving && <Loader2 className="animate-spin" />}
+              {levelSaving && <LoadingDots />}
               {t("levels.continue")}
             </Button>
 
@@ -268,7 +269,7 @@ export function CharacterCreateView({ projectId, feature, onOpenFeature }: Chara
           footer={
             <div className="flex min-h-10 flex-wrap items-center gap-4">
               <Button type="submit" disabled={saving || portraitBusy}>
-                {saving ? <Loader2 className="animate-spin" /> : <Plus />}
+                {saving ? <LoadingDots /> : <Plus />}
                 {saving ? t("create.saving") : t("create.save")}
               </Button>
 

@@ -2,14 +2,18 @@ import {
   BookOpenText,
   Brush,
   Clapperboard,
+  ClipboardList,
   Drama,
   FileUp,
+  Film,
   Filter,
   Flag,
+  FolderOpen,
   FolderTree,
   GalleryThumbnails,
   Image,
   Layers,
+  LayoutGrid,
   Link2,
   ListTree,
   MapPin,
@@ -58,6 +62,7 @@ export type TutorialId =
   | "novel"
   | "manga"
   | "story"
+  | "film"
   | "characters"
   | "locations"
   | "items"
@@ -119,6 +124,21 @@ export const TUTORIALS: Record<TutorialId, Tutorial> = {
       { id: "plan", icon: ListTree, open: "structure.plan" },
       { id: "plot", icon: Waypoints, open: "plot.board" },
       { id: "read", icon: Play, open: "structure.read" },
+    ],
+  },
+  film: {
+    icon: Film,
+    steps: [
+      { id: "start", icon: PenLine, open: "synopsis.edit" },
+      { id: "cast", icon: Users, open: "characters.create" },
+      { id: "plan", icon: ListTree, open: "structure.plan" },
+      { id: "scene", icon: Clapperboard },
+      { id: "progress", icon: Target, open: "film.progress" },
+      { id: "read", icon: BookOpenText, open: "film.read" },
+      { id: "continuity", icon: Route, open: "film.continuity" },
+      { id: "board", icon: LayoutGrid, open: "film.board" },
+      { id: "dossier", icon: FolderOpen, open: "film.progress" },
+      { id: "breakdown", icon: ClipboardList, open: "film.breakdown" },
     ],
   },
   characters: {
@@ -222,6 +242,7 @@ export const TUTORIALS: Record<TutorialId, Tutorial> = {
 export function tutorialForProject(projectType: string | null | undefined): TutorialId {
   if (projectType === "novel") return "novel";
   if (projectType === "manga") return "manga";
+  if (projectType === "film") return "film";
   return "story";
 }
 
@@ -232,6 +253,8 @@ export function tutorialForModule(moduleId: string): TutorialId | null {
       return "novel";
     case "script":
       return "manga";
+    case "film":
+      return "film";
     case "characters":
     case "locations":
     case "items":

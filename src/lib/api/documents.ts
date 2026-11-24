@@ -87,8 +87,9 @@ export const documentsApi = {
   deleteDocumentVersion: (projectId: string, versionId: string) =>
     call<void>("delete_document_version", { projectId, versionId }),
 
-  openStructureDocumentExternally: (projectId: string, documentId: string) =>
-    call<ExternalStatus>("open_structure_document_externally", { projectId, documentId }),
+  /** `confirmed` : l'utilisateur a accepté d'ouvrir un document reçu. */
+  openStructureDocumentExternally: (projectId: string, documentId: string, confirmed = false) =>
+    call<ExternalStatus>("open_structure_document_externally", { projectId, documentId, confirmed }),
 
   syncStructureDocumentExternal: (projectId: string, documentId: string) =>
     call<ExternalSync>("sync_structure_document_external", { projectId, documentId }),

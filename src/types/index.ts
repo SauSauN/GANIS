@@ -137,8 +137,8 @@ export type GanixImportMode = "copy" | "replace";
 
 export interface GanixImportOutcome {
   project: Project;
-  /** Remplacement : nom du fichier de sauvegarde de l'ancienne version. */
-  backupFile: string | null;
+  /** Remplacement : copie chiffrée de l'ancienne version, placée dans la corbeille des projets. */
+  backup: Project | null;
 }
 
 // ----------------------------------------------------------------------------
@@ -272,6 +272,8 @@ export interface StructureNode {
   sceneLocationId: string | null;
   /** Moment d'une scène (série). */
   sceneTime: SceneTime | null;
+  /** Échéance d'un épisode (série) : AAAA-MM-JJ ; `null` : aucune. */
+  dueDate?: string | null;
   createdAt: string; // RFC 3339, UTC
   updatedAt: string; // RFC 3339, UTC
 }
@@ -303,6 +305,8 @@ export interface SceneBlock {
   /** Didascalie de la réplique (dialogue seulement). */
   parenthetical: string;
   content: string;
+  /** Dernière modification du texte (pas de la place) de l'élément. */
+  updatedAt?: string;
 }
 
 export interface SceneScript {
@@ -330,6 +334,48 @@ export interface EpisodeFields {
   runtimeGoal: number | null;
   episodeStatus: EpisodeStatus | null;
   writer: string;
+  /** Échéance (AAAA-MM-JJ) ; `null` : aucune. */
+  dueDate: string | null;
+}
+
+/** Moments clés de la structure d'un film (repères placés sur une scène). */
+export const FILM_BEATS = ["inciting", "plot1", "midpoint", "plot2", "climax"] as const;
+export type FilmBeat = (typeof FILM_BEATS)[number];
+
+/** Couleurs des révisions de tournage, dans l'ordre d'usage. */
+export const REVISION_COLORS = ["white", "blue", "pink", "yellow", "green", "goldenrod", "buff", "salmon"] as const;
+export type RevisionColor = (typeof REVISION_COLORS)[number];
+
+/** Révision de tournage en cours : sa couleur et sa date de début (UTC). */
+export interface FilmRevision {
+  color: RevisionColor;
+  since: string;
+}
+
+/** Fiche du film entier (voir `044_film.sql` et `045_film_tools.sql`). */
+export interface FilmDetails {
+  logline: string;
+  /** Durée visée en minutes (`null` : aucune). */
+  runtimeGoal: number | null;
+  writer: string;
+  /** Dossier du film (le synopsis est celui du projet). */
+  intention: string;
+  pitch: string;
+  /** Moment clé → scène. */
+  beats: Partial<Record<FilmBeat, string>>;
+  revision: FilmRevision | null;
+  /** Scène → numéro verrouillé (« 12 », « 12A »). */
+  lockedNumbers: Record<string, string>;
+}
+
+/** Dépouillement d'une scène : ce qui n'a pas de fiche (voir `045_film_tools.sql`). */
+export const BREAKDOWN_FIELDS = ["extras", "props", "costumes", "makeup", "vehicles", "effects", "sound", "notes"] as const;
+export type BreakdownField = (typeof BREAKDOWN_FIELDS)[number];
+export type SceneBreakdown = Record<BreakdownField, string>;
+
+export interface SceneBreakdownRow {
+  sceneId: string;
+  breakdown: SceneBreakdown;
 }
 
 // ----------------------------------------------------------------------------
@@ -1019,6 +1065,19 @@ export interface AppInfo {
   name: string;
   version: string;
   offline: boolean;
+}
+
+/**
+ * Pourquoi les données de cet ordinateur sont verrouillées : clé
+ * d'appareil absente, illisible (autre compte Windows) ou qui ne
+ * correspond pas à la base de l'application.
+ */
+export type DeviceLockIssue = "missing" | "unreadable" | "wrongKey";
+
+/** État de la clé d'appareil au démarrage (`device_status`). */
+export interface DeviceStatus {
+  locked: boolean;
+  issue: DeviceLockIssue | null;
 }
 
 /**

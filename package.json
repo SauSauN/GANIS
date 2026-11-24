@@ -11,7 +11,10 @@
     "test": "vitest run src",
     "test:e2e": "playwright test",
     "seed:roman": "cd src-tauri && cargo test --lib seed_demo_roman -- --ignored --nocapture",
-    "seed:manga": "cd src-tauri && cargo test --lib seed_demo_manga -- --ignored --nocapture"
+    "seed:manga": "cd src-tauri && cargo test --lib seed_demo_manga -- --ignored --nocapture",
+    "seed:film": "cd src-tauri && cargo test --lib seed_demo_film -- --ignored --nocapture",
+    "seed:serie": "cd src-tauri && cargo test --lib seed_demo_serie -- --ignored --nocapture",
+    "seed:all": "cd src-tauri && cargo test --lib seed_demo_ -- --ignored --nocapture --test-threads=1"
   },
   "dependencies": {
     "@base-ui/react": "^1.8.0",

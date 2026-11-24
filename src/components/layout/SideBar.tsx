@@ -11,6 +11,8 @@ import { SideBarCharacters } from "@/components/characters/SideBarCharacters";
 import { SideBarLocations } from "@/components/locations/SideBarLocations";
 import { SideBarWorld } from "@/components/world/SideBarWorld";
 import { SideBarNotes } from "@/components/notes/SideBarNotes";
+import { SideBarBoards } from "@/components/boards/SideBarBoards";
+import { boardIdOfTab } from "@/lib/boards";
 import { SideBarSearch } from "@/components/search/SideBarSearch";
 import { SideBarStructure } from "@/components/structure/SideBarStructure";
 import { SideBarPlot } from "@/components/plot/SideBarPlot";
@@ -298,10 +300,14 @@ export function SideBar({
           <SideBarPlot projectId={projectId} activeTab={activeTab} onOpenFeature={preview} />
         )}
 
-        {/* Dossiers et notes, en arborescence. */}
-        {module.id === "notes" && (
-          <SideBarNotes projectId={projectId} activeTab={activeTab} onOpenFeature={preview} />
-        )}
+        {/* Dossiers et notes, en arborescence ; les planches d'inspiration à
+            leur place tant que leur onglet est ouvert. */}
+        {module.id === "notes" &&
+          (activeTab === "boards" || boardIdOfTab(activeTab) ? (
+            <SideBarBoards projectId={projectId} activeTab={activeTab} onOpenFeature={preview} />
+          ) : (
+            <SideBarNotes projectId={projectId} activeTab={activeTab} onOpenFeature={preview} />
+          ))}
       </aside>
 
       {/* Bord droit : poignée de redimensionnement (fine ligne au survol). */}

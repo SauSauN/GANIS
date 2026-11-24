@@ -1,0 +1,3421 @@
+{
+  "format": 1,
+  "project": {
+    "name": "Le Sel des Veilleuses",
+    "description": "Projet d'exemple — film. Bretagne, 1958 : une saunière doit rallumer les sept feux d'un phare pour que la mer lui rende son frère. Visite guidée : Notes › « À lire d'abord ».",
+    "type": "film",
+    "status": "in_progress"
+  },
+  "card": {
+    "pitch": "Sur une île bretonne, une saunière doit rallumer les sept feux du phare avant la grande marée pour que la mer lui rende son frère.",
+    "highlights": [
+      "3 actes, 7 séquences, 14 scènes écrites au format du scénario",
+      "13 personnages, 12 lieux, 10 fiches dans chaque module du monde",
+      "Fiche du film, trame en 4 intrigues, galerie de repérages"
+    ]
+  },
+  "synopsis": {
+    "text": "synopsis",
+    "genres": [
+      "Fantastique",
+      "Drame"
+    ],
+    "subgenres": [
+      "Conte",
+      "Drame familial"
+    ],
+    "tones": [
+      "Mélancolique",
+      "Lumineux"
+    ]
+  },
+  "characterSettings": {
+    "detailLevel": "advanced"
+  },
+  "locationSettings": {
+    "detailLevel": "advanced",
+    "customTypes": [
+      {
+        "key": "phare",
+        "name": "Phare",
+        "category": "built"
+      },
+      {
+        "key": "maison",
+        "name": "Maison",
+        "category": "built"
+      },
+      {
+        "key": "usine",
+        "name": "Usine",
+        "category": "built"
+      }
+    ]
+  },
+  "world": {
+    "item": {
+      "enabled": true,
+      "categories": [
+        "document",
+        "tool",
+        "magic",
+        "vehicle",
+        "consumable"
+      ],
+      "detailLevel": "advanced"
+    },
+    "species": {
+      "enabled": true,
+      "categories": [
+        "fauna",
+        "flora"
+      ],
+      "detailLevel": "advanced"
+    },
+    "faction": {
+      "enabled": true,
+      "categories": [
+        "political",
+        "religious",
+        "economic",
+        "criminal",
+        "secret",
+        "family",
+        "social",
+        "military"
+      ],
+      "detailLevel": "advanced"
+    },
+    "people": {
+      "enabled": true,
+      "categories": [
+        "people",
+        "culture",
+        "religion"
+      ],
+      "detailLevel": "advanced"
+    },
+    "magic": {
+      "enabled": true,
+      "categories": [
+        "system",
+        "branch",
+        "technique"
+      ],
+      "detailLevel": "advanced"
+    }
+  },
+  "structure": {
+    "autoNumbering": true,
+    "nodes": [
+      {
+        "key": "a1",
+        "title": "L'île",
+        "summary": "Yann disparaît ; la Compagnie arrive ; Maëlle refuse de croire aux contes.",
+        "children": [
+          {
+            "key": "q1",
+            "title": "La nuit de la disparition",
+            "summary": "Yann ne rentre pas ; on retrouve son las planté dans la vase.",
+            "episode": {
+              "episodeStatus": "final"
+            }
+          },
+          {
+            "key": "q2",
+            "title": "Les gens du continent",
+            "summary": "Danet présente la Compagnie au conseil ; Soazig parle des sept feux.",
+            "episode": {
+              "episodeStatus": "revision"
+            }
+          }
+        ]
+      },
+      {
+        "key": "a2",
+        "title": "La brume",
+        "summary": "La brume monte, les feux s'éteignent un à un ; Maëlle apprend le chant.",
+        "children": [
+          {
+            "key": "q3",
+            "title": "Les feux qui s'éteignent",
+            "summary": "Première brume, première lanterne morte ; Klervi voit les Morgans.",
+            "episode": {
+              "episodeStatus": "draft"
+            }
+          },
+          {
+            "key": "q4",
+            "title": "Le carnet de Soazig",
+            "summary": "Maëlle et Gwen lisent le carnet ; la lettre de Yann.",
+            "episode": {
+              "episodeStatus": "draft"
+            }
+          },
+          {
+            "key": "q5",
+            "title": "La grotte",
+            "summary": "Dans la grotte des Lamineurs, Maëlle rencontre la Dame.",
+            "episode": {
+              "episodeStatus": "outline"
+            }
+          }
+        ]
+      },
+      {
+        "key": "a3",
+        "title": "La grande marée",
+        "summary": "La septième marée : Maëlle traverse la Chaussée et chante seule.",
+        "children": [
+          {
+            "key": "q6",
+            "title": "La Chaussée des Noyés",
+            "summary": "Maëlle marche sur les récifs ; les Noyés se retournent.",
+            "episode": {
+              "episodeStatus": "outline"
+            }
+          },
+          {
+            "key": "q7",
+            "title": "Le sel rendu",
+            "summary": "Yann revient ; les marais sont rendus à la mer, et la mer les rend.",
+            "episode": {
+              "episodeStatus": "idea"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "locations": [
+    {
+      "key": "kerlenn",
+      "name": "Île de Kerlenn",
+      "type": "island",
+      "status": "existing",
+      "fields": {
+        "description": "Île granitique à trois milles de la pointe du Finistère : une lande, un bourg, des marais salants et un phare. Quatre cents habitants l'hiver.",
+        "climate": "Océanique, venté ; brumes épaisses à l'équinoxe.",
+        "terrain": "Granit rose, lande d'ajoncs, vasières à l'est.",
+        "population": "Quatre cents habitants",
+        "legends": "On dit que l'île flotte, retenue au fond par les sept feux du phare.",
+        "colorPalette": [
+          "#6b7f8e",
+          "#d9cfc0",
+          "#c9a227"
+        ]
+      },
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          120,
+          140,
+          160
+        ],
+        "ground": [
+          200,
+          190,
+          170
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "bourg",
+      "name": "Bourg de Kerlenn",
+      "type": "village",
+      "status": "existing",
+      "fields": {
+        "description": "Trois rues de maisons basses autour de l'église et du port.",
+        "atmosphere": "Volets bleus, odeur de goémon, cloche qui sonne les marées.",
+        "population": "Trois cents âmes"
+      },
+      "parentId": "@loc:kerlenn"
+    },
+    {
+      "key": "marais",
+      "name": "Marais salants de Pen-Ar-Bed",
+      "type": "plain",
+      "status": "existing",
+      "fields": {
+        "description": "Quarante œillets de sel à l'est de l'île, tenus par les saunières depuis le Moyen Âge.",
+        "naturalResources": [
+          "Sel gris",
+          "Fleur de sel",
+          "Salicorne"
+        ],
+        "dangers": "La mer y entre aux grandes marées si la digue cède."
+      },
+      "parentId": "@loc:kerlenn",
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          170,
+          180,
+          190
+        ],
+        "ground": [
+          220,
+          215,
+          205
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "phare",
+      "name": "Phare des Sept Veilleuses",
+      "type": "@ltype:phare",
+      "status": "existing",
+      "fields": {
+        "description": "Tour de granit de 1702, la plus vieille de la côte. Sept lanternes, une par marée de l'équinoxe.",
+        "builtOn": "1702",
+        "purpose": "Guider les bateaux ; selon l'île, retenir la mer.",
+        "condition": "damaged",
+        "legends": "Si les sept veilleuses s'éteignent la même nuit, la mer reprend ce qu'on lui a pris."
+      },
+      "parentId": "@loc:kerlenn",
+      "portrait": {
+        "kind": "landscape",
+        "sky": [
+          40,
+          50,
+          80
+        ],
+        "ground": [
+          90,
+          90,
+          100
+        ],
+        "width": 240,
+        "height": 160
+      }
+    },
+    {
+      "key": "maison-kervran",
+      "name": "Maison Kervran",
+      "type": "@ltype:maison",
+      "status": "existing",
+      "fields": {
+        "description": "Longère de pierre au bord des marais, toit d'ardoise, cheminée qui tire mal.",
+        "owner": "Anna Kervran",
+        "atmosphere": "Une table pour quatre où l'on n'est plus que trois."
+      },
+      "parentId": "@loc:marais"
+    },
+    {
+      "key": "eglise",
+      "name": "Église Saint-Gildas",
+      "type": "temple",
+      "status": "existing",
+      "fields": {
+        "description": "Petite église de granit ; un ex-voto par bateau perdu.",
+        "religion": "Catholique, mêlée aux vieilles croyances de l'île"
+      },
+      "parentId": "@loc:bourg"
+    },
+    {
+      "key": "port",
+      "name": "Port de Kerlenn",
+      "type": "port",
+      "status": "existing",
+      "fields": {
+        "description": "Une jetée, douze canots, le bateau-courrier du jeudi.",
+        "portKind": "fishing",
+        "seaRoutes": "Courrier pour Le Conquet le jeudi, si la mer le permet."
+      },
+      "parentId": "@loc:bourg"
+    },
+    {
+      "key": "grotte",
+      "name": "Grotte des Lamineurs",
+      "type": "cave",
+      "status": "hidden",
+      "fields": {
+        "description": "Grotte marine sous la falaise nord, accessible à marée basse seulement.",
+        "dangers": "La marée la remplit en vingt minutes.",
+        "legends": "Les Morgans y gardent ce que la mer a pris."
+      },
+      "parentId": "@loc:kerlenn"
+    },
+    {
+      "key": "usine",
+      "name": "Usine de la Compagnie",
+      "type": "@ltype:usine",
+      "status": "existing",
+      "fields": {
+        "description": "Hangar de tôle neuf sur l'ancien quai : la Compagnie y raffine le sel acheté aux saunières.",
+        "owner": "Compagnie des Sels du Ponant",
+        "builtOn": "1957",
+        "condition": "underConstruction"
+      },
+      "parentId": "@loc:port"
+    },
+    {
+      "key": "lande",
+      "name": "Lande de Ty-Glaz",
+      "type": "plain",
+      "status": "existing",
+      "fields": {
+        "description": "Lande d'ajoncs et de bruyère au centre de l'île, un menhir couché.",
+        "faunaFlora": "Ajoncs, courlis, lièvres."
+      },
+      "parentId": "@loc:kerlenn"
+    },
+    {
+      "key": "chaussee",
+      "name": "Chaussée des Noyés",
+      "type": "forbiddenZone",
+      "status": "inaccessible",
+      "fields": {
+        "description": "Ligne de récifs qui relie l'île au continent à marée basse d'équinoxe, une fois par siècle.",
+        "dangers": "Courants, brume, et ceux qui y marchent n'en reviennent pas.",
+        "accessConditions": "Marée d'équinoxe, coefficient supérieur à 118."
+      }
+    },
+    {
+      "key": "brest",
+      "name": "Brest",
+      "type": "city",
+      "status": "existing",
+      "fields": {
+        "description": "Le continent : le siège de la Compagnie, la préfecture, les douaniers.",
+        "atmosphere": "Hors champ, sauf une scène de bureau."
+      }
+    }
+  ],
+  "characters": [
+    {
+      "key": "maelle",
+      "firstName": "Maëlle",
+      "lastName": "Kervran",
+      "role": "main",
+      "status": "alive",
+      "fields": {
+        "age": "20 ans",
+        "gender": "female",
+        "occupation": "Saunière",
+        "origin": "@loc:maison-kervran",
+        "firstAppearance": "@node:s01",
+        "description": "Grande, les mains gercées par le sel, une tresse sous un foulard rouge. Elle parle peu et compte les marées.",
+        "mainGoal": "Retrouver son frère avant la grande marée.",
+        "distinctiveTrait": "Elle goûte l'eau pour savoir l'heure de la marée.",
+        "traits": [
+          "Obstinée",
+          "Silencieuse",
+          "Courageuse"
+        ],
+        "flaws": [
+          "Méfiante",
+          "Orgueilleuse"
+        ],
+        "fears": "Devenir comme sa mère, qui attend à la fenêtre.",
+        "secret": "Elle a vu Yann partir vers la Chaussée et n'a rien dit.",
+        "plannedArc": "De la culpabilité muette à la parole : elle finit par chanter la marée devant toute l'île.",
+        "colorPalette": [
+          "#b5523b",
+          "#e8e4da",
+          "#3d4a5c"
+        ]
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          215,
+          205,
+          190
+        ],
+        "figure": [
+          150,
+          60,
+          50
+        ]
+      }
+    },
+    {
+      "key": "yann",
+      "firstName": "Yann",
+      "lastName": "Kervran",
+      "role": "secondary",
+      "status": "missing",
+      "fields": {
+        "age": "16 ans",
+        "gender": "male",
+        "occupation": "Apprenti pêcheur",
+        "firstAppearance": "@node:s02",
+        "description": "Le frère cadet, rêveur, qui dessine des cartes de récifs dans les marges de ses cahiers.",
+        "mainGoal": "Traverser la Chaussée des Noyés pour prouver qu'elle existe.",
+        "secret": "Il a signé, au nom de la famille, la vente des marais à la Compagnie."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          200,
+          210,
+          220
+        ],
+        "figure": [
+          60,
+          80,
+          110
+        ]
+      }
+    },
+    {
+      "key": "anna",
+      "firstName": "Anna",
+      "lastName": "Kervran",
+      "role": "secondary",
+      "status": "alive",
+      "fields": {
+        "age": "47 ans",
+        "gender": "female",
+        "occupation": "Saunière, veuve",
+        "firstAppearance": "@node:s01",
+        "description": "Usée, droite, la voix basse. Elle a perdu son mari en mer il y a dix ans.",
+        "mainGoal": "Garder la maison et les marais, quoi qu'il en coûte."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          190,
+          185,
+          180
+        ],
+        "figure": [
+          80,
+          70,
+          70
+        ]
+      }
+    },
+    {
+      "key": "soazig",
+      "firstName": "Soazig",
+      "lastName": "Le Dantec",
+      "role": "mentor",
+      "status": "alive",
+      "fields": {
+        "nickname": "Mamm-gozh",
+        "age": "81 ans",
+        "gender": "female",
+        "occupation": "Ancienne gardienne du phare, conteuse",
+        "firstAppearance": "@node:s03",
+        "description": "Petite, coiffe de dentelle, pipe de terre. Elle connaît les sept chants de marée.",
+        "mainGoal": "Transmettre le chant avant de mourir.",
+        "secret": "Elle a passé un pacte avec la Dame des Brumes en 1910."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          225,
+          220,
+          210
+        ],
+        "figure": [
+          90,
+          90,
+          90
+        ]
+      }
+    },
+    {
+      "key": "loic",
+      "firstName": "Loïc",
+      "lastName": "Le Goff",
+      "role": "ally",
+      "status": "alive",
+      "fields": {
+        "age": "22 ans",
+        "gender": "male",
+        "occupation": "Pêcheur",
+        "firstAppearance": "@node:s02",
+        "description": "Ami d'enfance de Maëlle, rieur, costaud, mauvais menteur.",
+        "mainGoal": "Que Maëlle reste sur l'île.",
+        "traits": [
+          "Loyal",
+          "Drôle"
+        ]
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          205,
+          215,
+          200
+        ],
+        "figure": [
+          70,
+          100,
+          70
+        ]
+      }
+    },
+    {
+      "key": "danet",
+      "firstName": "Hervé",
+      "lastName": "Danet",
+      "role": "antagonist",
+      "status": "alive",
+      "fields": {
+        "age": "52 ans",
+        "gender": "male",
+        "occupation": "Directeur de la Compagnie des Sels du Ponant",
+        "origin": "@loc:brest",
+        "firstAppearance": "@node:s04",
+        "description": "Costume trois pièces, montre de gousset, sourire de notaire.",
+        "mainGoal": "Acheter tous les marais avant l'hiver.",
+        "deepDesire": "Être pris au sérieux par sa famille d'armateurs.",
+        "coreValues": "Le progrès, le rendement, le contrat signé."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          180,
+          180,
+          190
+        ],
+        "figure": [
+          40,
+          40,
+          50
+        ]
+      }
+    },
+    {
+      "key": "morvan",
+      "firstName": "Alain",
+      "lastName": "Morvan",
+      "role": "secondary",
+      "status": "alive",
+      "fields": {
+        "age": "60 ans",
+        "gender": "male",
+        "occupation": "Recteur de Saint-Gildas",
+        "firstAppearance": "@node:s05",
+        "description": "Soutane rapiécée, lunettes rondes ; il bénit les bateaux et fait semblant de ne pas croire aux Morgans."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          210,
+          205,
+          200
+        ],
+        "figure": [
+          30,
+          30,
+          30
+        ]
+      }
+    },
+    {
+      "key": "gwen",
+      "firstName": "Gwen",
+      "lastName": "Le Bihan",
+      "role": "ally",
+      "status": "alive",
+      "fields": {
+        "age": "35 ans",
+        "gender": "female",
+        "occupation": "Gardienne du phare",
+        "firstAppearance": "@node:s03",
+        "description": "Ciré jaune, lampe-tempête, carnet de quart. Elle tient le phare depuis la mort de son père.",
+        "mainGoal": "Garder les sept feux allumés malgré la Compagnie qui veut l'électrifier."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          230,
+          220,
+          160
+        ],
+        "figure": [
+          100,
+          80,
+          30
+        ]
+      }
+    },
+    {
+      "key": "quere",
+      "firstName": "Ronan",
+      "lastName": "Quéré",
+      "role": "secondary",
+      "status": "alive",
+      "fields": {
+        "age": "40 ans",
+        "gender": "male",
+        "occupation": "Médecin du continent, en poste pour l'hiver",
+        "firstAppearance": "@node:s06",
+        "description": "Rationaliste, gentil, qui note tout dans un carnet de cuir."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          200,
+          200,
+          210
+        ],
+        "figure": [
+          60,
+          60,
+          90
+        ]
+      }
+    },
+    {
+      "key": "jos",
+      "firstName": "Jos",
+      "lastName": "Le Bras",
+      "role": "secondary",
+      "status": "alive",
+      "fields": {
+        "age": "45 ans",
+        "gender": "male",
+        "occupation": "Contremaître de la Compagnie",
+        "firstAppearance": "@node:s04",
+        "description": "Enfant de l'île passé au service de Danet ; il a honte et le cache sous la brutalité."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          190,
+          180,
+          170
+        ],
+        "figure": [
+          90,
+          60,
+          40
+        ]
+      }
+    },
+    {
+      "key": "klervi",
+      "firstName": "Klervi",
+      "lastName": "Le Goff",
+      "role": "extra",
+      "status": "alive",
+      "fields": {
+        "age": "9 ans",
+        "gender": "female",
+        "occupation": "Écolière",
+        "firstAppearance": "@node:s05",
+        "description": "Petite sœur de Loïc ; elle voit les Morgans et le dit à tout le monde."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          240,
+          225,
+          225
+        ],
+        "figure": [
+          180,
+          80,
+          100
+        ]
+      }
+    },
+    {
+      "key": "dame",
+      "firstName": "La Dame",
+      "lastName": "des Brumes",
+      "role": "antagonist",
+      "status": "unknown",
+      "fields": {
+        "nickname": "Itron ar Vrumenn",
+        "gender": "female",
+        "firstAppearance": "@node:s07",
+        "description": "Silhouette de brume, robe d'algues, voix qui vient de partout à la fois.",
+        "mainGoal": "Reprendre les marais que les hommes ont volés à la mer.",
+        "secret": "Elle a été une saunière, la première, noyée pour avoir refusé de céder ses œillets."
+      },
+      "portrait": {
+        "kind": "portrait",
+        "background": [
+          170,
+          185,
+          195
+        ],
+        "figure": [
+          230,
+          235,
+          240
+        ]
+      }
+    },
+    {
+      "key": "pierrick",
+      "firstName": "Pierrick",
+      "lastName": "Kervran",
+      "role": "secondary",
+      "status": "dead",
+      "fields": {
+        "age": "Mort à 38 ans",
+        "gender": "male",
+        "occupation": "Pêcheur",
+        "firstAppearance": "@node:s09",
+        "description": "Le père, disparu en mer en 1948. Il n'apparaît qu'en souvenir."
+      }
+    }
+  ],
+  "items": [
+    {
+      "key": "veilleuses",
+      "name": "Les sept veilleuses",
+      "type": "lamp",
+      "status": "damaged",
+      "fields": {
+        "description": "Sept lanternes de cuivre au sommet du phare ; trois sont fêlées.",
+        "rarity": "unique",
+        "firstAppearance": "@node:s03",
+        "powers": "Allumées ensemble, elles tiennent la mer loin des marais."
+      },
+      "portrait": {
+        "kind": "swatches",
+        "colors": [
+          [
+            200,
+            150,
+            40
+          ],
+          [
+            120,
+            80,
+            30
+          ]
+        ],
+        "width": 400,
+        "height": 120
+      }
+    },
+    {
+      "key": "las",
+      "name": "Le las de Yann",
+      "type": "tool",
+      "status": "worn",
+      "fields": {
+        "description": "Râteau de saunier en bois de frêne, gravé « Y. K. ».",
+        "firstAppearance": "@node:s02",
+        "history": "Retrouvé planté dans la vase, la nuit de la disparition."
+      }
+    },
+    {
+      "key": "carnet-soazig",
+      "name": "Carnet de Soazig",
+      "type": "diary",
+      "status": "worn",
+      "fields": {
+        "description": "Carnet de quart du phare, 1908-1931, où Soazig a noté les sept chants.",
+        "author": "Soazig Le Dantec",
+        "language": "Breton et français",
+        "firstAppearance": "@node:s06"
+      }
+    },
+    {
+      "key": "cornet",
+      "name": "Le cornet de brume",
+      "type": "instrument",
+      "status": "intact",
+      "fields": {
+        "description": "Coquillage percé qui sonne comme une sirène de bateau.",
+        "use": "Appeler les Morgans, selon Klervi."
+      }
+    },
+    {
+      "key": "contrat",
+      "name": "Contrat de vente des marais",
+      "type": "contract",
+      "status": "intact",
+      "fields": {
+        "description": "Acte de vente des œillets Kervran à la Compagnie, signé « Y. Kervran ».",
+        "writtenOn": "14 septembre 1958",
+        "firstAppearance": "@node:s08"
+      }
+    },
+    {
+      "key": "cle-phare",
+      "name": "Clé du phare",
+      "type": "key",
+      "status": "intact",
+      "fields": {
+        "description": "Clé de fer longue comme une main.",
+        "opens": "La porte de la lanterne."
+      }
+    },
+    {
+      "key": "barque",
+      "name": "Le Santez-Anna",
+      "type": "boat",
+      "status": "damaged",
+      "fields": {
+        "description": "Canot à voile de Pierrick, coque bleue, qu'Anna n'a jamais vendu.",
+        "capacity": "Trois personnes",
+        "firstAppearance": "@node:s10"
+      }
+    },
+    {
+      "key": "medaille",
+      "name": "Médaille de saint Gildas",
+      "type": "amulet",
+      "status": "intact",
+      "fields": {
+        "description": "Médaille d'étain donnée aux enfants au Pardon de la mer.",
+        "powers": "Aucun, dit le recteur. Tout, dit Soazig."
+      }
+    },
+    {
+      "key": "fleur-bleue",
+      "name": "Fleur de sel bleue",
+      "type": "ingredient",
+      "status": "intact",
+      "fields": {
+        "description": "Fleur de sel teintée de bleu qui ne se forme que la veille des grandes marées.",
+        "rarity": "rare",
+        "effects": "Mêlée à l'huile des veilleuses, elle les fait brûler sous la pluie."
+      },
+      "portrait": {
+        "kind": "swatches",
+        "colors": [
+          [
+            120,
+            150,
+            200
+          ],
+          [
+            230,
+            235,
+            245
+          ]
+        ],
+        "width": 400,
+        "height": 120
+      }
+    },
+    {
+      "key": "lettre-yann",
+      "name": "Lettre de Yann",
+      "type": "letter",
+      "status": "intact",
+      "fields": {
+        "description": "Lettre laissée sous l'oreiller de Maëlle.",
+        "author": "Yann Kervran",
+        "recipient": "Maëlle",
+        "content": "« J'ai vendu pour qu'on parte. Je vais racheter. Ne le dis pas à maman. »"
+      }
+    }
+  ],
+  "species": [
+    {
+      "key": "goelands",
+      "name": "Goéland argenté",
+      "type": "bird",
+      "status": "common",
+      "fields": {
+        "description": "Le goéland de l'île, qui vole le poisson sur les étals.",
+        "diet": "omnivore",
+        "temperament": "aggressive",
+        "habitat": "Falaises, port."
+      }
+    },
+    {
+      "key": "phoque",
+      "name": "Phoque gris",
+      "type": "mammal",
+      "status": "rare",
+      "fields": {
+        "description": "Une colonie d'une dizaine de phoques sur les récifs nord.",
+        "diet": "carnivore",
+        "temperament": "wary",
+        "legends": "Les noyés reviennent en phoques pour voir leur famille."
+      }
+    },
+    {
+      "key": "anguilles",
+      "name": "Anguilles de brume",
+      "type": "fantasticCreature",
+      "status": "legendary",
+      "fields": {
+        "description": "Anguilles pâles qui nagent dans la brume comme dans l'eau.",
+        "dangerLevel": "medium",
+        "abilities": [
+          "Nagent dans l'air",
+          "Éteignent les lanternes"
+        ],
+        "firstAppearance": "@node:s07"
+      }
+    },
+    {
+      "key": "salicorne",
+      "name": "Salicorne",
+      "type": "herb",
+      "status": "common",
+      "fields": {
+        "description": "Plante grasse des bords d'œillets ; on la mange en pickles.",
+        "edible": "yes",
+        "uses": [
+          "Cuisine",
+          "Remède"
+        ]
+      }
+    },
+    {
+      "key": "ajonc",
+      "name": "Ajonc",
+      "type": "shrub",
+      "status": "common",
+      "fields": {
+        "description": "Buisson épineux à fleurs jaunes qui couvre la lande.",
+        "season": "Fleurit toute l'année"
+      }
+    },
+    {
+      "key": "lichen",
+      "name": "Lichen des veilleuses",
+      "type": "magicPlant",
+      "status": "rare",
+      "fields": {
+        "description": "Lichen doré qui pousse seulement sur les pierres du phare.",
+        "properties": "Luit faiblement quand la mer monte.",
+        "firstAppearance": "@node:s03"
+      }
+    },
+    {
+      "key": "courlis",
+      "name": "Courlis cendré",
+      "type": "bird",
+      "status": "endangered",
+      "fields": {
+        "description": "Oiseau des vasières au long bec courbe ; son cri annonce la brume."
+      }
+    },
+    {
+      "key": "algue",
+      "name": "Algue-lumière",
+      "type": "aquaticPlant",
+      "status": "rare",
+      "fields": {
+        "description": "Algue phosphorescente des flaques de la grotte.",
+        "toxicity": "mild"
+      }
+    },
+    {
+      "key": "kezeg",
+      "name": "Kezeg-mor",
+      "type": "fantasticCreature",
+      "status": "legendary",
+      "fields": {
+        "description": "Chevaux d'écume qui galopent sur la Chaussée aux marées d'équinoxe.",
+        "dangerLevel": "high",
+        "temperament": "unpredictable"
+      }
+    },
+    {
+      "key": "bar",
+      "name": "Bar de ligne",
+      "type": "fish",
+      "status": "common",
+      "fields": {
+        "description": "Le poisson noble de l'île, pêché à la ligne au pied du phare.",
+        "diet": "carnivore"
+      }
+    }
+  ],
+  "factions": [
+    {
+      "key": "compagnie",
+      "name": "Compagnie des Sels du Ponant",
+      "type": "company",
+      "status": "rising",
+      "fields": {
+        "description": "Société brestoise qui rachète les marais pour industrialiser le sel.",
+        "goals": "Une usine, une digue de béton, un sel en boîte vendu à Paris.",
+        "influence": "regional",
+        "founded": "1921",
+        "firstAppearance": "@node:s04"
+      },
+      "portrait": {
+        "kind": "swatches",
+        "colors": [
+          [
+            40,
+            50,
+            80
+          ],
+          [
+            200,
+            200,
+            210
+          ]
+        ],
+        "width": 400,
+        "height": 120
+      }
+    },
+    {
+      "key": "confrerie",
+      "name": "Confrérie des saunières",
+      "type": "guild",
+      "status": "declining",
+      "fields": {
+        "description": "Les femmes qui tiennent les œillets, de mère en fille.",
+        "motto": "Le sel ne se vend pas, il se partage",
+        "ranks": [
+          "Paludière",
+          "Maîtresse d'œillet",
+          "Doyenne"
+        ]
+      }
+    },
+    {
+      "key": "conseil",
+      "name": "Conseil de l'île",
+      "type": "council",
+      "status": "active",
+      "fields": {
+        "description": "Le maire, le recteur et trois anciens ; ils se réunissent au café.",
+        "influence": "local"
+      }
+    },
+    {
+      "key": "gardiens",
+      "name": "Les Gardiens du feu",
+      "type": "secretSociety",
+      "status": "underground",
+      "fields": {
+        "description": "Ceux qui savent pourquoi il faut sept feux et non un seul.",
+        "secrets": "Ils ont noyé la première saunière pour gagner les marais sur la mer.",
+        "membership": "Héréditaire, jamais plus de sept"
+      }
+    },
+    {
+      "key": "paroisse",
+      "name": "Paroisse Saint-Gildas",
+      "type": "church",
+      "status": "active",
+      "fields": {
+        "description": "La paroisse de l'île et son recteur.",
+        "rites": "Bénédiction des bateaux, Pardon de la mer."
+      }
+    },
+    {
+      "key": "coop",
+      "name": "Coopérative des pêcheurs",
+      "type": "guild",
+      "status": "active",
+      "fields": {
+        "description": "Douze canots qui vendent ensemble leur poisson au Conquet."
+      }
+    },
+    {
+      "key": "douane",
+      "name": "Douane de Brest",
+      "type": "guard",
+      "status": "active",
+      "fields": {
+        "description": "Deux douaniers qui viennent le jeudi et ne voient rien."
+      }
+    },
+    {
+      "key": "contrebandiers",
+      "name": "Contrebandiers de la Chaussée",
+      "type": "smugglers",
+      "status": "underground",
+      "fields": {
+        "description": "Ceux qui passent du tabac par les récifs à marée basse.",
+        "activities": [
+          "Tabac",
+          "Alcool"
+        ]
+      }
+    },
+    {
+      "key": "famille-kervran",
+      "name": "Famille Kervran",
+      "type": "clan",
+      "status": "declining",
+      "fields": {
+        "description": "Saunières depuis dix générations ; il ne reste que trois Kervran."
+      }
+    },
+    {
+      "key": "veuves",
+      "name": "Cercle des veuves",
+      "type": "club",
+      "status": "active",
+      "fields": {
+        "description": "Les femmes de marins perdus ; elles brodent les ex-voto.",
+        "activities": [
+          "Broderie",
+          "Veillées"
+        ]
+      }
+    }
+  ],
+  "peoples": [
+    {
+      "key": "kerlennais",
+      "name": "Gens de Kerlenn",
+      "type": "ethnicGroup",
+      "status": "declining",
+      "fields": {
+        "description": "Les insulaires, saunières et pêcheurs.",
+        "population": "Quatre cents",
+        "customs": "On ne siffle pas en mer ; on salue la marée.",
+        "spread": "local"
+      }
+    },
+    {
+      "key": "brezhoneg",
+      "name": "Le breton de l'île",
+      "type": "language",
+      "status": "endangered",
+      "fields": {
+        "description": "Un breton à part, plein de mots de sel et de marée.",
+        "vocabulary": "Holen (sel), mor (mer), brumenn (brume)."
+      }
+    },
+    {
+      "key": "morgans",
+      "name": "Les Morgans",
+      "type": "spiritBeings",
+      "status": "legendary",
+      "fields": {
+        "description": "Esprits de la mer, ni bons ni méchants, qui gardent ce que la mer a pris.",
+        "appearance": "Enfants pâles aux cheveux d'algue.",
+        "firstAppearance": "@node:s07"
+      }
+    },
+    {
+      "key": "culte-veilleuses",
+      "name": "Le culte des sept feux",
+      "type": "religion",
+      "status": "declining",
+      "fields": {
+        "description": "La vieille croyance de l'île : sept feux pour sept marées.",
+        "rituals": "Rallumer les feux en chantant, à l'équinoxe.",
+        "followers": "Les vieilles et les enfants"
+      }
+    },
+    {
+      "key": "ouvriers",
+      "name": "Les ouvriers du continent",
+      "type": "socialClass",
+      "status": "growing",
+      "fields": {
+        "description": "Les hommes que la Compagnie fait venir de Brest pour l'usine."
+      }
+    },
+    {
+      "key": "pardon",
+      "name": "Le Pardon de la mer",
+      "type": "tradition",
+      "status": "living",
+      "fields": {
+        "description": "Procession du 15 août vers le port ; on jette des fleurs à la mer.",
+        "celebrations": "Messe, procession, bal sur la jetée."
+      }
+    },
+    {
+      "key": "noyes",
+      "name": "Les Noyés",
+      "type": "mythology",
+      "status": "legendary",
+      "fields": {
+        "description": "Ceux que la mer a pris marchent sur la Chaussée une nuit par siècle.",
+        "myths": "Si on les appelle par leur nom, ils se retournent."
+      }
+    },
+    {
+      "key": "dame-culte",
+      "name": "La Dame des Brumes",
+      "type": "deity",
+      "status": "legendary",
+      "fields": {
+        "description": "La mer faite femme ; on lui laisse du sel sur le seuil.",
+        "domains": [
+          "Brume",
+          "Marées",
+          "Noyés"
+        ]
+      }
+    },
+    {
+      "key": "ker-is",
+      "name": "La légende de Ker-Is",
+      "type": "mythology",
+      "status": "legendary",
+      "fields": {
+        "description": "La ville engloutie dont les cloches sonnent sous la mer ; l'île en serait le clocher."
+      }
+    },
+    {
+      "key": "prophetie",
+      "name": "La prophétie de la septième marée",
+      "type": "prophecy",
+      "status": "legendary",
+      "fields": {
+        "description": "Une phrase du carnet de Soazig.",
+        "prophecyText": "« Quand la fille du sel chantera seule, la mer rendra ce qu'elle doit. »",
+        "fulfilment": "Maëlle chante la septième marée sur la Chaussée."
+      }
+    }
+  ],
+  "magic": [
+    {
+      "key": "feu",
+      "name": "Le Feu des veilleuses",
+      "type": "magicSystem",
+      "status": "rare",
+      "fields": {
+        "description": "La magie de l'île tient dans sept feux et sept chants.",
+        "rules": "Chaque feu répond à un chant ; un chant faux éteint le feu.",
+        "cost": "La voix : celle qui chante perd un peu de la sienne.",
+        "rarity": "rare"
+      },
+      "portrait": {
+        "kind": "swatches",
+        "colors": [
+          [
+            230,
+            170,
+            60
+          ],
+          [
+            60,
+            40,
+            30
+          ]
+        ],
+        "width": 400,
+        "height": 120
+      }
+    },
+    {
+      "key": "chant",
+      "name": "Le chant de marée",
+      "type": "technique",
+      "status": "secret",
+      "fields": {
+        "description": "Mélodie de sept notes que l'on chante face à la mer.",
+        "learning": "De bouche à oreille, de gardienne à gardienne.",
+        "power": "major"
+      },
+      "parentId": "@magic:feu"
+    },
+    {
+      "key": "sel-garde",
+      "name": "Le sel de garde",
+      "type": "ritual",
+      "status": "active",
+      "fields": {
+        "description": "Une poignée de sel sur chaque seuil pour que la brume n'entre pas.",
+        "materials": "Sel des marais, jamais celui de la Compagnie."
+      },
+      "parentId": "@magic:feu"
+    },
+    {
+      "key": "brumes",
+      "name": "Lecture des brumes",
+      "type": "technique",
+      "status": "rare",
+      "fields": {
+        "description": "Lire dans la brume ce qui arrive en mer.",
+        "whoCanUse": "Les enfants, et les vieilles qui n'ont pas oublié."
+      }
+    },
+    {
+      "key": "pacte",
+      "name": "Le pacte des Noyés",
+      "type": "forbiddenArt",
+      "status": "forbidden",
+      "fields": {
+        "description": "Échanger une vie contre une autre auprès de la Dame.",
+        "risks": "On ne choisit pas la vie qu'elle prend.",
+        "power": "devastating"
+      }
+    },
+    {
+      "key": "sang",
+      "name": "Le sang Kervran",
+      "type": "bloodline",
+      "status": "rare",
+      "fields": {
+        "description": "Les filles Kervran entendent la mer monter avant tout le monde.",
+        "inheritance": "De mère en fille"
+      }
+    },
+    {
+      "key": "benediction",
+      "name": "Bénédiction du Pardon",
+      "type": "ritual",
+      "status": "active",
+      "fields": {
+        "description": "L'eau bénite jetée sur les proues ; le recteur jure que c'est la seule magie de l'île."
+      }
+    },
+    {
+      "key": "appel",
+      "name": "L'appel des Morgans",
+      "type": "summoning",
+      "status": "forgotten",
+      "fields": {
+        "description": "Souffler trois fois dans le cornet de brume à marée basse.",
+        "summoned": "Les Morgans"
+      }
+    },
+    {
+      "key": "phoque-forme",
+      "name": "La peau de phoque",
+      "type": "transformation",
+      "status": "legendary",
+      "fields": {
+        "description": "Les noyés qui reviennent prennent la peau d'un phoque.",
+        "duration": "Une marée"
+      }
+    },
+    {
+      "key": "cercle",
+      "name": "Le cercle de sel",
+      "type": "spell",
+      "status": "rare",
+      "fields": {
+        "description": "Un cercle de fleur de sel bleue que la brume ne franchit pas.",
+        "duration": "Jusqu'à la pluie",
+        "power": "moderate"
+      },
+      "parentId": "@magic:feu"
+    }
+  ],
+  "relations": [
+    {
+      "sourceId": "@char:maelle",
+      "targetId": "@char:yann",
+      "type": "family",
+      "label": "Frère et sœur",
+      "directed": false,
+      "intensity": 5,
+      "sentiment": "positive",
+      "familyLink": "sibling"
+    },
+    {
+      "sourceId": "@char:anna",
+      "targetId": "@char:maelle",
+      "type": "family",
+      "label": "Mère",
+      "directed": true,
+      "intensity": 4,
+      "sentiment": "positive",
+      "familyLink": "parent"
+    },
+    {
+      "sourceId": "@char:anna",
+      "targetId": "@char:yann",
+      "type": "family",
+      "label": "Mère",
+      "directed": true,
+      "intensity": 4,
+      "sentiment": "positive",
+      "familyLink": "parent"
+    },
+    {
+      "sourceId": "@char:pierrick",
+      "targetId": "@char:maelle",
+      "type": "family",
+      "label": "Père",
+      "directed": true,
+      "intensity": 5,
+      "sentiment": "positive",
+      "familyLink": "parent"
+    },
+    {
+      "sourceId": "@char:soazig",
+      "targetId": "@char:maelle",
+      "type": "mentor",
+      "label": "Lui apprend le chant",
+      "directed": true,
+      "intensity": 4,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:loic",
+      "targetId": "@char:maelle",
+      "type": "love",
+      "label": "Amoureux sans le dire",
+      "directed": true,
+      "intensity": 3,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:loic",
+      "targetId": "@char:klervi",
+      "type": "family",
+      "label": "Frère et sœur",
+      "directed": false,
+      "intensity": 4,
+      "sentiment": "positive",
+      "familyLink": "sibling"
+    },
+    {
+      "sourceId": "@char:danet",
+      "targetId": "@char:maelle",
+      "type": "enmity",
+      "label": "Veut ses marais",
+      "directed": true,
+      "intensity": 4,
+      "sentiment": "negative"
+    },
+    {
+      "sourceId": "@char:jos",
+      "targetId": "@char:danet",
+      "type": "professional",
+      "label": "Contremaître",
+      "directed": true,
+      "intensity": 3,
+      "sentiment": "neutral"
+    },
+    {
+      "sourceId": "@char:gwen",
+      "targetId": "@char:maelle",
+      "type": "alliance",
+      "label": "Gardent les feux ensemble",
+      "directed": false,
+      "intensity": 4,
+      "sentiment": "positive"
+    },
+    {
+      "sourceId": "@char:dame",
+      "targetId": "@char:soazig",
+      "type": "secret",
+      "label": "Le pacte de 1910",
+      "directed": false,
+      "intensity": 5,
+      "sentiment": "negative"
+    },
+    {
+      "sourceId": "@char:yann",
+      "targetId": "@char:danet",
+      "type": "betrayal",
+      "label": "Lui a vendu les marais",
+      "directed": true,
+      "intensity": 4,
+      "sentiment": "negative"
+    },
+    {
+      "sourceId": "@char:quere",
+      "targetId": "@char:soazig",
+      "type": "rivalry",
+      "label": "La science contre les contes",
+      "directed": false,
+      "intensity": 2,
+      "sentiment": "neutral"
+    }
+  ],
+  "graph": [
+    {
+      "characterId": "@char:maelle",
+      "x": 0,
+      "y": 0
+    },
+    {
+      "characterId": "@char:yann",
+      "x": 220,
+      "y": -40
+    },
+    {
+      "characterId": "@char:anna",
+      "x": -40,
+      "y": -200
+    },
+    {
+      "characterId": "@char:pierrick",
+      "x": 140,
+      "y": -240
+    },
+    {
+      "characterId": "@char:soazig",
+      "x": -240,
+      "y": -60
+    },
+    {
+      "characterId": "@char:loic",
+      "x": -180,
+      "y": 180
+    },
+    {
+      "characterId": "@char:klervi",
+      "x": -380,
+      "y": 220
+    },
+    {
+      "characterId": "@char:danet",
+      "x": 300,
+      "y": 160
+    },
+    {
+      "characterId": "@char:jos",
+      "x": 480,
+      "y": 220
+    },
+    {
+      "characterId": "@char:gwen",
+      "x": 60,
+      "y": 230
+    },
+    {
+      "characterId": "@char:dame",
+      "x": -420,
+      "y": -160
+    },
+    {
+      "characterId": "@char:quere",
+      "x": -460,
+      "y": 40
+    },
+    {
+      "characterId": "@char:morvan",
+      "x": 200,
+      "y": 360
+    }
+  ],
+  "characterLocations": [
+    {
+      "characterId": "@char:maelle",
+      "locationId": "@loc:maison-kervran",
+      "type": "lives",
+      "label": "Y vit avec sa mère"
+    },
+    {
+      "characterId": "@char:maelle",
+      "locationId": "@loc:marais",
+      "type": "works",
+      "label": "Saunière"
+    },
+    {
+      "characterId": "@char:yann",
+      "locationId": "@loc:chaussee",
+      "type": "frequents",
+      "label": "Y dessine ses cartes"
+    },
+    {
+      "characterId": "@char:anna",
+      "locationId": "@loc:marais",
+      "type": "works",
+      "label": "Saunière"
+    },
+    {
+      "characterId": "@char:gwen",
+      "locationId": "@loc:phare",
+      "type": "guards",
+      "label": "Gardienne"
+    },
+    {
+      "characterId": "@char:soazig",
+      "locationId": "@loc:phare",
+      "type": "frequents",
+      "label": "Ancienne gardienne"
+    },
+    {
+      "characterId": "@char:danet",
+      "locationId": "@loc:usine",
+      "type": "owns",
+      "label": "Son usine"
+    },
+    {
+      "characterId": "@char:danet",
+      "locationId": "@loc:brest",
+      "type": "lives",
+      "label": "Siège de la Compagnie"
+    },
+    {
+      "characterId": "@char:morvan",
+      "locationId": "@loc:eglise",
+      "type": "works",
+      "label": "Recteur"
+    },
+    {
+      "characterId": "@char:loic",
+      "locationId": "@loc:port",
+      "type": "works",
+      "label": "Pêcheur"
+    },
+    {
+      "characterId": "@char:dame",
+      "locationId": "@loc:grotte",
+      "type": "hides",
+      "label": "Son domaine"
+    },
+    {
+      "characterId": "@char:pierrick",
+      "locationId": "@loc:chaussee",
+      "type": "died",
+      "label": "Disparu en 1948"
+    }
+  ],
+  "worldLinks": [
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:maelle",
+      "targetKind": "item",
+      "targetId": "@item:las",
+      "type": "owns",
+      "label": "Le garde pour Yann"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:yann",
+      "targetKind": "item",
+      "targetId": "@item:las",
+      "type": "made",
+      "label": "Gravé de ses initiales"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:soazig",
+      "targetKind": "item",
+      "targetId": "@item:carnet-soazig",
+      "type": "made",
+      "label": "Son carnet de quart"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:gwen",
+      "targetKind": "item",
+      "targetId": "@item:cle-phare",
+      "type": "owns",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:klervi",
+      "targetKind": "item",
+      "targetId": "@item:cornet",
+      "type": "owns",
+      "label": "Trouvé sur la grève"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:yann",
+      "targetKind": "item",
+      "targetId": "@item:contrat",
+      "type": "made",
+      "label": "Signé « Y. Kervran »"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:danet",
+      "targetKind": "faction",
+      "targetId": "@faction:compagnie",
+      "type": "leads",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:jos",
+      "targetKind": "faction",
+      "targetId": "@faction:compagnie",
+      "type": "memberOf",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:anna",
+      "targetKind": "faction",
+      "targetId": "@faction:confrerie",
+      "type": "memberOf",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:soazig",
+      "targetKind": "faction",
+      "targetId": "@faction:gardiens",
+      "type": "memberOf",
+      "label": "La dernière"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:morvan",
+      "targetKind": "faction",
+      "targetId": "@faction:paroisse",
+      "type": "leads",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:maelle",
+      "targetKind": "magic",
+      "targetId": "@magic:chant",
+      "type": "masters",
+      "label": "À la fin du film"
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:maelle",
+      "targetKind": "magic",
+      "targetId": "@magic:sang",
+      "type": "related",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:soazig",
+      "targetKind": "magic",
+      "targetId": "@magic:chant",
+      "type": "teaches",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:klervi",
+      "targetKind": "magic",
+      "targetId": "@magic:brumes",
+      "type": "related",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:maelle",
+      "targetKind": "people",
+      "targetId": "@people:kerlennais",
+      "type": "belongsTo",
+      "label": ""
+    },
+    {
+      "sourceKind": "character",
+      "sourceId": "@char:soazig",
+      "targetKind": "people",
+      "targetId": "@people:brezhoneg",
+      "type": "speaks",
+      "label": ""
+    },
+    {
+      "sourceKind": "faction",
+      "sourceId": "@faction:compagnie",
+      "targetKind": "location",
+      "targetId": "@loc:usine",
+      "type": "basedIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "faction",
+      "sourceId": "@faction:gardiens",
+      "targetKind": "location",
+      "targetId": "@loc:phare",
+      "type": "controls",
+      "label": ""
+    },
+    {
+      "sourceKind": "faction",
+      "sourceId": "@faction:contrebandiers",
+      "targetKind": "location",
+      "targetId": "@loc:chaussee",
+      "type": "presentIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "faction",
+      "sourceId": "@faction:paroisse",
+      "targetKind": "magic",
+      "targetId": "@magic:pacte",
+      "type": "forbids",
+      "label": ""
+    },
+    {
+      "sourceKind": "item",
+      "sourceId": "@item:veilleuses",
+      "targetKind": "location",
+      "targetId": "@loc:phare",
+      "type": "locatedIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "item",
+      "sourceId": "@item:barque",
+      "targetKind": "location",
+      "targetId": "@loc:port",
+      "type": "locatedIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "item",
+      "sourceId": "@item:fleur-bleue",
+      "targetKind": "magic",
+      "targetId": "@magic:cercle",
+      "type": "grants",
+      "label": ""
+    },
+    {
+      "sourceKind": "species",
+      "sourceId": "@species:anguilles",
+      "targetKind": "location",
+      "targetId": "@loc:phare",
+      "type": "livesIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "species",
+      "sourceId": "@species:algue",
+      "targetKind": "location",
+      "targetId": "@loc:grotte",
+      "type": "livesIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "species",
+      "sourceId": "@species:kezeg",
+      "targetKind": "location",
+      "targetId": "@loc:chaussee",
+      "type": "livesIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "species",
+      "sourceId": "@species:lichen",
+      "targetKind": "magic",
+      "targetId": "@magic:feu",
+      "type": "sourceOf",
+      "label": ""
+    },
+    {
+      "sourceKind": "people",
+      "sourceId": "@people:morgans",
+      "targetKind": "location",
+      "targetId": "@loc:grotte",
+      "type": "livesIn",
+      "label": ""
+    },
+    {
+      "sourceKind": "location",
+      "sourceId": "@loc:phare",
+      "targetKind": "magic",
+      "targetId": "@magic:feu",
+      "type": "sourceOf",
+      "label": ""
+    }
+  ],
+  "nodeLinks": [
+    {
+      "node": "@node:q1",
+      "characters": {
+        "maelle": "pov",
+        "yann": "mentioned"
+      },
+      "locations": {
+        "marais": "setting"
+      },
+      "entries": {
+        "@item:las": "central"
+      }
+    },
+    {
+      "node": "@node:q2",
+      "characters": {
+        "danet": "present"
+      },
+      "locations": {
+        "bourg": "setting"
+      },
+      "entries": {
+        "@faction:compagnie": "central",
+        "@people:pardon": "present"
+      }
+    },
+    {
+      "node": "@node:q3",
+      "entries": {
+        "@species:anguilles": "central",
+        "@item:veilleuses": "central",
+        "@people:morgans": "present"
+      }
+    },
+    {
+      "node": "@node:q4",
+      "entries": {
+        "@item:carnet-soazig": "central",
+        "@item:lettre-yann": "central",
+        "@people:prophetie": "mentioned"
+      }
+    },
+    {
+      "node": "@node:q5",
+      "entries": {
+        "@magic:pacte": "central",
+        "@species:algue": "present",
+        "@item:barque": "present"
+      }
+    },
+    {
+      "node": "@node:q6",
+      "entries": {
+        "@people:noyes": "central",
+        "@species:kezeg": "present",
+        "@item:medaille": "present"
+      }
+    },
+    {
+      "node": "@node:q7",
+      "entries": {
+        "@magic:chant": "central",
+        "@item:fleur-bleue": "present",
+        "@item:contrat": "mentioned"
+      }
+    },
+    {
+      "node": "@node:s03",
+      "entries": {
+        "@item:veilleuses": "central",
+        "@species:lichen": "mentioned"
+      }
+    },
+    {
+      "node": "@node:s08",
+      "entries": {
+        "@item:carnet-soazig": "central",
+        "@item:lettre-yann": "present"
+      }
+    },
+    {
+      "node": "@node:s13",
+      "entries": {
+        "@magic:chant": "central",
+        "@people:prophetie": "central"
+      }
+    }
+  ],
+  "glossary": [
+    {
+      "term": "Œillet",
+      "category": "Saunerie",
+      "definition": "Bassin carré d'argile où l'eau de mer s'évapore et où le sel cristallise.",
+      "links": [
+        {
+          "kind": "location",
+          "id": "@loc:marais"
+        }
+      ]
+    },
+    {
+      "term": "Las",
+      "category": "Saunerie",
+      "definition": "Long râteau de bois pour tirer le sel gris.",
+      "links": [
+        {
+          "kind": "item",
+          "id": "@item:las"
+        }
+      ]
+    },
+    {
+      "term": "Fleur de sel",
+      "category": "Saunerie",
+      "definition": "Fine pellicule de sel qui se forme à la surface les jours de vent sec.",
+      "links": [
+        {
+          "kind": "item",
+          "id": "@item:fleur-bleue"
+        }
+      ]
+    },
+    {
+      "term": "Veilleuse",
+      "category": "Phare",
+      "definition": "Chacune des sept lanternes du phare.",
+      "links": [
+        {
+          "kind": "item",
+          "id": "@item:veilleuses"
+        },
+        {
+          "kind": "location",
+          "id": "@loc:phare"
+        }
+      ]
+    },
+    {
+      "term": "Morgan",
+      "category": "Légendes",
+      "definition": "Esprit de la mer, enfant pâle aux cheveux d'algue.",
+      "links": [
+        {
+          "kind": "people",
+          "id": "@people:morgans"
+        }
+      ]
+    },
+    {
+      "term": "Chant de marée",
+      "category": "Magie",
+      "definition": "Mélodie de sept notes qui rallume les feux.",
+      "links": [
+        {
+          "kind": "magic",
+          "id": "@magic:chant"
+        }
+      ]
+    },
+    {
+      "term": "Coefficient",
+      "category": "Mer",
+      "definition": "Amplitude d'une marée, de 20 à 120. La septième marée du film dépasse 118.",
+      "links": [
+        {
+          "kind": "location",
+          "id": "@loc:chaussee"
+        }
+      ]
+    },
+    {
+      "term": "Pardon",
+      "category": "Traditions",
+      "definition": "Procession religieuse bretonne ; celui de Kerlenn bénit la mer.",
+      "links": [
+        {
+          "kind": "people",
+          "id": "@people:pardon"
+        }
+      ]
+    },
+    {
+      "term": "Mamm-gozh",
+      "category": "Breton",
+      "definition": "« Grand-mère » : le surnom de Soazig.",
+      "links": [
+        {
+          "kind": "character",
+          "id": "@char:soazig"
+        }
+      ]
+    },
+    {
+      "term": "Kezeg-mor",
+      "category": "Légendes",
+      "definition": "« Chevaux de mer » : l'écume des grandes marées.",
+      "links": [
+        {
+          "kind": "species",
+          "id": "@species:kezeg"
+        }
+      ]
+    },
+    {
+      "term": "Compagnie",
+      "category": "Continent",
+      "definition": "La Compagnie des Sels du Ponant, que l'île appelle simplement « la Compagnie ».",
+      "links": [
+        {
+          "kind": "faction",
+          "id": "@faction:compagnie"
+        }
+      ]
+    }
+  ],
+  "documents": [
+    {
+      "node": "@node:a1",
+      "name": "Note d'intention.docx",
+      "text": "doc:intention",
+      "note": "À joindre au dossier de l'avance sur recettes."
+    },
+    {
+      "node": "@node:a1",
+      "name": "Palette de l'acte I.png",
+      "image": {
+        "kind": "swatches",
+        "colors": [
+          [
+            107,
+            127,
+            142
+          ],
+          [
+            217,
+            207,
+            192
+          ],
+          [
+            181,
+            82,
+            59
+          ]
+        ],
+        "width": 500,
+        "height": 120
+      },
+      "note": "Gris de lande, crème de sel, rouge du foulard."
+    },
+    {
+      "node": "@node:q1",
+      "name": "Repérage — marais.png",
+      "image": {
+        "kind": "landscape",
+        "sky": [
+          170,
+          180,
+          190
+        ],
+        "ground": [
+          220,
+          215,
+          205
+        ],
+        "width": 480,
+        "height": 320
+      }
+    },
+    {
+      "node": "@node:q2",
+      "name": "Discours de Danet.md",
+      "text": "doc:discours",
+      "earlier": "doc:discours-v1",
+      "note": "Version courte pour le tournage."
+    },
+    {
+      "node": "@node:q3",
+      "name": "Découpage technique séq. 3.txt",
+      "text": "doc:decoupage"
+    },
+    {
+      "node": "@node:q4",
+      "name": "Page du carnet de Soazig.docx",
+      "text": "doc:carnet"
+    },
+    {
+      "node": "@node:q5",
+      "name": "Repérage — grotte.png",
+      "image": {
+        "kind": "landscape",
+        "sky": [
+          20,
+          40,
+          60
+        ],
+        "ground": [
+          60,
+          90,
+          110
+        ],
+        "width": 480,
+        "height": 320
+      },
+      "note": "Grotte de Morgat, à confirmer."
+    },
+    {
+      "node": "@node:q6",
+      "name": "Table des marées 1958.md",
+      "text": "doc:marees"
+    },
+    {
+      "node": "@node:a3",
+      "name": "Partition du chant.txt",
+      "text": "doc:chant",
+      "note": "Mélodie de Nolwenn Le Goff, compositrice."
+    },
+    {
+      "node": "@node:q7",
+      "name": "Plan de travail du tournage.md",
+      "text": "doc:plan-travail"
+    },
+    {
+      "node": "@node:a2",
+      "name": "Effets visuels — anguilles.md",
+      "text": "doc:vfx"
+    }
+  ],
+  "gallery": {
+    "logo": {
+      "kind": "swatches",
+      "colors": [
+        [
+          200,
+          150,
+          40
+        ],
+        [
+          40,
+          50,
+          80
+        ]
+      ],
+      "width": 200,
+      "height": 200
+    },
+    "folders": [
+      {
+        "key": "reperages",
+        "name": "Repérages"
+      },
+      {
+        "key": "costumes",
+        "name": "Costumes"
+      },
+      {
+        "key": "ambiances",
+        "name": "Ambiances"
+      },
+      {
+        "key": "brumes",
+        "name": "Brumes",
+        "parent": "ambiances"
+      }
+    ],
+    "images": [
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            120,
+            140,
+            160
+          ],
+          "ground": [
+            200,
+            190,
+            170
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Kerlenn depuis la mer",
+        "description": "Île de Batz, côté nord, à l'aube.",
+        "folder": "reperages"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            40,
+            50,
+            80
+          ],
+          "ground": [
+            90,
+            90,
+            100
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Le phare la nuit",
+        "folder": "reperages"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            170,
+            180,
+            190
+          ],
+          "ground": [
+            220,
+            215,
+            205
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Les œillets au couchant",
+        "folder": "reperages"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            20,
+            40,
+            60
+          ],
+          "ground": [
+            60,
+            90,
+            110
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Entrée de la grotte",
+        "folder": "reperages"
+      },
+      {
+        "image": {
+          "kind": "portrait",
+          "background": [
+            215,
+            205,
+            190
+          ],
+          "figure": [
+            150,
+            60,
+            50
+          ]
+        },
+        "caption": "Maëlle — costume",
+        "description": "Foulard rouge, ciré du père à partir de l'acte II.",
+        "folder": "costumes"
+      },
+      {
+        "image": {
+          "kind": "portrait",
+          "background": [
+            180,
+            180,
+            190
+          ],
+          "figure": [
+            40,
+            40,
+            50
+          ]
+        },
+        "caption": "Danet — costume",
+        "folder": "costumes"
+      },
+      {
+        "image": {
+          "kind": "portrait",
+          "background": [
+            170,
+            185,
+            195
+          ],
+          "figure": [
+            230,
+            235,
+            240
+          ]
+        },
+        "caption": "La Dame — recherche",
+        "description": "Pas de visage : un voile d'algues et de tulle.",
+        "folder": "costumes"
+      },
+      {
+        "image": {
+          "kind": "swatches",
+          "colors": [
+            [
+              107,
+              127,
+              142
+            ],
+            [
+              217,
+              207,
+              192
+            ],
+            [
+              181,
+              82,
+              59
+            ]
+          ],
+          "width": 480,
+          "height": 160
+        },
+        "caption": "Palette acte I",
+        "folder": "ambiances"
+      },
+      {
+        "image": {
+          "kind": "swatches",
+          "colors": [
+            [
+              60,
+              80,
+              100
+            ],
+            [
+              180,
+              190,
+              200
+            ],
+            [
+              230,
+              235,
+              240
+            ]
+          ],
+          "width": 480,
+          "height": 160
+        },
+        "caption": "Palette acte II",
+        "folder": "ambiances"
+      },
+      {
+        "image": {
+          "kind": "swatches",
+          "colors": [
+            [
+              240,
+              220,
+              160
+            ],
+            [
+              120,
+              150,
+              200
+            ],
+            [
+              255,
+              255,
+              255
+            ]
+          ],
+          "width": 480,
+          "height": 160
+        },
+        "caption": "Palette acte III",
+        "folder": "ambiances"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            200,
+            205,
+            210
+          ],
+          "ground": [
+            190,
+            195,
+            200
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Brume de lait",
+        "folder": "brumes"
+      },
+      {
+        "image": {
+          "kind": "landscape",
+          "sky": [
+            150,
+            160,
+            170
+          ],
+          "ground": [
+            120,
+            130,
+            140
+          ],
+          "width": 480,
+          "height": 320
+        },
+        "caption": "Brume d'orage",
+        "folder": "brumes"
+      },
+      {
+        "image": {
+          "kind": "swatches",
+          "colors": [
+            [
+              120,
+              150,
+              200
+            ],
+            [
+              230,
+              235,
+              245
+            ]
+          ],
+          "width": 300,
+          "height": 300
+        },
+        "caption": "Fleur de sel bleue (essai)"
+      }
+    ]
+  },
+  "notes": {
+    "folders": [
+      {
+        "key": "ecriture",
+        "name": "Écriture"
+      },
+      {
+        "key": "monde",
+        "name": "Monde"
+      },
+      {
+        "key": "production",
+        "name": "Production"
+      },
+      {
+        "key": "personnages",
+        "name": "Personnages",
+        "parent": "ecriture"
+      }
+    ],
+    "notes": [
+      {
+        "key": "mode-emploi",
+        "title": "À lire d'abord : ce projet d'exemple",
+        "pinned": true
+      },
+      {
+        "key": "intentions",
+        "title": "Ce que le film raconte vraiment",
+        "folder": "ecriture",
+        "pinned": true
+      },
+      {
+        "key": "structure",
+        "title": "Structure en trois actes",
+        "folder": "ecriture"
+      },
+      {
+        "key": "maelle",
+        "title": "Maëlle : l'arc de la voix",
+        "folder": "personnages"
+      },
+      {
+        "key": "dame",
+        "title": "La Dame : ni monstre ni sainte",
+        "folder": "personnages"
+      },
+      {
+        "key": "saunerie",
+        "title": "Le métier de saunière",
+        "folder": "monde"
+      },
+      {
+        "key": "regles",
+        "title": "Règles de la magie des feux",
+        "folder": "monde"
+      },
+      {
+        "key": "chronologie",
+        "title": "Chronologie de l'île",
+        "folder": "monde"
+      },
+      {
+        "key": "casting",
+        "title": "Casting envisagé",
+        "folder": "production"
+      },
+      {
+        "key": "budget",
+        "title": "Budget et contraintes",
+        "folder": "production"
+      },
+      {
+        "key": "questions",
+        "title": "Questions ouvertes",
+        "folder": "ecriture"
+      }
+    ],
+    "stickies": [
+      {
+        "text": "La brume = la culpabilité de Maëlle ?",
+        "color": "blue",
+        "x": 40,
+        "y": 40
+      },
+      {
+        "text": "Couper le flash-back de la lande si le film dépasse 1 h 50",
+        "color": "orange",
+        "x": 300,
+        "y": 40
+      },
+      {
+        "text": "Un seul plan sur Danet seul : dans le bateau, à la fin",
+        "color": "yellow",
+        "x": 560,
+        "y": 40
+      },
+      {
+        "text": "Klervi doit voir les Morgans AVANT tout le monde",
+        "color": "pink",
+        "x": 40,
+        "y": 220
+      },
+      {
+        "text": "Chant : 7 notes, pas plus",
+        "color": "green",
+        "x": 300,
+        "y": 220
+      },
+      {
+        "text": "Tourner la Chaussée en studio (bassin) ?",
+        "color": "purple",
+        "x": 560,
+        "y": 220
+      },
+      {
+        "text": "Jos ne suit pas Danet : le montrer",
+        "color": "yellow",
+        "x": 40,
+        "y": 400
+      },
+      {
+        "text": "Anna guérit quand le sel est rendu",
+        "color": "green",
+        "x": 300,
+        "y": 400
+      },
+      {
+        "text": "Page arrachée du carnet : qui l'a ?",
+        "color": "pink",
+        "x": 560,
+        "y": 400
+      },
+      {
+        "text": "Titre anglais : The Salt Lanterns",
+        "color": "blue",
+        "x": 820,
+        "y": 40
+      },
+      {
+        "text": "Durée visée : 1 h 45",
+        "color": "orange",
+        "x": 820,
+        "y": 220
+      }
+    ],
+    "systemNotes": false
+  },
+  "plot": {
+    "version": 1,
+    "lanes": [
+      {
+        "id": "maelle",
+        "name": "Maëlle et son frère",
+        "color": "#b5523b",
+        "main": true,
+        "hidden": false,
+        "characterId": "@char:maelle"
+      },
+      {
+        "id": "feux",
+        "name": "Les sept feux",
+        "color": "#c9a227",
+        "main": false,
+        "hidden": false,
+        "characterId": "@char:gwen"
+      },
+      {
+        "id": "compagnie",
+        "name": "La Compagnie",
+        "color": "#3d4a5c",
+        "main": false,
+        "hidden": false,
+        "characterId": "@char:danet"
+      },
+      {
+        "id": "passe",
+        "name": "1910 : le pacte",
+        "color": "#6b8e7f",
+        "main": false,
+        "hidden": false,
+        "characterId": "@char:soazig"
+      }
+    ],
+    "events": [
+      {
+        "id": "h1",
+        "laneId": "passe",
+        "row": -3,
+        "title": "Le pacte de Soazig",
+        "note": "Soazig échange une vie contre celle de Jakez.",
+        "pivot": true,
+        "status": "revised",
+        "tags": [
+          "passé"
+        ],
+        "characterIds": [
+          "@char:soazig",
+          "@char:dame"
+        ],
+        "povId": null,
+        "locationId": "@loc:grotte",
+        "nodeId": "@node:s08",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "21 septembre 1910",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "magic",
+            "id": "@magic:pacte"
+          }
+        ]
+      },
+      {
+        "id": "h2",
+        "laneId": "passe",
+        "row": -2,
+        "title": "La veilleuse fêlée",
+        "note": "La troisième lanterne se fêle ; elle fume depuis.",
+        "pivot": false,
+        "status": "revised",
+        "tags": [
+          "passé"
+        ],
+        "characterIds": [
+          "@char:soazig"
+        ],
+        "povId": null,
+        "locationId": "@loc:phare",
+        "nodeId": "@node:s03",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "1931",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "id": "@item:veilleuses"
+          }
+        ]
+      },
+      {
+        "id": "h3",
+        "laneId": "passe",
+        "row": -1,
+        "title": "Pierrick en mer",
+        "note": "Le père de Maëlle disparaît près de la Chaussée.",
+        "pivot": false,
+        "status": "revised",
+        "tags": [
+          "passé"
+        ],
+        "characterIds": [
+          "@char:pierrick"
+        ],
+        "povId": null,
+        "locationId": "@loc:chaussee",
+        "nodeId": "@node:s09",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "1948",
+        "words": 0,
+        "entries": []
+      },
+      {
+        "id": "e1",
+        "laneId": "maelle",
+        "row": 0,
+        "title": "Yann ne rentre pas",
+        "note": "Le las planté dans la vase.",
+        "pivot": true,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:maelle",
+          "@char:loic",
+          "@char:yann"
+        ],
+        "povId": "@char:maelle",
+        "locationId": "@loc:marais",
+        "nodeId": "@node:s02",
+        "alsoNodeIds": [
+          "@node:s01"
+        ],
+        "noteIds": [],
+        "date": "21 septembre 1958",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "id": "@item:las"
+          }
+        ]
+      },
+      {
+        "id": "c1",
+        "laneId": "compagnie",
+        "row": 1,
+        "title": "Danet au conseil",
+        "note": "« La famille Kervran a déjà signé. »",
+        "pivot": true,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:danet",
+          "@char:jos",
+          "@char:morvan",
+          "@char:maelle"
+        ],
+        "povId": null,
+        "locationId": "@loc:bourg",
+        "nodeId": "@node:s04",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "faction",
+            "id": "@faction:compagnie"
+          },
+          {
+            "kind": "item",
+            "id": "@item:contrat"
+          }
+        ]
+      },
+      {
+        "id": "f1",
+        "laneId": "feux",
+        "row": 2,
+        "title": "Six feux",
+        "note": "Les anguilles de brume éteignent la troisième lanterne.",
+        "pivot": false,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:maelle",
+          "@char:gwen",
+          "@char:dame"
+        ],
+        "povId": "@char:maelle",
+        "locationId": "@loc:phare",
+        "nodeId": "@node:s07",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "species",
+            "id": "@species:anguilles"
+          }
+        ]
+      },
+      {
+        "id": "e2",
+        "laneId": "maelle",
+        "row": 3,
+        "title": "La lettre de Yann",
+        "note": "Il a vendu pour qu'ils partent.",
+        "pivot": false,
+        "status": "written",
+        "tags": [],
+        "characterIds": [
+          "@char:maelle",
+          "@char:gwen"
+        ],
+        "povId": null,
+        "locationId": "@loc:phare",
+        "nodeId": "@node:s08",
+        "alsoNodeIds": [],
+        "noteIds": [
+          "@note:questions"
+        ],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "item",
+            "id": "@item:lettre-yann"
+          }
+        ]
+      },
+      {
+        "id": "e3",
+        "laneId": "maelle",
+        "row": 4,
+        "title": "Le souvenir du père",
+        "note": "Écouter la mer dans la pierre.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:maelle",
+          "@char:pierrick"
+        ],
+        "povId": null,
+        "locationId": "@loc:lande",
+        "nodeId": "@node:s09",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": []
+      },
+      {
+        "id": "e4",
+        "laneId": "maelle",
+        "row": 5,
+        "title": "La grotte",
+        "note": "Tout ce que la mer a pris.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:maelle",
+          "@char:loic"
+        ],
+        "povId": null,
+        "locationId": "@loc:grotte",
+        "nodeId": "@node:s10",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "species",
+            "id": "@species:algue"
+          }
+        ]
+      },
+      {
+        "id": "e5",
+        "laneId": "maelle",
+        "row": 6,
+        "title": "Le marché de la Dame",
+        "note": "Yann contre les marais.",
+        "pivot": true,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:maelle",
+          "@char:dame",
+          "@char:loic"
+        ],
+        "povId": null,
+        "locationId": "@loc:grotte",
+        "nodeId": "@node:s11",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "magic",
+            "id": "@magic:pacte"
+          }
+        ]
+      },
+      {
+        "id": "c2",
+        "laneId": "compagnie",
+        "row": 6,
+        "title": "Danet fait murer la digue",
+        "note": "Il veut l'usine avant la grande marée.",
+        "pivot": false,
+        "status": "idea",
+        "tags": [],
+        "characterIds": [
+          "@char:danet",
+          "@char:jos"
+        ],
+        "povId": null,
+        "locationId": "@loc:usine",
+        "nodeId": null,
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": []
+      },
+      {
+        "id": "f2",
+        "laneId": "feux",
+        "row": 7,
+        "title": "Un seul feu",
+        "note": "Il ne reste qu'une lanterne la nuit de la septième marée.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:gwen"
+        ],
+        "povId": null,
+        "locationId": "@loc:phare",
+        "nodeId": "@node:s12",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": []
+      },
+      {
+        "id": "e6",
+        "laneId": "maelle",
+        "row": 8,
+        "title": "Les Noyés se retournent",
+        "note": "Maëlle dit leurs noms.",
+        "pivot": false,
+        "status": "draft",
+        "tags": [],
+        "characterIds": [
+          "@char:maelle",
+          "@char:pierrick",
+          "@char:yann"
+        ],
+        "povId": null,
+        "locationId": "@loc:chaussee",
+        "nodeId": "@node:s12",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "people",
+            "id": "@people:noyes"
+          }
+        ]
+      },
+      {
+        "id": "e7",
+        "laneId": "maelle",
+        "row": 9,
+        "title": "Le chant seul",
+        "note": "Les sept feux se rallument ; Yann revient.",
+        "pivot": true,
+        "status": "idea",
+        "tags": [],
+        "characterIds": [
+          "@char:maelle",
+          "@char:yann"
+        ],
+        "povId": null,
+        "locationId": "@loc:chaussee",
+        "nodeId": "@node:s13",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": [
+          {
+            "kind": "magic",
+            "id": "@magic:chant"
+          },
+          {
+            "kind": "people",
+            "id": "@people:prophetie"
+          }
+        ]
+      },
+      {
+        "id": "c3",
+        "laneId": "compagnie",
+        "row": 10,
+        "title": "Danet repart",
+        "note": "Son contrat ne vaut plus rien : la moitié des marais est à la mer.",
+        "pivot": false,
+        "status": "idea",
+        "tags": [],
+        "characterIds": [
+          "@char:danet",
+          "@char:jos"
+        ],
+        "povId": null,
+        "locationId": "@loc:port",
+        "nodeId": "@node:s14",
+        "alsoNodeIds": [],
+        "noteIds": [],
+        "date": "",
+        "words": 0,
+        "entries": []
+      }
+    ],
+    "links": [
+      {
+        "id": "k1",
+        "from": "h1",
+        "to": "e5",
+        "kind": "influence",
+        "label": "le pacte",
+        "note": "La Dame se souvient de Soazig."
+      },
+      {
+        "id": "k2",
+        "from": "h3",
+        "to": "e6",
+        "kind": "influence",
+        "label": "le père",
+        "note": ""
+      },
+      {
+        "id": "k3",
+        "from": "e1",
+        "to": "e2",
+        "kind": "impact",
+        "label": "la disparition",
+        "note": ""
+      },
+      {
+        "id": "k4",
+        "from": "c1",
+        "to": "e2",
+        "kind": "impact",
+        "label": "la vente",
+        "note": "Maëlle comprend que Yann a signé."
+      },
+      {
+        "id": "k5",
+        "from": "f1",
+        "to": "f2",
+        "kind": "impact",
+        "label": "les feux s'éteignent",
+        "note": ""
+      },
+      {
+        "id": "k6",
+        "from": "e5",
+        "to": "e6",
+        "kind": "impact",
+        "label": "le refus",
+        "note": "Maëlle refuse le marché et va sur la Chaussée."
+      },
+      {
+        "id": "k7",
+        "from": "e7",
+        "to": "c3",
+        "kind": "impact",
+        "label": "les marais rendus",
+        "note": ""
+      },
+      {
+        "id": "k8",
+        "from": "e3",
+        "to": "e7",
+        "kind": "meeting",
+        "label": "écouter",
+        "note": "Le geste du père revient au moment du chant."
+      }
+    ],
+    "rowLabels": {
+      "-3": "1910",
+      "-2": "1931",
+      "-1": "1948",
+      "0": "21 septembre 1958",
+      "4": "22 septembre",
+      "8": "23 septembre",
+      "10": "Un an plus tard"
+    },
+    "acts": {
+      "0": "I. L'île",
+      "2": "II. La brume",
+      "8": "III. La grande marée"
+    },
+    "tension": {
+      "-3": 4,
+      "0": 5,
+      "1": 4,
+      "2": 6,
+      "3": 5,
+      "4": 3,
+      "5": 7,
+      "6": 8,
+      "7": 8,
+      "8": 9,
+      "9": 10,
+      "10": 2
+    },
+    "readingOrder": [],
+    "readingFollowsStructure": true,
+    "questions": [
+      {
+        "id": "q1",
+        "text": "Montrer la Dame dès l'acte I ?",
+        "done": false,
+        "eventId": "f1"
+      },
+      {
+        "id": "q2",
+        "text": "Danet doit-il assister au chant ?",
+        "done": true,
+        "eventId": "c3"
+      }
+    ],
+    "mysteries": [
+      {
+        "id": "y1",
+        "question": "Où est Yann ?",
+        "status": "solved",
+        "answer": "Sur la Chaussée, avec les Noyés.",
+        "payoff": "Il se retourne quand Maëlle dit son nom.",
+        "payoffEventId": "e6"
+      },
+      {
+        "id": "y2",
+        "question": "Qui a signé la vente ?",
+        "status": "solved",
+        "answer": "Yann, pour qu'ils puissent partir.",
+        "payoff": "La lettre sous l'oreiller.",
+        "payoffEventId": "e2"
+      },
+      {
+        "id": "y3",
+        "question": "Qui est la Dame ?",
+        "status": "solved",
+        "answer": "La première saunière, noyée par les Gardiens du feu.",
+        "payoff": "Elle le dit dans la grotte.",
+        "payoffEventId": "e5"
+      },
+      {
+        "id": "y4",
+        "question": "Qui a arraché la page du carnet ?",
+        "status": "open",
+        "answer": "",
+        "payoff": "",
+        "payoffEventId": null
+      }
+    ],
+    "clues": [
+      {
+        "id": "i1",
+        "text": "Le las planté droit, face à la Chaussée.",
+        "eventId": "e1",
+        "mysteryId": "y1"
+      },
+      {
+        "id": "i2",
+        "text": "« La famille Kervran a déjà signé. »",
+        "eventId": "c1",
+        "mysteryId": "y2"
+      },
+      {
+        "id": "i3",
+        "text": "Klervi : « Ils ont demandé où était Yann. »",
+        "eventId": "f1",
+        "mysteryId": "y1"
+      },
+      {
+        "id": "i4",
+        "text": "« Avant qu'on me noie pour un œillet. »",
+        "eventId": "e5",
+        "mysteryId": "y3"
+      }
+    ],
+    "goal": 0,
+    "templates": [
+      {
+        "id": "t1",
+        "name": "Conte en trois actes",
+        "steps": [
+          "Monde ordinaire",
+          "Perte",
+          "Appel",
+          "Refus",
+          "Mentor",
+          "Épreuves",
+          "Caverne",
+          "Sacrifice",
+          "Retour"
+        ]
+      }
+    ],
+    "sceneOrder": {}
+  },
+  "film": {
+    "logline": "Sur une île bretonne, une saunière doit rallumer les sept feux du phare avant la grande marée pour que la mer lui rende son frère.",
+    "runtimeGoal": 105,
+    "writer": "Nolwenn Kerhervé"
+  },
+  "versions": [
+    {
+      "kind": "synopsis",
+      "item": "default",
+      "name": "Synopsis envoyé au producteur",
+      "then": "synopsis-v1"
+    },
+    {
+      "kind": "structureNode",
+      "item": "@node:s01",
+      "name": "Premier jet de la scène 1"
+    }
+  ],
+  "trash": [
+    "@note:questions"
+  ],
+  "journal": [
+    {
+      "action": "created",
+      "kind": "structureNode",
+      "item": "@node:s14",
+      "label": "Le sel rendu"
+    },
+    {
+      "action": "updated",
+      "kind": "structureNode",
+      "item": "@node:s07",
+      "label": "La troisième lanterne"
+    }
+  ],
+  "workDays": [
+    {
+      "day": "2026-10-01",
+      "actions": 12,
+      "minutes": 45,
+      "words": 0
+    },
+    {
+      "day": "2026-10-02",
+      "actions": 20,
+      "minutes": 80,
+      "words": 0
+    },
+    {
+      "day": "2026-10-05",
+      "actions": 8,
+      "minutes": 30,
+      "words": 0
+    },
+    {
+      "day": "2026-10-06",
+      "actions": 31,
+      "minutes": 120,
+      "words": 0
+    },
+    {
+      "day": "2026-10-07",
+      "actions": 25,
+      "minutes": 95,
+      "words": 0
+    },
+    {
+      "day": "2026-10-09",
+      "actions": 14,
+      "minutes": 50,
+      "words": 0
+    },
+    {
+      "day": "2026-10-12",
+      "actions": 40,
+      "minutes": 150,
+      "words": 0
+    },
+    {
+      "day": "2026-10-13",
+      "actions": 22,
+      "minutes": 70,
+      "words": 0
+    },
+    {
+      "day": "2026-10-15",
+      "actions": 18,
+      "minutes": 60,
+      "words": 0
+    },
+    {
+      "day": "2026-10-16",
+      "actions": 35,
+      "minutes": 130,
+      "words": 0
+    },
+    {
+      "day": "2026-10-19",
+      "actions": 9,
+      "minutes": 25,
+      "words": 0
+    },
+    {
+      "day": "2026-10-20",
+      "actions": 27,
+      "minutes": 100,
+      "words": 0
+    }
+  ]
+}

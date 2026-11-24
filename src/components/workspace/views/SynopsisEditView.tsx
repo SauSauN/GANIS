@@ -6,7 +6,8 @@ import { errorText } from "@/lib/errors";
 import { useTranslation } from "react-i18next";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Loader2, Plus, RefreshCw, Save, X } from "lucide-react";
+import { Plus, RefreshCw, Save, X } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -481,7 +482,7 @@ export function SynopsisEditView({
             onClick={() => void handleSave()}
             disabled={saving || loading || !synopsis}
           >
-            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" /> : <Save className="mr-2 h-4 w-4" aria-hidden="true" />}
+            {saving ? <LoadingDots className="mr-2 h-4 w-4" aria-hidden="true" /> : <Save className="mr-2 h-4 w-4" aria-hidden="true" />}
 
             {t("common:actions.save")}
           </Button>

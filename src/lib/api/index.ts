@@ -11,6 +11,7 @@ import { glossaryApi } from "./glossary";
 import { sheetsApi } from "./sheets";
 import { projectImagesApi } from "./projectImages";
 import { imageFramesApi } from "./imageFrames";
+import { arcsBoardsApi } from "./arcsBoards";
 
 export { ApiError, isTauri, translateApiError } from "./client";
 
@@ -31,4 +32,5 @@ export const api = {
   ...sheetsApi,
   ...projectImagesApi,
   ...imageFramesApi,
+  ...arcsBoardsApi,
 };

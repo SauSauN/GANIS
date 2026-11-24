@@ -9,9 +9,10 @@ import { GALLERY_MAX_SIDE, PortraitError, preparePortrait } from "@/lib/portrait
 import { useLocationStore } from "@/stores/locationStore";
 import type { LocationImage } from "@/types";
 import { errorText } from "@/lib/errors";
+import { sessionMap } from "@/lib/sessionCache";
 
 /** Images déjà chargées (par identifiant), gardées le temps de la session. */
-const urlCache = new Map<string, string>();
+const urlCache = sessionMap<string, string>();
 
 /** Images en cours de chargement : pas de demande en double. */
 const inflight = new Set<string>();

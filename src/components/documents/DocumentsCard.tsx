@@ -10,7 +10,6 @@ import {
   FilePlus2,
   FolderInput,
   History,
-  Loader2,
   MessageSquareText,
   Paperclip,
   PencilLine,
@@ -18,6 +17,7 @@ import {
   Trash2,
   Upload,
 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { SelectionBar, SelectionCheckbox } from "@/components/common/SelectionBar";
 import { ActionMenu, type MenuItem } from "@/components/documents/ActionMenu";
 import { DocumentIcon } from "@/components/documents/DocumentIcon";
@@ -382,7 +382,7 @@ export function DocumentsCard({ projectId, nodeId, name, nodeOptions, readingOrd
 
           {busy && (
             <p role="status" className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" />
+              <LoadingDots className="size-4" />
               <span className="truncate">{busy}</span>
             </p>
           )}
@@ -402,7 +402,7 @@ export function DocumentsCard({ projectId, nodeId, name, nodeOptions, readingOrd
 
           {documents === null ? (
             <p className="flex items-center gap-2 text-sm text-muted-foreground" role="status">
-              <Loader2 className="size-4 animate-spin" />
+              <LoadingDots className="size-4" />
               {t("loading")}
             </p>
           ) : list.length === 0 ? (

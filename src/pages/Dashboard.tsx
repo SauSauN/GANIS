@@ -18,6 +18,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { GanixImportDialog } from "@/components/projects/GanixImportDialog";
+import { GANIX_OPENED_HERE } from "@/components/projects/GanixOpenListener";
 import { ProjectCard } from "@/components/projects/ProjectCard";
 import { ProjectTrashList } from "@/components/projects/ProjectTrashList";
 import { SpaceInfoDialog } from "@/components/projects/SpaceInfoDialog";
@@ -45,6 +46,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
+import { confirmGanixExport } from "@/lib/ganixExport";
 import { errorText } from "@/lib/errors";
 import { projectsInSpace, spaceOf } from "@/lib/projectSpace";
 import { showGuideOnce } from "@/lib/shortcuts";
@@ -283,6 +285,8 @@ export default function Dashboard() {
   /** Exporte un projet en `<nom du projet>.ganix`. */
   function handleExport(project: Project) {
     void run(project, async () => {
+      if (!(await confirmGanixExport(project))) return;
+
       const file = await api.exportProject(
         project.id,
         t("projects:ganix.export.dialogTitle"),
@@ -317,6 +321,26 @@ export default function Dashboard() {
     }
   }
 
+  /** `.ganix` ouvert par double-clic dans Windows : même aperçu que « Importer ». */
+  async function checkOpenedGanix() {
+    try {
+      const result = await api.takeOpenedGanix();
+      if (result) setPreview(result);
+    } catch (e) {
+      setActionError(errorText(e, "projects:ganix.import.failed"));
+    }
+  }
+
+  // À l'arrivée sur le tableau de bord (lancement par double-clic, après la
+  // connexion) et quand un fichier arrive pendant qu'il est affiché.
+  useEffect(() => {
+    void checkOpenedGanix();
+    const onOpened = () => void checkOpenedGanix();
+    window.addEventListener(GANIX_OPENED_HERE, onOpened);
+    return () => window.removeEventListener(GANIX_OPENED_HERE, onOpened);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [signedIn]);
+
   async function handleConfirmImport(mode: GanixImportMode) {
     if (!preview) return;
 
@@ -324,10 +348,10 @@ export default function Dashboard() {
 
     setPreview(null);
     setNotice(
-      outcome.backupFile
+      outcome.backup
         ? t("projects:ganix.import.replaced", {
             name: outcome.project.name,
-            file: outcome.backupFile,
+            backup: outcome.backup.name,
           })
         : t("projects:ganix.import.done", { name: outcome.project.name }),
     );

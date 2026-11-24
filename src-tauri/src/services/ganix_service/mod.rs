@@ -70,7 +70,7 @@ use crate::error::{AppError, AppResult};
 use crate::models::project::{Project, ProjectStatus, ProjectType};
 use crate::security::crypto::SecretKey;
 use crate::services::{project_service, project_storage};
-use crate::state::AppState;
+use crate::state::{AppState, Viewer};
 use crate::utils::{new_id, now_utc};
 use base64::Engine as _;
 use futures_util::TryStreamExt;

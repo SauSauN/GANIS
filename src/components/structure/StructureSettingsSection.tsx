@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Loader2 } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -77,7 +77,7 @@ export function StructureSettingsSection({ project }: { project: Project }) {
       </div>
     ) : (
       <p className="flex items-center gap-2 text-sm text-muted-foreground">
-        <Loader2 className="h-4 w-4 animate-spin" />
+        <LoadingDots className="h-4 w-4" />
         {t("plan.loading")}
       </p>
     );

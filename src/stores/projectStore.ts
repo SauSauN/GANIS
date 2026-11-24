@@ -1,6 +1,7 @@
 import i18n from "@/i18n";
 import { create } from "zustand";
 import { api, ApiError } from "@/lib/api";
+import { forgetSessionCaches } from "@/lib/sessionCache";
 import { useCharacterStore } from "@/stores/characterStore";
 import { useLocationStore } from "@/stores/locationStore";
 import { usePlaceLinkStore } from "@/stores/placeLinkStore";
@@ -317,7 +318,7 @@ export const useProjectStore =
 
         // Remplacement : les données gardées en mémoire pour ce projet sont
         // périmées et seront relues à la prochaine ouverture.
-        if (outcome.backupFile) {
+        if (outcome.backup) {
           useSynopsisStore.getState().reset();
           useProjectLogoStore.getState().reset();
           useCharacterStore.getState().reset();
@@ -333,12 +334,16 @@ export const useProjectStore =
           useSheetDisplayStore.getState().reset();
           useTrashStore.getState().reset();
           useToastStore.getState().clear();
+          forgetSessionCaches();
         }
 
         set((state) => ({
           projects: upsert(state.projects, outcome.project),
           error: null,
         }));
+
+        // La sauvegarde de l'ancienne version est dans la corbeille des projets.
+        if (outcome.backup) void get().fetchTrash();
 
         return outcome;
       },
@@ -483,6 +488,8 @@ export const useProjectStore =
         useSheetDisplayStore.getState().reset();
         useTrashStore.getState().reset();
         useToastStore.getState().clear();
+        // Caches d'images déchiffrées et autres stores inscrits (manga, série…).
+        forgetSessionCaches();
 
         set(initial);
       },

@@ -1,6 +1,7 @@
+import { StepperGroup } from "@/components/common/NumberStepper";
 import { useEffect, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { useTranslation } from "react-i18next";
-import { Minus, Plus, RotateCcw } from "lucide-react";
+import { RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { clampFrame, frameStyle, MAX_ZOOM, NEUTRAL_FRAME, normalizeFrame, panFrame, stepZoom, wheelZoomFactor, type ImageFrame } from "@/lib/imageFrame";
 import { cn } from "@/lib/utils";
@@ -159,42 +160,26 @@ export function FrameEditor({ url, frame, busy = false, onCancel, onSave }: Fram
           garde la même taille dans les deux modes. */}
       <div className={IMAGE_ACTIONS_CLASS}>
         {/* Zoom : − / pourcentage / +. Un clic sur le pourcentage revient à 100 %. */}
-        <div className="flex items-center rounded-md border" role="group" aria-label={t("image.zoom")}>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            className="rounded-r-none"
-            disabled={draft.zoom <= 1 + 1e-6}
-            aria-label={t("image.zoomOut")}
-            title={t("image.zoomOut")}
-            onClick={() => setDraft((current) => clampFrame({ ...current, zoom: stepZoom(current.zoom, -1) }))}
-          >
-            <Minus />
-          </Button>
+        <StepperGroup
+          label={t("image.zoom")}
+          minusLabel={t("image.zoomOut")}
+          plusLabel={t("image.zoomIn")}
+          minusDisabled={draft.zoom <= 1 + 1e-6}
+          plusDisabled={draft.zoom >= MAX_ZOOM - 1e-6}
+          onMinus={() => setDraft((current) => clampFrame({ ...current, zoom: stepZoom(current.zoom, -1) }))}
+          onPlus={() => setDraft((current) => clampFrame({ ...current, zoom: stepZoom(current.zoom, 1) }))}
+        >
           <button
             type="button"
             aria-label={t("image.zoomReset", { value: Math.round(draft.zoom * 100) })}
             title={t("image.zoomResetHint")}
             onClick={() => setDraft((current) => clampFrame({ ...current, zoom: 1 }))}
-            className="h-8 min-w-16 border-x px-2 text-sm tabular-nums transition-colors hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+            className="h-full w-full px-2 tabular-nums hover:bg-secondary focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
             data-testid="zoom-value"
           >
             {t("image.percent", { value: Math.round(draft.zoom * 100) })}
           </button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            className="rounded-l-none"
-            disabled={draft.zoom >= MAX_ZOOM - 1e-6}
-            aria-label={t("image.zoomIn")}
-            title={t("image.zoomIn")}
-            onClick={() => setDraft((current) => clampFrame({ ...current, zoom: stepZoom(current.zoom, 1) }))}
-          >
-            <Plus />
-          </Button>
-        </div>
+        </StepperGroup>
         <span className="flex-1" />
         <Button type="button" variant="ghost" size="sm" onClick={() => setDraft(NEUTRAL_FRAME)}>
           <RotateCcw />

@@ -4,7 +4,8 @@ import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { portraitFrameKey } from "@/lib/imageFrame";
 import { useImageFrame } from "@/stores/imageFrameStore";
-import { ChevronDown, ChevronRight, LayoutGrid, ListTree, Loader2, Plus, Search, Settings2, UserRound } from "lucide-react";
+import { ChevronDown, ChevronRight, LayoutGrid, ListTree, Plus, Search, Settings2, UserRound } from "lucide-react";
+import { LoadingDots } from "@/components/common/LoadingDots";
 import { ProfileCard } from "@/components/common/ProfileCard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -204,7 +205,7 @@ export function WorldListView({
           </div>
         ) : (
           <p className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+            <LoadingDots className="size-4" aria-hidden="true" />
             {t("list.loading")}
           </p>
         )}

@@ -157,8 +157,16 @@ pub fn verify_archive(path: &Path) -> AppResult<Manifest> {
     let index = read_index(&mut archive)?;
 
     for (name, expected) in &index.checksums.files {
-        let mut entry = archive.by_name(name).map_err(|e| damaged(format!("{name} : {e}")))?;
-        if &sha256_reader(&mut entry)? != expected {
+        let entry = archive.by_name(name).map_err(|e| damaged(format!("{name} : {e}")))?;
+        // Jamais plus que la taille annoncée (+1 pour détecter le mensonge) :
+        // une entrée qui se décompresse sans fin est arrêtée là.
+        let declared = entry.size();
+        let mut limited = CountingReader { inner: entry.take(declared.saturating_add(1)), count: 0 };
+        let hash = sha256_reader(&mut limited)?;
+        if limited.count != declared {
+            return Err(damaged(format!("CHECKSUM_MISMATCH : taille inattendue : {name}")));
+        }
+        if &hash != expected {
             return Err(damaged(format!("CHECKSUM_MISMATCH : {name}")));
         }
     }
@@ -166,3 +174,17 @@ pub fn verify_archive(path: &Path) -> AppResult<Manifest> {
     Ok(index.manifest)
 }
 
+
+/// Lecteur qui compte les octets lus.
+struct CountingReader<R> {
+    inner: R,
+    count: u64,
+}
+
+impl<R: Read> Read for CountingReader<R> {
+    fn read(&mut self, buf: &mut [u8]) -> std::io::Result<usize> {
+        let read = self.inner.read(buf)?;
+        self.count += read as u64;
+        Ok(read)
+    }
+}
